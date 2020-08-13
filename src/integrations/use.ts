@@ -45,11 +45,12 @@ export default function use(framework: any, agileInstance: Agile) {
     agileInstance.integration = finalIntegration;
 
     // If the Integration is ready call integration.bind()
-    if (agileInstance.integration.ready)
+    if (agileInstance.integration.ready) {
         if (agileInstance.integration.bind)
             agileInstance.integration.bind(agileInstance);
-        else
-            console.error('Pulse: Failed to integrate with framework! It\'s possible you didn\'t call Pulse.initFrameworkIntegration() before new Pulse.');
+        if (agileInstance.config.logJobs) console.log("Agile: Successfully integrated " + frameworkName);
+    } else
+        console.error('Pulse: Failed to integrate with framework! It\'s possible you didn\'t call Pulse.initFrameworkIntegration() before new Pulse.');
 }
 
 

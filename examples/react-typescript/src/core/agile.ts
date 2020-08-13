@@ -1,13 +1,16 @@
-import Agile from 'agile-framework';
 import React from "react";
+import Agile from 'agile-framework';
 
+
+console.log("Test");
 
 export const App = new Agile({
-    framework: React
+    framework: React,
+    logJobs: true
 });
 
-const TEST_STATE = App.State("Test");
-App.
+
+
 
 
 

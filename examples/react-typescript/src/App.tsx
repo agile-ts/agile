@@ -1,8 +1,14 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import {useAgile} from "agile-framework";
+import {TEST_STATE} from "./core";
 
 function App() {
+
+  // const [testState]: string[] = useAgile([TEST_STATE]);
+
+  console.log("Rerender ", TEST_STATE.value);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -17,6 +23,7 @@ function App() {
         >
           Learn React
         </a>
+
       </header>
     </div>
   );

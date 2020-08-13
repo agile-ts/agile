@@ -98,7 +98,7 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
         const tempAgileInstance = getAgileInstance(depsArray[0]);
         if (!tempAgileInstance) {
             console.error("Agile: Failed to get Agile Instance");
-            return undefined;
+            return [undefined];
         }
         agileInstance = tempAgileInstance;
     }
@@ -107,13 +107,13 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
     const React = agileInstance.integration?.frameworkConstructor;
     if (!React) {
         console.error("Agile: Failed to get Framework Constructor");
-        return undefined;
+        return [undefined];
     }
 
     // This is a Trigger State used to force the component to Re-render
     const [_, set_] = React.useState({});
 
-    React.useEffect(() => {
+    React.useEffect(function() {
         // Create a callback base subscription, Callback invokes re-render Trigger
         const subscriptionContainer = agileInstance?.subController.subscribeWithSubsArray(
             () => {
