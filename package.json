@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev": "tsc-watch"
   },
+  "types": "./dist/index.d.ts",
   "author": "BennoDev",
   "license": "ISC",
   "dependencies": {
