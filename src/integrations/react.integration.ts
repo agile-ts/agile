@@ -128,6 +128,10 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
     }, []);
 
     // Return Public Value of State
+    if(!Array.isArray(deps) && depsArray.length === 1)
+        return depsArray[0].getPublicValue();
+
+    // Return Public Value of State in Array
     return depsArray.map(dep => {
         return dep.getPublicValue();
     });

@@ -96,7 +96,7 @@ export default class Runtime {
     // Side Effect
     //=========================================================================================================
 
-    private sideEffects(state: State){
+    private sideEffects(state: State) {
 
     }
 
@@ -141,7 +141,7 @@ export default class Runtime {
             // If Component based subscription call the updateMethod which every framework has to define
             if (subscriptionContainer instanceof ComponentContainer)
                 if (this.agileInstance.integration?.updateMethod)
-                    this.agileInstance.integration?.updateMethod(subscriptionContainer.component, Runtime.formatChangedKeys(subscriptionContainer))
+                    this.agileInstance.integration?.updateMethod(subscriptionContainer.component, Runtime.formatChangedPropKeys(subscriptionContainer))
         });
 
         // Log Job
@@ -160,7 +160,7 @@ export default class Runtime {
      * @internal
      * Builds an object out of propKeysChanged in the SubscriptionContainer
      */
-    static formatChangedKeys(subscriptionContainer: SubscriptionContainer): { [key: string]: any } {
+    static formatChangedPropKeys(subscriptionContainer: SubscriptionContainer): { [key: string]: any } {
         const finalObject: { [key: string]: any } = {};
 
         // Build Object

@@ -86,8 +86,6 @@ function validateCustomFramework(customIntegration: Integration): boolean {
 function getFrameworkName(frameworkConstructor: any): string {
     let name: string = 'custom';
 
-    if (!frameworkConstructor) return name;
-
     // Check if framework is React
     if (frameworkConstructor.hasOwnProperty('__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED'))
         return 'react';

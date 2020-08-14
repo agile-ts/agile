@@ -1,17 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
+import logo from './logo.svg';
 import './App.css';
-import {useAgile} from "agile-framework";
-import {TEST_STATE} from "./core";
+import {useAgile} from 'agile-framework';
+import {Test} from "./core";
 
 function App() {
 
-  // const [testState]: string[] = useAgile([TEST_STATE]);
-
-  console.log("Rerender ", TEST_STATE.value);
+   // const [myState] = useAgile([MY_STATE]);
+    const [test, setTest] = useState(false);
 
   return (
     <div className="App">
       <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
@@ -21,9 +22,8 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+            {Test}
         </a>
-
       </header>
     </div>
   );
