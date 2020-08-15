@@ -61,7 +61,7 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 
         public updatedProps = this.props;
 
-        constructor(public props: any) {
+        constructor(props: any) {
             super(props);
 
             // Create HOC based Subscription with Array (Rerenders will here be caused via force Update)
@@ -162,6 +162,10 @@ const reactIntegration: Integration = {
     },
     updateMethod(componentInstance: any, updatedData: Object) {
         if (Object.keys(updatedData).length !== 0) {
+            // Update Props
+            componentInstance.updatedProps = {...componentInstance.updatedProps, ...updatedData};
+
+            // Set State
             componentInstance.setState(updatedData);
         } else {
             componentInstance.forceUpdate();
