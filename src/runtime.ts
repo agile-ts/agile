@@ -68,14 +68,14 @@ export default class Runtime {
 
         // Perform SideEffects
 
-        // Set Job as compoleted
+        // Set Job as completed
         this.completed.push(job);
 
         // Reset Current property
         this.current = null;
 
         // Logging
-        if (this.agileInstance.config.logJobs) console.log(`Completed Job: Name:${job.state.name}`, job);
+        if (this.agileInstance.config.logJobs) console.log(`Agile: Completed Job(${job.state.name})`, job);
 
         // Continue the Loop and perform the next job
         if (this.queue.length > 0) {
@@ -135,13 +135,16 @@ export default class Runtime {
         // Perform Component or Callback updates
         componentsToUpdate.forEach(subscriptionContainer => {
             // If Callback based subscription call the Callback Function
-            if (subscriptionContainer instanceof CallbackContainer)
+            if (subscriptionContainer instanceof CallbackContainer) {
                 subscriptionContainer.callback();
+                return;
+            }
 
             // If Component based subscription call the updateMethod which every framework has to define
-            if (subscriptionContainer instanceof ComponentContainer)
-                if (this.agileInstance.integration?.updateMethod)
-                    this.agileInstance.integration?.updateMethod(subscriptionContainer.component, Runtime.formatChangedPropKeys(subscriptionContainer))
+            if (this.agileInstance.integration?.updateMethod)
+                this.agileInstance.integration?.updateMethod(subscriptionContainer.component, Runtime.formatChangedPropKeys(subscriptionContainer));
+            else
+                console.warn("Agile: The framework which you are using doesn't provide an updateMethod so it might be possible that no rerender will be triggered")
         });
 
         // Log Job

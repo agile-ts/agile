@@ -20,7 +20,6 @@ export class ComponentContainer {
     public mappedPropStates?: { [key: string]: State };
     public propKeysChanged: Array<string> = [];  // Used to preserve local keys to update before update is performed, cleared every update
 
-    // General
     public ready: boolean = false;
     public subs: Set<State> = new Set<State>([]);
 
@@ -52,11 +51,17 @@ export class CallbackContainer extends ComponentContainer {
 //=========================================================================================================
 
 export default class SubController {
+    public agileInstance: Agile;
+
     // Component based Subscription
     public components: Set<ComponentContainer> = new Set();
 
     // Callback based Subscription
     public callbacks: Set<CallbackContainer> = new Set();
+
+    public constructor(agileInstance: Agile) {
+        this.agileInstance = agileInstance;
+    }
 
 
     //=========================================================================================================
@@ -65,9 +70,9 @@ export default class SubController {
     /**
      * Subscribe to Agile with a returned array of props this props can than passed trough the component (See react-integration)
      */
-    public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: State } = {}, agileInstance: Agile): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: State['value'] } } {
+    public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: State } = {}): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: State['value'] } } {
         // Register Component
-        const subscriptionContainer = this.registerComponent(subscriptionInstance, agileInstance);
+        const subscriptionContainer = this.registerSubscription(subscriptionInstance);
 
         const props: { [key: string]: State } = {};
         subscriptionContainer.passProps = true;
@@ -100,12 +105,10 @@ export default class SubController {
     //=========================================================================================================
     /**
      * Subscribe to Agile States
-     * @param integrationInstance - Either a CallbackContainer or a bound component instance
-     * @param subs - An Array of States
      */
-    public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<State> = [], agileInstance: Agile): SubscriptionContainer {
+    public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<State> = []): SubscriptionContainer {
         // Register Component
-        const subscriptionContainer = this.registerComponent(subscriptionInstance, agileInstance, subs);
+        const subscriptionContainer = this.registerSubscription(subscriptionInstance, subs);
 
         // Add subs to State Subs
         subs.forEach(state => {
@@ -150,7 +153,7 @@ export default class SubController {
     /**
      * Register the Component and create and return a component container
      */
-    public registerComponent(integrationInstance: any, agileInstance: Agile, subs: Array<State> = []): SubscriptionContainer {
+    public registerSubscription(integrationInstance: any, subs: Array<State> = []): SubscriptionContainer {
         // - Callback based Subscription
         if (typeof integrationInstance === 'function') {
             // Create CallbackContainer
@@ -159,7 +162,11 @@ export default class SubController {
             // Add to callbacks
             this.callbacks.add(callbackContainer);
 
+            // Set Ready
             callbackContainer.ready = true;
+
+            if (this.agileInstance.config.logJobs)
+                console.log("Agile: Registered Callback ", callbackContainer);
 
             return callbackContainer;
         }
@@ -174,8 +181,12 @@ export default class SubController {
         // Add to components
         this.components.add(componentContainer);
 
-        if (!agileInstance.config.waitForMount)
+        // Set Ready
+        if (!this.agileInstance.config.waitForMount)
             componentContainer.ready = true;
+
+        if (this.agileInstance.config.logJobs)
+            console.log("Agile: Registered Component ", componentContainer);
 
         return componentContainer;
     }

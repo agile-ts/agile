@@ -16,7 +16,7 @@ export default class Agile {
     public subController: SubController;
 
     constructor(public config: AgileConfig = {}) {
-        this.subController = new SubController();
+        this.subController = new SubController(this);
         this.runtime = new Runtime(this);
 
         // Init Framework

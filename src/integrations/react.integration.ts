@@ -2,7 +2,7 @@ import {State} from "../state";
 import Agile from "..";
 import {getAgileInstance, normalizeDeps} from "../utils";
 import {Integration} from "./use";
-import {ComponentContainer, SubscriptionContainer} from "../sub";
+import {SubscriptionContainer} from "../sub";
 
 
 //=========================================================================================================
@@ -56,12 +56,12 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 
             // Create HOC based Subscription with Array
             if (depsArray) {
-                agileInstance?.subController.subscribeWithSubsArray(this, depsArray, agileInstance);
+                agileInstance?.subController.subscribeWithSubsArray(this, depsArray);
             }
 
             // Create HOC based Subscription with Object
             if (depsObject) {
-                const response = agileInstance?.subController.subscribeWithSubsObject(this, depsObject, agileInstance);
+                const response = agileInstance?.subController.subscribeWithSubsObject(this, depsObject);
                 this.props = {
                     ...props,
                     ...response?.props
@@ -119,8 +119,7 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
             () => {
                 set_({});
             },
-            depsArray,
-            agileInstance
+            depsArray
         );
 
         // Unsubscribe on Unmount
@@ -147,7 +146,7 @@ const reactIntegration: Integration = {
     bind(agileInstance: Agile) {
         // Not sure if usePulse should get into the pulseInstance
         // pulseInstance.usePulse = (deps: Array<State>) => usePulse(deps, pulseInstance);
-        if (agileInstance.config.logJobs) console.log("Agile: Successfully binded React to Agile")
+        // if (agileInstance.config.logJobs) console.log("Agile: Successfully binded React to Agile")
     },
     updateMethod(componentInstance: any, updatedData: Object) {
         if (updatedData) {

@@ -78,7 +78,7 @@ export class State<ValueType = any> {
      */
     public type(type: any): this {
         const supportedConstructors = ['String', 'Boolean', 'Array', 'Object', 'Number'];
-        if (typeof type === 'function' && supportedConstructors.includes(type.name)) {
+        if (typeof type === 'function' && supportedConstructors.findIndex(supportedConstructor => supportedConstructor === type.name) !== -1) {
             this.valueType = type.name.toLowerCase();
         }
         return this;
