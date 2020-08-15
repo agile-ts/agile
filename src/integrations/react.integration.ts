@@ -19,53 +19,65 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 
         // Get Agile Instance
         if (!agileInstance) {
-            const tempAgileInstance = getAgileInstance(depsArray[0]);
-            if (!tempAgileInstance) {
-                console.error("Agile: Failed to get Agile Instance");
-                return undefined;
+            if (depsArray.length > 0) {
+                const tempAgileInstance = getAgileInstance(depsArray[0]);
+                agileInstance = tempAgileInstance || undefined;
+            } else {
+                console.error("Agile: Please don't pass an empty array!");
             }
-            agileInstance = tempAgileInstance;
         }
     } else if (typeof deps === "object") {
         depsObject = deps;
+
+        if (!agileInstance) {
+            const objectKeys = Object.keys(depsObject);
+            if (objectKeys.length > 0) {
+                const tempAgileInstance = getAgileInstance(depsObject[objectKeys[0]]);
+                agileInstance = tempAgileInstance || undefined;
+            } else {
+                console.error("Agile: Please don't pass an empty object!");
+            }
+        }
     } else {
         console.error("Agile: No Valid AgileHOC properties");
-        return undefined;
+        return ReactComponent;
     }
 
     // Check if agile Instance exists
     if (!agileInstance) {
         console.error("Agile: Failed to get Agile Instance");
-        return undefined;
+        return ReactComponent;
     }
 
     // Get React constructor
     const React = agileInstance.integration?.frameworkConstructor;
     if (!React) {
         console.error("Agile: Failed to get Framework Constructor");
-        return undefined;
+        return ReactComponent;
     }
 
     return class extends React.Component {
-        public props: any;
         public componentContainer: SubscriptionContainer | null = null; // Will be set in registerComponent
 
-        constructor(props: any) {
-            super(props);
-            this.props = props;
+        public updatedProps = this.props;
 
-            // Create HOC based Subscription with Array
-            if (depsArray) {
+        constructor(public props: any) {
+            super(props);
+
+            // Create HOC based Subscription with Array (Rerenders will here be caused via force Update)
+            if (depsArray)
                 agileInstance?.subController.subscribeWithSubsArray(this, depsArray);
-            }
 
             // Create HOC based Subscription with Object
             if (depsObject) {
                 const response = agileInstance?.subController.subscribeWithSubsObject(this, depsObject);
-                this.props = {
+                this.updatedProps = {
                     ...props,
                     ...response?.props
                 }
+
+                // Defines State for causing rerender (will be called in updateMethod)
+                this.state = depsObject;
             }
         }
 
@@ -79,7 +91,7 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
         }
 
         render() {
-            return React.createElement(ReactComponent, this.props);
+            return React.createElement(ReactComponent, this.updatedProps);
         }
     };
 }
@@ -98,7 +110,7 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
         const tempAgileInstance = getAgileInstance(depsArray[0]);
         if (!tempAgileInstance) {
             console.error("Agile: Failed to get Agile Instance");
-            return [undefined];
+            return undefined;
         }
         agileInstance = tempAgileInstance;
     }
@@ -107,13 +119,13 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
     const React = agileInstance.integration?.frameworkConstructor;
     if (!React) {
         console.error("Agile: Failed to get Framework Constructor");
-        return [undefined];
+        return undefined;
     }
 
     // This is a Trigger State used to force the component to Re-render
     const [_, set_] = React.useState({});
 
-    React.useEffect(function() {
+    React.useEffect(function () {
         // Create a callback base subscription, Callback invokes re-render Trigger
         const subscriptionContainer = agileInstance?.subController.subscribeWithSubsArray(
             () => {
@@ -127,7 +139,7 @@ export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
     }, []);
 
     // Return Public Value of State
-    if(!Array.isArray(deps) && depsArray.length === 1)
+    if (!Array.isArray(deps) && depsArray.length === 1)
         return depsArray[0].getPublicValue();
 
     // Return Public Value of State in Array
@@ -149,7 +161,7 @@ const reactIntegration: Integration = {
         // if (agileInstance.config.logJobs) console.log("Agile: Successfully binded React to Agile")
     },
     updateMethod(componentInstance: any, updatedData: Object) {
-        if (updatedData) {
+        if (Object.keys(updatedData).length !== 0) {
             componentInstance.setState(updatedData);
         } else {
             componentInstance.forceUpdate();
