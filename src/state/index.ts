@@ -1,6 +1,7 @@
 import Agile from "../agile";
 import {copy} from "../utils";
 import Dep from "./dep";
+import { reset } from "./helper";
 
 export class State<ValueType = any> {
 
@@ -9,7 +10,9 @@ export class State<ValueType = any> {
     public name?: string;
     public valueType?: string;
     public dep: Dep;
+    public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
+    public isSet: boolean = false; // Has been changed from initial value
 
     public set value(value: ValueType) {
         this._masterValue = value;
@@ -65,6 +68,7 @@ export class State<ValueType = any> {
             this.agileInstance.runtime.ingest(this, newState);
         }
 
+        this.isSet = newState !== this.initialState;
         return this;
     }
 
@@ -110,6 +114,70 @@ export class State<ValueType = any> {
 
 
     //=========================================================================================================
+    // Undo
+    //=========================================================================================================
+    /**
+     * Will set the state to the previous State
+     */
+    public undo() {
+        this.set(this.previousState);
+    }
+
+
+    //=========================================================================================================
+    // Reset
+    //=========================================================================================================
+    /**
+     * Will reset the state to the initial value
+     */
+    public reset(): this {
+        reset(this);
+        return this;
+    }
+
+
+    //=========================================================================================================
+    // Watch
+    //=========================================================================================================
+    /**
+     * Will always be called if the state changes
+     * @param key - The key of the watch method
+     * @param callback - The callback function
+     */
+    public watch(key: string, callback: (value: any) => void): this {
+        // Check if callback is a function  (js)
+        if (typeof callback !== 'function') {
+            console.error('A callback has to be a function');
+            return this;
+        }
+
+        // Check if key is a string (because its a key of an object) (js)
+        if (typeof key !== 'string') {
+            console.error('A key has to be a string');
+            return this;
+        }
+
+        // Add callback with key to watchers
+        this.watchers[key] = callback;
+
+        return this;
+    }
+
+
+    //=========================================================================================================
+    // Remove Watcher
+    //=========================================================================================================
+    /**
+     * Removes a watcher called after the key
+     * @param key - the key of the watcher function
+     */
+    public removeWatcher(key: number | string): this {
+        delete this.watchers[key];
+        return this;
+    }
+
+
+    //=========================================================================================================
     // Private Write
     //=========================================================================================================
     /**
@@ -121,6 +189,4 @@ export class State<ValueType = any> {
         this._masterValue = copy(value);
         this.nextState = copy(value);
     }
-
-
 }

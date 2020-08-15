@@ -15,7 +15,7 @@ export default class Runtime {
     private queue: Array<Job> = [];
     private completed: Array<Job> = [];
 
-    public foundState: Set<State> = new Set();
+    // public foundState: Set<State> = new Set();
 
     constructor(agileInstance: Agile) {
         this.agileInstance = agileInstance;
@@ -67,6 +67,7 @@ export default class Runtime {
         job.state.privateWrite(job.newStateValue);
 
         // Perform SideEffects
+        this.sideEffects(job.state);
 
         // Set Job as completed
         this.completed.push(job);
@@ -77,7 +78,7 @@ export default class Runtime {
         // Logging
         if (this.agileInstance.config.logJobs) console.log(`Agile: Completed Job(${job.state.name})`, job);
 
-        // Continue the Loop and perform the next job
+        // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
         if (this.queue.length > 0) {
             const performJob = this.queue.shift();
             if (performJob)
@@ -95,9 +96,18 @@ export default class Runtime {
     //=========================================================================================================
     // Side Effect
     //=========================================================================================================
-
+    /**
+     * @internal
+     * SideEffects are sideEffects of the perform function.. for instance the watchers
+     */
     private sideEffects(state: State) {
+        // Call Watchers
+        for (let watcher in state.watchers)
+            if (typeof state.watchers[watcher] === 'function')
+                state.watchers[watcher](state.getPublicValue());
 
+        // Ingest Dependencies of State
+        state.dep.deps.forEach((state) => this.ingest(state, undefined));
     }
 
 
@@ -121,8 +131,8 @@ export default class Runtime {
                     let localKey: string | null = null;
 
                     // Find the local Key for this update by comparing the State instance from this Job to the State instances in the mappedStates object
-                    for (let key in subscriptionContainer.mappedPropStates)
-                        if (subscriptionContainer.mappedPropStates[key] === job.state)
+                    for (let key in subscriptionContainer.propStates)
+                        if (subscriptionContainer.propStates[key] === job.state)
                             localKey = key;
 
                     // If matching key is found push it into the SubscriptionContainer
@@ -149,7 +159,7 @@ export default class Runtime {
 
         // Log Job
         if (this.agileInstance.config.logJobs && componentsToUpdate.size > 0)
-            console.log("Agile: Rendered Components ", componentsToUpdate);
+            console.log("Agile: Rerendered Components ", componentsToUpdate);
 
         // Reset completed Jobs
         this.completed = [];
@@ -168,8 +178,8 @@ export default class Runtime {
 
         // Build Object
         subscriptionContainer.propKeysChanged.forEach(changedKey => {
-            if (subscriptionContainer.mappedPropStates)
-                finalObject[changedKey] = subscriptionContainer.mappedPropStates[changedKey].value;
+            if (subscriptionContainer.propStates)
+                finalObject[changedKey] = subscriptionContainer.propStates[changedKey].value;
         });
 
         return finalObject;

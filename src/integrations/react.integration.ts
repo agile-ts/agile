@@ -161,6 +161,8 @@ const reactIntegration: Integration = {
         // if (agileInstance.config.logJobs) console.log("Agile: Successfully binded React to Agile")
     },
     updateMethod(componentInstance: any, updatedData: Object) {
+        // UpdatedData will be empty if the AgileHOC doesn't get an object as deps
+
         if (Object.keys(updatedData).length !== 0) {
             // Update Props
             componentInstance.updatedProps = {...componentInstance.updatedProps, ...updatedData};

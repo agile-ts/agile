@@ -17,7 +17,7 @@ export class ComponentContainer {
     public component: any;
 
     public passProps: boolean = false;
-    public mappedPropStates?: { [key: string]: State };
+    public propStates?: { [key: string]: State };
     public propKeysChanged: Array<string> = [];  // Used to preserve local keys to update before update is performed, cleared every update
 
     public ready: boolean = false;
@@ -76,7 +76,7 @@ export default class SubController {
 
         const props: { [key: string]: State } = {};
         subscriptionContainer.passProps = true;
-        subscriptionContainer.mappedPropStates = {...subs};
+        subscriptionContainer.propStates = {...subs};
 
         // Go through subs
         let localKeys = Object.keys(subs);
