@@ -132,7 +132,7 @@ export default class Runtime {
 
         // Map through completed Jobs
         this.completed.forEach(job =>
-            // Map through subs of the current Job
+            // Map through subs of the current Job State
             job.state.dep.subs.forEach(subscriptionContainer => {
                 // For a Container that require props to be passed
                 if (subscriptionContainer.passProps) {
@@ -160,7 +160,7 @@ export default class Runtime {
 
             // If Component based subscription call the updateMethod which every framework has to define
             if (this.agileInstance.integration?.updateMethod)
-                this.agileInstance.integration?.updateMethod(subscriptionContainer.component, Runtime.formatChangedPropKeys(subscriptionContainer));
+                this.agileInstance.integration?.updateMethod(subscriptionContainer.component, this.formatChangedPropKeys(subscriptionContainer));
             else
                 console.warn("Agile: The framework which you are using doesn't provide an updateMethod so it might be possible that no rerender will be triggered")
         });
@@ -181,7 +181,7 @@ export default class Runtime {
      * @internal
      * Builds an object out of propKeysChanged in the SubscriptionContainer
      */
-    static formatChangedPropKeys(subscriptionContainer: SubscriptionContainer): { [key: string]: any } {
+    public formatChangedPropKeys(subscriptionContainer: SubscriptionContainer): { [key: string]: any } {
         const finalObject: { [key: string]: any } = {};
 
         // Build Object
