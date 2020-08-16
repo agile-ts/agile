@@ -7,6 +7,7 @@ export interface AgileConfig {
     framework?: any
     logJobs?: boolean
     waitForMount?: boolean
+    storagePrefix?: string
 }
 
 export default class Agile {
