@@ -144,7 +144,7 @@ export class State<ValueType = any> {
      * @param key - The key of the watch method
      * @param callback - The callback function
      */
-    public watch(key: string, callback: (value: any) => void): this {
+    public watch(key: string, callback: (value: ValueType) => void): this {
         // Check if callback is a function  (js)
         if (typeof callback !== 'function') {
             console.error('A callback has to be a function');
@@ -171,7 +171,7 @@ export class State<ValueType = any> {
      * Removes a watcher called after the key
      * @param key - the key of the watcher function
      */
-    public removeWatcher(key: number | string): this {
+    public removeWatcher(key: string): this {
         delete this.watchers[key];
         return this;
     }
