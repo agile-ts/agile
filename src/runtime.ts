@@ -1,7 +1,7 @@
 import {State} from "./state";
 import Agile from "./agile";
 import {copy} from "./utils";
-import {CallbackContainer, ComponentContainer, SubscriptionContainer} from "./sub";
+import {CallbackContainer, SubscriptionContainer} from "./sub";
 
 export interface Job {
     state: State
@@ -66,7 +66,7 @@ export default class Runtime {
         // Write new value into the State
         job.state.privateWrite(job.newStateValue);
 
-        // Perform SideEffects
+        // Perform SideEffects like watcher functions
         this.sideEffects(job.state);
 
         // Set Job as completed
@@ -76,7 +76,8 @@ export default class Runtime {
         this.current = null;
 
         // Logging
-        if (this.agileInstance.config.logJobs) console.log(`Agile: Completed Job(${job.state.name})`, job);
+        if (this.agileInstance.config.logJobs)
+            console.log(`Agile: Completed Job(${job.state.name})`, job);
 
         // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
         if (this.queue.length > 0) {
@@ -119,6 +120,13 @@ export default class Runtime {
      * This will be update all Subscribers of complete jobs
      */
     private updateSubscribers(): void {
+        // Check if Agile has an integration because its useless to go trough this process without framework
+        // It won't happen anything because the state has no subs.. but this check here will maybe improve the performance by many states
+        if (!this.agileInstance.integration) {
+            this.completed = [];
+            return;
+        }
+
         // Components that has to be updated
         const componentsToUpdate: Set<SubscriptionContainer> = new Set<SubscriptionContainer>();
 
