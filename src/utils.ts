@@ -9,7 +9,7 @@ import Agile from "./agile";
  * Copy an array or object.. without any dependencies
  */
 export const copy = (val: any) => {
-    if (typeof val === 'object') val = { ...val };
+    if (typeof val === 'object') val = {...val};
     else if (Array.isArray(val)) val = [...val];
 
     return val;
@@ -17,7 +17,7 @@ export const copy = (val: any) => {
 
 
 //=========================================================================================================
-// Ingest
+// Normalize Deps
 //=========================================================================================================
 /**
  * Convert Dependencies into an array
