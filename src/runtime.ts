@@ -3,17 +3,23 @@ import Agile from "./agile";
 import {copy} from "./utils";
 import {CallbackContainer, SubscriptionContainer} from "./sub";
 
-export interface Job {
+export interface JobInterface {
     state: State
     newStateValue?: any
+    background?: boolean
+}
+
+export interface JobConfigInterface {
+    perform?: boolean
+    background?: boolean
 }
 
 export default class Runtime {
     public agileInstance: Agile;
 
-    private current: Job | null = null;
-    private queue: Array<Job> = [];
-    private completed: Array<Job> = [];
+    private current: JobInterface | null = null;
+    private queue: Array<JobInterface> = [];
+    private completed: Array<JobInterface> = [];
 
     // public foundState: Set<State> = new Set();
 
@@ -29,8 +35,12 @@ export default class Runtime {
      * @internal
      * Creates a Job out of the State and the new Value and add it to a queue
      */
-    public ingest(state: State, newStateValue?: any, perform: boolean = true): void {
-        let job: Job = {state, newStateValue};
+    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {}): void {
+        let job: JobInterface = {
+            state: state,
+            newStateValue: newStateValue,
+            background: options?.background
+        };
 
         // If the argument at the position 1 -> newState is undefined than take the next State
         // Have to do it so because you can also set the StateValue to undefined but there I don't want to take the nextState value
@@ -41,7 +51,7 @@ export default class Runtime {
         this.queue.push(job);
 
         // Perform the Job
-        if (perform) {
+        if (options?.perform) {
             const performJob = this.queue.shift();
             if (performJob)
                 this.perform(performJob);
@@ -56,7 +66,7 @@ export default class Runtime {
      * @internal
      * Perform a State Update
      */
-    private perform(job: Job): void {
+    private perform(job: JobInterface): void {
         // Set Current to Job
         this.current = job;
 
@@ -69,8 +79,9 @@ export default class Runtime {
         // Perform SideEffects like watcher functions
         this.sideEffects(job.state);
 
-        // Set Job as completed
-        this.completed.push(job);
+        // Set Job as completed (The deps and subs of completed jobs will be updated)
+        if (!job.background)
+            this.completed.push(job);
 
         // Reset Current property
         this.current = null;
