@@ -1,11 +1,13 @@
 import Agile from "../agile";
 import {State} from "./index";
 
-export interface StorageMethods {
+export interface StorageConfigInterface {
     async?: boolean;
-    get?: (key: string) => any;
-    set?: (key: string, value: any) => void;
-    remove?: (key: string) => void;
+    methods?: {
+        get: (key: string) => any;
+        set: (key: string, value: any) => void;
+        remove: (key: string) => void;
+    }
 }
 
 export default class Storage {
@@ -15,29 +17,31 @@ export default class Storage {
     private storageReady: boolean = false;
     private storageType: 'localStorage' | 'custom' = 'localStorage';
     private storagePrefix: string = 'agile';
-    private storageMethods: StorageMethods;
+    private storageConfig: StorageConfigInterface;
 
     public persistedStates: Set<State> = new Set();
 
-    constructor(agileInstance: Agile, storageMethods: StorageMethods) {
+    constructor(agileInstance: Agile, storageConfig: StorageConfigInterface) {
         this.agileInstance = agileInstance;
-        this.storageMethods = storageMethods;
+        this.storageConfig = storageConfig;
 
         // Set custom Storage prefix
         if (agileInstance.config.storagePrefix)
             this.storagePrefix = agileInstance.config.storagePrefix;
 
         // Set custom Storage functions
-        if (storageMethods.get || storageMethods.set || storageMethods.remove)
+        if (storageConfig.methods)
             this.storageType = 'custom';
 
-        // Instantiate Storage
+        if (storageConfig.async) this.isAsync = true;
+
+        // Instantiate Custom Storage
         if (this.storageType === 'custom')
             this.instantiateCustomStorage()
-        else
-            this.instantiateLocalStorage()
 
-        if (storageMethods.async) this.isAsync = true;
+        // Instantiate Local Storage
+        if (this.storageType === 'localStorage')
+            this.instantiateLocalStorage()
     }
 
 
@@ -46,12 +50,19 @@ export default class Storage {
     //=========================================================================================================
 
     private instantiateLocalStorage() {
-        if (this.localStorageAvailable() && this.storagePrefix === 'localStorage') {
-            this.storageMethods.get = localStorage.getItem.bind(localStorage);
-            this.storageMethods.set = localStorage.setItem.bind(localStorage);
-            this.storageMethods.remove = localStorage.removeItem.bind(localStorage);
-            this.storageReady = true;
+        // Check if Local Storage is Available (For instance in ReactNative it doesn't exist)
+        if (!this.localStorageAvailable()) {
+            console.warn("Agile: Local Storage is here not available.. to use the Storage functionality please provide a custom Storage!");
+            return;
         }
+
+        // Set StorageMethods to LocalStorageMethods
+        this.storageConfig.methods = {
+            get: localStorage.getItem.bind(localStorage),
+            set: localStorage.setItem.bind(localStorage),
+            remove: localStorage.removeItem.bind(localStorage)
+        }
+        this.storageReady = true;
     }
 
 
@@ -60,15 +71,25 @@ export default class Storage {
     //=========================================================================================================
 
     private instantiateCustomStorage() {
-        if (
-            this.checkStorageFunction(this.storageMethods.get) &&
-            this.checkStorageFunction(this.storageMethods.set) &&
-            this.checkStorageFunction(this.storageMethods.remove)
-        ) {
-            this.storageReady = true;
-        } else {
-            console.warn("Some of your storage Methods aren't valid!");
+        // Check Get Function
+        if (!this.isValidStorageFunction(this.storageConfig.methods?.get)) {
+            console.error("Agile: Your GET StorageMethod isn't valid!");
+            return;
         }
+
+        // Check Set Function
+        if (!this.isValidStorageFunction(this.storageConfig.methods?.set)) {
+            console.error("Agile: Your SET StorageMethod isn't valid!");
+            return;
+        }
+
+        // Check Remove Function
+        if (!this.isValidStorageFunction(this.storageConfig.methods?.remove)) {
+            console.error("Agile: Your REMOVE StorageMethod isn't valid!");
+            return;
+        }
+
+        this.storageReady = true;
     }
 
 
@@ -77,32 +98,32 @@ export default class Storage {
     //=========================================================================================================
 
     public get(key: string) {
-        if (!this.storageReady || !this.storageMethods.get) return;
+        if (!this.storageReady || !this.storageConfig.methods?.get) return;
 
-        // Async get
-        if (this.isAsync) {
+        // Async Get
+        if (this.isAsync)
             return new Promise((resolve, reject) => {
                 // @ts-ignore
-                this.storageMethods
-                    .get(this.getKey(key))
+                this.storageConfig.methods
+                    .get(this.getStorageKey(key))
                     .then((res: any) => {
-                        // If result is no Json format return it
-                        if (typeof res !== 'string') return resolve(res);
+                        // If result is no Json
+                        if (!this.isJsonString(res))
+                            return resolve(res);
 
-                        // Format Json to object
+                        // Format Json to Object
                         resolve(JSON.parse(res));
                     })
                     .catch(reject);
             });
-        }
 
-        // Normal get
-        try {
-            return JSON.parse(this.storageMethods.get(this.getKey(key)));
-        } catch (error) {
-            console.warn("Agile: Something went wrong by parsing the storage value. Maybe you forgot to set the storage to async")
-            return undefined;
-        }
+        // Normal Get
+        if (this.isJsonString(this.storageConfig.methods.get(this.getStorageKey(key))))
+            return JSON.parse(this.storageConfig.methods.get(this.getStorageKey(key)));
+
+        // If the JsonString is not valid it might be a promise
+        console.warn("Agile: Something went wrong by parsing the storage value into json. Maybe you forgot to set the storage to async");
+        return undefined;
     }
 
 
@@ -111,8 +132,8 @@ export default class Storage {
     //=========================================================================================================
 
     public set(key: string, value: any) {
-        if (!this.storageReady || !this.storageMethods.set) return;
-        this.storageMethods.set(this.getKey(key), JSON.stringify(value));
+        if (!this.storageReady || !this.storageConfig.methods?.set) return;
+        this.storageConfig.methods.set(this.getStorageKey(key), JSON.stringify(value));
     }
 
 
@@ -121,8 +142,8 @@ export default class Storage {
     //=========================================================================================================
 
     public remove(key: string) {
-        if (!this.storageReady || !this.storageMethods.remove) return;
-        this.storageMethods.remove(this.getKey(key));
+        if (!this.storageReady || !this.storageConfig.methods?.remove) return;
+        this.storageConfig.methods.remove(this.getStorageKey(key));
     }
 
 
@@ -130,11 +151,11 @@ export default class Storage {
     // Helper
     //=========================================================================================================
 
-    private getKey(key: string) {
+    private getStorageKey(key: string) {
         return `_${this.storagePrefix}_${key}`;
     }
 
-    private checkStorageFunction(func: any) {
+    private isValidStorageFunction(func: any) {
         return typeof func === 'function';
     }
 
@@ -146,5 +167,14 @@ export default class Storage {
         } catch (e) {
             return false;
         }
+    }
+
+    private isJsonString(value: any) {
+        try {
+            JSON.parse(value);
+        } catch (e) {
+            return false;
+        }
+        return true;
     }
 }
