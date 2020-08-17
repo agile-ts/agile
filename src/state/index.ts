@@ -1,18 +1,18 @@
 import Agile from "../agile";
 import {copy} from "../utils";
 import Dep from "./dep";
-import { reset } from "./helper";
 
 export class State<ValueType = any> {
 
     public agileInstance: Agile;
 
     public name?: string;
-    public valueType?: string;
+    public valueType?: string; // primitive types for js users
     public dep: Dep;
     public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
+    public isPersistState: boolean = false; // Is saved in storage
 
     public set value(value: ValueType) {
         this._masterValue = value;
@@ -24,8 +24,8 @@ export class State<ValueType = any> {
 
     public initialState: ValueType;
     public _masterValue: ValueType;
-    public previousState: ValueType;
-    public nextState: ValueType;
+    public previousState: ValueType; // Will be set in runtime
+    public nextState: ValueType; // The next state if the newValue is undefined -> a backup value
 
     // public computeValue?: (newState?: ValueType) => ValueType;
 
@@ -54,19 +54,20 @@ export class State<ValueType = any> {
             return this;
         }
 
-        // check type if set and correct otherwise exit
-        if (this.valueType) {
-            console.warn(`Pulse: Error setting state: Incorrect type (${typeof newState}) was provided. Type fixed to ${this.valueType}`);
+        // Check Type is Correct
+        if (this.valueType && !this.isCorrectType(newState)) {
+            console.warn(`Agile: Incorrect type (${typeof newState}) was provided. Type fixed to ${this.valueType}`);
             return this;
         }
 
-        // Ingest update using most basic mutation method
-        if (options.background) {
-            this.privateWrite(newState);
-            if (this.sideEffects) this.sideEffects();
-        } else {
-            this.agileInstance.runtime.ingest(this, newState);
-        }
+        // Ingest update
+        this.agileInstance.runtime.ingest(this, newState, {
+            background: options.background
+        });
+
+        // Execute Side Effects
+        if (this.sideEffects)
+            this.sideEffects();
 
         this.isSet = newState !== this.initialState;
         return this;
@@ -78,13 +79,21 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
+     * This is thought for js users.. because ts users can set the type in <>
      * @param type - wished type of the state
      */
     public type(type: any): this {
-        const supportedConstructors = ['String', 'Boolean', 'Array', 'Object', 'Number'];
-        if (typeof type === 'function' && supportedConstructors.findIndex(supportedConstructor => supportedConstructor === type.name) !== -1) {
-            this.valueType = type.name.toLowerCase();
+        // Supported types
+        const supportedTypes = ['String', 'Boolean', 'Array', 'Object', 'Number'];
+
+        // Check if type is a supported Type
+        if (supportedTypes.findIndex(supportedType => supportedType === type.name) === -1) {
+            console.warn(`Agile: '${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`);
+            return this;
         }
+
+        // Set valueType
+        this.valueType = type.name.toLowerCase();
         return this;
     }
 
@@ -131,7 +140,12 @@ export class State<ValueType = any> {
      * Will reset the state to the initial value
      */
     public reset(): this {
-        reset(this);
+        // Remove State from Storage
+        if (this.isPersistState)
+            this.agileInstance.storage.remove(this.name || '');
+
+        // Set State to initial State
+        this.set(this.initialState);
         return this;
     }
 
@@ -188,5 +202,15 @@ export class State<ValueType = any> {
     public privateWrite(value: any) {
         this._masterValue = copy(value);
         this.nextState = copy(value);
+    }
+
+
+    //=========================================================================================================
+    // Helper
+    //=========================================================================================================
+
+    private isCorrectType(value: any): boolean {
+        let type: string = typeof value;
+        return type === this.valueType;
     }
 }
