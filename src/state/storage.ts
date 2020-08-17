@@ -2,11 +2,12 @@ import Agile from "../agile";
 import {State} from "./index";
 
 export interface StorageConfigInterface {
-    async?: boolean;
+    async?: boolean
+    storagePrefix?: string
     methods?: {
-        get: (key: string) => any;
-        set: (key: string, value: any) => void;
-        remove: (key: string) => void;
+        get: (key: string) => any
+        set: (key: string, value: any) => void
+        remove: (key: string) => void
     }
 }
 
@@ -26,8 +27,8 @@ export default class Storage {
         this.storageConfig = storageConfig;
 
         // Set custom Storage prefix
-        if (agileInstance.config.storagePrefix)
-            this.storagePrefix = agileInstance.config.storagePrefix;
+        if (storageConfig.storagePrefix)
+            this.storagePrefix = storageConfig.storagePrefix;
 
         // Set custom Storage functions
         if (storageConfig.methods)
