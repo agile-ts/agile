@@ -72,7 +72,7 @@ export default class Runtime {
         this.currentJob = job;
 
         // Set Previous State
-        job.state.previousState = copy(job.state._masterValue);
+        job.state.previousState = copy(job.state.value);
 
         // Write new value into the State
         job.state.privateWrite(job.newStateValue);
@@ -89,7 +89,7 @@ export default class Runtime {
 
         // Logging
         if (this.agileInstance.config.logJobs)
-            console.log(`Agile: Completed Job(${job.state.name})`, job);
+            console.log(`Agile: Completed Job(${job.state.key})`, job);
 
         // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
         if (this.jobQueue.length > 0) {
@@ -119,7 +119,7 @@ export default class Runtime {
         // Call Watchers
         for (let watcher in state.watchers)
             if (typeof state.watchers[watcher] === 'function')
-                state.watchers[watcher](state.getPublicValue());
+                state.watchers[watcher](state.value);
 
         // Call State SideEffects
         // this should not be used on root state class as it would be overwritten by extentions

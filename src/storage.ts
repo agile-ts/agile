@@ -1,5 +1,5 @@
-import Agile from "../agile";
-import {State} from "./index";
+import Agile from "./agile";
+import {State} from "./state";
 
 export interface StorageConfigInterface {
     async?: boolean

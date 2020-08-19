@@ -1,29 +1,22 @@
 import Agile from "../agile";
 import {copy} from "../utils";
 import Dep from "./dep";
+import {persistValue} from "./persist";
 
 export class State<ValueType = any> {
 
     public agileInstance: Agile;
 
-    public name?: string;
+    public _key?: string;
     public valueType?: string; // primitive types for js users
-    public dep: Dep;
+    public dep: Dep; // Includes the subscriptions and dependencies of the state
     public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
     public isPersistState: boolean = false; // Is saved in storage
 
-    public set value(value: ValueType) {
-        this._masterValue = value;
-    }
-
-    public get value(): ValueType {
-        return this._masterValue;
-    }
-
     public initialState: ValueType;
-    public _masterValue: ValueType;
+    public _value: ValueType; // The current value of the state
     public previousState: ValueType; // Will be set in runtime
     public nextState: ValueType; // The next state if the newValue is undefined -> a backup value
 
@@ -34,9 +27,25 @@ export class State<ValueType = any> {
         this.initialState = initialState;
         this.dep = new Dep(deps);
 
-        this._masterValue = initialState;
+        this._value = initialState;
         this.previousState = initialState;
         this.nextState = initialState;
+    }
+
+    public set value(value: ValueType) {
+        this._value = value;
+    }
+
+    public get value(): ValueType {
+        return this._value;
+    }
+
+    public set key(value: string | undefined) {
+        this._key = value;
+    }
+
+    public get key(): string | undefined {
+        return this._key;
     }
 
 
@@ -78,7 +87,6 @@ export class State<ValueType = any> {
     // Type
     //=========================================================================================================
     /**
-     * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
      * This is thought for js users.. because ts users can set the type in <>
      * @param type - wished type of the state
      */
@@ -99,25 +107,14 @@ export class State<ValueType = any> {
 
 
     //=========================================================================================================
-    // Get Public Value
+    // Set Key
     //=========================================================================================================
     /**
-     * Returns the Public Value of this state -> _masterValue
-     */
-    public getPublicValue(): ValueType {
-        return this._masterValue;
-    }
-
-
-    //=========================================================================================================
-    // Key
-    //=========================================================================================================
-    /**
-     * Will define the key of this state which will be outputted for instance in logs
+     * Will define the key of this state which will be outputted for instance in logs or used as storage key
      * @param key
      */
-    public key(key: string): this {
-        this.name = key;
+    public setKey(key: string): this {
+        this._key = key;
         return this;
     }
 
@@ -140,9 +137,9 @@ export class State<ValueType = any> {
      * Will reset the state to the initial value
      */
     public reset(): this {
-        // Remove State from Storage
+        // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
         if (this.isPersistState)
-            this.agileInstance.storage.remove(this.name || '');
+            this.agileInstance.storage.remove(this.key || '');
 
         // Set State to initial State
         this.set(this.initialState);
@@ -192,16 +189,33 @@ export class State<ValueType = any> {
 
 
     //=========================================================================================================
+    // Persist
+    //=========================================================================================================
+    /**
+     * Saves the state in the local storage or in a own configured storage
+     * @param key - the storage key
+     */
+    public persist(key?: string): this {
+        this.isPersistState = true;
+        persistValue(this, key);
+        return this;
+    }
+
+
+    //=========================================================================================================
     // Private Write
     //=========================================================================================================
     /**
      * @internal
      *  Will set a new _masterValue without causing a rerender
-     * @param value
      */
     public privateWrite(value: any) {
-        this._masterValue = copy(value);
+        this.value = copy(value);
         this.nextState = copy(value);
+
+        // Save changes in Storage
+        if (this.isPersistState && this.key)
+            this.agileInstance.storage.set(this.key, this.value);
     }
 
 

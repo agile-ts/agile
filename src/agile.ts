@@ -2,7 +2,7 @@ import Runtime from "./runtime";
 import use, {Integration} from "./integrations/use";
 import SubController from "./sub";
 import {State} from "./state";
-import Storage, {StorageConfigInterface} from "./state/storage";
+import Storage, {StorageConfigInterface} from "./storage";
 
 export interface AgileConfigInterface {
     framework?: any
@@ -63,7 +63,15 @@ export default class Agile {
      * @param storageConfig
      */
     public setStorage(storageConfig: StorageConfigInterface): void {
+        // Get States which are already saved into a storage
+        const persistedStates = this.storage.persistedStates;
+
+        // Define new Storage
         this.storage = new Storage(this, storageConfig);
+        this.storage.persistedStates = persistedStates;
+
+        // Save all already saved states into the new Storage
+        this.storage.persistedStates.forEach(state => state.persist(state.key));
     }
 
 
