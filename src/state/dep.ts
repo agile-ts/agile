@@ -2,9 +2,8 @@ import {SubscriptionContainer} from '../sub';
 import {State} from "./index";
 
 export default class Dep {
-    // static
-    public deps: Set<any> = new Set(); // Dependencies of a State
-    public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions of a State (In a render Component) (Set by integrations)
+    public deps: Set<any> = new Set(); // Dependencies from the State
+    public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions for instance a component subscribes to a state to get rerendered if the state changes
 
     constructor(initialDeps?: Array<Dep>) {
         if (!initialDeps) return;

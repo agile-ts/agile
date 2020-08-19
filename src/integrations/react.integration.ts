@@ -23,19 +23,20 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
                 const tempAgileInstance = getAgileInstance(depsArray[0]);
                 agileInstance = tempAgileInstance || undefined;
             } else {
-                console.error("Agile: Please don't pass an empty array!");
+                console.warn("Agile: Please don't pass an empty array!");
             }
         }
     } else if (typeof deps === "object") {
         depsObject = deps;
 
+        // Get Agile Instance
         if (!agileInstance) {
             const objectKeys = Object.keys(depsObject);
             if (objectKeys.length > 0) {
                 const tempAgileInstance = getAgileInstance(depsObject[objectKeys[0]]);
                 agileInstance = tempAgileInstance || undefined;
             } else {
-                console.error("Agile: Please don't pass an empty object!");
+                console.warn("Agile: Please don't pass an empty object!");
             }
         }
     } else {
@@ -57,7 +58,7 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
     }
 
     return class extends React.Component {
-        public componentContainer: SubscriptionContainer | null = null; // Will be set in registerComponent
+        public componentContainer: SubscriptionContainer | null = null; // Will be set in registerSubscription (sub.ts)
 
         public updatedProps = this.props;
 

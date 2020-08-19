@@ -16,12 +16,13 @@ export type SubscriptionContainer = ComponentContainer | CallbackContainer;
 export class ComponentContainer {
     public component: any;
 
+    // Only needed object orientated subscriptions
     public passProps: boolean = false;
-    public propStates?: { [key: string]: State };
+    public propStates?: { [key: string]: State }; // states which will than be returned as prop object by the integration
     public propKeysChanged: Array<string> = [];  // Used to preserve local keys to update before update is performed, cleared every update
 
     public ready: boolean = false;
-    public subs: Set<State> = new Set<State>([]);
+    public subs: Set<State> = new Set<State>([]); // States that are subscribed by this component
 
     constructor(component: any, subs?: Set<State>) {
         this.component = component
@@ -68,10 +69,9 @@ export default class SubController {
     // Subscribe with Subs Object
     //=========================================================================================================
     /**
-     * Subscribe to Agile with a returned array of props this props can than passed trough the component (See react-integration)
+     * Subscribe to Agile State with a returned object of props this props can than be returned by the component (See react-integration)
      */
     public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: State } = {}): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: State['value'] } } {
-        // Register Component
         const subscriptionContainer = this.registerSubscription(subscriptionInstance);
 
         const props: { [key: string]: State } = {};
@@ -86,10 +86,10 @@ export default class SubController {
             // Add State to SubscriptionContainer Subs
             subscriptionContainer.subs.add(state);
 
-            // Add SubscriptionContainer to State Dependencies Subs
+            // Add SubscriptionContainer to State Subs
             state.dep.subs.add(subscriptionContainer);
 
-            // Add state to prop
+            // Add state to props
             props[key] = state.value;
         });
 
@@ -104,13 +104,11 @@ export default class SubController {
     // Subscribe with Subs Array
     //=========================================================================================================
     /**
-     * Subscribe to Agile States
+     * Subscribe to Agile State
      */
     public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<State> = []): SubscriptionContainer {
-        // Register Component
         const subscriptionContainer = this.registerSubscription(subscriptionInstance, subs);
 
-        // Add subs to State Subs
         subs.forEach(state => {
             // Add State to SubscriptionContainer Subs
             subscriptionContainer.subs.add(state);
@@ -128,13 +126,12 @@ export default class SubController {
     //=========================================================================================================
     /**
      * Unsubscribe a component or callback
-     * @param subscriptionInstance - Either a CallbackContainer or a bound component instance
      */
     public unsubscribe(subscriptionInstance: any) {
         const unsub = (subscriptionContainer: CallbackContainer | ComponentContainer) => {
             subscriptionContainer.ready = false;
 
-            // Remove component container from subs dep
+            // Removes SubscriptionContainer from State subs
             subscriptionContainer.subs.forEach(state => {
                 state.dep.subs.delete(subscriptionInstance);
             });
@@ -148,16 +145,16 @@ export default class SubController {
 
 
     //=========================================================================================================
-    // Register Component
+    // Register Subscription
     //=========================================================================================================
     /**
-     * Register the Component and create and return a component container
+     * Registers the Component/Callback Subscription and returns a SubscriptionContainer
      */
     public registerSubscription(integrationInstance: any, subs: Array<State> = []): SubscriptionContainer {
         // - Callback based Subscription
         if (typeof integrationInstance === 'function') {
             // Create CallbackContainer
-            let callbackContainer = new CallbackContainer(integrationInstance as Function, new Set(subs));
+            const callbackContainer = new CallbackContainer(integrationInstance as Function, new Set(subs));
 
             // Add to callbacks
             this.callbacks.add(callbackContainer);
@@ -173,7 +170,7 @@ export default class SubController {
 
         // - Component based Subscription
         // Create Component Container
-        let componentContainer = new ComponentContainer(integrationInstance, new Set(subs));
+        const componentContainer = new ComponentContainer(integrationInstance, new Set(subs));
 
         // Instantiate the componentContainer in a Component (for instance see react.integration AgileHOC)
         integrationInstance.componentContainer = componentContainer;
@@ -196,7 +193,7 @@ export default class SubController {
     // Mount
     //=========================================================================================================
     /**
-     * Mounts currently only useful in Component based Subscription
+     * This will mount the component (Mounts currently only useful in Component based Subscription)
      */
     public mount(integrationInstance: any) {
         if (!integrationInstance.componentContainer) return;

@@ -98,7 +98,7 @@ export default class Storage {
     // Get
     //=========================================================================================================
 
-    public get(key: string) {
+    public get<GetType = any>(key: string): GetType | Promise<GetType> | undefined {
         if (!this.storageReady || !this.storageConfig.methods?.get) return;
 
         // Async Get
