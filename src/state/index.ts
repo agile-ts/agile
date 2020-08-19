@@ -22,11 +22,11 @@ export class State<ValueType = any> {
 
     // public computeValue?: (newState?: ValueType) => ValueType;
 
-    constructor(agileInstance: Agile, initialState: ValueType, deps: Array<Dep> = []) {
+    constructor(agileInstance: Agile, initialState: ValueType, key?: string, deps: Array<Dep> = []) {
         this.agileInstance = agileInstance;
         this.initialState = initialState;
         this.dep = new Dep(deps);
-
+        this._key = key;
         this._value = initialState;
         this.previousState = initialState;
         this.nextState = initialState;
@@ -58,8 +58,8 @@ export class State<ValueType = any> {
      */
     public set(newState?: ValueType, options: { background?: boolean } = {}): this {
         // Causes a rerender on this State without changing it
-        if (newState === undefined) {
-            this.agileInstance.runtime.ingest(this, undefined);
+        if (arguments[0] === undefined) {
+            this.agileInstance.runtime.ingest(this);
             return this;
         }
 
@@ -102,19 +102,6 @@ export class State<ValueType = any> {
 
         // Set valueType
         this.valueType = type.name.toLowerCase();
-        return this;
-    }
-
-
-    //=========================================================================================================
-    // Set Key
-    //=========================================================================================================
-    /**
-     * Will define the key of this state which will be outputted for instance in logs or used as storage key
-     * @param key
-     */
-    public setKey(key: string): this {
-        this._key = key;
         return this;
     }
 

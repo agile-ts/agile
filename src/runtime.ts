@@ -35,12 +35,26 @@ export default class Runtime {
      * @internal
      * Creates a Job out of State and new Value and than add it to a job queue
      */
-    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {perform: true}): void {
+    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {
+        perform: true,
+        background: false
+    }): void {
+        // Create Job
         const job: JobInterface = {
             state: state,
             newStateValue: newStateValue,
             background: options?.background
         };
+
+        // Merge default values into options
+        options = {...{perform: true, background: false}, ...options};
+
+        // Check if state value und newStateValue are the same.. if so return
+        if (state.value === newStateValue){
+            if (this.agileInstance.config.logJobs)
+                console.log("Agile: Doesn't perform job because state values are the same! ", job);
+            return;
+        }
 
         // If the argument at the position 1 -> newState is undefined than take the next State
         // Have to do it so because you can also set the StateValue to undefined but there I don't want to take the nextState value
@@ -55,7 +69,8 @@ export default class Runtime {
             const performJob = this.jobQueue.shift();
             if (performJob)
                 this.perform(performJob);
-            console.warn("Agile: Failed to perform Job ", job)
+            else
+                console.warn("Agile: No Job in queue ", job)
         }
     }
 

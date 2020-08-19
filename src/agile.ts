@@ -52,7 +52,7 @@ export default class Agile {
      * Create Pulse state
      * @param initialState Any - the value to initialize a State instance with
      */
-    public State = <T>(initialState: T) => new State<T>(this, initialState);
+    public State = <T>(initialState: T, key?: string) => new State<T>(this, initialState, key);
 
 
     //=========================================================================================================
