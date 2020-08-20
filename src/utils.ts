@@ -44,3 +44,25 @@ export function getAgileInstance(state: State): Agile | null {
 
     return null
 }
+
+
+//=========================================================================================================
+// Is Function
+//=========================================================================================================
+/**
+ * Checks if func is a function
+ */
+export function isFunction(func: () => any) {
+    return typeof func === 'function';
+}
+
+
+//=========================================================================================================
+// Is Async Function
+//=========================================================================================================
+/**
+ * Checks if func is a async function
+ */
+export function isAsyncFunction(func: () => any) {
+    return func.constructor.name === 'AsyncFunction';
+}
