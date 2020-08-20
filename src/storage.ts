@@ -4,7 +4,7 @@ import {isAsyncFunction, isFunction} from "./utils";
 
 export interface StorageConfigInterface {
     async?: boolean
-    storagePrefix?: string
+    prefix?: string
     methods?: {
         get: (key: string) => any
         set: (key: string, value: any) => void
@@ -28,8 +28,8 @@ export default class Storage {
         this.storageConfig = storageConfig;
 
         // Set custom Storage prefix
-        if (storageConfig.storagePrefix)
-            this.storagePrefix = storageConfig.storagePrefix;
+        if (storageConfig.prefix)
+            this.storagePrefix = storageConfig.prefix;
 
         // Set custom Storage functions
         if (storageConfig.methods)
