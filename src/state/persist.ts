@@ -18,7 +18,7 @@ export function persistValue(state: State, key?: string) {
     key = tempKey;
 
     // Get Storage
-    const storage = state.agileInstance.storage;
+    const storage = state.agileInstance().storage;
 
     // Add State to persistedStates in Storage
     storage.persistedStates.add(state);
@@ -57,5 +57,5 @@ function handleStorageValue(storageVal: any, storage: Storage, state: State) {
     }
 
     // If the value already exists in the storage.. load it into the state
-    state.agileInstance.runtime.ingest(state, storageVal);
+    state.agileInstance().runtime.ingest(state, storageVal);
 }

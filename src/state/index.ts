@@ -5,7 +5,7 @@ import {persistValue} from "./persist";
 
 export class State<ValueType = any> {
 
-    public agileInstance: Agile;
+    public agileInstance: () => Agile;
 
     public _key?: string;
     public valueType?: string; // primitive types for js users
@@ -23,7 +23,7 @@ export class State<ValueType = any> {
     // public computeValue?: (newState?: ValueType) => ValueType;
 
     constructor(agileInstance: Agile, initialState: ValueType, key?: string, deps: Array<Dep> = []) {
-        this.agileInstance = agileInstance;
+        this.agileInstance = () => agileInstance;
         this.initialState = initialState;
         this.dep = new Dep(deps);
         this._key = key;
@@ -59,7 +59,7 @@ export class State<ValueType = any> {
     public set(value?: ValueType, options: { background?: boolean } = {}): this {
         // Causes a rerender on this State without changing it
         if (arguments[0] === undefined) {
-            this.agileInstance.runtime.ingest(this);
+            this.agileInstance().runtime.ingest(this);
             return this;
         }
 
@@ -70,7 +70,7 @@ export class State<ValueType = any> {
         }
 
         // Ingest update
-        this.agileInstance.runtime.ingest(this, value, {
+        this.agileInstance().runtime.ingest(this, value, {
             background: options.background
         });
 
@@ -125,8 +125,8 @@ export class State<ValueType = any> {
      */
     public reset(): this {
         // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
-        if (this.isPersistState)
-            this.agileInstance.storage.remove(this.key || '');
+        if (this.isPersistState && this.key)
+            this.agileInstance().storage.remove(this.key);
 
         // Set State to initial State
         this.set(this.initialState);
@@ -202,7 +202,7 @@ export class State<ValueType = any> {
 
         // Save changes in Storage
         if (this.isPersistState && this.key)
-            this.agileInstance.storage.set(this.key, this.value);
+            this.agileInstance().storage.set(this.key, this.value);
     }
 
 

@@ -52,7 +52,7 @@ export class CallbackContainer extends ComponentContainer {
 //=========================================================================================================
 
 export default class SubController {
-    public agileInstance: Agile;
+    public agileInstance: () => Agile;
 
     // Component based Subscription
     public components: Set<ComponentContainer> = new Set();
@@ -61,7 +61,7 @@ export default class SubController {
     public callbacks: Set<CallbackContainer> = new Set();
 
     public constructor(agileInstance: Agile) {
-        this.agileInstance = agileInstance;
+        this.agileInstance = () => agileInstance;
     }
 
 
@@ -162,7 +162,7 @@ export default class SubController {
             // Set Ready
             callbackContainer.ready = true;
 
-            if (this.agileInstance.config.logJobs)
+            if (this.agileInstance().config.logJobs)
                 console.log("Agile: Registered Callback ", callbackContainer);
 
             return callbackContainer;
@@ -179,10 +179,10 @@ export default class SubController {
         this.components.add(componentContainer);
 
         // Set Ready
-        if (!this.agileInstance.config.waitForMount)
+        if (!this.agileInstance().config.waitForMount)
             componentContainer.ready = true;
 
-        if (this.agileInstance.config.logJobs)
+        if (this.agileInstance().config.logJobs)
             console.log("Agile: Registered Component ", componentContainer);
 
         return componentContainer;

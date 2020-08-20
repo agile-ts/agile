@@ -13,7 +13,7 @@ export interface StorageConfigInterface {
 }
 
 export default class Storage {
-    public agileInstance: Agile;
+    public agileInstance: () => Agile;
 
     public isAsync: boolean = false;
     private storageReady: boolean = false;
@@ -24,7 +24,7 @@ export default class Storage {
     public persistedStates: Set<State> = new Set();
 
     constructor(agileInstance: Agile, storageConfig: StorageConfigInterface) {
-        this.agileInstance = agileInstance;
+        this.agileInstance = () => agileInstance;
         this.storageConfig = storageConfig;
 
         // Set custom Storage prefix

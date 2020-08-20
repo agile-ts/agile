@@ -15,7 +15,7 @@ export interface JobConfigInterface {
 }
 
 export default class Runtime {
-    public agileInstance: Agile;
+    public agileInstance: () => Agile;
 
     private currentJob: JobInterface | null = null;
     private jobQueue: Array<JobInterface> = [];
@@ -24,7 +24,7 @@ export default class Runtime {
     // public foundState: Set<State> = new Set();
 
     constructor(agileInstance: Agile) {
-        this.agileInstance = agileInstance;
+        this.agileInstance = () => agileInstance;
     }
 
 
@@ -50,8 +50,8 @@ export default class Runtime {
         options = {...{perform: true, background: false}, ...options};
 
         // Check if state value und newStateValue are the same.. if so return
-        if (state.value === newStateValue){
-            if (this.agileInstance.config.logJobs)
+        if (state.value === newStateValue) {
+            if (this.agileInstance().config.logJobs)
                 console.log("Agile: Doesn't perform job because state values are the same! ", job);
             return;
         }
@@ -103,7 +103,7 @@ export default class Runtime {
         this.currentJob = null;
 
         // Logging
-        if (this.agileInstance.config.logJobs)
+        if (this.agileInstance().config.logJobs)
             console.log(`Agile: Completed Job(${job.state.key})`, job);
 
         // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
@@ -157,7 +157,7 @@ export default class Runtime {
     private updateSubscribers(): void {
         // Check if Agile has an integration because its useless to go trough this process without framework
         // It won't happen anything because the state has no subs.. but this check here will maybe improve the performance
-        if (!this.agileInstance.integration) {
+        if (!this.agileInstance().integration) {
             this.jobsToRerender = [];
             return;
         }
@@ -199,14 +199,15 @@ export default class Runtime {
             }
 
             // If Component based subscription call the updateMethod which every framework has to define
-            if (this.agileInstance.integration?.updateMethod)
-                this.agileInstance.integration?.updateMethod(subscriptionContainer.component, this.formatChangedPropKeys(subscriptionContainer));
+            if (this.agileInstance().integration?.updateMethod)
+                // @ts-ignore
+                this.agileInstance().integration?.updateMethod(subscriptionContainer.component, this.formatChangedPropKeys(subscriptionContainer));
             else
                 console.warn("Agile: The framework which you are using doesn't provide an updateMethod so it might be possible that no rerender will be triggered");
         });
 
         // Log Job
-        if (this.agileInstance.config.logJobs && subscriptionsToUpdate.size > 0)
+        if (this.agileInstance().config.logJobs && subscriptionsToUpdate.size > 0)
             console.log("Agile: Rerendered Components ", subscriptionsToUpdate);
 
         // Reset Jobs to Rerender
