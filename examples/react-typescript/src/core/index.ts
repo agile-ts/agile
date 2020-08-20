@@ -7,10 +7,11 @@ console.log("Test");
 
 export const App = new Agile({
     logJobs: true,
+    framework: React
 });
 
-export const MY_STATE = App.State<string>("MyState").key("my_state");
-export const MY_STATE_2 = App.State<string>("MyState2").key("my_state_2");
+export const MY_STATE = App.State<string>("MyState", "my-state").persist();
+export const MY_STATE_2 = App.State<string>("MyState2").persist("my-state2");
 
 MY_STATE.watch("test", (value) => {
     console.log("Watch " + value);
