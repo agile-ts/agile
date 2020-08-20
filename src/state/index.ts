@@ -56,7 +56,7 @@ export class State<ValueType = any> {
      * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
      * @param {ValueType} newState - The new value for this state
      */
-    public set(newState?: ValueType, options: { background?: boolean } = {}): this {
+    public set(value?: ValueType, options: { background?: boolean } = {}): this {
         // Causes a rerender on this State without changing it
         if (arguments[0] === undefined) {
             this.agileInstance.runtime.ingest(this);
@@ -64,13 +64,13 @@ export class State<ValueType = any> {
         }
 
         // Check Type is Correct
-        if (this.valueType && !this.isCorrectType(newState)) {
-            console.warn(`Agile: Incorrect type (${typeof newState}) was provided. Type fixed to ${this.valueType}`);
+        if (this.valueType && !this.isCorrectType(value)) {
+            console.warn(`Agile: Incorrect type (${typeof value}) was provided. Type fixed to ${this.valueType}`);
             return this;
         }
 
         // Ingest update
-        this.agileInstance.runtime.ingest(this, newState, {
+        this.agileInstance.runtime.ingest(this, value, {
             background: options.background
         });
 
@@ -78,7 +78,7 @@ export class State<ValueType = any> {
         if (this.sideEffects)
             this.sideEffects();
 
-        this.isSet = newState !== this.initialState;
+        this.isSet = value !== this.initialState;
         return this;
     }
 
