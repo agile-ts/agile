@@ -4,7 +4,6 @@ import Dep from "./dep";
 import {persistValue} from "./persist";
 
 export class State<ValueType = any> {
-
     public agileInstance: () => Agile;
 
     public _key?: string;
@@ -37,6 +36,10 @@ export class State<ValueType = any> {
     }
 
     public get value(): ValueType {
+        // Add state to foundState (for auto tracking used states in computed)
+        if (this.agileInstance().runtime.trackState)
+            this.agileInstance().runtime.foundStates.add(this);
+
         return this._value;
     }
 
@@ -197,12 +200,12 @@ export class State<ValueType = any> {
      *  Will set a new _masterValue without causing a rerender
      */
     public privateWrite(value: any) {
-        this.value = copy(value);
+        this._value = copy(value);
         this.nextState = copy(value);
 
         // Save changes in Storage
         if (this.isPersistState && this.key)
-            this.agileInstance().storage.set(this.key, this.value);
+            this.agileInstance().storage.set(this.key, this._value);
     }
 
 

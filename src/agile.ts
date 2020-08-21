@@ -3,6 +3,8 @@ import use, {Integration} from "./integrations/use";
 import SubController from "./sub";
 import {State} from "./state";
 import Storage, {StorageConfigInterface} from "./storage";
+import {Collection} from "./collection";
+import {Computed} from "./computed";
 
 export interface AgileConfigInterface {
     framework?: any
@@ -49,10 +51,30 @@ export default class Agile {
     // State
     //=========================================================================================================
     /**
-     * Create Pulse state
+     * Create Agile State
      * @param initialState Any - the value to initialize a State instance with
      */
-    public State = <T>(initialState: T, key?: string) => new State<T>(this, initialState, key);
+    public State = <ValueType>(initialState: ValueType, key?: string) => new State<ValueType>(this, initialState, key);
+
+
+    //=========================================================================================================
+    // Collection
+    //=========================================================================================================
+    /**
+     * Create Agile Collection
+     */
+    //   public Collection = <DataType>(config: Config<DataType, G, S>) => new Collection<DataType>(this, config)
+
+
+    //=========================================================================================================
+    // Computed
+    //=========================================================================================================
+    /**
+     * Create a Agile computed function
+     * @param deps Array - An array of state items to depend on
+     * @param computeFunction Function - A function where the return value is the state, ran every time a dep changes
+     */
+    public Computed = <T = any>(computeFunction: () => any, deps?: Array<State>) => new Computed<T>(this, computeFunction, deps);
 
 
     //=========================================================================================================

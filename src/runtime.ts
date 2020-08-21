@@ -2,6 +2,7 @@ import {State} from "./state";
 import Agile from "./agile";
 import {copy} from "./utils";
 import {CallbackContainer, SubscriptionContainer} from "./sub";
+import {Computed} from "./computed";
 
 export interface JobInterface {
     state: State
@@ -17,11 +18,14 @@ export interface JobConfigInterface {
 export default class Runtime {
     public agileInstance: () => Agile;
 
+    // Queue system
     private currentJob: JobInterface | null = null;
     private jobQueue: Array<JobInterface> = [];
     private jobsToRerender: Array<JobInterface> = [];
 
-    // public foundState: Set<State> = new Set();
+    // Used for tracking computed dependencies
+    public trackState: boolean = false; // Check if agile should track states
+    public foundStates: Set<State> = new Set(); // States which were tracked during the track time
 
     constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
@@ -52,14 +56,19 @@ export default class Runtime {
         // Check if state value und newStateValue are the same.. if so return
         if (state.value === newStateValue) {
             if (this.agileInstance().config.logJobs)
-                console.log("Agile: Doesn't perform job because state values are the same! ", job);
+                console.warn("Agile: Doesn't perform job because state values are the same! ", job);
             return;
         }
 
-        // If the argument at the position 1 -> newState is undefined than take the next State
-        // Have to do it so because you can also set the StateValue to undefined but there I don't want to take the nextState value
-        if (arguments[1] === undefined)
-            job.newStateValue = job.state.nextState
+        // Grab nextState if newState not passed or compute if needed
+        if (newStateValue === undefined) {
+            if (job.state instanceof Computed) {
+                job.newStateValue = job.state.computeValue();
+            } else {
+                console.warn("Agile: You can't set a State to undefined.. please use null!");
+                job.newStateValue = job.state.nextState
+            }
+        }
 
         // Push the Job to the Queue (safety.. that no Job get forgotten)
         this.jobQueue.push(job);
@@ -232,5 +241,22 @@ export default class Runtime {
         });
 
         return finalObject;
+    }
+
+    //=========================================================================================================
+    // Get Found State
+    //=========================================================================================================
+    /**
+     * @internal
+     * Will return all tracked States
+     */
+    public getFoundStates() {
+        const finalFoundStates = this.foundStates;
+
+        // Reset tracking
+        this.trackState = false;
+        this.foundStates = new Set();
+
+        return finalFoundStates;
     }
 }
