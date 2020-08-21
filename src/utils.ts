@@ -56,7 +56,7 @@ export function getAgileInstance(state: State): Agile | null {
 /**
  * Checks if func is a function
  */
-export function isFunction(func: () => any) {
+export function isFunction(func: any) {
     return typeof func === 'function';
 }
 
@@ -67,8 +67,8 @@ export function isFunction(func: () => any) {
 /**
  * Checks if func is a async function
  */
-export function isAsyncFunction(func: () => any) {
-    return func.constructor.name === 'AsyncFunction';
+export function isAsyncFunction(func: any) {
+    return isFunction(func) && func.constructor.name === 'AsyncFunction';
 }
 
 
@@ -87,4 +87,20 @@ export function isValidUrl(url: string): boolean {
         '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
         '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
     return pattern.test(url);
+}
+
+
+//=========================================================================================================
+// Is Json String
+//=========================================================================================================
+/**
+ * Checks if value is a valid JsonString
+ */
+export function isJsonString(value: any) {
+    try {
+        JSON.parse(value);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }

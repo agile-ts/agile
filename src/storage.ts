@@ -1,6 +1,6 @@
 import Agile from "./agile";
 import {State} from "./state";
-import {isAsyncFunction, isFunction} from "./utils";
+import {isAsyncFunction, isFunction, isJsonString} from "./utils";
 
 export interface StorageConfigInterface {
     async?: boolean
@@ -79,28 +79,24 @@ export default class Storage {
      */
     private instantiateCustomStorage() {
         // Check Get Function
-        // @ts-ignore
         if (!isFunction(this.storageConfig.methods?.get)) {
             console.error("Agile: Your GET StorageMethod isn't valid!");
             return;
         }
 
         // Check Set Function
-        // @ts-ignore
         if (!isFunction(this.storageConfig.methods?.set)) {
             console.error("Agile: Your SET StorageMethod isn't valid!");
             return;
         }
 
         // Check Remove Function
-        // @ts-ignore
         if (!isFunction(this.storageConfig.methods?.remove)) {
             console.error("Agile: Your REMOVE StorageMethod isn't valid!");
             return;
         }
 
         // Check if one function is async if so set is Async to true
-        // @ts-ignore
         if (isAsyncFunction(this.storageConfig.methods?.get) || isAsyncFunction(this.storageConfig.methods?.set) || isAsyncFunction(this.storageConfig.methods?.remove))
             this.isAsync = true;
 
@@ -123,7 +119,7 @@ export default class Storage {
                 this.storageConfig.methods?.get(this.getStorageKey(key))
                     .then((res: any) => {
                         // If result is no Json
-                        if (!this.isJsonString(res))
+                        if (!isJsonString(res))
                             return resolve(res);
 
                         // Format Json to Object
@@ -133,12 +129,13 @@ export default class Storage {
             });
 
         // Normal Get
-        if (this.isJsonString(this.storageConfig.methods.get(this.getStorageKey(key))))
-            return JSON.parse(this.storageConfig.methods.get(this.getStorageKey(key)));
+        const res = this.storageConfig.methods.get(this.getStorageKey(key));
+        if (isJsonString(res))
+            return JSON.parse(res);
 
         // If the JsonString is not valid it might be a promise
-        console.warn("Agile: Something went wrong by parsing the storage value into json. Maybe you forgot to set the storage to async");
-        return undefined;
+        console.warn("Agile: Something went wrong by parsing the storage json value.. Maybe you forgot to set the storage to async");
+        return res;
     }
 
 
@@ -182,14 +179,5 @@ export default class Storage {
         } catch (e) {
             return false;
         }
-    }
-
-    private isJsonString(value: any) {
-        try {
-            JSON.parse(value);
-        } catch (e) {
-            return false;
-        }
-        return true;
     }
 }
