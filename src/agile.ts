@@ -3,7 +3,7 @@ import use, {Integration} from "./integrations/use";
 import SubController from "./sub";
 import {State} from "./state";
 import Storage, {StorageConfigInterface} from "./storage";
-import {Collection} from "./collection";
+import {Collection, Config, DefaultDataItem} from "./collection";
 import {Computed} from "./computed";
 
 export interface AgileConfigInterface {
@@ -63,7 +63,7 @@ export default class Agile {
     /**
      * Create Agile Collection
      */
-    //   public Collection = <DataType>(config: Config<DataType, G, S>) => new Collection<DataType>(this, config)
+    public Collection = <DataType = DefaultDataItem>(config: Config<DataType>) => new Collection<DataType>(this, config);
 
 
     //=========================================================================================================

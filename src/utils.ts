@@ -104,3 +104,13 @@ export function isJsonString(value: any) {
     }
     return true;
 }
+
+//=========================================================================================================
+// Define Config
+//=========================================================================================================
+/**
+ * Will create a config (config) and merges default values (default) into this config (config)
+ */
+export function defineConfig<C>(config: C, defaults: object): C {
+    return { ...defaults, ...config };
+}

@@ -17,4 +17,10 @@ export const MY_COMPUTED = App.Computed<string>(() => {
     return "test" + MY_STATE.value + "_computed_" + MY_STATE_2.value;
 });
 
+// @ts-ignore
+export const MY_COLLECTION = App.Collection(collection => ({
+    key: 'my-collection'
+}));
+console.log("myCollection ", MY_COLLECTION)
+
 // console.log(JSON.stringify(MY_STATE));
