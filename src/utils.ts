@@ -8,16 +8,35 @@ import Agile from "./agile";
 /**
  * Copy an array or object.. without any dependencies
  */
-export const copy = (val: any) => {
-    // Keep in mind: https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
-    if (Array.isArray(val))
-        return [...val];
+export const copy = (value: any) => {
+    if (Array.isArray(value))
+        return [...value];
 
-    if (typeof val === 'object')
-        return {...val};
+    if (isValidObject(value))
+        return {...value};
 
-    return val;
+    return value;
 };
+
+
+//=========================================================================================================
+// Is Valid Object
+//=========================================================================================================
+/**
+ * Checks if an Object is an valid object for Agile
+ * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
+ */
+export function isValidObject(value: any): boolean {
+    function isHTMLElement(obj: any) {
+        try {
+            return obj instanceof HTMLElement;
+        } catch (e) {
+            return typeof obj === 'object' && obj.nodeType === 1 && typeof obj.style === 'object' && typeof obj.ownerDocument === 'object';
+        }
+    }
+
+    return value !== null && typeof value === 'object' && !isHTMLElement(value) && !Array.isArray(value);
+}
 
 
 //=========================================================================================================

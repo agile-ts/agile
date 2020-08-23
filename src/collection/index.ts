@@ -2,7 +2,7 @@ import Agile from "../agile";
 import Item from "./item";
 import {Group, GroupConfigInterface, GroupKey, PrimaryKey} from "./group";
 import {Selector} from "./selector";
-import {defineConfig, normalizeArray} from "../utils";
+import {defineConfig, isValidObject, normalizeArray} from "../utils";
 
 export type DefaultDataItem = { [key: string]: any };
 export type CollectionKey = string | number;
@@ -17,9 +17,9 @@ export interface CollectionConfigInterface {
 }
 
 export interface CollectOptionsInterface<DataType = any> {
-    patch?: boolean;
-    method?: 'push' | 'unshift';
-    forEachItem?: (item: DataType, key: PrimaryKey, index: number) => void;
+    patch?: boolean
+    method?: 'push' | 'unshift'
+    forEachItem?: (item: DataType, key: PrimaryKey, index: number) => void
 }
 
 export type Config<DataType = DefaultDataItem> =
@@ -229,17 +229,17 @@ export class Collection<DataType = DefaultDataItem> {
 
     //=========================================================================================================
     // Save Data
-    // TODO add later support for items without primaryKey passed by user and find a way to remove all this ts-ignores ^^
     //=========================================================================================================
     /**
      * @internal
      * Save data directly into collection storage
      */
     public saveData(data: DataType, patch?: boolean): PrimaryKey | null {
+        // Get primaryKey (default: 'id')
         const key = this.config.primaryKey;
-        if (!key) return null; // Should never happen
 
-        if (typeof data !== 'object') {
+        // Check if data is object if not return
+        if (!isValidObject(data)) {
             console.error("Agile: Collections items has to be an object for now!");
             return null;
         }
@@ -258,7 +258,7 @@ export class Collection<DataType = DefaultDataItem> {
         // If the data already exists and config is to patch, patch data
         if (item && patch)
             item.patch(data);
-        // If the data already exists and no config, overwite data
+        // If the data already exists and no config, overwrite data
         else if (item)
             item.set(data);
         // If data does not exist.. create new Data set
