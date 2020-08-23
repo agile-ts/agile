@@ -54,7 +54,7 @@ export class Collection<DataType = DefaultDataItem> {
         });
 
         // Set Default Group Key
-        if(this.config.defaultGroupKey)
+        if (this.config.defaultGroupKey)
             this.defaultGroupKey = this.config.defaultGroupKey;
 
         // Create Groups
@@ -206,6 +206,20 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Remove
+    //=========================================================================================================
+    /**
+     * Remove fromGroups or everywhere
+     */
+    public remove(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
+        return {
+            fromGroups: (groups: Array<string>) => this.removeFromGroups(primaryKeys, groups),
+            everywhere: () => this.deleteData(primaryKeys)
+        };
+    }
+
+
+    //=========================================================================================================
     // Group
     //=========================================================================================================
     /**
@@ -228,11 +242,59 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Remove From Groups
+    //=========================================================================================================
+    /**
+     * @internal
+     * Deletes Data from Groups
+     */
+    public removeFromGroups(primaryKeys: PrimaryKey | Array<PrimaryKey>, groups: GroupKey | Array<GroupKey>) {
+        const _primaryKeys = normalizeArray(primaryKeys);
+        const _groups = normalizeArray(groups);
+
+        _groups.forEach(groupName => {
+            _primaryKeys.forEach(primaryKey => {
+                // Return if group doesn't exist in collection
+                if (!this.groups[groupName])
+                    return;
+
+                // Get and Remove Group
+                const group = this.getGroup(groupName);
+                group.remove(primaryKey);
+            });
+        });
+    }
+
+
+    //=========================================================================================================
+    // Delete Data
+    //=========================================================================================================
+    /**
+     * @internal
+     * Deletes data directly form the collection
+     */
+    public deleteData(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
+        const _primaryKeys = normalizeArray<PrimaryKey>(primaryKeys);
+        const groups = Object.keys(this.groups)
+
+        _primaryKeys.forEach(primaryKey => {
+            // Remove primaryKey from collection data
+            delete this.data[primaryKey];
+
+            // Remove primaryKey from groups
+            groups.forEach(groupName => {
+                this.groups[groupName].remove(primaryKey);
+            });
+        });
+    }
+
+
+    //=========================================================================================================
     // Save Data
     //=========================================================================================================
     /**
      * @internal
-     * Save data directly into collection storage
+     * Save data directly into the collection
      */
     public saveData(data: DataType, patch?: boolean): PrimaryKey | null {
         // Get primaryKey (default: 'id')
