@@ -17,19 +17,29 @@ export const MY_COMPUTED = App.Computed<string>(() => {
     return "test" + MY_STATE.value + "_computed_" + MY_STATE_2.value;
 });
 
+
+interface collectionValueInterface {
+    id: string,
+    name: string
+}
+
 // @ts-ignore
-export const MY_COLLECTION = App.Collection(collection => ({
+export const MY_COLLECTION = App.Collection<collectionValueInterface>(collection => ({
     key: 'my-collection',
     groups: {
         myGroup: collection.Group()
     }
 }));
+MY_COLLECTION.collect({id: '1', name: 'test'});
+MY_COLLECTION.collect({id: '2', name: 'test2'}, 'myGroup');
 console.log("Group: myCollection ", MY_COLLECTION);
 
-export const MY_COLLECTION_2 = App.Collection({
+export const MY_COLLECTION_2 = App.Collection<collectionValueInterface>({
     key: 'my-collection_2',
     groups: ['myGroup']
 });
+MY_COLLECTION_2.collect({id: '1', name: 'test'});
+MY_COLLECTION_2.collect({id: '2', name: 'test2'}, 'myGroup');
 console.log("Group: myCollection2 ", MY_COLLECTION_2);
 
 

@@ -250,7 +250,7 @@ export class Collection<DataType = DefaultDataItem> {
 
         // Create reference of data at the data key
         // @ts-ignore
-        let item: Item<DataType> = this.data[_data[key]];
+        let item: Item<DataType> = this.data[data[key]];
 
         // If the data already exists and config is to patch, patch data
         if (item && patch)
