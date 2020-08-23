@@ -1,11 +1,11 @@
 import {State} from '../state';
 import {Collection, DefaultDataItem} from './index';
 
-export default class Data<DataType = DefaultDataItem> extends State<DataType> {
+export default class Item<DataType = DefaultDataItem> extends State<DataType> {
 
     private collection: () => Collection;
 
-    // public output: DataType | DefaultDataItem;
+    // public output: DataType;
 
     constructor(collection: Collection, data: DataType) {
         super(collection.agileInstance(), data);

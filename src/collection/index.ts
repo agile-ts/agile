@@ -1,5 +1,5 @@
 import Agile from "../agile";
-import Data from "./data";
+import Item from "./item";
 import {Group, GroupConfigInterface} from "./group";
 import {Selector} from "./selector";
 import {defineConfig} from "../utils";
@@ -28,7 +28,7 @@ export class Collection<DataType = DefaultDataItem> {
     public size: number = 0;
 
     // Collection data is stored here
-    public data: { [key: string]: Data<DataType> } = {};
+    public data: { [key: string]: Item<DataType> } = {};
 
     public groups: { [key: string]: Group<any> } = {};
     public selectors: { [key: string]: Selector<any> } = {};
