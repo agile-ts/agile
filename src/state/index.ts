@@ -15,6 +15,7 @@ export class State<ValueType = any> {
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
     public isPersistState: boolean = false; // Is saved in storage
+    public output?: any; // This contains the public value.. if _value doesn't contain the public value (Used for example by collections)
 
     public initialState: ValueType;
     public _value: ValueType; // The current value of the state
@@ -219,6 +220,20 @@ export class State<ValueType = any> {
     public persist(key?: StateKey): this {
         this.isPersistState = persistValue(this, key);
         return this;
+    }
+
+
+    //=========================================================================================================
+    // Get Public Value
+    //=========================================================================================================
+    /**
+     * @internal
+     *  Returns 100% the public value of a state because at some points (group) the _value contains only keys
+     */
+    public getPublicValue(): ValueType {
+        if (this.output !== undefined)
+            return this.output;
+        return this._value;
     }
 
 

@@ -143,11 +143,11 @@ export function useAgile(deps: Array<State | Collection> | State | Collection, a
 
     // Return Public Value of State
     if (depsArray.length === 1 && !Array.isArray(deps))
-        return depsArray[0].value;
+        return depsArray[0].getPublicValue();
 
     // Return Public Value of State in Array
     return depsArray.map(dep => {
-        return dep.value;
+        return dep.getPublicValue();
     });
 }
 

@@ -139,7 +139,7 @@ export default class Runtime {
         // Call Watchers
         for (let watcher in state.watchers)
             if (typeof state.watchers[watcher] === 'function')
-                state.watchers[watcher](state.value);
+                state.watchers[watcher](state.getPublicValue());
 
         // Call State SideEffects
         // this should not be used on root state class as it would be overwritten by extentions

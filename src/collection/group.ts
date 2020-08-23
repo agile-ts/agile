@@ -141,7 +141,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
                 }
 
                 // Return state value of data
-                return data.value;
+                return data.getPublicValue();
             }).filter(item => item !== undefined);
 
         // Log not found primaryKeys
