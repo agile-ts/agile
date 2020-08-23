@@ -1,6 +1,6 @@
 import Agile from "../agile";
 import Item from "./item";
-import {Group, GroupConfigInterface} from "./group";
+import {Group, GroupConfigInterface, GroupKey, PrimaryKey} from "./group";
 import {Selector} from "./selector";
 import {defineConfig} from "../utils";
 
@@ -77,7 +77,7 @@ export class Collection<DataType = DefaultDataItem> {
                 let instance;
                 switch (type) {
                     case "groups":
-                        instance = new Group(this.agileInstance(), this);
+                        instance = new Group(this.agileInstance(), this, [], {key: subInstance[i]});
                         break;
                     case "selectors":
                         instance = new Selector();
@@ -96,10 +96,37 @@ export class Collection<DataType = DefaultDataItem> {
         for (let i = 0; i < keys.length; i++) {
             // Create the sub instance in the final subInstance object
             finalSubInstanceObject[keys[i]] = subInstanceObject[keys[i]];
+
+            // Set key to property name if it isn't set yet
+            if (!finalSubInstanceObject[keys[i]].key)
+                finalSubInstanceObject[keys[i]] = keys[i];
         }
 
         // Set Collection instance
         this[type] = finalSubInstanceObject;
+    }
+
+
+    //=========================================================================================================
+    // Create Group
+    //=========================================================================================================
+    /**
+     * Create a group instance on this collection
+     */
+    public createGroup(groupName: GroupKey, initialItems?: Array<PrimaryKey>): Group<DataType> {
+        // Check if Group already exist
+        if (this.groups.hasOwnProperty(groupName)) {
+            console.warn(`Agile: The Group with the name ${groupName} already exists!`);
+            return this.groups[groupName];
+        }
+
+        // Create new Group
+        const group = new Group<DataType>(this.agileInstance(), this, initialItems, {key: groupName});
+
+        // Add new Group to groups
+        this.groups[groupName] = group;
+
+        return group;
     }
 
 
