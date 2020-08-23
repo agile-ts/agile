@@ -1,12 +1,14 @@
 import Agile from "../agile";
-import {copy} from "../utils";
+import {copy, flatMerge} from "../utils";
 import Dep from "./dep";
 import {persistValue} from "./persist";
+
+export type StateKey = string | number;
 
 export class State<ValueType = any> {
     public agileInstance: () => Agile;
 
-    public _key?: string;
+    public _key?: StateKey; // should be a unique key/name which identifies the state
     public valueType?: string; // primitive types for js users
     public dep: Dep; // Includes the subscriptions and dependencies of the state
     public watchers: { [key: string]: (value: any) => void } = {};
@@ -17,11 +19,11 @@ export class State<ValueType = any> {
     public initialState: ValueType;
     public _value: ValueType; // The current value of the state
     public previousState: ValueType; // Will be set in runtime
-    public nextState: ValueType; // The next state if the newValue is undefined -> a backup value
+    public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished (cleaner than always setting the state)
 
     // public computeValue?: (newState?: ValueType) => ValueType;
 
-    constructor(agileInstance: Agile, initialState: ValueType, key?: string, deps: Array<Dep> = []) {
+    constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<Dep> = []) {
         this.agileInstance = () => agileInstance;
         this.initialState = initialState;
         this.dep = new Dep(deps);
@@ -36,18 +38,18 @@ export class State<ValueType = any> {
     }
 
     public get value(): ValueType {
-        // Add state to foundState (for auto tracking used states in computed)
+        // Add state to foundState (for auto tracking used states in computed functions)
         if (this.agileInstance().runtime.trackState)
             this.agileInstance().runtime.foundStates.add(this);
 
         return this._value;
     }
 
-    public set key(value: string | undefined) {
+    public set key(value: StateKey | undefined) {
         this._key = value;
     }
 
-    public get key(): string | undefined {
+    public get key(): StateKey | undefined {
         return this._key;
     }
 
@@ -59,7 +61,7 @@ export class State<ValueType = any> {
      * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
      * @param {ValueType} newState - The new value for this state
      */
-    public set(value?: ValueType, options: { background?: boolean } = {}): this {
+    public set(value?: ValueType, options: { background?: boolean, sideEffects?: boolean } = {}): this {
         // Causes a rerender on this State without changing it
         if (arguments[0] === undefined) {
             this.agileInstance().runtime.ingest(this);
@@ -78,7 +80,7 @@ export class State<ValueType = any> {
         });
 
         // Execute Side Effects
-        if (this.sideEffects)
+        if (options.sideEffects && this.sideEffects)
             this.sideEffects();
 
         this.isSet = value !== this.initialState;
@@ -138,6 +140,30 @@ export class State<ValueType = any> {
 
 
     //=========================================================================================================
+    // Patch
+    //=========================================================================================================
+    /**
+     * Will always be called if the state changes
+     * @param key - The key of the watch method
+     * @param callback - The callback function
+     */
+    public patch(targetWithChanges: Object): this {
+        // Check if state is object.. because only objects can use the patch method
+        if (!(typeof this.nextState === 'object')) {
+            console.error("Agile: You can't use the patch method an a non object state!");
+            return this;
+        }
+
+        // Merge targetWithChanges into next State
+        this.nextState = flatMerge<ValueType>(this.nextState, targetWithChanges);
+
+        // Set State to nextState
+        this.set();
+
+        return this;
+    }
+
+    //=========================================================================================================
     // Watch
     //=========================================================================================================
     /**
@@ -185,9 +211,8 @@ export class State<ValueType = any> {
      * Saves the state in the local storage or in a own configured storage
      * @param key - the storage key
      */
-    public persist(key?: string): this {
-        this.isPersistState = true;
-        persistValue(this, key);
+    public persist(key?: StateKey): this {
+        this.isPersistState = persistValue(this, key);
         return this;
     }
 

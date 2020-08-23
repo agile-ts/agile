@@ -1,5 +1,5 @@
-import {State} from "./index";
-import Storage from "../storage";
+import {State, StateKey} from "./index";
+import Storage, {StorageKey} from "../storage";
 
 
 //=========================================================================================================
@@ -8,12 +8,12 @@ import Storage from "../storage";
 /**
  * Will persist the 'state' into the configured storage with the key or if no key passed the state key
  */
-export function persistValue(state: State, key?: string) {
+export function persistValue(state: State, key?: StateKey): boolean {
     // Validate Key
     const tempKey = validateKey(state, key);
     if (!tempKey) {
         console.error("Agile: If your State has no key provided before using persist.. you have to provide a key here!");
-        return;
+        return false;
     }
     key = tempKey;
 
@@ -28,6 +28,8 @@ export function persistValue(state: State, key?: string) {
         storage.get(key).then((value: any) => handleStorageValue(value, storage, state));
     else
         handleStorageValue(storage.get(key), storage, state);
+
+    return true;
 }
 
 
@@ -35,7 +37,7 @@ export function persistValue(state: State, key?: string) {
 // Helper
 //=========================================================================================================
 
-function validateKey(state: State, key?: string): string | null {
+function validateKey(state: State, key?: StateKey): StorageKey | null {
     // Get key from State key
     if (!key && state._key)
         return state._key;
@@ -44,7 +46,7 @@ function validateKey(state: State, key?: string): string | null {
     if (!key)
         return null;
 
-    // Set key as state name
+    // Set this storage key as state key
     state._key = key;
     return key;
 }

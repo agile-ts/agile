@@ -76,8 +76,9 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
         // remove primaryKey from nextState
         this.nextState = this.nextState.filter((i) => i !== primaryKey);
 
-        // Send nextState into the runtime
+        // Set State to nextState
         this.set();
+
         return this;
     }
 
@@ -104,8 +105,9 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
         // Push or unshift into state
         this.nextState[options.method || 'push'](primaryKey);
 
-        // Send nextState to runtime
+        // Set State to nextState
         this.set();
+
         return this;
     }
 
@@ -120,9 +122,9 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
     public build() {
         this.notFoundPrimaryKeys = [];
 
-        // Check if _value is an array if not something went wrong
+        // Check if _value is an array if not something went wrong because a group is always an array
         if (!Array.isArray(this._value)) {
-            console.warn("Agile: A group state has to be an array!");
+            console.error("Agile: A group state has to be an array!");
             return;
         }
 
@@ -142,6 +144,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
                 return data.value;
             }).filter(item => item !== undefined);
 
+        // Log not found primaryKeys
         if(this.notFoundPrimaryKeys.length > 0 && this.agileInstance().config.logJobs)
             console.warn(`Agile: Couldn't find states with the primary keys in group ${this.key}`, this.notFoundPrimaryKeys)
 

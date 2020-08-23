@@ -2,6 +2,7 @@ import Agile from "./agile";
 import {State} from "./state";
 import {isAsyncFunction, isFunction, isJsonString} from "./utils";
 
+export type StorageKey = string | number;
 export interface StorageConfigInterface {
     async?: boolean
     prefix?: string
@@ -110,7 +111,7 @@ export default class Storage {
     /**
      * Gets the value provided by the key from the storage
      */
-    public get<GetType = any>(key: string): GetType | Promise<GetType> | undefined {
+    public get<GetType = any>(key: StorageKey): GetType | Promise<GetType> | undefined {
         if (!this.storageReady || !this.storageConfig.methods?.get) return;
 
         // Async Get
@@ -145,7 +146,7 @@ export default class Storage {
     /**
      * Sets the value into the storage
      */
-    public set(key: string, value: any) {
+    public set(key: StorageKey, value: any) {
         if (!this.storageReady || !this.storageConfig.methods?.set) return;
         this.storageConfig.methods.set(this.getStorageKey(key), JSON.stringify(value));
     }
@@ -157,7 +158,7 @@ export default class Storage {
     /**
      * Deletes the value that is stored with the key
      */
-    public remove(key: string) {
+    public remove(key: StorageKey) {
         if (!this.storageReady || !this.storageConfig.methods?.remove) return;
         this.storageConfig.methods.remove(this.getStorageKey(key));
     }
@@ -167,7 +168,7 @@ export default class Storage {
     // Helper
     //=========================================================================================================
 
-    private getStorageKey(key: string) {
+    private getStorageKey(key: StorageKey) {
         return `_${this.storagePrefix}_${key}`;
     }
 

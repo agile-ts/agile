@@ -118,3 +118,20 @@ export function isJsonString(value: any) {
 export function defineConfig<C>(config: C, defaults: object): C {
     return {...defaults, ...config};
 }
+
+
+//=========================================================================================================
+// Flat Merge
+//=========================================================================================================
+/**
+ * Merged the items flat into the object
+ */
+export function flatMerge<DataType = Object>(source: DataType, changes: Object): DataType {
+    let keys = Object.keys(changes);
+    keys.forEach(property => {
+        // @ts-ignore
+        source[property] = changes[property];
+    });
+
+    return source;
+}

@@ -2,33 +2,38 @@ import Agile from "../agile";
 import Item from "./item";
 import {Group, GroupConfigInterface, GroupKey, PrimaryKey} from "./group";
 import {Selector} from "./selector";
-import {defineConfig} from "../utils";
+import {defineConfig, normalizeArray} from "../utils";
 
 export type DefaultDataItem = { [key: string]: any };
 export type CollectionKey = string | number;
 
-export interface CollectionConfig {
+export interface CollectionConfigInterface {
     groups?: { [key: string]: Group<any> } | string[]
     selectors?: { [key: string]: Selector<any> } | string[]
     key?: CollectionKey // should be a unique key/name which identifies the collection
     primaryKey?: string // the primaryKey of an item (default is id)
-    indexAll?: boolean
+    // indexAll?: boolean
+}
+
+export interface CollectOptionsInterface<DataType = any> {
+    patch?: boolean;
+    method?: 'push' | 'unshift';
+    forEachItem?: (item: DataType, key: PrimaryKey, index: number) => void;
 }
 
 export type Config<DataType = DefaultDataItem> =
-    | CollectionConfig
-    | ((collection: Collection<DataType>) => CollectionConfig);
+    | CollectionConfigInterface
+    | ((collection: Collection<DataType>) => CollectionConfigInterface);
 
 export class Collection<DataType = DefaultDataItem> {
     public agileInstance: () => Agile;
 
-    public config: CollectionConfig;
+    public config: CollectionConfigInterface;
 
-    // The amount of data items stored inside this collection
-    public size: number = 0;
-
-    // Collection data is stored here
-    public data: { [key: string]: Item<DataType> } = {};
+    public size: number = 0;  // The amount of data items stored inside this collection
+    public data: { [key: string]: Item<DataType> } = {}; // Collection data is stored here
+    public defaultGroupKey: string = 'default'; // The Group key which contains all collection items
+    // public hasPrimaryKey: boolean; // Checks if the user has passed a primaryKey
 
     public groups: { [key: string]: Group<any> } = {};
     public selectors: { [key: string]: Selector<any> } = {};
@@ -41,7 +46,7 @@ export class Collection<DataType = DefaultDataItem> {
             config = config(this);
 
         // Assign defaults to config
-        this.config = defineConfig<CollectionConfig>(config, {
+        this.config = defineConfig<CollectionConfigInterface>(config, {
             primaryKey: 'id',
             groups: {},
             selectors: {}
@@ -108,12 +113,61 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Collect
+    //=========================================================================================================
+    /**
+     * Collect iterable data into this collection.
+     * Note: Data items must include a primary key (id)
+     */
+    public collect(items: DataType | Array<DataType>, groups?: GroupKey | Array<GroupKey>, options: CollectOptionsInterface<DataType> = {}) {
+        const _items = normalizeArray<DataType>(items);
+        const _groups = normalizeArray<GroupKey>(groups);
+
+        // Assign defaults to config
+        options = defineConfig<CollectOptionsInterface>(options, {
+            method: 'push',
+        });
+
+        // Add default group if it hasn't been added (default group contains all items)
+        if (_groups.findIndex(groupName => groupName === this.defaultGroupKey) === -1)
+            _groups.push(this.defaultGroupKey);
+
+        // Create Group if it doesn't exist yet
+        _groups.forEach(groupName => !this.groups[groupName] && this.createGroup(groupName));
+
+        _items.forEach((item, index) => {
+            // Save items into Collection
+            let key = this.saveData(item, options.patch);
+
+            // Return if key doesn't exist (something went wrong in saveData)
+            if (!key) return;
+
+            // Call forEachItem method
+            if (options.forEachItem)
+                options.forEachItem(item, key, index);
+
+            // Add key to groups
+            _groups.forEach(groupName => {
+                if (key)
+                    this.groups[groupName].add(key, {method: options.method})
+            });
+        });
+    }
+
+
+    //=========================================================================================================
     // Create Group
     //=========================================================================================================
     /**
      * Create a group instance on this collection
      */
     public createGroup(groupName: GroupKey, initialItems?: Array<PrimaryKey>): Group<DataType> {
+
+        // Check if groupName is default.. if so say that the a group called 'default' always exist
+        if (groupName === this.defaultGroupKey) {
+            console.warn("Agile: A default Group get always created by Agile.. this Group contains all items of the collection");
+        }
+
         // Check if Group already exist
         if (this.groups.hasOwnProperty(groupName)) {
             console.warn(`Agile: The Group with the name ${groupName} already exists!`);
@@ -142,7 +196,7 @@ export class Collection<DataType = DefaultDataItem> {
         } else {
             console.warn(`Agile: Group with name ${groupName} doesn't exist!`);
             // Return empty group
-            return new Group(this.agileInstance(), this, [], { key: 'dummy' });
+            return new Group(this.agileInstance(), this, [], {key: 'dummy'});
         }
     }
 
@@ -166,5 +220,54 @@ export class Collection<DataType = DefaultDataItem> {
      */
     public Selector(initialSelection?: string | number): Selector<DataType> {
         return new Selector<DataType>();
+    }
+
+
+    //=========================================================================================================
+    // Save Data
+    // TODO add later support for items without primaryKey passed by user and find a way to remove all this ts-ignores ^^
+    //=========================================================================================================
+    /**
+     * @internal
+     * Save data directly into collection storage
+     */
+    public saveData(data: DataType, patch?: boolean): PrimaryKey | null {
+        const key = this.config.primaryKey;
+        if (!key) return null; // Should never happen
+
+        if (typeof data !== 'object') {
+            console.error("Agile: Collections items has to be an object for now!");
+            return null;
+        }
+
+        // Check if data has primaryKey
+        // @ts-ignore
+        if (!data.hasOwnProperty(key)) {
+            console.error("Agile: Collections items need a own primaryKey (default = id)");
+            return null;
+        }
+
+        // Create reference of data at the data key
+        // @ts-ignore
+        let item: Item<DataType> = this.data[_data[key]];
+
+        // If the data already exists and config is to patch, patch data
+        if (item && patch)
+            item.patch(data);
+        // If the data already exists and no config, overwite data
+        else if (item)
+            item.set(data);
+        // If data does not exist.. create new Data set
+        else
+            item = new Item<DataType>(this, data);
+
+        // @ts-ignore
+        this.data[data[key]] = item;
+
+        // Increase size
+        this.size++;
+
+        // @ts-ignore
+        return data[key];
     }
 }
