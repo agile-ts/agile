@@ -2,7 +2,8 @@ import Agile from "../agile";
 import Item from "./item";
 import {Group, GroupConfigInterface, GroupKey, PrimaryKey} from "./group";
 import {Selector} from "./selector";
-import {defineConfig, isValidObject, normalizeArray} from "../utils";
+import {defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
+import {State} from "../state";
 
 export type DefaultDataItem = { [key: string]: any };
 export type CollectionKey = string | number;
@@ -162,6 +163,47 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Update
+    //=========================================================================================================
+
+    public update(updateKey: PrimaryKey, changes: DefaultDataItem, config: { addNewProperties?: boolean } = {}): State | undefined {
+        // If item does not exist, return
+        if (!this.data.hasOwnProperty(updateKey)) {
+            console.error(`Agile: PrimaryKey '${updateKey} doesn't exist in collection `, this);
+            return undefined;
+        }
+
+        // Assign defaults to config
+        config = defineConfig(config, {
+            addNewProperties: false
+        });
+
+        const itemState = this.data[updateKey];
+        const currentItemValue = itemState.copy() as any;
+        const primaryKey = this.config.primaryKey || '';
+
+        // Merge current Item value with changes
+        const finalItemStateValue = flatMerge(currentItemValue, changes, {addNewProperties: config.addNewProperties});
+
+        // Assign finalItemStateValue to nextState
+        itemState.nextState = finalItemStateValue;
+
+        // Set State to nextState
+        itemState.set();
+
+        // If data key changes update it properly
+        if (currentItemValue[primaryKey] !== finalItemStateValue[primaryKey])
+            this.updateDataKey(currentItemValue[primaryKey], finalItemStateValue[primaryKey]);
+
+        // Rebuild all groups that includes the primaryKey
+        this.rebuildGroupsThatIncludePrimaryKey(finalItemStateValue[primaryKey]);
+
+        // Return data at primaryKey (updated State)
+        return this.data[finalItemStateValue[primaryKey]];
+    }
+
+
+    //=========================================================================================================
     // Create Group
     //=========================================================================================================
     /**
@@ -238,6 +280,43 @@ export class Collection<DataType = DefaultDataItem> {
      */
     public Selector(initialSelection?: string | number): Selector<DataType> {
         return new Selector<DataType>();
+    }
+
+
+    //=========================================================================================================
+    // Update Data Key
+    //=========================================================================================================
+    /**
+     * @internal
+     * This will properly change the key of a collection item
+     */
+    private updateDataKey(oldKey: PrimaryKey, newKey: PrimaryKey): void {
+        // If oldKey and newKey are the same, return
+        if (oldKey === newKey) return;
+
+        // Create copy of data
+        const dataCopy = this.data[oldKey];
+
+        // Delete old reference
+        delete this.data[oldKey];
+
+        // Apply the data into data with new key
+        this.data[newKey] = dataCopy;
+
+        // Update Groups
+        for (let groupName in this.groups) {
+            // Get Group
+            const group = this.getGroup(groupName);
+
+            // If Group does not contain oldKey, continue
+            if (group.value.findIndex(key => key === oldKey) === -1) continue;
+
+            // Replace the primaryKey at current index
+            group.nextState.splice(group.nextState.indexOf(oldKey), 1, newKey);
+
+            // Set State(Group) to nextState
+            group.set();
+        }
     }
 
 
@@ -335,5 +414,20 @@ export class Collection<DataType = DefaultDataItem> {
 
         // @ts-ignore
         return data[key];
+    }
+
+
+    //=========================================================================================================
+    // Rebuild Groups That Includes Primary Key
+    //=========================================================================================================
+    /**
+     * @internal
+     * Rebuild the Groups which contains the primaryKey
+     */
+    public rebuildGroupsThatIncludePrimaryKey(primaryKey: PrimaryKey): void {
+        for (let groupName in this.groups) {
+            const group = this.getGroup(groupName);
+            group.set();
+        }
     }
 }

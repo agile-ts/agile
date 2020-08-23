@@ -149,9 +149,12 @@ export function defineConfig<C>(config: C, defaults: object): C {
 /**
  * Merged the items flat into the object
  */
-export function flatMerge<DataType = Object>(source: DataType, changes: Object): DataType {
+export function flatMerge<DataType = Object>(source: DataType, changes: Object, config: { addNewProperties?: boolean } = {}): DataType {
     let keys = Object.keys(changes);
     keys.forEach(property => {
+        // @ts-ignore
+        if (!config.addNewProperties && !source[property]) continue;
+
         // @ts-ignore
         source[property] = changes[property];
     });
