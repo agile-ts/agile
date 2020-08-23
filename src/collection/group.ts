@@ -90,7 +90,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
      * Adds a key to a group
      */
     public add(primaryKey: PrimaryKey, options: GroupAddOptionsInterface = {}): this {
-        const exists = this.nextState.includes(primaryKey);
+        const exists = this.nextState.findIndex(key => key === primaryKey) !== -1;
 
         // Merge default values into options
         options = defineConfig(options, {method: 'push', overwrite: true});

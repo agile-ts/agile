@@ -163,12 +163,6 @@ export class Collection<DataType = DefaultDataItem> {
      * Create a group instance on this collection
      */
     public createGroup(groupName: GroupKey, initialItems?: Array<PrimaryKey>): Group<DataType> {
-
-        // Check if groupName is default.. if so say that the a group called 'default' always exist
-        if (groupName === this.defaultGroupKey) {
-            console.warn("Agile: A default Group get always created by Agile.. this Group contains all items of the collection");
-        }
-
         // Check if Group already exist
         if (this.groups.hasOwnProperty(groupName)) {
             console.warn(`Agile: The Group with the name ${groupName} already exists!`);
@@ -180,6 +174,10 @@ export class Collection<DataType = DefaultDataItem> {
 
         // Add new Group to groups
         this.groups[groupName] = group;
+
+        // Log Job
+        if (this.agileInstance().config.logJobs)
+            console.log(`Agile: Created Group called '${groupName}'`, group);
 
         return group;
     }

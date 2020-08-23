@@ -9,10 +9,12 @@ import Agile from "./agile";
  * Copy an array or object.. without any dependencies
  */
 export const copy = (val: any) => {
-    if (typeof val === 'object') val = {...val};
-    else if (Array.isArray(val)) val = [...val];
+    // Keep in mind: https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
+    if (Array.isArray(val))
+        return [...val];
 
-    return val;
+    if (typeof val === 'object')
+        return {...val};
 };
 
 
