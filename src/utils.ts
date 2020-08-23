@@ -17,13 +17,17 @@ export const copy = (val: any) => {
 
 
 //=========================================================================================================
-// Normalize Deps
+// Normalize Array
 //=========================================================================================================
 /**
- * Convert Dependencies into an array
+ * Convert item into an array
  */
-export function normalizeDeps(deps: Array<State> | State) {
-    return Array.isArray(deps) ? (deps as Array<State>) : [deps as State];
+export function normalizeArray<DataType = any>(items?: DataType | Array<DataType>): Array<DataType> {
+    // Return empty array if no items
+    if (!items)
+        return [];
+
+    return Array.isArray(items) ? items : [items as DataType];
 }
 
 
@@ -112,5 +116,5 @@ export function isJsonString(value: any) {
  * Will create a config (config) and merges default values (default) into this config (config)
  */
 export function defineConfig<C>(config: C, defaults: object): C {
-    return { ...defaults, ...config };
+    return {...defaults, ...config};
 }

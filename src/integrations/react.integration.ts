@@ -1,8 +1,9 @@
 import {State} from "../state";
 import Agile from "..";
-import {getAgileInstance, normalizeDeps} from "../utils";
+import {getAgileInstance, normalizeArray} from "../utils";
 import {Integration} from "./use";
 import {SubscriptionContainer} from "../sub";
+import {Collection} from "../collection";
 
 
 //=========================================================================================================
@@ -15,7 +16,7 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 
     if (deps instanceof State || Array.isArray(deps)) {
         // Normalize Dependencies
-        depsArray = normalizeDeps(deps || []);
+        depsArray = normalizeArray<State>(deps || []);
 
         // Get Agile Instance
         if (!agileInstance) {
@@ -102,9 +103,10 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 // Use Agile Hook
 //=========================================================================================================
 
-export function useAgile(deps: Array<State> | State, agileInstance?: Agile) {
+export function useAgile(deps: Array<State | Collection> | State | Collection, agileInstance?: Agile) {
     // Normalize Dependencies
-    let depsArray = normalizeDeps(deps);
+    let depsArray = normalizeArray<State | Collection>(deps)
+        .map(item => item instanceof Collection ? item.getGroup(item.defaultGroupKey) : item);
 
     // Get Agile Instance
     if (!agileInstance) {
