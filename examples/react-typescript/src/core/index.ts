@@ -19,8 +19,18 @@ export const MY_COMPUTED = App.Computed<string>(() => {
 
 // @ts-ignore
 export const MY_COLLECTION = App.Collection(collection => ({
-    key: 'my-collection'
+    key: 'my-collection',
+    groups: {
+        myGroup: collection.Group()
+    }
 }));
-console.log("myCollection ", MY_COLLECTION)
+console.log("Group: myCollection ", MY_COLLECTION);
+
+export const MY_COLLECTION_2 = App.Collection({
+    key: 'my-collection_2',
+    groups: ['myGroup']
+});
+console.log("Group: myCollection2 ", MY_COLLECTION_2);
+
 
 // console.log(JSON.stringify(MY_STATE));

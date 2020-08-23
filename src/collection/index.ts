@@ -98,13 +98,14 @@ export class Collection<DataType = DefaultDataItem> {
 
         // Loop through subInstance items
         const keys = Object.keys(subInstanceObject);
-        for (let i = 0; i < keys.length; i++) {
+        // https://stackoverflow.com/questions/29285897/what-is-the-difference-between-for-in-and-for-of-statements-in-jav
+        for (let key of keys) {
             // Create the sub instance in the final subInstance object
-            finalSubInstanceObject[keys[i]] = subInstanceObject[keys[i]];
+            finalSubInstanceObject[key] = subInstanceObject[key];
 
             // Set key to property name if it isn't set yet
-            if (!finalSubInstanceObject[keys[i]].key)
-                finalSubInstanceObject[keys[i]] = keys[i];
+            if (!finalSubInstanceObject[key].key)
+                finalSubInstanceObject[key].key = key;
         }
 
         // Set Collection instance
