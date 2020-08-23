@@ -146,7 +146,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
 
         // Log not found primaryKeys
         if(this.notFoundPrimaryKeys.length > 0 && this.agileInstance().config.logJobs)
-            console.warn(`Agile: Couldn't find states with the primary keys in group ${this.key}`, this.notFoundPrimaryKeys)
+            console.warn(`Agile: Couldn't find states with the primary keys in group '${this.key}'`, this.notFoundPrimaryKeys)
 
         // @ts-ignore
         this._output = finalOutput;

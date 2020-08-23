@@ -12,6 +12,7 @@ export interface CollectionConfigInterface {
     selectors?: { [key: string]: Selector<any> } | string[]
     key?: CollectionKey // should be a unique key/name which identifies the collection
     primaryKey?: string // the primaryKey of an item (default is id)
+    defaultGroupKey?: string // The defaultGroup.. in which all collected items get stored
     // indexAll?: boolean
 }
 
@@ -51,6 +52,10 @@ export class Collection<DataType = DefaultDataItem> {
             groups: {},
             selectors: {}
         });
+
+        // Set Default Group Key
+        if(this.config.defaultGroupKey)
+            this.defaultGroupKey = this.config.defaultGroupKey;
 
         // Create Groups
         if (config.groups)
