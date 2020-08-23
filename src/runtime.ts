@@ -41,15 +41,15 @@ export default class Runtime {
      * Note: its not possible to set a state to undefined because undefined is used for internal activities!
      */
     public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {}): void {
+        // Merge default values into options
+        options = defineConfig<JobConfigInterface>(options, {perform: true, background: false});
+
         // Create Job
         const job: JobInterface = {
             state: state,
             newStateValue: newStateValue,
             background: options?.background
         };
-
-        // Merge default values into options
-        options = defineConfig<JobConfigInterface>(options, {perform: true, background: false});
 
         // Check if state value und newStateValue are the same.. if so return
         if (state.value === newStateValue) {

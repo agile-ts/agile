@@ -15,6 +15,8 @@ export const copy = (val: any) => {
 
     if (typeof val === 'object')
         return {...val};
+
+    return val;
 };
 
 
