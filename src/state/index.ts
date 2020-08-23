@@ -1,5 +1,5 @@
 import Agile from "../agile";
-import {copy, flatMerge} from "../utils";
+import {copy, defineConfig, flatMerge} from "../utils";
 import Dep from "./dep";
 import {persistValue} from "./persist";
 
@@ -67,6 +67,11 @@ export class State<ValueType = any> {
             this.agileInstance().runtime.ingest(this);
             return this;
         }
+
+        // Assign defaults to options
+        options = defineConfig(options, {
+            sideEffects: true
+        });
 
         // Check Type is Correct
         if (this.valueType && !this.isCorrectType(value)) {
