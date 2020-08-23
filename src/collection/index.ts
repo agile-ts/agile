@@ -131,6 +131,23 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Get Group
+    //=========================================================================================================
+    /**
+     * Return an group from this collection as Group instance (extends State)
+     */
+    public getGroup(groupName: GroupKey): Group<DataType> {
+        if (this.groups[groupName]) {
+            return this.groups[groupName];
+        } else {
+            console.warn(`Agile: Group with name ${groupName} doesn't exist!`);
+            // Return empty group
+            return new Group(this.agileInstance(), this, [], { key: 'dummy' });
+        }
+    }
+
+
+    //=========================================================================================================
     // Group
     //=========================================================================================================
     /**
