@@ -1,6 +1,6 @@
 import {State} from "./state";
 import Agile from "./agile";
-import {copy} from "./utils";
+import {copy, defineConfig} from "./utils";
 import {CallbackContainer, SubscriptionContainer} from "./sub";
 import {Computed} from "./computed";
 
@@ -38,11 +38,9 @@ export default class Runtime {
     /**
      * @internal
      * Creates a Job out of State and new Value and than add it to a job queue
+     * Note: its not possible to set a state to undefined because undefined is used for internal activities!
      */
-    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {
-        perform: true,
-        background: false
-    }): void {
+    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {}): void {
         // Create Job
         const job: JobInterface = {
             state: state,
@@ -51,7 +49,7 @@ export default class Runtime {
         };
 
         // Merge default values into options
-        options = {...{perform: true, background: false}, ...options};
+        options = defineConfig<JobConfigInterface>(options, {perform: true, background: false});
 
         // Check if state value und newStateValue are the same.. if so return
         if (state.value === newStateValue) {
@@ -62,12 +60,10 @@ export default class Runtime {
 
         // Grab nextState if newState not passed or compute if needed
         if (newStateValue === undefined) {
-            if (job.state instanceof Computed) {
+            if (job.state instanceof Computed)
                 job.newStateValue = job.state.computeValue();
-            } else {
-                console.warn("Agile: You can't set a State to undefined.. please use null!");
+            else
                 job.newStateValue = job.state.nextState
-            }
         }
 
         // Push the Job to the Queue (safety.. that no Job get forgotten)

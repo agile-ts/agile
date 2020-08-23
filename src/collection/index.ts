@@ -1,16 +1,17 @@
 import Agile from "../agile";
 import Data from "./data";
-import {Group} from "./group";
+import {Group, GroupConfigInterface} from "./group";
 import {Selector} from "./selector";
 import {defineConfig} from "../utils";
 
 export type DefaultDataItem = { [key: string]: any };
+export type CollectionKey = string | number;
 
 export interface CollectionConfig {
     groups?: { [key: string]: Group<any> } | string[]
     selectors?: { [key: string]: Selector<any> } | string[]
-    key?: string
-    primaryKey?: string
+    key?: CollectionKey // should be a unique key/name which identifies the collection
+    primaryKey?: string // the primaryKey of an item (default is id)
     indexAll?: boolean
 }
 
@@ -76,7 +77,7 @@ export class Collection<DataType = DefaultDataItem> {
                 let instance;
                 switch (type) {
                     case "groups":
-                        instance = new Group();
+                        instance = new Group(this.agileInstance(), this);
                         break;
                     case "selectors":
                         instance = new Selector();
@@ -108,8 +109,8 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Create a group instance under this collection
      */
-    public Group(initialIndex?: Array<string>): Group<DataType> {
-        return new Group<DataType>();
+    public Group(initialItems?: Array<string>, config?: GroupConfigInterface): Group<DataType> {
+        return new Group<DataType>(this.agileInstance(), this, initialItems, config);
     }
 
 
