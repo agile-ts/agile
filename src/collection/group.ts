@@ -51,7 +51,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
      * Checks if the group contains the primaryKey
      */
     public has(primaryKey: PrimaryKey) {
-        return this.value.includes(primaryKey) || false;
+        return this.value.findIndex(key => key === primaryKey) !== -1;
     }
 
 
@@ -145,7 +145,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
             }).filter(item => item !== undefined);
 
         // Log not found primaryKeys
-        if(this.notFoundPrimaryKeys.length > 0 && this.agileInstance().config.logJobs)
+        if (this.notFoundPrimaryKeys.length > 0 && this.agileInstance().config.logJobs)
             console.warn(`Agile: Couldn't find states with the primary keys in group '${this.key}'`, this.notFoundPrimaryKeys)
 
         // @ts-ignore
