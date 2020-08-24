@@ -171,7 +171,7 @@ export default class API {
         // Extract response data
         if (finalResponse.type?.includes('application/json'))
             finalResponse.data = await finalResponse.raw?.json();
-        else if (typeof finalResponse?.raw?.text === 'function')
+        else if (typeof finalResponse.raw?.text === 'function')
             finalResponse.data = await finalResponse.raw.text();
 
         return finalResponse;

@@ -51,7 +51,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
             if (this.deps.findIndex(s => s === state) === -1) {
                 this.deps.push(state);
 
-                // Add this as dependencie of this state -> this will be updated if on state changes
+                // Add this as dependency of this state -> this will be updated if on state changes
                 state.dep.depend(this)
             }
         });
