@@ -298,6 +298,11 @@ export class Collection<DataType = DefaultDataItem> {
     public getValueById(id: ItemKey): DataType | undefined {
         let data = this.findById(id);
         if (!data) return undefined;
+
+        // Add state to foundState (for auto tracking used states in computed functions)
+        if (this.agileInstance().runtime.trackState)
+            this.agileInstance().runtime.foundStates.add(data);
+
         return data.value;
     }
 
