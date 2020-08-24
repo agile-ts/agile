@@ -1,9 +1,8 @@
-import {Collection, DefaultDataItem} from "./index";
+import {Collection, DefaultDataItem, PrimaryKey} from "./index";
 import {State} from "../state";
 import Agile from "../agile";
 import {defineConfig} from "../utils";
 
-export type PrimaryKey = string | number;
 export type GroupKey = string | number;
 
 export interface GroupAddOptionsInterface {
@@ -73,7 +72,13 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
      * Removes a item at primaryKey from the group
      */
     public remove(primaryKey: PrimaryKey): this {
-        // remove primaryKey from nextState
+        // Check if primaryKey exists in group if not, return
+        if (this.value.findIndex(key => key === primaryKey) === -1) {
+            console.error(`Agile: Couldn't find primaryKey '${primaryKey} in group`, this);
+            return this;
+        }
+
+        // Remove primaryKey from nextState
         this.nextState = this.nextState.filter((i) => i !== primaryKey);
 
         // Set State to nextState

@@ -106,7 +106,7 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 export function useAgile(deps: Array<State | Collection> | State | Collection, agileInstance?: Agile) {
     // Normalize Dependencies
     let depsArray = normalizeArray<State | Collection>(deps)
-        .map(item => item instanceof Collection ? item.getGroup(item.defaultGroupKey) : item);
+        .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item);
 
     // Get Agile Instance
     if (!agileInstance) {

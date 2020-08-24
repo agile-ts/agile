@@ -1,19 +1,20 @@
 import Agile from "../agile";
 import Item from "./item";
-import {Group, GroupConfigInterface, GroupKey, PrimaryKey} from "./group";
+import {Group, GroupConfigInterface, GroupKey} from "./group";
 import {Selector} from "./selector";
 import {copy, defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
-import {State} from "../state";
+import {State, StateKey} from "../state";
 
 export type DefaultDataItem = { [key: string]: any };
 export type CollectionKey = string | number;
+export type PrimaryKey = string | number; // The key of an item in a collection
 
 export interface CollectionConfigInterface {
     groups?: { [key: string]: Group<any> } | string[]
     selectors?: { [key: string]: Selector<any> } | string[]
     key?: CollectionKey // should be a unique key/name which identifies the collection
     primaryKey?: string // the primaryKey of an item (default is id)
-    defaultGroupKey?: string // The defaultGroup.. in which all collected items get stored
+    defaultGroupKey?: PrimaryKey // The defaultGroupKey(Name).. in which all collected items get stored
     // indexAll?: boolean
 }
 
@@ -34,8 +35,7 @@ export class Collection<DataType = DefaultDataItem> {
 
     public size: number = 0;  // The amount of data items stored inside this collection
     public data: { [key: string]: Item<DataType> } = {}; // Collection data is stored here
-    public defaultGroupKey: string = 'default'; // The Group key which contains all collection items
-    // public hasPrimaryKey: boolean; // Checks if the user has passed a primaryKey
+    public _key?: CollectionKey;
 
     public groups: { [key: string]: Group<any> } = {};
     public selectors: { [key: string]: Selector<any> } = {};
@@ -51,12 +51,12 @@ export class Collection<DataType = DefaultDataItem> {
         this.config = defineConfig<CollectionConfigInterface>(config, {
             primaryKey: 'id',
             groups: {},
-            selectors: {}
+            selectors: {},
+            defaultGroupKey: 'default'
         });
 
-        // Set Default Group Key
-        if (this.config.defaultGroupKey)
-            this.defaultGroupKey = this.config.defaultGroupKey;
+        // Set Key
+        this._key = this.config.key;
 
         // Create Groups
         if (config.groups)
@@ -65,6 +65,14 @@ export class Collection<DataType = DefaultDataItem> {
         // Create Selectors
         if (config.selectors)
             this.initSubInstances('selectors');
+    }
+
+    public set key(value: StateKey | undefined) {
+        this._key = value;
+    }
+
+    public get key(): StateKey | undefined {
+        return this._key;
     }
 
 
@@ -129,6 +137,7 @@ export class Collection<DataType = DefaultDataItem> {
     public collect(items: DataType | Array<DataType>, groups?: GroupKey | Array<GroupKey>, options: CollectOptionsInterface<DataType> = {}) {
         const _items = normalizeArray<DataType>(items);
         const _groups = normalizeArray<GroupKey>(groups);
+        const defaultGroupKey = this.config.defaultGroupKey || 'default';
 
         // Assign defaults to config
         options = defineConfig<CollectOptionsInterface>(options, {
@@ -136,8 +145,8 @@ export class Collection<DataType = DefaultDataItem> {
         });
 
         // Add default group if it hasn't been added (default group contains all items)
-        if (_groups.findIndex(groupName => groupName === this.defaultGroupKey) === -1)
-            _groups.push(this.defaultGroupKey);
+        if (_groups.findIndex(groupName => groupName === defaultGroupKey) === -1)
+            _groups.push(defaultGroupKey);
 
         // Create Group if it doesn't exist yet
         _groups.forEach(groupName => !this.groups[groupName] && this.createGroup(groupName));
@@ -257,8 +266,8 @@ export class Collection<DataType = DefaultDataItem> {
      */
     public remove(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
         return {
-            fromGroups: (groups: Array<string>) => this.removeFromGroups(primaryKeys, groups),
-            everywhere: () => this.deleteData(primaryKeys)
+            fromGroups: (groups: Array<PrimaryKey> | PrimaryKey) => this.removeFromGroups(primaryKeys, groups),
+            everywhere: () => this.removeData(primaryKeys)
         };
     }
 
@@ -267,7 +276,7 @@ export class Collection<DataType = DefaultDataItem> {
     // Group
     //=========================================================================================================
     /**
-     * Create a group instance under this collection
+     * Create a group instance under this collection (can be used in function based config)
      */
     public Group(initialItems?: Array<string>, config?: GroupConfigInterface): Group<DataType> {
         return new Group<DataType>(this.agileInstance(), this, initialItems, config);
@@ -278,7 +287,7 @@ export class Collection<DataType = DefaultDataItem> {
     // Selector
     //=========================================================================================================
     /**
-     * Create a selector instance under this collection
+     * Create a selector instance under this collection (can be used in function based config)
      */
     public Selector(initialSelection?: string | number): Selector<DataType> {
         return new Selector<DataType>();
@@ -333,14 +342,16 @@ export class Collection<DataType = DefaultDataItem> {
         const _primaryKeys = normalizeArray(primaryKeys);
         const _groups = normalizeArray(groups);
 
-        _groups.forEach(groupName => {
-            _primaryKeys.forEach(primaryKey => {
-                // Return if group doesn't exist in collection
-                if (!this.groups[groupName])
-                    return;
+        _groups.forEach(groupKey => {
+            // Return if group doesn't exist in collection
+            if (!this.groups[groupKey]){
+                console.error(`Agile: Couldn't find group('${groupKey}) in collection`, this);
+                return;
+            }
 
-                // Get and Remove Group
-                const group = this.getGroup(groupName);
+            // Remove primaryKeys from Group
+            _primaryKeys.forEach(primaryKey => {
+                const group = this.getGroup(groupKey);
                 group.remove(primaryKey);
             });
         });
@@ -354,17 +365,24 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Deletes data directly form the collection
      */
-    public deleteData(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
+    public removeData(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
         const _primaryKeys = normalizeArray<PrimaryKey>(primaryKeys);
         const groups = Object.keys(this.groups)
+        const dataKeys = Object.keys(this.data);
 
         _primaryKeys.forEach(primaryKey => {
+            // Check if primaryKey exists in collection
+            if (dataKeys.findIndex(key => primaryKey === key) === -1) {
+                console.error(`Agile: Couldn't find primaryKey '${primaryKey} in collection`, this);
+                return;
+            }
+
             // Remove primaryKey from collection data
             delete this.data[primaryKey];
 
             // Remove primaryKey from groups
-            groups.forEach(groupName => {
-                this.groups[groupName].remove(primaryKey);
+            groups.forEach(groupKey => {
+                this.groups[groupKey].remove(primaryKey);
             });
         });
     }
@@ -379,7 +397,7 @@ export class Collection<DataType = DefaultDataItem> {
      */
     public saveData(data: DataType, patch?: boolean): PrimaryKey | null {
         // Get primaryKey (default: 'id')
-        const key = this.config.primaryKey;
+        const key = this.config.primaryKey || 'id';
 
         // Check if data is object if not return
         if (!isValidObject(data)) {
@@ -427,9 +445,13 @@ export class Collection<DataType = DefaultDataItem> {
      * Rebuild the Groups which contains the primaryKey
      */
     public rebuildGroupsThatIncludePrimaryKey(primaryKey: PrimaryKey): void {
-        for (let groupName in this.groups) {
-            const group = this.getGroup(groupName);
-            group.set();
+        for (let groupKey in this.groups) {
+            // Get Group
+            const group = this.getGroup(groupKey);
+
+            // Check if group contains primaryKey if so rebuild it
+            if (group.has(primaryKey))
+                group.set();
         }
     }
 }

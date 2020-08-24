@@ -5,7 +5,8 @@ export default class Item<DataType = DefaultDataItem> extends State<DataType> {
 
     private collection: () => Collection;
 
-    // public output: DataType;
+    // @ts-ignore
+    public output: DataType; // Defines the type of the output (will be set external)
 
     constructor(collection: Collection, data: DataType) {
         super(collection.agileInstance(), data);
