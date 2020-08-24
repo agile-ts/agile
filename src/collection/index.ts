@@ -252,7 +252,7 @@ export class Collection<DataType = DefaultDataItem> {
             return this.groups[groupName];
         } else {
             console.warn(`Agile: Group with name ${groupName} doesn't exist!`);
-            // Return empty group
+            // Return empty group because useAgile can't handle undefined
             return new Group(this.agileInstance(), this, [], {key: 'dummy'});
         }
     }
@@ -409,6 +409,9 @@ export class Collection<DataType = DefaultDataItem> {
 
             // Remove primaryKey from collection data
             delete this.data[primaryKey];
+
+            // Decrease size
+            this.size--;
 
             // Remove primaryKey from groups
             groups.forEach(groupKey => {
