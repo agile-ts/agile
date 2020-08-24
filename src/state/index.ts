@@ -253,7 +253,7 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * @internal
-     *  Will set a new _masterValue without causing a rerender
+     *  Will set a new _value without causing a rerender
      */
     public privateWrite(value: any) {
         this._value = copy(value);
@@ -262,6 +262,19 @@ export class State<ValueType = any> {
         // Save changes in Storage
         if (this.isPersistState && this.key)
             this.agileInstance().storage.set(this.key, this._value);
+    }
+
+
+    //=========================================================================================================
+    // Get Persistable Value
+    //=========================================================================================================
+    /**
+     * @internal
+     *  Will return the perstiable Value of this state..
+     *  some classes which extends state might have another peristiableValue than this.value (like the selector)
+     */
+    public getPersistableValue(): any {
+        return this.value;
     }
 
 

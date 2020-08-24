@@ -1,6 +1,8 @@
 import {Collection, DefaultDataItem, ItemKey} from "./index";
 import {Computed} from "../computed";
 import Item from "./item";
+import {persistValue} from "../state/persist";
+import {StateKey} from "../state";
 
 export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
 
@@ -41,10 +43,35 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
     // Select
     //=========================================================================================================
     /**
-     * Changes the selector key
+     * Changes the id on which the selector is watching
      */
     public select(key: ItemKey) {
         this.id = key;
+    }
+
+
+    //=========================================================================================================
+    // Overwriting Persist
+    //=========================================================================================================
+    /**
+     * Saves the state in the local storage or in a own configured storage
+     * @param key - the storage key
+     */
+    public persist(key?: StateKey): this {
+        this.isPersistState = persistValue(this, key);
+        return this;
+    }
+
+
+    //=========================================================================================================
+    // Overwrite getPerstiableValue
+    //=========================================================================================================
+    /**
+     * @internal
+     *  Will return the perstiable Value of this state..
+     */
+    public getPersistableValue() {
+        return this.id;
     }
 }
 

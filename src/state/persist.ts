@@ -54,7 +54,7 @@ function validateKey(state: State, key?: StateKey): StorageKey | null {
 function handleStorageValue(storageVal: any, storage: Storage, state: State) {
     // If the value doesn't exist in the storage yet.. create it
     if (storageVal === null) {
-        storage.set(state._key || '', state.value);
+        storage.set(state._key || '', state.getPersistableValue());
         return;
     }
 
