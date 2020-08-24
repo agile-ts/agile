@@ -27,18 +27,11 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(collection
     key: 'my-collection',
     groups: {
         myGroup: collection.Group()
+    },
+    selectors: {
+        mySelector: collection.Selector("id1")
     }
 }));
 MY_COLLECTION.collect({id: 'id1', name: 'test'});
 MY_COLLECTION.collect({id: 'id2', name: 'test2'}, 'myGroup');
 console.log("Initial: myCollection ", MY_COLLECTION);
-
-export const MY_COLLECTION_2 = App.Collection<collectionValueInterface>({
-    key: 'my-collection_2',
-    groups: ['myGroup']
-});
-MY_COLLECTION_2.collect({id: 'id1', name: 'test'});
-MY_COLLECTION_2.collect({id: 'id2', name: 'test2'}, 'myGroup');
-console.log("Initial: myCollection2 ", MY_COLLECTION_2);
-
-// console.log(JSON.stringify(MY_STATE));

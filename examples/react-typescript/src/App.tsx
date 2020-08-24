@@ -9,6 +9,7 @@ const App = (props: any) => {
     const [myComputed] = useAgile([MY_COMPUTED]);
     const [myState, myState2] = useAgile([MY_STATE, MY_STATE_2]);
     const [myCollection] = useAgile([MY_COLLECTION.getGroup('myGroup')]);
+    const [mySelector] = useAgile([MY_COLLECTION.selectors.mySelector]);
 
 
     console.log("myComputed", MY_COMPUTED);
@@ -58,7 +59,24 @@ const App = (props: any) => {
                     }, 1000)}>
                         Collect
                     </button>
+                    <button onClick={() => setTimeout(() => {
+                        MY_COLLECTION.getGroup('myGroup').add('id3');
+                    }, 1000)}>
+                        Add to myGroup
+                    </button>
+                    <button onClick={() => setTimeout(() => {
+                        MY_COLLECTION.update("id3", {id: 'newId3', name: 'Test3_Changed'});
+                    }, 1000)}>
+                        Update id3
+                    </button>
+                    <button onClick={() => setTimeout(() => {
+                        MY_COLLECTION.remove("newId3").everywhere();
+                    }, 1000)}>
+                       Remove newId3
+                    </button>
                 </div>
+
+                <p>MySelector: {mySelector.name}</p>
 
             </header>
         </div>
