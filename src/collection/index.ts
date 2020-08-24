@@ -99,7 +99,7 @@ export class Collection<DataType = DefaultDataItem> {
                         instance = new Group(this.agileInstance(), this, [], {key: subInstance[i]});
                         break;
                     case "selectors":
-                        instance = new Selector();
+                        instance = new Selector(this, subInstance[i]);
                         break;
                     default:
                         instance = 'unknown';
@@ -324,8 +324,8 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Create a selector instance under this collection (can be used in function based config)
      */
-    public Selector(initialSelection?: string | number): Selector<DataType> {
-        return new Selector<DataType>();
+    public Selector(initialSelection: ItemKey): Selector<DataType> {
+        return new Selector<DataType>(this, initialSelection);
     }
 
 
