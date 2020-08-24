@@ -1,4 +1,4 @@
-import {Collection, DefaultDataItem, PrimaryKey} from "./index";
+import {Collection, DefaultDataItem, ItemKey} from "./index";
 import {State} from "../state";
 import Agile from "../agile";
 import {defineConfig} from "../utils";
@@ -14,13 +14,13 @@ export interface GroupConfigInterface {
     key?: GroupKey // should be a unique key/name which identifies the group
 }
 
-export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> {
+export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     collection: () => Collection<DataType>;
 
     _output: Array<DataType> = []; // Output of the collection (Note: _value are only the keys of the collection items)
-    notFoundPrimaryKeys: Array<PrimaryKey> = []; // Contains all key which can't be found in the collection
+    notFoundPrimaryKeys: Array<ItemKey> = []; // Contains all key which can't be found in the collection
 
-    constructor(agileInstance: Agile, collection: Collection<DataType>, initialItems?: Array<PrimaryKey>, config?: GroupConfigInterface) {
+    constructor(agileInstance: Agile, collection: Collection<DataType>, initialItems?: Array<ItemKey>, config?: GroupConfigInterface) {
         super(agileInstance, initialItems || [], config?.key);
         this.collection = () => collection;
 
@@ -49,7 +49,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
     /**
      * Checks if the group contains the primaryKey
      */
-    public has(primaryKey: PrimaryKey) {
+    public has(primaryKey: ItemKey) {
         return this.value.findIndex(key => key === primaryKey) !== -1;
     }
 
@@ -71,7 +71,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
     /**
      * Removes a item at primaryKey from the group
      */
-    public remove(primaryKey: PrimaryKey): this {
+    public remove(primaryKey: ItemKey): this {
         // Check if primaryKey exists in group if not, return
         if (this.value.findIndex(key => key === primaryKey) === -1) {
             console.error(`Agile: Couldn't find primaryKey '${primaryKey} in group`, this);
@@ -94,7 +94,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<PrimaryKey>> 
     /**
      * Adds a key to a group
      */
-    public add(primaryKey: PrimaryKey, options: GroupAddOptionsInterface = {}): this {
+    public add(primaryKey: ItemKey, options: GroupAddOptionsInterface = {}): this {
         const exists = this.nextState.findIndex(key => key === primaryKey) !== -1;
 
         // Merge default values into options

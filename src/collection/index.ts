@@ -7,21 +7,21 @@ import {State, StateKey} from "../state";
 
 export type DefaultDataItem = { [key: string]: any };
 export type CollectionKey = string | number;
-export type PrimaryKey = string | number; // The key of an item in a collection
+export type ItemKey = string | number; // The key of an item in a collection
 
 export interface CollectionConfigInterface {
     groups?: { [key: string]: Group<any> } | string[]
     selectors?: { [key: string]: Selector<any> } | string[]
     key?: CollectionKey // should be a unique key/name which identifies the collection
     primaryKey?: string // the primaryKey of an item (default is id)
-    defaultGroupKey?: PrimaryKey // The defaultGroupKey(Name).. in which all collected items get stored
+    defaultGroupKey?: ItemKey // The defaultGroupKey(Name).. in which all collected items get stored
     // indexAll?: boolean
 }
 
 export interface CollectOptionsInterface<DataType = any> {
     patch?: boolean
     method?: 'push' | 'unshift'
-    forEachItem?: (item: DataType, key: PrimaryKey, index: number) => void
+    forEachItem?: (item: DataType, key: ItemKey, index: number) => void
 }
 
 export type Config<DataType = DefaultDataItem> =
@@ -177,7 +177,7 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * * Update data by updateKey(id) in a Agile Collection
      */
-    public update(updateKey: PrimaryKey, changes: DefaultDataItem, config: { addNewProperties?: boolean } = {}): State | undefined {
+    public update(updateKey: ItemKey, changes: DefaultDataItem, config: { addNewProperties?: boolean } = {}): State | undefined {
         // If item does not exist, return
         if (!this.data.hasOwnProperty(updateKey)) {
             console.error(`Agile: PrimaryKey '${updateKey} doesn't exist in collection `, this);
@@ -220,7 +220,7 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Create a group instance on this collection
      */
-    public createGroup(groupName: GroupKey, initialItems?: Array<PrimaryKey>): Group<DataType> {
+    public createGroup(groupName: GroupKey, initialItems?: Array<ItemKey>): Group<DataType> {
         // Check if Group already exist
         if (this.groups.hasOwnProperty(groupName)) {
             console.warn(`Agile: The Group with the name ${groupName} already exists!`);
@@ -264,9 +264,9 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Remove fromGroups or everywhere
      */
-    public remove(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
+    public remove(primaryKeys: ItemKey | Array<ItemKey>) {
         return {
-            fromGroups: (groups: Array<PrimaryKey> | PrimaryKey) => this.removeFromGroups(primaryKeys, groups),
+            fromGroups: (groups: Array<ItemKey> | ItemKey) => this.removeFromGroups(primaryKeys, groups),
             everywhere: () => this.removeData(primaryKeys)
         };
     }
@@ -301,7 +301,7 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * This will properly change the key of a collection item
      */
-    private updateDataKey(oldKey: PrimaryKey, newKey: PrimaryKey): void {
+    private updateDataKey(oldKey: ItemKey, newKey: ItemKey): void {
         // If oldKey and newKey are the same, return
         if (oldKey === newKey) return;
 
@@ -338,7 +338,7 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Deletes Data from Groups
      */
-    public removeFromGroups(primaryKeys: PrimaryKey | Array<PrimaryKey>, groups: GroupKey | Array<GroupKey>) {
+    public removeFromGroups(primaryKeys: ItemKey | Array<ItemKey>, groups: GroupKey | Array<GroupKey>) {
         const _primaryKeys = normalizeArray(primaryKeys);
         const _groups = normalizeArray(groups);
 
@@ -365,8 +365,8 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Deletes data directly form the collection
      */
-    public removeData(primaryKeys: PrimaryKey | Array<PrimaryKey>) {
-        const _primaryKeys = normalizeArray<PrimaryKey>(primaryKeys);
+    public removeData(primaryKeys: ItemKey | Array<ItemKey>) {
+        const _primaryKeys = normalizeArray<ItemKey>(primaryKeys);
         const groups = Object.keys(this.groups)
         const dataKeys = Object.keys(this.data);
 
@@ -395,7 +395,7 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Save data directly into the collection
      */
-    public saveData(data: DataType, patch?: boolean): PrimaryKey | null {
+    public saveData(data: DataType, patch?: boolean): ItemKey | null {
         // Get primaryKey (default: 'id')
         const key = this.config.primaryKey || 'id';
 
@@ -444,7 +444,7 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Rebuild the Groups which contains the primaryKey
      */
-    public rebuildGroupsThatIncludePrimaryKey(primaryKey: PrimaryKey): void {
+    public rebuildGroupsThatIncludePrimaryKey(primaryKey: ItemKey): void {
         for (let groupKey in this.groups) {
             // Get Group
             const group = this.getGroup(groupKey);
