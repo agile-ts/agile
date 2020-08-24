@@ -273,6 +273,36 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Find By Id
+    //=========================================================================================================
+    /**
+     * Return an item from this collection by primaryKey as Item instance (extends State)
+     */
+    public findById(id: ItemKey): Item<DataType | undefined> {
+        // If data doesn't exists return an item with the value undefined (not returning directly undefined because useAgile only accept States)
+        if (!this.data.hasOwnProperty(id)) {
+            return new Item<undefined>(this, undefined);
+        }
+
+        // Return data by id
+        return this.data[id];
+    }
+
+
+    //=========================================================================================================
+    // Get Value By Id
+    //=========================================================================================================
+    /**
+     * Return a value from this collection by primaryKey
+     */
+    public getValueById(id: ItemKey): DataType | undefined {
+        let data = this.findById(id);
+        if (!data) return undefined;
+        return data.value;
+    }
+
+
+    //=========================================================================================================
     // Group
     //=========================================================================================================
     /**
@@ -344,7 +374,7 @@ export class Collection<DataType = DefaultDataItem> {
 
         _groups.forEach(groupKey => {
             // Return if group doesn't exist in collection
-            if (!this.groups[groupKey]){
+            if (!this.groups[groupKey]) {
                 console.error(`Agile: Couldn't find group('${groupKey}) in collection`, this);
                 return;
             }
