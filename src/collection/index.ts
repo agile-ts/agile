@@ -2,7 +2,7 @@ import Agile from "../agile";
 import Item from "./item";
 import {Group, GroupConfigInterface, GroupKey, PrimaryKey} from "./group";
 import {Selector} from "./selector";
-import {defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
+import {copy, defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
 import {State} from "../state";
 
 export type DefaultDataItem = { [key: string]: any };
@@ -165,7 +165,9 @@ export class Collection<DataType = DefaultDataItem> {
     //=========================================================================================================
     // Update
     //=========================================================================================================
-
+    /**
+     * * Update data by updateKey(id) in a Agile Collection
+     */
     public update(updateKey: PrimaryKey, changes: DefaultDataItem, config: { addNewProperties?: boolean } = {}): State | undefined {
         // If item does not exist, return
         if (!this.data.hasOwnProperty(updateKey)) {
@@ -179,27 +181,27 @@ export class Collection<DataType = DefaultDataItem> {
         });
 
         const itemState = this.data[updateKey];
-        const currentItemValue = itemState.copy() as any;
+        const currentItemValue = copy(itemState.value);
         const primaryKey = this.config.primaryKey || '';
 
         // Merge current Item value with changes
-        const finalItemStateValue = flatMerge(currentItemValue, changes, {addNewProperties: config.addNewProperties});
+        const finalItemValue = flatMerge(currentItemValue, changes, {addNewProperties: config.addNewProperties});
 
         // Assign finalItemStateValue to nextState
-        itemState.nextState = finalItemStateValue;
+        itemState.nextState = finalItemValue;
 
         // Set State to nextState
         itemState.set();
 
         // If data key changes update it properly
-        if (currentItemValue[primaryKey] !== finalItemStateValue[primaryKey])
-            this.updateDataKey(currentItemValue[primaryKey], finalItemStateValue[primaryKey]);
+        if (currentItemValue[primaryKey] !== finalItemValue[primaryKey])
+            this.updateDataKey(currentItemValue[primaryKey], finalItemValue[primaryKey]);
 
         // Rebuild all groups that includes the primaryKey
-        this.rebuildGroupsThatIncludePrimaryKey(finalItemStateValue[primaryKey]);
+        this.rebuildGroupsThatIncludePrimaryKey(finalItemValue[primaryKey]);
 
         // Return data at primaryKey (updated State)
-        return this.data[finalItemStateValue[primaryKey]];
+        return this.data[finalItemValue[primaryKey]];
     }
 
 

@@ -150,14 +150,18 @@ export function defineConfig<C>(config: C, defaults: object): C {
  * Merged the items flat into the object
  */
 export function flatMerge<DataType = Object>(source: DataType, changes: Object, config: { addNewProperties?: boolean } = {}): DataType {
+    // Copy Source to avoid reference
+    const _source = copy(source);
+
+    // Loop through changes object and merge changes into source
     let keys = Object.keys(changes);
     keys.forEach(property => {
         // @ts-ignore https://stackoverflow.com/questions/18452920/continue-in-cursor-foreach
-        if (!config.addNewProperties && !source[property]) return;
+        if (!config.addNewProperties && !_source[property]) return;
 
         // @ts-ignore
-        source[property] = changes[property];
+        _source[property] = changes[property];
     });
 
-    return source;
+    return _source;
 }
