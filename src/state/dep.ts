@@ -20,7 +20,7 @@ export default class Dep {
      * Add new State as dependency
      */
     public depend(state: State) {
-        if (state.dep !== this)
+        if (state.dep !== this && !this.deps.has(state))
             this.deps.add(state);
     }
 }
