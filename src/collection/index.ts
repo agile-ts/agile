@@ -1,7 +1,7 @@
 import Agile from "../agile";
 import Item from "./item";
 import {Group, GroupConfigInterface, GroupKey} from "./group";
-import {Selector} from "./selector";
+import {Selector, SelectorKey} from "./selector";
 import {copy, defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
 import {State, StateKey} from "../state";
 
@@ -99,7 +99,7 @@ export class Collection<DataType = DefaultDataItem> {
                         instance = new Group(this.agileInstance(), this, [], {key: subInstance[i]});
                         break;
                     case "selectors":
-                        instance = new Selector(this, subInstance[i]);
+                        instance = new Selector(this, subInstance[i], {key: subInstance[i]});
                         break;
                     default:
                         instance = 'unknown';
@@ -259,6 +259,23 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Get Selector
+    //=========================================================================================================
+    /**
+     * Return an selector from this collection as Selector instance (extends State)
+     */
+    public getSelector(selectorName: SelectorKey): Selector<DataType> {
+        if (this.selectors[selectorName]) {
+            return this.selectors[selectorName];
+        } else {
+            console.warn(`Agile: Selector with name ${selectorName} doesn't exist!`);
+            // Return empty group because useAgile can't handle undefined
+            return new Selector(this, 'dummy', {key: 'dummy'});
+        }
+    }
+
+
+    //=========================================================================================================
     // Remove
     //=========================================================================================================
     /**
@@ -362,6 +379,18 @@ export class Collection<DataType = DefaultDataItem> {
 
             // Set State(Group) to nextState
             group.set();
+        }
+
+        // Update Selector
+        for(let selectorName in this.selectors){
+          // Get Selector
+            const selector = this.getSelector(selectorName);
+
+            // If Selector doesn't watch on the oldKey, continue
+            if(selector.id !== oldKey) continue;
+
+            // Replace the oldKey with the newKey
+            selector.select(newKey);
         }
     }
 

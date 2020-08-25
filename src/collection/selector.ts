@@ -2,23 +2,32 @@ import {Collection, DefaultDataItem, ItemKey} from "./index";
 import {Computed} from "../computed";
 import Item from "./item";
 import {persistValue} from "../state/persist";
-import {StateKey} from "../state";
+import {StorageKey} from "../storage";
+
+export type SelectorKey = string | number;
+
+export interface SelectorConfigInterface {
+    key?: SelectorKey // should be a unique key/name which identifies the selector
+}
 
 export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
 
     public collection: () => Collection<DataType>;
     public _id: ItemKey;
 
-    constructor(collection: Collection<DataType>, key: ItemKey) {
+    constructor(collection: Collection<DataType>, id: ItemKey, config?: SelectorConfigInterface) {
         // If no key provided set it to dummy (dummyKey)
-        if (!key)
-            key = 'dummy';
+        if (!id)
+            id = 'dummy';
 
         // Instantiate Computed with 'computed' function
-        super(collection.agileInstance(), () => findData<DataType>(collection, key));
+        super(collection.agileInstance(), () => findData<DataType>(collection, id));
+
+        if (config?.key)
+            this._key = config?.key;
 
         this.collection = () => collection;
-        this._id = key;
+        this._id = id;
 
         // Set type of State to object because a collection item is always an object
         this.type(Object);
@@ -45,8 +54,8 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
     /**
      * Changes the id on which the selector is watching
      */
-    public select(key: ItemKey) {
-        this.id = key;
+    public select(id: ItemKey) {
+        this.id = id;
     }
 
 
@@ -55,9 +64,9 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
     //=========================================================================================================
     /**
      * Saves the state in the local storage or in a own configured storage
-     * @param key - the storage key
+     * @param key - the storage key (if no key passed it will take the state key)
      */
-    public persist(key?: StateKey): this {
+    public persist(key?: StorageKey): this {
         this.isPersistState = persistValue(this, key);
         return this;
     }
@@ -82,14 +91,14 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
 /**
  * Computed function for the Selector
  */
-function findData<DataType>(collection: Collection<DataType>, key: ItemKey) {
+function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
     // Find data by id in collection
-    let data = collection.findById(key).value;
+    let data = collection.findById(id).value;
 
     // If data is not found, create placeholder data, so that when real data is collected it maintains connection
     if (!data) {
-        collection.data[key] = new Item<DataType>(collection, {id: key} as any);
-        data = collection.findById(key).value as DataType;
+        collection.data[id] = new Item<DataType>(collection, {id: id} as any);
+        data = collection.findById(id).value as DataType;
     }
 
     return data;
