@@ -458,12 +458,13 @@ export class Collection<DataType = DefaultDataItem> {
      */
     public removeData(primaryKeys: ItemKey | Array<ItemKey>) {
         const _primaryKeys = normalizeArray<ItemKey>(primaryKeys);
-        const groups = Object.keys(this.groups)
-        const dataKeys = Object.keys(this.data);
+        const groupKeys = Object.keys(this.groups);
+        const selectorKeys = Object.keys(this.selectors);
+        const itemKeys = Object.keys(this.data);
 
         _primaryKeys.forEach(primaryKey => {
             // Check if primaryKey exists in collection
-            if (dataKeys.findIndex(key => primaryKey === key) === -1) {
+            if (itemKeys.findIndex(key => primaryKey === key) === -1) {
                 console.error(`Agile: Couldn't find primaryKey '${primaryKey} in collection`, this);
                 return;
             }
@@ -474,10 +475,15 @@ export class Collection<DataType = DefaultDataItem> {
             // Decrease size
             this.size--;
 
-            // Remove primaryKey from groups
-            groups.forEach(groupKey => {
+            // Remove primaryKey from Groups
+            groupKeys.forEach(groupKey => {
                 this.groups[groupKey].remove(primaryKey);
             });
+
+            // Remove Selectors with primaryKey
+            selectorKeys.forEach(selectorKey => {
+                delete this.selectors[selectorKey];
+            })
         });
     }
 
