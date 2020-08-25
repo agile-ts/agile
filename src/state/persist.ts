@@ -8,7 +8,7 @@ import Storage, {StorageKey} from "../storage";
 /**
  * Will persist the 'state' into the configured storage with the key or if no key passed the state key
  */
-export function persistValue(state: State, key?: StorageKey): boolean {
+export async function persistValue(state: State, key?: StorageKey): Promise<boolean> {
     // Validate Key
     const tempKey = validateKey(state, key);
     if (!tempKey) {
@@ -24,12 +24,21 @@ export function persistValue(state: State, key?: StorageKey): boolean {
     storage.persistedStates.add(state);
 
     // Call Handle which decides weather it has to add the storage value to the state or save the state into the storage
-    if (storage.isAsync)
-        storage.get(key).then((value: any) => handleStorageValue(value, storage, state));
-    else
-        handleStorageValue(storage.get(key), storage, state);
+    await handleStorageValue(key, storage, state);
 
     return true;
+}
+
+
+//=========================================================================================================
+// Update Value
+//=========================================================================================================
+/**
+ * Save current _value into storage if isPersistState
+ */
+export function updateValue(state: State) {
+    if (state.isPersistState && state.key)
+        state.agileInstance().storage.set(state.key, state._value);
 }
 
 
@@ -39,25 +48,28 @@ export function persistValue(state: State, key?: StorageKey): boolean {
 
 function validateKey(state: State, key?: StorageKey): StorageKey | null {
     // Get key from State key
-    if (!key && state._key)
-        return state._key;
+    if (!key && state.key)
+        return state.key;
 
     // Return null if no key can be found
     if (!key)
         return null;
 
     // Set this storage key as state key
-    state._key = key;
+    state.key = key;
     return key;
 }
 
-function handleStorageValue(storageVal: any, storage: Storage, state: State) {
+async function handleStorageValue(key: StorageKey, storage: Storage, state: State) {
+    // Get storage Value
+    const storageValue = await storage.get(key);
+
     // If the value doesn't exist in the storage yet.. create it
-    if (storageVal === null) {
-        storage.set(state._key || '', state.getPersistableValue());
+    if (!storageValue && state.key) {
+        storage.set(state.key, state.getPersistableValue());
         return;
     }
 
     // If the value already exists in the storage.. load it into the state
-    state.agileInstance().runtime.ingest(state, storageVal);
+    state.set(storageValue);
 }

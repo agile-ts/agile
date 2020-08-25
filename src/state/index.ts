@@ -1,7 +1,7 @@
 import Agile from "../agile";
 import {copy, defineConfig, flatMerge, isValidObject} from "../utils";
 import Dep from "./dep";
-import {persistValue} from "./persist";
+import {persistValue, updateValue} from "./persist";
 import {StorageKey} from "../storage";
 
 export type StateKey = string | number;
@@ -218,7 +218,9 @@ export class State<ValueType = any> {
      * @param key - the storage key (if no key passed it will take the state key)
      */
     public persist(key?: StorageKey): this {
-        this.isPersistState = persistValue(this, key);
+        persistValue(this, key).then((value) => {
+            this.isPersistState = value
+        });
         return this;
     }
 
@@ -253,15 +255,14 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * @internal
-     *  Will set a new _value without causing a rerender
+     *  Will set a new _value and handles the stuff around like storage, ..
      */
     public privateWrite(value: any) {
         this._value = copy(value);
         this.nextState = copy(value);
 
         // Save changes in Storage
-        if (this.isPersistState && this.key)
-            this.agileInstance().storage.set(this.key, this._value);
+        updateValue(this);
     }
 
 
