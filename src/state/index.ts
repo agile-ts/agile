@@ -1,5 +1,5 @@
 import Agile from "../agile";
-import {copy, defineConfig, flatMerge} from "../utils";
+import {copy, defineConfig, flatMerge, isValidObject} from "../utils";
 import Dep from "./dep";
 import {persistValue} from "./persist";
 import {StorageKey} from "../storage";
@@ -61,7 +61,6 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
-     * @param {ValueType} newState - The new value for this state
      */
     public set(value?: ValueType, options: { background?: boolean, sideEffects?: boolean } = {}): this {
         // Causes a rerender on this State without changing it
@@ -75,11 +74,15 @@ export class State<ValueType = any> {
             sideEffects: true
         });
 
-        // Check Type is Correct
+        // Check if Type is Correct
         if (this.valueType && !this.isCorrectType(value)) {
             console.warn(`Agile: Incorrect type (${typeof value}) was provided. Type fixed to ${this.valueType}`);
             return this;
         }
+
+        // Check if something has changed
+        if (this.value === value)
+            return this;
 
         // Ingest update
         this.agileInstance().runtime.ingest(this, value, {
@@ -154,13 +157,17 @@ export class State<ValueType = any> {
      */
     public patch(targetWithChanges: Object): this {
         // Check if state is object.. because only objects can use the patch method
-        if (!(typeof this.nextState === 'object')) {
+        if (!isValidObject(this.nextState)) {
             console.error("Agile: You can't use the patch method an a non object state!");
             return this;
         }
 
         // Merge targetWithChanges into next State
         this.nextState = flatMerge<ValueType>(this.nextState, targetWithChanges);
+
+        // Check if something has changed
+        if (this.value === this.nextState)
+            return this;
 
         // Set State to nextState
         this.set();
@@ -180,12 +187,6 @@ export class State<ValueType = any> {
         // Check if callback is a function  (js)
         if (typeof callback !== 'function') {
             console.error('A callback has to be a function');
-            return this;
-        }
-
-        // Check if key is a string (because its a key of an object) (js)
-        if (typeof key !== 'string') {
-            console.error('A key has to be a string');
             return this;
         }
 
