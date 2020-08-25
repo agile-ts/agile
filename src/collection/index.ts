@@ -247,7 +247,7 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Create a selector instance on this collection
      */
-    public createSelector(selectorName: GroupKey, id: ItemKey): Selector<DataType> {
+    public createSelector(selectorName: SelectorKey, id: ItemKey): Selector<DataType> {
         // Check if Selector already exist
         if (this.selectors.hasOwnProperty(selectorName)) {
             console.warn(`Agile: The Selector with the name ${selectorName} already exists!`);
