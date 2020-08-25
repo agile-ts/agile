@@ -2,6 +2,7 @@ import Agile from "../agile";
 import {copy, defineConfig, flatMerge} from "../utils";
 import Dep from "./dep";
 import {persistValue} from "./persist";
+import {StorageKey} from "../storage";
 
 export type StateKey = string | number;
 
@@ -35,7 +36,7 @@ export class State<ValueType = any> {
     }
 
     public set value(value: ValueType) {
-        this._value = value;
+        this.set(value);
     }
 
     public get value(): ValueType {
@@ -149,9 +150,7 @@ export class State<ValueType = any> {
     // Patch
     //=========================================================================================================
     /**
-     * Will always be called if the state changes
-     * @param key - The key of the watch method
-     * @param callback - The callback function
+     * Will merge the changes into the state
      */
     public patch(targetWithChanges: Object): this {
         // Check if state is object.. because only objects can use the patch method
@@ -215,9 +214,9 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * Saves the state in the local storage or in a own configured storage
-     * @param key - the storage key
+     * @param key - the storage key (if no key passed it will take the state key)
      */
-    public persist(key?: StateKey): this {
+    public persist(key?: StorageKey): this {
         this.isPersistState = persistValue(this, key);
         return this;
     }

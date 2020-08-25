@@ -1,4 +1,4 @@
-import {State, StateKey} from "./index";
+import {State} from "./index";
 import Storage, {StorageKey} from "../storage";
 
 
@@ -8,7 +8,7 @@ import Storage, {StorageKey} from "../storage";
 /**
  * Will persist the 'state' into the configured storage with the key or if no key passed the state key
  */
-export function persistValue(state: State, key?: StateKey): boolean {
+export function persistValue(state: State, key?: StorageKey): boolean {
     // Validate Key
     const tempKey = validateKey(state, key);
     if (!tempKey) {
@@ -37,7 +37,7 @@ export function persistValue(state: State, key?: StateKey): boolean {
 // Helper
 //=========================================================================================================
 
-function validateKey(state: State, key?: StateKey): StorageKey | null {
+function validateKey(state: State, key?: StorageKey): StorageKey | null {
     // Get key from State key
     if (!key && state._key)
         return state._key;
