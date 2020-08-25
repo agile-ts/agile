@@ -242,6 +242,33 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Create Selector
+    //=========================================================================================================
+    /**
+     * Create a selector instance on this collection
+     */
+    public createSelector(selectorName: GroupKey, id: ItemKey): Selector<DataType> {
+        // Check if Selector already exist
+        if (this.selectors.hasOwnProperty(selectorName)) {
+            console.warn(`Agile: The Selector with the name ${selectorName} already exists!`);
+            return this.selectors[selectorName];
+        }
+
+        // Create new Selector
+        const selector = new Selector<DataType>(this, id, {key: selectorName});
+
+        // Add new Selector to selectors
+        this.selectors[selectorName] = selector;
+
+        // Log Job
+        if (this.agileInstance().config.logJobs)
+            console.log(`Agile: Created Selector called '${selectorName}'`, selector);
+
+        return selector;
+    }
+
+
+    //=========================================================================================================
     // Get Group
     //=========================================================================================================
     /**
@@ -382,12 +409,12 @@ export class Collection<DataType = DefaultDataItem> {
         }
 
         // Update Selector
-        for(let selectorName in this.selectors){
-          // Get Selector
+        for (let selectorName in this.selectors) {
+            // Get Selector
             const selector = this.getSelector(selectorName);
 
             // If Selector doesn't watch on the oldKey, continue
-            if(selector.id !== oldKey) continue;
+            if (selector.id !== oldKey) continue;
 
             // Replace the oldKey with the newKey
             selector.select(newKey);
