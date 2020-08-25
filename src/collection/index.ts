@@ -490,44 +490,45 @@ export class Collection<DataType = DefaultDataItem> {
      * Save data directly into the collection
      */
     public saveData(data: DataType, patch?: boolean): ItemKey | null {
+        // Transform data to any because otherwise I have many type errors (because not defined object)
+        // https://stackoverflow.com/questions/57350092/string-cant-be-used-to-index-type
+        const _data = data as any;
+
         // Get primaryKey (default: 'id')
-        const key = this.config.primaryKey || 'id';
+        const primaryKey = this.config.primaryKey || 'id';
+        const itemKey = _data[primaryKey];
 
         // Check if data is object if not return
-        if (!isValidObject(data)) {
+        if (!isValidObject(_data)) {
             console.error("Agile: Collections items has to be an object for now!");
             return null;
         }
 
         // Check if data has primaryKey
-        // @ts-ignore
-        if (!data.hasOwnProperty(key)) {
+        if (!_data.hasOwnProperty(primaryKey)) {
             console.error("Agile: Collections items need a own primaryKey (default = id)");
             return null;
         }
 
         // Create reference of data at the data key
-        // @ts-ignore
-        let item: Item<DataType> = this.data[data[key]];
+        let item: Item<DataType> = this.data[itemKey];
 
         // If the data already exists and config is to patch, patch data
         if (item && patch)
-            item.patch(data);
+            item.patch(_data);
         // If the data already exists and no config, overwrite data
         else if (item)
-            item.set(data);
+            item.set(_data);
         // If data does not exist.. create new Data set
         else
-            item = new Item<DataType>(this, data);
+            item = new Item<DataType>(this, _data);
 
-        // @ts-ignore
-        this.data[data[key]] = item;
+        this.data[itemKey] = item;
 
         // Increase size
         this.size++;
 
-        // @ts-ignore
-        return data[key];
+        return itemKey;
     }
 
 
