@@ -5,6 +5,7 @@ import {State} from "./state";
 import Storage, {StorageConfigInterface} from "./storage";
 import {Collection, Config, DefaultDataItem} from "./collection";
 import {Computed} from "./computed";
+import API, {apiConfig} from "./api/api";
 
 export interface AgileConfigInterface {
     framework?: any
@@ -48,11 +49,34 @@ export default class Agile {
 
 
     //=========================================================================================================
+    // API
+    //=========================================================================================================
+    /**
+     * Create Agile API
+     * @param config Object
+     * @param config.options Object - Typescript default: RequestInit (headers, credentials, mode, etc...)
+     * @param config.baseURL String - Url to prepend to endpoints (without trailing slash)
+     * @param config.timeout Number - Time to wait for request before throwing error
+     */
+    public API = (config: apiConfig) => new API(config);
+
+
+    //=========================================================================================================
+    // Storage
+    //=========================================================================================================
+    /**
+     * Create Agile Storage
+     */
+    public Storage = (config: StorageConfigInterface) => new Storage(this, config);
+
+
+    //=========================================================================================================
     // State
     //=========================================================================================================
     /**
      * Create Agile State
      * @param initialState Any - the value to initialize a State instance with
+     * @key State key/name which identifies the state
      */
     public State = <ValueType>(initialState: ValueType, key?: string) => new State<ValueType>(this, initialState, key);
 
@@ -94,6 +118,9 @@ export default class Agile {
 
         // Save all already saved states into the new Storage
         this.storage.persistedStates.forEach(state => state.persist(state.key));
+
+        // Save all already saved collections into the new Storage
+        this.storage.persistedCollections.forEach(collection => collection.persist(collection.key));
     }
 
 
