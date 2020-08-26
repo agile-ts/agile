@@ -86,12 +86,9 @@ export class State<ValueType = any> {
 
         // Ingest update
         this.agileInstance().runtime.ingest(this, value, {
-            background: options.background
+            background: options.background,
+            sideEffects: options.sideEffects
         });
-
-        // Execute Side Effects
-        if (options.sideEffects && this.sideEffects)
-            this.sideEffects();
 
         this.isSet = value !== this.initialState;
         return this;

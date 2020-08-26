@@ -7,12 +7,16 @@ import {Computed} from "./computed";
 export interface JobInterface {
     state: State
     newStateValue?: any
-    background?: boolean
+    options?: {
+        background?: boolean
+        sideEffects?: boolean
+    }
 }
 
 export interface JobConfigInterface {
     perform?: boolean
     background?: boolean
+    sideEffects?: boolean
 }
 
 export default class Runtime {
@@ -48,7 +52,10 @@ export default class Runtime {
         const job: JobInterface = {
             state: state,
             newStateValue: newStateValue,
-            background: options?.background
+            options: {
+                background: options?.background,
+                sideEffects: options?.sideEffects
+            }
         };
 
         // Check if state value und newStateValue are the same.. if so return
@@ -98,10 +105,10 @@ export default class Runtime {
         job.state.privateWrite(job.newStateValue);
 
         // Perform SideEffects like watcher functions
-        this.sideEffects(job.state);
+        this.sideEffects(job);
 
         // Set Job as completed (The deps and subs of completed jobs will be updated)
-        if (!job.background)
+        if (!job.options?.background)
             this.jobsToRerender.push(job);
 
         // Reset Current Job
@@ -135,16 +142,16 @@ export default class Runtime {
      * @internal
      * SideEffects are sideEffects of the perform function.. for instance the watchers
      */
-    private sideEffects(state: State) {
+    private sideEffects(job: JobInterface) {
+        const state = job.state;
+
         // Call Watchers
         for (let watcher in state.watchers)
             if (typeof state.watchers[watcher] === 'function')
                 state.watchers[watcher](state.getPublicValue());
 
         // Call State SideEffects
-        // this should not be used on root state class as it would be overwritten by extentions
-        // this is used mainly to cause group to generate its output after changing
-        if (typeof state.sideEffects === 'function')
+        if (typeof state.sideEffects === 'function' && job.options?.sideEffects)
             state.sideEffects();
 
         // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
