@@ -1,6 +1,7 @@
 import Agile from "./agile";
 import {State} from "./state";
 import {isAsyncFunction, isFunction, isJsonString} from "./utils";
+import {Collection} from "./collection";
 
 export type StorageKey = string | number;
 export interface StorageConfigInterface {
@@ -23,6 +24,7 @@ export default class Storage {
     private storageConfig: StorageConfigInterface;
 
     public persistedStates: Set<State> = new Set();
+    public persistedCollections: Set<Collection> = new Set();
 
     constructor(agileInstance: Agile, storageConfig: StorageConfigInterface) {
         this.agileInstance = () => agileInstance;

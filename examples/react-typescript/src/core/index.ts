@@ -29,9 +29,9 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(collection
         myGroup: collection.Group()
     },
     selectors: {
-        mySelector: collection.Selector("id1")
+        mySelector: collection.Selector("id3")
     }
-}));
+})).persist();
 MY_COLLECTION.collect({id: 'id1', name: 'test'});
 MY_COLLECTION.collect({id: 'id2', name: 'test2'}, 'myGroup');
 console.log("Initial: myCollection ", MY_COLLECTION);

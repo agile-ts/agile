@@ -4,6 +4,8 @@ import {Group, GroupConfigInterface, GroupKey} from "./group";
 import {Selector, SelectorKey} from "./selector";
 import {copy, defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
 import {State, StateKey} from "../state";
+import {StorageKey} from "../storage";
+import {persistValue, removeItem, setItem} from "./perstist";
 
 export type DefaultDataItem = { [key: string]: any };
 export type CollectionKey = string | number;
@@ -36,6 +38,7 @@ export class Collection<DataType = DefaultDataItem> {
     public size: number = 0;  // The amount of data items stored inside this collection
     public data: { [key: string]: Item<DataType> } = {}; // Collection data is stored here
     public _key?: CollectionKey;
+    public isPersistCollection: boolean = false; // Is saved in storage
 
     public groups: { [key: string]: Group<any> } = {};
     public selectors: { [key: string]: Selector<any> } = {};
@@ -352,6 +355,21 @@ export class Collection<DataType = DefaultDataItem> {
 
 
     //=========================================================================================================
+    // Persist
+    //=========================================================================================================
+    /**
+     * Saves the collection in the local storage or in a own configured storage
+     * @param key - the storage key (if no key passed it will take the collection key)
+     */
+    public persist(key?: StorageKey): this {
+        persistValue(this, key).then((value) => {
+            this.isPersistCollection = value
+        });
+        return this;
+    }
+
+
+    //=========================================================================================================
     // Group
     //=========================================================================================================
     /**
@@ -462,28 +480,31 @@ export class Collection<DataType = DefaultDataItem> {
         const selectorKeys = Object.keys(this.selectors);
         const itemKeys = Object.keys(this.data);
 
-        _primaryKeys.forEach(primaryKey => {
+        _primaryKeys.forEach(itemKey => {
             // Check if primaryKey exists in collection
-            if (itemKeys.findIndex(key => primaryKey === key) === -1) {
-                console.error(`Agile: Couldn't find primaryKey '${primaryKey} in collection`, this);
+            if (itemKeys.findIndex(key => itemKey === key) === -1) {
+                console.error(`Agile: Couldn't find primaryKey '${itemKey} in collection`, this);
                 return;
             }
 
             // Remove primaryKey from collection data
-            delete this.data[primaryKey];
+            delete this.data[itemKey];
 
             // Decrease size
             this.size--;
 
             // Remove primaryKey from Groups
             groupKeys.forEach(groupKey => {
-                this.groups[groupKey].remove(primaryKey);
+                this.groups[groupKey].remove(itemKey);
             });
 
             // Remove Selectors with primaryKey
             selectorKeys.forEach(selectorKey => {
                 delete this.selectors[selectorKey];
-            })
+            });
+
+            // Storage
+            removeItem(itemKey, this);
         });
     }
 
@@ -533,6 +554,9 @@ export class Collection<DataType = DefaultDataItem> {
 
         // Increase size
         this.size++;
+
+        // Storage
+        setItem(itemKey, this);
 
         return itemKey;
     }

@@ -2,6 +2,7 @@ import {Collection, DefaultDataItem, ItemKey} from "./index";
 import {State} from "../state";
 import Agile from "../agile";
 import {defineConfig} from "../utils";
+import {updateGroup} from "./perstist";
 
 export type GroupKey = string | number;
 
@@ -71,18 +72,22 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     /**
      * Removes a item at primaryKey from the group
      */
-    public remove(primaryKey: ItemKey): this {
+    public remove(itemKey: ItemKey): this {
         // Check if primaryKey exists in group if not, return
-        if (this.value.findIndex(key => key === primaryKey) === -1) {
-            console.error(`Agile: Couldn't find primaryKey '${primaryKey} in group`, this);
+        if (this.value.findIndex(key => key === itemKey) === -1) {
+            console.error(`Agile: Couldn't find primaryKey '${itemKey} in group`, this);
             return this;
         }
 
         // Remove primaryKey from nextState
-        this.nextState = this.nextState.filter((i) => i !== primaryKey);
+        this.nextState = this.nextState.filter((i) => i !== itemKey);
 
         // Set State to nextState
         this.set();
+
+        // Storage
+        if (this.key)
+            updateGroup(this.key, this.collection());
 
         return this;
     }
@@ -94,24 +99,28 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     /**
      * Adds a key to a group
      */
-    public add(primaryKey: ItemKey, options: GroupAddOptionsInterface = {}): this {
-        const exists = this.nextState.findIndex(key => key === primaryKey) !== -1;
+    public add(itemKey: ItemKey, options: GroupAddOptionsInterface = {}): this {
+        const exists = this.nextState.findIndex(key => key === itemKey) !== -1;
 
         // Merge default values into options
         options = defineConfig(options, {method: 'push', overwrite: true});
 
         // Removes temporary key from group to overwrite it properly
         if (options.overwrite)
-            this.nextState = this.nextState.filter((i) => i !== primaryKey);
+            this.nextState = this.nextState.filter((i) => i !== itemKey);
         // If we do not want to overwrite and key already exists in group, exit
         else if (exists)
             return this;
 
         // Push or unshift into state
-        this.nextState[options.method || 'push'](primaryKey);
+        this.nextState[options.method || 'push'](itemKey);
 
         // Set State to nextState
         this.set();
+
+        // Storage
+        if (this.key)
+            updateGroup(this.key, this.collection());
 
         return this;
     }

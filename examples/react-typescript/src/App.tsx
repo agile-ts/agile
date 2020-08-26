@@ -9,7 +9,7 @@ const App = (props: any) => {
     const [myComputed] = useAgile([MY_COMPUTED]);
     const [myState, myState2] = useAgile([MY_STATE, MY_STATE_2]);
     const [myCollection] = useAgile([MY_COLLECTION.getGroup('myGroup')]);
-    const [mySelector] = useAgile([MY_COLLECTION.selectors.mySelector]);
+    const [mySelector] = useAgile([MY_COLLECTION.getSelector('mySelector')]);
 
 
     console.log("myComputed", MY_COMPUTED);
@@ -25,7 +25,7 @@ const App = (props: any) => {
                 <div className={"Container"}>
                     <h3 className={"Title"}>My State</h3>
                     <button onClick={() => setTimeout(() => {
-                        MY_STATE.set("Test1");
+                        MY_STATE.set("Test10");
                     }, 1000)}>
                         {myState}_{myState2}
                     </button>
