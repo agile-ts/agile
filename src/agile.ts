@@ -8,10 +8,10 @@ import {Computed} from "./computed";
 import API, {apiConfig} from "./api/api";
 
 export interface AgileConfigInterface {
-    framework?: any
-    logJobs?: boolean
-    waitForMount?: boolean,
-    storageConfig?: StorageConfigInterface
+    framework?: Integration | any // Integration = for custom frameworks | any = for existing frameworks like react
+    logJobs?: boolean // If Agile should log some stuff in the console
+    waitForMount?: boolean // If Agile should wait until the component mounted (note working yet)
+    storageConfig?: StorageConfigInterface // For custom storage (default: Local Storage)
 }
 
 export default class Agile {
