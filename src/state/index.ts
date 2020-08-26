@@ -81,7 +81,7 @@ export class State<ValueType = any> {
         }
 
         // Check if something has changed
-        if (this.value === value)
+        if (this.value === value || JSON.stringify(this.value) === JSON.stringify(value))
             return this;
 
         // Ingest update
