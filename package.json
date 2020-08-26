@@ -6,7 +6,8 @@
   "module": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc-watch"
+    "dev": "tsc-watch",
+    "test": "mocha"
   },
   "types": "./dist/index.d.ts",
   "author": "BennoDev",

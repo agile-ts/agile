@@ -2,15 +2,16 @@ import 'mocha';
 import {expect} from 'chai';
 import Agile, {State} from "../../src";
 
-
 describe('Default Tests', () => {
     const App = new Agile();
 
+    // Set States
     const MY_BOOLEAN = App.State<boolean>(true);
     const MY_STRING = App.State<string>('hello');
     const MY_NUMBER = App.State<number>(10);
     const MY_OBJECT = App.State<{ name: string }>({name: 'jeff'});
 
+    // Set States with Key
     const MY_BOOLEAN_WITH_KEY = App.State<boolean>(true, 'boolean');
     const MY_STRING_WITH_KEY = App.State<string>('hello', 'string');
     const MY_NUMBER_WITH_KEY = App.State<number>(10, 'number');
@@ -52,7 +53,6 @@ describe('Default Tests', () => {
         expect(typeof MY_OBJECT_WITH_KEY.value === 'object').to.eq(true);
     });
 
-    /* Does fail somehow because it set the new key value(See: 'Change Key' Test) before executing this test
     it('Has correct key', () => {
         expect(MY_BOOLEAN.key).to.eq(undefined);
         expect(MY_STRING.key).to.eq(undefined);
@@ -64,7 +64,6 @@ describe('Default Tests', () => {
         expect(MY_NUMBER_WITH_KEY.key).to.eq('number');
         expect(MY_OBJECT_WITH_KEY.key).to.eq('object');
     });
-     */
 
     it('Has correct nextState', () => {
         expect(MY_BOOLEAN.nextState).to.eq(true);
@@ -127,17 +126,17 @@ describe('Default Tests', () => {
     });
 
     describe('Change Key', () => {
-        MY_BOOLEAN.key = 'newBoolean';
-        MY_STRING.key = 'newString';
-        MY_NUMBER.key = 'newNumber';
-        MY_OBJECT.key = 'newObject';
-
-        MY_BOOLEAN_WITH_KEY.key = 'newBoolean';
-        MY_STRING_WITH_KEY.key = 'newString';
-        MY_NUMBER_WITH_KEY.key = 'newNumber';
-        MY_OBJECT_WITH_KEY.key = 'newObject';
-
         it('Has correct key', () => {
+            MY_BOOLEAN.key = 'newBoolean';
+            MY_STRING.key = 'newString';
+            MY_NUMBER.key = 'newNumber';
+            MY_OBJECT.key = 'newObject';
+
+            MY_BOOLEAN_WITH_KEY.key = 'newBoolean';
+            MY_STRING_WITH_KEY.key = 'newString';
+            MY_NUMBER_WITH_KEY.key = 'newNumber';
+            MY_OBJECT_WITH_KEY.key = 'newObject';
+
             expect(MY_BOOLEAN.key).to.eq('newBoolean');
             expect(MY_STRING.key).to.eq('newString');
             expect(MY_NUMBER.key).to.eq('newNumber');
