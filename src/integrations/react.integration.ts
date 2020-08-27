@@ -102,8 +102,9 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 //=========================================================================================================
 // Use Agile Hook
 //=========================================================================================================
+type AgileHookType<X> = { [K in keyof X]: X[K] extends State<infer U> ? U : unknown };
 
-export function useAgile(deps: Array<State | Collection> | State | Collection, agileInstance?: Agile) {
+export function useAgile<X extends Array<State | Collection>>(deps: X, agileInstance?: Agile): AgileHookType<X> {
     // Normalize Dependencies
     let depsArray = normalizeArray<State | Collection>(deps)
         .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item);
@@ -113,7 +114,7 @@ export function useAgile(deps: Array<State | Collection> | State | Collection, a
         const tempAgileInstance = getAgileInstance(depsArray[0]);
         if (!tempAgileInstance) {
             console.error("Agile: Failed to get Agile Instance");
-            return undefined;
+            return [undefined] as AgileHookType<X>;
         }
         agileInstance = tempAgileInstance;
     }
@@ -122,7 +123,7 @@ export function useAgile(deps: Array<State | Collection> | State | Collection, a
     const React = agileInstance.integration?.frameworkConstructor;
     if (!React) {
         console.error("Agile: Failed to get Framework Constructor");
-        return undefined;
+        return [undefined] as AgileHookType<X>;
     }
 
     // This is a Trigger State used to force the component to Re-render
@@ -148,7 +149,7 @@ export function useAgile(deps: Array<State | Collection> | State | Collection, a
     // Return Public Value of State in Array
     return depsArray.map(dep => {
         return dep.getPublicValue();
-    });
+    }) as AgileHookType<X>;
 }
 
 
