@@ -63,15 +63,10 @@ export class State<ValueType = any> {
      * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
      */
     public set(value?: ValueType, options: { background?: boolean, sideEffects?: boolean } = {}): this {
-        // Causes a rerender on this State without changing it
-        if (arguments[0] === undefined) {
-            this.agileInstance().runtime.ingest(this);
-            return this;
-        }
-
         // Assign defaults to options
         options = defineConfig(options, {
-            sideEffects: true
+            sideEffects: true,
+            background: false
         });
 
         // Check if Type is Correct
@@ -92,6 +87,27 @@ export class State<ValueType = any> {
 
         this.isSet = value !== this.initialState;
         return this;
+    }
+
+
+    //=========================================================================================================
+    // Ingest
+    //=========================================================================================================
+    /**
+     * @internal
+     * Will ingest the nextState or the computedValue (rebuilds state)
+     */
+    public ingest(options: { background?: boolean, sideEffects?: boolean } = {}) {
+        // Assign defaults to options
+        options = defineConfig(options, {
+            sideEffects: true,
+            background: false
+        });
+
+        this.agileInstance().runtime.ingest(this, this.agileInstance().runtime.internalIngestKey, {
+            background: options.background,
+            sideEffects: options.sideEffects
+        });
     }
 
 
@@ -167,7 +183,7 @@ export class State<ValueType = any> {
             return this;
 
         // Set State to nextState
-        this.set();
+        this.ingest();
 
         return this;
     }

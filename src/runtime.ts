@@ -31,6 +31,8 @@ export default class Runtime {
     public trackState: boolean = false; // Check if agile should track states
     public foundStates: Set<State> = new Set(); // States which were tracked during the track time
 
+    public internalIngestKey = "This is an Internal Key for ingesting internal stuff!";
+
     constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
     }
@@ -46,17 +48,29 @@ export default class Runtime {
      */
     public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {}): void {
         // Merge default values into options
-        options = defineConfig<JobConfigInterface>(options, {perform: true, background: false});
+        options = defineConfig<JobConfigInterface>(options, {
+            perform: true,
+            background: false,
+            sideEffects: true
+        });
 
         // Create Job
         const job: JobInterface = {
             state: state,
             newStateValue: newStateValue,
             options: {
-                background: options?.background,
-                sideEffects: options?.sideEffects
+                background: options.background,
+                sideEffects: options.sideEffects
             }
         };
+
+        // Grab nextState if newState not passed or compute if needed
+        if (newStateValue === this.internalIngestKey) {
+            if (job.state instanceof Computed)
+                job.newStateValue = job.state.computeValue();
+            else
+                job.newStateValue = job.state.nextState
+        }
 
         // Check if state value und newStateValue are the same.. if so return
         if (state.value === newStateValue) {
@@ -65,19 +79,11 @@ export default class Runtime {
             return;
         }
 
-        // Grab nextState if newState not passed or compute if needed
-        if (newStateValue === undefined) {
-            if (job.state instanceof Computed)
-                job.newStateValue = job.state.computeValue();
-            else
-                job.newStateValue = job.state.nextState
-        }
-
         // Push the Job to the Queue (safety.. that no Job get forgotten)
         this.jobQueue.push(job);
 
         // Perform the Job
-        if (options?.perform) {
+        if (options.perform) {
             const performJob = this.jobQueue.shift();
             if (performJob)
                 this.perform(performJob);

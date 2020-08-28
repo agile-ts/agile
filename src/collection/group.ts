@@ -7,8 +7,9 @@ import {updateGroup} from "./perstist";
 export type GroupKey = string | number;
 
 export interface GroupAddOptionsInterface {
-    method?: 'unshift' | 'push'; // method to add to group
-    overwrite?: boolean; // set to false to leave primary key in place if it already exists
+    method?: 'unshift' | 'push' // method to add to group
+    overwrite?: boolean // set to false to leave primary key in place if it already exists
+    background?: boolean
 }
 
 export interface GroupConfigInterface {
@@ -18,7 +19,8 @@ export interface GroupConfigInterface {
 export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     collection: () => Collection<DataType>;
 
-    _output: Array<DataType> = []; // Output of the collection (Note: _value are only the keys of the collection items)
+    _output: Array<DataType> = []; // Output of the group (Note: _value are only the keys of the collection items)
+    _states: Array<State<DataType>> = []; // States of the Group
     notFoundPrimaryKeys: Array<ItemKey> = []; // Contains all key which can't be found in the collection
 
     constructor(agileInstance: Agile, collection: Collection<DataType>, initialItems?: Array<ItemKey>, config?: GroupConfigInterface) {
@@ -36,13 +38,20 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     }
 
     public get output(): Array<DataType> {
-        // Add state to foundState (for auto tracking used states in computed functions)
+        // Add state(group) to foundState (for auto tracking used states in computed functions)
         if (this.agileInstance().runtime.trackState)
             this.agileInstance().runtime.foundStates.add(this);
 
         return this._output;
     }
 
+    public get states(): Array<State<DataType>> {
+        // Add state(group) to foundState (for auto tracking used states in computed functions)
+        if (this.agileInstance().runtime.trackState)
+            this.agileInstance().runtime.foundStates.add(this);
+
+        return this._states;
+    }
 
     //=========================================================================================================
     // Has
@@ -83,7 +92,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         this.nextState = this.nextState.filter((i) => i !== itemKey);
 
         // Set State to nextState
-        this.set();
+        this.ingest();
 
         // Storage
         if (this.key)
@@ -116,7 +125,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         this.nextState[options.method || 'push'](itemKey);
 
         // Set State to nextState
-        this.set();
+        this.ingest({background: options.background});
 
         // Storage
         if (this.key)
@@ -142,27 +151,34 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
             return;
         }
 
-        // Map trough group key and returns their value
-        const finalOutput = this._value
+        // Map though group _value (collectionKey array) and get their state from collection
+        const finalStates = this._value
             .map((primaryKey) => {
                 // Get collection data at the primaryKey position
                 let data = this.collection().data[primaryKey];
 
-                // if no data found add this key to missing PrimaryKeys
+                // If no data found add this key to missing PrimaryKeys
                 if (!data) {
                     this.notFoundPrimaryKeys.push(primaryKey);
                     return;
                 }
 
-                // Return state value of data
-                return data.getPublicValue();
+                return data as State<DataType>;
             }).filter(item => item !== undefined);
+
+        // Map though found States and return their publicValue
+        const finalOutput = finalStates
+            .map((state) => {
+                // @ts-ignore
+                return state.getPublicValue();
+            });
 
         // Log not found primaryKeys
         if (this.notFoundPrimaryKeys.length > 0 && this.agileInstance().config.logJobs)
             console.warn(`Agile: Couldn't find states with the primary keys in group '${this.key}'`, this.notFoundPrimaryKeys)
 
         // @ts-ignore
+        this._states = finalStates;
         this._output = finalOutput;
     }
 }

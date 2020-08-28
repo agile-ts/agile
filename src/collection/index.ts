@@ -24,6 +24,7 @@ export interface CollectOptionsInterface<DataType = any> {
     patch?: boolean
     method?: 'push' | 'unshift'
     forEachItem?: (item: DataType, key: ItemKey, index: number) => void
+    background?: boolean
 }
 
 export type Config<DataType = DefaultDataItem> =
@@ -167,8 +168,8 @@ export class Collection<DataType = DefaultDataItem> {
 
             // Add key to groups
             _groups.forEach(groupName => {
-                if (key)
-                    this.groups[groupName].add(key, {method: options.method})
+                // @ts-ignore
+                this.groups[groupName].add(key, {method: options.method, background: options.background})
             });
         });
     }
@@ -203,7 +204,7 @@ export class Collection<DataType = DefaultDataItem> {
         itemState.nextState = finalItemValue;
 
         // Set State to nextState
-        itemState.set();
+        itemState.ingest();
 
         // If data key changes update it properly
         if (currentItemValue[primaryKey] !== finalItemValue[primaryKey])
@@ -423,7 +424,7 @@ export class Collection<DataType = DefaultDataItem> {
             group.nextState.splice(group.nextState.indexOf(oldKey), 1, newKey);
 
             // Set State(Group) to nextState
-            group.set();
+            group.ingest();
         }
 
         // Update Selector
@@ -576,7 +577,7 @@ export class Collection<DataType = DefaultDataItem> {
 
             // Check if group contains primaryKey if so rebuild it
             if (group.has(primaryKey))
-                group.set();
+                group.ingest();
         }
     }
 }
