@@ -161,7 +161,7 @@ export default class Runtime {
             state.sideEffects();
 
         // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
-        state.dep.deps.forEach((state) => this.ingest(state, undefined, {perform: false}));
+        state.dep.deps.forEach((state) => this.ingest(state, this.internalIngestKey, {perform: false}));
     }
 
 

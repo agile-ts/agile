@@ -7,16 +7,11 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     public computeFunction: () => ComputedValueType;
     public deps: Array<State> = [];
 
-    constructor(agileInstance: Agile, computeFunction: () => ComputedValueType, deps?: Array<State>) {
+    constructor(agileInstance: Agile, computeFunction: () => ComputedValueType, deps: Array<State> = []) {
         super(agileInstance, computeFunction());
         this.agileInstance = () => agileInstance;
         this.computeFunction = computeFunction;
-        if (deps) {
-            this.deps = deps;
-
-            // Loop through all depending states of this computed and add this to the state dependencies -> this will be updated if on state changes
-            deps.forEach(state => state.dep.depend(this));
-        }
+        this.deps = deps;
 
         // Recompute for setting initial state value and adding missing dependencies
         this.recompute();
@@ -42,13 +37,13 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         this.agileInstance().runtime.trackState = true;
 
         // Call computeFunction
-        const computedValue = this.computeFunction()
+        const computedValue = this.computeFunction();
 
         // Get tracked states
         let foundStates = this.agileInstance().runtime.getFoundStates();
         foundStates.forEach(state => {
             // Check if state isn't a hard coded dependency if not.. add it to dependencies
-            if (this.deps.findIndex(s => s === state) === -1) {
+            if (this.deps.findIndex(dep => dep === state) === -1) {
                 this.deps.push(state);
 
                 // Add this as dependency of this state -> this will be updated if on state changes
