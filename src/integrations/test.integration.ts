@@ -12,7 +12,8 @@ import {getAgileInstance, normalizeArray} from "../utils";
 export function useTest(deps: Array<State | Collection> | State | Collection, callBackFunction: Function, agileInstance?: Agile) {
     // Normalize Dependencies
     let depsArray = normalizeArray<State | Collection>(deps)
-        .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item);
+        .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item)
+        .filter(item => item !== undefined) as State[];
 
     // Get Agile Instance
     if (!agileInstance) {

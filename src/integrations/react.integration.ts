@@ -4,6 +4,7 @@ import {getAgileInstance, normalizeArray} from "../utils";
 import {Integration} from "./use";
 import {SubscriptionContainer} from "../sub";
 import {Collection} from "../collection";
+import {Group} from "../collection/group";
 
 
 //=========================================================================================================
@@ -102,19 +103,54 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
 //=========================================================================================================
 // Use Agile Hook
 //=========================================================================================================
-type AgileHookType<X> = { [K in keyof X]: X[K] extends State<infer U> ? U : unknown };
 
-export function useAgile<X extends Array<State | Collection>>(deps: X, agileInstance?: Agile): AgileHookType<X> {
+// Array Type
+// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
+type AgileHookArrayType<T> = {
+    [K in keyof T]: T[K] extends Group<infer U> ? U[]
+        : T[K] extends State<infer U> ? U
+            : T[K] extends Collection<infer U> ? U[]
+                : T[K] extends undefined ? undefined
+                    : never
+};
+
+// No Array Type
+type AgileHookType<T> = T extends Group<infer U> ? U[]
+    : T extends State<infer U> ? U
+        : T extends Collection<infer U> ? U[]
+            : T extends undefined ? undefined
+                : never;
+
+// Array
+export function useAgile<X extends Array<State | Collection | undefined>>(deps: X, agileInstance?: Agile): AgileHookArrayType<X>;
+
+// No Array
+export function useAgile<X extends State | Collection | undefined>(deps: X, agileInstance?: Agile): AgileHookType<X>;
+
+export function useAgile<X extends Array<State | Collection | undefined>, Y extends State | Collection | undefined>(deps: X | Y, agileInstance?: Agile): AgileHookArrayType<X> | AgileHookType<Y> {
     // Normalize Dependencies
-    let depsArray = normalizeArray<State | Collection>(deps)
-        .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item);
+    let depsArray = normalizeArray<State | Collection | undefined>(deps)
+        .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item)
+        .filter(item => item !== undefined) as State[];
+
+    // Function which creates the return value
+    const getReturnValue = (depsArray: State[]): AgileHookArrayType<X> | AgileHookType<Y> => {
+        // Return Public Value of State
+        if (depsArray.length === 1 && !Array.isArray(deps))
+            return depsArray[0]?.getPublicValue() as AgileHookType<Y>;
+
+        // Return Public Value of State in Array
+        return depsArray.map(dep => {
+            return dep.getPublicValue();
+        }) as AgileHookArrayType<X>;
+    }
 
     // Get Agile Instance
     if (!agileInstance) {
         const tempAgileInstance = getAgileInstance(depsArray[0]);
         if (!tempAgileInstance) {
             console.error("Agile: Failed to get Agile Instance");
-            return [undefined] as AgileHookType<X>;
+            return getReturnValue(depsArray);
         }
         agileInstance = tempAgileInstance;
     }
@@ -123,7 +159,7 @@ export function useAgile<X extends Array<State | Collection>>(deps: X, agileInst
     const React = agileInstance.integration?.frameworkConstructor;
     if (!React) {
         console.error("Agile: Failed to get Framework Constructor");
-        return [undefined] as AgileHookType<X>;
+        return getReturnValue(depsArray);
     }
 
     // This is a Trigger State used to force the component to Re-render
@@ -142,14 +178,7 @@ export function useAgile<X extends Array<State | Collection>>(deps: X, agileInst
         return () => agileInstance?.subController.unsubscribe(subscriptionContainer);
     }, []);
 
-    // Return Public Value of State
-    if (depsArray.length === 1 && !Array.isArray(deps))
-        return depsArray[0].getPublicValue();
-
-    // Return Public Value of State in Array
-    return depsArray.map(dep => {
-        return dep.getPublicValue();
-    }) as AgileHookType<X>;
+    return getReturnValue(depsArray);
 }
 
 
