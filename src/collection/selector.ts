@@ -10,7 +10,7 @@ export interface SelectorConfigInterface {
     key?: SelectorKey // should be a unique key/name which identifies the selector
 }
 
-export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
+export class Selector<DataType = DefaultDataItem> extends Computed<DataType | undefined> {
 
     public collection: () => Collection<DataType>;
     public _id: ItemKey;
@@ -95,12 +95,14 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType> {
  */
 function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
     // Find data by id in collection
-    let data = collection.findById(id).value;
+    let data = collection.findById(id)?.value;
 
-    // If data is not found, create placeholder data, so that when real data is collected it maintains connection
+    // If data is not found, create placeholder item, so that when real data is collected it maintains connection
     if (!data) {
-        collection.data[id] = new Item<DataType>(collection, {id: id} as any);
-        data = collection.findById(id).value as DataType;
+        const item = new Item<DataType>(collection, {id: id} as any);
+        item.isPlaceholder = true;
+        collection.data[id] = item;
+        data = item.value;
     }
 
     return data;

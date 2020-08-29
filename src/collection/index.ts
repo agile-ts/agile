@@ -283,8 +283,10 @@ export class Collection<DataType = DefaultDataItem> {
             return this.groups[groupName];
         } else {
             console.warn(`Agile: Group with name ${groupName} doesn't exist!`);
-            // Return empty group because useAgile can't handle undefined
-            return new Group(this.agileInstance(), this, [], {key: 'dummy'});
+            // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
+            const group = new Group(this.agileInstance(), this, [], {key: 'dummy'});
+            group.isPlaceholder = true;
+            return group;
         }
     }
 
@@ -295,14 +297,11 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Return an selector from this collection as Selector instance (extends State)
      */
-    public getSelector(selectorName: SelectorKey): Selector<DataType> {
+    public getSelector(selectorName: SelectorKey): Selector<DataType> | undefined {
         if (this.selectors[selectorName]) {
             return this.selectors[selectorName];
-        } else {
+        } else
             console.warn(`Agile: Selector with name ${selectorName} doesn't exist!`);
-            // Return empty group because useAgile can't handle undefined
-            return new Selector(this, 'dummy', {key: 'dummy'});
-        }
     }
 
 
@@ -326,11 +325,9 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Return an item from this collection by primaryKey as Item instance (extends State)
      */
-    public findById(id: ItemKey): Item<DataType | undefined> {
-        // If data doesn't exists return an item with the value undefined (not returning directly undefined because useAgile only accept States)
-        if (!this.data.hasOwnProperty(id)) {
-            return new Item<undefined>(this, undefined);
-        }
+    public findById(id: ItemKey): Item<DataType> | undefined {
+        if (!this.data.hasOwnProperty(id) || !this.data[id].exists)
+            return undefined;
 
         // Return data by id
         return this.data[id];
@@ -431,6 +428,7 @@ export class Collection<DataType = DefaultDataItem> {
         for (let selectorName in this.selectors) {
             // Get Selector
             const selector = this.getSelector(selectorName);
+            if (!selector) continue;
 
             // If Selector doesn't watch on the oldKey, continue
             if (selector.id !== oldKey) continue;
@@ -551,10 +549,15 @@ export class Collection<DataType = DefaultDataItem> {
         else
             item = new Item<DataType>(this, _data);
 
+        // Set item at data itemKey
         this.data[itemKey] = item;
 
         // Increase size
         this.size++;
+
+        // Set is placeholder to false
+        if (item.isPlaceholder)
+            item.isPlaceholder = false;
 
         // Storage
         setItem(itemKey, this);

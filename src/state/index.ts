@@ -17,6 +17,7 @@ export class State<ValueType = any> {
     public isSet: boolean = false; // Has been changed from initial value
     public isPersistState: boolean = false; // Is saved in storage
     public output?: any; // This contains the public value.. if _value doesn't contain the public value (Used for example by collections)
+    public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
 
     public initialState: ValueType;
     public _value: ValueType; // The current value of the state
@@ -246,6 +247,18 @@ export class State<ValueType = any> {
      */
     public copy(): ValueType {
         return copy(this.value);
+    }
+
+
+    //=========================================================================================================
+    // Exists
+    //=========================================================================================================
+    /**
+     * Checks if the State exists
+     */
+    public get exists(): boolean {
+        // Check if the value is not undefined and that the state is no placeholder
+        return this.value !== undefined && !this.isPlaceholder;
     }
 
 
