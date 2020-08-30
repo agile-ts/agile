@@ -57,7 +57,7 @@ describe('Set Function Tests', () => {
             expect(rerenderCount).to.eq(1, 'rerenderCount has been increased by 1');
         });
 
-        it('Can\'t update State with the same value', async () => {
+        it('Can\'t change State with the same value', async () => {
             // Update State
             MY_STATE.set(2);
 
@@ -75,7 +75,7 @@ describe('Set Function Tests', () => {
     })
 
     describe('Test sideEffects', () => {
-        it('Can update State with sideEffects = true', async () => {
+        it('Can change State with sideEffects = true', async () => {
             // Update State
             MY_STATE.set(3, {sideEffects: true});
 
@@ -86,7 +86,7 @@ describe('Set Function Tests', () => {
             expect(rerenderCount).to.eq(2, 'rerenderCount has been increased by 1');
         });
 
-        it('Can update State with sideEffects = false', async () => {
+        it('Can change State with sideEffects = false', async () => {
             // Update State
             MY_STATE.set(4, {sideEffects: false});
 
@@ -99,7 +99,7 @@ describe('Set Function Tests', () => {
     });
 
     describe('Test background', () => {
-        it('Can update State with background = true', async () => {
+        it('Can change State with background = true', async () => {
             // Update State
             MY_STATE.set(5, {background: true});
 
@@ -110,7 +110,7 @@ describe('Set Function Tests', () => {
             expect(rerenderCount).to.eq(3, 'rerenderCount stayed the same');
         });
 
-        it('Can update State with background = false', async () => {
+        it('Can change State with background = false', async () => {
             // Update State
             MY_STATE.set(6, {background: false});
 
