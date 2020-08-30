@@ -169,23 +169,35 @@ export class State<ValueType = any> {
     /**
      * Will merge the changes into the state
      */
-    public patch(targetWithChanges: Object): this {
+    public patch(targetWithChanges: object, options: { addNewProperties?: boolean } = {}): this {
         // Check if state is object.. because only objects can use the patch method
         if (!isValidObject(this.nextState)) {
-            console.error("Agile: You can't use the patch method an a non object state!");
+            console.warn("Agile: You can't use the patch method on a non object state!");
             return this;
         }
 
+        // Check if targetWithChanges is an Object.. because you can only patch objects into the State Object
+        if (!isValidObject(targetWithChanges)) {
+            console.warn("Agile: TargetWithChanges has to be an object!");
+            return this;
+        }
+
+        // Assign defaults to options
+        options = defineConfig(options, {
+            addNewProperties: true
+        });
+
         // Merge targetWithChanges into next State
-        this.nextState = flatMerge<ValueType>(this.nextState, targetWithChanges);
+        this.nextState = flatMerge<ValueType>(this.nextState, targetWithChanges, options);
 
         // Check if something has changed
-        if (this.value === this.nextState)
+        if (this.value === this.nextState || JSON.stringify(this.value) === JSON.stringify(this.nextState))
             return this;
 
         // Set State to nextState
         this.ingest();
 
+        this.isSet = this.nextState !== this.initialState;
         return this;
     }
 

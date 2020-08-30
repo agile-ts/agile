@@ -64,8 +64,8 @@ describe('Set Function Tests', () => {
             expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
             expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
 
-            expect(sideEffectCount).to.eq(3, 'sideEffectCount has been increased by 2 (2 by set, 1 by undo)');
-            expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 2 (2 by set, 1 by undo)');
+            expect(sideEffectCount).to.eq(3, 'sideEffectCount has been increased by 3 (2 by set, 1 by undo)');
+            expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 3 (2 by set, 1 by undo)');
         });
     });
 });
