@@ -42,7 +42,7 @@ describe('Set Function Tests', () => {
 
     describe('Test Change State', () => {
         it('Can change State', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(2);
 
             // Needs some time to call callbackFunction
@@ -52,13 +52,14 @@ describe('Set Function Tests', () => {
             expect(MY_STATE.previousState).to.eq(1, 'MY_STATE has correct previousState');
             expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
             expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
+            expect(MY_STATE.exists).to.eq(true, 'MY_STATE exists');
 
             expect(sideEffectCount).to.eq(1, 'sideEffectCount has been increased by 1');
             expect(rerenderCount).to.eq(1, 'rerenderCount has been increased by 1');
         });
 
         it('Can\'t change State with the same value', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(2);
 
             // Needs some time to call callbackFunction
@@ -76,7 +77,7 @@ describe('Set Function Tests', () => {
 
     describe('Test sideEffects', () => {
         it('Can change State with sideEffects = true', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(3, {sideEffects: true});
 
             // Needs some time to call callbackFunction
@@ -87,7 +88,7 @@ describe('Set Function Tests', () => {
         });
 
         it('Can change State with sideEffects = false', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(4, {sideEffects: false});
 
             // Needs some time to call callbackFunction
@@ -100,7 +101,7 @@ describe('Set Function Tests', () => {
 
     describe('Test background', () => {
         it('Can change State with background = true', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(5, {background: true});
 
             // Needs some time to call callbackFunction
@@ -111,7 +112,7 @@ describe('Set Function Tests', () => {
         });
 
         it('Can change State with background = false', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(6, {background: false});
 
             // Needs some time to call callbackFunction

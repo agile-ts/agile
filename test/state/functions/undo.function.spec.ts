@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
 
-describe('Set Function Tests', () => {
+describe('Undo Function Tests', () => {
     let rerenderCount = 0;
     let sideEffectCount = 0;
 
@@ -42,12 +42,13 @@ describe('Set Function Tests', () => {
 
     describe('Test Undo State', () => {
         it('Can undo State', async () => {
-            // Update State
+            // Change State
             MY_STATE.set(2);
 
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
+            // Change State
             MY_STATE.set(5);
 
             // Needs some time to call callbackFunction

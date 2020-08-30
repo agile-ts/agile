@@ -212,7 +212,7 @@ export class State<ValueType = any> {
     public watch(key: string, callback: (value: ValueType) => void): this {
         // Check if callback is a function  (js)
         if (typeof callback !== 'function') {
-            console.error('A callback has to be a function');
+            console.error('Agile: A watcher callback function has to be an function!');
             return this;
         }
 

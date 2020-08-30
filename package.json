@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc-watch",
-    "test": "mocha"
+    "test": "mocha -r ts-node/register --exit test/**/*.spec.ts"
   },
   "types": "./dist/index.d.ts",
   "author": "BennoDev",

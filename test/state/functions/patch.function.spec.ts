@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
 
-describe('Set Function Tests', () => {
+describe('Patch Function Tests', () => {
     let rerenderCount = 0;
     let sideEffectCount = 0;
 

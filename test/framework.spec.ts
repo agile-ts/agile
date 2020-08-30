@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile, {State} from "../src";
+import Agile from "../src";
 
 describe('Custom Framework Tests', () => {
     let boundFramework = false;

@@ -25,6 +25,7 @@ describe('Default Tests', () => {
         expect(MY_STATE.isPersistState).to.eq(false, 'MY_STATE has correct isPersistState');
         expect(MY_STATE.isPlaceholder).to.eq(false, 'MY_STATE has correct isPlaceholder');
         expect(MY_STATE.valueType).to.eq(undefined, 'MY_STATE has correct valueType');
+        expect(MY_STATE.exists).to.eq(true, 'MY_STATE exists');
 
         expect(typeof MY_STATE_WITH_KEY.value === 'boolean').to.eq(true, 'MY_STATE_WITH_KEY has correct type');
         expect(MY_STATE_WITH_KEY.key).to.eq('withKey', 'MY_STATE_WITH_KEY has correct key');
