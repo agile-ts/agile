@@ -79,6 +79,10 @@ export default class Runtime {
             return;
         }
 
+        // Logging
+        if (this.agileInstance().config.logJobs)
+            console.log(`Agile: Created Job(${job.state.key})`, job);
+
         // Push the Job to the Queue (safety.. that no Job get forgotten)
         this.jobQueue.push(job);
 
@@ -109,6 +113,10 @@ export default class Runtime {
 
         // Write new value into the State
         job.state.privateWrite(job.newStateValue);
+
+        // Set is placeholder to false, because it has got a value
+        if (job.state.isPlaceholder)
+            job.state.isPlaceholder = false;
 
         // Perform SideEffects like watcher functions
         this.sideEffects(job);
@@ -251,6 +259,7 @@ export default class Runtime {
 
         return finalObject;
     }
+
 
     //=========================================================================================================
     // Get Found State

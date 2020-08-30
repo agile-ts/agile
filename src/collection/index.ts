@@ -555,10 +555,6 @@ export class Collection<DataType = DefaultDataItem> {
         // Increase size
         this.size++;
 
-        // Set is placeholder to false
-        if (item.isPlaceholder)
-            item.isPlaceholder = false;
-
         // Storage
         setItem(itemKey, this);
 

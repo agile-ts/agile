@@ -258,7 +258,7 @@ export class State<ValueType = any> {
      */
     public get exists(): boolean {
         // Check if the value is not undefined and that the state is no placeholder
-        return this.value !== undefined && !this.isPlaceholder;
+        return this.getPublicValue() !== undefined && !this.isPlaceholder;
     }
 
 
