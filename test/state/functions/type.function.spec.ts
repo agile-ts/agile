@@ -15,7 +15,7 @@ describe('Type Function Tests', () => {
         expect(MY_STATE.valueType).to.eq('number', 'MY_STATE correct valueType');
     });
 
-    describe('Test State Changes', () => {
+    describe('Test Type of State', () => {
         it('Can change State with correct Type', async () => {
             // Update State
             MY_STATE.set(2);

@@ -20,7 +20,7 @@ describe('Set Function Tests', () => {
     });
 
     // Create State
-    const MY_STATE = App.State<number>(1, 'myState');
+    const MY_STATE = App.State<number>(1);
 
     // Set sideEffects for testing the functionality of it
     MY_STATE.sideEffects = () => {
@@ -40,7 +40,7 @@ describe('Set Function Tests', () => {
         expect(myHookState).to.eq(1, 'myHookState has correct MY_STATE value');
     });
 
-    describe('Test State Changes', () => {
+    describe('Test Change State', () => {
         it('Can change State', async () => {
             // Update State
             MY_STATE.set(2);
