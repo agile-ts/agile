@@ -110,4 +110,16 @@ describe('Persist Function Tests', () => {
             expect(App.storage.get('mySecondKey')).to.eq(undefined, 'MY_STATE isn\'t in storage');
         });
     });
+
+    describe('Test set on persist State', () => {
+        it("Updates the State in the Storage if it get changed", () => {
+            // Reset State
+            MY_STATE_WITH_KEY.set('bye');
+
+            expect(MY_STATE_WITH_KEY.persistSettings.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
+            expect(MY_STATE_WITH_KEY.persistSettings.persistKey).to.eq('myThirdKey', 'MY_STATE_WITH_KEY has correct persistKey');
+            expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(true, 'MY_STATE_WITH_KEY is in persistedStates');
+            expect(App.storage.get('myThirdKey')).to.eq('bye', 'MY_STATE_WITH_KEY is in storage and has been updated');
+        });
+    });
 });
