@@ -87,7 +87,7 @@ export default class Agile {
     /**
      * Create Agile Collection
      */
-    public Collection = <DataType = DefaultDataItem>(config: Config<DataType>) => new Collection<DataType>(this, config);
+    public Collection = <DataType = DefaultDataItem>(config?: Config<DataType>) => new Collection<DataType>(this, config);
 
 
     //=========================================================================================================

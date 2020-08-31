@@ -17,8 +17,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
 
     constructor(collection: Collection<DataType>, id: ItemKey, config?: SelectorConfigInterface) {
         // If no key provided set it to dummy (dummyKey)
-        if (!id)
-            id = 'dummy';
+        if (!id) id = 'dummy';
 
         // Instantiate Computed with 'computed' function
         super(collection.agileInstance(), () => findData<DataType>(collection, id));

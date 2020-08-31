@@ -44,7 +44,7 @@ export class Collection<DataType = DefaultDataItem> {
     public groups: { [key: string]: Group<any> } = {};
     public selectors: { [key: string]: Selector<any> } = {};
 
-    constructor(agileInstance: Agile, config: Config<DataType>) {
+    constructor(agileInstance: Agile, config: Config<DataType> = {}) {
         this.agileInstance = () => agileInstance;
 
         // If collection config is a function, execute and assign to config
@@ -63,12 +63,10 @@ export class Collection<DataType = DefaultDataItem> {
         this._key = this.config.key;
 
         // Create Groups
-        if (config.groups)
-            this.initSubInstances('groups');
+        this.initSubInstances('groups');
 
         // Create Selectors
-        if (config.selectors)
-            this.initSubInstances('selectors');
+        this.initSubInstances('selectors');
     }
 
     public set key(value: StateKey | undefined) {
@@ -87,14 +85,10 @@ export class Collection<DataType = DefaultDataItem> {
      * Init SubInstances like groups or selectors
      */
     private initSubInstances(type: 'groups' | 'selectors') {
-        const finalSubInstanceObject: any = {};
+        const subInstance = this.config[type] || {};
         let subInstanceObject: any = {};
-        const subInstance = this.config[type];
 
-        // Return empty object if subInstance doesn't exists
-        if (!subInstance) return {};
-
-        // if subInstance is array transform it to an object with the fitting class
+        // If subInstance is array transform it to an object with the fitting class
         if (Array.isArray(subInstance)) {
             for (let i = 0; i < subInstance.length; i++) {
                 let instance;
@@ -111,23 +105,25 @@ export class Collection<DataType = DefaultDataItem> {
                 subInstanceObject[subInstance[i]] = instance;
             }
         } else {
+            // If subInstance is Object.. set subInstanceObject to subInstance
             subInstanceObject = subInstance;
         }
 
-        // Loop through subInstance items
-        const keys = Object.keys(subInstanceObject);
-        // https://stackoverflow.com/questions/29285897/what-is-the-difference-between-for-in-and-for-of-statements-in-jav
-        for (let key of keys) {
-            // Create the sub instance in the final subInstance object
-            finalSubInstanceObject[key] = subInstanceObject[key];
+        // If groups.. add default group
+        if (type === "groups") {
+            if (!subInstanceObject[this.config.defaultGroupKey || 'default'])
+                subInstanceObject[this.config.defaultGroupKey || 'default'] = new Group(this.agileInstance(), this, [], {key: this.config.defaultGroupKey || 'default'});
+        }
 
+        const keys = Object.keys(subInstanceObject);
+        for (let key of keys) {
             // Set key to property name if it isn't set yet
-            if (!finalSubInstanceObject[key].key)
-                finalSubInstanceObject[key].key = key;
+            if (!subInstanceObject[key].key)
+                subInstanceObject[key].key = key;
         }
 
         // Set Collection instance
-        this[type] = finalSubInstanceObject;
+        this[type] = subInstanceObject;
     }
 
 
