@@ -136,8 +136,6 @@ export default class Storage {
         if (isJsonString(res))
             return JSON.parse(res);
 
-        // If the JsonString is not valid it might be a promise
-        console.warn("Agile: Something went wrong by parsing the storage json value.. Maybe you forgot to set the storage to async");
         return res;
     }
 

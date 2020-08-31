@@ -67,9 +67,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
      * @param key - the storage key (if no key passed it will take the state key)
      */
     public persist(key?: StorageKey): this {
-        persistValue(this, key).then((value => {
-            this.isPersistState = value
-        }));
+        persistValue(this, key);
         return this;
     }
 

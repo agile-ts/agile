@@ -8,17 +8,21 @@ import Storage, {StorageKey} from "../storage";
 /**
  * Will persist the 'state' into the configured storage with the key or if no key passed the state key
  */
-export async function persistValue(state: State, key?: StorageKey): Promise<boolean> {
+export async function persistValue(state: State, key?: StorageKey) {
     // Validate Key
     const tempKey = validateKey(state, key);
     if (!tempKey) {
         console.error("Agile: If your State has no key provided before using persist.. you have to provide a key here!");
-        return false;
+        return;
     }
     key = tempKey;
 
     // Get Storage
     const storage = state.agileInstance().storage;
+
+    // Check if persist State is already a isPersistState if so remove the old one
+    if (state.persistSettings.isPersisted && state.persistSettings.persistKey)
+        storage.remove(state.persistSettings.persistKey);
 
     // Add State to persistedStates in Storage
     storage.persistedStates.add(state);
@@ -26,7 +30,11 @@ export async function persistValue(state: State, key?: StorageKey): Promise<bool
     // Call Handle which decides weather it has to add the storage value to the state or save the state into the storage
     await handleStorageValue(key, storage, state);
 
-    return true;
+    // Set persistSettings
+    state.persistSettings = {
+        isPersisted: true,
+        persistKey: key
+    }
 }
 
 
@@ -37,8 +45,8 @@ export async function persistValue(state: State, key?: StorageKey): Promise<bool
  * Save current _value into storage if isPersistState
  */
 export function updateValue(state: State) {
-    if (state.isPersistState && state.key)
-        state.agileInstance().storage.set(state.key, state._value);
+    if (state.persistSettings.isPersisted && state.persistSettings.persistKey)
+        state.agileInstance().storage.set(state.persistSettings.persistKey, state._value);
 }
 
 
@@ -55,8 +63,10 @@ function validateKey(state: State, key?: StorageKey): StorageKey | null {
     if (!key)
         return null;
 
-    // Set this storage key as state key
-    state.key = key;
+    // Set Storage key as State key if no state key exists
+    if (!state.key)
+        state.key = key;
+
     return key;
 }
 
@@ -65,8 +75,8 @@ async function handleStorageValue(key: StorageKey, storage: Storage, state: Stat
     const storageValue = await storage.get(key);
 
     // If the value doesn't exist in the storage yet.. create it
-    if (!storageValue && state.key) {
-        storage.set(state.key, state.getPersistableValue());
+    if (!storageValue) {
+        storage.set(key, state.getPersistableValue());
         return;
     }
 

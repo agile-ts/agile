@@ -6,6 +6,11 @@ import {StorageKey} from "../storage";
 
 export type StateKey = string | number;
 
+export interface PersistSettingsInterface {
+    isPersisted: boolean // Is State persisted
+    persistKey?: string | number // Current Persist Key.. for handling twice persisted states
+}
+
 export class State<ValueType = any> {
     public agileInstance: () => Agile;
 
@@ -15,7 +20,7 @@ export class State<ValueType = any> {
     public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
-    public isPersistState: boolean = false; // Is saved in storage
+    public persistSettings: PersistSettingsInterface; // Includes persist 'settings' (have to rename if I got an better name)
     public output?: any; // This contains the public value.. if _value doesn't contain the public value (Used for example by collections)
     public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
 
@@ -34,6 +39,9 @@ export class State<ValueType = any> {
         this._value = initialState;
         this.previousState = initialState;
         this.nextState = initialState;
+        this.persistSettings = {
+            isPersisted: false
+        }
     }
 
     public set value(value: ValueType) {
@@ -154,8 +162,8 @@ export class State<ValueType = any> {
      */
     public reset(): this {
         // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
-        if (this.isPersistState && this.key)
-            this.agileInstance().storage.remove(this.key);
+        if (this.persistSettings.isPersisted && this.persistSettings.persistKey)
+            this.agileInstance().storage.remove(this.persistSettings.persistKey);
 
         // Set State to initial State
         this.set(this.initialState);
@@ -244,9 +252,7 @@ export class State<ValueType = any> {
      * @param key - the storage key (if no key passed it will take the state key)
      */
     public persist(key?: StorageKey): this {
-        persistValue(this, key).then((value) => {
-            this.isPersistState = value
-        });
+        persistValue(this, key);
         return this;
     }
 
