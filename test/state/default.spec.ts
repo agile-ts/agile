@@ -22,7 +22,7 @@ describe('Default Tests', () => {
         expect(MY_STATE.initialState).to.eq('hello', 'MY_STATE has correct initialState');
         expect(MY_STATE.exists).to.eq(true, 'MY_STATE has correct exists');
         expect(MY_STATE.isSet).to.eq(false, 'MY_STATE has correct isSet');
-        expect(MY_STATE.isPersistState).to.eq(false, 'MY_STATE has correct isPersistState');
+        expect(MY_STATE.persistSettings.isPersisted).to.eq(false, 'MY_STATE has correct isPersistState');
         expect(MY_STATE.isPlaceholder).to.eq(false, 'MY_STATE has correct isPlaceholder');
         expect(MY_STATE.valueType).to.eq(undefined, 'MY_STATE has correct valueType');
         expect(MY_STATE.exists).to.eq(true, 'MY_STATE exists');
