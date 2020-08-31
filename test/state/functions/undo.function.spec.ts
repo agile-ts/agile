@@ -40,33 +40,31 @@ describe('Undo Function Tests', () => {
         expect(myHookState).to.eq(1, 'myHookState has correct MY_STATE value');
     });
 
-    describe('Test Undo State', () => {
-        it('Can undo State', async () => {
-            // Change State
-            MY_STATE.set(2);
+    it('Can undo State', async () => {
+        // Change State
+        MY_STATE.set(2);
 
-            // Needs some time to call callbackFunction
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call callbackFunction
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            // Change State
-            MY_STATE.set(5);
+        // Change State
+        MY_STATE.set(5);
 
-            // Needs some time to call callbackFunction
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call callbackFunction
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            // Undo State
-            MY_STATE.undo();
+        // Undo State
+        MY_STATE.undo();
 
-            // Needs some time to call callbackFunction
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call callbackFunction
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
-            expect(MY_STATE.previousState).to.eq(5, 'MY_STATE has correct previousState');
-            expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
-            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
+        expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
+        expect(MY_STATE.previousState).to.eq(5, 'MY_STATE has correct previousState');
+        expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
+        expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
 
-            expect(sideEffectCount).to.eq(3, 'sideEffectCount has been increased by 3 (2 by set, 1 by undo)');
-            expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 3 (2 by set, 1 by undo)');
-        });
+        expect(sideEffectCount).to.eq(3, 'sideEffectCount has been increased by 3 (2 by set, 1 by undo)');
+        expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 3 (2 by set, 1 by undo)');
     });
 });

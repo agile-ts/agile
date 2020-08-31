@@ -18,7 +18,7 @@ describe('Custom Framework Tests', () => {
         }
     });
 
-    it('Has custom Framework bound', () => {
+    it('Has bound custom Framework', () => {
         expect(boundFramework).to.eq(true, 'boundFramework has correct value');
         expect(App.integration?.name).to.eq('test', 'Integration Name has correct value');
         expect(typeof App.integration?.bind === 'function').to.eq(true, 'Integration bind method get set');

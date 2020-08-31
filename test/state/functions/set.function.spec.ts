@@ -40,43 +40,41 @@ describe('Set Function Tests', () => {
         expect(myHookState).to.eq(1, 'myHookState has correct MY_STATE value');
     });
 
-    describe('Test Change State', () => {
-        it('Can change State', async () => {
-            // Change State
-            MY_STATE.set(2);
+    it('Can change State', async () => {
+        // Change State
+        MY_STATE.set(2);
 
-            // Needs some time to call callbackFunction
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call callbackFunction
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
-            expect(MY_STATE.previousState).to.eq(1, 'MY_STATE has correct previousState');
-            expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
-            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
-            expect(MY_STATE.exists).to.eq(true, 'MY_STATE exists');
+        expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
+        expect(MY_STATE.previousState).to.eq(1, 'MY_STATE has correct previousState');
+        expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
+        expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
+        expect(MY_STATE.exists).to.eq(true, 'MY_STATE exists');
 
-            expect(sideEffectCount).to.eq(1, 'sideEffectCount has been increased by 1');
-            expect(rerenderCount).to.eq(1, 'rerenderCount has been increased by 1');
-        });
+        expect(sideEffectCount).to.eq(1, 'sideEffectCount has been increased by 1');
+        expect(rerenderCount).to.eq(1, 'rerenderCount has been increased by 1');
+    });
 
-        it('Can\'t change State with the same value', async () => {
-            // Change State
-            MY_STATE.set(2);
+    it('Can\'t change State with the same value', async () => {
+        // Change State
+        MY_STATE.set(2);
 
-            // Needs some time to call callbackFunction
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call callbackFunction
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
-            expect(MY_STATE.previousState).to.eq(1, 'MY_STATE has correct previousState');
-            expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
-            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
+        expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
+        expect(MY_STATE.previousState).to.eq(1, 'MY_STATE has correct previousState');
+        expect(MY_STATE.nextState).to.eq(2, 'MY_STATE has correct nextState');
+        expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
 
-            expect(sideEffectCount).to.eq(1, 'sideEffectCount hasn\'t been increased');
-            expect(rerenderCount).to.eq(1, 'rerenderCount hasn\'t been increased');
-        });
-    })
+        expect(sideEffectCount).to.eq(1, 'sideEffectCount hasn\'t been increased');
+        expect(rerenderCount).to.eq(1, 'rerenderCount hasn\'t been increased');
+    });
 
-    describe('Test sideEffects', () => {
-        it('Can change State with sideEffects = true', async () => {
+    describe('Test sideEffects option', () => {
+        it('Does call sideEffects by changing State with sideEffects = true', async () => {
             // Change State
             MY_STATE.set(3, {sideEffects: true});
 
@@ -87,7 +85,7 @@ describe('Set Function Tests', () => {
             expect(rerenderCount).to.eq(2, 'rerenderCount has been increased by 1');
         });
 
-        it('Can change State with sideEffects = false', async () => {
+        it('Doesn\'t call sideEffects by changing State with sideEffects = false', async () => {
             // Change State
             MY_STATE.set(4, {sideEffects: false});
 
@@ -99,8 +97,8 @@ describe('Set Function Tests', () => {
         });
     });
 
-    describe('Test background', () => {
-        it('Can change State with background = true', async () => {
+    describe('Test background option', () => {
+        it('Doesn\'t call callBackFunction by changing State with background = true', async () => {
             // Change State
             MY_STATE.set(5, {background: true});
 
@@ -111,7 +109,7 @@ describe('Set Function Tests', () => {
             expect(rerenderCount).to.eq(3, 'rerenderCount hasn\'t been increased');
         });
 
-        it('Can change State with background = false', async () => {
+        it('Does call callBackFunction by changing State with background = false', async () => {
             // Change State
             MY_STATE.set(6, {background: false});
 

@@ -23,32 +23,30 @@ describe('Watcher Tests', () => {
         expect(MY_STATE.watchers.firstWatcher !== undefined).to.eq(true, 'MY_STATE has firstWatcher in watchers')
     });
 
-    describe('Test Watch on State', async () => {
-        it('Can Watch State', async () => {
-            // Update State
-            MY_STATE.set(2);
+    it('Can Watch State', async () => {
+        // Update State
+        MY_STATE.set(2);
 
-            // Needs some time to call watcher
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call watcher
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
-            expect(calledWatcherCount).to.eq(1, 'calledWatcherCount has been increased by 1');
-            expect(watcherValue).to.eq(2, 'watcherValue has correct value');
-        });
+        expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
+        expect(calledWatcherCount).to.eq(1, 'calledWatcherCount has been increased by 1');
+        expect(watcherValue).to.eq(2, 'watcherValue has correct value');
+    });
 
-        it('Can Remove Watcher', async () => {
-            // Remove Watcher
-            MY_STATE.removeWatcher('firstWatcher');
+    it('Can Remove Watcher', async () => {
+        // Remove Watcher
+        MY_STATE.removeWatcher('firstWatcher');
 
-            // Update State
-            MY_STATE.set(3);
+        // Update State
+        MY_STATE.set(3);
 
-            // Needs some time to call watcher
-            await new Promise(resolve => setTimeout(resolve, 100));
+        // Needs some time to call watcher
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE.value).to.eq(3, 'MY_STATE has correct value');
-            expect(calledWatcherCount).to.eq(1, 'calledWatcherCount hasn\'t been increased');
-            expect(watcherValue).to.eq(2, 'watcherValue has correct value'); // Is still 2 because it doesn't get updated anymore
-        });
+        expect(MY_STATE.value).to.eq(3, 'MY_STATE has correct value');
+        expect(calledWatcherCount).to.eq(1, 'calledWatcherCount hasn\'t been increased');
+        expect(watcherValue).to.eq(2, 'watcherValue has\'t change.. because of no update');
     });
 });

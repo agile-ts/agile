@@ -15,20 +15,18 @@ describe('Type Function Tests', () => {
         expect(MY_STATE.valueType).to.eq('number', 'MY_STATE correct valueType');
     });
 
-    describe('Test Type of State', () => {
-        it('Can change State with correct Type', async () => {
-            // Change State
-            MY_STATE.set(2);
+    it('Can change State with correct Type', async () => {
+        // Change State
+        MY_STATE.set(2);
 
-            expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
-        });
+        expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
+    });
 
-        it('Can\'t change State with wrong Type', async () => {
-            // Change State
-            // @ts-ignore
-            MY_STATE.set('Hello');
+    it('Can\'t change State with wrong Type', async () => {
+        // Change State
+        // @ts-ignore
+        MY_STATE.set('Hello');
 
-            expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
-        });
+        expect(MY_STATE.value).to.eq(2, 'MY_STATE has correct value');
     });
 });

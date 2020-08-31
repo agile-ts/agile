@@ -27,7 +27,6 @@ describe('Patch Function Tests', () => {
 
     // Create State
     const MY_STATE = App.State<userInterface>({id: 1, name: 'jeff'});
-    const MY_STATE_2 = App.State<string>('hello');
 
     // Set sideEffects for testing the functionality of it
     MY_STATE.sideEffects = () => {
@@ -53,9 +52,9 @@ describe('Patch Function Tests', () => {
         }), 'myHookState has correct MY_STATE value');
     });
 
-    describe('Test Patch State', () => {
+    describe('Patch State', () => {
         it('Can patch value into State', async () => {
-            // Patch State
+            // Patch Value
             MY_STATE.patch({name: 'hans'});
 
             // Needs some time to call callbackFunction
@@ -79,8 +78,8 @@ describe('Patch Function Tests', () => {
             expect(rerenderCount).to.eq(1, 'rerenderCount has been increased by 1');
         });
 
-        it('Can\'t patch value into State with the same value', async () => {
-            // Patch State
+        it('Can\'t patch value into State if the value is the same', async () => {
+            // Patch Value
             MY_STATE.patch({name: 'hans'});
 
             // Needs some time to call callbackFunction
@@ -89,16 +88,16 @@ describe('Patch Function Tests', () => {
             expect(JSON.stringify(MY_STATE.value)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'hans'
-            }), 'MY_STATE has correct value');
+            }), 'MY_STATE value stayed the same');
             expect(JSON.stringify(MY_STATE.previousState)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'jeff'
-            }), 'MY_STATE has correct previousState');
+            }), 'MY_STATE previousState stayed the same');
             expect(JSON.stringify(MY_STATE.nextState)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'hans'
-            }), 'MY_STATE has correct nextState');
-            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
+            }), 'MY_STATE nextState stayed the same');
+            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE isSet stayed the same');
 
             expect(sideEffectCount).to.eq(1, 'sideEffectCount hasn\'t been increased');
             expect(rerenderCount).to.eq(1, 'rerenderCount hasn\'t been increased');
@@ -107,7 +106,7 @@ describe('Patch Function Tests', () => {
         it('Can\'t patch value into State which is no Object', async () => {
             // Patch State
             // @ts-ignore
-            MY_STATE.patch('string');
+            MY_STATE.patch('noObject');
 
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -115,37 +114,40 @@ describe('Patch Function Tests', () => {
             expect(JSON.stringify(MY_STATE.value)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'hans'
-            }), 'MY_STATE has correct value');
+            }), 'MY_STATE value stayed the same');
             expect(JSON.stringify(MY_STATE.previousState)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'jeff'
-            }), 'MY_STATE has correct previousState');
+            }), 'MY_STATE previousState stayed the same');
             expect(JSON.stringify(MY_STATE.nextState)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'hans'
-            }), 'MY_STATE has correct nextState');
-            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE has correct isSet');
+            }), 'MY_STATE nextState stayed the same');
+            expect(MY_STATE.isSet).to.eq(true, 'MY_STATE isSet stayed the same');
 
             expect(sideEffectCount).to.eq(1, 'sideEffectCount hasn\'t been increased');
             expect(rerenderCount).to.eq(1, 'rerenderCount hasn\'t been increased');
         });
 
         it('Can\'t patch value into non Object State', async () => {
+            // Create State
+            const MY_NON_OBJECT_STATE = App.State<string>('test');
+
             // Patch State
-            MY_STATE_2.patch({test: 'test'});
+            MY_NON_OBJECT_STATE.patch({test: 'test'});
 
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE_2.value).to.eq('hello', 'MY_STATE has correct value');
-            expect(MY_STATE_2.previousState).to.eq('hello', 'MY_STATE has correct previousState');
-            expect(MY_STATE_2.nextState).to.eq('hello', 'MY_STATE has correct nextState');
-            expect(MY_STATE_2.isSet).to.eq(false, 'MY_STATE has correct isSet');
+            expect(MY_NON_OBJECT_STATE.value).to.eq('test', 'MY_NON_OBJECT_STATE value stayed the same');
+            expect(MY_NON_OBJECT_STATE.previousState).to.eq('test', 'MY_NON_OBJECT_STATE previousState stayed the same');
+            expect(MY_NON_OBJECT_STATE.nextState).to.eq('test', 'MY_NON_OBJECT_STATE nextState stayed the same');
+            expect(MY_NON_OBJECT_STATE.isSet).to.eq(false, 'MY_NON_OBJECT_STATE isSet stayed the same');
         });
     });
 
-    describe('Test addNewProperties', () => {
-        it('Can patch value into State with addNewProperties = false', async () => {
+    describe('Test addNewProperties option', () => {
+        it('Doesn\'t add property to value with addNewProperties = false', async () => {
             // Patch State
             MY_STATE.patch({name: 'frank', age: 10}, {addNewProperties: false});
 
@@ -170,7 +172,7 @@ describe('Patch Function Tests', () => {
             expect(rerenderCount).to.eq(2, 'rerenderCount has been increased by 1');
         });
 
-        it('Can patch value into State with addNewProperties = true', async () => {
+        it('Does add property to value with addNewProperties = true', async () => {
             // Patch State
             MY_STATE.patch({name: 'benno', age: 15}, {addNewProperties: true});
 
