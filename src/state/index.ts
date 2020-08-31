@@ -324,9 +324,12 @@ export class State<ValueType = any> {
 
 
     //=========================================================================================================
-    // Helper
+    // Is Correct Type
     //=========================================================================================================
-
+    /**
+     * @internal
+     * Checks if the 'value' has the same type as state.value
+     */
     private isCorrectType(value: any): boolean {
         let type: string = typeof value;
         return type === this.valueType;
