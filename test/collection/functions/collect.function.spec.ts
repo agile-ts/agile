@@ -73,6 +73,19 @@ describe('Set Function Tests', () => {
             expect(rerenderCount).to.eq(1, 'rerenderCount stayed the same');
         });
 
+        it('Can\'t collect no object item', async () => {
+            // Collect item
+            // @ts-ignore
+            MY_COLLECTION.collect('franz');
+
+            // Needs some time to call callbackFunction
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            expect(MY_COLLECTION.size).to.eq(1, 'MY_COLLECTION size stayed the same');
+
+            expect(rerenderCount).to.eq(1, 'rerenderCount stayed the same');
+        });
+
         it('Can\'t collect item with wrong primaryKey', async () => {
             // Collect item
             // @ts-ignore

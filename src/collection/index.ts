@@ -81,6 +81,7 @@ export class Collection<DataType = DefaultDataItem> {
     // Init SubInstances
     //=========================================================================================================
     /**
+     * @internal
      * Init SubInstances like groups or selectors
      */
     private initSubInstances(type: 'groups' | 'selectors') {
