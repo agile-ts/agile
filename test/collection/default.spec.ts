@@ -25,7 +25,7 @@ describe('Default Collection Tests', () => {
             expect(JSON.stringify(MY_COLLECTION.config.selectors)).to.eq(JSON.stringify({}), 'MY_COLLECTION has no config.selectors');
             expect(JSON.stringify(MY_COLLECTION.data)).to.eq(JSON.stringify({}), 'MY_COLLECTION has no data');
             expect(MY_COLLECTION.isPersistCollection).to.eq(false, 'MY_COLLECTION is no persisted Collection');
-            expect(JSON.stringify(MY_COLLECTION.groups)).to.eq(JSON.stringify({}), 'MY_COLLECTION has no groups');
+            expect(Object.keys(MY_COLLECTION.groups).length === 1 && MY_COLLECTION.groups["default"] !== undefined).to.eq(true, 'MY_COLLECTION has only default group');
             expect(JSON.stringify(MY_COLLECTION.selectors)).to.eq(JSON.stringify({}), 'MY_COLLECTION has no selectors');
             expect(MY_COLLECTION.size).to.eq(0, 'MY_COLLECTION has correct size');
         });
@@ -40,13 +40,13 @@ describe('Default Collection Tests', () => {
     });
 
     describe('Collection with Key', () => {
-        interface userInterface2 {
+        interface userInterface {
             key: number
             name: string
         }
 
         // Set Collection
-        const MY_COLLECTION_WITH_KEY = App.Collection<userInterface2>({
+        const MY_COLLECTION_WITH_KEY = App.Collection<userInterface>({
             primaryKey: 'key',
             key: 'myCollectionKey'
         });

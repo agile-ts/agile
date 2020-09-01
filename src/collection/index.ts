@@ -84,7 +84,7 @@ export class Collection<DataType = DefaultDataItem> {
      * Init SubInstances like groups or selectors
      */
     private initSubInstances(type: 'groups' | 'selectors') {
-        const subInstance = this.config[type] || {};
+        const subInstance = {...this.config[type]} || {};
         let subInstanceObject: any = {};
 
         // If subInstance is array transform it to an object with the fitting class
