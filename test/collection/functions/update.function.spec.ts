@@ -2,6 +2,7 @@ import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
+import {Group} from "../../../src/collection/group";
 
 describe('Update Function Tests', () => {
     let rerenderCount = 0;
@@ -39,7 +40,7 @@ describe('Update Function Tests', () => {
     });
 
     it('Has correct initial values', () => {
-        expect(MY_COLLECTION.groups['default'] !== undefined).to.eq(true, 'MY_COLLECTION default Group has been created')
+        expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created')
         expect(MY_COLLECTION.groups['default']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
         expect(MY_COLLECTION.size).to.eq(3, 'MY_COLLECTION size is 3 because of 3 default collects');
         expect(JSON.stringify(MY_COLLECTION.data[1].value)).to.eq(JSON.stringify({

@@ -2,6 +2,7 @@ import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
+import {Group} from "../../../src/collection/group";
 
 describe('Set Function Tests', () => {
     // Define Agile
@@ -36,7 +37,7 @@ describe('Set Function Tests', () => {
 
         it('Has correct initial values', () => {
             expect(JSON.stringify(MY_COLLECTION.data)).to.eq(JSON.stringify({}), 'MY_COLLECTION has correct data');
-            expect(MY_COLLECTION.groups['default'] !== undefined).to.eq(true, 'MY_COLLECTION default Group has been created')
+            expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created')
             expect(MY_COLLECTION.groups['default']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
 
             expect(JSON.stringify(myHookCollection)).to.eq(JSON.stringify([]), 'myHookState has correct MY_COLLECTION value');
@@ -304,7 +305,7 @@ describe('Set Function Tests', () => {
 
         it('Has correct initial values', () => {
             expect(JSON.stringify(MY_COLLECTION.data)).to.eq(JSON.stringify({}), 'MY_COLLECTION has correct data');
-            expect(MY_COLLECTION.groups['default'] !== undefined).to.eq(true, 'MY_COLLECTION default Group has been created')
+            expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created')
             expect(MY_COLLECTION.groups['default']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
 
             expect(JSON.stringify(myHookCollection)).to.eq(JSON.stringify([]), 'myHookState has correct MY_COLLECTION value');
