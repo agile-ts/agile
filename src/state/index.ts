@@ -177,7 +177,7 @@ export class State<ValueType = any> {
     /**
      * Will merge the changes into the state
      */
-    public patch(targetWithChanges: object, options: { addNewProperties?: boolean } = {}): this {
+    public patch(targetWithChanges: object, options: { addNewProperties?: boolean, background?: boolean } = {}): this {
         // Check if state is object.. because only objects can use the patch method
         if (!isValidObject(this.nextState)) {
             console.warn("Agile: You can't use the patch method on a non object state!");
@@ -192,7 +192,8 @@ export class State<ValueType = any> {
 
         // Assign defaults to options
         options = defineConfig(options, {
-            addNewProperties: true
+            addNewProperties: true,
+            background: false
         });
 
         // Merge targetWithChanges into next State
@@ -203,7 +204,7 @@ export class State<ValueType = any> {
             return this;
 
         // Set State to nextState
-        this.ingest();
+        this.ingest({background: options.background});
 
         this.isSet = this.nextState !== this.initialState;
         return this;

@@ -17,7 +17,6 @@ export interface CollectionConfigInterface {
     key?: CollectionKey // should be a unique key/name which identifies the collection
     primaryKey?: string // the primaryKey of an item (default is id)
     defaultGroupKey?: ItemKey // The defaultGroupKey(Name).. in which all collected items get stored
-    // indexAll?: boolean
 }
 
 export interface CollectOptionsInterface<DataType = any> {
@@ -139,7 +138,7 @@ export class Collection<DataType = DefaultDataItem> {
         const _groups = normalizeArray<GroupKey>(groups);
         const defaultGroupKey = this.config.defaultGroupKey || 'default';
 
-        // Assign defaults to config
+        // Assign defaults to options
         options = defineConfig<CollectOptionsInterface>(options, {
             method: 'push',
         });
@@ -153,7 +152,7 @@ export class Collection<DataType = DefaultDataItem> {
 
         _items.forEach((item, index) => {
             // Save items into Collection
-            let key = this.saveData(item, options.patch);
+            let key = this.saveData(item, {patch: options.patch, background: options.background});
 
             // Return if key doesn't exist (something went wrong in saveData)
             if (!key) return;
@@ -511,10 +510,16 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Save data directly into the collection
      */
-    public saveData(data: DataType, patch?: boolean): ItemKey | null {
+    public saveData(data: DataType, options: { patch?: boolean, background?: boolean } = {}): ItemKey | null {
         // Transform data to any because otherwise I have many type errors (because not defined object)
         // https://stackoverflow.com/questions/57350092/string-cant-be-used-to-index-type
         const _data = data as any;
+
+        // Assign defaults to options
+        options = defineConfig(options, {
+            patch: false,
+            background: false,
+        });
 
         // Get primaryKey (default: 'id')
         const primaryKey = this.config.primaryKey || 'id';
@@ -528,7 +533,7 @@ export class Collection<DataType = DefaultDataItem> {
 
         // Check if data has primaryKey
         if (!_data.hasOwnProperty(primaryKey)) {
-            console.error("Agile: Collections items need a own primaryKey (default = id)");
+            console.error("Agile: Collections items need a own primaryKey. Here " + this.config.primaryKey);
             return null;
         }
 
@@ -536,20 +541,19 @@ export class Collection<DataType = DefaultDataItem> {
         let item: Item<DataType> = this.data[itemKey];
 
         // If the data already exists and config is to patch, patch data
-        if (item && patch)
-            item.patch(_data);
+        if (item && options.patch)
+            item.patch(_data, {background: options.background});
         // If the data already exists and no config, overwrite data
         else if (item)
-            item.set(_data);
-        // If data does not exist.. create new Data set
-        else
+            item.set(_data, {background: options.background});
+        // If data does not exist.. create new Item set and increase the size
+        else{
             item = new Item<DataType>(this, _data);
+            this.size++;
+        }
 
         // Set item at data itemKey
         this.data[itemKey] = item;
-
-        // Increase size
-        this.size++;
 
         // Storage
         setItem(itemKey, this);
