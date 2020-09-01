@@ -176,7 +176,7 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * * Update data by updateKey(id) in a Agile Collection
      */
-    public update(updateKey: ItemKey, changes: DefaultDataItem, config: { addNewProperties?: boolean } = {}): State | undefined {
+    public update(updateKey: ItemKey, changes: DefaultDataItem | DataType, options: { addNewProperties?: boolean, background?: boolean } = {}): State | undefined {
         // If item does not exist, return
         if (!this.data.hasOwnProperty(updateKey)) {
             console.error(`Agile: PrimaryKey '${updateKey} doesn't exist in collection `, this);
@@ -184,8 +184,9 @@ export class Collection<DataType = DefaultDataItem> {
         }
 
         // Assign defaults to config
-        config = defineConfig(config, {
-            addNewProperties: false
+        options = defineConfig(options, {
+            addNewProperties: false,
+            background: false
         });
 
         const itemState = this.data[updateKey];
@@ -193,20 +194,24 @@ export class Collection<DataType = DefaultDataItem> {
         const primaryKey = this.config.primaryKey || '';
 
         // Merge current Item value with changes
-        const finalItemValue = flatMerge(currentItemValue, changes, {addNewProperties: config.addNewProperties});
+        const finalItemValue = flatMerge(currentItemValue, changes, {addNewProperties: options.addNewProperties});
+
+        // Check if something has changed
+        if (finalItemValue === itemState.nextState || JSON.stringify(finalItemValue) === JSON.stringify(itemState.nextState))
+            return this.data[finalItemValue[primaryKey]];
 
         // Assign finalItemStateValue to nextState
         itemState.nextState = finalItemValue;
 
         // Set State to nextState
-        itemState.ingest();
+        itemState.ingest({background: options.background});
 
         // If data key changes update it properly
         if (currentItemValue[primaryKey] !== finalItemValue[primaryKey])
-            this.updateDataKey(currentItemValue[primaryKey], finalItemValue[primaryKey]);
+            this.updateItemPrimaryKeys(currentItemValue[primaryKey], finalItemValue[primaryKey], {background: options.background});
 
         // Rebuild all groups that includes the primaryKey
-        this.rebuildGroupsThatIncludePrimaryKey(finalItemValue[primaryKey]);
+        this.rebuildGroupsThatIncludePrimaryKey(finalItemValue[primaryKey], {background: options.background});
 
         // Return data at primaryKey (updated State)
         return this.data[finalItemValue[primaryKey]];
@@ -391,9 +396,14 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * This will properly change the key of a collection item
      */
-    private updateDataKey(oldKey: ItemKey, newKey: ItemKey): void {
+    private updateItemPrimaryKeys(oldKey: ItemKey, newKey: ItemKey, options?: { background?: boolean }): void {
         // If oldKey and newKey are the same, return
         if (oldKey === newKey) return;
+
+        // Assign defaults to config
+        options = defineConfig(options, {
+            background: false
+        });
 
         // Create copy of data
         const dataCopy = this.data[oldKey];
@@ -416,7 +426,7 @@ export class Collection<DataType = DefaultDataItem> {
             group.nextState.splice(group.nextState.indexOf(oldKey), 1, newKey);
 
             // Set State(Group) to nextState
-            group.ingest();
+            group.ingest({background: options?.background});
         }
 
         // Update Selector
@@ -429,7 +439,7 @@ export class Collection<DataType = DefaultDataItem> {
             if (selector.id !== oldKey) continue;
 
             // Replace the oldKey with the newKey
-            selector.select(newKey);
+            selector.select(newKey, {background: options?.background});
         }
     }
 
@@ -547,7 +557,7 @@ export class Collection<DataType = DefaultDataItem> {
         else if (item)
             item.set(_data, {background: options.background});
         // If data does not exist.. create new Item set and increase the size
-        else{
+        else {
             item = new Item<DataType>(this, _data);
             this.size++;
         }
@@ -569,14 +579,20 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Rebuild the Groups which contains the primaryKey
      */
-    public rebuildGroupsThatIncludePrimaryKey(primaryKey: ItemKey): void {
+    public rebuildGroupsThatIncludePrimaryKey(primaryKey: ItemKey, options?: { background?: boolean }): void {
+        // Assign defaults to config
+        options = defineConfig(options, {
+            background: false
+        });
+
+        // Rebuild groups that includes primaryKey
         for (let groupKey in this.groups) {
             // Get Group
             const group = this.getGroup(groupKey);
 
             // Check if group contains primaryKey if so rebuild it
             if (group.has(primaryKey))
-                group.ingest();
+                group.ingest({background: options?.background});
         }
     }
 }

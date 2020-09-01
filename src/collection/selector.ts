@@ -3,6 +3,7 @@ import {Computed} from "../computed";
 import Item from "./item";
 import {persistValue} from "../state/persist";
 import {StorageKey} from "../storage";
+import {defineConfig} from "../utils";
 
 export type SelectorKey = string | number;
 
@@ -33,13 +34,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
     }
 
     public set id(val: ItemKey) {
-        this._id = val;
-
-        // Update Computed Function with new key(id)
-        this.computeFunction = () => findData<DataType>(this.collection(), val);
-
-        // Recompute to apply changes properly
-        this.recompute();
+       this.select(val);
     }
 
     public get id() {
@@ -53,8 +48,21 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
     /**
      * Changes the id on which the selector is watching
      */
-    public select(id: ItemKey) {
-        this.id = id;
+    public select(id: ItemKey, options?: {background?: boolean, sideEffects?: boolean}) {
+        // Assign defaults to config
+        options = defineConfig(options, {
+            background: false,
+            sideEffects: true
+        });
+
+        // Set _id to new id
+        this._id = id;
+
+        // Update Computed Function with new key(id)
+        this.computeFunction = () => findData<DataType>(this.collection(), id);
+
+        // Recompute to apply changes properly
+        this.recompute(options);
     }
 
 

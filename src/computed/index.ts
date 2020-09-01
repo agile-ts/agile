@@ -1,5 +1,6 @@
 import {State} from "../state";
 import Agile from "../agile";
+import {defineConfig} from "../utils";
 
 export class Computed<ComputedValueType = any> extends State<ComputedValueType> {
     public agileInstance: () => Agile;
@@ -61,8 +62,15 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     /**
      * Will call the computeFunction and update the dependencies
      */
-    public recompute(): void {
-        this.set(this.computeValue());
+    public recompute(options?: {background?: boolean, sideEffects?: boolean}): void {
+        // Assign defaults to config
+        options = defineConfig(options, {
+            background: false,
+            sideEffects: true
+        });
+
+        // Set value to computeValue
+        this.set(this.computeValue(), options);
     }
 
 
