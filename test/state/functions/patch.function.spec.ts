@@ -50,6 +50,8 @@ describe('Patch Function Tests', () => {
             id: 1,
             name: 'jeff'
         }), 'myHookState has correct MY_STATE value');
+        expect(rerenderCount).to.eq(0, 'rerenderCount is 0');
+        expect(sideEffectCount).to.eq(0, 'sideEffectCount is 0');
     });
 
     describe('Patch State', () => {

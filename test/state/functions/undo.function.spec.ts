@@ -38,6 +38,8 @@ describe('Undo Function Tests', () => {
         expect(typeof MY_STATE.sideEffects === 'function').to.eq(true, 'MY_STATE has sideEffect function');
 
         expect(myHookState).to.eq(1, 'myHookState has correct MY_STATE value');
+        expect(rerenderCount).to.eq(0, 'rerenderCount is 0');
+        expect(sideEffectCount).to.eq(0, 'sideEffectCount is 0');
     });
 
     it('Can undo State', async () => {
