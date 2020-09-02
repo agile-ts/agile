@@ -20,7 +20,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     collection: () => Collection<DataType>;
 
     _output: Array<DataType> = []; // Output of the group (Note: _value are only the keys of the collection items)
-    _states: Array<State<DataType>> = []; // States of the Group
+    _states: Array<() => State<DataType>> = []; // States of the Group
     notFoundPrimaryKeys: Array<ItemKey> = []; // Contains all key which can't be found in the collection
 
     constructor(agileInstance: Agile, collection: Collection<DataType>, initialItems?: Array<ItemKey>, config?: GroupConfigInterface) {
@@ -50,7 +50,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         if (this.agileInstance().runtime.trackState)
             this.agileInstance().runtime.foundStates.add(this);
 
-        return this._states;
+        return this._states.map(state => state());
     }
 
     //=========================================================================================================
@@ -112,7 +112,10 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         const exists = this.nextState.findIndex(key => key === itemKey) !== -1;
 
         // Merge default values into options
-        options = defineConfig(options, {method: 'push', overwrite: true});
+        options = defineConfig(options, {
+            method: 'push',
+            overwrite: true
+        });
 
         // Removes temporary key from group to overwrite it properly
         if (options.overwrite)
@@ -128,8 +131,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         this.ingest({background: options.background});
 
         // Storage
-        if (this.key)
-            updateGroup(this.key, this.collection());
+        if (this.key) updateGroup(this.key, this.collection());
 
         return this;
     }
@@ -178,7 +180,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
             console.warn(`Agile: Couldn't find states with the primary keys in group '${this.key}'`, this.notFoundPrimaryKeys);
 
         // @ts-ignore
-        this._states = finalStates;
+        this._states = finalStates.map(state => (() => state));
         this._output = finalOutput;
     }
 }
