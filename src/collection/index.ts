@@ -165,30 +165,31 @@ export class Collection<DataType = DefaultDataItem> {
             if (options.forEachItem)
                 options.forEachItem(item, key, index);
 
-            // Add key to groups
-            _groups.forEach(groupName => {
-                // @ts-ignore
-                this.groups[groupName].add(key, {method: options.method, background: options.background})
-            });
-
-            // If item doesn't exist check if the key has already been added to the group -> group need rebuild to has correct output and states
+            // If item doesn't exist check if the key has already been added to the group -> group need rebuild to has correct output
             if (!itemExists) {
                 const groupKey = Object.keys(this.groups);
                 groupKey.forEach(groupName => {
                     // Get Group
                     const group = this.getGroup(groupName);
 
-                    // Check if item is in Group
+                    // Check if item key exists in Group
                     // @ts-ignore
                     if (group.value.findIndex(primaryKey => primaryKey === item[this.config.primaryKey || 'id']) !== -1) {
                         // Rebuild Group
                         group.build();
 
                         // Force Rerender to get the correct output in components
-                        group.ingest({forceRerender: true})
+                        if (!options.background)
+                            group.ingest({forceRerender: true})
                     }
                 });
             }
+
+            // Add key to groups
+            _groups.forEach(groupName => {
+                // @ts-ignore
+                this.groups[groupName].add(key, {method: options.method, background: options.background})
+            });
         });
     }
 
@@ -219,8 +220,8 @@ export class Collection<DataType = DefaultDataItem> {
         // Merge current Item value with changes
         const finalItemValue = flatMerge(currentItemValue, changes, {addNewProperties: options.addNewProperties});
 
-        // Check if something has changed
-        if (finalItemValue === itemState.nextState || JSON.stringify(finalItemValue) === JSON.stringify(itemState.nextState))
+        // Check if something has changed (stringifying because of possible object or array)
+        if (JSON.stringify(finalItemValue) === JSON.stringify(itemState.nextState))
             return this.data[finalItemValue[primaryKey]];
 
         // Assign finalItemStateValue to nextState
@@ -602,10 +603,11 @@ export class Collection<DataType = DefaultDataItem> {
      * @internal
      * Rebuild the Groups which contains the primaryKey
      */
-    public rebuildGroupsThatIncludePrimaryKey(primaryKey: ItemKey, options?: { background?: boolean }): void {
+    public rebuildGroupsThatIncludePrimaryKey(primaryKey: ItemKey, options?: { background?: boolean, forceRerender?: boolean }): void {
         // Assign defaults to config
         options = defineConfig(options, {
-            background: false
+            background: false,
+            forceRerender: !options?.background // forceRerender false.. because forceRerender has more weight than background in runtime
         });
 
         // Rebuild groups that includes primaryKey
@@ -615,7 +617,7 @@ export class Collection<DataType = DefaultDataItem> {
 
             // Check if group contains primaryKey if so rebuild it
             if (group.has(primaryKey))
-                group.ingest({background: options?.background});
+                group.ingest({background: options?.background, forceRerender: options?.forceRerender});
         }
     }
 }
