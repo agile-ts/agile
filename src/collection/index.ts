@@ -167,8 +167,8 @@ export class Collection<DataType = DefaultDataItem> {
 
             // If item doesn't exist check if the key has already been added to the group -> group need rebuild to has correct output
             if (!itemExists) {
-                const groupKey = Object.keys(this.groups);
-                groupKey.forEach(groupName => {
+                const groupKeys = Object.keys(this.groups);
+                groupKeys.forEach(groupName => {
                     // Get Group
                     const group = this.getGroup(groupName);
 
@@ -509,9 +509,9 @@ export class Collection<DataType = DefaultDataItem> {
         const itemKeys = Object.keys(this.data);
 
         _primaryKeys.forEach(itemKey => {
-            // Check if primaryKey exists in collection
-            if (itemKeys.findIndex(key => itemKey === key) === -1) {
-                console.error(`Agile: Couldn't find primaryKey '${itemKey} in collection`, this);
+            // Check if primaryKey exists in collection, if not return
+            if (itemKeys.findIndex(key => itemKey.toString() === key) === -1) {
+                console.error(`Agile: Couldn't find primaryKey '${itemKey}' in collection`, this);
                 return;
             }
 
