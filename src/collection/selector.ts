@@ -102,7 +102,7 @@ function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
     // Find data by id in collection
     let data = collection.findById(id)?.value;
 
-    // If data is not found, create placeholder item, so that when real data is collected it maintains connection
+    // If data is not found, create placeholder item, so that when real data is collected it maintains connection and causes a rerender
     if (!data) {
         const item = new Item<DataType>(collection, {id: id} as any);
         item.isPlaceholder = true;
