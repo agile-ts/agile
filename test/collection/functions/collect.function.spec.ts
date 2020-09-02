@@ -4,7 +4,7 @@ import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
 import {Group} from "../../../src/collection/group";
 
-describe('Set Function Tests', () => {
+describe('Collect Function Tests', () => {
     // Define Agile
     const App = new Agile({
         framework: {
