@@ -84,8 +84,8 @@ export class State<ValueType = any> {
             return this;
         }
 
-        // Check if something has changed
-        if (this.value === value || JSON.stringify(this.value) === JSON.stringify(value))
+        // Check if something has changed (stringifying because of possible object or array)
+        if (JSON.stringify(this.value) === JSON.stringify(value))
             return this;
 
         // Ingest update
@@ -106,16 +106,18 @@ export class State<ValueType = any> {
      * @internal
      * Will ingest the nextState or the computedValue (rebuilds state)
      */
-    public ingest(options: { background?: boolean, sideEffects?: boolean } = {}) {
+    public ingest(options: { background?: boolean, sideEffects?: boolean, forceRerender?: boolean } = {}) {
         // Assign defaults to options
         options = defineConfig(options, {
             sideEffects: true,
-            background: false
+            background: false,
+            forceRerender: false
         });
 
         this.agileInstance().runtime.ingest(this, this.agileInstance().runtime.internalIngestKey, {
             background: options.background,
-            sideEffects: options.sideEffects
+            sideEffects: options.sideEffects,
+            forceRerender: options.forceRerender
         });
     }
 
@@ -199,8 +201,8 @@ export class State<ValueType = any> {
         // Merge targetWithChanges into next State
         this.nextState = flatMerge<ValueType>(this.nextState, targetWithChanges, options);
 
-        // Check if something has changed
-        if (this.value === this.nextState || JSON.stringify(this.value) === JSON.stringify(this.nextState))
+        // Check if something has changed (stringifying because of possible object or array)
+        if (JSON.stringify(this.value) === JSON.stringify(this.nextState))
             return this;
 
         // Set State to nextState

@@ -152,6 +152,9 @@ export class Collection<DataType = DefaultDataItem> {
         _groups.forEach(groupName => !this.groups[groupName] && this.createGroup(groupName));
 
         _items.forEach((item, index) => {
+            // @ts-ignore
+            const itemExists = !!this.findById(item[this.config.primaryKey || 'id']);
+
             // Save items into Collection
             let key = this.saveData(item, {patch: options.patch, background: options.background});
 
@@ -167,6 +170,25 @@ export class Collection<DataType = DefaultDataItem> {
                 // @ts-ignore
                 this.groups[groupName].add(key, {method: options.method, background: options.background})
             });
+
+            // If item doesn't exist check if the key has already been added to the group -> group need rebuild to has correct output and states
+            if (!itemExists) {
+                const groupKey = Object.keys(this.groups);
+                groupKey.forEach(groupName => {
+                    // Get Group
+                    const group = this.getGroup(groupName);
+
+                    // Check if item is in Group
+                    // @ts-ignore
+                    if (group.value.findIndex(primaryKey => primaryKey === item[this.config.primaryKey || 'id']) !== -1) {
+                        // Rebuild Group
+                        group.build();
+
+                        // Force Rerender to get the correct output in components
+                        group.ingest({forceRerender: true})
+                    }
+                });
+            }
         });
     }
 
@@ -374,7 +396,7 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Create a group instance under this collection (can be used in function based config)
      */
-    public Group(initialItems?: Array<string>, config?: GroupConfigInterface): Group<DataType> {
+    public Group(initialItems?: Array<ItemKey>, config?: GroupConfigInterface): Group<DataType> {
         return new Group<DataType>(this.agileInstance(), this, initialItems, config);
     }
 

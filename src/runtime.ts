@@ -10,13 +10,15 @@ export interface JobInterface {
     options?: {
         background?: boolean
         sideEffects?: boolean
+        forceRerender?: boolean
     }
 }
 
 export interface JobConfigInterface {
-    perform?: boolean
-    background?: boolean
-    sideEffects?: boolean
+    perform?: boolean // Should preform the job instantly
+    background?: boolean // Shouldn't cause an rerender during the perform process
+    sideEffects?: boolean // Should perform sideEffects like rebuilding groups
+    forceRerender?: boolean // Force rerender although for instance the values are the same
 }
 
 export default class Runtime {
@@ -51,7 +53,8 @@ export default class Runtime {
         options = defineConfig<JobConfigInterface>(options, {
             perform: true,
             background: false,
-            sideEffects: true
+            sideEffects: true,
+            forceRerender: false
         });
 
         // Create Job
@@ -60,7 +63,8 @@ export default class Runtime {
             newStateValue: newStateValue,
             options: {
                 background: options.background,
-                sideEffects: options.sideEffects
+                sideEffects: options.sideEffects,
+                forceRerender: options.forceRerender
             }
         };
 
@@ -72,8 +76,8 @@ export default class Runtime {
                 job.newStateValue = job.state.nextState
         }
 
-        // Check if state value und newStateValue are the same.. if so return
-        if (state.value === newStateValue) {
+        // Check if state value und newStateValue are the same.. if so return except force Rerender (stringifying because of possible object or array)
+        if (JSON.stringify(state.value) === JSON.stringify(job.newStateValue) && !options.forceRerender) {
             if (this.agileInstance().config.logJobs)
                 console.warn("Agile: Doesn't perform job because state values are the same! ", job);
             return;
@@ -118,11 +122,11 @@ export default class Runtime {
         if (job.state.isPlaceholder)
             job.state.isPlaceholder = false;
 
-        // Perform SideEffects like watcher functions
+        // Perform SideEffects like watcher functions or state.sideEffects
         this.sideEffects(job);
 
         // Set Job as completed (The deps and subs of completed jobs will be updated)
-        if (!job.options?.background)
+        if (!job.options?.background || job.options?.forceRerender)
             this.jobsToRerender.push(job);
 
         // Reset Current Job
