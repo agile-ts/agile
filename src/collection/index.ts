@@ -138,6 +138,7 @@ export class Collection<DataType = DefaultDataItem> {
         const _items = normalizeArray<DataType>(items);
         const _groups = normalizeArray<GroupKey>(groups);
         const defaultGroupKey = this.config.defaultGroupKey || 'default';
+        const groupsToRebuild: Group[] = [];
 
         // Assign defaults to options
         options = defineConfig<CollectOptionsInterface>(options, {
@@ -148,12 +149,12 @@ export class Collection<DataType = DefaultDataItem> {
         if (_groups.findIndex(groupName => groupName === defaultGroupKey) === -1)
             _groups.push(defaultGroupKey);
 
-        // Create Group if it doesn't exist yet
+        // Create not existing Groups
         _groups.forEach(groupName => !this.groups[groupName] && this.createGroup(groupName));
 
         _items.forEach((item, index) => {
-            // @ts-ignore
-            const itemExists = !!this.findById(item[this.config.primaryKey || 'id']);
+            // Check if the item already exists in the Collection
+            const itemExists = !!this.findById((item as any)[this.config.primaryKey || 'id']);
 
             // Save items into Collection
             let key = this.saveData(item, {patch: options.patch, background: options.background});
@@ -165,23 +166,17 @@ export class Collection<DataType = DefaultDataItem> {
             if (options.forEachItem)
                 options.forEachItem(item, key, index);
 
-            // If item doesn't exist check if the key has already been added to the group -> group need rebuild to has correct output
+            // If item didn't exist.. check if the itemKey has already been added to a group before -> group need rebuild to has correct output
             if (!itemExists) {
                 const groupKeys = Object.keys(this.groups);
                 groupKeys.forEach(groupName => {
                     // Get Group
                     const group = this.getGroup(groupName);
 
-                    // Check if item key exists in Group
-                    // @ts-ignore
-                    if (group.value.findIndex(primaryKey => primaryKey === item[this.config.primaryKey || 'id']) !== -1) {
-                        // Rebuild Group
-                        group.build();
-
-                        // Force Rerender to get the correct output in components
-                        if (!options.background)
-                            group.ingest({forceRerender: true})
-                    }
+                    // Check if itemKey exists in Group if so push it to groupsToRebuild
+                    if (group.value.findIndex(primaryKey => primaryKey === (item as any)[this.config.primaryKey || 'id']) !== -1
+                        && groupsToRebuild.findIndex(group => group.key?.toString() === groupName) === -1)
+                        groupsToRebuild.push(group);
                 });
             }
 
@@ -191,6 +186,15 @@ export class Collection<DataType = DefaultDataItem> {
                 this.groups[groupName].add(key, {method: options.method, background: options.background})
             });
         });
+
+        // Rebuild groups
+        groupsToRebuild.forEach(group => {
+            // Rebuild Group
+            group.build();
+
+            // Force Rerender to get the correct output in components
+            if (!options.background) group.ingest({forceRerender: true})
+        })
     }
 
 
