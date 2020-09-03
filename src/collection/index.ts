@@ -138,7 +138,7 @@ export class Collection<DataType = DefaultDataItem> {
         const _items = normalizeArray<DataType>(items);
         const _groups = normalizeArray<GroupKey>(groups);
         const defaultGroupKey = this.config.defaultGroupKey || 'default';
-        const groupsToRebuild: Group[] = [];
+        const groupsToRebuild: Set<Group> = new Set<Group>();
 
         // Assign defaults to options
         options = defineConfig<CollectOptionsInterface>(options, {
@@ -174,9 +174,8 @@ export class Collection<DataType = DefaultDataItem> {
                     const group = this.getGroup(groupName);
 
                     // Check if itemKey exists in Group if so push it to groupsToRebuild
-                    if (group.value.findIndex(primaryKey => primaryKey === (item as any)[this.config.primaryKey || 'id']) !== -1
-                        && groupsToRebuild.findIndex(group => group.key?.toString() === groupName) === -1)
-                        groupsToRebuild.push(group);
+                    if (group.value.findIndex(primaryKey => primaryKey === (item as any)[this.config.primaryKey || 'id']) !== -1)
+                        groupsToRebuild.add(group);
                 });
             }
 

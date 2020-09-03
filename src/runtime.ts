@@ -192,7 +192,7 @@ export default class Runtime {
             return;
         }
 
-        // Subscriptions that has to be updated
+        // Subscriptions that has to be updated (Set = For preventing double subscriptions without further checks)
         const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<SubscriptionContainer>();
 
         // Map through Jobs to Rerender
@@ -220,7 +220,6 @@ export default class Runtime {
             }));
 
         // Perform Component or Callback updates
-        // TODO maybe add a unique key to a component and if its the same don't cause a rerender for both -> performance optimization
         subscriptionsToUpdate.forEach(subscriptionContainer => {
             // If Callback based subscription call the Callback Function
             if (subscriptionContainer instanceof CallbackContainer) {
