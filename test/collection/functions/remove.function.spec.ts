@@ -2,7 +2,6 @@ import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
-import {Group} from "../../../src/collection/group";
 import Item from "../../../src/collection/item";
 
 describe('Remove Function Tests', () => {
@@ -28,12 +27,13 @@ describe('Remove Function Tests', () => {
         }
 
         // Create Collection
-        const MY_COLLECTION = App.Collection<userInterface>((collection => ({
-            groups: {
-                group1: collection.Group([1, 2, 3]),
-                group2: collection.Group([1, 2, 3])
-            }
-        })));
+        const MY_COLLECTION = App.Collection<userInterface>(collection => ({
+                groups: {
+                    group1: collection.Group([1, 2, 3]),
+                    group2: collection.Group([1, 2, 3])
+                }
+            })
+        );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
         const [myGroup1, myGroup2] = useTest([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('group2')], () => {
@@ -43,11 +43,6 @@ describe('Remove Function Tests', () => {
         MY_COLLECTION.collect([{id: 1, name: 'jeff'}, {id: 2, name: 'hans'}, {id: 3, name: 'frank'}]);
 
         it('Has correct initial values', () => {
-            expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created');
-            expect(MY_COLLECTION.groups['group1'] instanceof Group).to.eq(true, 'MY_COLLECTION group1 Group has been created');
-            expect(MY_COLLECTION.groups['group1']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group1 Group has correct subs size');
-            expect(MY_COLLECTION.groups['group2'] instanceof Group).to.eq(true, 'MY_COLLECTION group2 Group has been created');
-            expect(MY_COLLECTION.groups['group2']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group2 Group has correct subs size');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([1, 2, 3]), 'group1 has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.groups['group2'].value)).to.eq(JSON.stringify([1, 2, 3]), 'group2 has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.data[1].value)).to.eq(JSON.stringify({
@@ -64,9 +59,7 @@ describe('Remove Function Tests', () => {
             }), 'MY_COLLECTION data contains item with id 3');
             expect(MY_COLLECTION.size).to.eq(3, 'MY_COLLECTION has correct size');
 
-            expect(JSON.stringify(myGroup1)).to.eq(JSON.stringify([]), 'myGroup1 has correct MY_COLLECTION group1 value');
-            expect(JSON.stringify(myGroup2)).to.eq(JSON.stringify([]), 'myGroup2 has correct MY_COLLECTION group2 value');
-            expect(rerenderCount).to.eq(1, 'rerenderCount is 0 Because ');
+            expect(rerenderCount).to.eq(1, 'rerenderCount has correct value');
         });
 
         it('Can remove item which exist', async () => {
@@ -150,12 +143,13 @@ describe('Remove Function Tests', () => {
         }
 
         // Create Collection
-        const MY_COLLECTION = App.Collection<userInterface>((collection => ({
-            groups: {
-                group1: collection.Group([1, 2, 3]),
-                group2: collection.Group([1, 2, 3])
-            }
-        })));
+        const MY_COLLECTION = App.Collection<userInterface>(collection => ({
+                groups: {
+                    group1: collection.Group([1, 2, 3]),
+                    group2: collection.Group([1, 2, 3])
+                }
+            })
+        );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
         const [myGroup1, myGroup2] = useTest([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('group2')], () => {
@@ -165,11 +159,6 @@ describe('Remove Function Tests', () => {
         MY_COLLECTION.collect([{id: 1, name: 'jeff'}, {id: 2, name: 'hans'}, {id: 3, name: 'frank'}]);
 
         it('Has correct initial values', () => {
-            expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created');
-            expect(MY_COLLECTION.groups['group1'] instanceof Group).to.eq(true, 'MY_COLLECTION group1 Group has been created');
-            expect(MY_COLLECTION.groups['group1']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group1 Group has correct subs size');
-            expect(MY_COLLECTION.groups['group2'] instanceof Group).to.eq(true, 'MY_COLLECTION group2 Group has been created');
-            expect(MY_COLLECTION.groups['group2']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group2 Group has correct subs size');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([1, 2, 3]), 'group1 has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.groups['group2'].value)).to.eq(JSON.stringify([1, 2, 3]), 'group2 has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.data[1].value)).to.eq(JSON.stringify({
@@ -186,9 +175,7 @@ describe('Remove Function Tests', () => {
             }), 'MY_COLLECTION data contains item with id 3');
             expect(MY_COLLECTION.size).to.eq(3, 'MY_COLLECTION has correct size');
 
-            expect(JSON.stringify(myGroup1)).to.eq(JSON.stringify([]), 'myGroup1 has correct MY_COLLECTION group1 value');
-            expect(JSON.stringify(myGroup2)).to.eq(JSON.stringify([]), 'myGroup2 has correct MY_COLLECTION group2 value');
-            expect(rerenderCount).to.eq(1, 'rerenderCount is 0 Because ');
+            expect(rerenderCount).to.eq(1, 'rerenderCount has correct value');
         });
 
         it('Can remove item which exist', async () => {
