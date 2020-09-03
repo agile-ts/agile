@@ -2,7 +2,7 @@ import 'mocha';
 import {expect} from 'chai';
 import Agile, {State} from "../../../src";
 
-describe('FindById Function Tests', () => {
+describe('GetValueById Function Tests', () => {
     // Define Agile
     const App = new Agile();
 
@@ -23,14 +23,13 @@ describe('FindById Function Tests', () => {
         expect(MY_COLLECTION.size).to.eq(2, 'MY_COLLECTION has correct size');
     });
 
-    it('Can findById', () => {
-        const item = MY_COLLECTION.findById(1);
+    it('Can getValueById', () => {
+        const item = MY_COLLECTION.getValueById(1);
 
-        expect(item instanceof State).to.eq(true, 'item is instanceof State')
-        expect(JSON.stringify(item?.value)).to.eq(JSON.stringify({id: 1, name: 'jeff'}), 'item has correct value');
+        expect(JSON.stringify(item)).to.eq(JSON.stringify({id: 1, name: 'jeff'}), 'item has correct value');
     });
 
-    it('Can\'t findById not existing item', () => {
+    it('Can\'t getValueById with not existing item id', () => {
         const item = MY_COLLECTION.findById(5);
 
         expect(item).to.eq(undefined, 'item is undefined')
