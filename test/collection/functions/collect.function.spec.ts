@@ -124,6 +124,22 @@ describe('Collect Function Tests', () => {
             expect(rerenderCount).to.eq(2, 'rerenderCount has been increased by 1');
         });
 
+        it('Can overwrite item if collecting with existing primaryKey', async () => {
+            MY_COLLECTION.collect({id: 2, name: 'benno'});
+
+            // Needs some time to call callbackFunction
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            expect(JSON.stringify(MY_COLLECTION.data[2]?.value)).to.eq(JSON.stringify({
+                id: 2,
+                name: 'benno'
+            }), 'MY_COLLECTION data has overwritten value with id 2');
+            expect(MY_COLLECTION.size).to.eq(3, 'MY_COLLECTION size stayed the same');
+            expect(MY_COLLECTION.groups['default']?.value.findIndex(value => value === 2) !== -1).to.eq(true, 'MY_COLLECTION default group still contains collected value');
+
+            expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 1');
+        });
+
         describe('Test background option', () => {
             it('Does call callBackFunction by collecting Item with background = false', async () => {
                 // Collect item
@@ -139,7 +155,7 @@ describe('Collect Function Tests', () => {
                 expect(MY_COLLECTION.groups['default']?.value.findIndex(value => value === 4) !== -1).to.eq(true, 'MY_COLLECTION default group contains collected value');
                 expect(MY_COLLECTION.size).to.eq(4, 'MY_COLLECTION size has been increased by 1');
 
-                expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 1');
+                expect(rerenderCount).to.eq(4, 'rerenderCount has been increased by 1');
             });
 
             it('Doesn\'t call callBackFunction by collecting Item with background = true', async () => {
@@ -156,7 +172,7 @@ describe('Collect Function Tests', () => {
                 expect(MY_COLLECTION.groups['default']?.value.findIndex(value => value === 5) !== -1).to.eq(true, 'MY_COLLECTION default group contains collected value');
                 expect(MY_COLLECTION.size).to.eq(5, 'MY_COLLECTION size has been increased by 1');
 
-                expect(rerenderCount).to.eq(3, 'rerenderCount stayed the same');
+                expect(rerenderCount).to.eq(4, 'rerenderCount stayed the same');
             });
         });
 
@@ -176,7 +192,7 @@ describe('Collect Function Tests', () => {
                 expect(MY_COLLECTION.groups['default']?.value[MY_COLLECTION.groups['default']?.value.length - 1]).to.eq(6, 'MY_COLLECTION default group collected value is last item in group');
                 expect(MY_COLLECTION.size).to.eq(6, 'MY_COLLECTION size has been increased by 1');
 
-                expect(rerenderCount).to.eq(4, 'rerenderCount has been increased by 1');
+                expect(rerenderCount).to.eq(5, 'rerenderCount has been increased by 1');
             });
 
             it('Does add the item at the start of the group with method = \'unshift\'', async () => {
@@ -194,12 +210,12 @@ describe('Collect Function Tests', () => {
                 expect(MY_COLLECTION.groups['default']?.value[0]).to.eq(7, 'MY_COLLECTION default group collected value is first item in group');
                 expect(MY_COLLECTION.size).to.eq(7, 'MY_COLLECTION size has been increased by 1');
 
-                expect(rerenderCount).to.eq(5, 'rerenderCount has been increased by 1');
+                expect(rerenderCount).to.eq(6, 'rerenderCount has been increased by 1');
             });
         });
 
         describe('Test patch option', () => {
-            it('Does patch value into item without changing the rest of it with patch = true', async () => {
+            it('Does patch value into item without overwriting it with patch = true', async () => {
                 // Collect item
                 // @ts-ignore
                 MY_COLLECTION.collect({id: 1, age: 20}, [], {patch: true});
@@ -215,10 +231,10 @@ describe('Collect Function Tests', () => {
                 expect(MY_COLLECTION.groups['default']?.value.findIndex(value => value === 1) !== -1).to.eq(true, 'MY_COLLECTION default group still contains collected value');
                 expect(MY_COLLECTION.size).to.eq(7, 'MY_COLLECTION size stayed the same');
 
-                expect(rerenderCount).to.eq(6, 'rerenderCount has been increased by 1');
+                expect(rerenderCount).to.eq(7, 'rerenderCount has been increased by 1');
             });
 
-            it('Does set value into item with changing the rest of it with patch = false', async () => {
+            it('Does set value into item by overwriting it with patch = false', async () => {
                 // Collect item
                 // @ts-ignore
                 MY_COLLECTION.collect({id: 2, age: 30}, [], {patch: false});
@@ -233,7 +249,7 @@ describe('Collect Function Tests', () => {
                 expect(MY_COLLECTION.groups['default']?.value.findIndex(value => value === 2) !== -1).to.eq(true, 'MY_COLLECTION default group still contains collected value');
                 expect(MY_COLLECTION.size).to.eq(7, 'MY_COLLECTION size stayed the same');
 
-                expect(rerenderCount).to.eq(7, 'rerenderCount has been increased by 1');
+                expect(rerenderCount).to.eq(8, 'rerenderCount has been increased by 1');
             });
         });
 
@@ -278,8 +294,7 @@ describe('Collect Function Tests', () => {
                     index: 1
                 }), 'myForEachItem has contains second collected item');
 
-                expect(rerenderCount).to.eq(8, 'rerenderCount has been increased by 1');
-
+                expect(rerenderCount).to.eq(9, 'rerenderCount has been increased by 1');
             });
         });
     });
