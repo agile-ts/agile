@@ -114,7 +114,8 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         // Merge default values into options
         options = defineConfig(options, {
             method: 'push',
-            overwrite: true
+            overwrite: true,
+            background: false
         });
 
         // Removes temporary key from group to overwrite it properly
@@ -126,6 +127,10 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
 
         // Push or unshift into state
         this.nextState[options.method || 'push'](itemKey);
+
+        // If item doesn't exist in collection set background to true, because a rerender is in this case unnecessary (output doesn't change)
+        if (!this.collection().findById(itemKey))
+            options.background = true;
 
         // Set State to nextState
         this.ingest({background: options.background});
