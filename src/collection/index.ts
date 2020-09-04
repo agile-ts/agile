@@ -20,10 +20,10 @@ export interface CollectionConfigInterface {
 }
 
 export interface CollectOptionsInterface<DataType = any> {
-    patch?: boolean
-    method?: 'push' | 'unshift'
-    forEachItem?: (item: DataType, key: ItemKey, index: number) => void
-    background?: boolean
+    patch?: boolean // If the item should be patched into existing item (only useful if Item already exists)
+    method?: 'push' | 'unshift' // Method for adding item to group
+    forEachItem?: (item: DataType, key: ItemKey, index: number) => void // To do something with collected items
+    background?: boolean // If the action should happen in the background -> no rerender
 }
 
 export type Config<DataType = DefaultDataItem> =
@@ -159,7 +159,7 @@ export class Collection<DataType = DefaultDataItem> {
             // Save items into Collection
             let key = this.saveData(item, {patch: options.patch, background: options.background});
 
-            // Return if key doesn't exist (something went wrong in saveData)
+            // Return if key doesn't exist (something went wrong in saveData, Note: Error will be logged in saveData)
             if (!key) return;
 
             // Call forEachItem method

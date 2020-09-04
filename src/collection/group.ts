@@ -7,9 +7,9 @@ import {updateGroup} from "./perstist";
 export type GroupKey = string | number;
 
 export interface GroupAddOptionsInterface {
-    method?: 'unshift' | 'push' // method to add to group
-    overwrite?: boolean // set to false to leave primary key in place if it already exists
-    background?: boolean
+    method?: 'unshift' | 'push' // Method for adding item to group
+    overwrite?: boolean // Set to false to leave primary key in place if it already exists
+    background?: boolean // If the action should happen in the background -> no rerender
 }
 
 export interface GroupConfigInterface {
