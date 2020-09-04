@@ -8,7 +8,10 @@ import Agile from "./agile";
 /**
  * Copy an array or object.. without any dependencies
  */
-export const copy = (value: any) => {
+
+export function copy<T = any>(value: T): T;
+export function copy<T extends Array<T>>(value: T): T[];
+export function copy<T = any>(value: T): T | T[] {
     if (Array.isArray(value))
         return [...value];
 
@@ -16,7 +19,7 @@ export const copy = (value: any) => {
         return {...value};
 
     return value;
-};
+}
 
 
 //=========================================================================================================
@@ -151,7 +154,7 @@ export function defineConfig<C>(config: C, defaults: object): C {
  */
 export function flatMerge<DataType = Object>(source: DataType, changes: Object, config: { addNewProperties?: boolean } = {}): DataType {
     // Copy Source to avoid reference
-    const _source = copy(source);
+    const _source = copy<DataType>(source);
 
     // Loop through changes object and merge changes into source
     let keys = Object.keys(changes);
