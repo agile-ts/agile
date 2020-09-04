@@ -143,6 +143,8 @@ export class Collection<DataType = DefaultDataItem> {
         // Assign defaults to options
         options = defineConfig<CollectOptionsInterface>(options, {
             method: 'push',
+            background: false,
+            patch: false
         });
 
         // Add default group if it hasn't been added (default group contains all items)
@@ -217,7 +219,7 @@ export class Collection<DataType = DefaultDataItem> {
         });
 
         const itemState = this.data[updateKey];
-        const currentItemValue = copy(itemState.value);
+        const currentItemValue = copy(itemState.value) as any;
         const primaryKey = this.config.primaryKey || '';
 
         // Merge current Item value with changes
@@ -518,13 +520,7 @@ export class Collection<DataType = DefaultDataItem> {
                 return;
             }
 
-            // Remove primaryKey from collection data
-            delete this.data[itemKey];
-
-            // Decrease size
-            this.size--;
-
-            // Remove primaryKey from Groups
+            // Remove primaryKey from Groups (have to be above deleting the data because.. the remove function needs to know if the data exists or not)
             groupKeys.forEach(groupKey => {
                 this.groups[groupKey].remove(itemKey);
             });
@@ -533,6 +529,12 @@ export class Collection<DataType = DefaultDataItem> {
             selectorKeys.forEach(selectorKey => {
                 delete this.selectors[selectorKey];
             });
+
+            // Remove primaryKey from collection data
+            delete this.data[itemKey];
+
+            // Decrease size
+            this.size--;
 
             // Storage
             removeItem(itemKey, this);

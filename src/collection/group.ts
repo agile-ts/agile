@@ -1,7 +1,7 @@
 import {Collection, DefaultDataItem, ItemKey} from "./index";
 import {State} from "../state";
 import Agile from "../agile";
-import {defineConfig} from "../utils";
+import {defineConfig, normalizeArray} from "../utils";
 import {updateGroup} from "./perstist";
 
 export type GroupKey = string | number;
@@ -81,27 +81,40 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     /**
      * Removes a item at primaryKey from the group
      */
-    public remove(itemKey: ItemKey, options: {background?: boolean} = {}): this {
-        // Check if primaryKey exists in group if not, return
-        if (this.value.findIndex(key => key === itemKey) === -1) {
-            console.error(`Agile: Couldn't find primaryKey '${itemKey} in group`, this);
-            return this;
-        }
+    public remove(itemKeys: ItemKey | ItemKey[], options: { background?: boolean } = {}): this {
+        const _itemKeys = normalizeArray<ItemKey>(itemKeys);
+        const notExistingCollectionItems: Array<ItemKey> = [];
 
         // Merge default values into options
         options = defineConfig(options, {
             background: false
         });
 
-        // Remove primaryKey from nextState
-        this.nextState = this.nextState.filter((i) => i !== itemKey);
+        _itemKeys.forEach(itemKey => {
+            // If item doesn't exist in collection add it to notExistingItems
+            if (!this.collection().findById(itemKey))
+                notExistingCollectionItems.push(itemKey);
+
+            // Check if primaryKey exists in group if not, return
+            if (this.value.findIndex(key => key === itemKey) === -1) {
+                console.error(`Agile: Couldn't find primaryKey '${itemKey} in group`, this);
+                return;
+            }
+
+            // Remove primaryKey from nextState
+            this.nextState = this.nextState.filter((i) => i !== itemKey);
+
+            // Storage
+            if (this.key)
+                updateGroup(this.key, this.collection());
+        });
+
+        // If all items don't exist in collection.. set background to true because the output won't change -> no rerender necessary
+        if (notExistingCollectionItems.length >= _itemKeys.length)
+            options.background = true;
 
         // Set State to nextState
         this.ingest(options);
-
-        // Storage
-        if (this.key)
-            updateGroup(this.key, this.collection());
 
         return this;
     }
@@ -113,35 +126,49 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     /**
      * Adds a key to a group
      */
-    public add(itemKey: ItemKey, options: GroupAddOptionsInterface = {}): this {
-        const exists = this.nextState.findIndex(key => key === itemKey) !== -1;
+    public add(itemKeys: ItemKey | ItemKey[], options: GroupAddOptionsInterface = {}): this {
+        const _itemKeys = normalizeArray<ItemKey>(itemKeys);
+        const notExistingCollectionItems: Array<ItemKey> = [];
+        let newNextState = [...this.nextState]; // Had to create copy array otherwise also 'this.value' would change.. by changing 'this.nextState' directly.
 
         // Merge default values into options
-        options = defineConfig(options, {
+        options = defineConfig<GroupAddOptionsInterface>(options, {
             method: 'push',
-            overwrite: true,
+            overwrite: false,
             background: false
         });
 
-        // Removes temporary key from group to overwrite it properly
-        if (options.overwrite)
-            this.nextState = this.nextState.filter((i) => i !== itemKey);
-        // If we do not want to overwrite and key already exists in group, exit
-        else if (exists)
-            return this;
+        _itemKeys.forEach(itemKey => {
+            // Check if item already exists in group
+            const existsInGroup = newNextState.findIndex(key => key === itemKey) !== -1;
 
-        // Push or unshift into state
-        this.nextState[options.method || 'push'](itemKey);
+            // If item doesn't exist in collection add it to notExistingItems
+            if (!this.collection().findById(itemKey))
+                notExistingCollectionItems.push(itemKey);
 
-        // If item doesn't exist in collection set background to true, because a rerender is in this case unnecessary (output doesn't change)
-        if (!this.collection().findById(itemKey))
+            // Removes temporary key from group to overwrite it properly
+            if (options.overwrite)
+                newNextState = newNextState.filter((i) => i !== itemKey);
+            // If we do not want to overwrite and key already exists in group, exit
+            else if (existsInGroup)
+                return;
+
+            // Push or unshift into state
+            newNextState[options.method || 'push'](itemKey);
+
+            // Storage
+            if (this.key) updateGroup(this.key, this.collection());
+        });
+
+        // If all items don't exist in collection.. set background to true because the output won't change -> no rerender necessary
+        if (notExistingCollectionItems.length >= _itemKeys.length)
             options.background = true;
+
+        // Set nextState to newNextState
+        this.nextState = newNextState;
 
         // Set State to nextState
         this.ingest({background: options.background});
-
-        // Storage
-        if (this.key) updateGroup(this.key, this.collection());
 
         return this;
     }
