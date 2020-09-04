@@ -47,6 +47,7 @@ describe('Default Group Tests', () => {
             expect(MY_COLLECTION.groups['group1'].key).to.eq('group1', 'group1 has correct key');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([]), 'group1 has correct output');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([]), 'group1 has correct initial value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].states)).to.eq(JSON.stringify([]), 'group1 has correct states');
 
             expect(JSON.stringify(myGroup1)).to.eq(JSON.stringify([]), 'myGroup1 has correct MY_COLLECTION group1 value');
             expect(JSON.stringify(notExistingGroup)).to.eq(JSON.stringify([]), 'notExistingGroup has [] as value');
@@ -88,6 +89,11 @@ describe('Default Group Tests', () => {
                 {id: 2, name: 'hans'},
                 {id: 3, name: 'frank'}
             ]), 'group1 has correct output');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].states)).to.eq(JSON.stringify([
+                MY_COLLECTION.findById(1),
+                MY_COLLECTION.findById(2),
+                MY_COLLECTION.findById(3)
+            ]), 'group1 has correct states');
             expect(MY_COLLECTION.groups['group1'].key).to.eq('group1', 'group1 has correct key');
 
             expect(JSON.stringify(myGroup1)).to.eq(JSON.stringify([]), 'myGroup1 has correct MY_COLLECTION group1 value');

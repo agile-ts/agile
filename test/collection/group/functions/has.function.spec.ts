@@ -37,7 +37,6 @@ describe('Has function Tests', () => {
 
         expect(has).to.eq(true);
         expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([1, 2, 3]), 'group1 has correct initial value');
-
     });
 
     it('Can use has function with not existing primaryKey in collection and group', () => {
