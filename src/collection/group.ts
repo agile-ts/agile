@@ -81,18 +81,23 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     /**
      * Removes a item at primaryKey from the group
      */
-    public remove(itemKey: ItemKey): this {
+    public remove(itemKey: ItemKey, options: {background?: boolean} = {}): this {
         // Check if primaryKey exists in group if not, return
         if (this.value.findIndex(key => key === itemKey) === -1) {
             console.error(`Agile: Couldn't find primaryKey '${itemKey} in group`, this);
             return this;
         }
 
+        // Merge default values into options
+        options = defineConfig(options, {
+            background: false
+        });
+
         // Remove primaryKey from nextState
         this.nextState = this.nextState.filter((i) => i !== itemKey);
 
         // Set State to nextState
-        this.ingest();
+        this.ingest(options);
 
         // Storage
         if (this.key)
