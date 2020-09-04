@@ -37,7 +37,16 @@ describe('Add function Tests', () => {
         rerenderCount++;
     });
 
-    MY_COLLECTION.collect([{id: 1, name: 'jeff'}, {id: 2, name: 'hans'}, {id: 3, name: 'frank'}, {id: 4, name: 'gina'}, {id: 5, name: 'tabea'}, {id: 6, name: 'livia'}]);
+    MY_COLLECTION.collect([
+        {id: 1, name: 'jeff'},
+        {id: 2, name: 'hans'},
+        {id: 3, name: 'frank'},
+        {id: 4, name: 'gina'},
+        {id: 5, name: 'tabea'},
+        {id: 6, name: 'livia'},
+        {id: 7, name: 'joshi'},
+        {id: 8, name: 'günter'}
+    ]);
 
     it('Has correct initial values', () => {
         expect(MY_COLLECTION.groups['group1'] instanceof Group).to.eq(true, 'MY_COLLECTION group1 Group has been created');
@@ -47,7 +56,7 @@ describe('Add function Tests', () => {
         ]), 'group1 has correct output');
 
         expect(JSON.stringify(myGroup1)).to.eq(JSON.stringify([]), 'myGroup1 has correct MY_COLLECTION group1 value');
-        expect(rerenderCount).to.eq(1, 'rerenderCount has correct value');
+        expect(rerenderCount).to.eq(1, 'rerenderCount has been correct value');
     });
 
     it('Can add Group', async () => {
@@ -63,7 +72,25 @@ describe('Add function Tests', () => {
         ]), 'group1 has correct output');
         expect(JSON.stringify(MY_COLLECTION.groups['group1'].notFoundPrimaryKeys)).to.eq(JSON.stringify([]), 'group1 has correct notFoundPrimaryKeys');
 
-        expect(rerenderCount).to.eq(2, 'rerenderCount has increased by 1');
+        expect(rerenderCount).to.eq(2, 'rerenderCount has been increased by 1');
+    });
+
+    it('Can add multiple Groups', async () => {
+        MY_COLLECTION.groups['group1'].add([7, 8]);
+
+        // Needs some time to call callbackFunction
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 7, 8]), 'group1 has correct value');
+        expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
+            {id: 2, name: 'hans'},
+            {id: 1, name: 'jeff'},
+            {id: 7, name: 'joshi'},
+            {id: 8, name: 'günter'}
+        ]), 'group1 has correct output');
+        expect(JSON.stringify(MY_COLLECTION.groups['group1'].notFoundPrimaryKeys)).to.eq(JSON.stringify([]), 'group1 has correct notFoundPrimaryKeys');
+
+        expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 1');
     });
 
     it('Can\'t add item to Group which already exists', async () => {
@@ -72,13 +99,15 @@ describe('Add function Tests', () => {
         // Needs some time to call callbackFunction
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1]), 'group1 has correct value');
+        expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 7, 8]), 'group1 has correct value');
         expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
             {id: 2, name: 'hans'},
-            {id: 1, name: 'jeff'}
+            {id: 1, name: 'jeff'},
+            {id: 7, name: 'joshi'},
+            {id: 8, name: 'günter'}
         ]), 'group1 has correct output');
 
-        expect(rerenderCount).to.eq(2, 'rerenderCount stayed the same');
+        expect(rerenderCount).to.eq(3, 'rerenderCount stayed the same');
     });
 
     it('Can add item to Group which doesn\'t exist in collection', async () => {
@@ -87,14 +116,16 @@ describe('Add function Tests', () => {
         // Needs some time to call callbackFunction
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 100]), 'group1 has correct value');
+        expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 7, 8, 100]), 'group1 has correct value');
         expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
             {id: 2, name: 'hans'},
-            {id: 1, name: 'jeff'}
+            {id: 1, name: 'jeff'},
+            {id: 7, name: 'joshi'},
+            {id: 8, name: 'günter'}
         ]), 'group1 has correct output');
         expect(JSON.stringify(MY_COLLECTION.groups['group1'].notFoundPrimaryKeys)).to.eq(JSON.stringify([100]), 'group1 has correct notFoundPrimaryKeys');
 
-        expect(rerenderCount).to.eq(2, 'rerenderCount stayed the same because output won\'t change -> rerender not necessary');
+        expect(rerenderCount).to.eq(3, 'rerenderCount stayed the same because output won\'t change -> rerender not necessary');
     });
 
     describe('Test background option', () => {
@@ -104,14 +135,16 @@ describe('Add function Tests', () => {
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 100, 3]), 'group1 has correct value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 7, 8, 100, 3]), 'group1 has correct value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
                 {id: 2, name: 'hans'},
                 {id: 1, name: 'jeff'},
+                {id: 7, name: 'joshi'},
+                {id: 8, name: 'günter'},
                 {id: 3, name: 'frank'}
             ]), 'group1 has correct output');
 
-            expect(rerenderCount).to.eq(3, 'rerenderCount has increased by 1');
+            expect(rerenderCount).to.eq(4, 'rerenderCount has been increased by 1');
         });
 
         it('Doesn\'t call callBackFunction by adding Item to group with background = true', async () => {
@@ -120,15 +153,17 @@ describe('Add function Tests', () => {
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 100, 3, 4]), 'group1 has correct value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 7, 8, 100, 3, 4]), 'group1 has correct value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
                 {id: 2, name: 'hans'},
                 {id: 1, name: 'jeff'},
+                {id: 7, name: 'joshi'},
+                {id: 8, name: 'günter'},
                 {id: 3, name: 'frank'},
                 {id: 4, name: 'gina'}
             ]), 'group1 has correct output');
 
-            expect(rerenderCount).to.eq(3, 'rerenderCount stayed the same');
+            expect(rerenderCount).to.eq(4, 'rerenderCount stayed the same');
         });
     });
 
@@ -139,16 +174,18 @@ describe('Add function Tests', () => {
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 100, 3, 4, 5]), 'group1 has correct value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([2, 1, 7, 8, 100, 3, 4, 5]), 'group1 has correct value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
                 {id: 2, name: 'hans'},
                 {id: 1, name: 'jeff'},
+                {id: 7, name: 'joshi'},
+                {id: 8, name: 'günter'},
                 {id: 3, name: 'frank'},
                 {id: 4, name: 'gina'},
                 {id: 5, name: 'tabea'}
             ]), 'group1 has correct output');
 
-            expect(rerenderCount).to.eq(4, 'rerenderCount has increased by 1');
+            expect(rerenderCount).to.eq(5, 'rerenderCount has been increased by 1');
         });
 
         it('Does add the item at the start of the group with method = \'unshift\'', async () => {
@@ -157,17 +194,19 @@ describe('Add function Tests', () => {
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([6, 2, 1, 100, 3, 4, 5]), 'group1 has correct value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([6, 2, 1, 7, 8, 100, 3, 4, 5]), 'group1 has correct value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
                 {id: 6, name: 'livia'},
                 {id: 2, name: 'hans'},
                 {id: 1, name: 'jeff'},
+                {id: 7, name: 'joshi'},
+                {id: 8, name: 'günter'},
                 {id: 3, name: 'frank'},
                 {id: 4, name: 'gina'},
                 {id: 5, name: 'tabea'}
             ]), 'group1 has correct output');
 
-            expect(rerenderCount).to.eq(5, 'rerenderCount has increased by 1');
+            expect(rerenderCount).to.eq(6, 'rerenderCount has been increased by 1');
         });
     });
 
@@ -178,17 +217,19 @@ describe('Add function Tests', () => {
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([6, 2, 1, 100, 3, 4, 5]), 'group1 has correct value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([6, 2, 1, 7, 8, 100, 3, 4, 5]), 'group1 has correct value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
                 {id: 6, name: 'livia'},
                 {id: 2, name: 'hans'},
                 {id: 1, name: 'jeff'},
+                {id: 7, name: 'joshi'},
+                {id: 8, name: 'günter'},
                 {id: 3, name: 'frank'},
                 {id: 4, name: 'gina'},
                 {id: 5, name: 'tabea'}
             ]), 'group1 has correct output');
 
-            expect(rerenderCount).to.eq(5, 'rerenderCount stayed the same');
+            expect(rerenderCount).to.eq(6, 'rerenderCount stayed the same');
         });
 
         it('Overwrites existing item and add it at new position with overwrite = true', async () => {
@@ -197,17 +238,19 @@ describe('Add function Tests', () => {
             // Needs some time to call callbackFunction
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([6, 2, 1, 100, 4, 5, 3]), 'group1 has correct value');
+            expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([6, 2, 1, 7, 8, 100, 4, 5, 3]), 'group1 has correct value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([
                 {id: 6, name: 'livia'},
                 {id: 2, name: 'hans'},
                 {id: 1, name: 'jeff'},
+                {id: 7, name: 'joshi'},
+                {id: 8, name: 'günter'},
                 {id: 4, name: 'gina'},
                 {id: 5, name: 'tabea'},
                 {id: 3, name: 'frank'}
             ]), 'group1 has correct output');
 
-            expect(rerenderCount).to.eq(6, 'rerenderCount has increased by 1');
+            expect(rerenderCount).to.eq(7, 'rerenderCount has been increased by 1');
         });
     });
 });

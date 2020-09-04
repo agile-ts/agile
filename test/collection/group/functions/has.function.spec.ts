@@ -20,7 +20,12 @@ describe('Has function Tests', () => {
         })
     );
 
-    MY_COLLECTION.collect([{id: 1, name: 'jeff'}, {id: 2, name: 'hans'}, {id: 3, name: 'frank'}, {id: 4, name: 'gina'}]);
+    MY_COLLECTION.collect([
+        {id: 1, name: 'jeff'},
+        {id: 2, name: 'hans'},
+        {id: 3, name: 'frank'},
+        {id: 4, name: 'gina'}
+    ]);
 
     it('Has correct initial values', () => {
         expect(MY_COLLECTION.groups['group1'] instanceof Group).to.eq(true, 'MY_COLLECTION group1 Group has been created');
