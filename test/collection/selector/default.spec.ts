@@ -43,6 +43,7 @@ describe('Default Selector Tests', () => {
             expect(MY_COLLECTION.selectors['selector1'] instanceof Selector).to.eq(true, 'MY_COLLECTION selector1 Selector has been created');
             expect(MY_COLLECTION.selectors['selector1']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION selector1 Selector has correct subs size');
             expect(MY_COLLECTION.selectors['selector1'].key).to.eq('selector1', 'selector1 Selector has correct initial key');
+            expect(MY_COLLECTION.selectors['selector1'].id).to.eq(1, 'selector1 Selector has correct initial id');
             expect(MY_COLLECTION.selectors['selector1'].exists).to.eq(false, 'selector1 Selector doesn\'t exist');
             expect(JSON.stringify(MY_COLLECTION.selectors['selector1'].value)).to.eq(JSON.stringify(undefined), 'selector1 Selector has correct initial value');
 
@@ -74,7 +75,7 @@ describe('Default Selector Tests', () => {
             expect(JSON.stringify(MY_COLLECTION.selectors['selector1'].value)).to.eq(JSON.stringify({
                 id: 1,
                 name: 'jeff'
-            }), 'selector1 has correct initial value');
+            }), 'selector1 Selector has correct initial value');
 
             expect(MY_COLLECTION.data[1].exists).to.eq(true, 'MY_COLLECTION data at id 1 exists');
             expect(JSON.stringify(MY_COLLECTION.data[1].value)).to.eq(JSON.stringify({
