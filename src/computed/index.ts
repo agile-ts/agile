@@ -62,7 +62,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     /**
      * Will call the computeFunction and update the dependencies
      */
-    public recompute(options?: {background?: boolean, sideEffects?: boolean}): void {
+    public recompute(options?: { background?: boolean, sideEffects?: boolean }): void {
         // Assign defaults to config
         options = defineConfig(options, {
             background: false,

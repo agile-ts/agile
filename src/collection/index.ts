@@ -308,15 +308,16 @@ export class Collection<DataType = DefaultDataItem> {
      * Return an group from this collection as Group instance (extends State)
      */
     public getGroup(groupName: GroupKey): Group<DataType> {
-        if (this.groups[groupName]) {
+        // Check if group exists
+        if (this.groups[groupName])
             return this.groups[groupName];
-        } else {
-            console.warn(`Agile: Group with name '${groupName}' doesn't exist!`);
-            // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
-            const group = new Group(this.agileInstance(), this, [], {key: 'dummy'});
-            group.isPlaceholder = true;
-            return group;
-        }
+
+        console.warn(`Agile: Group with name '${groupName}' doesn't exist!`);
+
+        // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
+        const group = new Group(this.agileInstance(), this, [], {key: 'dummy'});
+        group.isPlaceholder = true;
+        return group;
     }
 
 
@@ -327,10 +328,13 @@ export class Collection<DataType = DefaultDataItem> {
      * Return an selector from this collection as Selector instance (extends State)
      */
     public getSelector(selectorName: SelectorKey): Selector<DataType> | undefined {
-        if (this.selectors[selectorName]) {
+        // Check if selector exists
+        if (this.selectors[selectorName])
             return this.selectors[selectorName];
-        } else
-            console.warn(`Agile: Selector with name ${selectorName} doesn't exist!`);
+
+        console.warn(`Agile: Selector with name '${selectorName}' doesn't exist!`);
+
+        return undefined;
     }
 
 

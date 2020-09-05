@@ -3,7 +3,7 @@ import {Computed} from "../computed";
 import Item from "./item";
 import {persistValue} from "../state/persist";
 import {StorageKey} from "../storage";
-import {defineConfig} from "../utils";
+import {copy, defineConfig} from "../utils";
 
 export type SelectorKey = string | number;
 
@@ -34,7 +34,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
     }
 
     public set id(val: ItemKey) {
-       this.select(val);
+        this.select(val);
     }
 
     public get id() {
@@ -48,7 +48,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
     /**
      * Changes the id on which the selector is watching
      */
-    public select(id: ItemKey, options?: {background?: boolean, sideEffects?: boolean}) {
+    public select(id: ItemKey, options?: { background?: boolean, sideEffects?: boolean }) {
         // Assign defaults to config
         options = defineConfig(options, {
             background: false,
@@ -67,7 +67,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
 
 
     //=========================================================================================================
-    // Overwriting Persist
+    // Overwrite Persist
     //=========================================================================================================
     /**
      * Saves the state in the local storage or in a own configured storage
@@ -100,15 +100,28 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
  */
 function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
     // Find data by id in collection
-    let data = collection.findById(id)?.value;
+    let item = collection.findById(id);
 
     // If data is not found, create placeholder item, so that when real data is collected it maintains connection and causes a rerender
-    if (!data) {
-        const item = new Item<DataType>(collection, {id: id} as any);
-        item.isPlaceholder = true;
-        collection.data[id] = item;
-        data = item.value;
+    if (!item) {
+        const newItem = new Item<DataType>(collection, {id: id} as any);
+        newItem.isPlaceholder = true;
+        collection.data[id] = newItem;
+        item = newItem;
     }
 
-    return data;
+    // If initial State is still {id: id}.. because of placeholder item and the value isn't {id: id} -> had got real value.. set the initial State to this first real value
+    if (JSON.stringify(item.initialState) === JSON.stringify({id: id}) && JSON.stringify(item.nextState) !== JSON.stringify({id: id})){
+        item.initialState = copy(item.nextState);
+        item.previousState = copy(item.nextState);
+    }
+
+    // Have to create the final Value here, to get added to the track states also if the item doesn't exist yet.. (otherwise auto tracking state wouldn't work -> this won't get called if the item changes )
+    const finalValue = item.value;
+
+    // If item doesn't exist return undefined.. otherwise it would return {id: id}
+    if (!item.exists)
+        return undefined;
+
+    return finalValue;
 }
