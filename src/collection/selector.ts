@@ -55,6 +55,10 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
             sideEffects: true
         });
 
+        // Remove item if its a placeholder because if so it won't be needed without being selected by this selector
+        if (this.collection().findById(this.id)?.isPlaceholder)
+            this.collection().remove(this.id).everywhere();
+
         // Set _id to new id
         this._id = id;
 
@@ -111,7 +115,7 @@ function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
     }
 
     // If initial State is still {id: id}.. because of placeholder item and the value isn't {id: id} -> had got real value.. set the initial State to this first real value
-    if (JSON.stringify(item.initialState) === JSON.stringify({id: id}) && JSON.stringify(item.nextState) !== JSON.stringify({id: id})){
+    if (JSON.stringify(item.initialState) === JSON.stringify({id: id}) && JSON.stringify(item.nextState) !== JSON.stringify({id: id})) {
         item.initialState = copy(item.nextState);
         item.previousState = copy(item.nextState);
     }
