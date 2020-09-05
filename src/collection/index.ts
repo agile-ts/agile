@@ -417,8 +417,8 @@ export class Collection<DataType = DefaultDataItem> {
     /**
      * Create a selector instance under this collection (can be used in function based config)
      */
-    public Selector(initialSelection: ItemKey): Selector<DataType> {
-        return new Selector<DataType>(this, initialSelection);
+    public Selector(initialSelection: ItemKey, options?: {key?: SelectorKey}): Selector<DataType> {
+        return new Selector<DataType>(this, initialSelection, options);
     }
 
 
