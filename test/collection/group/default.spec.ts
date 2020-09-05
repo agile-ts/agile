@@ -34,7 +34,7 @@ describe('Default Group Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myGroup1, notExistingGroup] = useTest([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('notExisting')], () => {
+        const [myGroup1] = useTest([MY_COLLECTION.getGroup('group1')], () => {
             rerenderCount++;
         });
 
@@ -50,7 +50,6 @@ describe('Default Group Tests', () => {
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].states)).to.eq(JSON.stringify([]), 'group1 has correct states');
 
             expect(JSON.stringify(myGroup1)).to.eq(JSON.stringify([]), 'myGroup1 has correct MY_COLLECTION group1 value');
-            expect(JSON.stringify(notExistingGroup)).to.eq(JSON.stringify([]), 'notExistingGroup has [] as value');
             expect(rerenderCount).to.eq(0, 'rerenderCount has correct value');
         });
     });
