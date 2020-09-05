@@ -27,9 +27,10 @@ describe('getSelector Function Tests', () => {
         // Get Selector
         const mySelector = MY_COLLECTION.getSelector('selector1');
 
-        expect(mySelector instanceof Selector).to.eq(true, 'mySelector is a selector');
+        expect(mySelector instanceof Selector).to.eq(true, 'mySelector is a Selector');
         expect(mySelector?.key).to.eq('selector1', 'mySelector has correct key');
-        expect(mySelector?.exists).to.eq(true, 'mySelector does exist');
+        expect(mySelector?.exists).to.eq(false, 'mySelector doesn\'t exist because it has no value');
+        expect(mySelector?.value).to.eq(undefined, 'mySelector has correct value');
     });
 
     it('Can\'t get Selector which doesn\'t exist', () => {
