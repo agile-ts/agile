@@ -156,7 +156,7 @@ export class Collection<DataType = DefaultDataItem> {
 
         _items.forEach((item, index) => {
             // Check if the item already exists in the Collection
-            const itemExists = !!this.findById((item as any)[this.config.primaryKey || 'id']);
+            const itemExists = !!this.data[(item as any)[this.config.primaryKey || 'id']];
 
             // Save items into Collection
             let key = this.saveData(item, {patch: options.patch, background: options.background});

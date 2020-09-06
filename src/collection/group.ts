@@ -97,7 +97,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
 
             // Check if primaryKey exists in group if not, return
             if (this.value.findIndex(key => key === itemKey) === -1) {
-                console.error(`Agile: Couldn't find primaryKey '${itemKey} in group`, this);
+                console.error(`Agile: Couldn't find primaryKey '${itemKey}' in group`, this);
                 return;
             }
 

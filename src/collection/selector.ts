@@ -56,8 +56,8 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
         });
 
         // Remove item if its a placeholder because if so it won't be needed without being selected by this selector
-        if (this.collection().findById(this.id)?.isPlaceholder)
-            this.collection().remove(this.id).everywhere();
+        if (this.collection().data[this.id]?.isPlaceholder)
+            delete this.collection().data[this.id];
 
         // Set _id to new id
         this._id = id;
