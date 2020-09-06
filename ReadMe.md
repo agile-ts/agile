@@ -10,5 +10,5 @@ So I can change things quickly and don't have to deal with a big framework which
 ##### Feel free to use it but be aware that it is optimized to my needs and has no docs
 
 <div align="center">
-  <img src="https://i.gifer.com/yC.gif">
+  <img src="https://i.pinimg.com/originals/66/70/fd/6670fd61b91760bf8f04ca0479a2e0d1.gif">
 </div>
