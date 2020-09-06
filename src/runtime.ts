@@ -109,7 +109,7 @@ export default class Runtime {
      * Perform a State Update
      */
     private perform(job: JobInterface): void {
-        // Set Job to current
+        // Set Job to currentJob
         this.currentJob = job;
 
         // Set Previous State
@@ -117,6 +117,9 @@ export default class Runtime {
 
         // Write new value into the State
         job.state.privateWrite(job.newStateValue);
+
+        // Set isSet
+        job.state.isSet = job.newStateValue !== job.state.initialState;
 
         // Set is placeholder to false, because it has got a value
         if (job.state.isPlaceholder)

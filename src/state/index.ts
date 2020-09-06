@@ -69,9 +69,9 @@ export class State<ValueType = any> {
     // Set
     //=========================================================================================================
     /**
-     * Directly set state to a new value, if nothing is passed in State.nextState will be used as the next value
+     * Directly set state to a new value
      */
-    public set(value?: ValueType, options: { background?: boolean, sideEffects?: boolean } = {}): this {
+    public set(value: ValueType, options: { background?: boolean, sideEffects?: boolean } = {}): this {
         // Assign defaults to options
         options = defineConfig(options, {
             sideEffects: true,
@@ -88,13 +88,12 @@ export class State<ValueType = any> {
         if (JSON.stringify(this.value) === JSON.stringify(value))
             return this;
 
-        // Ingest update
+        // Ingest updated value
         this.agileInstance().runtime.ingest(this, value, {
             background: options.background,
             sideEffects: options.sideEffects
         });
 
-        this.isSet = value !== this.initialState;
         return this;
     }
 

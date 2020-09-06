@@ -63,10 +63,7 @@ export class Selector<DataType = DefaultDataItem> extends Computed<DataType | un
         this._id = id;
 
         // Update Computed Function with new key(id)
-        this.computeFunction = () => findData<DataType>(this.collection(), id);
-
-        // Recompute to apply changes properly
-        this.recompute(options);
+        this.updateComputeFunction(() => findData<DataType>(this.collection(), id), [], options);
     }
 
 

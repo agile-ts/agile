@@ -7,12 +7,13 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
 
     public computeFunction: () => ComputedValueType;
     public deps: Array<State> = [];
+    private hardCodedDeps: Array<State> = [];
 
     constructor(agileInstance: Agile, computeFunction: () => ComputedValueType, deps: Array<State> = []) {
         super(agileInstance, computeFunction());
         this.agileInstance = () => agileInstance;
         this.computeFunction = computeFunction;
-        this.deps = deps;
+        this.hardCodedDeps = deps;
 
         // Recompute for setting initial state value and adding missing dependencies
         this.recompute();
@@ -28,9 +29,47 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
 
 
     //=========================================================================================================
+    // Recompute
+    //=========================================================================================================
+    /**
+     * Will call the computeFunction and update the dependencies
+     */
+    public recompute(options?: { background?: boolean, sideEffects?: boolean }) {
+        // Assign defaults to config
+        options = defineConfig(options, {
+            background: false,
+            sideEffects: true
+        });
+
+        // Set nextState to compute Value
+        this.nextState = this.computeValue();
+
+        // Set State to nextState
+        this.ingest(options);
+    }
+
+
+    //=========================================================================================================
+    // Updates Compute Function
+    //=========================================================================================================
+    /**
+     * @internal
+     * Updates the Compute Function
+     */
+    public updateComputeFunction(computeFunction: () => ComputedValueType, deps: Array<State> = [], options?: { background?: boolean, sideEffects?: boolean }) {
+        this.computeFunction = computeFunction;
+        this.hardCodedDeps = deps;
+
+        // Recompute for setting initial state value and adding missing dependencies
+        this.recompute(options);
+    }
+
+
+    //=========================================================================================================
     // Compute Values
     //=========================================================================================================
     /**
+     * @internal
      * Will add auto tracked dependencies to this and calls the computeFunction
      */
     public computeValue(): ComputedValueType {
@@ -40,39 +79,24 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         // Call computeFunction
         const computedValue = this.computeFunction();
 
-        // Get tracked states
+        // Get tracked states and set trackSate to false
         let foundStates = this.agileInstance().runtime.getFoundStates();
-        foundStates.forEach(state => {
-            // Check if state isn't a hard coded dependency if not.. add it to dependencies
-            if (this.deps.findIndex(dep => dep === state) === -1) {
-                this.deps.push(state);
 
-                // Add this as dependency of this state -> this will be updated if on state changes
-                state.dep.depend(this)
-            }
+        // Handle dependencies
+        const newDeps: Array<State> = [];
+        foundStates.forEach(state => {
+            // Add the state to newDeps
+            newDeps.push(state);
+
+            // Add this as dependency of the state
+            state.dep.depend(this);
         });
+
+        // Set deps
+        this.deps = {...this.hardCodedDeps, ...newDeps};
 
         return computedValue;
     }
-
-
-    //=========================================================================================================
-    // Recompute
-    //=========================================================================================================
-    /**
-     * Will call the computeFunction and update the dependencies
-     */
-    public recompute(options?: { background?: boolean, sideEffects?: boolean }): void {
-        // Assign defaults to config
-        options = defineConfig(options, {
-            background: false,
-            sideEffects: true
-        });
-
-        // Set value to computeValue
-        this.set(this.computeValue(), options);
-    }
-
 
     //=========================================================================================================
     // Overwriting some functions which can't be used in computed
