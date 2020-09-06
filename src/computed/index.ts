@@ -7,7 +7,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
 
     public computeFunction: () => ComputedValueType;
     public deps: Array<State> = [];
-    private hardCodedDeps: Array<State> = [];
+    public hardCodedDeps: Array<State> = [];
 
     constructor(agileInstance: Agile, computeFunction: () => ComputedValueType, deps: Array<State> = []) {
         super(agileInstance, computeFunction());
@@ -53,7 +53,6 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     // Updates Compute Function
     //=========================================================================================================
     /**
-     * @internal
      * Updates the Compute Function
      */
     public updateComputeFunction(computeFunction: () => ComputedValueType, deps: Array<State> = [], options?: { background?: boolean, sideEffects?: boolean }) {
@@ -93,10 +92,11 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         });
 
         // Set deps
-        this.deps = {...this.hardCodedDeps, ...newDeps};
+        this.deps = [...this.hardCodedDeps, ...newDeps];
 
         return computedValue;
     }
+
 
     //=========================================================================================================
     // Overwriting some functions which can't be used in computed

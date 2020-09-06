@@ -98,7 +98,7 @@ export default class Agile {
      * @param deps Array - An array of state items to depend on
      * @param computeFunction Function - A function where the return value is the state, ran every time a dep changes
      */
-    public Computed = <T = any>(computeFunction: () => any, deps?: Array<State>) => new Computed<T>(this, computeFunction, deps);
+    public Computed = <T = any>(computeFunction: () => T, deps?: Array<State>) => new Computed<T>(this, computeFunction, deps);
 
 
     //=========================================================================================================
