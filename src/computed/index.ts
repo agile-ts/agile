@@ -41,9 +41,6 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
             sideEffects: true
         });
 
-        // Set nextState to compute Value
-        this.nextState = this.computeValue();
-
         // Set State to nextState
         this.ingest(options);
     }
