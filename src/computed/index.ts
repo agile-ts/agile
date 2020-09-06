@@ -78,12 +78,18 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         // Get tracked states and set trackSate to false
         let foundStates = this.agileInstance().runtime.getFoundStates();
 
-        // Handle dependencies
+        // Handle foundStates dependencies
         const newDeps: Array<State> = [];
         foundStates.forEach(state => {
             // Add the state to newDeps
             newDeps.push(state);
 
+            // Add this as dependency of the state
+            state.dep.depend(this);
+        });
+
+        // Handle hardCoded dependencies
+        this.hardCodedDeps.forEach(state => {
             // Add this as dependency of the state
             state.dep.depend(this);
         });
