@@ -5,6 +5,7 @@ import {Integration} from "./use";
 import {SubscriptionContainer} from "../sub";
 import {Collection} from "../collection";
 import {Group} from "../collection/group";
+import {Event, EventCallbackFunction} from "../event";
 
 
 //=========================================================================================================
@@ -179,6 +180,35 @@ export function useAgile<X extends Array<State | Collection | undefined>, Y exte
     }, []);
 
     return getReturnValue(depsArray);
+}
+
+
+//=========================================================================================================
+// Use Event Hook
+//=========================================================================================================
+
+export function useEvent<E extends Event>(event: E, callback: EventCallbackFunction<E['payload']>, agileInstance?: Agile) {
+    // Get Agile Instance
+    if (!agileInstance) {
+        const tempAgileInstance = event.agileInstance();
+        if (!tempAgileInstance) {
+            console.error("Agile: Failed to get Agile Instance");
+            return;
+        }
+        agileInstance = tempAgileInstance;
+    }
+
+    // Get React constructor
+    const React = agileInstance.integration?.frameworkConstructor;
+    if (!React) {
+        console.error("Agile: Failed to get Framework Constructor");
+        return;
+    }
+
+    React.useEffect(function () {
+        // Call event on component mount and remove event on component unmount
+        return event.on(callback);
+    }, []);
 }
 
 

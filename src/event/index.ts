@@ -20,6 +20,8 @@ export class Event<PayloadType = EventPayload> {
     public uses: number = 0; // How often the event has been used
     private currentTimeout: any; // The current timeout (function)
     private queue: Array<PayloadType> = []; // Queue if something is currently in timeout
+    // @ts-ignore
+    public payload: PayloadType; // Only holds reference to the PayloadType so that it can be read external (never defined)
 
     constructor(agileInstance: Agile, config: EventConfig = {}) {
         this.agileInstance = () => agileInstance;
@@ -44,13 +46,13 @@ export class Event<PayloadType = EventPayload> {
             // Disable Event
             this.disable();
 
-            return cleanUpFunction();
+            return cleanUpFunction;
         }
 
         // Add callback to Event Callbacks
         this.callbacks.add(callback);
 
-        return cleanUpFunction();
+        return cleanUpFunction;
     }
 
 
