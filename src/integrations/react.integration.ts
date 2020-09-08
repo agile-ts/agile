@@ -190,7 +190,7 @@ export function useAgile<X extends Array<State | Collection | undefined>, Y exte
 export function useEvent<E extends Event>(event: E, callback: EventCallbackFunction<E['payload']>, agileInstance?: Agile) {
     // Get Agile Instance
     if (!agileInstance) {
-        const tempAgileInstance = event.agileInstance();
+        const tempAgileInstance = getAgileInstance(event);
         if (!tempAgileInstance) {
             console.error("Agile: Failed to get Agile Instance");
             return;
