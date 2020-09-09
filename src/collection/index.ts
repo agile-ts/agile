@@ -1,9 +1,9 @@
 import Agile from "../agile";
 import Item from "./item";
-import {Group, GroupConfigInterface, GroupKey} from "./group";
-import {Selector, SelectorKey} from "./selector";
+import Group, {GroupConfigInterface, GroupKey} from "./group";
+import Selector, {SelectorKey} from "./selector";
 import {copy, defineConfig, flatMerge, isValidObject, normalizeArray} from "../utils";
-import {State, StateKey} from "../state";
+import State, {StateKey} from "../state";
 import {StorageKey} from "../storage";
 import {persistValue, removeItem, setItem} from "./perstist";
 
@@ -30,7 +30,7 @@ export type Config<DataType = DefaultDataItem> =
     | CollectionConfigInterface
     | ((collection: Collection<DataType>) => CollectionConfigInterface);
 
-export class Collection<DataType = DefaultDataItem> {
+export default class Collection<DataType = DefaultDataItem> {
     public agileInstance: () => Agile;
 
     public config: CollectionConfigInterface;
@@ -315,7 +315,7 @@ export class Collection<DataType = DefaultDataItem> {
         console.warn(`Agile: Group with name '${groupName}' doesn't exist!`);
 
         // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
-        const group = new Group(this.agileInstance(), this, [], {key: 'dummy'});
+        const group = new Group<DataType>(this.agileInstance(), this, [], {key: 'dummy'});
         group.isPlaceholder = true;
         return group;
     }

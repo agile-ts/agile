@@ -1,8 +1,8 @@
-import {State} from "../state";
-import {Collection} from "../collection";
+import State from "../state";
+import Collection from "../collection";
 import Agile from "../index";
 import {getAgileInstance, normalizeArray} from "../utils";
-import {Group} from "../collection/group";
+import Group from "../collection/group";
 
 
 //=========================================================================================================

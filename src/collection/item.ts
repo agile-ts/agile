@@ -1,5 +1,5 @@
-import {State} from '../state';
-import {Collection, DefaultDataItem} from './index';
+import State from '../state';
+import Collection, {DefaultDataItem} from './index';
 
 export default class Item<DataType = DefaultDataItem> extends State<DataType> {
 

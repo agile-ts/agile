@@ -1,7 +1,7 @@
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
 import {expect} from "chai";
-import {Group} from "../../../src/collection/group";
+import Group from "../../../src/collection/group";
 
 describe('Default Group Tests', () => {
     // Define Agile

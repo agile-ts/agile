@@ -2,7 +2,7 @@ import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../../src";
 import {useTest} from "../../../src/integrations/test.integration";
-import {Group} from "../../../src/collection/group";
+import Group from "../../../src/collection/group";
 
 describe('Collect Function Tests', () => {
     // Define Agile

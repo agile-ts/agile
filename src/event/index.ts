@@ -11,7 +11,7 @@ export interface EventConfig {
     delay?: number
 }
 
-export class Event<PayloadType = EventPayload> {
+export default class Event<PayloadType = EventPayload> {
     public agileInstance: () => Agile;
 
     public config: EventConfig;
@@ -20,6 +20,7 @@ export class Event<PayloadType = EventPayload> {
     public uses: number = 0; // How often the event has been used
     private currentTimeout: any; // The current timeout (function)
     private queue: Array<PayloadType> = []; // Queue if something is currently in timeout
+
     // @ts-ignore
     public payload: PayloadType; // Only holds reference to the PayloadType so that it can be read external (never defined)
 

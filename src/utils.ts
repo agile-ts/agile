@@ -1,7 +1,7 @@
-import {State} from "./state";
+import State from "./state";
 import Agile from "./agile";
-import {Event} from "./event";
-import {Collection} from "./collection";
+import Event from "./event";
+import Collection from "./collection";
 
 
 //=========================================================================================================

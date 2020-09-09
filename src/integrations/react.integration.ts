@@ -1,11 +1,11 @@
-import {State} from "../state";
+import State from "../state";
 import Agile from "..";
 import {getAgileInstance, normalizeArray} from "../utils";
 import {Integration} from "./use";
 import {SubscriptionContainer} from "../sub";
-import {Collection} from "../collection";
-import {Group} from "../collection/group";
-import {Event, EventCallbackFunction} from "../event";
+import Collection from "../collection";
+import Group from "../collection/group";
+import Event, {EventCallbackFunction} from "../event";
 
 
 //=========================================================================================================

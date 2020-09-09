@@ -1,11 +1,12 @@
 import Runtime from "./runtime";
 import use, {Integration} from "./integrations/use";
 import SubController from "./sub";
-import {State} from "./state";
+import State from "./state";
 import Storage, {StorageConfigInterface} from "./storage";
-import {Collection, Config, DefaultDataItem} from "./collection";
-import {Computed} from "./computed";
-import API, {apiConfig} from "./api/api";
+import Collection, {Config, DefaultDataItem} from "./collection";
+import Computed from "./computed";
+import API, {apiConfig} from "./api";
+import Event, {EventConfig, EventPayload} from "./event";
 
 export interface AgileConfigInterface {
     framework?: Integration | any // Integration = for custom frameworks | any = for existing frameworks like react
@@ -98,7 +99,16 @@ export default class Agile {
      * @param deps Array - An array of state items to depend on
      * @param computeFunction Function - A function where the return value is the state, ran every time a dep changes
      */
-    public Computed = <T = any>(computeFunction: () => T, deps?: Array<State>) => new Computed<T>(this, computeFunction, deps);
+    public Computed = <ComputedValueType = any>(computeFunction: () => ComputedValueType, deps?: Array<State>) => new Computed<ComputedValueType>(this, computeFunction, deps);
+
+
+    //=========================================================================================================
+    // Event
+    //=========================================================================================================
+    /**
+     * Create a Pulse Event
+     */
+    public Event = <PayloadType = EventPayload>(config?: EventConfig) => new Event<PayloadType>(this, config);
 
 
     //=========================================================================================================

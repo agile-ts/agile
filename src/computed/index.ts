@@ -1,8 +1,8 @@
-import {State} from "../state";
+import State from "../state";
 import Agile from "../agile";
 import {defineConfig} from "../utils";
 
-export class Computed<ComputedValueType = any> extends State<ComputedValueType> {
+export default class Computed<ComputedValueType = any> extends State<ComputedValueType> {
     public agileInstance: () => Agile;
 
     public computeFunction: () => ComputedValueType;
