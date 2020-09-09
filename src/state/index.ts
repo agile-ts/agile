@@ -11,7 +11,7 @@ export interface PersistSettingsInterface {
     persistKey?: string | number // Current Persist Key.. for handling twice persisted states
 }
 
-export class State<ValueType = any> {
+export default class State<ValueType = any> {
     public agileInstance: () => Agile;
 
     public _key?: StateKey; // should be a unique key/name which identifies the state

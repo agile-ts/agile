@@ -1,8 +1,8 @@
 import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../../src";
-import {Computed} from "../../../src/computed";
-import {useTest} from "../../../src/integrations/test.integration";
+import Computed from "../../../src/computed";
+import {useTest} from "../../../src/integrations/test/test.integration";
 
 describe('updateComputeFunction Function tests', () => {
     let rerenderCount = 0;

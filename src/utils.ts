@@ -1,5 +1,7 @@
-import {State} from "./state";
+import State from "./state";
 import Agile from "./agile";
+import Event from "./event";
+import Collection from "./collection";
 
 
 //=========================================================================================================
@@ -61,13 +63,19 @@ export function normalizeArray<DataType = any>(items?: DataType | Array<DataType
 // Get Instance
 //=========================================================================================================
 /**
- * Get the agileInstance of the State.. and if that doesn't exist get the global AgileInstance
+ * Tries to get AgileInstance from instance(State, Collection)
  */
-export function getAgileInstance(state: State): Agile | null {
+export function getAgileInstance(instance: any): Agile | null {
     try {
-        // Return state agileInstance if it exists
-        if (state.agileInstance)
-            return state.agileInstance();
+        // Return state agileInstance
+        if (instance instanceof State)
+            return instance.agileInstance();
+
+        if(instance instanceof Event)
+            return instance.agileInstance();
+
+        if(instance instanceof Collection)
+            return instance.agileInstance();
 
         // Return the globalBind agile instance
         // @ts-ignore

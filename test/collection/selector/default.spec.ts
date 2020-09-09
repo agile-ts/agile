@@ -1,7 +1,7 @@
 import Agile from "../../../src";
-import {useTest} from "../../../src/integrations/test.integration";
+import {useTest} from "../../../src/integrations/test/test.integration";
 import {expect} from "chai";
-import {Selector} from "../../../src/collection/selector";
+import Selector from "../../../src/collection/selector";
 import Item from "../../../src/collection/item";
 
 describe('Default Selector Tests', () => {
