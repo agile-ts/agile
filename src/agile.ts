@@ -3,10 +3,10 @@ import use, {Integration} from "./integrations/use";
 import SubController from "./sub";
 import State from "./state";
 import Storage, {StorageConfigInterface} from "./storage";
-import Collection, {Config, DefaultDataItem} from "./collection";
+import Collection, {CollectionConfig, DefaultDataItem} from "./collection";
 import Computed from "./computed";
 import API, {apiConfig} from "./api";
-import Event, {EventConfig, EventPayload} from "./event";
+import Event, {EventConfig, DefaultEventPayload} from "./event";
 
 export interface AgileConfigInterface {
     framework?: Integration | any // Integration = for custom frameworks | any = for existing frameworks like react
@@ -88,7 +88,7 @@ export default class Agile {
     /**
      * Create Agile Collection
      */
-    public Collection = <DataType = DefaultDataItem>(config?: Config<DataType>) => new Collection<DataType>(this, config);
+    public Collection = <DataType = DefaultDataItem>(config?: CollectionConfig<DataType>) => new Collection<DataType>(this, config);
 
 
     //=========================================================================================================
@@ -108,7 +108,7 @@ export default class Agile {
     /**
      * Create a Pulse Event
      */
-    public Event = <PayloadType = EventPayload>(config?: EventConfig) => new Event<PayloadType>(this, config);
+    public Event = <PayloadType = DefaultEventPayload>(config?: EventConfig) => new Event<PayloadType>(this, config);
 
 
     //=========================================================================================================

@@ -26,7 +26,7 @@ export interface CollectOptionsInterface<DataType = any> {
     background?: boolean // If the action should happen in the background -> no rerender
 }
 
-export type Config<DataType = DefaultDataItem> =
+export type CollectionConfig<DataType = DefaultDataItem> =
     | CollectionConfigInterface
     | ((collection: Collection<DataType>) => CollectionConfigInterface);
 
@@ -43,7 +43,7 @@ export default class Collection<DataType = DefaultDataItem> {
     public groups: { [key: string]: Group<any> } = {};
     public selectors: { [key: string]: Selector<any> } = {};
 
-    constructor(agileInstance: Agile, config: Config<DataType> = {}) {
+    constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
         this.agileInstance = () => agileInstance;
 
         // If collection config is a function, execute and assign to config

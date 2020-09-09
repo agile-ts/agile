@@ -1,17 +1,18 @@
 import Agile from "../agile";
 import {defineConfig} from "../utils";
 
-export type EventPayload = { [key: string]: any };
-export type EventCallbackFunction<PayloadType = EventPayload> = (payload?: PayloadType) => void;
+export type DefaultEventPayload = { [key: string]: any };
+export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (payload?: PayloadType) => void;
+export type EventKey = string | number;
 
 export interface EventConfig {
-    key?: string
+    key?: EventKey
     enabled?: boolean
     maxUses?: number
     delay?: number
 }
 
-export default class Event<PayloadType = EventPayload> {
+export default class Event<PayloadType = DefaultEventPayload> {
     public agileInstance: () => Agile;
 
     public config: EventConfig;
