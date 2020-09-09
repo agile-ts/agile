@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../../src";
-import {useTest} from "../../../src/integrations/test.integration";
+import {useTest} from "../../../src/integrations/test/test.integration";
 import Item from "../../../src/collection/item";
 
 describe('Remove Function Tests', () => {
