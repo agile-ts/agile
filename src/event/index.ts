@@ -1,5 +1,6 @@
 import Agile from "../agile";
 import {defineConfig} from "../utils";
+import {StateKey} from "../state";
 
 export type DefaultEventPayload = { [key: string]: any };
 export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (payload?: PayloadType) => void;
@@ -17,6 +18,7 @@ export default class Event<PayloadType = DefaultEventPayload> {
 
     public config: EventConfig;
 
+    public _key?: StateKey; // should be a unique key/name which identifies the event
     private callbacks: Set<EventCallbackFunction<PayloadType>> = new Set(); // Stores callback functions
     public uses: number = 0; // How often the event has been used
     private currentTimeout: any; // The current timeout (function)
@@ -32,6 +34,17 @@ export default class Event<PayloadType = DefaultEventPayload> {
         this.config = defineConfig<EventConfig>(config, {
             enabled: true
         });
+
+        // Set Key
+        this._key = this.config.key;
+    }
+
+    public set key(value: StateKey | undefined) {
+        this._key = value;
+    }
+
+    public get key(): StateKey | undefined {
+        return this._key;
     }
 
 

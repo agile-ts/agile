@@ -61,10 +61,10 @@ export default class Collection<DataType = DefaultDataItem> {
         // Set Key
         this._key = this.config.key;
 
-        // Create Groups
+        // Init Groups
         this.initSubInstances('groups');
 
-        // Create Selectors
+        // Init Selectors
         this.initSubInstances('selectors');
     }
 
