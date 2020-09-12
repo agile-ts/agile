@@ -35,3 +35,5 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(collection
 MY_COLLECTION.collect({id: 'id1', name: 'test'});
 MY_COLLECTION.collect({id: 'id2', name: 'test2'}, 'myGroup');
 console.log("Initial: myCollection ", MY_COLLECTION);
+
+export const MY_EVENT = App.Event<{name: string}>();

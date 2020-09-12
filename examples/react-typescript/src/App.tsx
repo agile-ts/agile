@@ -1,21 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import {useAgile} from 'agile-framework';
-import {MY_COLLECTION, MY_COMPUTED, MY_STATE, MY_STATE_2} from "./core";
+import {useAgile, useEvent} from 'agile-framework';
+import {MY_COLLECTION, MY_COMPUTED, MY_EVENT, MY_STATE, MY_STATE_2} from "./core";
 
 const App = (props: any) => {
 
     const [myComputed] = useAgile([MY_COMPUTED]);
     const [myState, myState2] = useAgile([MY_STATE, MY_STATE_2]);
     const [myCollection] = useAgile([MY_COLLECTION.getGroup('myGroup')]);
-    const [mySelector] = useAgile([MY_COLLECTION.getSelector('mySelector')]);
+    const mySelector = useAgile(MY_COLLECTION.getSelector('mySelector'));
 
+    useEvent(MY_EVENT, () => {
+        console.log("Triggered Event");
+    });
 
     console.log("myComputed", MY_COMPUTED);
     console.log("myState", MY_STATE);
     console.log("myState2", MY_STATE_2);
     console.log("myCollection", MY_COLLECTION);
+    console.log("myEvent", MY_EVENT);
 
 
     return (
@@ -48,6 +51,15 @@ const App = (props: any) => {
                 </div>
 
                 <div className={"Container"}>
+                    <h3 className={"Title"}>My Event</h3>
+                    <button onClick={() => setTimeout(() => {
+                        MY_EVENT.trigger({name: 'test'})
+                    }, 1000)}>
+                        Trigger
+                    </button>
+                </div>
+
+                <div className={"Container"}>
                     <h3 className={"Title"}>My Collection</h3>
                     <div>
                         {
@@ -72,11 +84,11 @@ const App = (props: any) => {
                     <button onClick={() => setTimeout(() => {
                         MY_COLLECTION.remove("newId3").everywhere();
                     }, 1000)}>
-                       Remove newId3
+                        Remove newId3
                     </button>
                 </div>
 
-                <p>MySelector: {mySelector.name}</p>
+                <p>MySelector: {mySelector?.name}</p>
 
             </header>
         </div>
