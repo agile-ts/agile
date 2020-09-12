@@ -23,6 +23,7 @@ export default class Event<PayloadType = DefaultEventPayload> {
     public uses: number = 0; // How often the event has been used
     private currentTimeout: any; // The current timeout (function)
     private queue: Array<PayloadType> = []; // Queue if something is currently in timeout
+    public enabled: boolean = true;
 
     // @ts-ignore
     public payload: PayloadType; // Only holds reference to the PayloadType so that it can be read external (never defined)
@@ -37,6 +38,10 @@ export default class Event<PayloadType = DefaultEventPayload> {
 
         // Set Key
         this._key = this.config.key;
+
+        // Set Enabled
+        if (this.config.enabled !== undefined)
+            this.enabled = this.config.enabled;
     }
 
     public set key(value: StateKey | undefined) {
@@ -57,13 +62,6 @@ export default class Event<PayloadType = DefaultEventPayload> {
     public on(callback: EventCallbackFunction<PayloadType>) {
         const cleanUpFunction = () => this.unsub(callback);
 
-        if (this.config.maxUses && this.uses > this.config.maxUses) {
-            // Disable Event
-            this.disable();
-
-            return cleanUpFunction;
-        }
-
         // Add callback to Event Callbacks
         this.callbacks.add(callback);
 
@@ -79,7 +77,7 @@ export default class Event<PayloadType = DefaultEventPayload> {
      */
     public trigger(payload?: PayloadType) {
         // If event is disabled, return
-        if (!this.config.enabled) return this;
+        if (!this.enabled) return this;
 
         if (this.config.delay)
             this.delayedTrigger(payload);
@@ -97,7 +95,7 @@ export default class Event<PayloadType = DefaultEventPayload> {
      * Disables the Event
      */
     public disable() {
-        this.config.enabled = false;
+        this.enabled = false;
         return this;
     }
 
@@ -108,7 +106,7 @@ export default class Event<PayloadType = DefaultEventPayload> {
      * Enables the Event
      */
     public enable() {
-        this.config.enabled = true;
+        this.enabled = true;
         return this;
     }
 
@@ -120,8 +118,8 @@ export default class Event<PayloadType = DefaultEventPayload> {
      * Resets the Event
      */
     public reset() {
-        // Enable event
-        this.enable();
+        // Set Enabled
+        this.enabled = this.config.enabled || true;
 
         // Reset Uses
         this.uses = 0;
@@ -157,6 +155,11 @@ export default class Event<PayloadType = DefaultEventPayload> {
 
         // Increase uses
         this.uses++;
+
+        // Check if maxUses has been reached, if so disable event
+        if (this.config.maxUses && this.uses >= this.config.maxUses)
+            // Disable Event
+            this.disable();
     }
 
 
