@@ -35,10 +35,10 @@ describe('Default Collection Tests', () => {
 
         it('Can change key', () => {
             // Update key
-            MY_COLLECTION.key = 'withKey';
+            MY_COLLECTION.key = 'myKey';
 
-            expect(MY_COLLECTION.key).to.eq('withKey', 'MY_STATE has correct key');
-            expect(MY_COLLECTION._key).to.eq('withKey', 'My_STATE has correct _key');
+            expect(MY_COLLECTION.key).to.eq('myKey', 'MY_COLLECTION has correct key');
+            expect(MY_COLLECTION._key).to.eq('myKey', 'MY_COLLECTION has correct _key');
         });
     });
 
