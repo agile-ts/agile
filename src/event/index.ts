@@ -19,7 +19,7 @@ export default class Event<PayloadType = DefaultEventPayload> {
     public config: EventConfig;
 
     public _key?: StateKey; // should be a unique key/name which identifies the event
-    private callbacks: Set<EventCallbackFunction<PayloadType>> = new Set(); // Stores callback functions
+    public callbacks: Set<EventCallbackFunction<PayloadType>> = new Set(); // Stores callback functions
     public uses: number = 0; // How often the event has been used
     private currentTimeout: any; // The current timeout (function)
     private queue: Array<PayloadType> = []; // Queue if something is currently in timeout
