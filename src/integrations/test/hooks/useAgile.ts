@@ -1,8 +1,8 @@
-import State from "../../state";
-import Collection from "../../collection";
-import Agile from "../../index";
-import {getAgileInstance, normalizeArray} from "../../utils";
-import Group from "../../collection/group";
+import State from "../../../state";
+import Collection from "../../../collection";
+import Agile from "../../../index";
+import {getAgileInstance, normalizeArray} from "../../../utils";
+import Group from "../../../collection/group";
 
 
 //=========================================================================================================
@@ -28,12 +28,12 @@ type AgileHookType<T> = T extends Group<infer U> ? U[]
                 : never;
 
 // Array
-export function useTest<X extends Array<State | Collection | undefined>>(deps: X, callBackFunction: Function, agileInstance?: Agile): AgileHookArrayType<X>;
+export function useAgile<X extends Array<State | Collection | undefined>>(deps: X, callBackFunction: Function, agileInstance?: Agile): AgileHookArrayType<X>;
 
 // No Array
-export function useTest<X extends State | Collection | undefined>(deps: X, callBackFunction: Function, agileInstance?: Agile): AgileHookType<X>;
+export function useAgile<X extends State | Collection | undefined>(deps: X, callBackFunction: Function, agileInstance?: Agile): AgileHookType<X>;
 
-export function useTest<X extends Array<State | Collection | undefined>, Y extends State | Collection | undefined>(deps: X | Y, callBackFunction: Function, agileInstance?: Agile): AgileHookArrayType<X> | AgileHookType<Y> {
+export function useAgile<X extends Array<State | Collection | undefined>, Y extends State | Collection | undefined>(deps: X | Y, callBackFunction: Function, agileInstance?: Agile): AgileHookArrayType<X> | AgileHookType<Y> {
     // Normalize Dependencies
     let depsArray = normalizeArray<State | Collection | undefined>(deps)
         .map(item => item instanceof Collection ? item.getGroup(item.config.defaultGroupKey || 'default') : item)
