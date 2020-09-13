@@ -1,4 +1,4 @@
-# Agile Framework `1.1`
+# Agile Framework `1.0.2`
 
 _Agile is a global state and logic framework for reactive Typescript & Javascript applications. Supporting frameworks like React and React Native._
 
