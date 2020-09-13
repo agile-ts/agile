@@ -21,7 +21,7 @@ describe('Enable Function Tests', () => {
     });
 
     it('Can enable Event', () => {
-        // Disable Event
+        // Enable Event
         MY_EVENT.enable();
 
         expect(MY_EVENT.uses).to.eq(0, 'MY_EVENT uses stayed the same');
