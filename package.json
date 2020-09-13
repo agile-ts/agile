@@ -7,7 +7,12 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc-watch",
-    "test": "mocha -r ts-node/register --exit test/**/*.spec.ts"
+    "test": "mocha -r ts-node/register --exit test/**/*.spec.ts",
+
+    "prepare" : "npm run build",
+    "prepublishOnly" : "npm test",
+    "version" : "npm run format && git add -A src",
+    "postversion" : "git push && git push --tags"
   },
   "types": "./dist/index.d.ts",
   "author": "BennoDev",
