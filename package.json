@@ -1,5 +1,5 @@
 {
-  "name": "agile-architecture",
+  "name": "agile",
   "version": "1.0.2",
   "description": "Global state and logic framework for reactive React applications.",
   "main": "dist/index.js",
