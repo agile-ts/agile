@@ -1,0 +1,1 @@
+Note: the react hook will be tested in the agile-core tests
