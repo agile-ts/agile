@@ -1,5 +1,8 @@
-import State from "./index";
-import Storage, {StorageKey} from "../storage";
+import {
+    State,
+    Storage,
+    StorageKey
+} from '../internal';
 
 
 //=========================================================================================================

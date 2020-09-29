@@ -1,8 +1,12 @@
-import State from "./state";
-import Agile from "./agile";
-import {copy, defineConfig} from "./utils";
-import {CallbackContainer, SubscriptionContainer} from "./sub";
-import Computed from "./computed";
+import {
+    State,
+    Agile,
+    CallbackContainer,
+    SubscriptionContainer,
+    Computed,
+    copy,
+    defineConfig
+} from './internal';
 
 export interface JobInterface {
     state: State

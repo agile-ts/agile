@@ -1,12 +1,19 @@
-import Runtime from "./runtime";
-import use, {Integration} from "./use";
-import SubController from "./sub";
-import {State} from './internal';
-import Storage, {StorageConfigInterface} from "./storage";
-import Collection, {CollectionConfig, DefaultDataIt../packages/agile-core/src/collectioncollection";
-import Computed from "./computed";
-import API, {apiConfig} from "../../agile-api/src";
-import Event, {EventConfig, DefaultEventPayload} from "./event";
+import {
+    Runtime,
+    Integration,
+    SubController,
+    State,
+    Storage,
+    StorageConfigInterface,
+    Collection,
+    CollectionConfig,
+    DefaultDataItem,
+    Computed,
+    Event,
+    EventConfig,
+    DefaultEventPayload,
+    use
+} from './internal'
 
 export interface AgileConfigInterface {
     framework?: Integration | any // Integration = for custom frameworks | any = for existing frameworks like react
@@ -59,7 +66,8 @@ export class Agile {
      * @param config.baseURL String - Url to prepend to endpoints (without trailing slash)
      * @param config.timeout Number - Time to wait for request before throwing error
      */
-    public API = (config: apiConfig) => new API(config);
+    // public API = (config: apiConfig) => new API(config);
+
 
 
     //=========================================================================================================

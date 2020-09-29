@@ -1,9 +1,14 @@
-import Collection, {DefaultDataItem, ItemKey} from "./index";
-import Computed from "../computed";
-import Item from "./item";
-import {persistValue} from "../state/persist";
-import {StorageKey} from "../storage";
-import {copy, defineConfig} from "../utils";
+import {
+    Collection,
+    DefaultDataItem,
+    ItemKey,
+    Computed,
+    Item,
+    StorageKey,
+    copy,
+    defineConfig
+} from '../internal';
+import {persistValue} from '../state/persist';
 
 export type SelectorKey = string | number;
 

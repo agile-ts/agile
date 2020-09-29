@@ -1,8 +1,14 @@
-import Agile from "../agile";
-import {copy, defineConfig, flatMerge, isValidObject} from "../utils";
-import Dep from "./dep";
-import {persistValue, updateValue} from "./persist";
-import {StorageKey} from "../storage";
+import {
+    Agile,
+    Dep,
+    StorageKey,
+    copy,
+    defineConfig,
+    flatMerge,
+    isValidObject
+} from '../internal';
+import {persistValue, updateValue} from './persist';
+
 
 export type StateKey = string | number;
 
@@ -28,8 +34,6 @@ export class State<ValueType = any> {
     public _value: ValueType; // The current value of the state
     public previousState: ValueType; // Will be set in runtime
     public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished (cleaner than always setting the state)
-
-    // public computeValue?: (newState?: ValueType) => ValueType;
 
     constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<Dep> = []) {
         this.agileInstance = () => agileInstance;

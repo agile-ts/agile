@@ -1,6 +1,8 @@
-import State from "../state";
-import Agile from "../agile";
-import {defineConfig} from "../utils";
+import {
+    State,
+    Agile,
+    defineConfig
+} from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<ComputedValueType> {
     public agileInstance: () => Agile;

@@ -1,7 +1,11 @@
-import Agile from "./agile";
-import State from "./state";
-import {isAsyncFunction, isFunction, isJsonString} from "./utils";
-import Collection from "./collection";
+import {
+    Agile,
+    State,
+    Collection,
+    isAsyncFunction,
+    isFunction,
+    isJsonString
+} from '../internal';
 
 export type StorageKey = string | number;
 export interface StorageConfigInterface {

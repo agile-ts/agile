@@ -1,7 +1,9 @@
-import State from "./state";
-import Agile from "./agile";
-import Event from "./event";
-import Collection from "./collection";
+import {
+    State,
+    Agile,
+    Event,
+    Collection
+} from './internal';
 
 
 //=========================================================================================================
@@ -10,7 +12,6 @@ import Collection from "./collection";
 /**
  * Copy an array or object.. without any dependencies
  */
-
 export function copy<T = any>(value: T): T;
 export function copy<T extends Array<T>>(value: T): T[];
 export function copy<T = any>(value: T): T | T[] {
@@ -71,10 +72,10 @@ export function getAgileInstance(instance: any): Agile | null {
         if (instance instanceof State)
             return instance.agileInstance();
 
-        if(instance instanceof Event)
+        if (instance instanceof Event)
             return instance.agileInstance();
 
-        if(instance instanceof Collection)
+        if (instance instanceof Collection)
             return instance.agileInstance();
 
         // Return the globalBind agile instance

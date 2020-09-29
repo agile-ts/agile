@@ -1,5 +1,4 @@
-import State from "./state";
-import Agile from "./agile";
+import {Agile, State} from './internal';
 
 
 //=========================================================================================================

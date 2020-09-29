@@ -1,6 +1,10 @@
-import Collection, {ItemKey} from "./index";
-import Storage, {StorageKey} from "../storage";
-import {GroupKey} from "./group";
+import {
+    Collection,
+    ItemKey,
+    Storage,
+    StorageKey,
+    GroupKey
+} from '../internal';
 
 interface CollectionStorageData {
     data: ItemKey[],
@@ -9,6 +13,7 @@ interface CollectionStorageData {
 
 const storageItemKeyTemplate = '_${collectionKey}_item_${itemKey}';
 const storageGroupKeyTemplate = '_${collectionKey}_group_${groupKey}';
+
 
 //=========================================================================================================
 // Persist Value

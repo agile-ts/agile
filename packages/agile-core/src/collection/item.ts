@@ -1,5 +1,8 @@
-import State from '../state';
-import Collection, {DefaultDataItem} from './index';
+import {
+    State,
+    Collection,
+    DefaultDataItem
+} from '../internal';
 
 export class Item<DataType = DefaultDataItem> extends State<DataType> {
 

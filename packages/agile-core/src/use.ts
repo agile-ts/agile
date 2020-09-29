@@ -1,5 +1,4 @@
-import Agile from "../agile";
-import reactIntegration from "./react";
+import {Agile} from './internal';
 
 export interface Integration {
     ready?: boolean;

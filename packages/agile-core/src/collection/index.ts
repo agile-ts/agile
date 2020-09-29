@@ -8,6 +8,7 @@ import {
     State,
     StateKey,
     StorageKey,
+    GroupConfigInterface,
     copy,
     defineConfig,
     flatMerge,
