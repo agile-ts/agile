@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "BennoDev",
   "license": "ISC",
-  "description": "API extention for AgileTs",
+  "description": "API extension for AgileTs",
   "keywords": [],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
