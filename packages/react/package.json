@@ -1,0 +1,30 @@
+{
+  "name": "@agile/react",
+  "version": "0.0.1",
+  "author": "BennoDev",
+  "license": "ISC",
+  "description": "React extension for AgileTs",
+  "keywords": [],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@agile/core": "link:../core"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.49",
+    "react": "^16.13.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agile-ts/agile.git"
+  }
+}

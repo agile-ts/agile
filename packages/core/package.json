@@ -1,0 +1,20 @@
+{
+  "name": "@agile/core",
+  "version": "0.0.1",
+  "author": "BennoDev",
+  "license": "ISC",
+  "description": "Global state and logic framework for reactive JavaScript & TypeScript applications.",
+  "keywords": [],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agile-ts/agile.git"
+  }
+}

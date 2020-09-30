@@ -5,9 +5,9 @@
   "license": "ISC",
   "syncDir": "dist",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc-watch",
-    "test": "mocha -r ts-node/register --exit test/**/*.spec.ts",
+    "build": "tsc -b packages/core packages/react packages/api",
+    "dev": "tsc-watch -b packages/core packages/react packages/api",
+    "test": "mocha -r ts-node/register --exit packages/**/*.spec.ts",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "version": "npm run format && git add -A src",
