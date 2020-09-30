@@ -1,8 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile from "../../../src";
+import {Group, Agile} from "../../../src";
 import {useAgile} from "../../../../react/tests";
-import {Group} from "../../../src";
 
 describe('Collect Function Tests', () => {
     // Define Agile

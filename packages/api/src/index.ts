@@ -1,5 +1,5 @@
 import * as http from 'http';
-import {copy, isValidUrl} from '@agile/core';
+import {copy, isValidUrl} from '@agile-ts/core';
 
 export interface AgileResponse<DataType = any> {
     data: DataType // request body data

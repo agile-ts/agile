@@ -1,8 +1,6 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile from "../../src";
-import Group from "../../src/collection/group";
-import Selector from "../../src/collection/selector";
+import {Agile, Group, Selector} from "../../src";
 
 describe('Default Collection Tests', () => {
     // Define Agile

@@ -1,5 +1,5 @@
 import React from "react";
-import {Group, State, Collection, Agile, getAgileInstance, normalizeArray} from '@agile/core';
+import {Group, State, Collection, Agile, getAgileInstance, normalizeArray} from '@agile-ts/core';
 
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html

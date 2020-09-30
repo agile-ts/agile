@@ -8,7 +8,7 @@ export interface IntegrationConfig<F = any> {
 }
 
 export class Integration<F = any> {
-    public ready?: boolean;
+    public ready: boolean = false;
     public config: IntegrationConfig<F>;
 
     constructor(config: IntegrationConfig) {
@@ -19,7 +19,7 @@ export class Integration<F = any> {
 export class Integrations {
     public agileInstance: () => Agile;
 
-    public loadedIntegrations: Set<Integration> = new Set();
+    public integrations: Set<Integration> = new Set();
 
     constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
@@ -42,7 +42,7 @@ export class Integrations {
             return;
         }
 
-        this.loadedIntegrations.add(integration);
+        this.integrations.add(integration);
         if (this.agileInstance().config.logJobs)
             console.log(`Agile: Successfully integrated '${integration.config.name}'`);
     }
@@ -55,7 +55,10 @@ export class Integrations {
      * Binds the Framework to Agile
      */
     public bind() {
-        this.loadedIntegrations.forEach(integration => integration.config.bind && integration.config.bind(this.agileInstance()));
+        this.integrations.forEach(integration => {
+            integration.config.bind && integration.config.bind(this.agileInstance());
+            integration.ready = true;
+        });
     }
 
 
@@ -66,7 +69,7 @@ export class Integrations {
      * Updates Framework States
      */
     public update(componentInstance: any, updatedData: Object) {
-        this.loadedIntegrations.forEach(integration => integration.config.updateMethod && integration.config.updateMethod(componentInstance, updatedData));
+        this.integrations.forEach(integration => integration.config.updateMethod && integration.config.updateMethod(componentInstance, updatedData));
     }
 
 
@@ -77,6 +80,6 @@ export class Integrations {
      * Checks weather integrations are registered
      */
     public hasIntegration() {
-        return this.loadedIntegrations.size > 0;
+        return this.integrations.size > 0;
     }
 }

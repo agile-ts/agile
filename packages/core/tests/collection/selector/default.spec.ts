@@ -1,8 +1,7 @@
-import Agile from "../../../src";
-import {useAgile} from "../../../../react/tests";
+import 'mocha';
 import {expect} from "chai";
-import Selector from "../../../src/collection/selector";
-import Item from "../../../src/collection/item";
+import {useAgile} from "../../../../react/tests";
+import {Agile, Selector, Item} from "../../../src";
 
 describe('Default Selector Tests', () => {
     // Define Agile

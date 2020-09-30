@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile from "../../../src";
+import {Agile} from "../../../src";
 import {useAgile} from "../../../../react/tests";
 
 describe('Undo Function Tests', () => {

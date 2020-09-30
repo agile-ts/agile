@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from 'chai'
-import Agile from "../../../src";
+import {Agile} from "../../../src";
 
 describe('Type Function Tests', () => {
     // Define Agile

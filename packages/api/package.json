@@ -1,6 +1,6 @@
 {
-  "name": "@agile/api",
-  "version": "0.0.1",
+  "name": "@agile-ts/api",
+  "version": "0.0.2",
   "author": "BennoDev",
   "license": "ISC",
   "description": "API extension for AgileTs",
@@ -10,8 +10,21 @@
   "scripts": {
     "build": "tsc"
   },
+  "devDependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.2",
+    "@types/node": "^14.6.0",
+    "chai": "^4.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "mocha": "^8.1.1",
+    "prettier": "2.0.5",
+    "ts-node": "^8.10.2",
+    "tsc-watch": "^4.1.0",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.7"
+  },
   "dependencies": {
-    "@agile/core": "link:../core"
+    "@agile-ts/core": "file:../core"
   },
   "publishConfig": {
     "access": "public"
@@ -19,5 +32,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/agile-ts/agile.git"
-  }
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }

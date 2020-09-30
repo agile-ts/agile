@@ -1,8 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile from "../../../src";
+import {Agile, Item} from "../../../src";
 import {useAgile} from "../../../../react/tests";
-import Item from "../../../src/collection/item";
 
 describe('Remove Function Tests', () => {
     // Define Agile

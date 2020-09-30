@@ -1,4 +1,4 @@
-import {Agile, Integration} from '@agile/core'
+import {Agile, Integration} from '@agile-ts/core'
 import React from 'react';
 
 const reactIntegration = new Integration({

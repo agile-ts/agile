@@ -1,5 +1,5 @@
 import React from "react";
-import {State, Agile, ComponentSubscriptionContainer, getAgileInstance, normalizeArray} from "@agile/core";
+import {State, Agile, ComponentSubscriptionContainer, getAgileInstance, normalizeArray} from "@agile-ts/core";
 
 export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: string]: State } | State, agileInstance?: Agile) {
     let depsArray: Array<State>;

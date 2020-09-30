@@ -1,7 +1,6 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile from "../../../src";
-import Computed from "../../../src/computed";
+import {Agile, Computed} from "../../../src";
 import {useAgile} from "../../../../react/tests";
 
 describe('updateComputeFunction Function tests', () => {

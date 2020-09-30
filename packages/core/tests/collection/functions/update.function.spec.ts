@@ -1,8 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile from "../../../src";
+import {Agile, Group} from "../../../src";
 import {useAgile} from "../../../../react/tests";
-import Group from "../../../src/collection/group";
 
 describe('Update Function Tests', () => {
     let rerenderCount = 0;

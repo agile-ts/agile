@@ -1,7 +1,7 @@
-import Agile from "../../../../src";
-import {useAgile} from "../../../../../react/tests";
+import 'mocha';
 import {expect} from "chai";
-import Group from "../../../../src/collection/group";
+import {Agile, Group} from "../../../../src";
+import {useAgile} from "../../../../../react/tests";
 
 describe('Add function Tests', () => {
     let rerenderCount = 0;
