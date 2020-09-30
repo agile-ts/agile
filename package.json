@@ -1,5 +1,5 @@
 {
-  "private": true, 
+  "private": true,
   "description": "Global state and logic framework for reactive React applications.",
   "author": "BennoDev",
   "license": "ISC",
