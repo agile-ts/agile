@@ -1,9 +1,7 @@
-import Agile from 'agile-framework';
-import React from "react";
+import Agile from '@agile-ts/core';
 
 export const App = new Agile({
     logJobs: true,
-    framework: React
 });
 
 export const MY_STATE = App.State<string>("MyState", "my-state").persist();

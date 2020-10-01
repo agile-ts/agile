@@ -1,9 +1,9 @@
 import {
+    Agile,
+    State,
     Collection,
     DefaultDataItem,
     ItemKey,
-    State,
-    Agile,
     defineConfig,
     normalizeArray
 } from '../internal';
