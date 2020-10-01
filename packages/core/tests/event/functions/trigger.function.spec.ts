@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Agile} from "../../../src";
-import {useEvent} from "../../../../react/tests";
+import {useEvent_Test} from "../../../../react/tests";
 
 
 describe('Trigger Function Tests', () => {
@@ -25,7 +25,7 @@ describe('Trigger Function Tests', () => {
     });
 
     // @ts-ignore
-    useEvent(MY_EVENT, (payload => {
+    useEvent_Test(MY_EVENT, (payload => {
         eventCallCount++;
         currentEventPayload = payload;
     }));

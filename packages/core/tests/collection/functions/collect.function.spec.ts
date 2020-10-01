@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Group, Agile} from "../../../src";
-import {useAgile} from "../../../../react/tests";
+import {useAgile_Test} from "../../../../react/tests";
 
 describe('Collect Function Tests', () => {
     // Define Agile
@@ -21,7 +21,7 @@ describe('Collect Function Tests', () => {
         const MY_COLLECTION = App.Collection<userInterface>();
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myHookCollection] = useAgile([MY_COLLECTION], () => {
+        const [myHookCollection] = useAgile_Test([MY_COLLECTION], () => {
             rerenderCount++;
         });
 
@@ -304,7 +304,7 @@ describe('Collect Function Tests', () => {
         });
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myHookCollection] = useAgile([MY_COLLECTION], () => {
+        const [myHookCollection] = useAgile_Test([MY_COLLECTION], () => {
             rerenderCount++;
         });
 

@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from "chai";
-import {useAgile} from "../../../../react/tests";
+import {useAgile_Test} from "../../../../react/tests";
 import {Agile, Selector, Item} from "../../../src";
 
 describe('Default Selector Tests', () => {
@@ -25,7 +25,7 @@ describe('Default Selector Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [mySelector1] = useAgile([MY_COLLECTION.getSelector('selector1')], () => {
+        const [mySelector1] = useAgile_Test([MY_COLLECTION.getSelector('selector1')], () => {
             rerenderCount++;
         });
 

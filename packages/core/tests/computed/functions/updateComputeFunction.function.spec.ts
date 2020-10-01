@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Agile, Computed} from "../../../src";
-import {useAgile} from "../../../../react/tests";
+import {useAgile_Test} from "../../../../react/tests";
 
 describe('updateComputeFunction Function tests', () => {
     let rerenderCount = 0;
@@ -21,7 +21,7 @@ describe('updateComputeFunction Function tests', () => {
     });
 
     // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myComputed] = useAgile([MY_COMPUTED], () => {
+    const [myComputed] = useAgile_Test([MY_COMPUTED], () => {
         rerenderCount++;
     });
 

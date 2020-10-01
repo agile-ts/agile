@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Agile, Item} from "../../../src";
-import {useAgile} from "../../../../react/tests";
+import {useAgile_Test} from "../../../../react/tests";
 
 describe('Remove Function Tests', () => {
     // Define Agile
@@ -26,7 +26,7 @@ describe('Remove Function Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myGroup1, myGroup2] = useAgile([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('group2')], () => {
+        const [myGroup1, myGroup2] = useAgile_Test([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('group2')], () => {
             rerenderCount++;
         });
 
@@ -142,7 +142,7 @@ describe('Remove Function Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myGroup1, myGroup2] = useAgile([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('group2')], () => {
+        const [myGroup1, myGroup2] = useAgile_Test([MY_COLLECTION.getGroup('group1'), MY_COLLECTION.getGroup('group2')], () => {
             rerenderCount++;
         });
 
