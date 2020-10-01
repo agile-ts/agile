@@ -26,7 +26,13 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     }
 
     public get value(): ComputedValueType {
-        return super.value;
+        // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
+
+        // Add state to foundState (for auto tracking used states in computed functions)
+        if (this.agileInstance().runtime.trackState)
+            this.agileInstance().runtime.foundStates.add(this);
+
+        return this._value;
     }
 
 
