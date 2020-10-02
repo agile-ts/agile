@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Agile} from "../../../src";
-import {useEvent_Test} from "../../../../react/tests";
+import {useEvent_Test} from "../../test_integration";
 
 
 describe('Trigger Function Tests', () => {

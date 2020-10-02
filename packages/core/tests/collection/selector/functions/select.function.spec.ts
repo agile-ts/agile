@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from "chai";
 import {Agile, Selector, Item} from "../../../../src";
-import {useAgile_Test} from "../../../../../react/tests";
+import {useAgile_Test} from "../../../test_integration";
 
 describe('select Function Tests', () => {
     let rerenderCount = 0;

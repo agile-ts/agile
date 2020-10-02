@@ -1,9 +1,9 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Agile, Computed} from "../../../src";
-import {useAgile_Test} from "../../../../react/tests";
+import {useAgile_Test} from "../../test_integration";
 
-describe('updateComputeFunction Function tests', () => {
+describe('updateComputeFunction Function test_integration', () => {
     let rerenderCount = 0;
 
     // Define Agile

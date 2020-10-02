@@ -1,7 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Agile} from "../../../src";
-import {useAgile_Test} from "../../../../react/tests";
+import {useAgile_Test} from "../../test_integration";
 
 describe('Reset Function Tests', () => {
     let rerenderCount = 0;

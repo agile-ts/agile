@@ -1,4 +1,4 @@
-import {Group, State, Collection, Agile, getAgileInstance, normalizeArray} from '@agile-ts/core';
+import {Group, State, Collection, Agile, getAgileInstance, normalizeArray} from '../../../src';
 
 
 //=========================================================================================================

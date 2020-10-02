@@ -1,4 +1,4 @@
-import {Agile, Integration} from '@agile-ts/core'
+import {Agile, Integration} from '../../src';
 
 const testIntegration = new Integration({
     name: 'test',

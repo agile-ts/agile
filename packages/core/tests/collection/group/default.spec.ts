@@ -1,6 +1,6 @@
 import 'mocha';
 import {expect} from "chai";
-import {useAgile_Test} from "../../../../react/tests";
+import {useAgile_Test} from "../../test_integration";
 import {Agile, Group} from "../../../src";
 
 describe('Default Group Tests', () => {
