@@ -1,7 +1,7 @@
 import Agile from "../../../src";
-import {useTest} from "../../../src/integrations/test.integration";
+import {useAgile} from "../../../src/integrations/test";
 import {expect} from "chai";
-import {Selector} from "../../../src/collection/selector";
+import Selector from "../../../src/collection/selector";
 import Item from "../../../src/collection/item";
 
 describe('Default Selector Tests', () => {
@@ -35,7 +35,7 @@ describe('Default Selector Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [mySelector1] = useTest([MY_COLLECTION.getSelector('selector1')], () => {
+        const [mySelector1] = useAgile([MY_COLLECTION.getSelector('selector1')], () => {
             rerenderCount++;
         });
 

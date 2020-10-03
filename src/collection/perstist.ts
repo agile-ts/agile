@@ -1,4 +1,4 @@
-import {Collection, ItemKey} from "./index";
+import Collection, {ItemKey} from "./index";
 import Storage, {StorageKey} from "../storage";
 import {GroupKey} from "./group";
 

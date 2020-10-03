@@ -1,5 +1,5 @@
-import {Collection, DefaultDataItem, ItemKey} from "./index";
-import {State} from "../state";
+import Collection, {DefaultDataItem, ItemKey} from "./index";
+import State from "../state";
 import Agile from "../agile";
 import {defineConfig, normalizeArray} from "../utils";
 import {updateGroup} from "./perstist";
@@ -16,7 +16,7 @@ export interface GroupConfigInterface {
     key?: GroupKey // should be a unique key/name which identifies the group
 }
 
-export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
+export default class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     collection: () => Collection<DataType>;
 
     _output: Array<DataType> = []; // Output of the group (Note: _value are only the keys of the collection items)

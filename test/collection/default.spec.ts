@@ -1,19 +1,19 @@
 import 'mocha';
 import {expect} from 'chai';
 import Agile from "../../src";
-import {Group} from "../../src/collection/group";
-import {Selector} from "../../src/collection/selector";
+import Group from "../../src/collection/group";
+import Selector from "../../src/collection/selector";
 
 describe('Default Collection Tests', () => {
     // Define Agile
     const App = new Agile();
 
-    describe('Collection', () => {
-        interface userInterface {
-            id: number
-            name: string
-        }
+    interface userInterface {
+        id: number
+        name: string
+    }
 
+    describe('Collection', () => {
         // Set Collections
         const MY_COLLECTION = App.Collection<userInterface>();
 
@@ -35,19 +35,14 @@ describe('Default Collection Tests', () => {
 
         it('Can change key', () => {
             // Update key
-            MY_COLLECTION.key = 'withKey';
+            MY_COLLECTION.key = 'myKey';
 
-            expect(MY_COLLECTION.key).to.eq('withKey', 'MY_STATE has correct key');
-            expect(MY_COLLECTION._key).to.eq('withKey', 'My_STATE has correct _key');
+            expect(MY_COLLECTION.key).to.eq('myKey', 'MY_COLLECTION has correct key');
+            expect(MY_COLLECTION._key).to.eq('myKey', 'MY_COLLECTION has correct _key');
         });
     });
 
     describe('Collection with Key', () => {
-        interface userInterface {
-            id: number
-            name: string
-        }
-
         // Set Collection
         const MY_COLLECTION = App.Collection<userInterface>({
             key: 'myCollectionKey'
@@ -69,11 +64,6 @@ describe('Default Collection Tests', () => {
 
     describe('Collection with default Groups', () => {
         describe('Default Groups in Array shape', () => {
-            interface userInterface {
-                id: number
-                name: string
-            }
-
             // Set Collection
             const MY_COLLECTION = App.Collection<userInterface>({
                 groups: ['group1', 'group2']
@@ -111,11 +101,6 @@ describe('Default Collection Tests', () => {
     });
 
     describe('Collection with Key', () => {
-        interface userInterface {
-            id: number
-            name: string
-        }
-
         // Set Collection
         const MY_COLLECTION = App.Collection<userInterface>({
             key: 'myCollectionKey'
@@ -137,11 +122,6 @@ describe('Default Collection Tests', () => {
 
     describe('Collection with default Selectors', () => {
         describe('Default Selector in Array shape', () => {
-            interface userInterface {
-                id: number
-                name: string
-            }
-
             // Set Collection
             const MY_COLLECTION = App.Collection<userInterface>({
                 selectors: ['selector1', 'selector2']
@@ -156,11 +136,6 @@ describe('Default Collection Tests', () => {
         });
 
         describe('Default Selectors in Object shape', () => {
-            interface userInterface {
-                id: number
-                name: string
-            }
-
             // Set Collection
             const MY_COLLECTION = App.Collection<userInterface>((collection) => ({
                 selectors: {
@@ -179,11 +154,6 @@ describe('Default Collection Tests', () => {
     });
 
     describe('Collection with primaryKey', () => {
-        interface userInterface {
-            key: number
-            name: string
-        }
-
         // Set Collection
         const MY_COLLECTION = App.Collection<userInterface>({
             primaryKey: 'key'
@@ -195,11 +165,6 @@ describe('Default Collection Tests', () => {
     });
 
     describe('Collection with defaultGroupKey', () => {
-        interface userInterface {
-            id: number
-            name: string
-        }
-
         // Set Collection
         const MY_COLLECTION = App.Collection<userInterface>({
             defaultGroupKey: 'normal'

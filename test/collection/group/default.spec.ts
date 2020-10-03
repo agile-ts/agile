@@ -1,7 +1,7 @@
 import Agile from "../../../src";
-import {useTest} from "../../../src/integrations/test.integration";
+import {useAgile} from "../../../src/integrations/test";
 import {expect} from "chai";
-import {Group} from "../../../src/collection/group";
+import Group from "../../../src/collection/group";
 
 describe('Default Group Tests', () => {
     // Define Agile
@@ -34,7 +34,7 @@ describe('Default Group Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myGroup1] = useTest([MY_COLLECTION.getGroup('group1')], () => {
+        const [myGroup1] = useAgile([MY_COLLECTION.getGroup('group1')], () => {
             rerenderCount++;
         });
 
@@ -102,7 +102,7 @@ describe('Default Group Tests', () => {
         );
 
         // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-        const [myGroup1] = useTest([MY_COLLECTION.getGroup('group1')], () => {
+        const [myGroup1] = useAgile([MY_COLLECTION.getGroup('group1')], () => {
             rerenderCount++;
         });
 

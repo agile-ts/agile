@@ -1,5 +1,5 @@
 import {SubscriptionContainer} from '../sub';
-import {State} from "./index";
+import State from "./index";
 
 export default class Dep {
     public deps: Set<any> = new Set(); // Dependencies from the State

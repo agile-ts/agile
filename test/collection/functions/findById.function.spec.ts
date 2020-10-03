@@ -1,6 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
-import Agile, {State} from "../../../src";
+import Agile from "../../../src";
+import State from "../../../src/state";
 
 describe('FindById Function Tests', () => {
     // Define Agile

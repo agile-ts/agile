@@ -1,5 +1,5 @@
-import {Collection, DefaultDataItem, ItemKey} from "./index";
-import {Computed} from "../computed";
+import Collection, {DefaultDataItem, ItemKey} from "./index";
+import Computed from "../computed";
 import Item from "./item";
 import {persistValue} from "../state/persist";
 import {StorageKey} from "../storage";
@@ -11,7 +11,7 @@ export interface SelectorConfigInterface {
     key?: SelectorKey // should be a unique key/name which identifies the selector
 }
 
-export class Selector<DataType = DefaultDataItem> extends Computed<DataType | undefined> {
+export default class Selector<DataType = DefaultDataItem> extends Computed<DataType | undefined> {
 
     public collection: () => Collection<DataType>;
     public _id: ItemKey;

@@ -1,6 +1,6 @@
 import Agile from "../../../../src";
 import {expect} from "chai";
-import {Group} from "../../../../src/collection/group";
+import Group from "../../../../src/collection/group";
 
 describe('Has function Tests', () => {
     // Define Agile
