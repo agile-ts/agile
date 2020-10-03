@@ -14,7 +14,8 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
     "typescript": "~3.7.2",
-    "agile-framework": "file:../../"
+    "@agile-ts/core": "file:../../packages/core",
+    "@agile-ts/react": "file:../../packages/react"
   },
   "scripts": {
     "start": "react-scripts start",
