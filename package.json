@@ -1,14 +1,13 @@
 {
-  "name": "agile",
-  "version": "1.0.2",
+  "private": true,
   "description": "Global state and logic framework for reactive React applications.",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "./dist/index.d.ts",
+  "author": "BennoDev",
+  "license": "ISC",
+  "syncDir": "dist",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc-watch",
-    "test": "mocha -r ts-node/register --exit test/**/*.spec.ts",
+    "build": "tsc -b packages/core packages/react packages/api",
+    "dev": "tsc-watch -b packages/core packages/react packages/api",
+    "test": "mocha -r ts-node/register --exit packages/**/*.spec.ts",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "version": "npm run format && git add -A src",
@@ -16,15 +15,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/agile-architecture/agile.git"
+    "url": "git+https://github.com/agile-ts/agile.git"
   },
-  "keywords": [
-    "React",
-    "State-Management"
-  ],
-  "author": "BennoDev",
-  "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "@types/chai": "^4.2.12",
     "@types/mocha": "^8.0.2",
     "@types/node": "^14.6.0",
@@ -37,7 +30,7 @@
     "tslib": "^2.0.0",
     "typescript": "^3.9.7"
   },
-  "files": [
-    "dist/**/*"
+  "workspaces": [
+    "packages/*"
   ]
 }

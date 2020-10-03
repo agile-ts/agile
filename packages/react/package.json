@@ -1,0 +1,38 @@
+{
+  "name": "@agile-ts/react",
+  "version": "0.0.3",
+  "author": "BennoDev",
+  "license": "ISC",
+  "description": "React extension for AgileTs",
+  "keywords": [],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@agile-ts/core": "file:../core"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "prettier": "2.0.5",
+    "ts-node": "^8.10.2",
+    "tsc-watch": "^4.1.0",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.7"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agile-ts/agile.git"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}

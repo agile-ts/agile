@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.default.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": [
+    "./src/**/*" // Only include what is in src (-> dist, tests, .. will be excluded)
+  ]
+
+}
