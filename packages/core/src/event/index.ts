@@ -195,5 +195,4 @@ export class Event<PayloadType = DefaultEventPayload> {
 
         return;
     }
-
 }

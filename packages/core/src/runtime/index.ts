@@ -1,23 +1,15 @@
 import {
-    State,
     Agile,
     Computed,
     SubscriptionContainer,
     copy,
     defineConfig
 } from '../internal';
-import {ComponentSubscriptionContainer} from "./subscription/ComponentSubscriptionContainer";
 import {CallbackSubscriptionContainer} from "./subscription/CallbackSubscriptionContainer";
+import {Worker} from "./worker";
+import {Job} from "./job";
+import {Observable} from "./observable";
 
-export interface JobInterface {
-    state: State
-    newStateValue?: any
-    options?: {
-        background?: boolean
-        sideEffects?: boolean
-        forceRerender?: boolean
-    }
-}
 
 export interface JobConfigInterface {
     perform?: boolean // Should preform the job instantly
@@ -30,30 +22,19 @@ export class Runtime {
     public agileInstance: () => Agile;
 
     // Queue system
-    private currentJob: JobInterface | null = null;
-    private jobQueue: Array<JobInterface> = [];
-    private jobsToRerender: Array<JobInterface> = [];
+    private currentJob: Job | null = null;
+    private jobQueue: Array<Job> = [];
+    private jobsToRerender: Array<Job> = [];
 
     // Used for tracking computed dependencies
     public trackState: boolean = false; // Check if agile should track states
-    public foundStates: Set<State> = new Set(); // States which were tracked during the track time
-
-    public internalIngestKey = "This is an Internal Key for ingesting internal stuff!";
+    public foundStates: Set<Observable> = new Set(); // States which were tracked during the track time
 
     constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
     }
 
-
-    //=========================================================================================================
-    // Ingest
-    //=========================================================================================================
-    /**
-     * @internal
-     * Creates a Job out of State and new Value and than add it to a job queue
-     * Note: its not possible to set a state to undefined because undefined is used for internal activities!
-     */
-    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {}): void {
+    public ingest(worker: Worker, options: JobConfigInterface): void {
         // Merge default values into options
         options = defineConfig<JobConfigInterface>(options, {
             perform: true,
@@ -63,34 +44,15 @@ export class Runtime {
         });
 
         // Create Job
-        const job: JobInterface = {
-            state: state,
-            newStateValue: newStateValue,
-            options: {
-                background: options.background,
-                sideEffects: options.sideEffects,
-                forceRerender: options.forceRerender
-            }
-        };
-
-        // Grab nextState if newState not passed or compute if needed
-        if (newStateValue === this.internalIngestKey) {
-            if (job.state instanceof Computed)
-                job.newStateValue = job.state.computeValue();
-            else
-                job.newStateValue = job.state.nextState
-        }
-
-        // Check if state value und newStateValue are the same.. if so return except force Rerender (stringifying because of possible object or array)
-        if (JSON.stringify(state.value) === JSON.stringify(job.newStateValue) && !options.forceRerender) {
-            if (this.agileInstance().config.logJobs)
-                console.warn("Agile: Doesn't perform job because state values are the same! ", job);
-            return;
-        }
+        const job = new Job(worker, {
+            background: options.background,
+            sideEffects: options.sideEffects,
+            forceRerender: options.forceRerender
+        });
 
         // Logging
         if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Created Job(${job.state.key})`, job);
+            console.log(`Agile: Created Job(${job.worker.key})`, job);
 
         // Push the Job to the Queue (safety.. that no Job get forgotten)
         this.jobQueue.push(job);
@@ -113,28 +75,16 @@ export class Runtime {
      * @internal
      * Perform a State Update
      */
-    private perform(job: JobInterface): void {
+    private perform(job: Job): void {
         // Set Job to currentJob
         this.currentJob = job;
 
-        // Set Previous State
-        job.state.previousState = copy(job.state.value);
+        // Perform Job
+        job.worker.perform(job);
+        job.performed = true;
 
-        // Write new value into the State
-        job.state.privateWrite(job.newStateValue);
-
-        // Set isSet
-        job.state.isSet = job.newStateValue !== job.state.initialState;
-
-        // Set is placeholder to false, because it has got a value
-        if (job.state.isPlaceholder)
-            job.state.isPlaceholder = false;
-
-        // Perform SideEffects like watcher functions or state.sideEffects
-        this.sideEffects(job);
-
-        // Set Job as completed (The deps and subs of completed jobs will be updated)
-        if (!job.options?.background || job.options?.forceRerender)
+        // Add to rerender
+        if (job.rerender)
             this.jobsToRerender.push(job);
 
         // Reset Current Job
@@ -142,46 +92,20 @@ export class Runtime {
 
         // Logging
         if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Completed Job(${job.state.key})`, job);
+            console.log(`Agile: Completed Job(${job.worker.key})`, job);
 
         // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
         if (this.jobQueue.length > 0) {
             const performJob = this.jobQueue.shift();
             if (performJob)
                 this.perform(performJob);
-            else
-                console.warn("Agile: Failed to perform Job ", job);
         } else {
             // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
             setTimeout(() => {
                 // Cause rerender on Subscribers
                 this.updateSubscribers();
-            })
+            });
         }
-    }
-
-
-    //=========================================================================================================
-    // Side Effect
-    //=========================================================================================================
-    /**
-     * @internal
-     * SideEffects are sideEffects of the perform function.. for instance the watchers
-     */
-    private sideEffects(job: JobInterface) {
-        const state = job.state;
-
-        // Call Watchers
-        for (let watcher in state.watchers)
-            if (typeof state.watchers[watcher] === 'function')
-                state.watchers[watcher](state.getPublicValue());
-
-        // Call State SideEffects
-        if (typeof state.sideEffects === 'function' && job.options?.sideEffects)
-            state.sideEffects();
-
-        // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
-        state.dep.deps.forEach((state) => this.ingest(state, this.internalIngestKey, {perform: false}));
     }
 
 
@@ -196,7 +120,6 @@ export class Runtime {
         // Check if Agile has an integration because its useless to go trough this process without framework
         // It won't happen anything because the state has no subs.. but this check here will maybe improve the performance
         if (!this.agileInstance().integrations.hasIntegration()) {
-            this.jobsToRerender = [];
             return;
         }
 

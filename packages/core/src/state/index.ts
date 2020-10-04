@@ -8,6 +8,7 @@ import {
     isValidObject
 } from '../internal';
 import {persistValue, updateValue} from './persist';
+import {Observable} from "../runtime/observable";
 
 
 export type StateKey = string | number;
@@ -17,7 +18,7 @@ export interface PersistSettingsInterface {
     persistKey?: string | number // Current Persist Key.. for handling twice persisted states
 }
 
-export class State<ValueType = any> {
+export class State<ValueType = any> extends Observable{
     public agileInstance: () => Agile;
 
     public _key?: StateKey; // should be a unique key/name which identifies the state
