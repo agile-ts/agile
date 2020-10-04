@@ -1,7 +1,7 @@
-import {Agile} from '../../internal';
+import {Agile, Observer} from '../../internal';
 import {ComponentSubscriptionContainer} from "./ComponentSubscriptionContainer";
 import {CallbackSubscriptionContainer} from "./CallbackSubscriptionContainer";
-import {Observer} from "../observer";
+
 
 
 //=========================================================================================================

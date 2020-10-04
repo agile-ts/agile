@@ -1,17 +1,18 @@
 import {
     State,
     Agile,
-    defineConfig
+    defineConfig,
+    Observer
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<ComputedValueType> {
     public agileInstance: () => Agile;
 
     public computeFunction: () => ComputedValueType;
-    public deps: Array<State> = [];
-    public hardCodedDeps: Array<State> = [];
+    public deps: Array<Observer> = [];
+    public hardCodedDeps: Array<Observer> = [];
 
-    constructor(agileInstance: Agile, computeFunction: () => ComputedValueType, deps: Array<State> = []) {
+    constructor(agileInstance: Agile, computeFunction: () => ComputedValueType, deps: Array<Observer> = []) {
         super(agileInstance, computeFunction());
         this.agileInstance = () => agileInstance;
         this.computeFunction = computeFunction;
@@ -30,7 +31,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
 
         // Add state to foundState (for auto tracking used states in computed functions)
         if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this);
+            this.agileInstance().runtime.foundStates.add(this.observer);
 
         return this._value;
     }
@@ -60,7 +61,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     /**
      * Updates the Compute Function
      */
-    public updateComputeFunction(computeFunction: () => ComputedValueType, deps: Array<State> = [], options?: { background?: boolean, sideEffects?: boolean }) {
+    public updateComputeFunction(computeFunction: () => ComputedValueType, deps: Array<Observer> = [], options?: { background?: boolean, sideEffects?: boolean }) {
         this.computeFunction = computeFunction;
         this.hardCodedDeps = deps;
 
@@ -84,22 +85,22 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         const computedValue = this.computeFunction();
 
         // Get tracked states and set trackSate to false
-        let foundStates = this.agileInstance().runtime.getTrackedStates();
+        let foundStates = this.agileInstance().runtime.getTrackedObserver();
 
         // Handle foundStates dependencies
-        const newDeps: Array<State> = [];
+        const newDeps: Array<Observer> = [];
         foundStates.forEach(state => {
             // Add the state to newDeps
             newDeps.push(state);
 
             // Add this as dependency of the state
-            state.dep.depend(this);
+            state.dep.depend(this.observer);
         });
 
         // Handle hardCoded dependencies
-        this.hardCodedDeps.forEach(state => {
+        this.hardCodedDeps.forEach(observer => {
             // Add this as dependency of the state
-            state.dep.depend(this);
+            observer.dep.depend(this.observer);
         });
 
         // Set deps

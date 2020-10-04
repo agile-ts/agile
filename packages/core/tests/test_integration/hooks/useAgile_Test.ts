@@ -58,7 +58,7 @@ export function useAgile_Test<X extends Array<State | Collection | undefined>, Y
     }
 
     // Create a callback base subscription, Callback invokes re-render Trigger
-    agileInstance?.subController.subscribeWithSubsArray(callbackFunction, depsArray);
+    agileInstance?.subController.subscribeWithSubsArray(callbackFunction, depsArray.map(state => state.observer));
 
     return getReturnValue(depsArray);
 }

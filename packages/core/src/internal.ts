@@ -25,9 +25,11 @@ export * from './collection/selector';
 export * from './event';
 
 // Internal Classes
-export * from './runtime';
 export * from './storage';
 export * from './integrations';
+export * from './runtime';
+export * from './runtime/observer';
+export * from './runtime/job';
 export * from './runtime/subscription/sub';
 export * from './runtime/subscription/CallbackSubscriptionContainer';
 export * from './runtime/subscription/ComponentSubscriptionContainer';

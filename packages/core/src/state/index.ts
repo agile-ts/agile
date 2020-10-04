@@ -56,7 +56,7 @@ export class State<ValueType = any> {
     public get value(): ValueType {
         // Add state to foundState (for auto tracking used states in computed functions)
         if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this);
+            this.agileInstance().runtime.foundStates.add(this.observer);
 
         return this._value;
     }

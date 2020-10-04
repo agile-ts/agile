@@ -1,10 +1,10 @@
-import {Observer} from "./observer";
-import {defineConfig} from "../utils";
+import {Observer, defineConfig} from "../internal";
 
 export interface JobConfigInterface {
     background?: boolean
     sideEffects?: boolean
     forceRerender?: boolean
+    perform?: boolean
 }
 
 export class Job<o = Observer> {

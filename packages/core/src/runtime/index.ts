@@ -1,21 +1,12 @@
 import {
     Agile,
-    Computed,
     SubscriptionContainer,
-    copy,
-    defineConfig
+    defineConfig,
+    Observer,
+    Job,
+    JobConfigInterface
 } from '../internal';
 import {CallbackSubscriptionContainer} from "./subscription/CallbackSubscriptionContainer";
-import {Observer} from "./observer";
-import {Job} from "./job";
-
-
-export interface JobConfigInterface {
-    perform?: boolean // Should preform the job instantly
-    background?: boolean // Shouldn't cause an rerender during the perform process
-    sideEffects?: boolean // Should perform sideEffects like rebuilding groups
-    forceRerender?: boolean // Force rerender although for instance the values are the same
-}
 
 export class Runtime {
     public agileInstance: () => Agile;
@@ -196,7 +187,7 @@ export class Runtime {
      * @internal
      * Will return all tracked States
      */
-    public getTrackedStates() {
+    public getTrackedObserver() {
         const finalFoundStates = this.foundStates;
 
         // Reset tracking

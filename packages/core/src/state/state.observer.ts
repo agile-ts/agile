@@ -1,10 +1,4 @@
-import {Agile} from "../agile";
-import {Observer} from "../runtime/observer";
-import {State} from "./index";
-import {copy, defineConfig} from "../utils";
-import {Computed} from "../computed";
-import {JobConfigInterface} from "../runtime";
-import {Job} from "../runtime/job";
+import {Agile, Observer, State, Computed, Job, copy, defineConfig, JobConfigInterface} from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
 
