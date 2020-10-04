@@ -1,5 +1,4 @@
-import {Agile, Dep, StateKey} from "../internal";
-import {Job} from "./job";
+import {Agile, Dep, StateKey, Job} from "../internal";
 
 export type ObservableKey = string | number;
 

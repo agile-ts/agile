@@ -1,4 +1,13 @@
-import {Agile, Observer, State, Computed, Job, copy, defineConfig, JobConfigInterface} from '../internal';
+import {
+    Agile,
+    Observer,
+    State,
+    Computed,
+    Job,
+    JobConfigInterface,
+    copy,
+    defineConfig
+    } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
 
@@ -61,7 +70,7 @@ export class StateObserver<ValueType = any> extends Observer {
      * TOD_O
      */
     public perform(job: Job<this>) {
-        const state = job.observable.state;
+        const state = job.observer.state;
 
         // Set Previous State
         state.previousState = copy(state.value);
@@ -89,7 +98,7 @@ export class StateObserver<ValueType = any> extends Observer {
      * SideEffects are sideEffects of the perform function.. for instance the watchers
      */
     private sideEffects(job: Job<this>) {
-        const state = job.observable.state;
+        const state = job.observer.state;
 
         // Call Watchers
         for (let watcher in state.watchers)
@@ -101,6 +110,6 @@ export class StateObserver<ValueType = any> extends Observer {
             state.sideEffects();
 
         // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
-       job.observable.dep.deps.forEach((observer) => observer instanceof StateObserver && observer.ingest(this.internalIngestKey, {perform: false}));
+        job.observer.dep.deps.forEach((observer) => observer instanceof StateObserver && observer.ingest(this.internalIngestKey, {perform: false}));
     }
 }

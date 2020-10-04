@@ -8,9 +8,17 @@
 // Agile
 export * from './agile';
 
+// Runtime
+export * from './runtime/observer';
+export * from './runtime/dep';
+export * from './runtime/job';
+export * from './runtime/subscription/sub';
+export * from './runtime/subscription/CallbackSubscriptionContainer';
+export * from './runtime/subscription/ComponentSubscriptionContainer';
+
 // State
 export * from './state';
-export * from './runtime/dep';
+export * from './state/state.observer';
 
 // Computed
 export {Computed} from './computed';
@@ -28,11 +36,6 @@ export * from './event';
 export * from './storage';
 export * from './integrations';
 export * from './runtime';
-export * from './runtime/observer';
-export * from './runtime/job';
-export * from './runtime/subscription/sub';
-export * from './runtime/subscription/CallbackSubscriptionContainer';
-export * from './runtime/subscription/ComponentSubscriptionContainer';
 
 // Utils
 export * from './utils';

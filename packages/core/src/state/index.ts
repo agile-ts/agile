@@ -5,11 +5,10 @@ import {
     copy,
     defineConfig,
     flatMerge,
-    isValidObject
+    isValidObject,
+    StateObserver
 } from '../internal';
 import {persistValue, updateValue} from './persist';
-import {StateObserver} from "./state.observer";
-
 
 export type StateKey = string | number;
 

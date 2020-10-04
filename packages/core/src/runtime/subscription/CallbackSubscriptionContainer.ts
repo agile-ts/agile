@@ -1,5 +1,5 @@
+import {Observer} from "../../internal";
 import {ComponentSubscriptionContainer} from "./ComponentSubscriptionContainer";
-import {Observer} from "../observer";
 
 export class CallbackSubscriptionContainer extends ComponentSubscriptionContainer {
     public callback: Function;

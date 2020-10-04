@@ -9,12 +9,12 @@ export interface JobConfigInterface {
 
 export class Job<o = Observer> {
 
-    public observable: o;
+    public observer: o;
     public config: JobConfigInterface;
     public rerender: boolean;
     public performed: boolean = false;
 
-    constructor(observable: o, config: JobConfigInterface) {
+    constructor(observer: o, config: JobConfigInterface) {
         // Merge default values into options
         this.config = defineConfig<JobConfigInterface>(config, {
             background: false,
@@ -22,7 +22,7 @@ export class Job<o = Observer> {
             forceRerender: false
         });
 
-        this.observable = observable;
+        this.observer = observer;
         this.config = config;
         this.rerender = !config?.background || config?.forceRerender || true;
     }

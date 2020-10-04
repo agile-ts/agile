@@ -1,5 +1,4 @@
-import {State} from "../../internal";
-import {Observer} from "../observer";
+import {Observer} from "../../internal";
 
 export class ComponentSubscriptionContainer {
     public component: any;

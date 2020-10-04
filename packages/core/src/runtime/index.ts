@@ -42,7 +42,7 @@ export class Runtime {
 
         // Logging
         if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Created Job(${job.observable.key})`, job);
+            console.log(`Agile: Created Job(${job.observer.key})`, job);
 
         // Push the Job to the Queue (safety.. that no Job get forgotten)
         this.jobQueue.push(job);
@@ -70,7 +70,7 @@ export class Runtime {
         this.currentJob = job;
 
         // Perform Job
-        job.observable.perform(job);
+        job.observer.perform(job);
         job.performed = true;
 
         // Add to rerender
@@ -82,7 +82,7 @@ export class Runtime {
 
         // Logging
         if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Completed Job(${job.observable.key})`, job);
+            console.log(`Agile: Completed Job(${job.observer.key})`, job);
 
         // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
         if (this.jobQueue.length > 0) {
@@ -118,7 +118,7 @@ export class Runtime {
         // Map through Jobs to Rerender
         this.jobsToRerender.forEach(job =>
             // Map through subs of the current Job State
-            job.observable.dep.subs.forEach(subscriptionContainer => {
+            job.observer.dep.subs.forEach(subscriptionContainer => {
                 // Check if subscriptionContainer is ready
                 if (!subscriptionContainer.ready)
                     console.warn("Agile: SubscriptionContainer isn't ready yet ", subscriptionContainer);
@@ -129,7 +129,7 @@ export class Runtime {
 
                     // Find the local Key for this update by comparing the State instance from this Job to the State instances in the propStates object
                     for (let key in subscriptionContainer.propObservable)
-                        if (subscriptionContainer.propObservable[key] === job.observable)
+                        if (subscriptionContainer.propObservable[key] === job.observer)
                             localKey = key;
 
                     // If matching key is found push it into the SubscriptionContainer propKeysChanged where it later will be build to an changed prop object

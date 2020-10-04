@@ -2,12 +2,6 @@ import {Agile, Observer} from '../../internal';
 import {ComponentSubscriptionContainer} from "./ComponentSubscriptionContainer";
 import {CallbackSubscriptionContainer} from "./CallbackSubscriptionContainer";
 
-
-
-//=========================================================================================================
-// Subscription Container
-//=========================================================================================================
-
 export type SubscriptionContainer = ComponentSubscriptionContainer | CallbackSubscriptionContainer;
 
 

@@ -45,7 +45,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     public get output(): Array<DataType> {
         // Add state(group) to foundState (for auto tracking used states in computed functions)
         if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this);
+            this.agileInstance().runtime.foundStates.add(this.observer);
 
         return this._output;
     }
@@ -53,7 +53,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     public get states(): Array<State<DataType>> {
         // Add state(group) to foundState (for auto tracking used states in computed functions)
         if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this);
+            this.agileInstance().runtime.foundStates.add(this.observer);
 
         return this._states.map(state => state());
     }

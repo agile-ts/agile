@@ -1,7 +1,7 @@
 import {
-    SubscriptionContainer
+    SubscriptionContainer,
+    Observer
 } from '../internal';
-import {Observer} from "../internal";
 
 export class Dep {
     public deps: Set<Observer> = new Set(); // Dependencies from the State

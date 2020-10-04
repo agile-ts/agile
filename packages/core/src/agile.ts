@@ -13,7 +13,6 @@ import {
     EventConfig,
     DefaultEventPayload, Integrations
 } from './internal'
-import {Observer} from "./runtime/observer";
 
 export interface AgileConfigInterface {
     logJobs?: boolean // If Agile should log some stuff in the console
