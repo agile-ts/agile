@@ -1,6 +1,7 @@
-import {Agile, State} from '../../internal';
+import {Agile} from '../../internal';
 import {ComponentSubscriptionContainer} from "./ComponentSubscriptionContainer";
 import {CallbackSubscriptionContainer} from "./CallbackSubscriptionContainer";
+import {Observer} from "../observer";
 
 
 //=========================================================================================================
@@ -34,26 +35,26 @@ export class SubController {
     /**
      * Subscribe to Agile State with a returned object of props this props can than be returned by the component (See react-integration)
      */
-    public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: State } = {}): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: State['value'] } } {
+    public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: Observer } = {}): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: Observer['value'] } } {
         const subscriptionContainer = this.registerSubscription(subscriptionInstance);
 
-        const props: { [key: string]: State } = {};
+        const props: { [key: string]: Observer } = {};
         subscriptionContainer.passProps = true;
-        subscriptionContainer.propStates = {...subs};
+        subscriptionContainer.propObservable = {...subs};
 
         // Go through subs
         let localKeys = Object.keys(subs);
         localKeys.forEach(key => {
-            const state = subs[key];
+            const observable = subs[key];
 
             // Add State to SubscriptionContainer Subs
-            subscriptionContainer.subs.add(state);
+            subscriptionContainer.subs.add(observable);
 
             // Add SubscriptionContainer to State Subs
-            state.dep.subscribe(subscriptionContainer);
+            observable.dep.subscribe(subscriptionContainer);
 
             // Add state to props
-            props[key] = state.value;
+            props[key] = observable.value;
         });
 
         return {
@@ -69,15 +70,15 @@ export class SubController {
     /**
      * Subscribe to Agile State
      */
-    public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<State> = []): SubscriptionContainer {
+    public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<Observer> = []): SubscriptionContainer {
         const subscriptionContainer = this.registerSubscription(subscriptionInstance, subs);
 
-        subs.forEach(state => {
+        subs.forEach(observable => {
             // Add State to SubscriptionContainer Subs
-            subscriptionContainer.subs.add(state);
+            subscriptionContainer.subs.add(observable);
 
             // Add SubscriptionContainer to State Dependencies Subs
-            state.dep.subscribe(subscriptionContainer);
+            observable.dep.subscribe(subscriptionContainer);
         });
 
         return subscriptionContainer;
@@ -116,7 +117,7 @@ export class SubController {
     /**
      * Registers the Component/Callback Subscription and returns a SubscriptionContainer
      */
-    public registerSubscription(integrationInstance: any, subs: Array<State> = []): SubscriptionContainer {
+    public registerSubscription(integrationInstance: any, subs: Array<Observer> = []): SubscriptionContainer {
         if (typeof integrationInstance === 'function')
             return this.registerCallbackSubscription(integrationInstance, subs);
 
@@ -145,7 +146,7 @@ export class SubController {
      * Registers Component Subscription
      * Note: Helper Function
      */
-    private registerComponentSubscription(componentInstance: any, subs: Array<State> = []): ComponentSubscriptionContainer {
+    private registerComponentSubscription(componentInstance: any, subs: Array<Observer> = []): ComponentSubscriptionContainer {
         // Create ComponentSubscriptionContainer
         const componentContainer = new ComponentSubscriptionContainer(componentInstance, new Set(subs));
 
@@ -174,7 +175,7 @@ export class SubController {
      * Registers Callback Subscription
      * Note: Helper Function
      */
-    private registerCallbackSubscription(callbackFunction: () => void, subs: Array<State> = []): CallbackSubscriptionContainer {
+    private registerCallbackSubscription(callbackFunction: () => void, subs: Array<Observer> = []): CallbackSubscriptionContainer {
         // Create CallbackSubscriptionContainer
         const callbackContainer = new CallbackSubscriptionContainer(callbackFunction as Function, new Set(subs));
 

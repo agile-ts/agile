@@ -1,4 +1,4 @@
-import {Worker} from "./worker";
+import {Observer} from "./observer";
 import {defineConfig} from "../utils";
 
 export interface JobConfigInterface {
@@ -7,14 +7,14 @@ export interface JobConfigInterface {
     forceRerender?: boolean
 }
 
-export class Job<w = Worker> {
+export class Job<o = Observer> {
 
-    public worker: w;
+    public observable: o;
     public config: JobConfigInterface;
     public rerender: boolean;
     public performed: boolean = false;
 
-    constructor(worker: w, config: JobConfigInterface) {
+    constructor(observable: o, config: JobConfigInterface) {
         // Merge default values into options
         this.config = defineConfig<JobConfigInterface>(config, {
             background: false,
@@ -22,7 +22,7 @@ export class Job<w = Worker> {
             forceRerender: false
         });
 
-        this.worker = worker;
+        this.observable = observable;
         this.config = config;
         this.rerender = !config?.background || config?.forceRerender || true;
     }

@@ -1,22 +1,22 @@
 import {Agile} from "../agile";
-import {Worker} from "../runtime/worker";
+import {Observer} from "../runtime/observer";
 import {State} from "./index";
 import {copy, defineConfig} from "../utils";
 import {Computed} from "../computed";
 import {JobConfigInterface} from "../runtime";
 import {Job} from "../runtime/job";
 
-
-export class StateWorker<ValueType = any> extends Worker {
+export class StateObserver<ValueType = any> extends Observer {
 
     public nextStateValue: ValueType;
     public state: State<ValueType>;
-    public internalIngestKey = "This is an Internal Key for ingesting internal stuff!";
+    public internalIngestKey = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
     constructor(agileInstance: Agile, state: State) {
         super(agileInstance);
         this.state = state;
         this.nextStateValue = state.value;
+        this.value = state.value;
         this.key = state.key;
     }
 
@@ -29,7 +29,7 @@ export class StateWorker<ValueType = any> extends Worker {
      * Creates a Job out of State and new Value and than add it to a job queue
      * Note: its not possible to set a state to undefined because undefined is used for internal activities!
      */
-    public ingest(state: State, newStateValue?: any, options: JobConfigInterface = {}): void {
+    public ingest(newStateValue?: any, options: JobConfigInterface = {}): void {
         // Merge default values into options
         options = defineConfig<JobConfigInterface>(options, {
             perform: true,
@@ -40,15 +40,15 @@ export class StateWorker<ValueType = any> extends Worker {
 
         // Grab nextState if newState not passed or compute if needed
         if (newStateValue === this.internalIngestKey) {
-            if (state instanceof Computed)
-                this.nextStateValue = state.computeValue();
+            if (this.state instanceof Computed)
+                this.nextStateValue = this.state.computeValue();
             else
-                this.nextStateValue = state.nextState
+                this.nextStateValue = this.state.nextState
         }
         this.nextStateValue = newStateValue;
 
         // Check if state value und newStateValue are the same.. if so return except force Rerender (stringifying because of possible object or array)
-        if (JSON.stringify(state.value) === JSON.stringify(this.nextStateValue) && !options.forceRerender) {
+        if (JSON.stringify(this.state.value) === JSON.stringify(this.nextStateValue) && !options.forceRerender) {
             if (this.agileInstance().config.logJobs)
                 console.warn("Agile: Doesn't created job because state values are the same! ");
             return;
@@ -67,7 +67,7 @@ export class StateWorker<ValueType = any> extends Worker {
      * TOD_O
      */
     public perform(job: Job<this>) {
-        const state = job.worker.state;
+        const state = job.observable.state;
 
         // Set Previous State
         state.previousState = copy(state.value);
@@ -95,7 +95,7 @@ export class StateWorker<ValueType = any> extends Worker {
      * SideEffects are sideEffects of the perform function.. for instance the watchers
      */
     private sideEffects(job: Job<this>) {
-        const state = job.worker.state;
+        const state = job.observable.state;
 
         // Call Watchers
         for (let watcher in state.watchers)
@@ -107,6 +107,6 @@ export class StateWorker<ValueType = any> extends Worker {
             state.sideEffects();
 
         // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
-        state.dep.deps.forEach((state) => this.ingest(state, this.internalIngestKey, {perform: false}));
+       job.observable.dep.deps.forEach((observer) => observer instanceof StateObserver && observer.ingest(this.internalIngestKey, {perform: false}));
     }
 }

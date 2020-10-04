@@ -8,7 +8,7 @@ import {
     isValidObject
 } from '../internal';
 import {persistValue, updateValue} from './persist';
-import {Observable} from "../runtime/observable";
+import {StateObserver} from "./state.observer";
 
 
 export type StateKey = string | number;
@@ -18,18 +18,18 @@ export interface PersistSettingsInterface {
     persistKey?: string | number // Current Persist Key.. for handling twice persisted states
 }
 
-export class State<ValueType = any> extends Observable{
+export class State<ValueType = any> {
     public agileInstance: () => Agile;
 
     public _key?: StateKey; // should be a unique key/name which identifies the state
     public valueType?: string; // primitive types for js users
-    public dep: Dep; // Includes the subscriptions and dependencies of the state
     public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
     public persistSettings: PersistSettingsInterface; // Includes persist 'settings' (have to rename if I got an better name)
     public output?: any; // This contains the public value.. if _value doesn't contain the public value (Used for example by collections)
     public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
+    public observer: StateObserver;
 
     public initialState: ValueType;
     public _value: ValueType; // The current value of the state
@@ -39,7 +39,6 @@ export class State<ValueType = any> extends Observable{
     constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<Dep> = []) {
         this.agileInstance = () => agileInstance;
         this.initialState = initialState;
-        this.dep = new Dep(deps);
         this._key = key;
         this._value = initialState;
         this.previousState = initialState;
@@ -47,6 +46,7 @@ export class State<ValueType = any> extends Observable{
         this.persistSettings = {
             isPersisted: false
         }
+        this.observer = new StateObserver<ValueType>(agileInstance, this);
     }
 
     public set value(value: ValueType) {
@@ -94,7 +94,7 @@ export class State<ValueType = any> extends Observable{
             return this;
 
         // Ingest updated value
-        this.agileInstance().runtime.ingest(this, value, {
+        this.observer.ingest(value, {
             background: options.background,
             sideEffects: options.sideEffects
         });
@@ -118,7 +118,7 @@ export class State<ValueType = any> extends Observable{
             forceRerender: false
         });
 
-        this.agileInstance().runtime.ingest(this, this.agileInstance().runtime.internalIngestKey, {
+        this.observer.ingest(this.observer.internalIngestKey, {
             background: options.background,
             sideEffects: options.sideEffects,
             forceRerender: options.forceRerender

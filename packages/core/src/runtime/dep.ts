@@ -1,17 +1,17 @@
 import {
-    State,
     SubscriptionContainer
 } from '../internal';
+import {Observer} from "./observer";
 
 export class Dep {
-    public deps: Set<any> = new Set(); // Dependencies from the State
+    public deps: Set<Observer> = new Set(); // Dependencies from the State
     public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions (for instance a component subscribes to a state to get rerendered if the state changes)
 
-    constructor(initialDeps?: Array<Dep>) {
+    constructor(initialDeps?: Array<Observer>) {
         if (!initialDeps) return;
 
         // Add Initial Dependencies to Deps
-        initialDeps.forEach(dep => this.deps.add(dep));
+        initialDeps.forEach(observable => this.deps.add(observable));
     }
 
 
@@ -21,9 +21,9 @@ export class Dep {
     /**
      * Add new Dependency to the State
      */
-    public depend(state: State) {
-        if (state.dep !== this && !this.deps.has(state))
-            this.deps.add(state);
+    public depend(observable: Observer) {
+        if (observable.dep !== this && !this.deps.has(observable))
+            this.deps.add(observable);
     }
 
 

@@ -6,9 +6,8 @@ import {
     defineConfig
 } from '../internal';
 import {CallbackSubscriptionContainer} from "./subscription/CallbackSubscriptionContainer";
-import {Worker} from "./worker";
+import {Observer} from "./observer";
 import {Job} from "./job";
-import {Observable} from "./observable";
 
 
 export interface JobConfigInterface {
@@ -28,13 +27,13 @@ export class Runtime {
 
     // Used for tracking computed dependencies
     public trackState: boolean = false; // Check if agile should track states
-    public foundStates: Set<Observable> = new Set(); // States which were tracked during the track time
+    public foundStates: Set<Observer> = new Set(); // States which were tracked during the track time
 
     constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
     }
 
-    public ingest(worker: Worker, options: JobConfigInterface): void {
+    public ingest(worker: Observer, options: JobConfigInterface): void {
         // Merge default values into options
         options = defineConfig<JobConfigInterface>(options, {
             perform: true,
@@ -52,7 +51,7 @@ export class Runtime {
 
         // Logging
         if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Created Job(${job.worker.key})`, job);
+            console.log(`Agile: Created Job(${job.observable.key})`, job);
 
         // Push the Job to the Queue (safety.. that no Job get forgotten)
         this.jobQueue.push(job);
@@ -80,7 +79,7 @@ export class Runtime {
         this.currentJob = job;
 
         // Perform Job
-        job.worker.perform(job);
+        job.observable.perform(job);
         job.performed = true;
 
         // Add to rerender
@@ -92,7 +91,7 @@ export class Runtime {
 
         // Logging
         if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Completed Job(${job.worker.key})`, job);
+            console.log(`Agile: Completed Job(${job.observable.key})`, job);
 
         // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
         if (this.jobQueue.length > 0) {
@@ -119,9 +118,8 @@ export class Runtime {
     private updateSubscribers(): void {
         // Check if Agile has an integration because its useless to go trough this process without framework
         // It won't happen anything because the state has no subs.. but this check here will maybe improve the performance
-        if (!this.agileInstance().integrations.hasIntegration()) {
+        if (!this.agileInstance().integrations.hasIntegration())
             return;
-        }
 
         // Subscriptions that has to be updated (Set = For preventing double subscriptions without further checks)
         const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<SubscriptionContainer>();
@@ -129,7 +127,7 @@ export class Runtime {
         // Map through Jobs to Rerender
         this.jobsToRerender.forEach(job =>
             // Map through subs of the current Job State
-            job.state.dep.subs.forEach(subscriptionContainer => {
+            job.observable.dep.subs.forEach(subscriptionContainer => {
                 // Check if subscriptionContainer is ready
                 if (!subscriptionContainer.ready)
                     console.warn("Agile: SubscriptionContainer isn't ready yet ", subscriptionContainer);
@@ -139,8 +137,8 @@ export class Runtime {
                     let localKey: string | null = null;
 
                     // Find the local Key for this update by comparing the State instance from this Job to the State instances in the propStates object
-                    for (let key in subscriptionContainer.propStates)
-                        if (subscriptionContainer.propStates[key] === job.state)
+                    for (let key in subscriptionContainer.propObservable)
+                        if (subscriptionContainer.propObservable[key] === job.observable)
                             localKey = key;
 
                     // If matching key is found push it into the SubscriptionContainer propKeysChanged where it later will be build to an changed prop object
@@ -183,8 +181,8 @@ export class Runtime {
 
         // Build Object
         subscriptionContainer.propKeysChanged.forEach(changedKey => {
-            if (subscriptionContainer.propStates)
-                finalObject[changedKey] = subscriptionContainer.propStates[changedKey].value;
+            if (subscriptionContainer.propObservable)
+                finalObject[changedKey] = subscriptionContainer.propObservable[changedKey].value;
         });
 
         return finalObject;

@@ -10,7 +10,7 @@ export * from './agile';
 
 // State
 export * from './state';
-export * from './state/dep';
+export * from './runtime/dep';
 
 // Computed
 export {Computed} from './computed';
