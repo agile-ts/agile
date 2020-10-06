@@ -31,14 +31,14 @@ describe('Default Group Tests', () => {
 
         it('Has correct initial values', () => {
             expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created');
-            expect(MY_COLLECTION.groups['default']?.dep.subs.size === 0).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
+            expect(MY_COLLECTION.groups['default']?.observer.dep.subs.size === 0).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
             expect(JSON.stringify(MY_COLLECTION.groups['default'].value)).to.eq(JSON.stringify([]), 'default Group has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.groups['default'].output)).to.eq(JSON.stringify([]), 'default Group has correct initial output');
             expect(JSON.stringify(MY_COLLECTION.groups['default'].states)).to.eq(JSON.stringify([]), 'default Group has correct initial states');
             expect(MY_COLLECTION.groups['default'].key).to.eq('default', 'group1 Group has correct initial key');
 
             expect(MY_COLLECTION.groups['group1'] instanceof Group).to.eq(true, 'MY_COLLECTION group1 Group has been created');
-            expect(MY_COLLECTION.groups['group1']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group1 Group has correct subs size');
+            expect(MY_COLLECTION.groups['group1']?.observer.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group1 Group has correct subs size');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([]), 'group1 Group has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([]), 'group1 Group has correct initial output');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].states)).to.eq(JSON.stringify([]), 'group1 Group has correct initial states');
@@ -99,14 +99,14 @@ describe('Default Group Tests', () => {
 
         it('Has correct initial values', () => {
             expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created');
-            expect(MY_COLLECTION.groups['default']?.dep.subs.size === 0).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
+            expect(MY_COLLECTION.groups['default']?.observer.dep.subs.size === 0).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
             expect(JSON.stringify(MY_COLLECTION.groups['default'].value)).to.eq(JSON.stringify([]), 'default has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.groups['default'].output)).to.eq(JSON.stringify([]), 'default has correct initial output');
             expect(JSON.stringify(MY_COLLECTION.groups['default'].states)).to.eq(JSON.stringify([]), 'default has correct initial states');
             expect(MY_COLLECTION.groups['default'].key).to.eq('default', 'default Group has correct initial key');
 
             expect(MY_COLLECTION.groups['group1'] instanceof Group).to.eq(true, 'MY_COLLECTION group1 Group has been created');
-            expect(MY_COLLECTION.groups['group1']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group1 Group has correct subs size');
+            expect(MY_COLLECTION.groups['group1']?.observer.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION group1 Group has correct subs size');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].value)).to.eq(JSON.stringify([1, 2, 3]), 'group1 Group has correct initial value');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].output)).to.eq(JSON.stringify([]), 'group1 Group has correct initial output');
             expect(JSON.stringify(MY_COLLECTION.groups['group1'].states)).to.eq(JSON.stringify([]), 'group1 Group has correct initial states');

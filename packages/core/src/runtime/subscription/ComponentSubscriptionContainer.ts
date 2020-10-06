@@ -5,7 +5,7 @@ export class ComponentSubscriptionContainer {
 
     // Only needed by object orientated subscriptions
     public passProps: boolean = false;
-    public propObservable?: { [key: string]: Observer }; // states which will than be returned as prop object by the integration
+    public propObservers?: { [key: string]: Observer }; // states which will than be returned as prop object by the integration
     public propKeysChanged: Array<string> = [];  // Used to preserve local keys to update before update is performed, cleared every update
 
     public ready: boolean = false;

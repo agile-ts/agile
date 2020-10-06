@@ -6,7 +6,7 @@ import {
     defineConfig,
     flatMerge,
     isValidObject,
-    StateObserver
+    StateObserver, internalIngestKey
 } from '../internal';
 import {persistValue, updateValue} from './persist';
 
@@ -54,8 +54,8 @@ export class State<ValueType = any> {
 
     public get value(): ValueType {
         // Add state to foundState (for auto tracking used states in computed functions)
-        if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this.observer);
+        if (this.agileInstance().runtime.trackObserver)
+            this.agileInstance().runtime.foundObservers.add(this.observer);
 
         return this._value;
     }
@@ -117,7 +117,7 @@ export class State<ValueType = any> {
             forceRerender: false
         });
 
-        this.observer.ingest(this.observer.internalIngestKey, {
+        this.observer.ingest(internalIngestKey, {
             background: options.background,
             sideEffects: options.sideEffects,
             forceRerender: options.forceRerender

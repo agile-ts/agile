@@ -34,7 +34,7 @@ export class SubController {
 
         const props: { [key: string]: Observer } = {};
         subscriptionContainer.passProps = true;
-        subscriptionContainer.propObservable = {...subs};
+        subscriptionContainer.propObservers = {...subs};
 
         // Go through subs
         let localKeys = Object.keys(subs);

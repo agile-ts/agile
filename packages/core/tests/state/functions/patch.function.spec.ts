@@ -34,7 +34,7 @@ describe('Patch Function Tests', () => {
             id: 1,
             name: 'jeff'
         }), 'MY_STATE has correct value');
-        expect(MY_STATE.dep.subs.size === 1).to.eq(true, 'MY_STATE has correct subs size (Subs are components/callbackFunctions which causes rerender)');
+        expect(MY_STATE.observer.dep.subs.size === 1).to.eq(true, 'MY_STATE has correct subs size (Subs are components/callbackFunctions which causes rerender)');
         expect(typeof MY_STATE.sideEffects === 'function').to.eq(true, 'MY_STATE has sideEffect function');
 
         expect(JSON.stringify(myHookState)).to.eq(JSON.stringify({

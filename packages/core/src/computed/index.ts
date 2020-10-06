@@ -30,8 +30,8 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
 
         // Add state to foundState (for auto tracking used states in computed functions)
-        if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this.observer);
+        if (this.agileInstance().runtime.trackObserver)
+            this.agileInstance().runtime.foundObservers.add(this.observer);
 
         return this._value;
     }
@@ -61,9 +61,9 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
     /**
      * Updates the Compute Function
      */
-    public updateComputeFunction(computeFunction: () => ComputedValueType, deps: Array<Observer> = [], options?: { background?: boolean, sideEffects?: boolean }) {
+    public updateComputeFunction(computeFunction: () => ComputedValueType, deps: Array<State> = [], options?: { background?: boolean, sideEffects?: boolean }) {
         this.computeFunction = computeFunction;
-        this.hardCodedDeps = deps;
+        this.hardCodedDeps = deps.map(state => state.observer);
 
         // Recompute for setting initial state value and adding missing dependencies
         this.recompute(options);
@@ -79,7 +79,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
      */
     public computeValue(): ComputedValueType {
         // Set tracking state to true which will than track all states which for instance call state.value
-        this.agileInstance().runtime.trackState = true;
+        this.agileInstance().runtime.trackObserver = true;
 
         // Call computeFunction
         const computedValue = this.computeFunction();
@@ -90,6 +90,8 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         // Handle foundStates dependencies
         const newDeps: Array<Observer> = [];
         foundObservers.forEach(observer => {
+            if(!observer) return;
+
             // Add the state to newDeps
             newDeps.push(observer);
 

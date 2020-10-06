@@ -17,14 +17,14 @@ export class Runtime {
     private jobsToRerender: Array<Job> = [];
 
     // Used for tracking computed dependencies
-    public trackState: boolean = false; // Check if agile should track states
-    public foundStates: Set<Observer> = new Set(); // States which were tracked during the track time
+    public trackObserver: boolean = false; // Check if agile should track states
+    public foundObservers: Set<Observer> = new Set(); // States which were tracked during the track time
 
     constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
     }
 
-    public ingest(worker: Observer, options: JobConfigInterface): void {
+    public ingest(observer: Observer, options: JobConfigInterface): void {
         // Merge default values into options
         options = defineConfig<JobConfigInterface>(options, {
             perform: true,
@@ -34,11 +34,14 @@ export class Runtime {
         });
 
         // Create Job
-        const job = new Job(worker, {
+        const job = new Job(observer, {
             background: options.background,
             sideEffects: options.sideEffects,
             forceRerender: options.forceRerender
         });
+
+        // Set rerender depending on if it has an integration
+        job.rerender = this.agileInstance().integrations.hasIntegration();
 
         // Logging
         if (this.agileInstance().config.logJobs)
@@ -107,12 +110,7 @@ export class Runtime {
      * This will be update all Subscribers of complete jobs
      */
     private updateSubscribers(): void {
-        // Check if Agile has an integration because its useless to go trough this process without framework
-        // It won't happen anything because the state has no subs.. but this check here will maybe improve the performance
-        if (!this.agileInstance().integrations.hasIntegration())
-            return;
-
-        // Subscriptions that has to be updated (Set = For preventing double subscriptions without further checks)
+        // Subscriptions that has to be updated
         const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<SubscriptionContainer>();
 
         // Map through Jobs to Rerender
@@ -128,8 +126,8 @@ export class Runtime {
                     let localKey: string | null = null;
 
                     // Find the local Key for this update by comparing the State instance from this Job to the State instances in the propStates object
-                    for (let key in subscriptionContainer.propObservable)
-                        if (subscriptionContainer.propObservable[key] === job.observer)
+                    for (let key in subscriptionContainer.propObservers)
+                        if (subscriptionContainer.propObservers[key] === job.observer)
                             localKey = key;
 
                     // If matching key is found push it into the SubscriptionContainer propKeysChanged where it later will be build to an changed prop object
@@ -172,8 +170,8 @@ export class Runtime {
 
         // Build Object
         subscriptionContainer.propKeysChanged.forEach(changedKey => {
-            if (subscriptionContainer.propObservable)
-                finalObject[changedKey] = subscriptionContainer.propObservable[changedKey].value;
+            if (subscriptionContainer.propObservers)
+                finalObject[changedKey] = subscriptionContainer.propObservers[changedKey].value;
         });
 
         return finalObject;
@@ -188,11 +186,11 @@ export class Runtime {
      * Will return all tracked States
      */
     public getTrackedObserver() {
-        const finalFoundStates = this.foundStates;
+        const finalFoundStates = this.foundObservers;
 
         // Reset tracking
-        this.trackState = false;
-        this.foundStates = new Set();
+        this.trackObserver = false;
+        this.foundObservers = new Set();
 
         return finalFoundStates;
     }

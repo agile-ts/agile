@@ -44,16 +44,16 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
 
     public get output(): Array<DataType> {
         // Add state(group) to foundState (for auto tracking used states in computed functions)
-        if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this.observer);
+        if (this.agileInstance().runtime.trackObserver)
+            this.agileInstance().runtime.foundObservers.add(this.observer);
 
         return this._output;
     }
 
     public get states(): Array<State<DataType>> {
         // Add state(group) to foundState (for auto tracking used states in computed functions)
-        if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this.observer);
+        if (this.agileInstance().runtime.trackObserver)
+            this.agileInstance().runtime.foundObservers.add(this.observer);
 
         return this._states.map(state => state());
     }
@@ -65,6 +65,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
      * Checks if the group contains the primaryKey
      */
     public has(primaryKey: ItemKey) {
+        console.log(this.value);
         return this.value.findIndex(key => key === primaryKey) !== -1;
     }
 

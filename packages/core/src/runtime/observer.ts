@@ -7,12 +7,14 @@ export class Observer {
     public agileInstance: () => Agile;
 
     public _key?: ObservableKey;
-    public dep: Dep;
-    public value: any; // The current value which will be returned for instance if its a prop based subscription
+    public dep: Dep; // Dependencies and Subscriptions of the Observer
 
-    constructor(agileInstance: Agile) {
+    public hasValue: boolean = false; // Weather the Observer has an value or not
+    public value: any; // Value of the Observer if it has one
+
+    constructor(agileInstance: Agile, deps?: Array<Observer>) {
         this.agileInstance = () => agileInstance;
-        this.dep = new Dep();
+        this.dep = new Dep(deps);
     }
 
     public set key(value: StateKey | undefined) {

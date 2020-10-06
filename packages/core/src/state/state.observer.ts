@@ -9,18 +9,19 @@ import {
     defineConfig
     } from '../internal';
 
+export const internalIngestKey = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
+
 export class StateObserver<ValueType = any> extends Observer {
 
-    public nextStateValue: ValueType;
-    public state: State<ValueType>;
-    public internalIngestKey = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
+    public state: State<ValueType>; // State on which the Observer is watching
+    public nextStateValue: ValueType; // The next State value
 
     constructor(agileInstance: Agile, state: State) {
         super(agileInstance);
         this.state = state;
         this.nextStateValue = state.value;
         this.value = state.value;
-        this.key = state.key;
+        this.key = `o_${state.key}`;
     }
 
 
@@ -42,7 +43,7 @@ export class StateObserver<ValueType = any> extends Observer {
         });
 
         // Grab nextState if newState not passed or compute if needed
-        if (newStateValue === this.internalIngestKey) {
+        if (newStateValue === internalIngestKey) {
             if (this.state instanceof Computed)
                 this.nextStateValue = this.state.computeValue();
             else
@@ -110,6 +111,6 @@ export class StateObserver<ValueType = any> extends Observer {
             state.sideEffects();
 
         // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
-        job.observer.dep.deps.forEach((observer) => observer instanceof StateObserver && observer.ingest(this.internalIngestKey, {perform: false}));
+        job.observer.dep.deps.forEach((observer) => observer instanceof StateObserver && observer.ingest(internalIngestKey, {perform: false}));
     }
 }

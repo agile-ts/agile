@@ -61,7 +61,7 @@ export function useAgile<X extends Array<State | Collection | undefined>, Y exte
             () => {
                 set_({});
             },
-            depsArray
+            depsArray.map(dep => dep.observer)
         );
 
         // Unsubscribe on Unmount
