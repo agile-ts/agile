@@ -7,14 +7,14 @@ export interface JobConfigInterface {
     perform?: boolean
 }
 
-export class Job<o = Observer> {
+export class Job<ObserverType = Observer> {
 
-    public observer: o;
+    public observer: ObserverType;
     public config: JobConfigInterface;
     public rerender: boolean;
     public performed: boolean = false;
 
-    constructor(observer: o, config: JobConfigInterface) {
+    constructor(observer: ObserverType, config: JobConfigInterface) {
         // Merge default values into options
         this.config = defineConfig<JobConfigInterface>(config, {
             background: false,
@@ -22,9 +22,11 @@ export class Job<o = Observer> {
             forceRerender: false
         });
 
+
         this.observer = observer;
         this.config = config;
-        this.rerender = !config?.background || config?.forceRerender || true;
-    }
 
+        // @ts-ignore
+        this.rerender = (!config.background || config.forceRerender) && this.observer.agileInstance().integrations.hasIntegration();
+    }
 }

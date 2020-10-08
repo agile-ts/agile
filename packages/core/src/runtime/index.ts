@@ -40,9 +40,6 @@ export class Runtime {
             forceRerender: options.forceRerender
         });
 
-        // Set rerender depending on if it has an integration
-        job.rerender = this.agileInstance().integrations.hasIntegration();
-
         // Logging
         if (this.agileInstance().config.logJobs)
             console.log(`Agile: Created Job(${job.observer.key})`, job);

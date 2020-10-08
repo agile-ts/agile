@@ -35,7 +35,7 @@ export class State<ValueType = any> {
     public previousState: ValueType; // Will be set in runtime
     public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished (cleaner than always setting the state)
 
-    constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<Dep> = []) {
+    constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<State> = []) {
         this.agileInstance = () => agileInstance;
         this.initialState = initialState;
         this._key = key;
@@ -45,7 +45,7 @@ export class State<ValueType = any> {
         this.persistSettings = {
             isPersisted: false
         }
-        this.observer = new StateObserver<ValueType>(agileInstance, this);
+        this.observer = new StateObserver<ValueType>(agileInstance, this, deps.map(state => state.observer), key);
     }
 
     public set value(value: ValueType) {
@@ -62,6 +62,7 @@ export class State<ValueType = any> {
 
     public set key(value: StateKey | undefined) {
         this._key = value;
+        this.observer.key = `o_${value}`;
     }
 
     public get key(): StateKey | undefined {
