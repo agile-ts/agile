@@ -4,16 +4,18 @@ import {
     defineConfig,
     Observer,
     Job,
-    JobConfigInterface
+    JobConfigInterface,
+    CallbackSubscriptionContainer, ComponentSubscriptionContainer, StateObserver
 } from '../internal';
-import {CallbackSubscriptionContainer} from "./subscription/CallbackSubscriptionContainer";
 
 export class Runtime {
+
     public agileInstance: () => Agile;
 
     // Queue system
     private currentJob: Job | null = null;
     private jobQueue: Array<Job> = [];
+    private notReadyJobsToRerender: Array<Job> = [];
     private jobsToRerender: Array<Job> = [];
 
     // Used for tracking computed dependencies
@@ -25,7 +27,6 @@ export class Runtime {
     }
 
     public ingest(observer: Observer, options: JobConfigInterface): void {
-        // Merge default values into options
         options = defineConfig<JobConfigInterface>(options, {
             perform: true,
             background: false,
@@ -44,10 +45,10 @@ export class Runtime {
         if (this.agileInstance().config.logJobs)
             console.log(`Agile: Created Job(${job.observer.key})`, job);
 
-        // Push the Job to the Queue (safety.. that no Job get forgotten)
+        // Push the Job to the Queue
         this.jobQueue.push(job);
 
-        // Perform the Job
+        // Perform the Job and remove it from queue
         if (options.perform) {
             const performJob = this.jobQueue.shift();
             if (performJob)
@@ -66,7 +67,6 @@ export class Runtime {
      * Perform a State Update
      */
     private perform(job: Job): void {
-        // Set Job to currentJob
         this.currentJob = job;
 
         // Perform Job
@@ -92,7 +92,6 @@ export class Runtime {
         } else {
             // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
             setTimeout(() => {
-                // Cause rerender on Subscribers
                 this.updateSubscribers();
             });
         }
@@ -104,46 +103,38 @@ export class Runtime {
     //=========================================================================================================
     /**
      * @internal
-     * This will be update all Subscribers of complete jobs
+     * Updates all Subscribers
      */
     private updateSubscribers(): void {
         // Subscriptions that has to be updated
         const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<SubscriptionContainer>();
 
         // Map through Jobs to Rerender
-        this.jobsToRerender.forEach(job =>
-            // Map through subs of the current Job State
+        this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach(job =>
             job.observer.dep.subs.forEach(subscriptionContainer => {
                 // Check if subscriptionContainer is ready
-                if (!subscriptionContainer.ready)
-                    console.warn("Agile: SubscriptionContainer isn't ready yet ", subscriptionContainer);
+                if (!subscriptionContainer.ready) {
+                    this.notReadyJobsToRerender.push(job);
+                    if (this.agileInstance().config.logJobs)
+                        console.warn("Agile: SubscriptionContainer isn't ready yet ", subscriptionContainer);
+                    return;
+                }
 
                 // For a Container that require props to be passed
-                if (subscriptionContainer.passProps) {
-                    let localKey: string | null = null;
+                if (subscriptionContainer.passProps)
+                    this.handlePassProps(subscriptionContainer, job);
 
-                    // Find the local Key for this update by comparing the State instance from this Job to the State instances in the propStates object
-                    for (let key in subscriptionContainer.propObservers)
-                        if (subscriptionContainer.propObservers[key] === job.observer)
-                            localKey = key;
-
-                    // If matching key is found push it into the SubscriptionContainer propKeysChanged where it later will be build to an changed prop object
-                    if (localKey)
-                        subscriptionContainer.propKeysChanged.push(localKey);
-                }
                 subscriptionsToUpdate.add(subscriptionContainer);
-            }));
+            })
+        );
 
-        // Perform Component or Callback updates
+        // Rerender the Components via CallbackSubscriptions or ComponentSubscription
         subscriptionsToUpdate.forEach(subscriptionContainer => {
-            // If Callback based subscription call the Callback Function
-            if (subscriptionContainer instanceof CallbackSubscriptionContainer) {
+            if (subscriptionContainer instanceof CallbackSubscriptionContainer)
                 subscriptionContainer.callback();
-                return;
-            }
 
-            // If Component based subscription call the updateMethod
-            this.agileInstance().integrations.update(subscriptionContainer.component, this.formatChangedPropKeys(subscriptionContainer));
+            if (subscriptionContainer instanceof ComponentSubscriptionContainer)
+                this.agileInstance().integrations.update(subscriptionContainer.component, this.formatChangedPropKeys(subscriptionContainer));
         });
 
         // Log Job
@@ -154,6 +145,26 @@ export class Runtime {
         this.jobsToRerender = [];
     }
 
+
+    //=========================================================================================================
+    // Handle Pass Props
+    //=========================================================================================================
+    /**
+     * @internal
+     * Handle prop passing subscription
+     */
+    public handlePassProps(subscriptionContainer: SubscriptionContainer, job: Job) {
+        let localKey: string | null = null;
+
+        // Find the local Key for this update by comparing the State instance from this Job to the State instances in the propStates object
+        for (let key in subscriptionContainer.subs)
+            if (subscriptionContainer.subs[key] === job.observer)
+                localKey = key;
+
+        // If matching key is found push it into the SubscriptionContainer propKeysChanged where it later will be build to an changed prop object
+        if (localKey)
+            subscriptionContainer.propKeysChanged.push(localKey);
+    }
 
     //=========================================================================================================
     // Format Changed Prop Keys
@@ -167,8 +178,8 @@ export class Runtime {
 
         // Build Object
         subscriptionContainer.propKeysChanged.forEach(changedKey => {
-            if (subscriptionContainer.propObservers)
-                finalObject[changedKey] = subscriptionContainer.propObservers[changedKey].value;
+            if (subscriptionContainer.subs[changedKey] instanceof StateObserver)
+                finalObject[changedKey] = subscriptionContainer.subs[changedKey].value;
         });
 
         return finalObject;
@@ -182,13 +193,13 @@ export class Runtime {
      * @internal
      * Will return all tracked States
      */
-    public getTrackedObserver() {
-        const finalFoundStates = this.foundObservers;
+    public getTrackedObservers(): Set<Observer> {
+        const finalFoundObservers = this.foundObservers;
 
         // Reset tracking
         this.trackObserver = false;
         this.foundObservers = new Set();
 
-        return finalFoundStates;
+        return finalFoundObservers;
     }
 }

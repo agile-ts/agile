@@ -85,7 +85,7 @@ export class Computed<ComputedValueType = any> extends State<ComputedValueType> 
         const computedValue = this.computeFunction();
 
         // Get tracked states and set trackSate to false
-        let foundObservers = this.agileInstance().runtime.getTrackedObserver();
+        let foundObservers = this.agileInstance().runtime.getTrackedObservers();
 
         // Handle foundStates dependencies
         const newDeps: Array<Observer> = [];

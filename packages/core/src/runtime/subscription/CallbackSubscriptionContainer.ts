@@ -1,11 +1,10 @@
-import {Observer} from "../../internal";
-import {ComponentSubscriptionContainer} from "./ComponentSubscriptionContainer";
+import {Observer, SubscriptionContainer} from "../../internal";
 
-export class CallbackSubscriptionContainer extends ComponentSubscriptionContainer {
+export class CallbackSubscriptionContainer extends SubscriptionContainer{
     public callback: Function;
 
     constructor(callback: Function, subs?: Set<Observer>) {
-        super(null, subs);
+        super(subs);
 
         this.callback = callback;
     }

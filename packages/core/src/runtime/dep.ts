@@ -19,7 +19,7 @@ export class Dep {
     // Depend
     //=========================================================================================================
     /**
-     * Add new Dependency to the State
+     * Add new Dependency to the Observer
      */
     public depend(observable: Observer) {
         if (observable.dep !== this && !this.deps.has(observable))
@@ -31,7 +31,7 @@ export class Dep {
     // Subscribe
     //=========================================================================================================
     /**
-     * Add new Subscription to the State
+     * Add new Subscription to the Observer
      */
     public subscribe(subscriptionContainer: SubscriptionContainer){
         if(!this.subs.has(subscriptionContainer))
@@ -43,10 +43,10 @@ export class Dep {
     // Unsubscribe
     //=========================================================================================================
     /**
-     * Delete Subscription from the State
+     * Delete Subscription from the Observer
      */
     public unsubscribe(subscriptionContainer: SubscriptionContainer){
-        if(!this.subs.has(subscriptionContainer))
+        if(this.subs.has(subscriptionContainer))
             this.subs.delete(subscriptionContainer);
     }
 }

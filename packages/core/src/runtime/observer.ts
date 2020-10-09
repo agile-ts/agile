@@ -9,10 +9,7 @@ export class Observer<ValueType = any> {
     public _key?: ObserverKey;
     public dep: Dep; // Dependencies and Subscriptions of the Observer
 
-    public hasValue: boolean = false; // Weather the Observer has an value or not
-    public value: any; // Value of the Observer if it has one
-
-    constructor(agileInstance: Agile, deps?: Array<Observer>, key?: ObserverKey) {
+    constructor(agileInstance: Agile, deps?: Array<Observer>, key?: ObserverKey, value?: ValueType) {
         this.agileInstance = () => agileInstance;
         this.dep = new Dep(deps);
         this._key = key;

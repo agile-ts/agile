@@ -26,7 +26,6 @@ export class State<ValueType = any> {
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
     public persistSettings: PersistSettingsInterface; // Includes persist 'settings' (have to rename if I got an better name)
-    public output?: any; // This contains the public value.. if _value doesn't contain the public value (Used for example by collections)
     public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
     public observer: StateObserver;
 
@@ -292,11 +291,9 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * @internal
-     *  Returns 100% the public value of a state because at some points (group) the _value contains only keys
+     *  Returns the public value (will be overwritten for instance in group)
      */
     public getPublicValue(): ValueType {
-        if (this.output !== undefined)
-            return this.output;
         return this._value;
     }
 

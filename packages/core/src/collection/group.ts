@@ -226,4 +226,17 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
         this._states = finalStates.map(state => (() => state));
         this._output = finalOutput;
     }
+
+
+    //=========================================================================================================
+    // Get Public Value
+    //=========================================================================================================
+    /**
+     * @internal
+     *  Returns the public value
+     */
+    // @ts-ignore
+    public getPublicValue(): Array<DataType> {
+        return this.output;
+    }
 }

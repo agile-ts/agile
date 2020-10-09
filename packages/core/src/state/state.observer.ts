@@ -16,13 +16,13 @@ export class StateObserver<ValueType = any> extends Observer {
 
     public state: () => State<ValueType>; // State on which the Observer is watching
     public nextStateValue: ValueType; // The next State value
+    public value: ValueType;
 
     constructor(agileInstance: Agile, state: State, deps?: Array<Observer>, key?: ObserverKey) {
         super(agileInstance, deps, key);
         this.state = () => state;
         this.nextStateValue = state.value;
         this.value = state.value;
-        this.hasValue = true; // States always have an value
     }
 
 
