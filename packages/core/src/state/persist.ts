@@ -24,8 +24,8 @@ export async function persistValue(state: State, key?: StorageKey) {
     const storage = state.agileInstance().storage;
 
     // Check if persist State is already a isPersistState if so remove the old one
-    if (state.persistSettings.isPersisted && state.persistSettings.persistKey)
-        storage.remove(state.persistSettings.persistKey);
+    if (state.persistConfig.isPersisted && state.persistConfig.persistKey)
+        storage.remove(state.persistConfig.persistKey);
 
     // Add State to persistedStates in Storage
     storage.persistedStates.add(state);
@@ -34,7 +34,7 @@ export async function persistValue(state: State, key?: StorageKey) {
     await handleStorageValue(key, storage, state);
 
     // Set persistSettings
-    state.persistSettings = {
+    state.persistConfig = {
         isPersisted: true,
         persistKey: key
     }
@@ -48,8 +48,8 @@ export async function persistValue(state: State, key?: StorageKey) {
  * Save current _value into storage if isPersistState
  */
 export function updateValue(state: State) {
-    if (state.persistSettings.isPersisted && state.persistSettings.persistKey)
-        state.agileInstance().storage.set(state.persistSettings.persistKey, state._value);
+    if (state.persistConfig.isPersisted && state.persistConfig.persistKey)
+        state.agileInstance().storage.set(state.persistConfig.persistKey, state._value);
 }
 
 

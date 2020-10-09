@@ -1,6 +1,5 @@
 import {
     Agile,
-    Dep,
     StorageKey,
     copy,
     defineConfig,
@@ -12,7 +11,7 @@ import {persistValue, updateValue} from './persist';
 
 export type StateKey = string | number;
 
-export interface PersistSettingsInterface {
+export interface PersistConfigInterface {
     isPersisted: boolean // Is State persisted
     persistKey?: string | number // Current Persist Key.. for handling twice persisted states
 }
@@ -25,7 +24,7 @@ export class State<ValueType = any> {
     public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
-    public persistSettings: PersistSettingsInterface; // Includes persist 'settings' (have to rename if I got an better name)
+    public persistConfig: PersistConfigInterface; // Includes persist 'settings' (have to rename if I got an better name)
     public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
     public observer: StateObserver;
 
@@ -41,7 +40,7 @@ export class State<ValueType = any> {
         this._value = initialState;
         this.previousState = initialState;
         this.nextState = initialState;
-        this.persistSettings = {
+        this.persistConfig = {
             isPersisted: false
         }
         this.observer = new StateObserver<ValueType>(agileInstance, this, deps.map(state => state.observer), key);
@@ -117,11 +116,7 @@ export class State<ValueType = any> {
             forceRerender: false
         });
 
-        this.observer.ingest(internalIngestKey, {
-            background: options.background,
-            sideEffects: options.sideEffects,
-            forceRerender: options.forceRerender
-        });
+        this.observer.ingest(internalIngestKey, options);
     }
 
 
@@ -167,8 +162,8 @@ export class State<ValueType = any> {
      */
     public reset(): this {
         // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
-        if (this.persistSettings.isPersisted && this.persistSettings.persistKey)
-            this.agileInstance().storage.remove(this.persistSettings.persistKey);
+        if (this.persistConfig.isPersisted && this.persistConfig.persistKey)
+            this.agileInstance().storage.remove(this.persistConfig.persistKey);
 
         // Set State to initial State
         this.set(this.initialState);

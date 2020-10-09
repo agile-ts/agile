@@ -45,8 +45,9 @@ export class StateObserver<ValueType = any> extends Observer {
 
         // Grab nextState if newState not passed or compute if needed
         if (newStateValue === internalIngestKey) {
-            if (this.state instanceof Computed)
-                this.nextStateValue = this.state.computeValue();
+            if (this.state() instanceof Computed)
+                // @ts-ignore
+                this.nextStateValue = this.state().computeValue();
             else
                 this.nextStateValue = this.state().nextState
         } else
@@ -72,20 +73,20 @@ export class StateObserver<ValueType = any> extends Observer {
      * TOD_O
      */
     public perform(job: Job<this>) {
-        const state = job.observer.state;
+        const state = job.observer.state();
 
         // Set Previous State
-        state().previousState = copy(state().value);
+        state.previousState = copy(state.value);
 
         // Write new value into the State
-        state().privateWrite(this.nextStateValue);
+        state.privateWrite(this.nextStateValue);
 
         // Set isSet
-        state().isSet = this.nextStateValue !== state().initialState;
+        state.isSet = this.nextStateValue !== state.initialState;
 
         // Set is placeholder to false, because it has got a value
-        if (state().isPlaceholder)
-            state().isPlaceholder = false;
+        if (state.isPlaceholder)
+            state.isPlaceholder = false;
 
         // Set Observer value
         this.value = this.nextStateValue;
@@ -103,17 +104,16 @@ export class StateObserver<ValueType = any> extends Observer {
      * SideEffects are sideEffects of the perform function.. for instance the watchers
      */
     private sideEffects(job: Job<this>) {
-        const state = job.observer.state;
+        const state = job.observer.state();
 
         // Call Watchers
-        for (let watcher in state().watchers)
-            if (typeof state().watchers[watcher] === 'function')
-                state().watchers[watcher](state().getPublicValue());
+        for (let watcher in state.watchers)
+            if (typeof state.watchers[watcher] === 'function')
+                state.watchers[watcher](state.getPublicValue());
 
         // Call State SideEffects
-        if (typeof state().sideEffects === 'function' && job.config?.sideEffects)
-            // @ts-ignore
-            state().sideEffects();
+        if (typeof state.sideEffects === 'function' && job.config?.sideEffects)
+            state.sideEffects();
 
 
         // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
