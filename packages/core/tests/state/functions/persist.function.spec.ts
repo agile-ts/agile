@@ -30,7 +30,7 @@ describe('Persist Function Tests', () => {
 
         it('Has correct initial values', () => {
             expect(MY_STATE.value).to.eq(1, 'MY_STATE has correct value');
-            expect(MY_STATE.persistSettings.isPersisted).to.eq(false, 'MY_STATE has correct isPersistState');
+            expect(MY_STATE.persistConfig.isPersisted).to.eq(false, 'MY_STATE has correct isPersistState');
             expect(App.storage.persistedStates.has(MY_STATE)).to.eq(false, 'MY_STATE isn\'t in persistedStates');
             expect(App.storage.persistedStates.has(MY_STATE)).to.eq(false, 'MY_STATE isn\'t in persistedStates');
         });
@@ -39,8 +39,8 @@ describe('Persist Function Tests', () => {
             // Persist State
             MY_STATE.persist();
 
-            expect(MY_STATE.persistSettings.isPersisted).to.eq(false, 'MY_STATE has correct isPersisted');
-            expect(MY_STATE.persistSettings.persistKey).to.eq(undefined, 'MY_STATE has correct persistKey');
+            expect(MY_STATE.persistConfig.isPersisted).to.eq(false, 'MY_STATE has correct isPersisted');
+            expect(MY_STATE.persistConfig.persistKey).to.eq(undefined, 'MY_STATE has correct persistKey');
             expect(MY_STATE.key).to.eq(undefined, 'MY_STATE has correct key');
             expect(App.storage.persistedStates.has(MY_STATE)).to.eq(false, 'MY_STATE isn\'t in persistedStates');
             expect(App.storage.get('mySecondKey')).to.eq(undefined, 'MY_STATE isn\'t in storage');
@@ -53,8 +53,8 @@ describe('Persist Function Tests', () => {
             // Needs some time to persist value
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE.persistSettings.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
-            expect(MY_STATE.persistSettings.persistKey).to.eq('mySecondKey', 'MY_STATE has correct persistKey');
+            expect(MY_STATE.persistConfig.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
+            expect(MY_STATE.persistConfig.persistKey).to.eq('mySecondKey', 'MY_STATE has correct persistKey');
             expect(MY_STATE.key).to.eq('mySecondKey', 'MY_STATE key has been set to persistKey if no key is provided');
             expect(App.storage.persistedStates.has(MY_STATE)).to.eq(true, 'MY_STATE isn\'t in persistedStates');
             expect(App.storage.get('mySecondKey')).to.eq(1, 'MY_STATE is in storage');
@@ -65,8 +65,8 @@ describe('Persist Function Tests', () => {
                 // Reset State
                 MY_STATE.reset();
 
-                expect(MY_STATE.persistSettings.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
-                expect(MY_STATE.persistSettings.persistKey).to.eq('mySecondKey', 'MY_STATE has correct persistKey');
+                expect(MY_STATE.persistConfig.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
+                expect(MY_STATE.persistConfig.persistKey).to.eq('mySecondKey', 'MY_STATE has correct persistKey');
                 expect(MY_STATE.key).to.eq('mySecondKey', 'MY_STATE has correct key');
                 expect(App.storage.persistedStates.has(MY_STATE)).to.eq(true, 'MY_STATE is in persistedStates');
                 expect(App.storage.get('mySecondKey')).to.eq(undefined, 'MY_STATE isn\'t in storage');
@@ -78,8 +78,8 @@ describe('Persist Function Tests', () => {
                 // Reset State
                 MY_STATE.set(5);
 
-                expect(MY_STATE.persistSettings.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
-                expect(MY_STATE.persistSettings.persistKey).to.eq('mySecondKey', 'MY_STATE_WITH_KEY has correct persistKey');
+                expect(MY_STATE.persistConfig.isPersisted).to.eq(true, 'MY_STATE has correct isPersisted');
+                expect(MY_STATE.persistConfig.persistKey).to.eq('mySecondKey', 'MY_STATE_WITH_KEY has correct persistKey');
                 expect(App.storage.persistedStates.has(MY_STATE)).to.eq(true, 'MY_STATE_WITH_KEY is in persistedStates');
                 expect(App.storage.get('mySecondKey')).to.eq(5, 'MY_STATE_WITH_KEY is in storage and has been updated');
             });
@@ -93,7 +93,7 @@ describe('Persist Function Tests', () => {
         it('Has correct initial values', () => {
             expect(MY_STATE_WITH_KEY.value).to.eq('hello', 'MY_STATE_WITH_KEY has correct value');
             expect(MY_STATE_WITH_KEY.key).to.eq('myKey', 'MY_STATE_WITH_KEY has correct key');
-            expect(MY_STATE_WITH_KEY.persistSettings.isPersisted).to.eq(false, 'MY_STATE_WITH_KEY has correct isPersistState');
+            expect(MY_STATE_WITH_KEY.persistConfig.isPersisted).to.eq(false, 'MY_STATE_WITH_KEY has correct isPersistState');
             expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(false, 'MY_STATE_WITH_KEY isn\'t in persistedStates');
             expect(App.storage.get('myKey')).to.eq(undefined, 'MY_STATE_WITH_KEY isn\'t in storage');
         });
@@ -105,8 +105,8 @@ describe('Persist Function Tests', () => {
             // Needs some time to persist value
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE_WITH_KEY.persistSettings.isPersisted).to.eq(true, 'MY_STATE_WITH_KEY has correct isPersistState');
-            expect(MY_STATE_WITH_KEY.persistSettings.persistKey).to.eq('myKey', 'MY_STATE_WITH_KEY has correct persistKey');
+            expect(MY_STATE_WITH_KEY.persistConfig.isPersisted).to.eq(true, 'MY_STATE_WITH_KEY has correct isPersistState');
+            expect(MY_STATE_WITH_KEY.persistConfig.persistKey).to.eq('myKey', 'MY_STATE_WITH_KEY has correct persistKey');
             expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(true, 'MY_STATE_WITH_KEY is in persistedStates');
             expect(App.storage.get('myKey')).to.eq('hello', 'MY_STATE_WITH_KEY is in storage');
         });
@@ -118,8 +118,8 @@ describe('Persist Function Tests', () => {
             // Needs some time to persist value
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            expect(MY_STATE_WITH_KEY.persistSettings.isPersisted).to.eq(true, 'MY_STATE_WITH_KEY has correct isPersistState');
-            expect(MY_STATE_WITH_KEY.persistSettings.persistKey).to.eq('myThirdKey', 'MY_STATE_WITH_KEY has correct persistKey');
+            expect(MY_STATE_WITH_KEY.persistConfig.isPersisted).to.eq(true, 'MY_STATE_WITH_KEY has correct isPersistState');
+            expect(MY_STATE_WITH_KEY.persistConfig.persistKey).to.eq('myThirdKey', 'MY_STATE_WITH_KEY has correct persistKey');
             expect(MY_STATE_WITH_KEY.key).to.eq('myKey', 'MY_STATE_WITH_KEY has correct key');
             expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(true, 'MY_STATE_WITH_KEY is in persistedStates');
             expect(App.storage.get('myThirdKey')).to.eq('hello', 'MY_STATE_WITH_KEY with new key is in storage');

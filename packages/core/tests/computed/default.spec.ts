@@ -47,7 +47,8 @@ describe('Default Computed Tests', () => {
             expect(MY_COMPUTED.key).to.eq(undefined, 'MY_COMPUTED has correct initial key');
             expect(MY_COMPUTED.value).to.eq('hello_bye_jeff_hans', 'MY_COMPUTED has correct value');
             expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([]), 'MY_COMPUTED has correct hardCodedDeps');
-            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE, MY_STATE_2, MY_SELECTOR, MY_COLLECTION.findById(2)]), 'MY_COMPUTED has correct deps');
+            // @ts-ignore
+            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE.observer, MY_STATE_2.observer, MY_SELECTOR.observer, MY_COLLECTION.findById(2).observer]), 'MY_COMPUTED has correct deps');
             expect(computedCallCount).to.eq(2, 'computedCallCount has correct initial value');
             expect(rerenderCount).to.eq(0, 'rerenderCount has correct initial value');
         });
@@ -120,8 +121,9 @@ describe('Default Computed Tests', () => {
             expect(MY_COMPUTED instanceof Computed).to.eq(true, 'MY_COMPUTED is computed');
             expect(MY_COMPUTED.key).to.eq(undefined, 'MY_COMPUTED has correct initial key');
             expect(MY_COMPUTED.value).to.eq('hello_bye_jeff_hans', 'MY_COMPUTED has correct value');
-            expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([MY_STATE_3]), 'MY_COMPUTED has correct hardCodedDeps');
-            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_3, MY_STATE, MY_STATE_2, MY_SELECTOR, MY_COLLECTION.findById(2)]), 'MY_COMPUTED has correct deps');
+            expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([MY_STATE_3.observer]), 'MY_COMPUTED has correct hardCodedDeps');
+            // @ts-ignore
+            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_3.observer, MY_STATE.observer, MY_STATE_2.observer, MY_SELECTOR.observer, MY_COLLECTION.findById(2).observer]), 'MY_COMPUTED has correct deps');
             expect(computedCallCount).to.eq(2, 'computedCallCount has correct initial value');
             expect(rerenderCount).to.eq(0, 'rerenderCount has correct initial value');
         });

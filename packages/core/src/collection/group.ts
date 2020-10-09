@@ -65,7 +65,6 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
      * Checks if the group contains the primaryKey
      */
     public has(primaryKey: ItemKey) {
-        console.log(this.value);
         return this.value.findIndex(key => key === primaryKey) !== -1;
     }
 
