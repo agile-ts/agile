@@ -29,7 +29,7 @@ describe('Update Function Tests', () => {
 
     it('Has correct initial values', () => {
         expect(MY_COLLECTION.groups['default'] instanceof Group).to.eq(true, 'MY_COLLECTION default Group has been created')
-        expect(MY_COLLECTION.groups['default']?.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
+        expect(MY_COLLECTION.groups['default']?.observer.dep.subs.size === 1).to.eq(true, 'MY_COLLECTION default Group has correct subs size');
         expect(MY_COLLECTION.size).to.eq(3, 'MY_COLLECTION has correct size');
         expect(JSON.stringify(MY_COLLECTION.data[1].value)).to.eq(JSON.stringify({
             id: 1,

@@ -1,17 +1,17 @@
 import {
-    State,
-    SubscriptionContainer
+    SubscriptionContainer,
+    Observer
 } from '../internal';
 
 export class Dep {
-    public deps: Set<any> = new Set(); // Dependencies from the State
+    public deps: Set<Observer> = new Set(); // Dependencies from the State
     public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions (for instance a component subscribes to a state to get rerendered if the state changes)
 
-    constructor(initialDeps?: Array<Dep>) {
+    constructor(initialDeps?: Array<Observer>) {
         if (!initialDeps) return;
 
         // Add Initial Dependencies to Deps
-        initialDeps.forEach(dep => this.deps.add(dep));
+        initialDeps.forEach(observable => this.deps.add(observable));
     }
 
 
@@ -19,11 +19,11 @@ export class Dep {
     // Depend
     //=========================================================================================================
     /**
-     * Add new Dependency to the State
+     * Add new Dependency to the Observer
      */
-    public depend(state: State) {
-        if (state.dep !== this && !this.deps.has(state))
-            this.deps.add(state);
+    public depend(observable: Observer) {
+        if (observable.dep !== this && !this.deps.has(observable))
+            this.deps.add(observable);
     }
 
 
@@ -31,7 +31,7 @@ export class Dep {
     // Subscribe
     //=========================================================================================================
     /**
-     * Add new Subscription to the State
+     * Add new Subscription to the Observer
      */
     public subscribe(subscriptionContainer: SubscriptionContainer){
         if(!this.subs.has(subscriptionContainer))
@@ -43,10 +43,10 @@ export class Dep {
     // Unsubscribe
     //=========================================================================================================
     /**
-     * Delete Subscription from the State
+     * Delete Subscription from the Observer
      */
     public unsubscribe(subscriptionContainer: SubscriptionContainer){
-        if(!this.subs.has(subscriptionContainer))
+        if(this.subs.has(subscriptionContainer))
             this.subs.delete(subscriptionContainer);
     }
 }

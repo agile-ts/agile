@@ -1,13 +1,13 @@
 import React from "react";
-import {State, Agile, ComponentSubscriptionContainer, getAgileInstance, normalizeArray} from "@agile-ts/core";
+import {State, Agile, ComponentSubscriptionContainer, getAgileInstance, normalizeArray, Observer} from "@agile-ts/core";
 
 export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: string]: State } | State, agileInstance?: Agile) {
-    let depsArray: Array<State>;
-    let depsObject: { [key: string]: State };
+    let depsArray: Array<Observer>;
+    let depsObject: { [key: string]: Observer } = {};
 
     if (deps instanceof State || Array.isArray(deps)) {
         // Normalize Dependencies
-        depsArray = normalizeArray<State>(deps || []);
+        depsArray = normalizeArray<State>(deps || []).map(dep => dep.observer);
 
         // Get Agile Instance
         if (!agileInstance) {
@@ -19,7 +19,9 @@ export function AgileHOC(ReactComponent: any, deps?: Array<State> | { [key: stri
             }
         }
     } else if (typeof deps === "object") {
-        depsObject = deps;
+        for (let dep in deps) {
+            depsObject[dep] = deps[dep].observer;
+        }
 
         // Get Agile Instance
         if (!agileInstance) {

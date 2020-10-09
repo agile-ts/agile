@@ -1,14 +1,4 @@
-import {Agile, State} from '../../internal';
-import {ComponentSubscriptionContainer} from "./ComponentSubscriptionContainer";
-import {CallbackSubscriptionContainer} from "./CallbackSubscriptionContainer";
-
-
-//=========================================================================================================
-// Subscription Container
-//=========================================================================================================
-
-export type SubscriptionContainer = ComponentSubscriptionContainer | CallbackSubscriptionContainer;
-
+import {Agile, Observer, StateObserver, SubscriptionContainer, ComponentSubscriptionContainer, CallbackSubscriptionContainer} from '../../internal';
 
 //=========================================================================================================
 // Controller
@@ -18,10 +8,10 @@ export class SubController {
     public agileInstance: () => Agile;
 
     // Component based Subscription
-    public components: Set<ComponentSubscriptionContainer> = new Set();
+    public componentSubs: Set<ComponentSubscriptionContainer> = new Set();
 
     // Callback based Subscription
-    public callbacks: Set<CallbackSubscriptionContainer> = new Set();
+    public callbackSubs: Set<CallbackSubscriptionContainer> = new Set();
 
     public constructor(agileInstance: Agile) {
         this.agileInstance = () => agileInstance;
@@ -34,26 +24,28 @@ export class SubController {
     /**
      * Subscribe to Agile State with a returned object of props this props can than be returned by the component (See react-integration)
      */
-    public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: State } = {}): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: State['value'] } } {
+    public subscribeWithSubsObject(subscriptionInstance: any, subs: { [key: string]: Observer } = {}): { subscriptionContainer: SubscriptionContainer, props: { [key: string]: StateObserver['value'] } } {
         const subscriptionContainer = this.registerSubscription(subscriptionInstance);
 
-        const props: { [key: string]: State } = {};
+        const props: { [key: string]: Observer } = {};
         subscriptionContainer.passProps = true;
-        subscriptionContainer.propStates = {...subs};
 
         // Go through subs
         let localKeys = Object.keys(subs);
         localKeys.forEach(key => {
-            const state = subs[key];
+            const observable = subs[key];
 
             // Add State to SubscriptionContainer Subs
-            subscriptionContainer.subs.add(state);
+            subscriptionContainer.subs.add(observable);
 
             // Add SubscriptionContainer to State Subs
-            state.dep.subscribe(subscriptionContainer);
+            observable.dep.subscribe(subscriptionContainer);
+
+            // If no state instance return, because only states have a 'value'
+            if(!(observable instanceof StateObserver)) return;
 
             // Add state to props
-            props[key] = state.value;
+            props[key] = observable.value;
         });
 
         return {
@@ -69,15 +61,15 @@ export class SubController {
     /**
      * Subscribe to Agile State
      */
-    public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<State> = []): SubscriptionContainer {
+    public subscribeWithSubsArray(subscriptionInstance: any, subs: Array<Observer> = []): SubscriptionContainer {
         const subscriptionContainer = this.registerSubscription(subscriptionInstance, subs);
 
-        subs.forEach(state => {
+        subs.forEach(observable => {
             // Add State to SubscriptionContainer Subs
-            subscriptionContainer.subs.add(state);
+            subscriptionContainer.subs.add(observable);
 
-            // Add SubscriptionContainer to State Dependencies Subs
-            state.dep.subscribe(subscriptionContainer);
+            // Add SubscriptionContainer to State Subs
+            observable.dep.subscribe(subscriptionContainer);
         });
 
         return subscriptionContainer;
@@ -116,25 +108,11 @@ export class SubController {
     /**
      * Registers the Component/Callback Subscription and returns a SubscriptionContainer
      */
-    public registerSubscription(integrationInstance: any, subs: Array<State> = []): SubscriptionContainer {
+    public registerSubscription(integrationInstance: any, subs: Array<Observer> = []): SubscriptionContainer {
         if (typeof integrationInstance === 'function')
             return this.registerCallbackSubscription(integrationInstance, subs);
 
         return this.registerComponentSubscription(integrationInstance, subs);
-    }
-
-
-    //=========================================================================================================
-    // Mount
-    //=========================================================================================================
-    /**
-     * This will mount the component (Mounts currently only useful in Component based Subscription)
-     */
-    public mount(integrationInstance: any) {
-        if (!integrationInstance.componentContainer) return;
-
-        // Set Ready to true
-        integrationInstance.componentContainer.ready = true;
     }
 
 
@@ -145,7 +123,7 @@ export class SubController {
      * Registers Component Subscription
      * Note: Helper Function
      */
-    private registerComponentSubscription(componentInstance: any, subs: Array<State> = []): ComponentSubscriptionContainer {
+    private registerComponentSubscription(componentInstance: any, subs: Array<Observer> = []): ComponentSubscriptionContainer {
         // Create ComponentSubscriptionContainer
         const componentContainer = new ComponentSubscriptionContainer(componentInstance, new Set(subs));
 
@@ -154,7 +132,7 @@ export class SubController {
             componentInstance.componentSubscriptionContainer = componentContainer;
 
         // Add to components
-        this.components.add(componentContainer);
+        this.componentSubs.add(componentContainer);
 
         // Set Ready
         if (!this.agileInstance().config.waitForMount)
@@ -174,12 +152,12 @@ export class SubController {
      * Registers Callback Subscription
      * Note: Helper Function
      */
-    private registerCallbackSubscription(callbackFunction: () => void, subs: Array<State> = []): CallbackSubscriptionContainer {
+    private registerCallbackSubscription(callbackFunction: () => void, subs: Array<Observer> = []): CallbackSubscriptionContainer {
         // Create CallbackSubscriptionContainer
         const callbackContainer = new CallbackSubscriptionContainer(callbackFunction as Function, new Set(subs));
 
         // Add to callbacks
-        this.callbacks.add(callbackContainer);
+        this.callbackSubs.add(callbackContainer);
 
         // Set Ready
         callbackContainer.ready = true;
@@ -188,5 +166,18 @@ export class SubController {
             console.log("Agile: Registered Callback ", callbackContainer);
 
         return callbackContainer;
+    }
+
+
+
+    //=========================================================================================================
+    // Mount
+    //=========================================================================================================
+    /**
+     * This will mount the component (Mounts currently only useful in Component based Subscription)
+     */
+    public mount(integrationInstance: any) {
+        if (!integrationInstance.componentContainer) return;
+        integrationInstance.componentContainer.ready = true;
     }
 }

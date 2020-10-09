@@ -110,7 +110,7 @@ export class Agile {
      * @param deps Array - An array of state items to depend on
      * @param computeFunction Function - A function where the return value is the state, ran every time a dep changes
      */
-    public Computed = <ComputedValueType = any>(computeFunction: () => ComputedValueType, deps?: Array<State>) => new Computed<ComputedValueType>(this, computeFunction, deps);
+    public Computed = <ComputedValueType = any>(computeFunction: () => ComputedValueType, deps?: Array<State>) => new Computed<ComputedValueType>(this, computeFunction, deps?.map(state => state.observer));
 
 
     //=========================================================================================================

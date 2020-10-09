@@ -1,18 +1,17 @@
 import {
     Agile,
-    Dep,
     StorageKey,
     copy,
     defineConfig,
     flatMerge,
-    isValidObject
+    isValidObject,
+    StateObserver, internalIngestKey
 } from '../internal';
 import {persistValue, updateValue} from './persist';
 
-
 export type StateKey = string | number;
 
-export interface PersistSettingsInterface {
+export interface PersistConfigInterface {
     isPersisted: boolean // Is State persisted
     persistKey?: string | number // Current Persist Key.. for handling twice persisted states
 }
@@ -22,30 +21,29 @@ export class State<ValueType = any> {
 
     public _key?: StateKey; // should be a unique key/name which identifies the state
     public valueType?: string; // primitive types for js users
-    public dep: Dep; // Includes the subscriptions and dependencies of the state
     public watchers: { [key: string]: (value: any) => void } = {};
     public sideEffects?: Function;  // SideEffects can be set by extended classes, such as Groups to build their output.
     public isSet: boolean = false; // Has been changed from initial value
-    public persistSettings: PersistSettingsInterface; // Includes persist 'settings' (have to rename if I got an better name)
-    public output?: any; // This contains the public value.. if _value doesn't contain the public value (Used for example by collections)
+    public persistConfig: PersistConfigInterface; // Includes persist 'settings' (have to rename if I got an better name)
     public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
+    public observer: StateObserver;
 
     public initialState: ValueType;
     public _value: ValueType; // The current value of the state
     public previousState: ValueType; // Will be set in runtime
     public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished (cleaner than always setting the state)
 
-    constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<Dep> = []) {
+    constructor(agileInstance: Agile, initialState: ValueType, key?: StateKey, deps: Array<State> = []) {
         this.agileInstance = () => agileInstance;
         this.initialState = initialState;
-        this.dep = new Dep(deps);
         this._key = key;
         this._value = initialState;
         this.previousState = initialState;
         this.nextState = initialState;
-        this.persistSettings = {
+        this.persistConfig = {
             isPersisted: false
         }
+        this.observer = new StateObserver<ValueType>(agileInstance, this, deps.map(state => state.observer), key);
     }
 
     public set value(value: ValueType) {
@@ -54,14 +52,15 @@ export class State<ValueType = any> {
 
     public get value(): ValueType {
         // Add state to foundState (for auto tracking used states in computed functions)
-        if (this.agileInstance().runtime.trackState)
-            this.agileInstance().runtime.foundStates.add(this);
+        if (this.agileInstance().runtime.trackObserver)
+            this.agileInstance().runtime.foundObservers.add(this.observer);
 
         return this._value;
     }
 
     public set key(value: StateKey | undefined) {
         this._key = value;
+        this.observer.key = `o_${value}`;
     }
 
     public get key(): StateKey | undefined {
@@ -93,7 +92,7 @@ export class State<ValueType = any> {
             return this;
 
         // Ingest updated value
-        this.agileInstance().runtime.ingest(this, value, {
+        this.observer.ingest(value, {
             background: options.background,
             sideEffects: options.sideEffects
         });
@@ -117,11 +116,7 @@ export class State<ValueType = any> {
             forceRerender: false
         });
 
-        this.agileInstance().runtime.ingest(this, this.agileInstance().runtime.internalIngestKey, {
-            background: options.background,
-            sideEffects: options.sideEffects,
-            forceRerender: options.forceRerender
-        });
+        this.observer.ingest(internalIngestKey, options);
     }
 
 
@@ -167,8 +162,8 @@ export class State<ValueType = any> {
      */
     public reset(): this {
         // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
-        if (this.persistSettings.isPersisted && this.persistSettings.persistKey)
-            this.agileInstance().storage.remove(this.persistSettings.persistKey);
+        if (this.persistConfig.isPersisted && this.persistConfig.persistKey)
+            this.agileInstance().storage.remove(this.persistConfig.persistKey);
 
         // Set State to initial State
         this.set(this.initialState);
@@ -291,11 +286,9 @@ export class State<ValueType = any> {
     //=========================================================================================================
     /**
      * @internal
-     *  Returns 100% the public value of a state because at some points (group) the _value contains only keys
+     *  Returns the public value (will be overwritten for instance in group)
      */
     public getPublicValue(): ValueType {
-        if (this.output !== undefined)
-            return this.output;
         return this._value;
     }
 

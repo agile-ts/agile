@@ -30,7 +30,7 @@ describe('updateComputeFunction Function test_integration', () => {
         expect(MY_COMPUTED.key).to.eq(undefined, 'MY_COMPUTED has correct initial key');
         expect(MY_COMPUTED.value).to.eq('hello_bye', 'MY_COMPUTED has correct value');
         expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([]), 'MY_COMPUTED has correct hardCodedDeps');
-        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE, MY_STATE_2]), 'MY_COMPUTED has correct deps');
+        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE.observer, MY_STATE_2.observer]), 'MY_COMPUTED has correct deps');
 
         expect(myComputed).to.eq('hello_bye', 'myComputed has correct initial value');
         expect(rerenderCount).to.eq(0, 'rerenderCount has correct initial value');
@@ -47,7 +47,7 @@ describe('updateComputeFunction Function test_integration', () => {
 
         expect(MY_COMPUTED.value).to.eq('jeff_hans', 'MY_COMPUTED has correct value');
         expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([]), 'MY_COMPUTED has correct hardCodedDeps');
-        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_3, MY_STATE_4]), 'MY_COMPUTED has correct deps');
+        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_3.observer, MY_STATE_4.observer]), 'MY_COMPUTED has correct deps');
 
         expect(rerenderCount).to.eq(1, 'rerenderCount has been increased by 1');
     });
@@ -62,8 +62,8 @@ describe('updateComputeFunction Function test_integration', () => {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         expect(MY_COMPUTED.value).to.eq('bye_jeff', 'MY_COMPUTED has correct value');
-        expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([MY_STATE_4]), 'MY_COMPUTED has correct hardCodedDeps');
-        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_4, MY_STATE_2, MY_STATE_3]), 'MY_COMPUTED has correct deps');
+        expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([MY_STATE_4.observer]), 'MY_COMPUTED has correct hardCodedDeps');
+        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_4.observer, MY_STATE_2.observer, MY_STATE_3.observer]), 'MY_COMPUTED has correct deps');
 
         expect(rerenderCount).to.eq(2, 'rerenderCount has been increased by 1');
     });
@@ -79,7 +79,7 @@ describe('updateComputeFunction Function test_integration', () => {
 
         expect(MY_COMPUTED.value).to.eq('bye_jeff', 'MY_COMPUTED has correct value');
         expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([]), 'MY_COMPUTED has correct hardCodedDeps');
-        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_2, MY_STATE_3]), 'MY_COMPUTED has correct deps');
+        expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_2.observer, MY_STATE_3.observer]), 'MY_COMPUTED has correct deps');
 
         expect(rerenderCount).to.eq(2, 'rerenderCount stayed the same');
     });
@@ -96,7 +96,7 @@ describe('updateComputeFunction Function test_integration', () => {
 
             expect(MY_COMPUTED.value).to.eq('hello_jeff', 'MY_COMPUTED has correct value');
             expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([]), 'MY_COMPUTED has correct hardCodedDeps');
-            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE, MY_STATE_3]), 'MY_COMPUTED has correct deps');
+            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE.observer, MY_STATE_3.observer]), 'MY_COMPUTED has correct deps');
 
             expect(rerenderCount).to.eq(3, 'rerenderCount has been increased by 1');
         });
@@ -112,7 +112,7 @@ describe('updateComputeFunction Function test_integration', () => {
 
             expect(MY_COMPUTED.value).to.eq('hans_bye', 'MY_COMPUTED has correct value');
             expect(JSON.stringify(MY_COMPUTED.hardCodedDeps)).to.eq(JSON.stringify([]), 'MY_COMPUTED has correct hardCodedDeps');
-            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_4, MY_STATE_2]), 'MY_COMPUTED has correct deps');
+            expect(JSON.stringify(MY_COMPUTED.deps)).to.eq(JSON.stringify([MY_STATE_4.observer, MY_STATE_2.observer]), 'MY_COMPUTED has correct deps');
 
             expect(rerenderCount).to.eq(3, 'rerenderCount stayed the same');
         });

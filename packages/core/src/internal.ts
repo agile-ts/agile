@@ -8,9 +8,20 @@
 // Agile
 export * from './agile';
 
+// Runtime
+export * from './runtime';
+export * from './runtime/observer';
+export * from './runtime/dep';
+export * from './runtime/job';
+export * from './runtime/subscription/SubscriptionContainer';
+export * from './runtime/subscription/CallbackSubscriptionContainer';
+export * from './runtime/subscription/ComponentSubscriptionContainer';
+export * from './runtime/subscription/sub';
+
+
 // State
 export * from './state';
-export * from './state/dep';
+export * from './state/state.observer';
 
 // Computed
 export {Computed} from './computed';
@@ -25,12 +36,8 @@ export * from './collection/selector';
 export * from './event';
 
 // Internal Classes
-export * from './runtime';
 export * from './storage';
 export * from './integrations';
-export * from './runtime/subscription/sub';
-export * from './runtime/subscription/CallbackSubscriptionContainer';
-export * from './runtime/subscription/ComponentSubscriptionContainer';
 
 // Utils
 export * from './utils';
