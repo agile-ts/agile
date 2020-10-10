@@ -81,6 +81,7 @@ export class Storage {
       set: localStorage.setItem.bind(localStorage),
       remove: localStorage.removeItem.bind(localStorage),
     };
+
     this.storageReady = true;
   }
 
@@ -121,7 +122,7 @@ export class Storage {
   // Get
   //=========================================================================================================
   /**
-   * Gets the storage value at the provided Key
+   * Gets the value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    */
   public get<GetType = any>(
@@ -144,7 +145,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Gets the storage value at the provided Key (async)
+   * Gets the value at the provided Key (async)
    * @param {StorageKey} key - Key of the Storage property
    */
   public asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
@@ -163,7 +164,7 @@ export class Storage {
   // Set
   //=========================================================================================================
   /**
-   * Saves value into Storage
+   * Saves the value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    * @param {any} value - Value you want to save
    */
@@ -176,7 +177,7 @@ export class Storage {
   // Remove
   //=========================================================================================================
   /**
-   * Deletes value at StorageKey
+   * Removes the value at provided Key
    * @param {StorageKey} key - Key of the Storage property
    */
   public remove(key: StorageKey): void {
