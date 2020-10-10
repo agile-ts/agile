@@ -25,7 +25,7 @@ export async function persistValue(state: State, key?: StorageKey) {
     storage.remove(state.persistConfig.persistKey);
 
   // Add State to persistedStates in Storage
-  storage.persistedItems.add(state);
+  storage.persistedStates.add(state);
 
   // Call Handle which decides weather it has to add the storage value to the state or save the state into the storage
   await handleStorageValue(key, storage, state);

@@ -33,11 +33,11 @@ describe("Persist Function Tests", () => {
         false,
         "MY_STATE has correct isPersistState"
       );
-      expect(App.storage.persistedItems.has(MY_STATE)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
         false,
         "MY_STATE isn't in persistedStates"
       );
-      expect(App.storage.persistedItems.has(MY_STATE)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
         false,
         "MY_STATE isn't in persistedStates"
       );
@@ -56,7 +56,7 @@ describe("Persist Function Tests", () => {
         "MY_STATE has correct persistKey"
       );
       expect(MY_STATE.key).to.eq(undefined, "MY_STATE has correct key");
-      expect(App.storage.persistedItems.has(MY_STATE)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
         false,
         "MY_STATE isn't in persistedStates"
       );
@@ -85,7 +85,7 @@ describe("Persist Function Tests", () => {
         "mySecondKey",
         "MY_STATE key has been set to persistKey if no key is provided"
       );
-      expect(App.storage.persistedItems.has(MY_STATE)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
         true,
         "MY_STATE isn't in persistedStates"
       );
@@ -106,7 +106,7 @@ describe("Persist Function Tests", () => {
           "MY_STATE has correct persistKey"
         );
         expect(MY_STATE.key).to.eq("mySecondKey", "MY_STATE has correct key");
-        expect(App.storage.persistedItems.has(MY_STATE)).to.eq(
+        expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
           true,
           "MY_STATE is in persistedStates"
         );
@@ -130,7 +130,7 @@ describe("Persist Function Tests", () => {
           "mySecondKey",
           "MY_STATE_WITH_KEY has correct persistKey"
         );
-        expect(App.storage.persistedItems.has(MY_STATE)).to.eq(
+        expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
           true,
           "MY_STATE_WITH_KEY is in persistedStates"
         );
@@ -159,7 +159,7 @@ describe("Persist Function Tests", () => {
         false,
         "MY_STATE_WITH_KEY has correct isPersistState"
       );
-      expect(App.storage.persistedItems.has(MY_STATE_WITH_KEY)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(
         false,
         "MY_STATE_WITH_KEY isn't in persistedStates"
       );
@@ -184,7 +184,7 @@ describe("Persist Function Tests", () => {
         "myKey",
         "MY_STATE_WITH_KEY has correct persistKey"
       );
-      expect(App.storage.persistedItems.has(MY_STATE_WITH_KEY)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(
         true,
         "MY_STATE_WITH_KEY is in persistedStates"
       );
@@ -213,7 +213,7 @@ describe("Persist Function Tests", () => {
         "myKey",
         "MY_STATE_WITH_KEY has correct key"
       );
-      expect(App.storage.persistedItems.has(MY_STATE_WITH_KEY)).to.eq(
+      expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(
         true,
         "MY_STATE_WITH_KEY is in persistedStates"
       );

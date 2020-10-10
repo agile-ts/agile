@@ -5,11 +5,13 @@ import {
   isAsyncFunction,
   isFunction,
   isJsonString,
+  defineConfig,
 } from "../internal";
 
 export type StorageKey = string | number;
+export type StorageType = "localStorage" | "custom";
+
 /**
- * Configure AgileStorage
  * @param {boolean} async - If its a async storage
  * @param {string} prefix - Prefix of the storage
  * @param {Object} methods - Storage methods like (get, set, remove)
@@ -30,31 +32,30 @@ export interface StorageConfigInterface {
 export class Storage {
   public agileInstance: () => Agile;
 
-  public isAsync: boolean = false;
-  private storageReady: boolean = false;
-  private storageType: "localStorage" | "custom" = "localStorage";
-  private storagePrefix: string = "agile";
-  private storageConfig: StorageConfigInterface;
+  public storageReady: boolean = false;
+  public storageType: StorageType = "localStorage";
+  public config: StorageConfigInterface;
 
-  public persistedItems: Set<State> = new Set();
+  public persistedStates: Set<State> = new Set();
   public persistedCollections: Set<Collection> = new Set();
 
+  /**
+   * Storage
+   * @param {Agile} agileInstance - An instance of Agile
+   * @param {StorageConfigInterface} storageConfig - Config
+   */
   constructor(agileInstance: Agile, storageConfig: StorageConfigInterface) {
     this.agileInstance = () => agileInstance;
-    this.storageConfig = storageConfig;
+    this.config = defineConfig(storageConfig, {
+      prefix: "agile",
+      async: false,
+    });
 
-    // Set custom Storage prefix
-    if (storageConfig.prefix) this.storagePrefix = storageConfig.prefix;
-
-    // Set custom Storage functions
+    // If Storage Methods are provided its a custom Storage
     if (storageConfig.methods) this.storageType = "custom";
 
-    if (storageConfig.async) this.isAsync = true;
-
-    // Instantiate Custom Storage
+    // Instantiate Storage
     if (this.storageType === "custom") this.instantiateCustomStorage();
-
-    // Instantiate Local Storage
     if (this.storageType === "localStorage") this.instantiateLocalStorage();
   }
 
@@ -62,11 +63,12 @@ export class Storage {
   // Instantiate Local Storage
   //=========================================================================================================
   /**
-   * This instantiate the Local Storage
+   * @internal
+   * Instantiates the LocalStorage
    */
   private instantiateLocalStorage() {
     // Check if Local Storage is Available (For instance in ReactNative it doesn't exist)
-    if (!this.localStorageAvailable()) {
+    if (!Storage.localStorageAvailable()) {
       console.warn(
         "Agile: Local Storage is here not available.. to use the Storage functionality please provide a custom Storage!"
       );
@@ -74,7 +76,7 @@ export class Storage {
     }
 
     // Set StorageMethods to LocalStorageMethods
-    this.storageConfig.methods = {
+    this.config.methods = {
       get: localStorage.getItem.bind(localStorage),
       set: localStorage.setItem.bind(localStorage),
       remove: localStorage.removeItem.bind(localStorage),
@@ -86,34 +88,31 @@ export class Storage {
   // Instantiate Custom Storage
   //=========================================================================================================
   /**
-   * This instantiate the Custom Storage
+   * @internal
+   * Instantiates the Custom Storage
    */
   private instantiateCustomStorage() {
-    // Check Get Function
-    if (!isFunction(this.storageConfig.methods?.get)) {
+    // Validate Functions
+    if (!isFunction(this.config.methods?.get)) {
       console.error("Agile: Your GET StorageMethod isn't valid!");
       return;
     }
-
-    // Check Set Function
-    if (!isFunction(this.storageConfig.methods?.set)) {
+    if (!isFunction(this.config.methods?.set)) {
       console.error("Agile: Your SET StorageMethod isn't valid!");
       return;
     }
-
-    // Check Remove Function
-    if (!isFunction(this.storageConfig.methods?.remove)) {
+    if (!isFunction(this.config.methods?.remove)) {
       console.error("Agile: Your REMOVE StorageMethod isn't valid!");
       return;
     }
 
-    // Check if one function is async if so set is Async to true
+    // Check if custom Storage is async
     if (
-      isAsyncFunction(this.storageConfig.methods?.get) ||
-      isAsyncFunction(this.storageConfig.methods?.set) ||
-      isAsyncFunction(this.storageConfig.methods?.remove)
+      isAsyncFunction(this.config.methods?.get) ||
+      isAsyncFunction(this.config.methods?.set) ||
+      isAsyncFunction(this.config.methods?.remove)
     )
-      this.isAsync = true;
+      this.config.async = true;
 
     this.storageReady = true;
   }
@@ -122,72 +121,90 @@ export class Storage {
   // Get
   //=========================================================================================================
   /**
-   * Gets the value provided by the key from the storage
+   * Gets the storage value at the provided Key
+   * @param {StorageKey} key - Key of the Storage property
    */
   public get<GetType = any>(
     key: StorageKey
   ): GetType | Promise<GetType> | undefined {
-    if (!this.storageReady || !this.storageConfig.methods?.get) return;
+    if (!this.storageReady || !this.config.methods?.get) return;
 
     // Async Get
-    if (this.isAsync)
-      return new Promise((resolve, reject) => {
-        this.storageConfig.methods
-          ?.get(this.getStorageKey(key))
-          .then((res: any) => {
-            // If result is no Json
-            if (!isJsonString(res)) return resolve(res);
-
-            // Format Json to Object
-            resolve(JSON.parse(res));
-          })
-          .catch(reject);
-      });
+    if (this.config.async) return this.asyncGet<GetType>(key);
 
     // Normal Get
-    const res = this.storageConfig.methods.get(this.getStorageKey(key));
+    const res = this.config.methods.get(this.getStorageKey(key));
     if (isJsonString(res)) return JSON.parse(res);
 
     return res;
   }
 
   //=========================================================================================================
+  // Async Get
+  //=========================================================================================================
+  /**
+   * @internal
+   * Gets the storage value at the provided Key (async)
+   * @param {StorageKey} key - Key of the Storage property
+   */
+  public asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
+    return new Promise((resolve, reject) => {
+      this.config.methods
+        ?.get(this.getStorageKey(key))
+        .then((res: any) => {
+          if (isJsonString(res)) return resolve(JSON.parse(res));
+          resolve(res);
+        })
+        .catch(reject);
+    });
+  }
+
+  //=========================================================================================================
   // Set
   //=========================================================================================================
   /**
-   * Sets the value into the storage
+   * Saves value into Storage
+   * @param {StorageKey} key - Key of the Storage property
+   * @param {any} value - Value you want to save
    */
-  public set(key: StorageKey, value: any) {
-    if (!this.storageReady || !this.storageConfig.methods?.set) return;
-    this.storageConfig.methods.set(
-      this.getStorageKey(key),
-      JSON.stringify(value)
-    );
+  public set(key: StorageKey, value: any): void {
+    if (!this.storageReady || !this.config.methods?.set) return;
+    this.config.methods.set(this.getStorageKey(key), JSON.stringify(value));
   }
 
   //=========================================================================================================
   // Remove
   //=========================================================================================================
   /**
-   * Deletes the value that is stored with the key
+   * Deletes value at StorageKey
+   * @param {StorageKey} key - Key of the Storage property
    */
-  public remove(key: StorageKey) {
-    if (!this.storageReady || !this.storageConfig.methods?.remove) return;
-    this.storageConfig.methods.remove(this.getStorageKey(key));
+  public remove(key: StorageKey): void {
+    if (!this.storageReady || !this.config.methods?.remove) return;
+    this.config.methods.remove(this.getStorageKey(key));
   }
 
   //=========================================================================================================
-  // Helper
+  // Get Storage Key
   //=========================================================================================================
-
-  private getStorageKey(key: StorageKey) {
-    return `_${this.storagePrefix}_${key}`;
+  /**
+   * @internal
+   * Create Storage Key out of provide StorageKey
+   */
+  private getStorageKey(key: StorageKey): string {
+    return `_${this.config.prefix}_${key}`;
   }
 
-  private localStorageAvailable() {
+  //=========================================================================================================
+  // Local Storage Available
+  //=========================================================================================================
+  /**
+   * Checks if localStorage is available in this Environment
+   */
+  static localStorageAvailable(): boolean {
     try {
-      localStorage.setItem("_", "_");
-      localStorage.removeItem("_");
+      localStorage.setItem("_myDummyKey_", "myDummyValue");
+      localStorage.removeItem("_myDummyKey_");
       return true;
     } catch (e) {
       return false;

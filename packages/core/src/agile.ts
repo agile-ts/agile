@@ -131,14 +131,14 @@ export class Agile {
    */
   public configureStorage(config: StorageConfigInterface): void {
     // Get States which are already saved into a storage
-    const persistedItems = this.storage.persistedItems;
+    const persistedItems = this.storage.persistedStates;
 
     // Define new Storage
     this.storage = new Storage(this, config);
-    this.storage.persistedItems = persistedItems;
+    this.storage.persistedStates = persistedItems;
 
     // Transfer already saved items to the new Storage
-    this.storage.persistedItems.forEach((state) => state.persist(state.key));
+    this.storage.persistedStates.forEach((state) => state.persist(state.key));
     this.storage.persistedCollections.forEach((collection) =>
       collection.persist(collection.key)
     );
