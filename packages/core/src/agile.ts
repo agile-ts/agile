@@ -1,166 +1,162 @@
 import {
-    Runtime,
-    Integration,
-    SubController,
-    State,
-    Storage,
-    StorageConfigInterface,
-    Collection,
-    CollectionConfig,
-    DefaultDataItem,
-    Computed,
-    Event,
-    EventConfig,
-    DefaultEventPayload, Integrations
-} from './internal'
+  Runtime,
+  Integration,
+  State,
+  Storage,
+  StorageConfigInterface,
+  Collection,
+  CollectionConfig,
+  DefaultDataItem,
+  Computed,
+  Event,
+  EventConfig,
+  DefaultEventPayload,
+  Integrations,
+  Observer,
+} from "./internal";
 
+/**
+ * @param {boolean} logJobs - Allow Agile Logs
+ * @param {boolean} waitForMount - If Agile should wait until the component mounts
+ * @param {StorageConfigInterface} storageConfig - For setting up custom Storage
+ */
 export interface AgileConfigInterface {
-    logJobs?: boolean // If Agile should log some stuff in the console
-    waitForMount?: boolean // If Agile should wait until the component mounted (note working yet)
-    storageConfig?: StorageConfigInterface // For custom storage (default: Local Storage)
+  logJobs?: boolean;
+  waitForMount?: boolean;
+  storageConfig?: StorageConfigInterface;
 }
 
 export class Agile {
+  public runtime: Runtime;
+  public storage: Storage;
 
-    public runtime: Runtime;
-    public subController: SubController;
-    public storage: Storage;
+  // Integrations
+  public integrations: Integrations; // Integrated frameworks
+  static initialIntegrations: Integration[] = []; // Had to create this, to add integrations to Agile without creating a new Instance of it
 
-    // Integrations
-    public integrations: Integrations;
-    static initialIntegrations: Integration[] = [];
+  /**
+   * Agile
+   * @param {AgileConfigInterface} config - Config
+   */
+  constructor(public config: AgileConfigInterface = {}) {
+    this.integrations = new Integrations(this);
+    this.runtime = new Runtime(this);
+    this.storage = new Storage(this, config.storageConfig || {});
 
-    constructor(public config: AgileConfigInterface = {}) {
-        this.integrations = new Integrations(this);
-        this.subController = new SubController(this);
-        this.runtime = new Runtime(this);
-        this.storage = new Storage(this, config.storageConfig || {});
+    // Bind Frameworks to Agile
+    this.integrations.bind();
 
-        // Bind Frameworks to Agile
-        this.integrations.bind();
+    // Creates a global agileInstance
+    this.globalBind();
+  }
 
-        // Creates a global agile instance..
-        this.globalBind();
+  //=========================================================================================================
+  // Use
+  //=========================================================================================================
+  /**
+   * Integrate framework into Agile
+   * @param {Integration} integration - Integration which you want to integrate/register
+   */
+  public use(integration: Integration) {
+    this.integrations.integrate(integration);
+    return this;
+  }
+
+  //=========================================================================================================
+  // Storage
+  //=========================================================================================================
+  /**
+   * Create custom Storage
+   * @param {StorageConfigInterface} config - Config
+   */
+  public Storage = (config: StorageConfigInterface) =>
+    new Storage(this, config);
+
+  //=========================================================================================================
+  // State
+  //=========================================================================================================
+  /**
+   * Create Agile State
+   * @param {ValueType} initialValue - Initial value of the State
+   * @param {string} key - Key/Name of the State
+   */
+  public State = <ValueType>(initialValue: ValueType, key?: string) =>
+    new State<ValueType>(this, initialValue, key);
+
+  //=========================================================================================================
+  // Collection
+  //=========================================================================================================
+  /**
+   * Create Agile Collection, which olds an List of Objects
+   * @param {CollectionConfig} config - Config
+   */
+  public Collection = <DataType = DefaultDataItem>(
+    config?: CollectionConfig<DataType>
+  ) => new Collection<DataType>(this, config);
+
+  //=========================================================================================================
+  // Computed
+  //=========================================================================================================
+  /**
+   * Create Agile Computed Function, which will be updated if any dependency get updated
+   * @param {() => ComputedValueType} computeFunction - Computed Function
+   * @param {Array<State>} deps - Deps of the Computed Function
+   */
+  public Computed = <ComputedValueType = any>(
+    computeFunction: () => ComputedValueType,
+    deps?: Array<State | Observer>
+  ) =>
+    new Computed<ComputedValueType>(
+      this,
+      computeFunction,
+      deps?.map((dep) => (dep instanceof State ? dep.observer : dep))
+    );
+
+  //=========================================================================================================
+  // Event
+  //=========================================================================================================
+  /**
+   * Create Agile Event
+   * @param {EventConfig} config - Config
+   */
+  public Event = <PayloadType = DefaultEventPayload>(config?: EventConfig) =>
+    new Event<PayloadType>(this, config);
+
+  //=========================================================================================================
+  // Set Storage
+  //=========================================================================================================
+  /**
+   * Configure AgileStorage
+   * @param {StorageConfigInterface} config - Config
+   */
+  public configureStorage(config: StorageConfigInterface): void {
+    // Get States which are already saved into a storage
+    const persistedItems = this.storage.persistedItems;
+
+    // Define new Storage
+    this.storage = new Storage(this, config);
+    this.storage.persistedItems = persistedItems;
+
+    // Transfer already saved items to the new Storage
+    this.storage.persistedItems.forEach((state) => state.persist(state.key));
+    this.storage.persistedCollections.forEach((collection) =>
+      collection.persist(collection.key)
+    );
+  }
+
+  //=========================================================================================================
+  // Global Bind
+  //=========================================================================================================
+  /**
+   * @internal
+   * Creates a global reference to the first agileInstance created
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+   */
+  private globalBind() {
+    try {
+      if (!globalThis.__agile) globalThis.__agile = this;
+    } catch (error) {
+      console.warn("Failed to create global agileInstance");
     }
-
-
-    //=========================================================================================================
-    // Use
-    //=========================================================================================================
-    /**
-     * Use custom Integration
-     */
-    public use(integration: Integration) {
-        this.integrations.integrate(integration);
-        return this;
-    }
-
-
-    //=========================================================================================================
-    // API
-    //=========================================================================================================
-    /**
-     * Create Agile API
-     * @param config Object
-     * @param config.options Object - Typescript default: RequestInit (headers, credentials, mode, etc...)
-     * @param config.baseURL String - Url to prepend to endpoints (without trailing slash)
-     * @param config.timeout Number - Time to wait for request before throwing error
-     */
-    // public API = (config: apiConfig) => new API(config);
-
-
-
-    //=========================================================================================================
-    // Storage
-    //=========================================================================================================
-    /**
-     * Create Agile Storage
-     */
-    public Storage = (config: StorageConfigInterface) => new Storage(this, config);
-
-
-    //=========================================================================================================
-    // State
-    //=========================================================================================================
-    /**
-     * Create Agile State
-     * @param initialState Any - the value to initialize a State instance with
-     * @key State key/name which identifies the state
-     */
-    public State = <ValueType>(initialState: ValueType, key?: string) => new State<ValueType>(this, initialState, key);
-
-
-    //=========================================================================================================
-    // Collection
-    //=========================================================================================================
-    /**
-     * Create Agile Collection
-     * @param config object | function returning object
-     * @param config.primaryKey string - The primary key for the collection.
-     * @param config.groups object - Define groups for this collection.
-     */
-    public Collection = <DataType = DefaultDataItem>(config?: CollectionConfig<DataType>) => new Collection<DataType>(this, config);
-
-
-    //=========================================================================================================
-    // Computed
-    //=========================================================================================================
-    /**
-     * Create a Agile computed function
-     * @param deps Array - An array of state items to depend on
-     * @param computeFunction Function - A function where the return value is the state, ran every time a dep changes
-     */
-    public Computed = <ComputedValueType = any>(computeFunction: () => ComputedValueType, deps?: Array<State>) => new Computed<ComputedValueType>(this, computeFunction, deps?.map(state => state.observer));
-
-
-    //=========================================================================================================
-    // Event
-    //=========================================================================================================
-    /**
-     * Create a Pulse Event
-     */
-    public Event = <PayloadType = DefaultEventPayload>(config?: EventConfig) => new Event<PayloadType>(this, config);
-
-
-    //=========================================================================================================
-    // Set Storage
-    //=========================================================================================================
-    /**
-     * Configures the Agile Storage
-     * @param storageConfig
-     */
-    public setStorage(storageConfig: StorageConfigInterface): void {
-        // Get States which are already saved into a storage
-        const persistedStates = this.storage.persistedStates;
-
-        // Define new Storage
-        this.storage = new Storage(this, storageConfig);
-        this.storage.persistedStates = persistedStates;
-
-        // Save all already saved states into the new Storage
-        this.storage.persistedStates.forEach(state => state.persist(state.key));
-
-        // Save all already saved collections into the new Storage
-        this.storage.persistedCollections.forEach(collection => collection.persist(collection.key));
-    }
-
-
-    //=========================================================================================================
-    // Global Bind
-    //=========================================================================================================
-    /**
-     * @internal
-     * Creates a global reference to the first pulse instance created this runtime
-     */
-    private globalBind() {
-        try {
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
-            // @ts-ignore
-            if (!globalThis.__agile) globalThis.__agile = this;
-        } catch (error) {
-            // fail silently
-        }
-    }
+  }
 }
-
-

@@ -1,179 +1,194 @@
-import {
-    State,
-    Agile,
-    Event,
-    Collection
-} from './internal';
-
+import { State, Agile, Event, Collection } from "./internal";
 
 //=========================================================================================================
 // Copy
 //=========================================================================================================
 /**
- * Copy an array or object.. without any dependencies
+ * Creates a fresh copy of an Array or Object
+ * @param {any | Array<any>} value - Array/Object which you want to copy
  */
 export function copy<T = any>(value: T): T;
 export function copy<T extends Array<T>>(value: T): T[];
 export function copy<T = any>(value: T): T | T[] {
-    if (Array.isArray(value))
-        return [...value];
-
-    if (isValidObject(value))
-        return {...value};
-
-    return value;
+  if (Array.isArray(value)) return [...value];
+  if (isValidObject(value)) return { ...value };
+  return value;
 }
-
 
 //=========================================================================================================
 // Is Valid Object
 //=========================================================================================================
 /**
- * Checks if an Object is an valid object for Agile
+ * Checks if an Value is a valid Object
  * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
+ * @param {any} value - Value you want to check if its a valid Object
  */
 export function isValidObject(value: any): boolean {
-    function isHTMLElement(obj: any) {
-        try {
-            return obj instanceof HTMLElement;
-        } catch (e) {
-            return typeof obj === 'object' && obj.nodeType === 1 && typeof obj.style === 'object' && typeof obj.ownerDocument === 'object';
-        }
+  function isHTMLElement(obj: any) {
+    try {
+      return obj instanceof HTMLElement;
+    } catch (e) {
+      return (
+        typeof obj === "object" &&
+        obj.nodeType === 1 &&
+        typeof obj.style === "object" &&
+        typeof obj.ownerDocument === "object"
+      );
     }
+  }
 
-    return value !== null && typeof value === 'object' && !isHTMLElement(value) && !Array.isArray(value);
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    !isHTMLElement(value) &&
+    !Array.isArray(value)
+  );
 }
-
 
 //=========================================================================================================
 // Normalize Array
 //=========================================================================================================
 /**
- * Convert item into an array
+ * Will transform items into an Array
+ * @param {DataType | Array<DataType>} items - Item/s you want to transform into an array
  */
-export function normalizeArray<DataType = any>(items?: DataType | Array<DataType>): Array<DataType> {
-    // Return empty array if no items
-    if (!items)
-        return [];
+export function normalizeArray<DataType = any>(
+  items?: DataType | Array<DataType>
+): Array<DataType> {
+  // Return empty array if no items
+  if (!items) return [];
 
-    return Array.isArray(items) ? items : [items as DataType];
+  return Array.isArray(items) ? items : [items as DataType];
 }
-
 
 //=========================================================================================================
 // Get Instance
 //=========================================================================================================
 /**
- * Tries to get AgileInstance from instance(State, Collection)
+ * Tries to get the agileInstance from the provided instances
+ * If no agileInstance found it will return the global bound agileInstance
+ * @param {any} instance - Instance which could hold an AgileInstance
  */
 export function getAgileInstance(instance: any): Agile | null {
-    try {
-        // Return state agileInstance
-        if (instance instanceof State)
-            return instance.agileInstance();
+  try {
+    // Return state agileInstance
+    if (instance instanceof State) return instance.agileInstance();
 
-        if (instance instanceof Event)
-            return instance.agileInstance();
+    if (instance instanceof Event) return instance.agileInstance();
 
-        if (instance instanceof Collection)
-            return instance.agileInstance();
+    if (instance instanceof Collection) return instance.agileInstance();
 
-        // Return the globalBind agile instance
-        // @ts-ignore
-        return globalThis.__agile;
-    } catch (e) {
-        // fail silently
-    }
-
-    return null
+    // Return a global bound agileInstance (set in first instantiation of Agile)
+    return globalThis.__agile;
+  } catch (e) {
+    // fail silently
+  }
+  return null;
 }
-
 
 //=========================================================================================================
 // Is Function
 //=========================================================================================================
 /**
- * Checks if func is a function
+ * Checks if @func is an function
+ * @param {any} value - Value you want to check if its a function
  */
-export function isFunction(func: any) {
-    return typeof func === 'function';
+export function isFunction(value: any): boolean {
+  return typeof value === "function";
 }
-
 
 //=========================================================================================================
 // Is Async Function
 //=========================================================================================================
 /**
- * Checks if func is a async function
+ * Checks if func is an async function
+ * @param {any} value - Value you want to check if its a async function
  */
-export function isAsyncFunction(func: any) {
-    return isFunction(func) && func.constructor.name === 'AsyncFunction';
+export function isAsyncFunction(value: any): boolean {
+  return isFunction(value) && value.constructor.name === "AsyncFunction";
 }
-
 
 //=========================================================================================================
 // Is Valid Url
-// https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
 //=========================================================================================================
 /**
- * Checks if url is valid
+ * checks the correctness of the url
+ * https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
+ * @param {string} url - Url you want to check if its valid
  */
 export function isValidUrl(url: string): boolean {
-    const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
-    return pattern.test(url);
+  const pattern = new RegExp(
+    "^(https?:\\/\\/)?" + // protocol
+    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+    "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  );
+  return pattern.test(url);
 }
-
 
 //=========================================================================================================
 // Is Json String
 //=========================================================================================================
 /**
  * Checks if value is a valid JsonString
+ * @param {any} value - Value you want to check if its an JsonString
  */
-export function isJsonString(value: any) {
-    try {
-        JSON.parse(value);
-    } catch (e) {
-        return false;
-    }
-    return true;
+export function isJsonString(value: any): boolean {
+  try {
+    JSON.parse(value);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
 
 //=========================================================================================================
 // Define Config
 //=========================================================================================================
 /**
- * Will create a config (config) and merges default values (default) into this config (config)
+ * Merges default values into config
+ * @param {ConfigInterface} config - Config which should receive the default values
+ * @param {Object} defaults - Default values which will be merged into config
  */
-export function defineConfig<C>(config: C, defaults: object): C {
-    return {...defaults, ...config};
+export function defineConfig<ConfigInterface = Object>(
+  config: ConfigInterface,
+  defaults: Object
+): ConfigInterface {
+  return flatMerge(config, defaults, { addNewProperties: false });
 }
-
 
 //=========================================================================================================
 // Flat Merge
 //=========================================================================================================
 /**
- * Merged the items flat into the object
+ * @param {boolean} addNewProperties - Add new properties to source Object or not
  */
-export function flatMerge<DataType = Object>(source: DataType, changes: Object, config: { addNewProperties?: boolean } = {}): DataType {
-    // Copy Source to avoid reference
-    const _source = copy<DataType>(source);
+export interface FlatMergeConfigInterface {
+  addNewProperties?: boolean;
+}
+/**
+ * Merge items into object but only at the top level
+ * @param {DataType} source - Source object
+ * @param {Object} changes - Changes you want to merge into the source object
+ * @param {Object} config - Config
+ */
+export function flatMerge<DataType = Object>(
+  source: DataType,
+  changes: Object,
+  config: FlatMergeConfigInterface = {}
+): DataType {
+  // Copy Source to avoid references
+  const _source = copy<DataType>(source);
 
-    // Loop through changes object and merge changes into source
-    let keys = Object.keys(changes);
-    keys.forEach(property => {
-        // @ts-ignore https://stackoverflow.com/questions/18452920/continue-in-cursor-foreach
-        if (!config.addNewProperties && !_source[property]) return;
+  // Loop through source object an merge changes into it
+  let keys = Object.keys(changes);
+  keys.forEach((property) => {
+    if (!config.addNewProperties && !_source[property]) return;
+    _source[property] = changes[property];
+  });
 
-        // @ts-ignore
-        _source[property] = changes[property];
-    });
-
-    return _source;
+  return _source;
 }
