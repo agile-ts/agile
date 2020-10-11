@@ -157,7 +157,7 @@ export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
   defaults: Object
 ): ConfigInterface {
-  return flatMerge(config, defaults, { addNewProperties: false });
+  return { ...defaults, ...config };
 }
 
 //=========================================================================================================
@@ -182,6 +182,7 @@ export function flatMerge<DataType = Object>(
 ): DataType {
   // Copy Source to avoid references
   const _source = copy<DataType>(source);
+  if (!_source) return _source;
 
   // Loop through source object an merge changes into it
   let keys = Object.keys(changes);
@@ -191,4 +192,28 @@ export function flatMerge<DataType = Object>(
   });
 
   return _source;
+}
+
+//=========================================================================================================
+// Equals
+//=========================================================================================================
+/**
+ * Check if 2 values are equal
+ * @param {any} value1 - First Value
+ * @param {any} value2 - Second Value
+ */
+export function equal(value1: any, value2: any): boolean {
+  return value1 === value2 || JSON.stringify(value1) === JSON.stringify(value2);
+}
+
+//=========================================================================================================
+// Not Equals
+//=========================================================================================================
+/**
+ * Check if 2 values aren't equal
+ * @param {any} value1 - First Value
+ * @param {any} value2 - Second Value
+ */
+export function notEqual(value1: any, value2: any): boolean {
+  return value1 !== value2 && JSON.stringify(value1) !== JSON.stringify(value2);
 }

@@ -36,14 +36,12 @@ export class Runtime {
       perform: true,
       background: false,
       sideEffects: true,
-      forceRerender: false,
     });
 
     // Create Job
     const job = new Job(observer, {
       background: options.background,
       sideEffects: options.sideEffects,
-      forceRerender: options.forceRerender,
     });
 
     // Logging

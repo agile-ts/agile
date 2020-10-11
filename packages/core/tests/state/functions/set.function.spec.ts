@@ -29,7 +29,7 @@ describe("Set Function Tests", () => {
       true,
       "MY_STATE has correct subs size (Subs are components/callbackFunctions which causes rerender)"
     );
-    expect(typeof MY_STATE.sideEffects === "function").to.eq(
+    expect(typeof MY_STATE.sideEffects["test"] === "function").to.eq(
       true,
       "MY_STATE has sideEffect function"
     );

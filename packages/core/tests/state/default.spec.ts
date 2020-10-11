@@ -23,8 +23,8 @@ describe("Default State Tests", () => {
       );
       expect(MY_STATE.key).to.eq(undefined, "MY_STATE has correct key");
       expect(MY_STATE._key).to.eq(undefined, "My_STATE has correct _key");
-      expect(MY_STATE.sideEffects).to.eq(
-        undefined,
+      expect(JSON.stringify(MY_STATE.sideEffects)).to.eq(
+        JSON.stringify({}),
         "MY_STATE has no sideEffects"
       );
       expect(MY_STATE.nextState).to.eq(
