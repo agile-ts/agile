@@ -35,6 +35,7 @@ export class Agile {
   static initialIntegrations: Integration[] = []; // Had to create this, to add integrations to Agile without creating a new Instance of it
 
   /**
+   * @public
    * Agile
    * @param {AgileConfigInterface} config - Config
    */
@@ -54,6 +55,7 @@ export class Agile {
   // Use
   //=========================================================================================================
   /**
+   * @public
    * Integrate framework into Agile
    * @param {Integration} integration - Integration which you want to integrate/register
    */
@@ -66,6 +68,7 @@ export class Agile {
   // Storage
   //=========================================================================================================
   /**
+   * @public
    * Create custom Storage
    * @param {StorageConfigInterface} config - Config
    */
@@ -76,6 +79,7 @@ export class Agile {
   // State
   //=========================================================================================================
   /**
+   * @public
    * Create Agile State
    * @param {ValueType} initialValue - Initial value of the State
    * @param {string} key - Key/Name of the State
@@ -87,6 +91,7 @@ export class Agile {
   // Collection
   //=========================================================================================================
   /**
+   * @public
    * Create Agile Collection, which olds an List of Objects
    * @param {CollectionConfig} config - Config
    */
@@ -98,6 +103,7 @@ export class Agile {
   // Computed
   //=========================================================================================================
   /**
+   * @public
    * Create Agile Computed Function, which will be updated if any dependency get updated
    * @param {() => ComputedValueType} computeFunction - Computed Function
    * @param {Array<State>} deps - Deps of the Computed Function
@@ -116,6 +122,7 @@ export class Agile {
   // Event
   //=========================================================================================================
   /**
+   * @public
    * Create Agile Event
    * @param {EventConfig} config - Config
    */
@@ -126,6 +133,7 @@ export class Agile {
   // Set Storage
   //=========================================================================================================
   /**
+   * @public
    * Configure AgileStorage
    * @param {StorageConfigInterface} config - Config
    */
@@ -142,6 +150,17 @@ export class Agile {
     this.storage.persistedCollections.forEach((collection) =>
       collection.persist(collection.key)
     );
+  }
+
+  //=========================================================================================================
+  // Has Integration
+  //=========================================================================================================
+  /**
+   * @public
+   * Checks if Agile has registered any Integration
+   */
+  public hasIntegration(): boolean {
+    return this.integrations.hasIntegration();
   }
 
   //=========================================================================================================

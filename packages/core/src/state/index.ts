@@ -7,47 +7,66 @@ import {
   isValidObject,
   StateObserver,
   internalIngestKey,
+  StatePersistManager,
+  Observer,
+  equal,
+  StateJobConfigInterface,
 } from "../internal";
-import { StatePersistManager } from "./state.persist";
 
 export type StateKey = string | number;
+
+/**
+ * @param {boolean} background - If assigning a the new value should happen in the background -> not causing a rerender
+ * @param {boolean} sideEffects - If Side Effects of the State should get executed (sideEffects)
+ */
+export interface SetConfigInterface {
+  background?: boolean;
+  sideEffects?: boolean;
+}
 
 export class State<ValueType = any> {
   public agileInstance: () => Agile;
 
-  public _key?: StateKey; // should be a unique key/name which identifies the state
+  public _key?: StateKey;
   public valueType?: string; // primitive types for js users
-  public watchers: { [key: string]: (value: any) => void } = {};
-  public sideEffects: { [key: string]: () => void } = {}; // SideEffects during the Runtime process
-  public isSet: boolean = false; // Has been changed from initial value
-  public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
-
-  public observer: StateObserver;
-
-  public isPersisted: boolean = false;
-  public persistManager: StatePersistManager | undefined;
-
+  public isSet: boolean = false; // If value has is not the same as initialValue
+  public isPlaceholder: boolean = false; // If placeholder its just a placeholder of a state, because the state isn't defined yet
   public initialState: ValueType;
-  public _value: ValueType; // The current value of the state
-  public previousState: ValueType; // Will be set in runtime
-  public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished (cleaner than always setting the state)
+  public _value: ValueType; // Current Value of the State
+  public previousState: ValueType;
+  public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished
 
+  public observer: StateObserver; // Handles deps and subs of the State (rerender stuff)
+  public sideEffects: { [key: string]: () => void } = {}; // SideEffects during the Runtime process
+
+  public isPersisted: boolean = false; // If the State got saved in Storage
+  public persistManager: StatePersistManager | undefined; // Manages saving the State into Storage
+
+  public watchers: { [key: string]: (value: any) => void } = {};
+
+  /**
+   * State
+   * @param {Agile} agileInstance - An instance of Agile
+   * @param {ValueType} initialValue - Initial Value of the State
+   * @param {StateKey} key - Key/Name of the State
+   * @param {Array<Observer>} deps - Initial deps of the State
+   */
   constructor(
     agileInstance: Agile,
-    initialState: ValueType,
+    initialValue: ValueType,
     key?: StateKey,
-    deps: Array<State> = []
+    deps: Array<Observer> = []
   ) {
     this.agileInstance = () => agileInstance;
-    this.initialState = initialState;
+    this.initialState = initialValue;
     this._key = key;
-    this._value = initialState;
-    this.previousState = initialState;
-    this.nextState = initialState;
+    this._value = initialValue;
+    this.previousState = initialValue;
+    this.nextState = initialValue;
     this.observer = new StateObserver<ValueType>(
       agileInstance,
       this,
-      deps.map((state) => state.observer),
+      deps,
       key
     );
   }
@@ -57,7 +76,7 @@ export class State<ValueType = any> {
   }
 
   public get value(): ValueType {
-    // Add state to foundState (for auto tracking used states in computed functions)
+    // Add state to Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObserver)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
@@ -65,8 +84,19 @@ export class State<ValueType = any> {
   }
 
   public set key(value: StateKey | undefined) {
+    const oldKey = this._key;
+
+    // Change State Key
     this._key = value;
+
+    // Change Key in Observer
     this.observer.key = `o_${value}`;
+
+    // Change Key in PersistManager
+    if (this.isPersisted && this.persistManager) {
+      if (value && this.persistManager.key === oldKey)
+        this.persistManager.key = value;
+    }
   }
 
   public get key(): StateKey | undefined {
@@ -77,36 +107,28 @@ export class State<ValueType = any> {
   // Set
   //=========================================================================================================
   /**
-   * Directly set state to a new value
+   * @public
+   * Update the Value of the State
+   * @param {ValueType} value - The new Value which you want to assign to the State
+   * @param {SetConfigInterface} config - Config
    */
-  public set(
-    value: ValueType,
-    options: { background?: boolean; sideEffects?: boolean } = {}
-  ): this {
-    // Assign defaults to options
-    options = defineConfig(options, {
+  public set(value: ValueType, config: SetConfigInterface = {}): this {
+    config = defineConfig(config, {
       sideEffects: true,
       background: false,
     });
 
-    // Check if Type is Correct
+    // Check if Type is Correct (js)
     if (this.valueType && !this.isCorrectType(value)) {
-      console.warn(
-        `Agile: Incorrect type (${typeof value}) was provided. Type fixed to ${
-          this.valueType
-        }`
-      );
+      console.warn(`Agile: Incorrect type (${typeof value}) was provided.`);
       return this;
     }
 
-    // Check if something has changed (stringifying because of possible object or array)
-    if (JSON.stringify(this.value) === JSON.stringify(value)) return this;
+    // Check if value has changed
+    if (equal(this.value, value)) return this;
 
     // Ingest updated value
-    this.observer.ingest(value, {
-      background: options.background,
-      sideEffects: options.sideEffects,
-    });
+    this.observer.ingest(value, config);
 
     return this;
   }
@@ -116,23 +138,17 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Will ingest the nextState or the computedValue (rebuilds state)
+   * Ingests the nextState, computedValue into the runtime
+   * @param {StateJobConfigInterface} config - Config
    */
-  public ingest(
-    options: {
-      background?: boolean;
-      sideEffects?: boolean;
-      forceRerender?: boolean;
-    } = {}
-  ) {
-    // Assign defaults to options
-    options = defineConfig(options, {
+  public ingest(config: StateJobConfigInterface = {}): this {
+    config = defineConfig(config, {
       sideEffects: true,
       background: false,
       forceRerender: false,
     });
-
-    this.observer.ingest(internalIngestKey, options);
+    this.observer.ingest(internalIngestKey, config);
+    return this;
   }
 
   //=========================================================================================================
@@ -143,7 +159,6 @@ export class State<ValueType = any> {
    * @param type - wished type of the state
    */
   public type(type: any): this {
-    // Supported types
     const supportedTypes = ["String", "Boolean", "Array", "Object", "Number"];
 
     // Check if type is a supported Type
@@ -158,7 +173,6 @@ export class State<ValueType = any> {
       return this;
     }
 
-    // Set valueType
     this.valueType = type.name.toLowerCase();
     return this;
   }

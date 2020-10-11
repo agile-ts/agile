@@ -40,6 +40,7 @@ export class Storage {
   public persistedCollections: Set<Collection> = new Set();
 
   /**
+   * @public
    * Storage
    * @param {Agile} agileInstance - An instance of Agile
    * @param {StorageConfigInterface} storageConfig - Config
@@ -122,6 +123,7 @@ export class Storage {
   // Get
   //=========================================================================================================
   /**
+   * @public
    * Gets the value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    */
@@ -148,7 +150,7 @@ export class Storage {
    * Gets the value at the provided Key (async)
    * @param {StorageKey} key - Key of the Storage property
    */
-  public asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
+  private asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
     return new Promise((resolve, reject) => {
       this.config.methods
         ?.get(this.getStorageKey(key))
@@ -164,6 +166,7 @@ export class Storage {
   // Set
   //=========================================================================================================
   /**
+   * @public
    * Saves/Updates the value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    * @param {any} value - Value you want to save
@@ -177,6 +180,7 @@ export class Storage {
   // Remove
   //=========================================================================================================
   /**
+   * @public
    * Removes the value at provided Key
    * @param {StorageKey} key - Key of the Storage property
    */
@@ -200,6 +204,7 @@ export class Storage {
   // Local Storage Available
   //=========================================================================================================
   /**
+   * @internal
    * Checks if localStorage is available in this Environment
    */
   static localStorageAvailable(): boolean {

@@ -28,6 +28,7 @@ export class Integrations {
   public integrations: Set<Integration> = new Set(); // All Integrations that got registered
 
   /**
+   * @internal
    * Integration
    * @param {Agile} agileInstance - An Instance of Agile
    */
@@ -44,6 +45,7 @@ export class Integrations {
   // Integrate
   //=========================================================================================================
   /**
+   * @internal
    * Integrates a framework into Agile
    * @param {Integration} integration - Integration which you want to integrate/register
    */
@@ -97,6 +99,7 @@ export class Integrations {
   // Has Integration
   //=========================================================================================================
   /**
+   * @internal
    * Checks if Agile has registered any Integration
    */
   public hasIntegration(): boolean {

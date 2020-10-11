@@ -30,6 +30,7 @@ export class StateObserver<ValueType = any> extends Observer {
   public value: ValueType; // Current State value
 
   /**
+   * @internal
    * State Observer
    * @param {Agile} agileInstance - An instance of Agile
    * @param {State} state - State

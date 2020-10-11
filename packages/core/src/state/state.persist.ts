@@ -8,6 +8,7 @@ export class StatePersistManager<ValueType = any> {
   public ready: boolean = false;
 
   /**
+   * @internal
    * State Persist Manager - Handles the permanent saving of a State
    * @param {Agile} agileInstance - An instance of Agile
    * @param {State} state - State you want to save
@@ -87,6 +88,7 @@ export class StatePersistManager<ValueType = any> {
   // Load Value
   //=========================================================================================================
   /**
+   * @internal
    * Loads the State Value from the Storage
    */
   public async loadValue(): Promise<ValueType | undefined> {
@@ -98,6 +100,7 @@ export class StatePersistManager<ValueType = any> {
   // Set Value
   //=========================================================================================================
   /**
+   * @internal
    * Saves/Updates the State Value in the Storage
    * @param {ValueType} value - Value you want to save
    */
@@ -110,6 +113,7 @@ export class StatePersistManager<ValueType = any> {
   // Remove Value
   //=========================================================================================================
   /**
+   * @internal
    * Removes the State Value from the Storage
    */
   public removeValue(): void {
