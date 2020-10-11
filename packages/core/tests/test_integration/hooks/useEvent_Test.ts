@@ -1,5 +1,8 @@
-import {Event, EventCallbackFunction} from '../../../src';
+import { Event, EventCallbackFunction } from "../../../src";
 
-export function useEvent_Test<E extends Event>(event: E, callback: EventCallbackFunction<E['payload']>) {
-    event.on(callback);
+export function useEvent_Test<E extends Event>(
+  event: E,
+  callback: EventCallbackFunction<E["payload"]>
+) {
+  event.on(callback);
 }
