@@ -8,14 +8,9 @@ import {
   StateObserver,
   internalIngestKey,
 } from "../internal";
-import { persistValue, updateValue } from "./persist";
+import { StatePersistManager } from "./state.persist";
 
 export type StateKey = string | number;
-
-export interface PersistConfigInterface {
-  isPersisted: boolean; // Is State persisted
-  persistKey?: string | number; // Current Persist Key.. for handling twice persisted states
-}
 
 export class State<ValueType = any> {
   public agileInstance: () => Agile;
@@ -25,9 +20,12 @@ export class State<ValueType = any> {
   public watchers: { [key: string]: (value: any) => void } = {};
   public sideEffects: { [key: string]: () => void } = {}; // SideEffects during the Runtime process
   public isSet: boolean = false; // Has been changed from initial value
-  public persistConfig: PersistConfigInterface; // Includes persist 'settings' (have to rename if I got an better name)
   public isPlaceholder: boolean = false; // Defines if the state is a placeholder or not
+
   public observer: StateObserver;
+
+  public isPersisted: boolean = false;
+  public persistManager: StatePersistManager | undefined;
 
   public initialState: ValueType;
   public _value: ValueType; // The current value of the state
@@ -46,9 +44,6 @@ export class State<ValueType = any> {
     this._value = initialState;
     this.previousState = initialState;
     this.nextState = initialState;
-    this.persistConfig = {
-      isPersisted: false,
-    };
     this.observer = new StateObserver<ValueType>(
       agileInstance,
       this,
@@ -186,8 +181,8 @@ export class State<ValueType = any> {
    */
   public reset(): this {
     // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
-    if (this.persistConfig.isPersisted && this.persistConfig.persistKey)
-      this.agileInstance().storage.remove(this.persistConfig.persistKey);
+    if (this.isPersisted && this.persistManager)
+      this.persistManager.removeValue();
 
     // Set State to initial State
     this.set(this.initialState);
@@ -285,7 +280,20 @@ export class State<ValueType = any> {
    * @param key - the storage key (if no key passed it will take the state key)
    */
   public persist(key?: StorageKey): this {
-    persistValue(this, key);
+    if (this.isPersisted && this.persistManager) {
+      console.warn(`Agile: The State '${this.key}' is already persisted!`);
+
+      // Update Key in PersistManager
+      if (key) this.persistManager.key = key;
+      return this;
+    }
+
+    // Create new PersistManager instance
+    this.persistManager = new StatePersistManager<ValueType>(
+      this.agileInstance(),
+      this,
+      key
+    );
     return this;
   }
 
@@ -355,7 +363,8 @@ export class State<ValueType = any> {
     this.nextState = copy(value);
 
     // Save changes in Storage
-    updateValue(this);
+    if (this.isPersisted && this.persistManager)
+      this.persistManager.setValue(value);
   }
 
   //=========================================================================================================

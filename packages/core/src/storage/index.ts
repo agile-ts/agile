@@ -164,7 +164,7 @@ export class Storage {
   // Set
   //=========================================================================================================
   /**
-   * Saves the value at the provided Key
+   * Saves/Updates the value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    * @param {any} value - Value you want to save
    */

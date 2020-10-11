@@ -20,6 +20,7 @@ export * from "./runtime/subscription/sub";
 // State
 export * from "./state";
 export * from "./state/state.observer";
+export * from "./state/state.persist";
 
 // Computed
 export { Computed } from "./computed";
