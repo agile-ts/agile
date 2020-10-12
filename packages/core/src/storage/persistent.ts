@@ -1,63 +1,52 @@
-import { Agile, State, StorageKey } from "../internal";
+import { Agile, StorageKey } from "../internal";
 
-export class StatePersistManager<ValueType = any> {
+export class Persistent<ValueType = any> {
   public agileInstance: () => Agile;
 
-  public state: () => State;
   public _key: StorageKey = "unknown";
   public ready: boolean = false;
 
   /**
    * @internal
-   * State Persist Manager - Handles the permanent saving of a State
+   * Persistent - Handles saving of Agile Instances
    * @param {Agile} agileInstance - An instance of Agile
-   * @param {State} state - State you want to save
-   * @param {StorageKey} key - Key of the Storage property
    */
-  constructor(agileInstance: Agile, state: State<ValueType>, key?: StorageKey) {
+  constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
-    this.state = () => state;
-
-    // Validate Key
-    const finalKey = this.validateKey(key);
-    if (!finalKey) {
-      console.error(
-        "Agile: If your State has no key provided before using persist.. you have to provide a key here!"
-      );
-      return;
-    }
-    this._key = finalKey;
-    this.ready = true;
-
-    // Load or Save the State Value for the first Time
-    this.initialLoading(finalKey);
-
-    agileInstance.storage.persistedStates.add(state);
-    state.isPersisted = true;
   }
 
   public set key(value: StorageKey) {
-    if (value === this._key) return;
-
-    // Remove value with old Key
-    this.removeValue();
-
-    // Update Key
     this._key = value;
-
-    // If not ready before set it to ready
-    if (!this.ready) {
-      this.agileInstance().storage.persistedStates.add(this.state());
-      this.state().isPersisted = true;
-      this.ready = true;
-    }
-
-    // Set value with new Key
-    this.setValue(this.state().value);
   }
 
   public get key(): StorageKey {
     return this._key;
+  }
+
+  //=========================================================================================================
+  // Init Persistent
+  //=========================================================================================================
+  /**
+   * @internal
+   * Inits the Persistent - Have to do that this way since validateKey/initialLoading can have deps that aren't set before defining properties in extending/child class
+   * @param {StorageKey} key - Key of the Storage property
+   */
+  public initPersistent(key?: StorageKey): boolean {
+    // Validate Key
+    const finalKey = this.validateKey(key);
+    if (!finalKey) {
+      console.error("Agile: No persist Key found!");
+      return false;
+    }
+    this._key = finalKey;
+
+    // Load or Save the persistent Value for the first Time
+    this.initialLoading(finalKey);
+
+    this.agileInstance().storage.persistentInstances.add(this);
+    this.ready = true;
+
+    return true;
   }
 
   //=========================================================================================================
@@ -68,20 +57,8 @@ export class StatePersistManager<ValueType = any> {
    * Loads or Saves the StorageValue for the first time
    * @param {StorageKey} key -  Key of the Storage property
    */
-  private async initialLoading(key: StorageKey) {
-    const state = this.state();
-
-    // Get storage Value
-    const storageValue = await this.loadValue();
-
-    // If value doesn't exist in the storage.. create it
-    if (!storageValue) {
-      this.setValue(state.getPersistableValue());
-      return;
-    }
-
-    // If value exists in storage, load it into the state
-    state.set(storageValue);
+  public async initialLoading(key: StorageKey) {
+    console.warn("Didn't set initialLoading function in Persistent ", this.key);
   }
 
   //=========================================================================================================
@@ -129,18 +106,8 @@ export class StatePersistManager<ValueType = any> {
    * Validates the Storage Key
    * @param {StorageKey} key - Key you want to validate
    */
-  private validateKey(key?: StorageKey): StorageKey | null {
-    const state = this.state();
-
-    // Get key from State key
-    if (!key && state.key) return state.key;
-
-    // Return null if no key can be found
-    if (!key) return null;
-
-    // Set Storage key as State key if no State key exists
-    if (!state.key) state.key = key;
-
-    return key;
+  public validateKey(key?: StorageKey): StorageKey | null {
+    console.warn("Didn't set validateKey function in Persistent ", this.key);
+    return null;
   }
 }

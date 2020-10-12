@@ -17,10 +17,14 @@ export * from "./runtime/subscription/CallbackSubscriptionContainer";
 export * from "./runtime/subscription/ComponentSubscriptionContainer";
 export * from "./runtime/subscription/sub";
 
+// Storage
+export * from "./storage";
+export * from "./storage/persistent";
+
 // State
 export * from "./state";
 export * from "./state/state.observer";
-export * from "./state/state.persist";
+export * from "./state/state.persistent";
 
 // Computed
 export { Computed } from "./computed";
@@ -34,8 +38,7 @@ export * from "./collection/selector";
 // Event
 export * from "./event";
 
-// Internal Classes
-export * from "./storage";
+// Integrations
 export * from "./integrations";
 
 // Utils

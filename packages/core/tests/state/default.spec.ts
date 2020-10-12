@@ -41,7 +41,7 @@ describe("Default State Tests", () => {
         false,
         "MY_STATE has correct isPersisted"
       );
-      expect(MY_STATE.persistManager).to.eq(
+      expect(MY_STATE.persistent).to.eq(
         undefined,
         "MY_STATE has no persistManager"
       );

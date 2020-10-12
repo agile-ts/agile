@@ -7,6 +7,7 @@ import {
   isJsonString,
   defineConfig,
 } from "../internal";
+import { Persistent } from "./persistent";
 
 export type StorageKey = string | number;
 export type StorageType = "localStorage" | "custom";
@@ -36,8 +37,7 @@ export class Storage {
   public storageType: StorageType = "localStorage";
   public config: StorageConfigInterface;
 
-  public persistedStates: Set<State> = new Set();
-  public persistedCollections: Set<Collection> = new Set();
+  public persistentInstances: Set<Persistent> = new Set();
 
   /**
    * @public

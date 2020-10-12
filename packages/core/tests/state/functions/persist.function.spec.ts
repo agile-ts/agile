@@ -33,14 +33,14 @@ describe("Persist Function Tests", () => {
         false,
         "MY_STATE has correct isPersisted"
       );
-      expect(MY_STATE.persistManager).to.eq(
+      expect(MY_STATE.persistent).to.eq(
         undefined,
         "MY_STATE has no persistManager"
       );
-      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-        false,
-        "MY_STATE isn't in persistedStates"
-      );
+      expect(
+        MY_STATE.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE.persistent)
+      ).to.eq(false, "MY_STATE isn't in persistedStates");
     });
 
     it("Can't persist State without persist Key", () => {
@@ -51,27 +51,27 @@ describe("Persist Function Tests", () => {
         false,
         "MY_STATE has correct isPersisted"
       );
-      expect(MY_STATE.persistManager !== undefined).to.eq(
+      expect(MY_STATE.persistent !== undefined).to.eq(
         true,
         "MY_STATE has persistManager"
       );
-      expect(MY_STATE.persistManager?.ready).to.eq(
+      expect(MY_STATE.persistent?.ready).to.eq(
         false,
         "MY_STATE persistManager is not ready"
       );
-      expect(MY_STATE.persistManager?.key).to.eq(
+      expect(MY_STATE.persistent?.key).to.eq(
         "unknown",
         "MY_STATE persistManager has 'unknown' key"
       );
-      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-        false,
-        "MY_STATE isn't in persistedStates"
-      );
+      expect(
+        MY_STATE.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE.persistent)
+      ).to.eq(false, "MY_STATE isn't in persistedStates");
       expect(MY_STATE.key).to.eq(undefined, "MY_STATE has correct key");
-      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-        false,
-        "MY_STATE isn't in persistedStates"
-      );
+      expect(
+        MY_STATE.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE.persistent)
+      ).to.eq(false, "MY_STATE isn't in persistedStates");
       expect(App.storage.get("mySecondKey")).to.eq(
         undefined,
         "MY_STATE isn't in storage"
@@ -89,30 +89,30 @@ describe("Persist Function Tests", () => {
         true,
         "MY_STATE has correct isPersisted"
       );
-      expect(MY_STATE.persistManager !== undefined).to.eq(
+      expect(MY_STATE.persistent !== undefined).to.eq(
         true,
         "MY_STATE has persistManager"
       );
-      expect(MY_STATE.persistManager?.key).to.eq(
+      expect(MY_STATE.persistent?.key).to.eq(
         "mySecondKey",
         "MY_STATE persistManager has correct Key"
       );
-      expect(MY_STATE.persistManager?.ready).to.eq(
+      expect(MY_STATE.persistent?.ready).to.eq(
         true,
         "MY_STATE persistManager is ready"
       );
-      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-        true,
-        "MY_STATE is in persistedStates"
-      );
+      expect(
+        MY_STATE.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE.persistent)
+      ).to.eq(true, "MY_STATE is in persistedStates");
       expect(MY_STATE.key).to.eq(
         "mySecondKey",
         "MY_STATE key has been set to persistKey if no key is provided"
       );
-      expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-        true,
-        "MY_STATE isn't in persistedStates"
-      );
+      expect(
+        MY_STATE.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE.persistent)
+      ).to.eq(true, "MY_STATE isn't in persistedStates");
       expect(App.storage.get("mySecondKey")).to.eq(1, "MY_STATE is in storage");
     });
 
@@ -126,10 +126,10 @@ describe("Persist Function Tests", () => {
           "MY_STATE has correct isPersisted"
         );
         expect(MY_STATE.key).to.eq("mySecondKey", "MY_STATE has correct key");
-        expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-          true,
-          "MY_STATE is in persistedStates"
-        );
+        expect(
+          MY_STATE.persistent !== undefined &&
+            App.storage.persistentInstances.has(MY_STATE.persistent)
+        ).to.eq(true, "MY_STATE is in persistedStates");
         expect(App.storage.get("mySecondKey")).to.eq(
           undefined,
           "MY_STATE isn't in storage"
@@ -146,10 +146,10 @@ describe("Persist Function Tests", () => {
           true,
           "MY_STATE has correct isPersisted"
         );
-        expect(App.storage.persistedStates.has(MY_STATE)).to.eq(
-          true,
-          "MY_STATE_WITH_KEY is in persistedStates"
-        );
+        expect(
+          MY_STATE.persistent !== undefined &&
+            App.storage.persistentInstances.has(MY_STATE.persistent)
+        ).to.eq(true, "MY_STATE_WITH_KEY is in persistedStates");
         expect(App.storage.get("mySecondKey")).to.eq(
           5,
           "MY_STATE_WITH_KEY is in storage and has been updated"
@@ -175,14 +175,14 @@ describe("Persist Function Tests", () => {
         false,
         "MY_STATE_WITH_KEY has correct isPersistState"
       );
-      expect(MY_STATE_WITH_KEY.persistManager).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent).to.eq(
         undefined,
         "MY_STATE_WITH_KEY has no persistManager"
       );
-      expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(
-        false,
-        "MY_STATE_WITH_KEY isn't in persistedStates"
-      );
+      expect(
+        MY_STATE_WITH_KEY.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
+      ).to.eq(false, "MY_STATE_WITH_KEY isn't in persistedStates");
       expect(App.storage.get("myKey")).to.eq(
         undefined,
         "MY_STATE_WITH_KEY isn't in storage"
@@ -200,22 +200,22 @@ describe("Persist Function Tests", () => {
         true,
         "MY_STATE_WITH_KEY has correct isPersistState"
       );
-      expect(MY_STATE_WITH_KEY.persistManager !== undefined).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent !== undefined).to.eq(
         true,
         "MY_STATE_WITH_KEY has persistManager"
       );
-      expect(MY_STATE_WITH_KEY.persistManager?.key).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent?.key).to.eq(
         "myKey",
         "MY_STATE_WITH_KEY persistManager has correct key"
       );
-      expect(MY_STATE_WITH_KEY.persistManager?.ready).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent?.ready).to.eq(
         true,
         "MY_STATE_WITH_KEY persistManager is ready"
       );
-      expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(
-        true,
-        "MY_STATE_WITH_KEY is in persistedStates"
-      );
+      expect(
+        MY_STATE_WITH_KEY.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
+      ).to.eq(true, "MY_STATE_WITH_KEY is in persistedStates");
       expect(App.storage.get("myKey")).to.eq(
         "hello",
         "MY_STATE_WITH_KEY is in storage"
@@ -233,15 +233,15 @@ describe("Persist Function Tests", () => {
         true,
         "MY_STATE_WITH_KEY has correct isPersistState"
       );
-      expect(MY_STATE_WITH_KEY.persistManager !== undefined).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent !== undefined).to.eq(
         true,
         "MY_STATE_WITH_KEY has persistManager"
       );
-      expect(MY_STATE_WITH_KEY.persistManager?.key).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent?.key).to.eq(
         "myThirdKey",
         "MY_STATE_WITH_KEY persistManager has correct key"
       );
-      expect(MY_STATE_WITH_KEY.persistManager?.ready).to.eq(
+      expect(MY_STATE_WITH_KEY.persistent?.ready).to.eq(
         true,
         "MY_STATE_WITH_KEY persistManager is ready"
       );
@@ -249,10 +249,10 @@ describe("Persist Function Tests", () => {
         "myKey",
         "MY_STATE_WITH_KEY has correct key"
       );
-      expect(App.storage.persistedStates.has(MY_STATE_WITH_KEY)).to.eq(
-        true,
-        "MY_STATE_WITH_KEY is in persistedStates"
-      );
+      expect(
+        MY_STATE_WITH_KEY.persistent !== undefined &&
+          App.storage.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
+      ).to.eq(true, "MY_STATE_WITH_KEY is in persistedStates");
       expect(App.storage.get("myThirdKey")).to.eq(
         "hello",
         "MY_STATE_WITH_KEY with new key is in storage"

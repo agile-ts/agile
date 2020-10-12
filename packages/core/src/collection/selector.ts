@@ -7,7 +7,7 @@ import {
   StorageKey,
   copy,
   defineConfig,
-  StatePersistManager,
+  StatePersistent,
 } from "../internal";
 
 export type SelectorKey = string | number;
@@ -91,20 +91,16 @@ export class Selector<DataType = DefaultDataItem> extends Computed<
    * @param key - the storage key (if no key passed it will take the state key)
    */
   public persist(key?: StorageKey): this {
-    if (this.isPersisted && this.persistManager) {
+    if (this.isPersisted && this.persistent) {
       console.warn(`Agile: The State ${this.key} is already persisted!`);
 
-      // Update Key in PersistManager
-      if (key) this.persistManager.key = key;
+      // Update Key in Persistent
+      if (key) this.persistent.key = key;
       return this;
     }
 
-    // Create new PersistManager instance
-    this.persistManager = new StatePersistManager(
-      this.agileInstance(),
-      this,
-      key
-    );
+    // Create new StatePersistent instance
+    this.persistent = new StatePersistent(this.agileInstance(), this, key);
     return this;
   }
 
