@@ -74,13 +74,13 @@ describe("Default Selector Tests", () => {
         }),
         "MY_COLLECTION data at id 1 has correct initial value"
       );
-      expect(JSON.stringify(MY_COLLECTION.data[1].initialState)).to.eq(
+      expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
         }),
         "MY_COLLECTION data at id 1 has correct initialState"
       );
-      expect(JSON.stringify(MY_COLLECTION.data[1].previousState)).to.eq(
+      expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
         }),
@@ -127,14 +127,14 @@ describe("Default Selector Tests", () => {
         }),
         "MY_COLLECTION data at id 1 has correct initial value"
       );
-      expect(JSON.stringify(MY_COLLECTION.data[1].initialState)).to.eq(
+      expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "jeff",
         }),
         "MY_COLLECTION data at id 1 has correct initialState"
       );
-      expect(JSON.stringify(MY_COLLECTION.data[1].previousState)).to.eq(
+      expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "jeff",

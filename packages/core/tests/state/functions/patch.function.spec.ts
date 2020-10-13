@@ -72,14 +72,14 @@ describe("Patch Function Tests", () => {
         }),
         "MY_STATE has correct value"
       );
-      expect(JSON.stringify(MY_STATE.previousState)).to.eq(
+      expect(JSON.stringify(MY_STATE.previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "jeff",
         }),
         "MY_STATE has correct previousState"
       );
-      expect(JSON.stringify(MY_STATE.nextState)).to.eq(
+      expect(JSON.stringify(MY_STATE.nextStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "hans",
@@ -109,14 +109,14 @@ describe("Patch Function Tests", () => {
         }),
         "MY_STATE value stayed the same"
       );
-      expect(JSON.stringify(MY_STATE.previousState)).to.eq(
+      expect(JSON.stringify(MY_STATE.previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "jeff",
         }),
         "MY_STATE previousState stayed the same"
       );
-      expect(JSON.stringify(MY_STATE.nextState)).to.eq(
+      expect(JSON.stringify(MY_STATE.nextStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "hans",
@@ -144,14 +144,14 @@ describe("Patch Function Tests", () => {
         }),
         "MY_STATE value stayed the same"
       );
-      expect(JSON.stringify(MY_STATE.previousState)).to.eq(
+      expect(JSON.stringify(MY_STATE.previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "jeff",
         }),
         "MY_STATE previousState stayed the same"
       );
-      expect(JSON.stringify(MY_STATE.nextState)).to.eq(
+      expect(JSON.stringify(MY_STATE.nextStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "hans",
@@ -178,11 +178,11 @@ describe("Patch Function Tests", () => {
         "test",
         "MY_NON_OBJECT_STATE value stayed the same"
       );
-      expect(MY_NON_OBJECT_STATE.previousState).to.eq(
+      expect(MY_NON_OBJECT_STATE.previousStateValue).to.eq(
         "test",
         "MY_NON_OBJECT_STATE previousState stayed the same"
       );
-      expect(MY_NON_OBJECT_STATE.nextState).to.eq(
+      expect(MY_NON_OBJECT_STATE.nextStateValue).to.eq(
         "test",
         "MY_NON_OBJECT_STATE nextState stayed the same"
       );
@@ -208,14 +208,14 @@ describe("Patch Function Tests", () => {
         }),
         "MY_STATE has correct value"
       );
-      expect(JSON.stringify(MY_STATE.previousState)).to.eq(
+      expect(JSON.stringify(MY_STATE.previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "hans",
         }),
         "MY_STATE has correct previousState"
       );
-      expect(JSON.stringify(MY_STATE.nextState)).to.eq(
+      expect(JSON.stringify(MY_STATE.nextStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "frank",
@@ -246,14 +246,14 @@ describe("Patch Function Tests", () => {
         }),
         "MY_STATE has correct value"
       );
-      expect(JSON.stringify(MY_STATE.previousState)).to.eq(
+      expect(JSON.stringify(MY_STATE.previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "frank",
         }),
         "MY_STATE has correct previousState"
       );
-      expect(JSON.stringify(MY_STATE.nextState)).to.eq(
+      expect(JSON.stringify(MY_STATE.nextStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "benno",

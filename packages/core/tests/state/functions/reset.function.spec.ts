@@ -59,11 +59,11 @@ describe("Reset Function Tests", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(MY_STATE.value).to.eq(1, "MY_STATE has correct value");
-    expect(MY_STATE.previousState).to.eq(
+    expect(MY_STATE.previousStateValue).to.eq(
       5,
       "MY_STATE has correct previousState"
     );
-    expect(MY_STATE.nextState).to.eq(1, "MY_STATE has correct nextState");
+    expect(MY_STATE.nextStateValue).to.eq(1, "MY_STATE has correct nextState");
     expect(MY_STATE.isSet).to.eq(false, "MY_STATE has correct isSet");
 
     expect(sideEffectCount).to.eq(

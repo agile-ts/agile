@@ -136,11 +136,11 @@ function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
 
   // If initial State is still {id: id}.. because of placeholder item and the value isn't {id: id} -> had got real value.. set the initial State to this first real value
   if (
-    JSON.stringify(item.initialState) === JSON.stringify({ id: id }) &&
-    JSON.stringify(item.nextState) !== JSON.stringify({ id: id })
+    JSON.stringify(item.initialStateValue) === JSON.stringify({ id: id }) &&
+    JSON.stringify(item.nextStateValue) !== JSON.stringify({ id: id })
   ) {
-    item.initialState = copy(item.nextState);
-    item.previousState = copy(item.nextState);
+    item.initialStateValue = copy(item.nextStateValue);
+    item.previousStateValue = copy(item.nextStateValue);
   }
 
   // Have to create the final Value here, to get added to the track states also if the item doesn't exist yet.. (otherwise auto tracking state wouldn't work -> this won't get called if the item changes )

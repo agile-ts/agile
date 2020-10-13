@@ -77,7 +77,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // Grab nextState or compute the State if internalIngestKey got passed
     if (newStateValue === internalIngestKey) {
       if (state instanceof Computed) this.nextStateValue = state.computeValue();
-      else this.nextStateValue = state.nextState;
+      else this.nextStateValue = state.nextStateValue;
     } else this.nextStateValue = newStateValue;
 
     // If nextStateValue and currentValue are equals return
@@ -105,13 +105,13 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = job.observer.state();
 
     // Set Previous State
-    state.previousState = copy(state.value);
+    state.previousStateValue = copy(state.value);
 
     // Write new value into the State
     state.privateWrite(this.nextStateValue);
 
     // Set isSet
-    state.isSet = notEqual(this.nextStateValue, state.initialState);
+    state.isSet = notEqual(this.nextStateValue, state.initialStateValue);
 
     // Reset isPlaceholder since it got an value
     if (state.isPlaceholder) state.isPlaceholder = false;

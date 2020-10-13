@@ -47,11 +47,11 @@ describe("Set Function Tests", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(MY_STATE.value).to.eq(2, "MY_STATE has correct value");
-    expect(MY_STATE.previousState).to.eq(
+    expect(MY_STATE.previousStateValue).to.eq(
       1,
       "MY_STATE has correct previousState"
     );
-    expect(MY_STATE.nextState).to.eq(2, "MY_STATE has correct nextState");
+    expect(MY_STATE.nextStateValue).to.eq(2, "MY_STATE has correct nextState");
     expect(MY_STATE.isSet).to.eq(true, "MY_STATE has correct isSet");
     expect(MY_STATE.exists).to.eq(true, "MY_STATE exists");
 
@@ -67,11 +67,11 @@ describe("Set Function Tests", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(MY_STATE.value).to.eq(2, "MY_STATE has correct value");
-    expect(MY_STATE.previousState).to.eq(
+    expect(MY_STATE.previousStateValue).to.eq(
       1,
       "MY_STATE has correct previousState"
     );
-    expect(MY_STATE.nextState).to.eq(2, "MY_STATE has correct nextState");
+    expect(MY_STATE.nextStateValue).to.eq(2, "MY_STATE has correct nextState");
     expect(MY_STATE.isSet).to.eq(true, "MY_STATE has correct isSet");
 
     expect(sideEffectCount).to.eq(1, "sideEffectCount hasn't been increased");

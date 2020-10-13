@@ -276,11 +276,14 @@ export class Collection<DataType = DefaultDataItem> {
     });
 
     // Check if something has changed (stringifying because of possible object or array)
-    if (JSON.stringify(finalItemValue) === JSON.stringify(itemState.nextState))
+    if (
+      JSON.stringify(finalItemValue) ===
+      JSON.stringify(itemState.nextStateValue)
+    )
       return this.data[finalItemValue[primaryKey]];
 
     // Assign finalItemStateValue to nextState
-    itemState.nextState = finalItemValue;
+    itemState.nextStateValue = finalItemValue;
 
     // Set State to nextState
     itemState.ingest({ background: options.background });
@@ -534,7 +537,11 @@ export class Collection<DataType = DefaultDataItem> {
       if (group.value.findIndex((key) => key === oldKey) === -1) continue;
 
       // Replace the primaryKey at current index
-      group.nextState.splice(group.nextState.indexOf(oldKey), 1, newKey);
+      group.nextStateValue.splice(
+        group.nextStateValue.indexOf(oldKey),
+        1,
+        newKey
+      );
 
       // Set State(Group) to nextState
       group.ingest({ background: options?.background });

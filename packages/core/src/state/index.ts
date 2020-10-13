@@ -11,6 +11,7 @@ import {
   Observer,
   equal,
   StateJobConfigInterface,
+  isFunction,
 } from "../internal";
 
 export type StateKey = string | number;
@@ -24,6 +25,15 @@ export interface SetConfigInterface {
   sideEffects?: boolean;
 }
 
+/**
+ * @param {boolean} background - If assigning a the new value should happen in the background -> not causing a rerender
+ * @param {boolean} addNewProperties - If it should add new properties to the State object
+ */
+export interface PatchConfigInterface {
+  addNewProperties?: boolean;
+  background?: boolean;
+}
+
 export class State<ValueType = any> {
   public agileInstance: () => Agile;
 
@@ -31,10 +41,10 @@ export class State<ValueType = any> {
   public valueType?: string; // primitive types for js users
   public isSet: boolean = false; // If value has is not the same as initialValue
   public isPlaceholder: boolean = false; // If placeholder its just a placeholder of a state, because the state isn't defined yet
-  public initialState: ValueType;
+  public initialStateValue: ValueType;
   public _value: ValueType; // Current Value of the State
-  public previousState: ValueType;
-  public nextState: ValueType; // The next state is used internal and represents the nextState which can be edited as wished
+  public previousStateValue: ValueType;
+  public nextStateValue: ValueType; // The nextStateValue is used internal and represents the next State Value which can be edited as wished
 
   public observer: StateObserver; // Handles deps and subs of the State (rerender stuff)
   public sideEffects: { [key: string]: () => void } = {}; // SideEffects during the Runtime process
@@ -58,11 +68,11 @@ export class State<ValueType = any> {
     deps: Array<Observer> = []
   ) {
     this.agileInstance = () => agileInstance;
-    this.initialState = initialValue;
+    this.initialStateValue = initialValue;
     this._key = key;
     this._value = initialValue;
-    this.previousState = initialValue;
-    this.nextState = initialValue;
+    this.previousStateValue = initialValue;
+    this.nextStateValue = initialValue;
     this.observer = new StateObserver<ValueType>(
       agileInstance,
       this,
@@ -126,7 +136,7 @@ export class State<ValueType = any> {
     // Check if value has changed
     if (equal(this.value, value)) return this;
 
-    // Ingest updated value
+    // Ingest updated value into runtime
     this.observer.ingest(value, config);
 
     return this;
@@ -154,18 +164,16 @@ export class State<ValueType = any> {
   // Type
   //=========================================================================================================
   /**
-   * This is thought for js users.. because ts users can set the type in <>
-   * @param type - wished type of the state
+   * @public
+   * Assign a initial default type to a State
+   * Note this is mainly thought for JS users
+   * @param type - wished Type ('String', 'Boolean', 'Array', 'Object', 'Number')
    */
   public type(type: any): this {
     const supportedTypes = ["String", "Boolean", "Array", "Object", "Number"];
 
     // Check if type is a supported Type
-    if (
-      supportedTypes.findIndex(
-        (supportedType) => supportedType === type.name
-      ) === -1
-    ) {
+    if (!supportedTypes.includes(type.name)) {
       console.warn(
         `Agile: '${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`
       );
@@ -180,24 +188,26 @@ export class State<ValueType = any> {
   // Undo
   //=========================================================================================================
   /**
-   * Will set the state to the previous State
+   * @public
+   * Undoes the last State change
    */
   public undo() {
-    this.set(this.previousState);
+    this.set(this.previousStateValue);
   }
 
   //=========================================================================================================
   // Reset
   //=========================================================================================================
   /**
-   * Will reset the state to the initial value
+   * @public
+   * Resets the State to its initial value
    */
   public reset(): this {
-    // Remove State from Storage (because it is than the initial State again and there is no need to save it anymore)
+    this.set(this.initialStateValue);
+
+    // Remove State from Storage (since its the initial State)
     if (this.isPersisted && this.persistent) this.persistent.removeValue();
 
-    // Set State to initial State
-    this.set(this.initialState);
     return this;
   }
 
@@ -205,47 +215,46 @@ export class State<ValueType = any> {
   // Patch
   //=========================================================================================================
   /**
-   * Will merge the changes into the state
+   * @public
+   * Patches changes into object
+   * Note: Only useful if State is object
+   * @param {object} targetWithChanges - The Object which includes the changes which than will be patched into the State
+   * @param {PatchConfigInterface} config - Config
    */
   public patch(
     targetWithChanges: object,
-    options: { addNewProperties?: boolean; background?: boolean } = {}
+    config: PatchConfigInterface = {}
   ): this {
-    // Check if state is object.. because only objects can use the patch method
-    if (!isValidObject(this.nextState)) {
+    config = defineConfig(config, {
+      addNewProperties: true,
+      background: false,
+    });
+
+    if (!isValidObject(this.nextStateValue)) {
       console.warn(
-        "Agile: You can't use the patch method on a non object state!"
+        "Agile: You can't use the patch method on a non object States!"
       );
       return this;
     }
 
-    // Check if targetWithChanges is an Object.. because you can only patch objects into the State Object
     if (!isValidObject(targetWithChanges)) {
       console.warn("Agile: TargetWithChanges has to be an object!");
       return this;
     }
 
-    // Assign defaults to options
-    options = defineConfig(options, {
-      addNewProperties: true,
-      background: false,
-    });
-
-    // Merge targetWithChanges into next State
-    this.nextState = flatMerge<ValueType>(
-      this.nextState,
+    // Merge targetWithChanges into nextStateValue
+    this.nextStateValue = flatMerge<ValueType>(
+      this.nextStateValue,
       targetWithChanges,
-      options
+      { addNewProperties: config.addNewProperties }
     );
 
-    // Check if something has changed (stringifying because of possible object or array)
-    if (JSON.stringify(this.value) === JSON.stringify(this.nextState))
-      return this;
+    // Check if value has changed
+    if (equal(this.value, this.nextStateValue)) return this;
 
-    // Set State to nextState
-    this.ingest({ background: options.background });
+    // Ingest updated nextStateValue
+    this.ingest({ background: config.background });
 
-    this.isSet = this.nextState !== this.initialState;
     return this;
   }
 
@@ -253,22 +262,20 @@ export class State<ValueType = any> {
   // Watch
   //=========================================================================================================
   /**
-   * Will always be called if the state changes
-   * @param key - The key of the watch method
-   * @param callback - The callback function
+   * @public
+   * Watches State and detect State changes
+   * @param {string} key - Key of the Watcher
+   * @param {(value: ValueType) => void} callback - Callback Function which should be called if State changes
    */
   public watch(key: string, callback: (value: ValueType) => void): this {
-    // Check if callback is a function  (js)
-    if (typeof callback !== "function") {
+    if (!isFunction(callback)) {
       console.error(
         "Agile: A watcher callback function has to be an function!"
       );
       return this;
     }
 
-    // Add callback with key to watchers
     this.watchers[key] = callback;
-
     return this;
   }
 
@@ -276,8 +283,9 @@ export class State<ValueType = any> {
   // Remove Watcher
   //=========================================================================================================
   /**
-   * Removes a watcher called after the key
-   * @param key - the key of the watcher function
+   * @public
+   * Removes Watcher at given Key
+   * @param {string} key - Key of the Watcher you want to remove
    */
   public removeWatcher(key: string): this {
     delete this.watchers[key];
@@ -288,8 +296,9 @@ export class State<ValueType = any> {
   // Persist
   //=========================================================================================================
   /**
-   * Saves the state in the local storage or in a own configured storage
-   * @param key - the storage key (if no key passed it will take the state key)
+   * @public
+   * Saves State in custom or local Storage
+   * @param {string} key - Storage Key (Note: not needed if State has already a key/name)
    */
   public persist(key?: StorageKey): this {
     if (this.isPersisted && this.persistent) {
@@ -300,7 +309,6 @@ export class State<ValueType = any> {
       return this;
     }
 
-    // Create new Persistent instance
     this.persistent = new StatePersistent<ValueType>(
       this.agileInstance(),
       this,
@@ -313,7 +321,8 @@ export class State<ValueType = any> {
   // Copy
   //=========================================================================================================
   /**
-   * Returns a fresh copy of the current value
+   * @public
+   * Creates a fresh copy of the State Value (-> No reference to State value)
    */
   public copy(): ValueType {
     return copy(this.value);
@@ -323,10 +332,10 @@ export class State<ValueType = any> {
   // Exists
   //=========================================================================================================
   /**
+   * @public
    * Checks if the State exists
    */
   public get exists(): boolean {
-    // Check if the value is not undefined and that the state is no placeholder
     return this.getPublicValue() !== undefined && !this.isPlaceholder;
   }
 
@@ -334,9 +343,19 @@ export class State<ValueType = any> {
   // Add SideEffect
   //=========================================================================================================
   /**
-   * Add a SideEffect to the State
+   * @internal
+   * Add a SideEffect to State (Will be called on every State change)
+   * @param {string} key - Key of the Watcher
+   * @param {() => void)} sideEffect - Callback Function which should be called if State changes
    */
   public addSideEffect(key: string, sideEffect: () => void): this {
+    if (!isFunction(sideEffect)) {
+      console.error(
+        "Agile: A watcher sideEffect function has to be an function!"
+      );
+      return this;
+    }
+
     this.sideEffects[key] = sideEffect;
     return this;
   }
@@ -345,7 +364,9 @@ export class State<ValueType = any> {
   // Remove SideEffect
   //=========================================================================================================
   /**
-   * Removes a Side affect from the State
+   * @internal
+   * Remove SideEffect at given Key
+   * @param {string} key - Key of the SideEffect you want to remove
    */
   public removeSideEffect(key: string): this {
     delete this.sideEffects[key];
@@ -353,41 +374,20 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
-  // Get Public Value
-  //=========================================================================================================
-  /**
-   * @internal
-   *  Returns the public value (will be overwritten for instance in group)
-   */
-  public getPublicValue(): ValueType {
-    return this._value;
-  }
-
-  //=========================================================================================================
   // Private Write
   //=========================================================================================================
   /**
    * @internal
-   *  Will set a new _value and handles the stuff around like storage, ..
+   *  Writes value into State
+   *  Note: doesn't cause rerender and so.. for that use the Set Function
+   *  @param {any} value - Value you want to write into the State
    */
   public privateWrite(value: any) {
     this._value = copy(value);
-    this.nextState = copy(value);
+    this.nextStateValue = copy(value);
 
     // Save changes in Storage
     if (this.isPersisted && this.persistent) this.persistent.setValue(value);
-  }
-
-  //=========================================================================================================
-  // Get Persistable Value
-  //=========================================================================================================
-  /**
-   * @internal
-   *  Will return the perstiable Value of this state..
-   *  some classes which extends state might have another peristiableValue than this.value (like the selector)
-   */
-  public getPersistableValue(): any {
-    return this.value;
   }
 
   //=========================================================================================================
@@ -395,10 +395,33 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Checks if the 'value' has the same type as state.value
+   * Checks if Value has correct valueType
+   *  @param {any} value - Value you want to check if it has correct valueType
    */
   private isCorrectType(value: any): boolean {
     let type: string = typeof value;
     return type === this.valueType;
+  }
+
+  //=========================================================================================================
+  // Get Public Value
+  //=========================================================================================================
+  /**
+   * @internal
+   *  Returns public value of this State
+   */
+  public getPublicValue(): ValueType {
+    return this._value;
+  }
+
+  //=========================================================================================================
+  // Get Persistable Value
+  //=========================================================================================================
+  /**
+   * @internal
+   *  Returns persistableValue Value of this State
+   */
+  public getPersistableValue(): any {
+    return this.value;
   }
 }

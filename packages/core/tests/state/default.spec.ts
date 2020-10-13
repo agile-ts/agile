@@ -17,7 +17,7 @@ describe("Default State Tests", () => {
         "MY_STATE has correct type"
       );
       expect(MY_STATE._value).to.eq("hello", "MY_STATE has correct _value");
-      expect(MY_STATE.previousState).to.eq(
+      expect(MY_STATE.previousStateValue).to.eq(
         "hello",
         "MY_STATE has correct previousState"
       );
@@ -27,11 +27,11 @@ describe("Default State Tests", () => {
         JSON.stringify({}),
         "MY_STATE has no sideEffects"
       );
-      expect(MY_STATE.nextState).to.eq(
+      expect(MY_STATE.nextStateValue).to.eq(
         "hello",
         "MY_STATE has correct nextState"
       );
-      expect(MY_STATE.initialState).to.eq(
+      expect(MY_STATE.initialStateValue).to.eq(
         "hello",
         "MY_STATE has correct initialState"
       );

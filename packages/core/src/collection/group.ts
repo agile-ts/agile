@@ -116,7 +116,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
       }
 
       // Remove primaryKey from nextState
-      this.nextState = this.nextState.filter((i) => i !== itemKey);
+      this.nextStateValue = this.nextStateValue.filter((i) => i !== itemKey);
 
       // Storage
       if (this.key) updateGroup(this.key, this.collection());
@@ -144,7 +144,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingCollectionItems: Array<ItemKey> = [];
-    let newNextState = [...this.nextState]; // Had to create copy array otherwise also 'this.value' would change.. by changing 'this.nextState' directly.
+    let newNextState = [...this.nextStateValue]; // Had to create copy array otherwise also 'this.value' would change.. by changing 'this.nextState' directly.
 
     // Merge default values into options
     options = defineConfig<GroupAddOptionsInterface>(options, {
@@ -180,7 +180,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
       options.background = true;
 
     // Set nextState to newNextState
-    this.nextState = newNextState;
+    this.nextStateValue = newNextState;
 
     // Set State to nextState
     this.ingest({ background: options.background });
