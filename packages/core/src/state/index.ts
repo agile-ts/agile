@@ -12,27 +12,8 @@ import {
   equal,
   StateJobConfigInterface,
   isFunction,
+  notEqual,
 } from "../internal";
-
-export type StateKey = string | number;
-
-/**
- * @param {boolean} background - If assigning a the new value should happen in the background -> not causing a rerender
- * @param {boolean} sideEffects - If Side Effects of the State should get executed (sideEffects)
- */
-export interface SetConfigInterface {
-  background?: boolean;
-  sideEffects?: boolean;
-}
-
-/**
- * @param {boolean} background - If assigning a the new value should happen in the background -> not causing a rerender
- * @param {boolean} addNewProperties - If it should add new properties to the State object
- */
-export interface PatchConfigInterface {
-  addNewProperties?: boolean;
-  background?: boolean;
-}
 
 export class State<ValueType = any> {
   public agileInstance: () => Agile;
@@ -87,7 +68,7 @@ export class State<ValueType = any> {
 
   public get value(): ValueType {
     // Add state to Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObserver)
+    if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
     return this._value;
@@ -340,6 +321,48 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
+  // Is
+  //=========================================================================================================
+  /**
+   * @public
+   * Equivalent to ===
+   * @param {ValueType} value - value which you want to check if its equals to the State value
+   */
+  public is(value: ValueType): boolean {
+    return equal(value, this.value);
+  }
+
+  //=========================================================================================================
+  // Is Not
+  //=========================================================================================================
+  /**
+   * @public
+   * Equivalent to !==
+   * @param {ValueType} value - value which you want to check if its not equals to the State value
+   */
+  public isNot(value: ValueType): boolean {
+    return notEqual(value, this.value);
+  }
+
+  //=========================================================================================================
+  // Toggle
+  //=========================================================================================================
+  /**
+   * @public
+   * Inverts the State
+   * Note: Only useful by boolean based States
+   */
+  public invert(): this {
+    if (typeof this._value !== "boolean") {
+      console.warn("Agile: You can only invert boolean based States!");
+      return this;
+    }
+    this.set(this._value);
+
+    return this;
+  }
+
+  //=========================================================================================================
   // Add SideEffect
   //=========================================================================================================
   /**
@@ -411,6 +434,9 @@ export class State<ValueType = any> {
    *  Returns public value of this State
    */
   public getPublicValue(): ValueType {
+    // If the State value for the wide world isn't the value its the output (see Group)
+    if (this["output"] !== undefined) return this["output"];
+
     return this._value;
   }
 
@@ -424,4 +450,22 @@ export class State<ValueType = any> {
   public getPersistableValue(): any {
     return this.value;
   }
+}
+
+export type StateKey = string | number;
+/**
+ * @param {boolean} background - If assigning a new value should happen in the background -> not causing a rerender
+ * @param {boolean} sideEffects - If Side Effects of the State should get executed (sideEffects)
+ */
+export interface SetConfigInterface {
+  background?: boolean;
+  sideEffects?: boolean;
+}
+/**
+ * @param {boolean} background - If assigning a new value should happen in the background -> not causing a rerender
+ * @param {boolean} addNewProperties - If it should add new properties to the State object
+ */
+export interface PatchConfigInterface {
+  addNewProperties?: boolean;
+  background?: boolean;
 }

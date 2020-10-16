@@ -17,6 +17,12 @@ export class StatePersistent<ValueType = any> extends Persistent {
   }
 
   public set key(value: StorageKey) {
+    // If persistent isn't ready try to init it again
+    if (!this.ready) {
+      this.initPersistent(value);
+      return;
+    }
+
     if (value === this._key) return;
 
     // Remove value with old Key
@@ -24,13 +30,6 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     // Update Key
     this._key = value;
-
-    // If not ready before set it to ready
-    if (!this.ready) {
-      this.agileInstance().storage.persistentInstances.add(this);
-      this.state().isPersisted = true;
-      this.ready = true;
-    }
 
     // Set value with new Key
     this.setValue(this.state().value);

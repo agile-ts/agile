@@ -98,7 +98,7 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Perform a Job
+   * Performs a Job
    * @param {Job<this>} job - The Job which should be performed
    */
   public perform(job: Job<this>) {

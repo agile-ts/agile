@@ -9,27 +9,6 @@ import {
 } from "../internal";
 import { Persistent } from "./persistent";
 
-export type StorageKey = string | number;
-export type StorageType = "localStorage" | "custom";
-
-/**
- * @param {boolean} async - If its a async storage
- * @param {string} prefix - Prefix of the storage
- * @param {Object} methods - Storage methods like (get, set, remove)
- * @param {(key: string) => any} methods.get - Get Method which will get Items out of the Storage
- * @param {key: string, value: any) => void} methods.set - Set Method which will set Items into the Storage
- * @param {(key: string) => void} methods.remove - Remove Methods which will remove Items from the Storage
- */
-export interface StorageConfigInterface {
-  async?: boolean;
-  prefix?: string;
-  methods?: {
-    get: (key: string) => any;
-    set: (key: string, value: any) => void;
-    remove: (key: string) => void;
-  };
-}
-
 export class Storage {
   public agileInstance: () => Agile;
 
@@ -65,7 +44,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Instantiates the LocalStorage
+   * Instantiates LocalStorage
    */
   private instantiateLocalStorage() {
     // Check if Local Storage is Available (For instance in ReactNative it doesn't exist)
@@ -91,7 +70,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Instantiates the Custom Storage
+   * Instantiates Custom Storage
    */
   private instantiateCustomStorage() {
     // Validate Functions
@@ -124,7 +103,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Gets the value at the provided Key
+   * Gets value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    */
   public get<GetType = any>(
@@ -147,7 +126,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Gets the value at the provided Key (async)
+   * Gets value at the provided Key (async)
    * @param {StorageKey} key - Key of the Storage property
    */
   private asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
@@ -167,7 +146,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Saves/Updates the value at the provided Key
+   * Saves/Updates value at the provided Key
    * @param {StorageKey} key - Key of the Storage property
    * @param {any} value - Value you want to save
    */
@@ -181,7 +160,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Removes the value at provided Key
+   * Removes value at provided Key
    * @param {StorageKey} key - Key of the Storage property
    */
   public remove(key: StorageKey): void {
@@ -216,4 +195,24 @@ export class Storage {
       return false;
     }
   }
+}
+
+export type StorageKey = string | number;
+export type StorageType = "localStorage" | "custom";
+/**
+ * @param {boolean} async - If its a async storage
+ * @param {string} prefix - Prefix of the storage
+ * @param {Object} methods - Storage methods like (get, set, remove)
+ * @param {(key: string) => any} methods.get - Get Method which will get Items out of the Storage
+ * @param {key: string, value: any) => void} methods.set - Set Method which will set Items into the Storage
+ * @param {(key: string) => void} methods.remove - Remove Methods which will remove Items from the Storage
+ */
+export interface StorageConfigInterface {
+  async?: boolean;
+  prefix?: string;
+  methods?: {
+    get: (key: string) => any;
+    set: (key: string, value: any) => void;
+    remove: (key: string) => void;
+  };
 }

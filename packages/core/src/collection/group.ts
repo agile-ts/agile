@@ -49,7 +49,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
 
   public get output(): Array<DataType> {
     // Add state(group) to foundState (for auto tracking used states in computed functions)
-    if (this.agileInstance().runtime.trackObserver)
+    if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
     return this._output;
@@ -57,7 +57,7 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
 
   public get states(): Array<State<DataType>> {
     // Add state(group) to foundState (for auto tracking used states in computed functions)
-    if (this.agileInstance().runtime.trackObserver)
+    if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
     return this._states.map((state) => state());
@@ -239,17 +239,5 @@ export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
     // @ts-ignore
     this._states = finalStates.map((state) => () => state);
     this._output = finalOutput;
-  }
-
-  //=========================================================================================================
-  // Get Public Value
-  //=========================================================================================================
-  /**
-   * @internal
-   *  Returns the public value
-   */
-  // @ts-ignore
-  public getPublicValue(): Array<DataType> {
-    return this.output;
   }
 }

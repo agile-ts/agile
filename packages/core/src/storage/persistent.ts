@@ -58,7 +58,10 @@ export class Persistent<ValueType = any> {
    * @param {StorageKey} key -  Key of the Storage property
    */
   public async initialLoading(key: StorageKey) {
-    console.warn("Didn't set initialLoading function in Persistent ", this.key);
+    console.warn(
+      "Agile: Didn't set initialLoading function in Persistent ",
+      this.key
+    );
   }
 
   //=========================================================================================================
@@ -107,7 +110,10 @@ export class Persistent<ValueType = any> {
    * @param {StorageKey} key - Key you want to validate
    */
   public validateKey(key?: StorageKey): StorageKey | null {
-    console.warn("Didn't set validateKey function in Persistent ", this.key);
+    console.warn(
+      "Agile: Didn't set validateKey function in Persistent ",
+      this.key
+    );
     return null;
   }
 }

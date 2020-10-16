@@ -1,17 +1,16 @@
 import { Observer, defineConfig } from "../internal";
 
-export interface JobConfigInterface {
-  background?: boolean; // If it should cause an rerender
-  sideEffects?: boolean; // If it should call sideEffects
-  perform?: boolean; // If the Job should be performed
-}
-
-export class Job<ObserverType = Observer> {
+export class Job<ObserverType extends Observer = Observer> {
   public observer: ObserverType;
   public config: JobConfigInterface;
-  public rerender: boolean;
-  public performed: boolean = false;
+  public rerender: boolean; // If it should cause a rerender
+  public performed: boolean = false; // If it has already been performed
 
+  /**
+   * Job - Will be created by runtime and represents a job which will than be executed by the runtime
+   * @param {Observer} observer - Observer which is represented by this job and get performed
+   * @param {JobConfigInterface} config - Config
+   */
   constructor(observer: ObserverType, config: JobConfigInterface) {
     this.config = defineConfig<JobConfigInterface>(config, {
       background: false,
@@ -21,10 +20,19 @@ export class Job<ObserverType = Observer> {
 
     this.observer = observer;
     this.config = config;
-
     this.rerender =
       !config.background &&
-      // @ts-ignore
       this.observer.agileInstance().integrations.hasIntegration();
   }
+}
+
+/**
+ * @param {boolean} background - If assigning a new value should happen in the background -> not causing a rerender
+ * @param {boolean} sideEffects - If it should execute sideEffects
+ * @param {boolean} perform - If it should perform the Job immediately
+ */
+export interface JobConfigInterface {
+  background?: boolean;
+  sideEffects?: boolean;
+  perform?: boolean;
 }

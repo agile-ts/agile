@@ -10,7 +10,7 @@ export * from "./agile";
 // Runtime
 export * from "./runtime";
 export * from "./runtime/observer";
-export * from "./runtime/dep";
+export * from "./runtime/observer/dep";
 export * from "./runtime/job";
 export * from "./runtime/subscription/SubscriptionContainer";
 export * from "./runtime/subscription/CallbackSubscriptionContainer";

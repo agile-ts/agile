@@ -13,21 +13,12 @@ import {
   DefaultEventPayload,
   Integrations,
   Observer,
+  SubController,
 } from "./internal";
-
-/**
- * @param {boolean} logJobs - Allow Agile Logs
- * @param {boolean} waitForMount - If Agile should wait until the component mounts
- * @param {StorageConfigInterface} storageConfig - For setting up custom Storage
- */
-export interface AgileConfigInterface {
-  logJobs?: boolean;
-  waitForMount?: boolean;
-  storageConfig?: StorageConfigInterface;
-}
 
 export class Agile {
   public runtime: Runtime;
+  public subController: SubController;
   public storage: Storage;
 
   // Integrations
@@ -42,6 +33,7 @@ export class Agile {
   constructor(public config: AgileConfigInterface = {}) {
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
+    this.subController = new SubController(this);
     this.storage = new Storage(this, config.storageConfig || {});
 
     // Bind Frameworks to Agile
@@ -174,7 +166,18 @@ export class Agile {
     try {
       if (!globalThis.__agile) globalThis.__agile = this;
     } catch (error) {
-      console.warn("Failed to create global agileInstance");
+      console.warn("Agile: Failed to create global agileInstance");
     }
   }
+}
+
+/**
+ * @param {boolean} logJobs - Allow Agile Logs
+ * @param {boolean} waitForMount - If Agile should wait until the component mounts
+ * @param {StorageConfigInterface} storageConfig - For setting up custom Storage
+ */
+export interface AgileConfigInterface {
+  logJobs?: boolean;
+  waitForMount?: boolean;
+  storageConfig?: StorageConfigInterface;
 }

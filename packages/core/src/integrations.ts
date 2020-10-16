@@ -1,18 +1,5 @@
 import { Agile } from "./internal";
 
-/**
- * @param {string} name - Name of the Integration
- * @param {any} frameworkInstance - The framework instance (for instance in case of react you pass React)
- * @param {(agileInstance: Agile) => void} bind - Will be called if the framework got successful integrated
- * @param {(componentInstance: any, updatedData: Object) => void} updateMethod - Will be called if a Observer updates his subs (Only by Component based Subscription)
- */
-export interface IntegrationConfig<F = any> {
-  name?: string;
-  frameworkInstance?: F;
-  bind?: (agileInstance: Agile) => void;
-  updateMethod?: (componentInstance: any, updatedData: Object) => void;
-}
-
 export class Integration<F = any> {
   public ready: boolean = false;
   public config: IntegrationConfig<F>;
@@ -83,7 +70,7 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Will call the updateMethod in integrations
+   * Calls updateMethod in provided integrations
    * @param {any} componentInstance - Component which should get updated
    * @param {Object} updatedData - Updated Properties with the new Values (Note: properties with no value won't get passed)
    */
@@ -105,4 +92,17 @@ export class Integrations {
   public hasIntegration(): boolean {
     return this.integrations.size > 0;
   }
+}
+
+/**
+ * @param {string} name - Name of the Integration
+ * @param {any} frameworkInstance - The framework instance (for instance in case of react you pass React)
+ * @param {(agileInstance: Agile) => void} bind - Will be called if the framework got successful integrated
+ * @param {(componentInstance: any, updatedData: Object) => void} updateMethod - Will be called if a Observer updates his subs (Only by Component based Subscription)
+ */
+export interface IntegrationConfig<F = any> {
+  name?: string;
+  frameworkInstance?: F;
+  bind?: (agileInstance: Agile) => void;
+  updateMethod?: (componentInstance: any, updatedData: Object) => void;
 }

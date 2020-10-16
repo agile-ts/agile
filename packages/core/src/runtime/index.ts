@@ -8,27 +8,27 @@ import {
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
   StateObserver,
-  SubController,
 } from "../internal";
 
 export class Runtime {
   public agileInstance: () => Agile;
 
-  public subController: SubController; // Handles the subscriptions to an component
-
   // Queue system
   private currentJob: Job | null = null;
   private jobQueue: Array<Job> = [];
-  private notReadyJobsToRerender: Array<Job> = [];
-  private jobsToRerender: Array<Job> = [];
+  private notReadyJobsToRerender: Array<Job> = []; // Jobs that are performed but not ready to rerender (wait for mount)
+  private jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
-  // Used for tracking computed dependencies
-  public trackObserver: boolean = false; // Check if agile should track states
-  public foundObservers: Set<Observer> = new Set(); // States which were tracked during the track time
+  // Tracking - Used to track computed dependencies
+  public trackObservers: boolean = false; // Check if agile should track observers
+  public foundObservers: Set<Observer> = new Set(); // States which were tracked during the trackObservers time
 
+  /**
+   * Runtime - Handles changes of Observers
+   * @param {Agile} agileInstance - An instance of Agile
+   */
   constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
-    this.subController = new SubController(agileInstance);
   }
 
   public ingest(observer: Observer, options: JobConfigInterface): void {
@@ -203,7 +203,7 @@ export class Runtime {
     const finalFoundObservers = this.foundObservers;
 
     // Reset tracking
-    this.trackObserver = false;
+    this.trackObservers = false;
     this.foundObservers = new Set();
 
     return finalFoundObservers;

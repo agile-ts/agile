@@ -434,7 +434,7 @@ export class Collection<DataType = DefaultDataItem> {
       return undefined;
 
     // Add state to foundState (for auto tracking used states in computed functions)
-    if (this.agileInstance().runtime.trackObserver)
+    if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.data[id].observer);
 
     // Return data by id
