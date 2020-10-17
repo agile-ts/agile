@@ -6,7 +6,8 @@ export class Observer<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: ObserverKey;
-  public dep: Dep; // Dependencies and Subscriptions of the Observer
+  public dep: Dep; // Dependencies and Subscriptions of Observer
+  public value?: ValueType; // Value of Observer
 
   constructor(
     agileInstance: Agile,
@@ -17,6 +18,7 @@ export class Observer<ValueType = any> {
     this.agileInstance = () => agileInstance;
     this.dep = new Dep(deps);
     this._key = key;
+    this.value = value;
   }
 
   public set key(value: StateKey | undefined) {

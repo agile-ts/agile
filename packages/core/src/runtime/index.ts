@@ -23,6 +23,7 @@ export class Runtime {
   public foundObservers: Set<Observer> = new Set(); // States which were tracked during the trackObservers time
 
   /**
+   * @internal
    * Runtime - Handles changes of Observers
    * @param {Agile} agileInstance - An instance of Agile
    */

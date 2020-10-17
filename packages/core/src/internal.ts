@@ -12,9 +12,9 @@ export * from "./runtime";
 export * from "./runtime/observer";
 export * from "./runtime/observer/dep";
 export * from "./runtime/job";
-export * from "./runtime/subscription/SubscriptionContainer";
-export * from "./runtime/subscription/CallbackSubscriptionContainer";
-export * from "./runtime/subscription/ComponentSubscriptionContainer";
+export * from "./runtime/subscription/container/SubscriptionContainer";
+export * from "./runtime/subscription/container/CallbackSubscriptionContainer";
+export * from "./runtime/subscription/container/ComponentSubscriptionContainer";
 export * from "./runtime/subscription/sub";
 
 // Storage

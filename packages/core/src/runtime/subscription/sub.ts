@@ -7,19 +7,17 @@ import {
   CallbackSubscriptionContainer,
 } from "../../internal";
 
-//=========================================================================================================
-// Controller
-//=========================================================================================================
-
 export class SubController {
   public agileInstance: () => Agile;
 
-  // Component based Subscription
   public componentSubs: Set<ComponentSubscriptionContainer> = new Set();
-
-  // Callback based Subscription
   public callbackSubs: Set<CallbackSubscriptionContainer> = new Set();
 
+  /**
+   * @internal
+   * SubController - Handles subscriptions to a Component
+   * @param {Agile} agileInstance - An instance of Agile
+   */
   public constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
   }
@@ -28,39 +26,41 @@ export class SubController {
   // Subscribe with Subs Object
   //=========================================================================================================
   /**
-   * Subscribe to Agile State with a returned object of props this props can than be returned by the component (See react-integration)
+   * @internal
+   * Subscribe to Agile with Object shaped subs
+   * @param {any} integrationInstance - IntegrationInstance -> CallbackFunction or Component
+   * @param subs - Initial subs in Object shape
    */
   public subscribeWithSubsObject(
-    subscriptionInstance: any,
+    integrationInstance: any,
     subs: { [key: string]: Observer } = {}
   ): {
     subscriptionContainer: SubscriptionContainer;
-    props: { [key: string]: StateObserver["value"] };
+    props: { [key: string]: Observer["value"] };
   } {
+    const props: { [key: string]: Observer } = {};
+
+    // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
-      subscriptionInstance
+      integrationInstance
     );
 
-    const props: { [key: string]: Observer } = {};
+    // Set SubscriptionContainer to Object based
     subscriptionContainer.isObjectBased = true;
     subscriptionContainer.subsObject = subs;
 
-    // Go through subs
-    let localKeys = Object.keys(subs);
-    localKeys.forEach((key) => {
+    // Loop through initial subs and instantiate them
+    Object.keys(subs).forEach((key) => {
       const observable = subs[key];
 
       // Add State to SubscriptionContainer Subs
       subscriptionContainer.subs.add(observable);
 
-      // Add SubscriptionContainer to State Subs
+      // Add SubscriptionContainer to Observer Subs
       observable.dep.subscribe(subscriptionContainer);
 
-      // If no state instance return, because only states have a 'value'
-      if (!(observable instanceof StateObserver)) return;
-
-      // Add state to props
-      props[key] = observable.value;
+      // Add Value to props if Observer has value
+      if (observable.value) props[key] = observable.value;
     });
 
     return {
@@ -73,17 +73,22 @@ export class SubController {
   // Subscribe with Subs Array
   //=========================================================================================================
   /**
-   * Subscribe to Agile State
+   * @internal
+   * Subscribe to Agile with Array shaped subs
+   * @param {any} integrationInstance - IntegrationInstance -> CallbackFunction or Component
+   * @param {Array<Observer>} subs - Initial subs in Array shape
    */
   public subscribeWithSubsArray(
-    subscriptionInstance: any,
+    integrationInstance: any,
     subs: Array<Observer> = []
   ): SubscriptionContainer {
+    // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
-      subscriptionInstance,
+      integrationInstance,
       subs
     );
 
+    // Loop through initial subs and instantiate them
     subs.forEach((observable) => {
       // Add State to SubscriptionContainer Subs
       subscriptionContainer.subs.add(observable);
@@ -99,23 +104,27 @@ export class SubController {
   // Unsubscribe
   //=========================================================================================================
   /**
-   * Unsubscribe a component or callback
+   * @internal
+   * Unsubscribe callbackSubscriptionInstance or componentSubscriptionInstance
+   * @param {any} subscriptionInstance - SubscriptionInstance -> SubscriptionContainer or Component which holds an SubscriptionContainer
    */
   public unsubscribe(subscriptionInstance: any) {
+    // Helper function to unsubscribe callback or component based subscription
     const unsub = (subscriptionContainer: SubscriptionContainer) => {
       subscriptionContainer.ready = false;
 
-      // Removes SubscriptionContainer from State subs
+      // Removes SubscriptionContainer from Observer subs
       subscriptionContainer.subs.forEach((state) => {
         state.dep.unsubscribe(subscriptionContainer);
       });
     };
 
-    // Check if subscriptionInstance is CallbackSubscriptionContainer
+    // Unsubscribe callback based Subscription
     if (subscriptionInstance instanceof CallbackSubscriptionContainer)
       unsub(subscriptionInstance);
 
-    // Check if subscriptionInstance has componentSubscriptionContainer.. which holds an instance of a ComponentSubscriptionContainer
+    // Unsubscribe component based Subscription
+    // Check if component/class has property componentSubscriptionContainer, which should hold an instance of ComponentSubscriptionContainer
     if (subscriptionInstance.componentSubscriptionContainer)
       unsub(
         subscriptionInstance.componentSubscriptionContainer as ComponentSubscriptionContainer
@@ -126,7 +135,10 @@ export class SubController {
   // Register Subscription
   //=========================================================================================================
   /**
-   * Registers the Component/Callback Subscription and returns a SubscriptionContainer
+   * @internal
+   * Registers Component or Callback Subscription
+   * @param {any} integrationInstance - IntegrationInstance -> CallbackFunction or Component
+   * @param {Array<Observer>} subs - Initial subs in Array shape
    */
   public registerSubscription(
     integrationInstance: any,

@@ -4,6 +4,11 @@ export class Integration<F = any> {
   public ready: boolean = false;
   public config: IntegrationConfig<F>;
 
+  /**
+   * @public
+   * Integration
+   * @param {IntegrationConfig} config - Config
+   */
   constructor(config: IntegrationConfig) {
     this.config = config;
   }

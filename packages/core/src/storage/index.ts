@@ -20,7 +20,7 @@ export class Storage {
 
   /**
    * @public
-   * Storage
+   * Storage - Interface for saving stuff in a Storage
    * @param {Agile} agileInstance - An instance of Agile
    * @param {StorageConfigInterface} storageConfig - Config
    */

@@ -36,6 +36,7 @@ export class State<ValueType = any> {
   public watchers: { [key: string]: (value: any) => void } = {};
 
   /**
+   * @public
    * State
    * @param {Agile} agileInstance - An instance of Agile
    * @param {ValueType} initialValue - Initial Value of the State

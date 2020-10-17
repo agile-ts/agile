@@ -13,25 +13,16 @@ import {
   isFunction,
 } from "../internal";
 
-export type InternalIngestKeyType = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 export const internalIngestKey =
   "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
-
-/**
- * @param {boolean} forceRerender - Force rerender no matter what happens
- */
-export interface StateJobConfigInterface extends JobConfigInterface {
-  forceRerender?: boolean;
-}
 
 export class StateObserver<ValueType = any> extends Observer {
   public state: () => State<ValueType>; // State where the Observer is the runtime interface
   public nextStateValue: ValueType; // Next State value
-  public value: ValueType; // Current State value
 
   /**
    * @internal
-   * State Observer
+   * State Observer - Handles State changes and ingest it into the Runtime
    * @param {Agile} agileInstance - An instance of Agile
    * @param {State} state - State
    * @param {Array<Observer>} deps - Initial Dependencies of the State
@@ -152,4 +143,13 @@ export class StateObserver<ValueType = any> extends Observer {
         observer.ingest(internalIngestKey, { perform: false })
     );
   }
+}
+
+export type InternalIngestKeyType = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
+
+/**
+ * @param {boolean} forceRerender - Force rerender no matter what happens
+ */
+export interface StateJobConfigInterface extends JobConfigInterface {
+  forceRerender?: boolean;
 }
