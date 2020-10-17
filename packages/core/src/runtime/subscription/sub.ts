@@ -42,7 +42,7 @@ export class SubController {
     );
 
     const props: { [key: string]: Observer } = {};
-    subscriptionContainer.passProps = true;
+    subscriptionContainer.isObjectBased = true;
     subscriptionContainer.subsObject = subs;
 
     // Go through subs

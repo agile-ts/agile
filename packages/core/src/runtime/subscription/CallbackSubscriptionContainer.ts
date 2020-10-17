@@ -5,7 +5,6 @@ export class CallbackSubscriptionContainer extends SubscriptionContainer{
 
     constructor(callback: Function, subs?: Set<Observer>) {
         super(subs);
-
         this.callback = callback;
     }
 }

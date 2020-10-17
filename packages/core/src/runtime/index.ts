@@ -55,10 +55,10 @@ export class Runtime {
     if (this.agileInstance().config.logJobs)
       console.log(`Agile: Created Job(${job.observer.key})`, job);
 
-    // Add Job to JobQueue (so no Job get missing)
+    // Add Job to JobQueue (-> no Job get missing)
     this.jobQueue.push(job);
 
-    // Perform the Job and remove it from jobQueue
+    // Perform Job
     if (config.perform) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
@@ -71,7 +71,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job
+   * Performs Job and add it to the rerender queue if needed
    * @param {Job} job - Job you want to perform
    */
   private perform(job: Job): void {
@@ -90,7 +90,7 @@ export class Runtime {
     if (this.agileInstance().config.logJobs)
       console.log(`Agile: Completed Job(${job.observer.key})`, job);
 
-    // Perform Jobs as long Jobs are left in queue, if no job left update Subscribers of performed Jobs
+    // Perform Jobs as long as Jobs are in queue, if no job left update Subscribers of performed Jobs
     if (this.jobQueue.length > 0) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
@@ -108,7 +108,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Updates all Subscribers of Jobs that have to be rerendered
+   * Updates all Subscribers of the Observer in a Job
    */
   private updateSubscribers(): void {
     if (!this.agileInstance().integrations.hasIntegration()) {
@@ -121,7 +121,7 @@ export class Runtime {
       SubscriptionContainer
     >();
 
-    // Handle Object based Jobs and check if Job is ready
+    // Handle Object based Jobs and checks if Job is ready
     this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach((job) => {
       job.observer.dep.subs.forEach((subscriptionContainer) => {
         // Check if Subscription is ready to rerender
@@ -135,9 +135,8 @@ export class Runtime {
           return;
         }
 
-        // For a Container that require props to be passed
-        if (subscriptionContainer.passProps)
-          this.handlePassProps(subscriptionContainer, job);
+        if (subscriptionContainer.isObjectBased)
+          this.handleObjectBasedSubscription(subscriptionContainer, job);
 
         subscriptionsToUpdate.add(subscriptionContainer);
       });
@@ -153,30 +152,33 @@ export class Runtime {
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
-          this.formatChangedPropKeys(subscriptionContainer)
+          this.getObjectBasedProps(subscriptionContainer)
         );
     });
 
     // Logging
-    if (this.agileInstance().config.logJobs && subscriptionsToUpdate.size > 0)
+    if (this.agileInstance().config.logJobs)
       console.log("Agile: Rerendered Subscriptions ", subscriptionsToUpdate);
 
-    // Reset Jobs to Rerender
     this.jobsToRerender = [];
   }
 
   //=========================================================================================================
-  // Handle Pass Props
+  // Handle Object Based Subscription
   //=========================================================================================================
   /**
    * @internal
-   * Handle prop passing subscription
+   * Handles pass props - Object based subscription
+   * @param {SubscriptionContainer} subscriptionContainer - SubscriptionContainer which is Object based (-> isObjectBased = true)
+   * @param {Job} job - Job which is is currently handled
    */
-  public handlePassProps(
+  public handleObjectBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
     job: Job
-  ) {
+  ): void {
     let localKey: string | null = null;
+
+    if (subscriptionContainer.isObjectBased) return;
 
     // Find localKey of the Job Observer
     for (let key in subscriptionContainer.subsObject)
@@ -184,23 +186,24 @@ export class Runtime {
         localKey = key;
 
     // Add localKey to propKeysChanged if it got found (since since the observer with that key has changed)
-    if (localKey) subscriptionContainer.propKeysChanged.push(localKey);
+    if (localKey) subscriptionContainer.objectKeysChanged.push(localKey);
   }
 
   //=========================================================================================================
-  // Format Changed Prop Keys
+  // Get Object Based Props
   //=========================================================================================================
   /**
    * @internal
-   * Builds an object out of propKeysChanged in the SubscriptionContainer
+   * Builds an object out of objectKeysChanged in the SubscriptionContainer with provided value
+   * @param {SubscriptionContainer} subscriptionContainer - SubscriptionContainer which is Object based
    */
-  public formatChangedPropKeys(
+  public getObjectBasedProps(
     subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
     const finalObject: { [key: string]: any } = {};
 
     // Map trough changed Keys and build finalObject which will be passed into update function
-    subscriptionContainer.propKeysChanged.forEach((changedKey) => {
+    subscriptionContainer.objectKeysChanged.forEach((changedKey) => {
       // Check if SubscriptionContainer has value if so add it to the final Object
       if (
         subscriptionContainer.subsObject &&
@@ -209,6 +212,8 @@ export class Runtime {
         finalObject[changedKey] =
           subscriptionContainer.subsObject[changedKey]["value"];
     });
+
+    subscriptionContainer.objectKeysChanged = [];
 
     return finalObject;
   }

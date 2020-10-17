@@ -7,7 +7,7 @@ export class Job<ObserverType extends Observer = Observer> {
   public performed: boolean = false; // If it has already been performed
 
   /**
-   * Job - Will be created by runtime and represents a job which will than be executed by the runtime
+   * Job - Will be created by runtime and represents a job which will than be executed by it
    * @param {Observer} observer - Observer which is represented by this job and get performed
    * @param {JobConfigInterface} config - Config
    */
