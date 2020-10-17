@@ -63,7 +63,7 @@ export class SubController {
       subscriptionContainer.subs.add(observable);
 
       // Add SubscriptionContainer to Observer Subs
-      observable.dep.subscribe(subscriptionContainer);
+      observable.subscribe(subscriptionContainer);
 
       // Add Value to props if Observer has value
       if (observable.value) props[key] = observable.value;
@@ -100,7 +100,7 @@ export class SubController {
       subscriptionContainer.subs.add(observable);
 
       // Add SubscriptionContainer to State Subs
-      observable.dep.subscribe(subscriptionContainer);
+      observable.subscribe(subscriptionContainer);
     });
 
     return subscriptionContainer;
@@ -121,7 +121,7 @@ export class SubController {
 
       // Removes SubscriptionContainer from Observer subs
       subscriptionContainer.subs.forEach((state) => {
-        state.dep.unsubscribe(subscriptionContainer);
+        state.unsubscribe(subscriptionContainer);
       });
     };
 

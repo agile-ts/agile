@@ -100,13 +100,13 @@ export class Computed<ComputedValueType = any> extends State<
       newDeps.push(observer);
 
       // Add this as dependency of the state
-      observer.dep.depend(this.observer);
+      observer.depend(this.observer);
     });
 
     // Handle hardCoded dependencies
     this.hardCodedDeps.forEach((observer) => {
       // Add this as dependency of the state
-      observer.dep.depend(this.observer);
+      observer.depend(this.observer);
     });
 
     // Set deps

@@ -36,7 +36,7 @@ describe("Update Function Tests", () => {
       true,
       "MY_COLLECTION default Group has been created"
     );
-    expect(MY_COLLECTION.groups["default"]?.observer.dep.subs.size === 1).to.eq(
+    expect(MY_COLLECTION.groups["default"]?.observer.subs.size === 1).to.eq(
       true,
       "MY_COLLECTION default Group has correct subs size"
     );

@@ -37,7 +37,7 @@ describe("Default Selector Tests", () => {
         "MY_COLLECTION selector1 Selector has been created"
       );
       expect(
-        MY_COLLECTION.selectors["selector1"]?.observer.dep.subs.size === 1
+        MY_COLLECTION.selectors["selector1"]?.observer.subs.size === 1
       ).to.eq(true, "MY_COLLECTION selector1 Selector has correct subs size");
       expect(MY_COLLECTION.selectors["selector1"].key).to.eq(
         "selector1",

@@ -124,7 +124,7 @@ export class Runtime {
 
     // Handle Object based Jobs and checks if Job is ready
     this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach((job) => {
-      job.observer.dep.subs.forEach((subscriptionContainer) => {
+      job.observer.subs.forEach((subscriptionContainer) => {
         // Check if Subscription is ready to rerender
         if (!subscriptionContainer.ready) {
           this.notReadyJobsToRerender.push(job);

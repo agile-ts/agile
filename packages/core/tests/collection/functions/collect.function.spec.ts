@@ -34,9 +34,10 @@ describe("Collect Function Tests", () => {
         true,
         "MY_COLLECTION default Group has been created"
       );
-      expect(
-        MY_COLLECTION.groups["default"]?.observer.dep.subs.size === 1
-      ).to.eq(true, "MY_COLLECTION default Group has correct subs size");
+      expect(MY_COLLECTION.groups["default"]?.observer.subs.size === 1).to.eq(
+        true,
+        "MY_COLLECTION default Group has correct subs size"
+      );
 
       expect(JSON.stringify(myHookCollection)).to.eq(
         JSON.stringify([]),
@@ -500,9 +501,10 @@ describe("Collect Function Tests", () => {
         true,
         "MY_COLLECTION default Group has been created"
       );
-      expect(
-        MY_COLLECTION.groups["default"]?.observer.dep.subs.size === 1
-      ).to.eq(true, "MY_COLLECTION default Group has correct subs size");
+      expect(MY_COLLECTION.groups["default"]?.observer.subs.size === 1).to.eq(
+        true,
+        "MY_COLLECTION default Group has correct subs size"
+      );
 
       expect(JSON.stringify(myHookCollection)).to.eq(
         JSON.stringify([]),

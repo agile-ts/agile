@@ -6,7 +6,7 @@ export class CallbackSubscriptionContainer extends SubscriptionContainer {
   /**
    * @internal
    * CallbackSubscriptionContainer - Callback based Subscription
-   * @param {Function} callback - Callback Function which causes a rerender on the Component which is subscribed by Agile
+   * @param {Function} callback - Callback Function which causes a rerender on the Component which subscribes Agile
    * @param {Set<Observer>} subs - Initial Subscriptions of the Subscription Container
    */
   constructor(callback: Function, subs?: Set<Observer>) {

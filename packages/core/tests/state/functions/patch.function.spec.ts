@@ -37,7 +37,7 @@ describe("Patch Function Tests", () => {
       }),
       "MY_STATE has correct value"
     );
-    expect(MY_STATE.observer.dep.subs.size === 1).to.eq(
+    expect(MY_STATE.observer.subs.size === 1).to.eq(
       true,
       "MY_STATE has correct subs size (Subs are components/callbackFunctions which causes rerender)"
     );

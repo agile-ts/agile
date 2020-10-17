@@ -136,7 +136,7 @@ export class StateObserver<ValueType = any> extends Observer {
           state.sideEffects[sideEffectKey]();
 
     // Ingest Dependencies of State into Runtime (for instance ComputedValues)
-    job.observer.dep.deps.forEach(
+    job.observer.deps.forEach(
       (observer) =>
         observer instanceof StateObserver &&
         observer.ingest(internalIngestKey, { perform: false })
