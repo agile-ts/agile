@@ -169,6 +169,7 @@ export function defineConfig<ConfigInterface = Object>(
 export interface FlatMergeConfigInterface {
   addNewProperties?: boolean;
 }
+
 /**
  * Merge items into object but only at the top level
  * @param {DataType} source - Source object
@@ -216,4 +217,22 @@ export function equal(value1: any, value2: any): boolean {
  */
 export function notEqual(value1: any, value2: any): boolean {
   return value1 !== value2 && JSON.stringify(value1) !== JSON.stringify(value2);
+}
+
+//=========================================================================================================
+// Generate Id
+//=========================================================================================================
+/**
+ * Generates random id
+ * @param {number} length - Length of generated Id
+ */
+export function generateId(length: number) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
