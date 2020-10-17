@@ -1,7 +1,6 @@
 import {
   Agile,
   Observer,
-  StateObserver,
   SubscriptionContainer,
   ComponentSubscriptionContainer,
   CallbackSubscriptionContainer,
@@ -10,8 +9,8 @@ import {
 export class SubController {
   public agileInstance: () => Agile;
 
-  public componentSubs: Set<ComponentSubscriptionContainer> = new Set();
-  public callbackSubs: Set<CallbackSubscriptionContainer> = new Set();
+  public componentSubs: Set<ComponentSubscriptionContainer> = new Set(); // Holds all registered ComponentSubscriptionContainers
+  public callbackSubs: Set<CallbackSubscriptionContainer> = new Set(); // Holds all registered CallbackSubscriptionContainers
 
   /**
    * @internal
@@ -29,7 +28,7 @@ export class SubController {
    * @internal
    * Subscribe to Agile with Object shaped subs
    * @param {any} integrationInstance - IntegrationInstance -> CallbackFunction or Component
-   * @param subs - Initial subs in Object shape
+   * @param subs - Initial subs Object
    */
   public subscribeWithSubsObject(
     integrationInstance: any,
@@ -40,17 +39,24 @@ export class SubController {
   } {
     const props: { [key: string]: Observer } = {};
 
+    // Create subsArray
+    const subsArray: Observer[] = [];
+    for (let key in subs) {
+      subsArray.push(subs[key]);
+    }
+
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
-      integrationInstance
+      integrationInstance,
+      subsArray
     );
 
     // Set SubscriptionContainer to Object based
     subscriptionContainer.isObjectBased = true;
     subscriptionContainer.subsObject = subs;
 
-    // Loop through initial subs and instantiate them
-    Object.keys(subs).forEach((key) => {
+    // Instantiate subs
+    for (let key in subs) {
       const observable = subs[key];
 
       // Add State to SubscriptionContainer Subs
@@ -61,7 +67,7 @@ export class SubController {
 
       // Add Value to props if Observer has value
       if (observable.value) props[key] = observable.value;
-    });
+    }
 
     return {
       subscriptionContainer: subscriptionContainer,
@@ -76,7 +82,7 @@ export class SubController {
    * @internal
    * Subscribe to Agile with Array shaped subs
    * @param {any} integrationInstance - IntegrationInstance -> CallbackFunction or Component
-   * @param {Array<Observer>} subs - Initial subs in Array shape
+   * @param {Array<Observer>} subs - Initial subs Array
    */
   public subscribeWithSubsArray(
     integrationInstance: any,
@@ -88,7 +94,7 @@ export class SubController {
       subs
     );
 
-    // Loop through initial subs and instantiate them
+    // Instantiate subs
     subs.forEach((observable) => {
       // Add State to SubscriptionContainer Subs
       subscriptionContainer.subs.add(observable);
@@ -124,7 +130,7 @@ export class SubController {
       unsub(subscriptionInstance);
 
     // Unsubscribe component based Subscription
-    // Check if component/class has property componentSubscriptionContainer, which should hold an instance of ComponentSubscriptionContainer
+    // Check if component/class has property componentSubscriptionContainer, which holds an instance of ComponentSubscriptionContainer
     if (subscriptionInstance.componentSubscriptionContainer)
       unsub(
         subscriptionInstance.componentSubscriptionContainer as ComponentSubscriptionContainer
@@ -154,73 +160,81 @@ export class SubController {
   // Register Component Subscription
   //=========================================================================================================
   /**
-   * Registers Component Subscription
-   * Note: Helper Function
+   * @internal
+   * Registers Component based Subscription
+   * @param {any} componentInstance - Component which has subscribed an Observer
+   * @param {Array<Observer>} subs - Initial subs Array
    */
   private registerComponentSubscription(
     componentInstance: any,
     subs: Array<Observer> = []
   ): ComponentSubscriptionContainer {
-    // Create ComponentSubscriptionContainer
-    const componentContainer = new ComponentSubscriptionContainer(
+    const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
       new Set(subs)
     );
 
-    // Create an instance of the componentSubscriptionContainer in the Component.. to be able to unsubscribe it later (see unsubscribe)
+    this.componentSubs.add(componentSubscriptionContainer);
+
+    // To have an instance of a SubscriptionContainer in the Component (for instance needed to unsubscribe component later)
     if (componentInstance.componentSubscriptionContainer)
-      componentInstance.componentSubscriptionContainer = componentContainer;
+      componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
 
-    // Add to components
-    this.componentSubs.add(componentContainer);
-
-    // Set Ready
+    // Set to ready if not waiting until component got mounted
     if (!this.agileInstance().config.waitForMount)
-      componentContainer.ready = true;
+      componentSubscriptionContainer.ready = true;
 
+    // Logging
     if (this.agileInstance().config.logJobs)
-      console.log("Agile: Registered Component ", componentContainer);
+      console.log(
+        "Agile: Registered Component based Subscription ",
+        componentSubscriptionContainer
+      );
 
-    return componentContainer;
+    return componentSubscriptionContainer;
   }
 
   //=========================================================================================================
   // Register Callback Subscription
   //=========================================================================================================
   /**
-   * Registers Callback Subscription
-   * Note: Helper Function
+   * @internal
+   * Registers Callback based Subscription
+   * @param {() => void} callbackFunction - CallbackFunction which causes a rerender on a component which has subscribed an Observer
+   * @param {Array<Observer>} subs - Initial subs Array
    */
   private registerCallbackSubscription(
     callbackFunction: () => void,
     subs: Array<Observer> = []
   ): CallbackSubscriptionContainer {
-    // Create CallbackSubscriptionContainer
-    const callbackContainer = new CallbackSubscriptionContainer(
-      callbackFunction as Function,
+    const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
+      callbackFunction,
       new Set(subs)
     );
 
-    // Add to callbacks
-    this.callbackSubs.add(callbackContainer);
+    this.callbackSubs.add(callbackSubscriptionContainer);
+    callbackSubscriptionContainer.ready = true;
 
-    // Set Ready
-    callbackContainer.ready = true;
-
+    // Logging
     if (this.agileInstance().config.logJobs)
-      console.log("Agile: Registered Callback ", callbackContainer);
+      console.log(
+        "Agile: Registered Callback based Subscription ",
+        callbackSubscriptionContainer
+      );
 
-    return callbackContainer;
+    return callbackSubscriptionContainer;
   }
 
   //=========================================================================================================
   // Mount
   //=========================================================================================================
   /**
-   * This will mount the component (Mounts currently only useful in Component based Subscription)
+   * @internal
+   * Mounts a component
+   * @param {any} componentInstance - Component which should get mounted
    */
-  public mount(integrationInstance: any) {
-    if (!integrationInstance.componentContainer) return;
-    integrationInstance.componentContainer.ready = true;
+  public mount(componentInstance: any) {
+    if (!componentInstance.componentSubscriptionContainer) return;
+    componentInstance.componentSubscriptionContainer.ready = true;
   }
 }

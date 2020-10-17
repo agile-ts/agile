@@ -34,10 +34,9 @@ export class StateObserver<ValueType = any> extends Observer {
     deps?: Array<Observer>,
     key?: ObserverKey
   ) {
-    super(agileInstance, deps, key);
+    super(agileInstance, deps, key, state.value);
     this.state = () => state;
     this.nextStateValue = state.value;
-    this.value = state.value;
   }
 
   //=========================================================================================================
