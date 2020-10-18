@@ -20,17 +20,17 @@ describe("On Function Tests", () => {
   MY_EVENT.on((payload) => {
     eventCallCount++;
     currentEventPayload = payload;
-  });
+  }, "myEvent");
 
   it("Has correct initial value", () => {
     expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
     expect(JSON.stringify(MY_EVENT.config)).to.eq(
-      JSON.stringify({ enabled: true }),
+      JSON.stringify({ enabled: true, rerender: false }),
       "MY_EVENT has correct initial config"
     );
-    expect(MY_EVENT.callbacks.size).to.eq(
-      1,
-      "MY_EVENT has correct callbacks size"
+    expect(MY_EVENT.callbacks["myEvent"] !== undefined).to.eq(
+      true,
+      "MY_EVENT has 'myEvent' in callbacks"
     );
     expect(MY_EVENT.enabled).to.eq(true, "MY_EVENT is enabled");
 

@@ -17,7 +17,7 @@ export const internalIngestKey =
   "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
 export class StateObserver<ValueType = any> extends Observer {
-  public state: () => State<ValueType>; // State where the Observer is the runtime interface
+  public state: () => State<ValueType>;
   public nextStateValue: ValueType; // Next State value
 
   /**
@@ -30,7 +30,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   constructor(
     agileInstance: Agile,
-    state: State,
+    state: State<ValueType>,
     deps?: Array<Observer>,
     key?: ObserverKey
   ) {

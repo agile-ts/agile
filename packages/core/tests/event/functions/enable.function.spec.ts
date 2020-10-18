@@ -17,7 +17,7 @@ describe("Enable Function Tests", () => {
   it("Has correct initial value", () => {
     expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
     expect(JSON.stringify(MY_EVENT.config)).to.eq(
-      JSON.stringify({ enabled: false }),
+      JSON.stringify({ enabled: false, rerender: false }),
       "MY_EVENT has correct initial config"
     );
     expect(MY_EVENT.enabled).to.eq(false, "MY_EVENT is disabled");
@@ -29,7 +29,7 @@ describe("Enable Function Tests", () => {
 
     expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses stayed the same");
     expect(JSON.stringify(MY_EVENT.config)).to.eq(
-      JSON.stringify({ enabled: false }),
+      JSON.stringify({ enabled: false, rerender: false }),
       "MY_EVENT has correct config"
     );
     expect(MY_EVENT.enabled).to.eq(true, "MY_EVENT is enabled");

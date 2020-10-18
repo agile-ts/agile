@@ -4,6 +4,7 @@ import {
   SubscriptionContainer,
   ComponentSubscriptionContainer,
   CallbackSubscriptionContainer,
+  isFunction,
 } from "../../internal";
 
 export class SubController {
@@ -150,7 +151,7 @@ export class SubController {
     integrationInstance: any,
     subs: Array<Observer> = []
   ): SubscriptionContainer {
-    if (typeof integrationInstance === "function")
+    if (isFunction(integrationInstance))
       return this.registerCallbackSubscription(integrationInstance, subs);
 
     return this.registerComponentSubscription(integrationInstance, subs);

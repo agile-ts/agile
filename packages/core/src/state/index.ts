@@ -82,7 +82,7 @@ export class State<ValueType = any> {
     this._key = value;
 
     // Change Key in Observer
-    this.observer.key = `o_${value}`;
+    this.observer.key = value;
 
     // Change Key in PersistManager
     if (this.isPersisted && this.persistent) {

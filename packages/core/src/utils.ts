@@ -226,11 +226,12 @@ export function notEqual(value1: any, value2: any): boolean {
  * Generates random id
  * @param {number} length - Length of generated Id
  */
-export function generateId(length: number) {
+export function generateId(length?: number) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
   let result = "";
+  if (!length) length = 5;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
