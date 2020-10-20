@@ -8,7 +8,9 @@ describe("Custom Framework Tests", () => {
   const customIntegration = new Integration({
     name: "test2",
     updateMethod: () => {},
-    bind: () => {},
+    bind: () => {
+      return true;
+    },
   });
 
   // Define Agile with framework

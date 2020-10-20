@@ -1,8 +1,8 @@
-// This file exposes Agile functions and types to the outside world.
+// This file exposes Agile functions and types to the outside world
 // It also serves as a cyclic dependency workaround
 // https://medium.com/visual-development/how-to-fix-nasty-circular-dependency-issues-once-and-for-all-in-javascript-typescript-a04c987cf0de.
 
-// !! All internal Agile modules must be imported from here.
+// !! All internal Agile modules must be imported from here!!
 
 // Agile
 export * from "./agile";
@@ -39,6 +39,7 @@ export * from "./event";
 
 // Integrations
 export * from "./integrations";
+export * from "./integrations/integration";
 
 // Utils
 export * from "./utils";

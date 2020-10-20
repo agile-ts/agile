@@ -4,8 +4,9 @@ import { State, Agile, Event, Collection } from "./internal";
 // Copy
 //=========================================================================================================
 /**
+ * @internal
  * Creates a fresh copy of an Array or Object
- * @param {any | Array<any>} value - Array/Object which you want to copy
+ * @param value - Array/Object which gets copied
  */
 export function copy<T = any>(value: T): T;
 export function copy<T extends Array<T>>(value: T): T[];
@@ -19,9 +20,10 @@ export function copy<T = any>(value: T): T | T[] {
 // Is Valid Object
 //=========================================================================================================
 /**
- * Checks if an Value is a valid Object
+ * @internal
+ * Checks if an value is valid Object
  * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
- * @param {any} value - Value you want to check if its a valid Object
+ * @param value - Value which is tested for its correctness
  */
 export function isValidObject(value: any): boolean {
   function isHTMLElement(obj: any) {
@@ -49,15 +51,14 @@ export function isValidObject(value: any): boolean {
 // Normalize Array
 //=========================================================================================================
 /**
- * Will transform items into an Array
- * @param {DataType | Array<DataType>} items - Item/s you want to transform into an array
+ * @internal
+ * Normalize Item/s so that it is an Item Array
+ * @param items - Item/s which get transformed
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>
 ): Array<DataType> {
-  // Return empty array if no items
   if (!items) return [];
-
   return Array.isArray(items) ? items : [items as DataType];
 }
 
@@ -65,20 +66,21 @@ export function normalizeArray<DataType = any>(
 // Get Instance
 //=========================================================================================================
 /**
- * Tries to get the agileInstance from the provided instances
- * If no agileInstance found it will return the global bound agileInstance
- * @param {any} instance - Instance which could hold an AgileInstance
+ * @internal
+ * Tries to get agileInstance from provided instance
+ * If no agileInstance found it returns the global AgileInstance
+ * @param instance - Instance which might hold an agileInstance
  */
 export function getAgileInstance(instance: any): Agile | null {
   try {
-    // Return state agileInstance
+    // Try to find agileInstance in Instance
     if (instance instanceof State) return instance.agileInstance();
-
     if (instance instanceof Event) return instance.agileInstance();
-
     if (instance instanceof Collection) return instance.agileInstance();
+    const _instance = instance["agileInstance"];
+    if (_instance) return instance;
 
-    // Return a global bound agileInstance (set in first instantiation of Agile)
+    // Return global bound agileInstance (set in first instantiation of Agile)
     return globalThis.__agile;
   } catch (e) {
     // fail silently
@@ -90,8 +92,9 @@ export function getAgileInstance(instance: any): Agile | null {
 // Is Function
 //=========================================================================================================
 /**
- * Checks if @func is an function
- * @param {any} value - Value you want to check if its a function
+ * @internal
+ * Checks if value is a function
+ * @param value - Value which is tested if its a function
  */
 export function isFunction(value: any): boolean {
   return typeof value === "function";
@@ -101,8 +104,9 @@ export function isFunction(value: any): boolean {
 // Is Async Function
 //=========================================================================================================
 /**
- * Checks if func is an async function
- * @param {any} value - Value you want to check if its a async function
+ * @internal
+ * Checks if value is an async function
+ * @param value - Value which is tested if its an async function
  */
 export function isAsyncFunction(value: any): boolean {
   return isFunction(value) && value.constructor.name === "AsyncFunction";
@@ -112,9 +116,10 @@ export function isAsyncFunction(value: any): boolean {
 // Is Valid Url
 //=========================================================================================================
 /**
- * checks the correctness of the url
- * https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
- * @param {string} url - Url you want to check if its valid
+ * @internal
+ * Checks the correctness of an url
+ * Resource: https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
+ * @param url - Url which is tested for its correctness
  */
 export function isValidUrl(url: string): boolean {
   const pattern = new RegExp(
@@ -133,8 +138,9 @@ export function isValidUrl(url: string): boolean {
 // Is Json String
 //=========================================================================================================
 /**
- * Checks if value is a valid JsonString
- * @param {any} value - Value you want to check if its an JsonString
+ * @internal
+ * Checks if value is valid JsonString
+ * @param value - Value which will be checked
  */
 export function isJsonString(value: any): boolean {
   try {
@@ -149,9 +155,10 @@ export function isJsonString(value: any): boolean {
 // Define Config
 //=========================================================================================================
 /**
- * Merges default values into config
- * @param {ConfigInterface} config - Config which should receive the default values
- * @param {Object} defaults - Default values which will be merged into config
+ * @internal
+ * Merges default values/properties into config object
+ * @param config - Config object which receives default values
+ * @param defaults - Default values object which will be merged into config object
  */
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
@@ -164,17 +171,19 @@ export function defineConfig<ConfigInterface = Object>(
 // Flat Merge
 //=========================================================================================================
 /**
- * @param {boolean} addNewProperties - Add new properties to source Object or not
+ * @internal
+ * @param addNewProperties - Adds new properties to source Object
  */
 export interface FlatMergeConfigInterface {
   addNewProperties?: boolean;
 }
 
 /**
- * Merge items into object but only at the top level
- * @param {DataType} source - Source object
- * @param {Object} changes - Changes you want to merge into the source object
- * @param {Object} config - Config
+ * @internal
+ * Merges items into object, be aware that the merge will only happen at the top level of the object
+ * @param source - Source object
+ * @param changes - Changes you want to merge into the source object
+ * @param config - Config
  */
 export function flatMerge<DataType = Object>(
   source: DataType,
@@ -199,9 +208,10 @@ export function flatMerge<DataType = Object>(
 // Equals
 //=========================================================================================================
 /**
+ * @internal
  * Check if 2 values are equal
- * @param {any} value1 - First Value
- * @param {any} value2 - Second Value
+ * @param value1 - First Value
+ * @param value2 - Second Value
  */
 export function equal(value1: any, value2: any): boolean {
   return value1 === value2 || JSON.stringify(value1) === JSON.stringify(value2);
@@ -211,9 +221,10 @@ export function equal(value1: any, value2: any): boolean {
 // Not Equals
 //=========================================================================================================
 /**
- * Check if 2 values aren't equal
- * @param {any} value1 - First Value
- * @param {any} value2 - Second Value
+ * @internal
+ * Checks if 2 values aren't equal
+ * @param value1 - First Value
+ * @param value2 - Second Value
  */
 export function notEqual(value1: any, value2: any): boolean {
   return value1 !== value2 && JSON.stringify(value1) !== JSON.stringify(value2);
@@ -223,8 +234,9 @@ export function notEqual(value1: any, value2: any): boolean {
 // Generate Id
 //=========================================================================================================
 /**
- * Generates random id
- * @param {number} length - Length of generated Id
+ * @internal
+ * Generates random Id
+ * @param length - Length of generated Id
  */
 export function generateId(length?: number) {
   const characters =

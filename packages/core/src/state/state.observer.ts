@@ -44,7 +44,7 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests the newStateValue into the Runtime
+   * Ingests newStateValue into Runtime
    * @param {any} newStateValue - New State Value
    * @param {JobConfigInterface} config - Config
    */

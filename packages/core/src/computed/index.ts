@@ -9,28 +9,37 @@ export class Computed<ComputedValueType = any> extends State<
   public deps: Array<Observer> = [];
   public hardCodedDeps: Array<Observer> = [];
 
+  /**
+   * @public
+   * Computed - Computes value from provided function.
+   * This value will be recomputed if one detected or given dependency changes.
+   * @param {Agile} agileInstance - An instance of Agile
+   * @param {() => ComputedValueType} computeFunction - Function which recomputes if a dependency in it changes
+   * @param { Array<Observer | State | Event>} deps - Initial deps of the Computed Function
+   */
   constructor(
     agileInstance: Agile,
     computeFunction: () => ComputedValueType,
-    deps: Array<Observer> = []
+    deps: Array<Observer | State | Event> = []
   ) {
     super(agileInstance, computeFunction());
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
-    this.hardCodedDeps = deps;
+    this.hardCodedDeps = deps
+      .map((dep) => dep["observer"] || undefined)
+      .filter((dep) => dep !== undefined);
 
     // Recompute for setting initial state value and adding missing dependencies
     this.recompute();
   }
 
   public set value(value: ComputedValueType) {
-    console.error(
-      "Agile: Can not mutate Computed value, please use recompute()"
-    );
+    console.error("Agile: Can't mutate Computed value!");
   }
 
   public get value(): ComputedValueType {
     // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
+    // Can't remove this getter function.. since the setter function is set in this class -> Error if not setter and getter set
 
     // Add state to foundState (for auto tracking used states in computed functions)
     if (this.agileInstance().runtime.trackObservers)
@@ -43,17 +52,16 @@ export class Computed<ComputedValueType = any> extends State<
   // Recompute
   //=========================================================================================================
   /**
-   * Will call the computeFunction and update the dependencies
+   * @public
+   * Recomputes Function Value -> calls ComputeFunction and updates her dependencies
+   * @param {RecomputeConfigInterface} config - Config
    */
-  public recompute(options?: { background?: boolean; sideEffects?: boolean }) {
-    // Assign defaults to config
-    options = defineConfig(options, {
+  public recompute(config?: RecomputeConfigInterface) {
+    config = defineConfig(config, {
       background: false,
       sideEffects: true,
     });
-
-    // Set State to nextState
-    this.ingest(options);
+    this.ingest(config);
   }
 
   //=========================================================================================================
@@ -65,13 +73,13 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<State> = [],
-    options?: { background?: boolean; sideEffects?: boolean }
+    config?: RecomputeConfigInterface
   ) {
     this.computeFunction = computeFunction;
     this.hardCodedDeps = deps.map((state) => state.observer);
 
     // Recompute for setting initial state value and adding missing dependencies
-    this.recompute(options);
+    this.recompute(config);
   }
 
   //=========================================================================================================
@@ -133,4 +141,13 @@ export class Computed<ComputedValueType = any> extends State<
     );
     return this;
   }
+}
+
+/**
+ * @param {boolean} background - If recomputing should happen in the background -> not causing a rerender
+ * @param {boolean} sideEffects - If Side Effects of the Computed should get executed (sideEffects)
+ */
+export interface RecomputeConfigInterface {
+  background?: boolean;
+  sideEffects?: boolean;
 }

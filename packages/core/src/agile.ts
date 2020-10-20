@@ -17,9 +17,9 @@ import {
 } from "./internal";
 
 export class Agile {
-  public runtime: Runtime;
-  public subController: SubController;
-  public storage: Storage;
+  public runtime: Runtime; // Handles Jobs that have to be 'rerendered'
+  public subController: SubController; // Handles subscriptions to Components
+  public storage: Storage; // Handles permanent saving
 
   // Integrations
   public integrations: Integrations; // Integrated frameworks
@@ -27,8 +27,8 @@ export class Agile {
 
   /**
    * @public
-   * Agile
-   * @param {AgileConfigInterface} config - Config
+   * Agile - Global state and logic framework for reactive Typescript & Javascript applications
+   * @param config - Config
    */
   constructor(public config: AgileConfigInterface = {}) {
     this.integrations = new Integrations(this);
@@ -36,10 +36,7 @@ export class Agile {
     this.subController = new SubController(this);
     this.storage = new Storage(this, config.storageConfig || {});
 
-    // Bind Frameworks to Agile
-    this.integrations.bind();
-
-    // Creates a global agileInstance
+    // Create global agileInstance
     this.globalBind();
   }
 
@@ -48,8 +45,8 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Integrate framework into Agile
-   * @param {Integration} integration - Integration which you want to integrate/register
+   * Integrates framework into Agile
+   * @param integration - Integration which gets registered/integrated
    */
   public use(integration: Integration) {
     this.integrations.integrate(integration);
@@ -61,8 +58,8 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Create custom Storage
-   * @param {StorageConfigInterface} config - Config
+   * Creates custom Storage
+   * @param config - Config
    */
   public Storage = (config: StorageConfigInterface) =>
     new Storage(this, config);
@@ -72,9 +69,9 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Create Agile State
-   * @param {ValueType} initialValue - Initial value of the State
-   * @param {string} key - Key/Name of the State
+   * State - Handles one value and causes rerender on subscribed Components
+   * @param initialValue - Initial Value of the State
+   * @param key - Key/Name of the State
    */
   public State = <ValueType>(initialValue: ValueType, key?: string) =>
     new State<ValueType>(this, initialValue, key);
@@ -84,8 +81,8 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Create Agile Collection, which olds an List of Objects
-   * @param {CollectionConfig} config - Config
+   * Collection - Handles a List of Objects with a key and causes rerender on subscribed Components
+   * @param config - Config
    */
   public Collection = <DataType = DefaultDataItem>(
     config?: CollectionConfig<DataType>
@@ -96,27 +93,23 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Create Agile Computed Function, which will be updated if any dependency get updated
-   * @param {() => ComputedValueType} computeFunction - Computed Function
-   * @param {Array<State>} deps - Deps of the Computed Function
+   * Computed - Function that recomputes its value if a dependency changes
+   * @param computeFunction - Computed Function
+   * @param deps - Hard coded dependencies of Computed Function
    */
   public Computed = <ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
-    deps?: Array<State | Observer>
-  ) =>
-    new Computed<ComputedValueType>(
-      this,
-      computeFunction,
-      deps?.map((dep) => (dep instanceof State ? dep.observer : dep))
-    );
+    deps?: Array<Observer | State | Event>
+    // @ts-ignore
+  ) => new Computed<ComputedValueType>(this, computeFunction, deps);
 
   //=========================================================================================================
   // Event
   //=========================================================================================================
   /**
    * @public
-   * Create Agile Event
-   * @param {EventConfig} config - Config
+   * Handy function for emitting UI updates and passing data with them
+   * @param config - Config
    */
   public Event = <PayloadType = DefaultEventPayload>(config?: EventConfig) =>
     new Event<PayloadType>(this, config);
@@ -127,17 +120,17 @@ export class Agile {
   /**
    * @public
    * Configure AgileStorage
-   * @param {StorageConfigInterface} config - Config
+   * @param storage - Storage that gets used as Agile Storage
    */
-  public configureStorage(config: StorageConfigInterface): void {
+  public configureStorage(storage: Storage): void {
     // Get States which are already saved into a storage
     const persistentInstances = this.storage.persistentInstances;
 
     // Define new Storage
-    this.storage = new Storage(this, config);
+    this.storage = storage;
     this.storage.persistentInstances = persistentInstances;
 
-    // Transfer already saved items to the new Storage
+    // Transfer already saved items to new Storage
     persistentInstances.forEach((persistent) =>
       persistent.initialLoading(persistent.key)
     );

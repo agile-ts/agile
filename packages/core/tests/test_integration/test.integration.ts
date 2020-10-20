@@ -5,6 +5,7 @@ const testIntegration = new Integration({
   frameworkInstance: null,
   bind(agileInstance: Agile) {
     // Nothing to bind ;D
+    return true;
   },
   updateMethod(componentInstance: any, updatedData: Object) {
     // Nothing

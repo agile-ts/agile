@@ -19,7 +19,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
   /**
    * @public
-   * Event - Create Callback Functions and call them
+   * Event - Handy function for emitting UI updates and passing data with them
    * @param {Agile} agileInstance - An instance of Agile
    * @param {EventConfig} config - Config
    */

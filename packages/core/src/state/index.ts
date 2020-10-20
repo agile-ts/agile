@@ -37,7 +37,7 @@ export class State<ValueType = any> {
 
   /**
    * @public
-   * State
+   * State - Handles value and causes rerender on subscribed Components
    * @param {Agile} agileInstance - An instance of Agile
    * @param {ValueType} initialValue - Initial Value of the State
    * @param {StateKey} key - Key/Name of the State
@@ -129,7 +129,8 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests the nextState, computedValue into the runtime
+   * Ingests nextState, computedValue into Runtime
+   * -> updates State and causes rerender if necessary
    * @param {StateJobConfigInterface} config - Config
    */
   public ingest(config: StateJobConfigInterface = {}): this {
