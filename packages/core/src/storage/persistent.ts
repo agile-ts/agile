@@ -9,7 +9,7 @@ export class Persistent<ValueType = any> {
   /**
    * @internal
    * Persistent - Handles saving of Agile Instances
-   * @param {Agile} agileInstance - An instance of Agile
+   * @param agileInstance - An instance of Agile
    */
   constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
@@ -28,8 +28,10 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Inits the Persistent - Have to do that this way since validateKey/initialLoading can have deps that aren't set before defining properties in extending/child class
-   * @param {StorageKey} key - Key of the Storage property
+   * Inits Persistent(this class)
+   * Have to do it that way since validateKey/initialLoading can have deps that aren't
+   * set before defining properties in extended class
+   * @param key - Key of Storage property
    */
   public initPersistent(key?: StorageKey): boolean {
     // Validate Key
@@ -40,7 +42,7 @@ export class Persistent<ValueType = any> {
     }
     this._key = finalKey;
 
-    // Load or Save the persistent Value for the first Time
+    // Load/Save persisted Value for the first Time
     this.initialLoading(finalKey);
 
     this.agileInstance().storage.persistentInstances.add(this);
@@ -54,8 +56,8 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Loads or Saves the StorageValue for the first time
-   * @param {StorageKey} key -  Key of the Storage property
+   * Loads/Saves Storage Value for the first Time
+   * @param key -  Key of Storage property
    */
   public async initialLoading(key: StorageKey) {
     console.warn(
@@ -69,7 +71,7 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Loads the State Value from the Storage
+   * Loads Value from Storage at this._key
    */
   public async loadValue(): Promise<ValueType | undefined> {
     if (!this.ready) return;
@@ -81,8 +83,8 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Saves/Updates the State Value in the Storage
-   * @param {ValueType} value - Value you want to save
+   * Saves/Updates Value in Storage at this._key
+   * @param value - new Value at this._key property
    */
   public setValue(value: ValueType): void {
     if (!this.ready) return;
@@ -94,7 +96,7 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Removes the State Value from the Storage
+   * Removes Value form Storage at this._key
    */
   public removeValue(): void {
     if (!this.ready) return;
@@ -106,8 +108,8 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Validates the Storage Key
-   * @param {StorageKey} key - Key you want to validate
+   * Validates Storage Key
+   * @param key - Key that gets validated
    */
   public validateKey(key?: StorageKey): StorageKey | null {
     console.warn(

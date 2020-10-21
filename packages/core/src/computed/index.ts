@@ -41,7 +41,7 @@ export class Computed<ComputedValueType = any> extends State<
     // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
     // Can't remove this getter function.. since the setter function is set in this class -> Error if not setter and getter set
 
-    // Add state to foundState (for auto tracking used states in computed functions)
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 

@@ -46,7 +46,7 @@ export class Agile {
   /**
    * @public
    * Integrates framework into Agile
-   * @param integration - Integration which gets registered/integrated
+   * @param integration - Integration that gets registered/integrated
    */
   public use(integration: Integration) {
     this.integrations.integrate(integration);
@@ -119,18 +119,17 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Configure AgileStorage
-   * @param storage - Storage that gets used as Agile Storage
+   * Configures Agile Storage
+   * @param storage - Storage that will get used as Agile Storage
    */
   public configureStorage(storage: Storage): void {
-    // Get States which are already saved into a storage
+    // Get Observers that are already saved into a storage
     const persistentInstances = this.storage.persistentInstances;
 
     // Define new Storage
     this.storage = storage;
-    this.storage.persistentInstances = persistentInstances;
 
-    // Transfer already saved items to new Storage
+    // Transfer already saved items into new Storage
     persistentInstances.forEach((persistent) =>
       persistent.initialLoading(persistent.key)
     );
@@ -141,7 +140,7 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Checks if Agile has registered any Integration
+   * Checks if Agile has any registered Integration
    */
   public hasIntegration(): boolean {
     return this.integrations.hasIntegration();
@@ -152,7 +151,7 @@ export class Agile {
   //=========================================================================================================
   /**
    * @internal
-   * Creates a global reference to the first agileInstance created
+   * Creates a global reference to the first agileInstance
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
    */
   private globalBind() {
@@ -165,9 +164,9 @@ export class Agile {
 }
 
 /**
- * @param {boolean} logJobs - Allow Agile Logs
- * @param {boolean} waitForMount - If Agile should wait until the component mounts
- * @param {StorageConfigInterface} storageConfig - For setting up custom Storage
+ * @param logJobs - Allow Agile Logs
+ * @param waitForMount - If Agile should wait until the component mounts
+ * @param storageConfig - For setting up custom Storage
  */
 export interface AgileConfigInterface {
   logJobs?: boolean;

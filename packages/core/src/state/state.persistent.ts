@@ -5,10 +5,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
   /**
    * @internal
-   * State Persist Manager - Handles the permanent saving of a State
-   * @param {Agile} agileInstance - An instance of Agile
-   * @param {State} state - State you want to save
-   * @param {StorageKey} key - Key of the Storage property
+   * State Persist Manager - Handles permanent saving of State Value
+   * @param agileInstance - An instance of Agile
+   * @param state - State
+   * @param key - Key of Storage property
    */
   constructor(agileInstance: Agile, state: State<ValueType>, key?: StorageKey) {
     super(agileInstance);
@@ -23,6 +23,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
       return;
     }
 
+    // Check if key has changed
     if (value === this._key) return;
 
     // Remove value with old Key
@@ -44,8 +45,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Loads or Saves the StorageValue for the first time
-   * @param {StorageKey} key -  Key of the Storage property
+   * Loads/Saves State Value for the first Time
+   * @param key -  Key of Storage property
    */
   public async initialLoading(key: StorageKey) {
     const state = this.state();
@@ -53,13 +54,13 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Get storage Value
     const storageValue = await this.loadValue();
 
-    // If value doesn't exist in the storage.. create it
+    // If value doesn't exist in the storage, add it
     if (!storageValue) {
       this.setValue(state.getPersistableValue());
       return;
     }
 
-    // If value exists in storage, load it into the state
+    // If value exists in storage, load it into State
     state.set(storageValue);
   }
 
@@ -68,8 +69,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Validates the Storage Key
-   * @param {StorageKey} key - Key you want to validate
+   * Validates Storage Key
+   * @param key - Key that gets validated
    */
   public validateKey(key?: StorageKey): StorageKey | null {
     const state = this.state();
@@ -77,10 +78,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Get key from State key
     if (!key && state.key) return state.key;
 
-    // Return null if no key can be found
+    // Return null if no key found
     if (!key) return null;
 
-    // Set Storage key as State key if no State key exists
+    // Set State Key to Storage Key if State key isn't set
     if (!state.key) state.key = key;
 
     return key;

@@ -5,8 +5,8 @@ import { State, Agile, Event, Collection } from "./internal";
 //=========================================================================================================
 /**
  * @internal
- * Creates a fresh copy of an Array or Object
- * @param value - Array/Object which gets copied
+ * Creates a fresh copy of an Array/Object
+ * @param value - Array/Object that gets copied
  */
 export function copy<T = any>(value: T): T;
 export function copy<T extends Array<T>>(value: T): T[];
@@ -23,7 +23,7 @@ export function copy<T = any>(value: T): T | T[] {
  * @internal
  * Checks if an value is valid Object
  * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
- * @param value - Value which is tested for its correctness
+ * @param value - Value that is tested for its correctness
  */
 export function isValidObject(value: any): boolean {
   function isHTMLElement(obj: any) {
@@ -53,7 +53,7 @@ export function isValidObject(value: any): boolean {
 /**
  * @internal
  * Normalize Item/s so that it is an Item Array
- * @param items - Item/s which get transformed
+ * @param items - Item/s that get transformed to an Array
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>
@@ -69,7 +69,7 @@ export function normalizeArray<DataType = any>(
  * @internal
  * Tries to get agileInstance from provided instance
  * If no agileInstance found it returns the global AgileInstance
- * @param instance - Instance which might hold an agileInstance
+ * @param instance - Instance that might hold an agileInstance
  */
 export function getAgileInstance(instance: any): Agile | null {
   try {
@@ -94,7 +94,7 @@ export function getAgileInstance(instance: any): Agile | null {
 /**
  * @internal
  * Checks if value is a function
- * @param value - Value which is tested if its a function
+ * @param value - Value that is tested if its a function
  */
 export function isFunction(value: any): boolean {
   return typeof value === "function";
@@ -106,7 +106,7 @@ export function isFunction(value: any): boolean {
 /**
  * @internal
  * Checks if value is an async function
- * @param value - Value which is tested if its an async function
+ * @param value - Value that is tested if its an async function
  */
 export function isAsyncFunction(value: any): boolean {
   return isFunction(value) && value.constructor.name === "AsyncFunction";
@@ -119,7 +119,7 @@ export function isAsyncFunction(value: any): boolean {
  * @internal
  * Checks the correctness of an url
  * Resource: https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
- * @param url - Url which is tested for its correctness
+ * @param url - Url that is tested for its correctness
  */
 export function isValidUrl(url: string): boolean {
   const pattern = new RegExp(
@@ -140,7 +140,7 @@ export function isValidUrl(url: string): boolean {
 /**
  * @internal
  * Checks if value is valid JsonString
- * @param value - Value which will be checked
+ * @param value - Value that will be checked
  */
 export function isJsonString(value: any): boolean {
   try {
@@ -157,8 +157,8 @@ export function isJsonString(value: any): boolean {
 /**
  * @internal
  * Merges default values/properties into config object
- * @param config - Config object which receives default values
- * @param defaults - Default values object which will be merged into config object
+ * @param config - Config object that receives default values
+ * @param defaults - Default values object that will be merged into config object
  */
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,

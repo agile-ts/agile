@@ -19,29 +19,29 @@ export class State<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: StateKey;
-  public valueType?: string; // primitive types for js users
-  public isSet: boolean = false; // If value has is not the same as initialValue
-  public isPlaceholder: boolean = false; // If placeholder its just a placeholder of a state, because the state isn't defined yet
+  public valueType?: string; // primitive type for js users
+  public isSet: boolean = false; // If value is not the same as initialValue
+  public isPlaceholder: boolean = false;
   public initialStateValue: ValueType;
-  public _value: ValueType; // Current Value of the State
+  public _value: ValueType; // Current Value of State
   public previousStateValue: ValueType;
-  public nextStateValue: ValueType; // The nextStateValue is used internal and represents the next State Value which can be edited as wished
+  public nextStateValue: ValueType; // NextStateValue is mostly used internal and represents the next State Value
 
-  public observer: StateObserver; // Handles deps and subs of the State (rerender stuff)
-  public sideEffects: { [key: string]: () => void } = {}; // SideEffects during the Runtime process
+  public observer: StateObserver; // Handles deps and subs of State and is like an interface to the Runtime
+  public sideEffects: { [key: string]: () => void } = {}; // SideEffects of State (will be executed in Runtime)
 
-  public isPersisted: boolean = false; // If the State got saved in Storage
-  public persistent: StatePersistent | undefined; // Manages saving the State into Storage
+  public isPersisted: boolean = false; // If State got saved in Storage
+  public persistent: StatePersistent | undefined; // Manages storing a State in Storage
 
   public watchers: { [key: string]: (value: any) => void } = {};
 
   /**
    * @public
    * State - Handles value and causes rerender on subscribed Components
-   * @param {Agile} agileInstance - An instance of Agile
-   * @param {ValueType} initialValue - Initial Value of the State
-   * @param {StateKey} key - Key/Name of the State
-   * @param {Array<Observer>} deps - Initial deps of the State
+   * @param agileInstance - An instance of Agile
+   * @param initialValue - Initial Value of the State
+   * @param key - Key/Name of the State
+   * @param deps - Initial deps of the State
    */
   constructor(
     agileInstance: Agile,
@@ -68,7 +68,7 @@ export class State<ValueType = any> {
   }
 
   public get value(): ValueType {
-    // Add state to Observers (for auto tracking used observers in computed function)
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
@@ -99,9 +99,9 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Update the Value of the State
-   * @param {ValueType} value - The new Value which you want to assign to the State
-   * @param {SetConfigInterface} config - Config
+   * Updates Value of State
+   * @param value - Value that gets set to the new Value of the State
+   * @param config - Config
    */
   public set(value: ValueType, config: SetConfigInterface = {}): this {
     config = defineConfig(config, {
@@ -110,7 +110,7 @@ export class State<ValueType = any> {
     });
 
     // Check if Type is Correct (js)
-    if (this.valueType && !this.isCorrectType(value)) {
+    if (this.valueType && !this.hasCorrectType(value)) {
       console.warn(`Agile: Incorrect type (${typeof value}) was provided.`);
       return this;
     }
@@ -118,7 +118,7 @@ export class State<ValueType = any> {
     // Check if value has changed
     if (equal(this.value, value)) return this;
 
-    // Ingest updated value into runtime
+    // Ingest new value into runtime
     this.observer.ingest(value, config);
 
     return this;
@@ -129,9 +129,8 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests nextState, computedValue into Runtime
-   * -> updates State and causes rerender if necessary
-   * @param {StateJobConfigInterface} config - Config
+   * Ingests nextStateValue, computedValue into Runtime
+   * @param config - Config
    */
   public ingest(config: StateJobConfigInterface = {}): this {
     config = defineConfig(config, {
@@ -148,8 +147,8 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Assign a initial default type to a State
-   * Note this is mainly thought for JS users
+   * Assign native type to State Value
+   * Note: This function is mainly thought for JS users
    * @param type - wished Type ('String', 'Boolean', 'Array', 'Object', 'Number')
    */
   public type(type: any): this {
@@ -172,7 +171,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Undoes the last State change
+   * Undoes latest State change
    */
   public undo() {
     this.set(this.previousStateValue);
@@ -183,12 +182,12 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Resets the State to its initial value
+   * Resets State to its initial value
    */
   public reset(): this {
     this.set(this.initialStateValue);
 
-    // Remove State from Storage (since its the initial State)
+    // Remove State from Storage (since its the initial Value)
     if (this.isPersisted && this.persistent) this.persistent.removeValue();
 
     return this;
@@ -200,9 +199,9 @@ export class State<ValueType = any> {
   /**
    * @public
    * Patches changes into object
-   * Note: Only useful if State is object
-   * @param {object} targetWithChanges - The Object which includes the changes which than will be patched into the State
-   * @param {PatchConfigInterface} config - Config
+   * Note: Only useful if State is an Object
+   * @param targetWithChanges - Object that contains the changes that will be patched into the State Value (Object)
+   * @param config - Config
    */
   public patch(
     targetWithChanges: object,
@@ -232,10 +231,10 @@ export class State<ValueType = any> {
       { addNewProperties: config.addNewProperties }
     );
 
-    // Check if value has changed
+    // Check if value has been changed
     if (equal(this.value, this.nextStateValue)) return this;
 
-    // Ingest updated nextStateValue
+    // Ingest updated nextStateValue into Runtime
     this.ingest({ background: config.background });
 
     return this;
@@ -246,9 +245,9 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Watches State and detect State changes
-   * @param {string} key - Key of the Watcher
-   * @param {(value: ValueType) => void} callback - Callback Function which should be called if State changes
+   * Watches State and detects State changes
+   * @param key - Key of Watcher Function
+   * @param callback - Callback Function which will be called if State value changes
    */
   public watch(key: string, callback: (value: ValueType) => void): this {
     if (!isFunction(callback)) {
@@ -257,7 +256,6 @@ export class State<ValueType = any> {
       );
       return this;
     }
-
     this.watchers[key] = callback;
     return this;
   }
@@ -268,7 +266,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Removes Watcher at given Key
-   * @param {string} key - Key of the Watcher you want to remove
+   * @param key - Key of Watcher that gets removed
    */
   public removeWatcher(key: string): this {
     delete this.watchers[key];
@@ -280,14 +278,15 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Saves State in custom or local Storage
-   * @param {string} key - Storage Key (Note: not needed if State has already a key/name)
+   * Stores State Value into Agile Storage
+   * @param key - Storage Key (Note: not needed if State has key/name)
    */
   public persist(key?: StorageKey): this {
+    // Check if State is already persisted if so only change key if provided
     if (this.isPersisted && this.persistent) {
-      console.warn(`Agile: The State '${this.key}' is already persisted!`);
+      console.warn(`Agile: State '${this.key}' is already persisted!`);
 
-      // Update Key in Persistent
+      // Update Persistent Key
       if (key) this.persistent.key = key;
       return this;
     }
@@ -305,7 +304,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Creates a fresh copy of the State Value (-> No reference to State value)
+   * Creates fresh copy of State Value (-> No reference to State Value)
    */
   public copy(): ValueType {
     return copy(this.value);
@@ -316,7 +315,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Checks if the State exists
+   * Checks if State exists
    */
   public get exists(): boolean {
     return this.getPublicValue() !== undefined && !this.isPlaceholder;
@@ -328,7 +327,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Equivalent to ===
-   * @param {ValueType} value - value which you want to check if its equals to the State value
+   * @param value - Value that gets checked if its equals to the State Value
    */
   public is(value: ValueType): boolean {
     return equal(value, this.value);
@@ -340,19 +339,19 @@ export class State<ValueType = any> {
   /**
    * @public
    * Equivalent to !==
-   * @param {ValueType} value - value which you want to check if its not equals to the State value
+   * @param value - Value that gets checked if its not equals to the State Value
    */
   public isNot(value: ValueType): boolean {
     return notEqual(value, this.value);
   }
 
   //=========================================================================================================
-  // Toggle
+  // Invert
   //=========================================================================================================
   /**
    * @public
-   * Inverts the State
-   * Note: Only useful by boolean based States
+   * Inverts State Value
+   * Note: Only useful with boolean based States
    */
   public invert(): this {
     if (typeof this._value !== "boolean") {
@@ -360,7 +359,6 @@ export class State<ValueType = any> {
       return this;
     }
     this.set(this._value);
-
     return this;
   }
 
@@ -369,18 +367,15 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Add a SideEffect to State (Will be called on every State change)
-   * @param {string} key - Key of the Watcher
-   * @param {() => void)} sideEffect - Callback Function which should be called if State changes
+   * Adds SideEffect to State
+   * @param key - Key of SideEffect
+   * @param sideEffect - Callback Function that gets called on every State Value change
    */
   public addSideEffect(key: string, sideEffect: () => void): this {
     if (!isFunction(sideEffect)) {
-      console.error(
-        "Agile: A watcher sideEffect function has to be an function!"
-      );
+      console.error("Agile: A sideEffect function has to be an function!");
       return this;
     }
-
     this.sideEffects[key] = sideEffect;
     return this;
   }
@@ -390,8 +385,8 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Remove SideEffect at given Key
-   * @param {string} key - Key of the SideEffect you want to remove
+   * Removes SideEffect at given Key
+   * @param key - Key of the SideEffect that gets removed
    */
   public removeSideEffect(key: string): this {
     delete this.sideEffects[key];
@@ -403,9 +398,8 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   *  Writes value into State
-   *  Note: doesn't cause rerender and so.. for that use the Set Function
-   *  @param {any} value - Value you want to write into the State
+   * Writes new Value into State
+   * @param value - New Value of State
    */
   public privateWrite(value: any) {
     this._value = copy(value);
@@ -420,10 +414,10 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Checks if Value has correct valueType
-   *  @param {any} value - Value you want to check if it has correct valueType
+   * Checks if Value has correct valueType (js)
+   * @param value - Value that gets checked for its correct Type
    */
-  private isCorrectType(value: any): boolean {
+  private hasCorrectType(value: any): boolean {
     let type: string = typeof value;
     return type === this.valueType;
   }
@@ -433,10 +427,10 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   *  Returns public value of this State
+   * Returns public Value of State
    */
   public getPublicValue(): ValueType {
-    // If the State value for the wide world isn't the value its the output (see Group)
+    // If State Value is used internal and output represents the real state value (for instance in Group)
     if (this["output"] !== undefined) return this["output"];
 
     return this._value;
@@ -447,7 +441,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   *  Returns persistableValue Value of this State
+   * Returns persistable Value of this State
    */
   public getPersistableValue(): any {
     return this.value;
@@ -455,17 +449,19 @@ export class State<ValueType = any> {
 }
 
 export type StateKey = string | number;
+
 /**
- * @param {boolean} background - If assigning a new value should happen in the background -> not causing a rerender
- * @param {boolean} sideEffects - If Side Effects of the State should get executed (sideEffects)
+ * @param background - If assigning a new value will happen in the background (-> not causing any rerender)
+ * @param sideEffects - If Side Effects of State will be executed
  */
 export interface SetConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
 }
+
 /**
- * @param {boolean} background - If assigning a new value should happen in the background -> not causing a rerender
- * @param {boolean} addNewProperties - If it should add new properties to the State object
+ * @param background - If assigning a new value will happen in the background (-> not causing any rerender)
+ * @param addNewProperties - If new Properties will be added to the State Value
  */
 export interface PatchConfigInterface {
   addNewProperties?: boolean;

@@ -1,7 +1,5 @@
 import {
   Agile,
-  State,
-  Collection,
   isAsyncFunction,
   isFunction,
   isJsonString,
@@ -20,9 +18,9 @@ export class Storage {
 
   /**
    * @public
-   * Storage - Interface for saving stuff in a Storage
-   * @param {Agile} agileInstance - An instance of Agile
-   * @param {StorageConfigInterface} storageConfig - Config
+   * Storage - Interface for Agile to save Items in Storage
+   * @param agileInstance - An instance of Agile
+   * @param storageConfig - Config
    */
   constructor(agileInstance: Agile, storageConfig: StorageConfigInterface) {
     this.agileInstance = () => agileInstance;
@@ -44,13 +42,13 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Instantiates LocalStorage
+   * Instantiates Local Storage
    */
   private instantiateLocalStorage() {
-    // Check if Local Storage is Available (For instance in ReactNative it doesn't exist)
+    // Check if Local Storage is Available
     if (!Storage.localStorageAvailable()) {
       console.warn(
-        "Agile: Local Storage is here not available.. to use the Storage functionality please provide a custom Storage!"
+        "Agile: Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
       );
       return;
     }
@@ -103,8 +101,8 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Gets value at the provided Key
-   * @param {StorageKey} key - Key of the Storage property
+   * Gets value at provided Key
+   * @param key - Key of Storage property
    */
   public get<GetType = any>(
     key: StorageKey
@@ -117,7 +115,6 @@ export class Storage {
     // Normal Get
     const res = this.config.methods.get(this.getStorageKey(key));
     if (isJsonString(res)) return JSON.parse(res);
-
     return res;
   }
 
@@ -127,7 +124,7 @@ export class Storage {
   /**
    * @internal
    * Gets value at the provided Key (async)
-   * @param {StorageKey} key - Key of the Storage property
+   * @param key - Key of Storage property
    */
   private asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
     return new Promise((resolve, reject) => {
@@ -147,8 +144,8 @@ export class Storage {
   /**
    * @public
    * Saves/Updates value at the provided Key
-   * @param {StorageKey} key - Key of the Storage property
-   * @param {any} value - Value you want to save
+   * @param key - Key of Storage property
+   * @param value - Value you want to update/save
    */
   public set(key: StorageKey, value: any): void {
     if (!this.storageReady || !this.config.methods?.set) return;
@@ -161,7 +158,7 @@ export class Storage {
   /**
    * @public
    * Removes value at provided Key
-   * @param {StorageKey} key - Key of the Storage property
+   * @param key - Key of Storage property
    */
   public remove(key: StorageKey): void {
     if (!this.storageReady || !this.config.methods?.remove) return;
@@ -173,7 +170,8 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Create Storage Key out of provide StorageKey
+   * Creates Storage Key from provided key
+   * @param key - Key that gets converted into a Storage Key
    */
   private getStorageKey(key: StorageKey): string {
     return `_${this.config.prefix}_${key}`;
@@ -200,12 +198,12 @@ export class Storage {
 export type StorageKey = string | number;
 export type StorageType = "localStorage" | "custom";
 /**
- * @param {boolean} async - If its a async storage
- * @param {string} prefix - Prefix of the storage
- * @param {Object} methods - Storage methods like (get, set, remove)
- * @param {(key: string) => any} methods.get - Get Method which will get Items out of the Storage
- * @param {key: string, value: any) => void} methods.set - Set Method which will set Items into the Storage
- * @param {(key: string) => void} methods.remove - Remove Methods which will remove Items from the Storage
+ * @param async - If its an async storage
+ * @param prefix - Prefix of Storage Property
+ * @param methods - Storage methods like (get, set, remove)
+ * @param methods.get - Get Method of Storage (gets items from storage)
+ * @param methods.set - Set Method of Storage (saves/updates items in storage)
+ * @param methods.remove - Remove Methods of Storage (removes items from storage)
  */
 export interface StorageConfigInterface {
   async?: boolean;

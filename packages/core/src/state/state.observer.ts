@@ -22,11 +22,11 @@ export class StateObserver<ValueType = any> extends Observer {
 
   /**
    * @internal
-   * State Observer - Handles State changes and ingest it into the Runtime
-   * @param {Agile} agileInstance - An instance of Agile
-   * @param {State} state - State
-   * @param {Array<Observer>} deps - Initial Dependencies of the State
-   * @param {ObserverKey} key - Key/Name of the Observer
+   * State Observer - Handles State changes, dependencies and ingest changes into the Runtime
+   * @param agileInstance - An instance of Agile
+   * @param state - State
+   * @param deps - Initial Dependencies of State
+   * @param key - Key/Name of Observer
    */
   constructor(
     agileInstance: Agile,
@@ -44,9 +44,9 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests newStateValue into Runtime
-   * @param {any} newStateValue - New State Value
-   * @param {JobConfigInterface} config - Config
+   * Ingests new State Value into Runtime and applies it to the State
+   * @param newStateValue - New State Value that gets applied to the State
+   * @param config - Config
    */
   public ingest(
     newStateValue: ValueType | InternalIngestKeyType = internalIngestKey,
@@ -61,10 +61,10 @@ export class StateObserver<ValueType = any> extends Observer {
       forceRerender: false,
     });
 
-    // If forceRerender.. set background to false since forceRerender is 'stronger' than background
+    // If forceRerender, set background config to false since forceRerender is 'stronger' than background
     if (config.forceRerender && config.background) config.background = false;
 
-    // Grab nextState or compute the State if internalIngestKey got passed
+    // Grab nextState or compute State if internalIngestKey got passed
     if (newStateValue === internalIngestKey) {
       if (state instanceof Computed) this.nextStateValue = state.computeValue();
       else this.nextStateValue = state.nextStateValue;
@@ -79,7 +79,6 @@ export class StateObserver<ValueType = any> extends Observer {
       return;
     }
 
-    // Ingest into runtime
     this.agileInstance().runtime.ingest(this, config);
   }
 
@@ -88,8 +87,8 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Performs a Job
-   * @param {Job<this>} job - The Job which should be performed
+   * Performs Job from Runtime
+   * @param job - Job that gets performed
    */
   public perform(job: Job<this>) {
     const state = job.observer.state();
@@ -135,7 +134,7 @@ export class StateObserver<ValueType = any> extends Observer {
         if (isFunction(state.sideEffects[sideEffectKey]))
           state.sideEffects[sideEffectKey]();
 
-    // Ingest Dependencies of State into Runtime (for instance ComputedValues)
+    // Ingest Dependencies of State into Runtime
     job.observer.deps.forEach(
       (observer) =>
         observer instanceof StateObserver &&
@@ -147,7 +146,7 @@ export class StateObserver<ValueType = any> extends Observer {
 export type InternalIngestKeyType = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
 /**
- * @param {boolean} forceRerender - Force rerender no matter what happens
+ * @param forceRerender - Force rerender no matter what happens
  */
 export interface StateJobConfigInterface extends JobConfigInterface {
   forceRerender?: boolean;
