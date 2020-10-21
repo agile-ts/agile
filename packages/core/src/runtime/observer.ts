@@ -6,18 +6,17 @@ export class Observer<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: ObserverKey;
-  public deps: Set<Observer> = new Set(); // Dependencies (Other Observers)
-  public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions (Components) which the Observer has subscribed
+  public deps: Set<Observer> = new Set(); // Observers that depends on this Observer
+  public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions(Components) which this Observer has subscribed
   public value?: ValueType; // Value of Observer
 
   /**
    * @internal
-   * Observers - Handles subscriptions and dependencies and is like an instance to the Runtime
-   * Note: No stand alone class!
-   * @param {Agile} agileInstance - An instance of Agile
-   * @param {ValueType} value - Value of Observer
-   * @param {Array<Observer>} deps - Initial Dependencies of the Observer
-   * @param {ObserverKey} key - Key/Name of the Observer
+   * Observer - Handles subscriptions and dependencies of an Agile Class and is like an instance to the Runtime
+   * @param agileInstance - An instance of Agile
+   * @param value - Initial Value of Observer
+   * @param deps - Initial Dependencies of Observer
+   * @param key - Key/Name of Observer
    */
   constructor(
     agileInstance: Agile,
@@ -44,11 +43,11 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Performs a Job
-   * @param {Job<this>} job - The Job which should be performed
+   * Performs Job of Runtime
+   * @param job - Job that gets performed
    */
   public perform(job: Job) {
-    console.warn("Didn't set perform function in Observer ", this.key);
+    console.warn("Agile: Didn't set perform function in Observer ", this.key);
   }
 
   //=========================================================================================================
@@ -56,8 +55,8 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Add new Dependency
-   * @param {Observer} observer - Observer which should depend on this Observer
+   * Add new Dependency to Observer
+   * @param observer - Observer that will depend on this Observer
    */
   public depend(observer: Observer) {
     if (!this.deps.has(observer)) this.deps.add(observer);
@@ -69,7 +68,7 @@ export class Observer<ValueType = any> {
   /**
    * @internal
    * Add new Subscription
-   * @param {SubscriptionContainer} subscriptionContainer - SubscriptionContainer (Component) which the Observer should subscribe
+   * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
    */
   public subscribe(subscriptionContainer: SubscriptionContainer) {
     if (!this.subs.has(subscriptionContainer))
@@ -82,7 +81,7 @@ export class Observer<ValueType = any> {
   /**
    * @internal
    * Remove Subscription
-   * @param {SubscriptionContainer} subscriptionContainer - SubscriptionContainer (Component) which the Observer should unsubscribe
+   * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
    */
   public unsubscribe(subscriptionContainer: SubscriptionContainer) {
     if (this.subs.has(subscriptionContainer))

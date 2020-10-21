@@ -25,8 +25,8 @@ export class StateObserver<ValueType = any> extends Observer {
    * State Observer - Handles State changes, dependencies and ingest changes into the Runtime
    * @param agileInstance - An instance of Agile
    * @param state - State
-   * @param deps - Initial Dependencies of State
-   * @param key - Key/Name of Observer
+   * @param deps - Initial Dependencies of State Observer
+   * @param key - Key/Name of State Observer
    */
   constructor(
     agileInstance: Agile,

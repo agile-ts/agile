@@ -16,7 +16,7 @@ export class Integration<F = any> {
 
 /**
  * @param name - Name of Integration
- * @param frameworkInstance - The framework instance (for instance in case of react you pass React)
+ * @param frameworkInstance - An Instance of the Framework which gets integrated (for instance in case of react you pass React)
  * @param bind - Will be called if the framework got successful integrated
  * @param updateMethod - Will be called if a Observer updates his subs (Only by Component based Subscription)
  */

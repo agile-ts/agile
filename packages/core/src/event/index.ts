@@ -15,7 +15,7 @@ export class Event<PayloadType = DefaultEventPayload> {
   public observer: EventObserver;
 
   // @ts-ignore
-  public payload: PayloadType; // Holds type of PayloadType so that it can be read external (never defined)
+  public payload: PayloadType; // Holds type of Payload so that it can be read external (never defined)
 
   /**
    * @public

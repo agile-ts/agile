@@ -19,13 +19,13 @@ export class Runtime {
   private jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
   // Tracking - Used to track computed dependencies
-  public trackObservers: boolean = false; // Check if agile should track observers
-  public foundObservers: Set<Observer> = new Set(); // States which were tracked during the trackObservers time
+  public trackObservers: boolean = false; // Check if Runtime have to track Observers
+  public foundObservers: Set<Observer> = new Set(); // Observers that got tracked during the 'trackObservers' time
 
   /**
    * @internal
-   * Runtime - Handles changes of Observers
-   * @param {Agile} agileInstance - An instance of Agile
+   * Runtime - Performs ingested Observers
+   * @param agileInstance - An instance of Agile
    */
   constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
@@ -36,9 +36,9 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests Observer into runtime which will than be performed
-   * @param {Observer} observer - Observer you want to perform
-   * @param {JobConfigInterface} config - Config
+   * Ingests Observer into Runtime and creates Job
+   * @param observer - Observer that gets performed by the Runtime
+   * @param config - Config
    */
   public ingest(observer: Observer, config: JobConfigInterface): void {
     config = defineConfig<JobConfigInterface>(config, {
@@ -72,8 +72,8 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job and add it to the rerender queue if needed
-   * @param {Job} job - Job you want to perform
+   * Performs Job and add it to rerender queue if necessary
+   * @param job - Job that gets performed
    */
   private perform(job: Job): void {
     this.currentJob = job;
@@ -83,15 +83,13 @@ export class Runtime {
     job.performed = true;
 
     if (job.rerender) this.jobsToRerender.push(job);
-
-    // Reset currentJob since it has been performed
     this.currentJob = null;
 
     // Logging
     if (this.agileInstance().config.logJobs)
       console.log(`Agile: Completed Job(${job.observer.key})`, job);
 
-    // Perform Jobs as long as Jobs are in queue, if no job left update Subscribers of performed Jobs
+    // Perform Jobs as long as Jobs are in queue, if no job left update/rerender Subscribers of performed Jobs
     if (this.jobQueue.length > 0) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
@@ -109,7 +107,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Updates all Subscribers of the Observer in a Job
+   * Updates all Subscribers of Job
    */
   private updateSubscribers(): void {
     if (!this.agileInstance().integrations.hasIntegration()) {
@@ -117,7 +115,7 @@ export class Runtime {
       return;
     }
 
-    // Subscriptions that has to be updated (Set = For preventing double subscriptions without further checks)
+    // Subscriptions that has to be updated/rerendered (Set = For preventing double subscriptions without further checks)
     const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<
       SubscriptionContainer
     >();
@@ -159,7 +157,10 @@ export class Runtime {
 
     // Logging
     if (this.agileInstance().config.logJobs)
-      console.log("Agile: Rerendered Subscriptions ", subscriptionsToUpdate);
+      console.log(
+        "Agile: Updated/Rerendered Subscriptions ",
+        subscriptionsToUpdate
+      );
 
     this.jobsToRerender = [];
   }
@@ -169,9 +170,9 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Handles pass props - Object based subscription
-   * @param {SubscriptionContainer} subscriptionContainer - SubscriptionContainer which is Object based (-> isObjectBased = true)
-   * @param {Job} job - Job which is is currently handled
+   * Finds updated Key of SubscriptionContainer and adds it to 'objectKeysChanged'
+   * @param subscriptionContainer - Object based SubscriptionContainer
+   * @param job - Job that holds the SubscriptionContainer
    */
   public handleObjectBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
@@ -179,14 +180,14 @@ export class Runtime {
   ): void {
     let localKey: string | null = null;
 
-    if (subscriptionContainer.isObjectBased) return;
+    if (!subscriptionContainer.isObjectBased) return;
 
-    // Find localKey of the Job Observer
+    // Find localKey of Job Observer in SubscriptionContainer
     for (let key in subscriptionContainer.subsObject)
       if (subscriptionContainer.subsObject[key] === job.observer)
         localKey = key;
 
-    // Add localKey to propKeysChanged if it got found (since since the observer with that key has changed)
+    // Add localKey to objectKeysChanged
     if (localKey) subscriptionContainer.objectKeysChanged.push(localKey);
   }
 
@@ -195,17 +196,17 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Builds an object out of objectKeysChanged in the SubscriptionContainer with provided value
-   * @param {SubscriptionContainer} subscriptionContainer - SubscriptionContainer which is Object based
+   * Builds Object out of 'objectKeysChanged' with new Values provided by Observers
+   * @param subscriptionContainer - SubscriptionContainer from which the Object gets built
    */
   public getObjectBasedProps(
     subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
     const finalObject: { [key: string]: any } = {};
 
-    // Map trough changed Keys and build finalObject which will be passed into update function
+    // Map trough changed Keys and build finalObject
     subscriptionContainer.objectKeysChanged.forEach((changedKey) => {
-      // Check if SubscriptionContainer has value if so add it to the final Object
+      // Check if Observer at changedKey has value property, if so add it to final Object
       if (
         subscriptionContainer.subsObject &&
         subscriptionContainer.subsObject[changedKey]["value"]
@@ -215,7 +216,6 @@ export class Runtime {
     });
 
     subscriptionContainer.objectKeysChanged = [];
-
     return finalObject;
   }
 
@@ -224,7 +224,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Returns tracked Observers and stops runtime from tracking Observers
+   * Returns tracked Observers and stops Runtime from tracking anymore Observers
    */
   public getTrackedObservers(): Set<Observer> {
     const finalFoundObservers = this.foundObservers;

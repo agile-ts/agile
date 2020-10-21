@@ -5,9 +5,9 @@ export class ComponentSubscriptionContainer extends SubscriptionContainer {
 
   /**
    * @internal
-   * ComponentSubscriptionContainer - Component based Subscription
-   * @param {any} component - Component which is subscribes Agile
-   * @param {Set<Observer>} subs - Initial Subscriptions of the Subscription Container
+   * ComponentSubscriptionContainer - SubscriptionContainer for Component based Subscription
+   * @param component - Component that is subscribed by Agile
+   * @param  subs - Initial Subscriptions
    */
   constructor(component: any, subs?: Set<Observer>) {
     super(subs);

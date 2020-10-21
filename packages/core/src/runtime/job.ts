@@ -8,9 +8,9 @@ export class Job<ObserverType extends Observer = Observer> {
 
   /**
    * @internal
-   * Job - Will be created by runtime and represents a job which will than be executed by it
-   * @param {Observer} observer - Observer which is represented by this job and get performed
-   * @param {JobConfigInterface} config - Config
+   * Job - Holds Observer and gets executed by Runtime
+   * @param observer - Observer that is represented by this job and gets performed
+   * @param config - Config
    */
   constructor(observer: ObserverType, config: JobConfigInterface) {
     this.config = defineConfig<JobConfigInterface>(config, {
@@ -18,9 +18,8 @@ export class Job<ObserverType extends Observer = Observer> {
       sideEffects: true,
       forceRerender: false,
     });
-
-    this.observer = observer;
     this.config = config;
+    this.observer = observer;
     this.rerender =
       !config.background &&
       this.observer.agileInstance().integrations.hasIntegration();
@@ -28,9 +27,9 @@ export class Job<ObserverType extends Observer = Observer> {
 }
 
 /**
- * @param {boolean} background - If assigning a new value should happen in the background -> not causing a rerender
- * @param {boolean} sideEffects - If it should execute sideEffects
- * @param {boolean} perform - If it should perform the Job immediately
+ * @param background - If Job gets executed in the background -> not causing any rerender
+ * @param sideEffects - If SideEffects are performed
+ * @param perform - If Job gets performed immediately
  */
 export interface JobConfigInterface {
   background?: boolean;
