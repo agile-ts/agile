@@ -256,6 +256,15 @@ export class State<ValueType = any> {
       );
       return this;
     }
+
+    // Check if Callback Function already exists
+    if (this.watchers[key]) {
+      console.error(
+        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
+      );
+      return this;
+    }
+
     this.watchers[key] = callback;
     return this;
   }

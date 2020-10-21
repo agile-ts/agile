@@ -5,11 +5,11 @@ export class EventObserver<PayloadType = any> extends Observer {
 
   /**
    * @internal
-   * Event Observer - Ingest triggers into the Runtime
+   * Event Observer - Handles Event dependencies and ingests Event triggers into the Runtime
    * @param {Agile} agileInstance - An instance of Agile
    * @param {Event} event - Event
-   * @param {Array<Observer>} deps - Initial Dependencies of the State
-   * @param {ObserverKey} key - Key/Name of the Observer
+   * @param {Array<Observer>} deps - Initial Dependencies of the Event
+   * @param {ObserverKey} key - Key/Name of the Event Observer
    */
   constructor(
     agileInstance: Agile,
@@ -37,8 +37,8 @@ export class EventObserver<PayloadType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Performs a Job
-   * @param {Job<this>} job - The Job which should be performed
+   * Performs Job from Runtime
+   * @param job - Job that gets performed
    */
   public perform(job: Job<this>) {
     // Noting to perform
