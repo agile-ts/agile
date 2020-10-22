@@ -1,5 +1,4 @@
 import {
-  Agile,
   isAsyncFunction,
   isFunction,
   isJsonString,
@@ -8,8 +7,6 @@ import {
 import { Persistent } from "./persistent";
 
 export class Storage {
-  public agileInstance: () => Agile;
-
   public storageReady: boolean = false;
   public storageType: StorageType = "localStorage";
   public config: StorageConfigInterface;
@@ -18,12 +15,10 @@ export class Storage {
 
   /**
    * @public
-   * Storage - Interface for Agile to save Items in Storage
-   * @param agileInstance - An instance of Agile
+   * Storage - Interface for storing Items permanently
    * @param storageConfig - Config
    */
-  constructor(agileInstance: Agile, storageConfig: StorageConfigInterface) {
-    this.agileInstance = () => agileInstance;
+  constructor(storageConfig: StorageConfigInterface) {
     this.config = defineConfig(storageConfig, {
       prefix: "agile",
       async: false,
@@ -123,7 +118,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @internal
-   * Gets value at the provided Key (async)
+   * Gets value at provided Key (async)
    * @param key - Key of Storage property
    */
   private asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
@@ -143,9 +138,9 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Saves/Updates value at the provided Key
+   * Saves/Updates value at provided Key
    * @param key - Key of Storage property
-   * @param value - Value you want to update/save
+   * @param value - new Value that gets set
    */
   public set(key: StorageKey, value: any): void {
     if (!this.storageReady || !this.config.methods?.set) return;

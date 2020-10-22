@@ -21,7 +21,7 @@ export function copy<T = any>(value: T): T | T[] {
 //=========================================================================================================
 /**
  * @internal
- * Checks if an value is valid Object
+ * Checks if an value is a valid Object
  * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
  * @param value - Value that is tested for its correctness
  */
@@ -52,8 +52,8 @@ export function isValidObject(value: any): boolean {
 //=========================================================================================================
 /**
  * @internal
- * Normalize Item/s so that it is an Item Array
- * @param items - Item/s that get transformed to an Array
+ * Transforms Item/s to an Item Array
+ * @param items - Item/s that gets transformed to an Array
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>
@@ -67,9 +67,9 @@ export function normalizeArray<DataType = any>(
 //=========================================================================================================
 /**
  * @internal
- * Tries to get agileInstance from provided instance
+ * Tries to get an AgileInstance from provided instance
  * If no agileInstance found it returns the global AgileInstance
- * @param instance - Instance that might hold an agileInstance
+ * @param instance - Instance that might hold an AgileInstance
  */
 export function getAgileInstance(instance: any): Agile | null {
   try {
@@ -94,7 +94,7 @@ export function getAgileInstance(instance: any): Agile | null {
 /**
  * @internal
  * Checks if value is a function
- * @param value - Value that is tested if its a function
+ * @param value - Value that gets tested if its a function
  */
 export function isFunction(value: any): boolean {
   return typeof value === "function";
@@ -106,7 +106,7 @@ export function isFunction(value: any): boolean {
 /**
  * @internal
  * Checks if value is an async function
- * @param value - Value that is tested if its an async function
+ * @param value - Value that gets tested if its an async function
  */
 export function isAsyncFunction(value: any): boolean {
   return isFunction(value) && value.constructor.name === "AsyncFunction";
@@ -119,7 +119,7 @@ export function isAsyncFunction(value: any): boolean {
  * @internal
  * Checks the correctness of an url
  * Resource: https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
- * @param url - Url that is tested for its correctness
+ * @param url - Url that gets tested for its correctness
  */
 export function isValidUrl(url: string): boolean {
   const pattern = new RegExp(
@@ -140,7 +140,7 @@ export function isValidUrl(url: string): boolean {
 /**
  * @internal
  * Checks if value is valid JsonString
- * @param value - Value that will be checked
+ * @param value - Value that gets checked
  */
 export function isJsonString(value: any): boolean {
   try {
@@ -158,7 +158,7 @@ export function isJsonString(value: any): boolean {
  * @internal
  * Merges default values/properties into config object
  * @param config - Config object that receives default values
- * @param defaults - Default values object that will be merged into config object
+ * @param defaults - Default values object that gets merged into config object
  */
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
@@ -182,7 +182,7 @@ export interface FlatMergeConfigInterface {
  * @internal
  * Merges items into object, be aware that the merge will only happen at the top level of the object
  * @param source - Source object
- * @param changes - Changes you want to merge into the source object
+ * @param changes - Changes that get merged into the source object
  * @param config - Config
  */
 export function flatMerge<DataType = Object>(
@@ -209,7 +209,7 @@ export function flatMerge<DataType = Object>(
 //=========================================================================================================
 /**
  * @internal
- * Check if 2 values are equal
+ * Check if two values are equal
  * @param value1 - First Value
  * @param value2 - Second Value
  */
@@ -222,7 +222,7 @@ export function equal(value1: any, value2: any): boolean {
 //=========================================================================================================
 /**
  * @internal
- * Checks if 2 values aren't equal
+ * Checks if two values aren't equal
  * @param value1 - First Value
  * @param value2 - Second Value
  */

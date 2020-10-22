@@ -8,7 +8,7 @@ export class Persistent<ValueType = any> {
 
   /**
    * @internal
-   * Persistent - Handles saving of Agile Instances
+   * Persistent - Handles storing of Agile Instances
    * @param agileInstance - An instance of Agile
    */
   constructor(agileInstance: Agile) {
@@ -28,9 +28,8 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Inits Persistent(this class)
-   * Have to do it that way since validateKey/initialLoading can have deps that aren't
-   * set before defining properties in extended class
+   * Inits Persistent (this class)
+   * -> Sometimes this class needs to be instantiated after some properties have been set in extended class
    * @param key - Key of Storage property
    */
   public initPersistent(key?: StorageKey): boolean {
@@ -84,7 +83,7 @@ export class Persistent<ValueType = any> {
   /**
    * @internal
    * Saves/Updates Value in Storage at this._key
-   * @param value - new Value at this._key property
+   * @param value - new Value that gets set
    */
   public setValue(value: ValueType): void {
     if (!this.ready) return;

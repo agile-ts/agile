@@ -17,13 +17,13 @@ import {
 } from "./internal";
 
 export class Agile {
-  public runtime: Runtime; // Handles Jobs that have to be 'rerendered'
+  public runtime: Runtime;
   public subController: SubController; // Handles subscriptions to Components
   public storage: Storage; // Handles permanent saving
 
   // Integrations
   public integrations: Integrations; // Integrated frameworks
-  static initialIntegrations: Integration[] = []; // Had to create this, to add integrations to Agile without creating a new Instance of it
+  static initialIntegrations: Integration[] = []; // External added Integrations
 
   /**
    * @public
@@ -34,7 +34,7 @@ export class Agile {
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
-    this.storage = new Storage(this, config.storageConfig || {});
+    this.storage = new Storage(config.storageConfig || {});
 
     // Create global agileInstance
     this.globalBind();
@@ -58,18 +58,17 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Creates custom Storage
+   * Storage - Handy Interface for storing Items permanently
    * @param config - Config
    */
-  public Storage = (config: StorageConfigInterface) =>
-    new Storage(this, config);
+  public Storage = (config: StorageConfigInterface) => new Storage(config);
 
   //=========================================================================================================
   // State
   //=========================================================================================================
   /**
    * @public
-   * State - Handles one value and causes rerender on subscribed Components
+   * State - Class that holds one Value and causes rerenders on subscribed Components
    * @param initialValue - Initial Value of the State
    * @param key - Key/Name of the State
    */
@@ -81,7 +80,7 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Collection - Handles a List of Objects with a key and causes rerender on subscribed Components
+   * Collection - Class that holds a List of Objects with key and causes rerenders on subscribed Components
    * @param config - Config
    */
   public Collection = <DataType = DefaultDataItem>(
@@ -108,7 +107,7 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Handy function for emitting UI updates and passing data with them
+   * Event - Class that holds a List of Functions which can be triggered at the same time
    * @param config - Config
    */
   public Event = <PayloadType = DefaultEventPayload>(config?: EventConfig) =>
@@ -151,7 +150,7 @@ export class Agile {
   //=========================================================================================================
   /**
    * @internal
-   * Creates a global reference to the first agileInstance
+   * Creates global reference to the first agileInstance
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
    */
   private globalBind() {
@@ -166,7 +165,7 @@ export class Agile {
 /**
  * @param logJobs - Allow Agile Logs
  * @param waitForMount - If Agile should wait until the component mounts
- * @param storageConfig - For setting up custom Storage
+ * @param storageConfig - To configure Agile Storage
  */
 export interface AgileConfigInterface {
   logJobs?: boolean;

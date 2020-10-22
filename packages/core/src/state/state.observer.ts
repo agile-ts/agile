@@ -22,11 +22,11 @@ export class StateObserver<ValueType = any> extends Observer {
 
   /**
    * @internal
-   * State Observer - Handles State changes, dependencies and ingests changes into the Runtime
+   * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
    * @param agileInstance - An instance of Agile
    * @param state - State
-   * @param deps - Initial Dependencies of the State Observer
-   * @param key - Key/Name of the State Observer
+   * @param deps - Initial Dependencies of State Observer
+   * @param key - Key/Name of State Observer
    */
   constructor(
     agileInstance: Agile,
@@ -45,7 +45,7 @@ export class StateObserver<ValueType = any> extends Observer {
   /**
    * @internal
    * Ingests new State Value into Runtime and applies it to the State
-   * @param newStateValue - New State Value that gets applied to the State
+   * @param newStateValue - New Value of the State
    * @param config - Config
    */
   public ingest(
@@ -117,8 +117,8 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * SideEffects of the Perform Function
-   * @param job - Job where the SideEffects should be executed
+   * SideEffects of Perform Function
+   * @param job - Job whose SideEffects gets executed
    */
   private sideEffects(job: Job<this>) {
     const state = job.observer.state();

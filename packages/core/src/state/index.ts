@@ -19,7 +19,7 @@ export class State<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: StateKey;
-  public valueType?: string; // primitive type for js users
+  public valueType?: string; // primitive type of State Value for js users
   public isSet: boolean = false; // If value is not the same as initialValue
   public isPlaceholder: boolean = false;
   public initialStateValue: ValueType;
@@ -37,11 +37,11 @@ export class State<ValueType = any> {
 
   /**
    * @public
-   * State - Handles value and causes rerender on subscribed Components
+   * State - Class that holds one Value and causes rerenders on subscribed Components
    * @param agileInstance - An instance of Agile
-   * @param initialValue - Initial Value of the State
-   * @param key - Key/Name of the State
-   * @param deps - Initial deps of the State
+   * @param initialValue - Initial Value of State
+   * @param key - Key/Name of State
+   * @param deps - Initial deps of State
    */
   constructor(
     agileInstance: Agile,
@@ -100,7 +100,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Updates Value of State
-   * @param value - Value that gets set to the new Value of the State
+   * @param value - new State Value
    * @param config - Config
    */
   public set(value: ValueType, config: SetConfigInterface = {}): this {
@@ -147,7 +147,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Assign native type to State Value
+   * Assign primitive type to State Value
    * Note: This function is mainly thought for JS users
    * @param type - wished Type ('String', 'Boolean', 'Array', 'Object', 'Number')
    */
@@ -171,7 +171,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Undoes latest State change
+   * Undoes latest State Value change
    */
   public undo() {
     this.set(this.previousStateValue);
@@ -182,7 +182,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Resets State to its initial value
+   * Resets State to its initial Value
    */
   public reset(): this {
     this.set(this.initialStateValue);
@@ -198,9 +198,9 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Patches changes into object
+   * Patches Object with changes into State Value
    * Note: Only useful if State is an Object
-   * @param targetWithChanges - Object that contains the changes that will be patched into the State Value (Object)
+   * @param targetWithChanges - Object that holds changes which get patched into State Value
    * @param config - Config
    */
   public patch(
@@ -287,7 +287,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Stores State Value into Agile Storage
+   * Saves State Value into Agile Storage permanently
    * @param key - Storage Key (Note: not needed if State has key/name)
    */
   public persist(key?: StorageKey): this {
@@ -450,7 +450,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Returns persistable Value of this State
+   * Returns persistable Value of State
    */
   public getPersistableValue(): any {
     return this.value;
