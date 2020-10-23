@@ -7,7 +7,7 @@ export class Observer<ValueType = any> {
 
   public _key?: ObserverKey;
   public deps: Set<Observer> = new Set(); // Observers that depends on this Observer
-  public subs: Set<SubscriptionContainer> = new Set(); // Subscriptions(Components) which this Observer has subscribed
+  public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers(Components) which this Observer has subscribed
   public value?: ValueType; // Value of Observer
 
   /**
@@ -55,7 +55,7 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Add new Dependency to Observer
+   * Adds Dependency to Observer
    * @param observer - Observer that will depend on this Observer
    */
   public depend(observer: Observer) {
@@ -67,7 +67,7 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Add new Subscription
+   * Adds Subscription to Observer
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
    */
   public subscribe(subscriptionContainer: SubscriptionContainer) {
@@ -80,7 +80,7 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Remove Subscription
+   * Removes Subscription from Observer
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
    */
   public unsubscribe(subscriptionContainer: SubscriptionContainer) {

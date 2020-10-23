@@ -27,7 +27,7 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Subscribe with Object shaped subs
+   * Subscribe with Object shaped Subscriptions
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscription Object
    */
@@ -81,7 +81,7 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Subscribe with Array shaped subs
+   * Subscribe with Array shaped Subscriptions
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscription Array
    */
@@ -112,8 +112,8 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Unsubscribe SubscriptionContainer
-   * @param subscriptionInstance - SubscriptionContainer or Component which holds an SubscriptionContainer
+   * Unsubscribes SubscriptionContainer(Component)
+   * @param subscriptionInstance - SubscriptionContainer or Component that holds an SubscriptionContainer
    */
   public unsubscribe(subscriptionInstance: any) {
     // Helper function to unsubscribe callback or component based subscription
@@ -143,7 +143,7 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Register SubscriptionContainer and decide weather integrationInstance is a callback or component based Subscription
+   * Registers SubscriptionContainer and decides weather integrationInstance is a callback or component based Subscription
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscriptions
    */
@@ -199,7 +199,7 @@ export class SubController {
   /**
    * @internal
    * Registers Callback based Subscription
-   * @param callbackFunction - Callback Function that causes a rerender on Component that got subscribed by Observer/s
+   * @param callbackFunction - Callback Function that causes rerender on Component which got subscribed by Observer/s
    * @param subs - Initial Subscriptions
    */
   private registerCallbackSubscription(
@@ -228,9 +228,8 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Mounts a Component
-   * Note: Only mounts Component based Subscription Component
-   * @param componentInstance - Component that mounted
+   * Mounts Component based SubscriptionContainer
+   * @param componentInstance - SubscriptionContainer(Component) that gets mounted
    */
   public mount(componentInstance: any) {
     if (!componentInstance.componentSubscriptionContainer) return;

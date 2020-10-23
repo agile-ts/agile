@@ -36,7 +36,8 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests Observer into Runtime and creates Job
+   * Ingests Observer into Runtime
+   * -> Creates Job which will be performed by the Runtime
    * @param observer - Observer that gets performed by the Runtime
    * @param config - Config
    */
@@ -72,7 +73,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job and add it to rerender queue if necessary
+   * Performs Job and adds him to the rerender queue if necessary
    * @param job - Job that gets performed
    */
   private perform(job: Job): void {
@@ -107,7 +108,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Updates all Subscribers of Job
+   * Updates/Rerenders all Subscribed Components of the Job (Observer)
    */
   private updateSubscribers(): void {
     if (!this.agileInstance().integrations.hasIntegration()) {
@@ -120,7 +121,7 @@ export class Runtime {
       SubscriptionContainer
     >();
 
-    // Handle Object based Jobs and checks if Job is ready
+    // Handle Object based Jobs and check if Job is ready
     this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach((job) => {
       job.observer.subs.forEach((subscriptionContainer) => {
         // Check if Subscription is ready to rerender
@@ -128,7 +129,7 @@ export class Runtime {
           this.notReadyJobsToRerender.push(job);
           if (this.agileInstance().config.logJobs)
             console.warn(
-              "Agile: SubscriptionContainer isn't ready to rerender!",
+              "Agile: SubscriptionContainer/Component isn't ready to rerender!",
               subscriptionContainer
             );
           return;
@@ -170,7 +171,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Finds updated Key of SubscriptionContainer and adds it to 'objectKeysChanged'
+   * Finds updated Key of SubscriptionContainer and adds it to 'changedObjectKeys'
    * @param subscriptionContainer - Object based SubscriptionContainer
    * @param job - Job that holds the SubscriptionContainer
    */
@@ -187,8 +188,8 @@ export class Runtime {
       if (subscriptionContainer.subsObject[key] === job.observer)
         localKey = key;
 
-    // Add localKey to objectKeysChanged
-    if (localKey) subscriptionContainer.objectKeysChanged.push(localKey);
+    // Add localKey to changedObjectKeys
+    if (localKey) subscriptionContainer.changedObjectKeys.push(localKey);
   }
 
   //=========================================================================================================
@@ -196,7 +197,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Builds Object out of 'objectKeysChanged' with new Values provided by Observers
+   * Builds Object from 'changedObjectKeys' with new Values provided by Observers
    * @param subscriptionContainer - SubscriptionContainer from which the Object gets built
    */
   public getObjectBasedProps(
@@ -205,7 +206,7 @@ export class Runtime {
     const finalObject: { [key: string]: any } = {};
 
     // Map trough changed Keys and build finalObject
-    subscriptionContainer.objectKeysChanged.forEach((changedKey) => {
+    subscriptionContainer.changedObjectKeys.forEach((changedKey) => {
       // Check if Observer at changedKey has value property, if so add it to final Object
       if (
         subscriptionContainer.subsObject &&
@@ -215,7 +216,7 @@ export class Runtime {
           subscriptionContainer.subsObject[changedKey]["value"];
     });
 
-    subscriptionContainer.objectKeysChanged = [];
+    subscriptionContainer.changedObjectKeys = [];
     return finalObject;
   }
 
