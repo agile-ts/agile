@@ -17,70 +17,37 @@ import {
 } from "../internal";
 import { persistValue, removeItem, setItem } from "./perstist";
 
-export type DefaultDataItem = { [key: string]: any };
-export type CollectionKey = string | number;
-export type ItemKey = string | number; // The key of an item in a collection
-
-/**
- * @param {string} primaryKey - Key/Name of the Collection
- * @param {{ [key: string]: Group<any> } | string[]} groups - Groups of the Collection
- * @param {{ [key: string]: Selector<any> } | string[]} selectors - Selectors of the Collection
- * @param {string} primaryKey - PrimaryKey of the Collection. So the property which holds the primaryKey in the DefaultDataItem. (default = id)
- * @param {string} defaultGroupKey - DefaultGroupKey of the Collection. The default Group will be named after this (Default Group holds all items of the Collection)
- */
-export interface CollectionConfigInterface {
-  groups?: { [key: string]: Group<any> } | string[];
-  selectors?: { [key: string]: Selector<any> } | string[];
-  key?: CollectionKey; // should be a unique key/name which identifies the collection
-  primaryKey?: string; // the primaryKey of an item (default is id)
-  defaultGroupKey?: ItemKey; // The defaultGroupKey(Name).. in which all collected items get stored
-}
-
-export interface CollectOptionsInterface<DataType = any> {
-  patch?: boolean; // If the item should be patched into existing item (only useful if Item already exists)
-  method?: "push" | "unshift"; // Method for adding item to group
-  forEachItem?: (item: DataType, key: ItemKey, index: number) => void; // To do something with collected items
-  background?: boolean; // If the action should happen in the background -> no rerender
-}
-
-export type CollectionConfig<DataType = DefaultDataItem> =
-  | CollectionConfigInterface
-  | ((collection: Collection<DataType>) => CollectionConfigInterface);
-
-export class Collection<DataType = DefaultDataItem> {
+export class Collection<DataType = DefaultItem> {
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
 
-  public size: number = 0; // The amount of data items stored inside this collection
-  public data: { [key: string]: Item<DataType> } = {}; // Collection data is stored here
+  public size: number = 0; // Amount of Items stored in Collection
+  public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
-  public isPersistCollection: boolean = false; // Is saved in storage
+  public isPersisted: boolean = false; // If Collection is stored in Storage
 
   public groups: { [key: string]: Group<any> } = {};
   public selectors: { [key: string]: Selector<any> } = {};
 
+  /**
+   * Class that holds a List of Objects with key and causes rerender on subscribed Components
+   * @param agileInstance - An instance
+   * @param config - Config
+   */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
-
-    // If collection config is a function, execute and assign to config
     if (typeof config === "function") config = config(this);
-
-    // Assign defaults to config
     this.config = defineConfig<CollectionConfigInterface>(config, {
       primaryKey: "id",
       groups: {},
       selectors: {},
       defaultGroupKey: "default",
     });
-
-    // Set Key
     this._key = this.config.key;
 
-    // Init Groups
+    // Init Sub Instances like groups, selectors
     this.initSubInstances("groups");
-
-    // Init Selectors
     this.initSubInstances("selectors");
   }
 
@@ -97,71 +64,68 @@ export class Collection<DataType = DefaultDataItem> {
   //=========================================================================================================
   /**
    * @internal
-   * Init SubInstances like groups or selectors
+   * Inits SubInstance of Collection like groups and selectors
+   * @param type - Type of SubInstance (groups, selectors)
    */
   private initSubInstances(type: "groups" | "selectors") {
-    const subInstance = copy(this.config[type]) || {};
-    let subInstanceObject: any = {};
+    const subInstances = copy(this.config[type]);
+    let subInstancesObject: any = {};
 
-    // If subInstance is array transform it to an object with the fitting class
-    if (Array.isArray(subInstance)) {
-      for (let i = 0; i < subInstance.length; i++) {
+    // If SubInstances is Array, transform it to Object
+    if (Array.isArray(subInstances)) {
+      subInstances.forEach((instanceName) => {
         let instance;
         switch (type) {
           case "groups":
             instance = new Group(this.agileInstance(), this, [], {
-              key: subInstance[i],
+              key: instanceName,
             });
             break;
           case "selectors":
-            instance = new Selector(this, subInstance[i], {
-              key: subInstance[i],
+            instance = new Selector(this, instanceName, {
+              key: instanceName,
             });
             break;
           default:
             instance = "unknown";
         }
-        subInstanceObject[subInstance[i]] = instance;
-      }
+        subInstancesObject[instanceName] = instance;
+      });
     } else {
-      // If subInstance is Object.. set subInstanceObject to subInstance
-      subInstanceObject = subInstance;
+      subInstancesObject = subInstances;
     }
 
-    // If groups.. add default group
+    // Add default Group
     if (type === "groups") {
-      if (!subInstanceObject[this.config.defaultGroupKey || "default"])
-        subInstanceObject[this.config.defaultGroupKey || "default"] = new Group(
-          this.agileInstance(),
-          this,
-          [],
-          {
-            key: this.config.defaultGroupKey || "default",
-          }
-        );
+      subInstancesObject[this.config.defaultGroupKey || "default"] = new Group(
+        this.agileInstance(),
+        this,
+        [],
+        {
+          key: this.config.defaultGroupKey || "default",
+        }
+      );
     }
 
-    const keys = Object.keys(subInstanceObject);
-    for (let key of keys) {
-      // Set key to property name if it isn't set yet
-      if (!subInstanceObject[key].key) subInstanceObject[key].key = key;
-    }
+    // Set key of subInstance to property Name
+    for (let key in subInstancesObject)
+      if (!subInstancesObject[key].key) subInstancesObject[key].key = key;
 
-    // Set Collection instance
-    this[type] = subInstanceObject;
+    // Assign subInstance to Collection
+    this[type] = subInstancesObject;
   }
 
   //=========================================================================================================
   // Collect
   //=========================================================================================================
   /**
-   * Collect iterable data into this collection.
-   * Note: Data items must include a primary key (id)
+   * Collect Item/s
+   * TODO
    */
   public collect(
     items: DataType | Array<DataType>,
     groups?: GroupKey | Array<GroupKey>,
-    options: CollectOptionsInterface<DataType> = {}
+    options: CollectConfigInterface<DataType> = {}
   ) {
     const _items = normalizeArray<DataType>(items);
     const _groups = normalizeArray<GroupKey>(groups);
@@ -169,7 +133,7 @@ export class Collection<DataType = DefaultDataItem> {
     const groupsToRebuild: Set<Group> = new Set<Group>();
 
     // Assign defaults to options
-    options = defineConfig<CollectOptionsInterface>(options, {
+    options = defineConfig<CollectConfigInterface>(options, {
       method: "push",
       background: false,
       patch: false,
@@ -248,7 +212,7 @@ export class Collection<DataType = DefaultDataItem> {
    */
   public update(
     updateKey: ItemKey,
-    changes: DefaultDataItem | DataType,
+    changes: DefaultItem | DataType,
     options: { addNewProperties?: boolean; background?: boolean } = {}
   ): State | undefined {
     // If item does not exist, return
@@ -463,7 +427,7 @@ export class Collection<DataType = DefaultDataItem> {
    */
   public persist(key?: StorageKey): this {
     persistValue(this, key).then((value) => {
-      this.isPersistCollection = value;
+      this.isPersisted = value;
     });
     return this;
   }
@@ -731,3 +695,39 @@ export class Collection<DataType = DefaultDataItem> {
     }
   }
 }
+
+export type DefaultItem = { [key: string]: any };
+export type CollectionKey = string | number;
+export type ItemKey = string | number; // Key Interface of Item in Collection
+
+/**
+ * @param primaryKey - Key/Name of Collection
+ * @param groups - Groups of Collection
+ * @param selectors - Selectors of Collection
+ * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
+ * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
+ */
+export interface CollectionConfigInterface {
+  groups?: { [key: string]: Group<any> } | string[];
+  selectors?: { [key: string]: Selector<any> } | string[];
+  key?: CollectionKey;
+  primaryKey?: string;
+  defaultGroupKey?: ItemKey;
+}
+
+/**
+ * @param patch - If Item gets patched into existing Item
+ * @param method - Way of adding Item to Collection (push, unshift)
+ * @param forEachItem - Loops through collected Items
+ * @param background - If collecting Item will happen in background (-> not causing any rerender)
+ */
+export interface CollectConfigInterface<DataType = any> {
+  patch?: boolean;
+  method?: "push" | "unshift";
+  forEachItem?: (item: DataType, key: ItemKey, index: number) => void;
+  background?: boolean;
+}
+
+export type CollectionConfig<DataType = DefaultItem> =
+  | CollectionConfigInterface
+  | ((collection: Collection<DataType>) => CollectionConfigInterface);

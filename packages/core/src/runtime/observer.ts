@@ -27,7 +27,7 @@ export class Observer<ValueType = any> {
     this.agileInstance = () => agileInstance;
     this._key = key;
     this.value = value;
-    deps?.forEach((observable) => this.deps.add(observable));
+    deps?.forEach((observer) => this.deps.add(observer));
   }
 
   public set key(value: StateKey | undefined) {
@@ -55,7 +55,7 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Adds Dependency to Observer
+   * Adds Dependency to Observer that will be ingested into the Runtime if this Observer changes
    * @param observer - Observer that will depend on this Observer
    */
   public depend(observer: Observer) {

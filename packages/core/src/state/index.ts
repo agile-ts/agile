@@ -19,25 +19,25 @@ export class State<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: StateKey;
-  public valueType?: string; // primitive type of State Value for js users
+  public valueType?: string; // primitive Type of State Value (for JS users)
   public isSet: boolean = false; // If value is not the same as initialValue
   public isPlaceholder: boolean = false;
   public initialStateValue: ValueType;
   public _value: ValueType; // Current Value of State
   public previousStateValue: ValueType;
-  public nextStateValue: ValueType; // NextStateValue is mostly used internal and represents the next State Value
+  public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
   public observer: StateObserver; // Handles deps and subs of State and is like an interface to the Runtime
   public sideEffects: { [key: string]: () => void } = {}; // SideEffects of State (will be executed in Runtime)
 
-  public isPersisted: boolean = false; // If State got saved in Storage
-  public persistent: StatePersistent | undefined; // Manages storing a State in Storage
+  public isPersisted: boolean = false; // If State is stored in Storage
+  public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
   public watchers: { [key: string]: (value: any) => void } = {};
 
   /**
    * @public
-   * State - Class that holds one Value and causes rerenders on subscribed Components
+   * State - Class that holds one Value and causes rerender on subscribed Components
    * @param agileInstance - An instance of Agile
    * @param initialValue - Initial Value of State
    * @param key - Key/Name of State

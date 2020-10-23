@@ -2,7 +2,7 @@ import {
   Agile,
   State,
   Collection,
-  DefaultDataItem,
+  DefaultItem,
   ItemKey,
   defineConfig,
   normalizeArray,
@@ -21,7 +21,7 @@ export interface GroupConfigInterface {
   key?: GroupKey; // should be a unique key/name which identifies the group
 }
 
-export class Group<DataType = DefaultDataItem> extends State<Array<ItemKey>> {
+export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   collection: () => Collection<DataType>;
 
   _output: Array<DataType> = []; // Output of the group (Note: _value are only the keys of the collection items)

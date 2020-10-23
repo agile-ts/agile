@@ -1,6 +1,6 @@
 import {
   Collection,
-  DefaultDataItem,
+  DefaultItem,
   ItemKey,
   Computed,
   Item,
@@ -16,7 +16,7 @@ export interface SelectorConfigInterface {
   key?: SelectorKey; // should be a unique key/name which identifies the selector
 }
 
-export class Selector<DataType = DefaultDataItem> extends Computed<
+export class Selector<DataType = DefaultItem> extends Computed<
   DataType | undefined
 > {
   public collection: () => Collection<DataType>;

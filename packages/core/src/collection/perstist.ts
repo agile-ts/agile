@@ -55,7 +55,7 @@ export async function persistValue(
 export async function setItem(itemKey: ItemKey, collection: Collection) {
   const storage = collection.agileInstance().storage;
 
-  if (collection.isPersistCollection && collection.key) {
+  if (collection.isPersisted && collection.key) {
     // Create Item Storage Key
     const itemStorageKey = storageItemKeyTemplate
       .replace("${collectionKey}", (collection.key || "unknown").toString())
@@ -86,7 +86,7 @@ export async function setItem(itemKey: ItemKey, collection: Collection) {
 export function removeItem(itemKey: ItemKey, collection: Collection) {
   const storage = collection.agileInstance().storage;
 
-  if (collection.isPersistCollection && collection.key) {
+  if (collection.isPersisted && collection.key) {
     // Create Item Storage Key
     const itemStorageKey = storageItemKeyTemplate
       .replace("${collectionKey}", (collection.key || "unknown").toString())
@@ -110,7 +110,7 @@ export function removeItem(itemKey: ItemKey, collection: Collection) {
 export function updateGroup(groupKey: GroupKey, collection: Collection) {
   const storage = collection.agileInstance().storage;
 
-  if (collection.isPersistCollection && collection.key) {
+  if (collection.isPersisted && collection.key) {
     // Create Group Storage Key
     const groupStorageKey = storageGroupKeyTemplate
       .replace("${collectionKey}", (collection.key || "unknown").toString())

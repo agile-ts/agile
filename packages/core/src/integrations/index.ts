@@ -7,7 +7,7 @@ export class Integrations {
 
   /**
    * @internal
-   * Integrations - Holds and manages all Integrations of Agile
+   * Integrations - Manages Integrations of Agile
    * @param agileInstance - An Instance of Agile
    */
   constructor(agileInstance: Agile) {
@@ -25,7 +25,7 @@ export class Integrations {
   /**
    * @internal
    * Integrates Framework (Integration) into Agile
-   * @param integration - Integration which gets registered/integrated
+   * @param integration - Integration that gets registered/integrated
    */
   public async integrate(integration: Integration) {
     // Check if integration is valid
@@ -54,7 +54,7 @@ export class Integrations {
    * @internal
    * Updates Integrations
    * -> calls 'updateMethod' in registered Integrations
-   * @param componentInstance - Component which gets updated
+   * @param componentInstance - Component that gets updated
    * @param updatedData - Updated Properties with new Value (Note: properties with no value won't get passed)
    */
   public update(componentInstance: any, updatedData: Object): void {

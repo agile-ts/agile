@@ -134,7 +134,7 @@ export class StateObserver<ValueType = any> extends Observer {
         if (isFunction(state.sideEffects[sideEffectKey]))
           state.sideEffects[sideEffectKey]();
 
-    // Ingest Dependencies of State into Runtime
+    // Ingest Dependencies of Observer into Runtime
     job.observer.deps.forEach(
       (observer) =>
         observer instanceof StateObserver &&

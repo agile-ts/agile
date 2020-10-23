@@ -49,7 +49,7 @@ describe("Default Collection Tests", () => {
         JSON.stringify({}),
         "MY_COLLECTION has no data"
       );
-      expect(MY_COLLECTION.isPersistCollection).to.eq(
+      expect(MY_COLLECTION.isPersisted).to.eq(
         false,
         "MY_COLLECTION is no persisted Collection"
       );

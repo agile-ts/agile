@@ -19,7 +19,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
   /**
    * @public
-   * Event - Handy function for emitting UI updates and passing data with them
+   * Event -  Class that holds a List of Functions which can be triggered at the same time
    * @param agileInstance - An instance of Agile
    * @param config - Config
    */
@@ -49,8 +49,8 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @public
-   * Registers new Callback Function that will be called if this Event got triggered
-   * @param callback - Callback Function that gets added to this Event
+   * Registers new Callback Function that will be called if this Event gets triggered
+   * @param callback - Callback Function
    * @param key - Key/Name of Callback Function
    * @return Clean up Function that removes added Callback Function
    */
@@ -98,7 +98,6 @@ export class Event<PayloadType = DefaultEventPayload> {
   /**
    * @public
    * Disables Event
-   * -> Event can't be triggered
    */
   public disable() {
     this.enabled = false;
@@ -111,7 +110,6 @@ export class Event<PayloadType = DefaultEventPayload> {
   /**
    * @public
    * Enables Event
-   * -> Event can be triggered
    */
   public enable() {
     this.enabled = true;

@@ -6,7 +6,7 @@ import {
   StorageConfigInterface,
   Collection,
   CollectionConfig,
-  DefaultDataItem,
+  DefaultItem,
   Computed,
   Event,
   EventConfig,
@@ -68,7 +68,7 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * State - Class that holds one Value and causes rerenders on subscribed Components
+   * State - Class that holds one Value and causes rerender on subscribed Components
    * @param initialValue - Initial Value of the State
    * @param key - Key/Name of the State
    */
@@ -80,10 +80,10 @@ export class Agile {
   //=========================================================================================================
   /**
    * @public
-   * Collection - Class that holds a List of Objects with key and causes rerenders on subscribed Components
+   * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param config - Config
    */
-  public Collection = <DataType = DefaultDataItem>(
+  public Collection = <DataType = DefaultItem>(
     config?: CollectionConfig<DataType>
   ) => new Collection<DataType>(this, config);
 
@@ -93,7 +93,7 @@ export class Agile {
   /**
    * @public
    * Computed - Function that recomputes its value if a dependency changes
-   * @param computeFunction - Computed Function
+   * @param computeFunction - Function for computing value
    * @param deps - Hard coded dependencies of Computed Function
    */
   public Computed = <ComputedValueType = any>(

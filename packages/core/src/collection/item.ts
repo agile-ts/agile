@@ -1,6 +1,6 @@
-import { State, Collection, DefaultDataItem } from "../internal";
+import { State, Collection, DefaultItem } from "../internal";
 
-export class Item<DataType = DefaultDataItem> extends State<DataType> {
+export class Item<DataType = DefaultItem> extends State<DataType> {
   private collection: () => Collection;
 
   // @ts-ignore
