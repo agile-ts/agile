@@ -9,24 +9,12 @@ import {
 } from "../internal";
 import { updateGroup } from "./perstist";
 
-export type GroupKey = string | number;
-
-export interface GroupAddOptionsInterface {
-  method?: "unshift" | "push"; // Method for adding item to group
-  overwrite?: boolean; // Set to false to leave primary key in place if it already exists
-  background?: boolean; // If the action should happen in the background -> no rerender
-}
-
-export interface GroupConfigInterface {
-  key?: GroupKey; // should be a unique key/name which identifies the group
-}
-
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   collection: () => Collection<DataType>;
 
   _output: Array<DataType> = []; // Output of the group (Note: _value are only the keys of the collection items)
   _states: Array<() => State<DataType>> = []; // States of the Group
-  notFoundPrimaryKeys: Array<ItemKey> = []; // Contains all key which can't be found in the collection
+  notFoundItemKeys: Array<ItemKey> = []; // Contains all key which can't be found in the collection
 
   constructor(
     agileInstance: Agile,
@@ -37,14 +25,11 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     super(agileInstance, initialItems || [], config?.key);
     this.collection = () => collection;
 
-    // Set build() to state sideEffect
-    this.addSideEffect("buildGroup", () => this.build());
-
-    // Set type of State to array because a group is an array of collection item keys
-    this.type(Array);
+    // Add rebuild to sideEffects so that it rebuilds the Group Output if the value changes
+    this.addSideEffect("buildGroup", () => this.rebuild());
 
     // Initial Build
-    this.build();
+    this.rebuild();
   }
 
   public get output(): Array<DataType> {
@@ -136,108 +121,104 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   // Add
   //=========================================================================================================
   /**
-   * Adds a key to a group
+   * Adds ItemKey/s to Group
+   * @param itemKeys - ItemKey/s that gets added to Group
+   * @param config - Config
    */
-  public add(
-    itemKeys: ItemKey | ItemKey[],
-    options: GroupAddOptionsInterface = {}
-  ): this {
+  public add(itemKeys: ItemKey | ItemKey[], config: GroupAddConfig = {}): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
-    const notExistingCollectionItems: Array<ItemKey> = [];
-    let newNextState = [...this.nextStateValue]; // Had to create copy array otherwise also 'this.value' would change.. by changing 'this.nextState' directly.
+    const notExistingItemKeys: Array<ItemKey> = []; // ItemKeys that don't exist in Collection
 
-    // Merge default values into options
-    options = defineConfig<GroupAddOptionsInterface>(options, {
+    config = defineConfig<GroupAddConfig>(config, {
       method: "push",
       overwrite: false,
       background: false,
     });
 
+    // Add ItemKeys to Group
     _itemKeys.forEach((itemKey) => {
-      // Check if item already exists in group
-      const existsInGroup =
-        newNextState.findIndex((key) => key === itemKey) !== -1;
+      const existsInGroup = this.nextStateValue.includes(itemKey);
 
-      // If item doesn't exist in collection add it to notExistingItems
+      // Check if ItemKey exists in Collection
       if (!this.collection().findById(itemKey))
-        notExistingCollectionItems.push(itemKey);
+        notExistingItemKeys.push(itemKey);
 
-      // Removes temporary key from group to overwrite it properly
-      if (options.overwrite)
-        newNextState = newNextState.filter((i) => i !== itemKey);
-      // If we do not want to overwrite and key already exists in group, exit
-      else if (existsInGroup) return;
+      // Remove ItemKey from Group if overwriting otherwise return
+      if (existsInGroup) {
+        if (config.overwrite)
+          this.nextStateValue = this.nextStateValue.filter(
+            (key) => key !== itemKey
+          );
+        else return;
+      }
 
-      // Push or unshift into state
-      newNextState[options.method || "push"](itemKey);
-
-      // Storage
-      if (this.key) updateGroup(this.key, this.collection());
+      // Add new ItemKey to Group
+      this.nextStateValue[config.method || "push"](itemKey);
     });
 
-    // If all items don't exist in collection.. set background to true because the output won't change -> no rerender necessary
-    if (notExistingCollectionItems.length >= _itemKeys.length)
-      options.background = true;
+    // If all added ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
+    if (notExistingItemKeys.length >= _itemKeys.length)
+      config.background = true;
 
-    // Set nextState to newNextState
-    this.nextStateValue = newNextState;
-
-    // Set State to nextState
-    this.ingest({ background: options.background });
+    // Ingest nextStateValue into Runtime
+    this.ingest({ background: config.background });
 
     return this;
   }
 
   //=========================================================================================================
-  // Build
+  // Rebuild
   //=========================================================================================================
   /**
    * @internal
-   * Will build the group -> it will set the output to the collection values
+   * Rebuilds Output of Group
    */
-  public build() {
-    this.notFoundPrimaryKeys = [];
+  public rebuild() {
+    const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
+    const groupItems: Array<State<DataType>> = [];
+    let groupOutput: Array<DataType>;
 
-    // Check if _value is an array if not something went wrong because a group is always an array
-    if (!Array.isArray(this._value)) {
-      console.error("Agile: A group state has to be an array!");
-      return;
-    }
+    // Create groupItems by finding fitting Item to ItemKey in Collection
+    this._value.forEach((itemKey) => {
+      let data = this.collection().data[itemKey];
+      if (data) groupItems.push(data);
+      else notFoundItemKeys.push(itemKey);
+    });
 
-    // Map though group _value (collectionKey array) and get their state from collection
-    const finalStates = this._value
-      .map((primaryKey) => {
-        // Get collection data at the primaryKey position
-        let data = this.collection().data[primaryKey];
-
-        // If no data found add this key to missing PrimaryKeys
-        if (!data) {
-          this.notFoundPrimaryKeys.push(primaryKey);
-          return;
-        }
-
-        return data as State<DataType>;
-      })
-      .filter((item) => item !== undefined);
-
-    // Map though found States and return their publicValue
-    const finalOutput = finalStates.map((state) => {
-      // @ts-ignore
+    // Create groupOutput with groupItems
+    groupOutput = groupItems.map((state) => {
       return state.getPublicValue();
     });
 
-    // Log not found primaryKeys
-    if (
-      this.notFoundPrimaryKeys.length > 0 &&
-      this.agileInstance().config.logJobs
-    )
+    // Logging
+    if (this.agileInstance().config.logJobs && notFoundItemKeys.length > 0)
       console.warn(
-        `Agile: Couldn't find states with the primary keys in group '${this.key}'`,
-        this.notFoundPrimaryKeys
+        `Agile: Couldn't find some Items in Collection '${this.key}'`,
+        notFoundItemKeys
       );
 
-    // @ts-ignore
-    this._states = finalStates.map((state) => () => state);
-    this._output = finalOutput;
+    this._states = groupItems.map((item) => () => item);
+    this._output = groupOutput;
+    this.notFoundItemKeys = notFoundItemKeys;
   }
+}
+
+export type GroupKey = string | number;
+
+/**
+ * @param method - Way of adding ItemKey to Group (push, unshift)
+ * @param overwrite - If adding ItemKey overwrites old ItemKey (-> gets added at the end of the Group)
+ * @param background - If adding ItemKey happens in the background (-> not causing any rerender)
+ */
+export interface GroupAddConfig {
+  method?: "unshift" | "push";
+  overwrite?: boolean;
+  background?: boolean;
+}
+
+/**
+ * @param key - Key/Name of Group
+ */
+export interface GroupConfigInterface {
+  key?: GroupKey;
 }

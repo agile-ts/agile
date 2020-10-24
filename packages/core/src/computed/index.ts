@@ -139,8 +139,8 @@ export class Computed<ComputedValueType = any> extends State<
 }
 
 /**
- * @param background - If recomputing value will happen in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of Computed will be executed
+ * @param background - If recomputing value happens in the background (-> not causing any rerender)
+ * @param sideEffects - If Side Effects of Computed get executed
  */
 export interface RecomputeConfigInterface {
   background?: boolean;

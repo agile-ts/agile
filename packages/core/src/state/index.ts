@@ -460,8 +460,8 @@ export class State<ValueType = any> {
 export type StateKey = string | number;
 
 /**
- * @param background - If assigning a new value will happen in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of State will be executed
+ * @param background - If assigning a new value happens in the background (-> not causing any rerender)
+ * @param sideEffects - If Side Effects of State get executed
  */
 export interface SetConfigInterface {
   background?: boolean;
@@ -469,8 +469,8 @@ export interface SetConfigInterface {
 }
 
 /**
- * @param background - If assigning a new value will happen in the background (-> not causing any rerender)
- * @param addNewProperties - If new Properties will be added to the State Value
+ * @param background - If assigning new value happens in the background (-> not causing any rerender)
+ * @param addNewProperties - If new Properties gets added to the State Value
  */
 export interface PatchConfigInterface {
   addNewProperties?: boolean;

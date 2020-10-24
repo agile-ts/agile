@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { Agile, Group } from "../../../../src";
 import { useAgile_Test } from "../../../test_integration";
 
-describe("Add function Tests", () => {
+describe("Remove function Tests", () => {
   let rerenderCount = 0;
 
   // Define Agile

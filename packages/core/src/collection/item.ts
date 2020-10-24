@@ -4,7 +4,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
   private collection: () => Collection;
 
   // @ts-ignore
-  public output: DataType; // Defines the type of the output (will be set external)
+  public output: DataType; // Defines type of output (will be set external)
 
   constructor(collection: Collection, data: DataType) {
     super(collection.agileInstance(), data);
@@ -17,8 +17,5 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     this.addSideEffect("rebuildGroup", () =>
       collection.rebuildGroupsThatIncludePrimaryKey(this.key || "")
     );
-
-    // Set type of State to object because a collection item is always an object
-    this.type(Object);
   }
 }

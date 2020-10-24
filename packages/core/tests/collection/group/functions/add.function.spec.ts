@@ -77,7 +77,7 @@ describe("Add function Tests", () => {
       "group1 has correct output"
     );
     expect(
-      JSON.stringify(MY_COLLECTION.groups["group1"].notFoundPrimaryKeys)
+      JSON.stringify(MY_COLLECTION.groups["group1"].notFoundItemKeys)
     ).to.eq(JSON.stringify([]), "group1 has correct notFoundPrimaryKeys");
 
     expect(rerenderCount).to.eq(2, "rerenderCount has been increased by 1");
@@ -103,7 +103,7 @@ describe("Add function Tests", () => {
       "group1 has correct output"
     );
     expect(
-      JSON.stringify(MY_COLLECTION.groups["group1"].notFoundPrimaryKeys)
+      JSON.stringify(MY_COLLECTION.groups["group1"].notFoundItemKeys)
     ).to.eq(JSON.stringify([]), "group1 has correct notFoundPrimaryKeys");
 
     expect(rerenderCount).to.eq(3, "rerenderCount has been increased by 1");
@@ -152,7 +152,7 @@ describe("Add function Tests", () => {
       "group1 has correct output"
     );
     expect(
-      JSON.stringify(MY_COLLECTION.groups["group1"].notFoundPrimaryKeys)
+      JSON.stringify(MY_COLLECTION.groups["group1"].notFoundItemKeys)
     ).to.eq(JSON.stringify([100]), "group1 has correct notFoundPrimaryKeys");
 
     expect(rerenderCount).to.eq(

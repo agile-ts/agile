@@ -120,88 +120,69 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * Collect Item/s
-   * TODO
+   * @param items - Item/s you want to collect
+   * @param groups - Add collected Item/s to certain Groups
+   * @param config - Config
    */
   public collect(
     items: DataType | Array<DataType>,
     groups?: GroupKey | Array<GroupKey>,
-    options: CollectConfigInterface<DataType> = {}
-  ) {
+    config: CollectConfigInterface<DataType> = {}
+  ): this {
     const _items = normalizeArray<DataType>(items);
-    const _groups = normalizeArray<GroupKey>(groups);
+    const groupKeys = normalizeArray<GroupKey>(groups);
     const defaultGroupKey = this.config.defaultGroupKey || "default";
-    const groupsToRebuild: Set<Group> = new Set<Group>();
+    const primaryKey = this.config.primaryKey || "id";
 
-    // Assign defaults to options
-    options = defineConfig<CollectConfigInterface>(options, {
+    config = defineConfig<CollectConfigInterface>(config, {
       method: "push",
       background: false,
       patch: false,
     });
 
-    // Add default group if it hasn't been added (default group contains all items)
-    if (_groups.findIndex((groupName) => groupName === defaultGroupKey) === -1)
-      _groups.push(defaultGroupKey);
+    // Add default GroupKey
+    if (!groupKeys.includes(defaultGroupKey)) groupKeys.push(defaultGroupKey);
 
     // Create not existing Groups
-    _groups.forEach(
+    groupKeys.forEach(
       (groupName) => !this.groups[groupName] && this.createGroup(groupName)
     );
 
+    // Handle added Items
     _items.forEach((item, index) => {
-      // Check if the item already exists in the Collection
-      const itemExists = !!this.data[
-        (item as any)[this.config.primaryKey || "id"]
-      ];
+      const itemKey = item[primaryKey];
+      const itemExists = !!this.data[itemKey];
 
-      // Save items into Collection
-      let key = this.saveData(item, {
-        patch: options.patch,
-        background: options.background,
+      // Save Item in Collection
+      const success = this.saveData(item, {
+        patch: config.patch,
+        background: config.background,
+      });
+      if (!success) return this;
+
+      // Add ItemKey to provided Groups
+      groupKeys.forEach((groupKey) => {
+        this.groups[groupKey].add(itemKey, {
+          method: config.method,
+          background: config.background,
+        });
       });
 
-      // Return if key doesn't exist (something went wrong in saveData, Note: Error will be logged in saveData)
-      if (!key) return;
-
-      // Call forEachItem method
-      if (options.forEachItem) options.forEachItem(item, key, index);
-
-      // If item didn't exist.. check if the itemKey has already been added to a group before -> group need rebuild to has correct output
+      // Ingest Group that includes ItemKey into Runtime that rebuilds the Group and causes rerender
       if (!itemExists) {
-        const groupKeys = Object.keys(this.groups);
-        groupKeys.forEach((groupName) => {
-          // Get Group
-          const group = this.getGroup(groupName);
-
-          // Check if itemKey exists in Group if so push it to groupsToRebuild
-          if (
-            group.value.findIndex(
-              (primaryKey) =>
-                primaryKey === (item as any)[this.config.primaryKey || "id"]
-            ) !== -1
-          )
-            groupsToRebuild.add(group);
-        });
+        for (let groupKey in this.groups) {
+          const group = this.getGroup(groupKey);
+          if (group.value.includes(itemKey)) {
+            if (!config.background) group.ingest({ forceRerender: true });
+          }
+        }
       }
 
-      // Add key to groups
-      _groups.forEach((groupName) => {
-        // @ts-ignore
-        this.groups[groupName].add(key, {
-          method: options.method,
-          background: options.background,
-        });
-      });
+      // Call forEachItem Method (config)
+      if (config.forEachItem) config.forEachItem(item, itemKey, index);
     });
 
-    // Rebuild groups
-    groupsToRebuild.forEach((group) => {
-      // Rebuild Group
-      group.build();
-
-      // Force Rerender to get the correct output in components
-      if (!options.background) group.ingest({ forceRerender: true });
-    });
+    return this;
   }
 
   //=========================================================================================================
@@ -607,48 +588,43 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @internal
    * Save data directly into the collection
+   * @param data - Add Item to Collection
+   * @param config - Config
    */
   public saveData(
     data: DataType,
-    options: { patch?: boolean; background?: boolean } = {}
-  ): ItemKey | null {
-    // Transform data to any because otherwise I have many type errors (because not defined object)
-    // https://stackoverflow.com/questions/57350092/string-cant-be-used-to-index-type
-    const _data = data as any;
+    config: { patch?: boolean; background?: boolean } = {}
+  ): boolean {
+    const _data = data as any; // Transformed Data to any because of unknown Object (DataType)
+    const primaryKey = this.config.primaryKey || "id";
+    const itemKey = _data[primaryKey];
 
-    // Assign defaults to options
-    options = defineConfig(options, {
+    config = defineConfig(config, {
       patch: false,
       background: false,
     });
 
-    // Get primaryKey (default: 'id')
-    const primaryKey = this.config.primaryKey || "id";
-    const itemKey = _data[primaryKey];
-
-    // Check if data is object if not return
     if (!isValidObject(_data)) {
-      console.error("Agile: Collections items has to be an object for now!");
-      return null;
+      console.error("Agile: Collections items has to be an object!");
+      return false;
     }
 
     // Check if data has primaryKey
     if (!_data.hasOwnProperty(primaryKey)) {
       console.error(
-        "Agile: Collections items need a own primaryKey. Here " +
-          this.config.primaryKey
+        `Agile: Collection Item needs a primary Key property called '${this.config.primaryKey}'!`
       );
-      return null;
+      return false;
     }
 
     // Create reference of data at the data key
     let item: Item<DataType> = this.data[itemKey];
 
     // If the data already exists and config is to patch, patch data
-    if (item && options.patch)
-      item.patch(_data, { background: options.background });
+    if (item && config.patch)
+      item.patch(_data, { background: config.background });
     // If the data already exists and no config, overwrite data
-    else if (item) item.set(_data, { background: options.background });
+    else if (item) item.set(_data, { background: config.background });
     // If data does not exist.. create new Item set and increase the size
     else {
       item = new Item<DataType>(this, _data);
@@ -661,7 +637,7 @@ export class Collection<DataType = DefaultItem> {
     // Storage
     setItem(itemKey, this);
 
-    return itemKey;
+    return true;
   }
 
   //=========================================================================================================
@@ -719,7 +695,7 @@ export interface CollectionConfigInterface {
  * @param patch - If Item gets patched into existing Item
  * @param method - Way of adding Item to Collection (push, unshift)
  * @param forEachItem - Loops through collected Items
- * @param background - If collecting Item will happen in background (-> not causing any rerender)
+ * @param background - If collecting Item happens in the background (-> not causing any rerender)
  */
 export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
