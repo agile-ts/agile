@@ -6,16 +6,24 @@ import {
   ItemKey,
   defineConfig,
   normalizeArray,
+  Item,
 } from "../internal";
-import { updateGroup } from "./perstist";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   collection: () => Collection<DataType>;
 
-  _output: Array<DataType> = []; // Output of the group (Note: _value are only the keys of the collection items)
-  _states: Array<() => State<DataType>> = []; // States of the Group
-  notFoundItemKeys: Array<ItemKey> = []; // Contains all key which can't be found in the collection
+  _output: Array<DataType> = []; // Output of Group
+  _items: Array<() => Item<DataType>> = []; // Items of Group
+  notFoundItemKeys: Array<ItemKey> = []; // Contains all key that can't be found in Collection
 
+  /**
+   * @public
+   * Group - Holds Items of Collection
+   * @param agileInstance - An instance of Agile
+   * @param collection - Collection to which the Group belongs
+   * @param initialItems - Initial ItemKeys of Group
+   * @param config - Config
+   */
   constructor(
     agileInstance: Agile,
     collection: Collection<DataType>,
@@ -32,37 +40,48 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     this.rebuild();
   }
 
+  /**
+   * @public
+   * Get Item Value of Group
+   */
   public get output(): Array<DataType> {
-    // Add state(group) to foundState (for auto tracking used states in computed functions)
+    // Add Group to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
     return this._output;
   }
 
-  public get states(): Array<State<DataType>> {
-    // Add state(group) to foundState (for auto tracking used states in computed functions)
+  /**
+   * @public
+   * Get Items of Group
+   */
+  public get items(): Array<Item<DataType>> {
+    // Add Group to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
       this.agileInstance().runtime.foundObservers.add(this.observer);
 
-    return this._states.map((state) => state());
+    return this._items.map((item) => item());
   }
 
   //=========================================================================================================
   // Has
   //=========================================================================================================
   /**
-   * Checks if the group contains the primaryKey
+   * @public
+   * Check if Group contains itemKey
+   * @param itemKey - ItemKey that gets checked if it exists in this Group
    */
-  public has(primaryKey: ItemKey) {
-    return this.value.findIndex((key) => key === primaryKey) !== -1;
+  public has(itemKey: ItemKey) {
+    return this.value.findIndex((key) => key === itemKey) !== -1;
   }
 
   //=========================================================================================================
   // Size
   //=========================================================================================================
   /**
-   * Returns the size of the group
+   * @public
+   * Get size of Group (-> How many Items it contains)
    */
   public get size(): number {
     return this.value.length;
@@ -72,47 +91,48 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   // Remove
   //=========================================================================================================
   /**
-   * Removes a item at primaryKey from the group
+   * @public
+   * Removes ItemKey/s from Group
+   * @param itemKeys - ItemKey/s that gets removed from Group
+   * @param config - Config
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    options: { background?: boolean } = {}
+    config: GroupRemoveConfig = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
-    const notExistingCollectionItems: Array<ItemKey> = [];
-
-    // Merge default values into options
-    options = defineConfig(options, {
+    const notExistingItemKeys: Array<ItemKey> = [];
+    config = defineConfig(config, {
       background: false,
     });
 
+    // Remove ItemKeys from Group
     _itemKeys.forEach((itemKey) => {
-      // If item doesn't exist in collection add it to notExistingItems
-      if (!this.collection().findById(itemKey))
-        notExistingCollectionItems.push(itemKey);
-
-      // Check if primaryKey exists in group if not, return
-      if (this.value.findIndex((key) => key === itemKey) === -1) {
+      // Check if itemKey exists in Group
+      if (!this.nextStateValue.includes(itemKey)) {
         console.error(
-          `Agile: Couldn't find primaryKey '${itemKey}' in group`,
+          `Agile: Couldn't find itemKey '${itemKey}' in Group!`,
           this
         );
         return;
       }
 
-      // Remove primaryKey from nextState
-      this.nextStateValue = this.nextStateValue.filter((i) => i !== itemKey);
+      // Check if ItemKey exists in Collection
+      if (!this.collection().findById(itemKey))
+        notExistingItemKeys.push(itemKey);
 
-      // Storage
-      if (this.key) updateGroup(this.key, this.collection());
+      // Remove ItemKey from Group
+      this.nextStateValue = this.nextStateValue.filter(
+        (key) => key !== itemKey
+      );
     });
 
-    // If all items don't exist in collection.. set background to true because the output won't change -> no rerender necessary
-    if (notExistingCollectionItems.length >= _itemKeys.length)
-      options.background = true;
+    // If all removed ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
+    if (notExistingItemKeys.length >= _itemKeys.length)
+      config.background = true;
 
-    // Set State to nextState
-    this.ingest(options);
+    // Ingest nextStateValue into Runtime
+    this.ingest({ background: config.background });
 
     return this;
   }
@@ -121,6 +141,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   // Add
   //=========================================================================================================
   /**
+   * @public
    * Adds ItemKey/s to Group
    * @param itemKeys - ItemKey/s that gets added to Group
    * @param config - Config
@@ -128,7 +149,6 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public add(itemKeys: ItemKey | ItemKey[], config: GroupAddConfig = {}): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeys: Array<ItemKey> = []; // ItemKeys that don't exist in Collection
-
     config = defineConfig<GroupAddConfig>(config, {
       method: "push",
       overwrite: false,
@@ -175,7 +195,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public rebuild() {
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
-    const groupItems: Array<State<DataType>> = [];
+    const groupItems: Array<Item<DataType>> = [];
     let groupOutput: Array<DataType>;
 
     // Create groupItems by finding fitting Item to ItemKey in Collection
@@ -186,8 +206,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Create groupOutput with groupItems
-    groupOutput = groupItems.map((state) => {
-      return state.getPublicValue();
+    groupOutput = groupItems.map((item) => {
+      return item.getPublicValue();
     });
 
     // Logging
@@ -197,7 +217,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
         notFoundItemKeys
       );
 
-    this._states = groupItems.map((item) => () => item);
+    this._items = groupItems.map((item) => () => item);
     this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
   }
@@ -213,6 +233,13 @@ export type GroupKey = string | number;
 export interface GroupAddConfig {
   method?: "unshift" | "push";
   overwrite?: boolean;
+  background?: boolean;
+}
+
+/**
+ * @param background - If removing ItemKey happens in the background (-> not causing any rerender)
+ */
+export interface GroupRemoveConfig {
   background?: boolean;
 }
 

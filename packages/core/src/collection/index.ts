@@ -5,17 +5,16 @@ import {
   GroupKey,
   Selector,
   SelectorKey,
-  State,
   StateKey,
   StorageKey,
   GroupConfigInterface,
-  copy,
   defineConfig,
   flatMerge,
   isValidObject,
   normalizeArray,
+  copy,
 } from "../internal";
-import { persistValue, removeItem, setItem } from "./perstist";
+import { persistValue, removeItem } from "./perstist";
 
 export class Collection<DataType = DefaultItem> {
   public agileInstance: () => Agile;
@@ -31,8 +30,9 @@ export class Collection<DataType = DefaultItem> {
   public selectors: { [key: string]: Selector<any> } = {};
 
   /**
+   * @public
    * Class that holds a List of Objects with key and causes rerender on subscribed Components
-   * @param agileInstance - An instance
+   * @param agileInstance - An instance of Agile
    * @param config - Config
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
@@ -46,79 +46,134 @@ export class Collection<DataType = DefaultItem> {
     });
     this._key = this.config.key;
 
-    // Init Sub Instances like groups, selectors
-    this.initSubInstances("groups");
-    this.initSubInstances("selectors");
+    this.initGroups();
+    this.initSelectors();
   }
 
+  /**
+   * @public
+   * Set Key/Name of Collection
+   */
   public set key(value: StateKey | undefined) {
     this._key = value;
   }
 
+  /**
+   * @public
+   * Get Key/Name of Collection
+   */
   public get key(): StateKey | undefined {
     return this._key;
   }
 
   //=========================================================================================================
-  // Init SubInstances
+  // Group
+  //=========================================================================================================
+  /**
+   * @public
+   * Group - Holds Items of this Collection
+   * @param initialItems - Initial ItemKeys of Group
+   * @param config - Config
+   */
+  public Group(
+    initialItems?: Array<ItemKey>,
+    config?: GroupConfigInterface
+  ): Group<DataType> {
+    return new Group<DataType>(
+      this.agileInstance(),
+      this,
+      initialItems,
+      config
+    );
+  }
+
+  //=========================================================================================================
+  // Selector
+  //=========================================================================================================
+  /**
+   * @public
+   * Selector - Represents an Item of this Collection
+   * @param initialKey - Key of Item that the Selector represents
+   * @param config - Config
+   */
+  public Selector(
+    initialKey: ItemKey,
+    config?: { key?: SelectorKey }
+  ): Selector<DataType> {
+    return new Selector<DataType>(this, initialKey, config);
+  }
+
+  //=========================================================================================================
+  // Init Groups
   //=========================================================================================================
   /**
    * @internal
-   * Inits SubInstance of Collection like groups and selectors
-   * @param type - Type of SubInstance (groups, selectors)
+   * Instantiates Groups
    */
-  private initSubInstances(type: "groups" | "selectors") {
-    const subInstances = copy(this.config[type]);
-    let subInstancesObject: any = {};
+  private initGroups() {
+    const groups = copy(this.config.groups);
+    if (!groups) return;
+    let groupsObject: { [key: string]: Group } = {};
 
-    // If SubInstances is Array, transform it to Object
-    if (Array.isArray(subInstances)) {
-      subInstances.forEach((instanceName) => {
-        let instance;
-        switch (type) {
-          case "groups":
-            instance = new Group(this.agileInstance(), this, [], {
-              key: instanceName,
-            });
-            break;
-          case "selectors":
-            instance = new Selector(this, instanceName, {
-              key: instanceName,
-            });
-            break;
-          default:
-            instance = "unknown";
-        }
-        subInstancesObject[instanceName] = instance;
+    // If groups is Array of SelectorNames transform it to Selector Object
+    if (Array.isArray(groups)) {
+      groups.forEach((groupKey) => {
+        groupsObject[groupKey] = new Group(this.agileInstance(), this, [], {
+          key: groupKey,
+        });
       });
-    } else {
-      subInstancesObject = subInstances;
-    }
+    } else groupsObject = groups;
 
     // Add default Group
-    if (type === "groups") {
-      subInstancesObject[this.config.defaultGroupKey || "default"] = new Group(
-        this.agileInstance(),
-        this,
-        [],
-        {
-          key: this.config.defaultGroupKey || "default",
-        }
-      );
-    }
+    groupsObject[this.config.defaultGroupKey || "default"] = new Group(
+      this.agileInstance(),
+      this,
+      [],
+      {
+        key: this.config.defaultGroupKey || "default",
+      }
+    );
 
-    // Set key of subInstance to property Name
-    for (let key in subInstancesObject)
-      if (!subInstancesObject[key].key) subInstancesObject[key].key = key;
+    // Set Key/Name of Selector to property Name
+    for (let key in groupsObject)
+      if (!groupsObject[key].key) groupsObject[key].key = key;
 
-    // Assign subInstance to Collection
-    this[type] = subInstancesObject;
+    this.groups = groupsObject;
+  }
+
+  //=========================================================================================================
+  // Init Selectors
+  //=========================================================================================================
+  /**
+   * @internal
+   * Instantiates Selectors
+   */
+  private initSelectors() {
+    const selectors = copy(this.config.selectors);
+    if (!selectors) return;
+    let selectorsObject: { [key: string]: Selector } = {};
+
+    // If selectors is Array of SelectorNames transform it to Selector Object
+    if (Array.isArray(selectors)) {
+      selectors.forEach((selectorKey) => {
+        selectorsObject[selectorKey] = new Selector(this, selectorKey, {
+          key: selectorKey,
+        });
+      });
+    } else selectorsObject = selectors;
+
+    // Set Key/Name of Selector to property Name
+    for (let key in selectorsObject)
+      if (!selectorsObject[key].key) selectorsObject[key].key = key;
+
+    this.selectors = selectorsObject;
   }
 
   //=========================================================================================================
   // Collect
   //=========================================================================================================
   /**
+   * @public
    * Collect Item/s
    * @param items - Item/s you want to collect
    * @param groups - Add collected Item/s to certain Groups
@@ -148,7 +203,7 @@ export class Collection<DataType = DefaultItem> {
       (groupName) => !this.groups[groupName] && this.createGroup(groupName)
     );
 
-    // Handle added Items
+    // Instantiate added Items
     _items.forEach((item, index) => {
       const itemKey = item[primaryKey];
       const itemExists = !!this.data[itemKey];
@@ -168,7 +223,7 @@ export class Collection<DataType = DefaultItem> {
         });
       });
 
-      // Ingest Group that includes ItemKey into Runtime that rebuilds the Group and causes rerender
+      // Ingest Group that includes ItemKey into Runtime, which than rebuilds the Group
       if (!itemExists) {
         for (let groupKey in this.groups) {
           const group = this.getGroup(groupKey);
@@ -189,78 +244,64 @@ export class Collection<DataType = DefaultItem> {
   // Update
   //=========================================================================================================
   /**
-   * * Update data by updateKey(id) in a Agile Collection
+   * @public
+   * Updates Item at provided Key
+   * @param itemKey - ItemKey of updated Item
+   * @param changes - Changes that will be merged into Item
+   * @param config - Config
    */
   public update(
-    updateKey: ItemKey,
+    itemKey: ItemKey,
     changes: DefaultItem | DataType,
-    options: { addNewProperties?: boolean; background?: boolean } = {}
-  ): State | undefined {
-    // If item does not exist, return
-    if (!this.data.hasOwnProperty(updateKey)) {
+    config: UpdateConfigInterface = {}
+  ): Item | undefined {
+    if (!this.data.hasOwnProperty(itemKey)) {
       console.error(
-        `Agile: PrimaryKey '${updateKey} doesn't exist in collection `,
+        `Agile: ItemKey '${itemKey} doesn't exist in Collection!`,
         this
       );
       return undefined;
     }
 
-    // Assign defaults to config
-    options = defineConfig(options, {
+    const item = this.data[itemKey];
+    const primaryKey = this.config.primaryKey || "";
+    config = defineConfig(config, {
       addNewProperties: false,
       background: false,
     });
 
-    const itemState = this.data[updateKey];
-    const currentItemValue = copy(itemState.value) as any;
-    const primaryKey = this.config.primaryKey || "";
-
-    // Merge current Item value with changes
-    const finalItemValue = flatMerge(currentItemValue, changes, {
-      addNewProperties: options.addNewProperties,
+    // Merge changes into ItemValue
+    const newItemValue = flatMerge(item.nextStateValue, changes, {
+      addNewProperties: config.addNewProperties,
     });
 
-    // Check if something has changed (stringifying because of possible object or array)
-    if (
-      JSON.stringify(finalItemValue) ===
-      JSON.stringify(itemState.nextStateValue)
-    )
-      return this.data[finalItemValue[primaryKey]];
-
-    // Assign finalItemStateValue to nextState
-    itemState.nextStateValue = finalItemValue;
-
-    // Set State to nextState
-    itemState.ingest({ background: options.background });
-
-    // If data key changes update it properly
-    if (currentItemValue[primaryKey] !== finalItemValue[primaryKey])
+    // Update primaryKey of Item if it has changed
+    if (item.value[primaryKey] !== newItemValue[primaryKey])
       this.updateItemPrimaryKeys(
-        currentItemValue[primaryKey],
-        finalItemValue[primaryKey],
-        { background: options.background }
+        item.value[primaryKey],
+        newItemValue[primaryKey],
+        { background: config.background }
       );
 
-    // Rebuild all groups that includes the primaryKey
-    this.rebuildGroupsThatIncludePrimaryKey(finalItemValue[primaryKey], {
-      background: options.background,
-    });
+    // Apply changes to Item
+    item.set(newItemValue, { background: config.background });
 
-    // Return data at primaryKey (updated State)
-    return this.data[finalItemValue[primaryKey]];
+    return this.data[newItemValue[primaryKey]];
   }
 
   //=========================================================================================================
   // Create Group
   //=========================================================================================================
   /**
-   * Create a group instance on this collection
+   * @public
+   * Creates new Group that holds Items of Collection
+   * @param groupName - Name/Key of Group
+   * @param initialItems - Initial ItemKeys of Group
    */
   public createGroup(
     groupName: GroupKey,
     initialItems?: Array<ItemKey>
   ): Group<DataType> {
-    // Check if Group already exist
     if (this.groups.hasOwnProperty(groupName)) {
       console.warn(
         `Agile: The Group with the name ${groupName} already exists!`
@@ -275,13 +316,11 @@ export class Collection<DataType = DefaultItem> {
       initialItems,
       { key: groupName }
     );
-
-    // Add new Group to groups
     this.groups[groupName] = group;
 
-    // Log Job
+    // Logging
     if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Created Group called '${groupName}'`, group);
+      console.log(`Agile: Created new Group called '${groupName}'`, group);
 
     return group;
   }
@@ -290,13 +329,15 @@ export class Collection<DataType = DefaultItem> {
   // Create Selector
   //=========================================================================================================
   /**
-   * Create a selector instance on this collection
+   * @public
+   * Creates new Selector that represents an Item of the Collection
+   * @param selectorName - Name/Key of Selector
+   * @param key - Key of Item that the Selector represents
    */
   public createSelector(
     selectorName: SelectorKey,
-    id: ItemKey
+    key: ItemKey
   ): Selector<DataType> {
-    // Check if Selector already exist
     if (this.selectors.hasOwnProperty(selectorName)) {
       console.warn(
         `Agile: The Selector with the name ${selectorName} already exists!`
@@ -305,12 +346,10 @@ export class Collection<DataType = DefaultItem> {
     }
 
     // Create new Selector
-    const selector = new Selector<DataType>(this, id, { key: selectorName });
-
-    // Add new Selector to selectors
+    const selector = new Selector<DataType>(this, key, { key: selectorName });
     this.selectors[selectorName] = selector;
 
-    // Log Job
+    // Logging
     if (this.agileInstance().config.logJobs)
       console.log(`Agile: Created Selector called '${selectorName}'`, selector);
 
@@ -321,37 +360,44 @@ export class Collection<DataType = DefaultItem> {
   // Get Group
   //=========================================================================================================
   /**
-   * Return an group from this collection as Group instance (extends State)
+   * @public
+   * Gets Group by Key/Name
+   * @param groupName - Name/Key of Group
    */
   public getGroup(groupName: GroupKey): Group<DataType> {
-    // Check if group exists
-    if (this.groups[groupName]) return this.groups[groupName];
+    if (!this.groups[groupName]) {
+      console.warn(`Agile: Group with key/name '${groupName}' doesn't exist!`);
 
-    console.warn(`Agile: Group with name '${groupName}' doesn't exist!`);
+      // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
+      const group = new Group<DataType>(this.agileInstance(), this, [], {
+        key: "dummy",
+      });
+      group.isPlaceholder = true;
+      return group;
+    }
 
-    // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
-    const group = new Group<DataType>(this.agileInstance(), this, [], {
-      key: "dummy",
-    });
-    group.isPlaceholder = true;
-    return group;
+    return this.groups[groupName];
   }
 
   //=========================================================================================================
   // Get Selector
   //=========================================================================================================
   /**
-   * Return an selector from this collection as Selector instance (extends State)
+   * @public
+   * Gets Selector by Key/Name
+   * @param selectorName - Name/Key of Selector
    */
   public getSelector(
     selectorName: SelectorKey
   ): Selector<DataType> | undefined {
-    // Check if selector exists
-    if (this.selectors[selectorName]) return this.selectors[selectorName];
+    if (!this.selectors[selectorName]) {
+      console.warn(
+        `Agile: Selector with name '${selectorName}' doesn't exist!`
+      );
+      return undefined;
+    }
 
-    console.warn(`Agile: Selector with name '${selectorName}' doesn't exist!`);
-
-    return undefined;
+    return this.selectors[selectorName];
   }
 
   //=========================================================================================================
@@ -411,37 +457,6 @@ export class Collection<DataType = DefaultItem> {
       this.isPersisted = value;
     });
     return this;
-  }
-
-  //=========================================================================================================
-  // Group
-  //=========================================================================================================
-  /**
-   * Create a group instance under this collection (can be used in function based config)
-   */
-  public Group(
-    initialItems?: Array<ItemKey>,
-    config?: GroupConfigInterface
-  ): Group<DataType> {
-    return new Group<DataType>(
-      this.agileInstance(),
-      this,
-      initialItems,
-      config
-    );
-  }
-
-  //=========================================================================================================
-  // Selector
-  //=========================================================================================================
-  /**
-   * Create a selector instance under this collection (can be used in function based config)
-   */
-  public Selector(
-    initialSelection: ItemKey,
-    options?: { key?: SelectorKey }
-  ): Selector<DataType> {
-    return new Selector<DataType>(this, initialSelection, options);
   }
 
   //=========================================================================================================
@@ -587,8 +602,8 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @internal
-   * Save data directly into the collection
-   * @param data - Add Item to Collection
+   * Saves Data into Collection
+   * @param data - Data that gets saved into Collection (needs primaryKey)
    * @param config - Config
    */
   public saveData(
@@ -597,8 +612,6 @@ export class Collection<DataType = DefaultItem> {
   ): boolean {
     const _data = data as any; // Transformed Data to any because of unknown Object (DataType)
     const primaryKey = this.config.primaryKey || "id";
-    const itemKey = _data[primaryKey];
-
     config = defineConfig(config, {
       patch: false,
       background: false,
@@ -609,7 +622,6 @@ export class Collection<DataType = DefaultItem> {
       return false;
     }
 
-    // Check if data has primaryKey
     if (!_data.hasOwnProperty(primaryKey)) {
       console.error(
         `Agile: Collection Item needs a primary Key property called '${this.config.primaryKey}'!`
@@ -617,25 +629,21 @@ export class Collection<DataType = DefaultItem> {
       return false;
     }
 
-    // Create reference of data at the data key
+    const itemKey = _data[primaryKey];
     let item: Item<DataType> = this.data[itemKey];
 
-    // If the data already exists and config is to patch, patch data
+    // Create or update Item
     if (item && config.patch)
-      item.patch(_data, { background: config.background });
-    // If the data already exists and no config, overwrite data
-    else if (item) item.set(_data, { background: config.background });
-    // If data does not exist.. create new Item set and increase the size
-    else {
+      item = item.patch(_data, { background: config.background });
+    if (item && !config.patch)
+      item = item.set(_data, { background: config.background });
+    if (!item) {
       item = new Item<DataType>(this, _data);
       this.size++;
     }
 
-    // Set item at data itemKey
+    // Set new Item at itemKey
     this.data[itemKey] = item;
-
-    // Storage
-    setItem(itemKey, this);
 
     return true;
   }
@@ -645,28 +653,26 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @internal
-   * Rebuild the Groups which contains the primaryKey
+   * Rebuilds Groups that includes ItemKey
+   * @itemKey - ItemKey that a Group have to contain to get rebuild
+   * @config - Config
    */
   public rebuildGroupsThatIncludePrimaryKey(
-    primaryKey: ItemKey,
-    options?: { background?: boolean; forceRerender?: boolean }
+    itemKey: ItemKey,
+    config?: { background?: boolean; forceRerender?: boolean }
   ): void {
-    // Assign defaults to config
-    options = defineConfig(options, {
+    config = defineConfig(config, {
       background: false,
-      forceRerender: !options?.background, // forceRerender false.. because forceRerender has more weight than background in runtime
+      forceRerender: !config?.background, // because forceRerender has more weight than background
     });
 
-    // Rebuild groups that includes primaryKey
+    // Rebuild Groups that include ItemKey
     for (let groupKey in this.groups) {
-      // Get Group
       const group = this.getGroup(groupKey);
-
-      // Check if group contains primaryKey if so rebuild it
-      if (group.has(primaryKey))
+      if (group.has(itemKey))
         group.ingest({
-          background: options?.background,
-          forceRerender: options?.forceRerender,
+          background: config?.background,
+          forceRerender: config?.forceRerender,
         });
     }
   }
@@ -701,6 +707,15 @@ export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
   method?: "push" | "unshift";
   forEachItem?: (item: DataType, key: ItemKey, index: number) => void;
+  background?: boolean;
+}
+
+/**
+ * @param addNewProperties -
+ * @param background - If collecting Item happens in the background (-> not causing any rerender)
+ */
+export interface UpdateConfigInterface {
+  addNewProperties?: boolean;
   background?: boolean;
 }
 

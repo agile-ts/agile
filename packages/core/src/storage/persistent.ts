@@ -15,10 +15,18 @@ export class Persistent<ValueType = any> {
     this.agileInstance = () => agileInstance;
   }
 
+  /**
+   * @internal
+   * Set Key/Name of Persistent
+   */
   public set key(value: StorageKey) {
     this._key = value;
   }
 
+  /**
+   * @internal
+   * Get Key/Name of Persistent
+   */
   public get key(): StorageKey {
     return this._key;
   }

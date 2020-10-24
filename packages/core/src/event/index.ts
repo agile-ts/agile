@@ -35,11 +35,19 @@ export class Event<PayloadType = DefaultEventPayload> {
       this.config.enabled !== undefined ? this.config.enabled : true;
   }
 
+  /**
+   * @public
+   * Set Key/Name of Event
+   */
   public set key(value: EventKey | undefined) {
     this._key = value;
     this.observer.key = value;
   }
 
+  /**
+   * @public
+   * Get Key/Name of Event
+   */
   public get key(): EventKey | undefined {
     return this._key;
   }

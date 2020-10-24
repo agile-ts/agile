@@ -32,10 +32,18 @@ export class Computed<ComputedValueType = any> extends State<
     this.recompute();
   }
 
+  /**
+   * @public
+   * Set Value of Computed
+   */
   public set value(value: ComputedValueType) {
     console.error("Agile: You can't mutate Computed value!");
   }
 
+  /**
+   * @public
+   * Get Value of Computed
+   */
   public get value(): ComputedValueType {
     // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
     // Can't remove this getter function.. since the setter function is set in this class -> Error if not setter and getter function set

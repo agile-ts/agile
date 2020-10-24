@@ -30,10 +30,18 @@ export class Observer<ValueType = any> {
     deps?.forEach((observer) => this.deps.add(observer));
   }
 
+  /**
+   * @internal
+   * Set Key/Name of Observer
+   */
   public set key(value: StateKey | undefined) {
     this._key = value;
   }
 
+  /**
+   * @internal
+   * Get Key/Name of Observer
+   */
   public get key(): StateKey | undefined {
     return this._key;
   }

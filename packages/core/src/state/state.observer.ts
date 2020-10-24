@@ -132,7 +132,7 @@ export class StateObserver<ValueType = any> extends Observer {
     if (job.config?.sideEffects)
       for (let sideEffectKey in state.sideEffects)
         if (isFunction(state.sideEffects[sideEffectKey]))
-          state.sideEffects[sideEffectKey]();
+          state.sideEffects[sideEffectKey](job.config);
 
     // Ingest Dependencies of Observer into Runtime
     job.observer.deps.forEach(

@@ -28,7 +28,9 @@ export class State<ValueType = any> {
   public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
   public observer: StateObserver; // Handles deps and subs of State and is like an interface to the Runtime
-  public sideEffects: { [key: string]: () => void } = {}; // SideEffects of State (will be executed in Runtime)
+  public sideEffects: {
+    [key: string]: (properties?: { [key: string]: any }) => void;
+  } = {}; // SideEffects of State (will be executed in Runtime)
 
   public isPersisted: boolean = false; // If State is stored in Storage
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
@@ -63,10 +65,18 @@ export class State<ValueType = any> {
     );
   }
 
+  /**
+   * @public
+   * Set Value of State
+   */
   public set value(value: ValueType) {
     this.set(value);
   }
 
+  /**
+   * @public
+   * Get Value of State
+   */
   public get value(): ValueType {
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
@@ -75,6 +85,10 @@ export class State<ValueType = any> {
     return this._value;
   }
 
+  /**
+   * @public
+   * Set Key/Name of State
+   */
   public set key(value: StateKey | undefined) {
     const oldKey = this._key;
 
@@ -90,6 +104,10 @@ export class State<ValueType = any> {
     }
   }
 
+  /**
+   * @public
+   * Get Key/Name of State
+   */
   public get key(): StateKey | undefined {
     return this._key;
   }
@@ -116,7 +134,7 @@ export class State<ValueType = any> {
     }
 
     // Check if value has changed
-    if (equal(this.value, value)) return this;
+    if (equal(this.nextStateValue, value)) return this;
 
     // Ingest new value into runtime
     this.observer.ingest(value, config);
@@ -380,7 +398,10 @@ export class State<ValueType = any> {
    * @param key - Key of SideEffect
    * @param sideEffect - Callback Function that gets called on every State Value change
    */
-  public addSideEffect(key: string, sideEffect: () => void): this {
+  public addSideEffect(
+    key: string,
+    sideEffect: (properties?: { [key: string]: any }) => void
+  ): this {
     if (!isFunction(sideEffect)) {
       console.error("Agile: A sideEffect function has to be an function!");
       return this;

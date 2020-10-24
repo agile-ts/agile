@@ -3,19 +3,22 @@ import { State, Collection, DefaultItem } from "../internal";
 export class Item<DataType = DefaultItem> extends State<DataType> {
   private collection: () => Collection;
 
-  // @ts-ignore
-  public output: DataType; // Defines type of output (will be set external)
-
+  /**
+   * @public
+   * Item of Collection
+   * @param collection - Collection to which the Item belongs
+   * @param data - Data that the Item holds
+   */
   constructor(collection: Collection, data: DataType) {
     super(collection.agileInstance(), data);
     this.collection = () => collection;
 
-    // Setting key of item to the data primaryKey
-    this.key = data && (data as any)[collection.config?.primaryKey || "id"];
+    // Setting primaryKey of Data to Key/Name of Item
+    this.key = data[collection.config?.primaryKey || "id"];
 
-    // Add rebuildGroupsThatIncludePrimaryKey to sideEffects to rebuild the groups which includes the primaryKey if the state changes
-    this.addSideEffect("rebuildGroup", () =>
-      collection.rebuildGroupsThatIncludePrimaryKey(this.key || "")
+    // Add RebuildGroupThatIncludePrimaryKey to sideEffects, so that it rebuilds the Group if it changes
+    this.addSideEffect("rebuildGroup", (properties: any) =>
+      collection.rebuildGroupsThatIncludePrimaryKey(this.key || "", properties)
     );
   }
 }
