@@ -90,6 +90,27 @@ export class State<ValueType = any> {
    * Set Key/Name of State
    */
   public set key(value: StateKey | undefined) {
+    this.setKey(value);
+  }
+
+  /**
+   * @public
+   * Get Key/Name of State
+   */
+  public get key(): StateKey | undefined {
+    return this._key;
+  }
+
+  //=========================================================================================================
+  // Set Key
+  //=========================================================================================================
+  /**
+   * @internal
+   * Set Key/Name of State
+   * https://github.com/microsoft/TypeScript/issues/338
+   * @param value - New Key/Name of State
+   */
+  public setKey(value: StateKey | undefined) {
     const oldKey = this._key;
 
     // Change State Key
@@ -102,14 +123,6 @@ export class State<ValueType = any> {
     if (this.isPersisted && this.persistent) {
       if (value && this.persistent.key === oldKey) this.persistent.key = value;
     }
-  }
-
-  /**
-   * @public
-   * Get Key/Name of State
-   */
-  public get key(): StateKey | undefined {
-    return this._key;
   }
 
   //=========================================================================================================
