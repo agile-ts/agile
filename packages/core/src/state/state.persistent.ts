@@ -75,7 +75,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public validateKey(key?: StorageKey): StorageKey | null {
     const state = this.state();
 
-    // Get key from State key
+    // Get key from State
     if (!key && state.key) return state.key;
 
     // Return null if no key found

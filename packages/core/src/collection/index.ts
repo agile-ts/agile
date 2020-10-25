@@ -656,6 +656,9 @@ export class Collection<DataType = DefaultItem> {
       this.size++;
     }
 
+    // Reset isPlaceholder of Item since it got an value
+    if (item.isPlaceholder) item.isPlaceholder = false;
+
     // Set new Item at itemKey
     this.data[itemKey] = item;
 
