@@ -14,7 +14,6 @@ import {
   normalizeArray,
   copy,
 } from "../internal";
-import { persistValue, removeItem } from "./perstist";
 
 export class Collection<DataType = DefaultItem> {
   public agileInstance: () => Agile;
@@ -277,11 +276,9 @@ export class Collection<DataType = DefaultItem> {
 
     // Update primaryKey of Item if it has changed
     if (item.value[primaryKey] !== newItemValue[primaryKey])
-      this.updateItemPrimaryKeys(
-        item.value[primaryKey],
-        newItemValue[primaryKey],
-        { background: config.background }
-      );
+      this.updateItemKey(item.value[primaryKey], newItemValue[primaryKey], {
+        background: config.background,
+      });
 
     // Apply changes to Item
     item.set(newItemValue, { background: config.background });
@@ -404,44 +401,50 @@ export class Collection<DataType = DefaultItem> {
   // Remove
   //=========================================================================================================
   /**
-   * Remove fromGroups or everywhere
+   * @public
+   * Remove Items from special Group or from everywhere
+   * @param itemKeys - ItemKey/s that get removed
    */
-  public remove(primaryKeys: ItemKey | Array<ItemKey>) {
+  public remove(itemKeys: ItemKey | Array<ItemKey>) {
     return {
       fromGroups: (groups: Array<ItemKey> | ItemKey) =>
-        this.removeFromGroups(primaryKeys, groups),
-      everywhere: () => this.removeData(primaryKeys),
+        this.removeFromGroups(itemKeys, groups),
+      everywhere: () => this.removeData(itemKeys),
     };
   }
 
   //=========================================================================================================
-  // Find By Id
+  // Get Item by Id
   //=========================================================================================================
   /**
-   * Return an item from this collection by primaryKey as Item instance (extends State)
+   * @public
+   * Gets Item by Id
+   * @param itemKey - ItemKey of Item that might get found
    */
-  public findById(id: ItemKey): Item<DataType> | undefined {
-    if (!this.data.hasOwnProperty(id) || !this.data[id].exists)
+  public getItemById(itemKey: ItemKey): Item<DataType> | undefined {
+    if (!this.data.hasOwnProperty(itemKey) || !this.data[itemKey].exists)
       return undefined;
 
-    // Add state to foundState (for auto tracking used states in computed functions)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.data[id].observer);
+    const item = this.data[itemKey];
 
-    // Return data by id
-    return this.data[id];
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
+    if (this.agileInstance().runtime.trackObservers)
+      this.agileInstance().runtime.foundObservers.add(item.observer);
+
+    return item;
   }
 
   //=========================================================================================================
-  // Get Value By Id
+  // Get Value by Id
   //=========================================================================================================
   /**
-   * Return a value from this collection by primaryKey
+   * @public
+   * Gets ItemValue by Id
+   * @param itemKey - ItemKey of ItemValue that might get found
    */
-  public getValueById(id: ItemKey): DataType | undefined {
-    let data = this.findById(id);
+  public getValueById(itemKey: ItemKey): DataType | undefined {
+    let data = this.getItemById(itemKey);
     if (!data) return undefined;
-
     return data.value;
   }
 
@@ -449,75 +452,89 @@ export class Collection<DataType = DefaultItem> {
   // Persist
   //=========================================================================================================
   /**
-   * Saves the collection in the local storage or in a own configured storage
-   * @param key - the storage key (if no key passed it will take the collection key)
+   * @public
+   * Saves Collection Value into Agile Storage permanently
+   * @param key - Storage Key (Note: not needed if Collection has key/name)
    */
   public persist(key?: StorageKey): this {
-    persistValue(this, key).then((value) => {
-      this.isPersisted = value;
-    });
+    // TODO
     return this;
   }
 
   //=========================================================================================================
-  // Update Data Key
+  // Group Size
   //=========================================================================================================
   /**
    * @internal
-   * This will properly change the key of a collection item
+   * Returns the count of Groups
    */
-  private updateItemPrimaryKeys(
-    oldKey: ItemKey,
-    newKey: ItemKey,
-    options?: { background?: boolean }
-  ): void {
-    // If oldKey and newKey are the same, return
-    if (oldKey === newKey) return;
+  public groupsSize(): number {
+    let size = 0;
+    for (let group in this.groups) size++;
+    return size;
+  }
 
-    // Assign defaults to config
-    options = defineConfig(options, {
+  //=========================================================================================================
+  // Selector Size
+  //=========================================================================================================
+  /**
+   * @internal
+   * Returns the count of Selectors
+   */
+  public selectorsSize(): number {
+    let size = 0;
+    for (let selector in this.selectors) size++;
+    return size;
+  }
+
+  //=========================================================================================================
+  // Update Item Key
+  //=========================================================================================================
+  /**
+   * @internal
+   * Updates ItemKey of Item
+   * @param oldItemKey - Old ItemKey of Item
+   * @param newItemKey - New ItemKey of Item
+   * @param config - Config
+   */
+  private updateItemKey(
+    oldItemKey: ItemKey,
+    newItemKey: ItemKey,
+    config?: UpdateItemKeyInterface
+  ): void {
+    if (oldItemKey === newItemKey) return;
+    config = defineConfig(config, {
       background: false,
     });
+    const item = this.data[oldItemKey];
 
-    // Create copy of data
-    const dataCopy = this.data[oldKey];
+    // Delete old Item at old ItemKey
+    delete this.data[oldItemKey];
 
-    // Delete old reference
-    delete this.data[oldKey];
+    // Add new Item at new ItemKey
+    this.data[newItemKey] = item;
 
-    // Apply the data into data with new key
-    this.data[newKey] = dataCopy;
+    // Update Key/Name of Item
+    if (item.key === oldItemKey) item.key = newItemKey;
 
     // Update Groups
     for (let groupName in this.groups) {
-      // Get Group
       const group = this.getGroup(groupName);
+      if (group.isPlaceholder || !group.value.includes(oldItemKey)) continue;
 
-      // If Group does not contain oldKey, continue
-      if (group.value.findIndex((key) => key === oldKey) === -1) continue;
-
-      // Replace the primaryKey at current index
-      group.nextStateValue.splice(
-        group.nextStateValue.indexOf(oldKey),
-        1,
-        newKey
-      );
-
-      // Set State(Group) to nextState
-      group.ingest({ background: options?.background });
+      // Replace old ItemKey with new ItemKey
+      const newGroupValue = copy(group.value);
+      newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
+      group.set(newGroupValue, { background: config?.background });
     }
 
-    // Update Selector
+    // Update Selectors
     for (let selectorName in this.selectors) {
-      // Get Selector
       const selector = this.getSelector(selectorName);
-      if (!selector) continue;
+      if (!selector || selector.id !== oldItemKey) continue;
 
-      // If Selector doesn't watch on the oldKey, continue
-      if (selector.id !== oldKey) continue;
-
-      // Replace the oldKey with the newKey
-      selector.select(newKey, { background: options?.background });
+      // Replace old ItemKey with new ItemKey
+      selector.select(newItemKey, { background: config?.background });
     }
   }
 
@@ -525,75 +542,72 @@ export class Collection<DataType = DefaultItem> {
   // Remove From Groups
   //=========================================================================================================
   /**
-   * @internal
-   * Deletes Data from Groups
+   * @public
+   * Removes Item/s(ItemKey/s) from Group/s(GroupKey/s)
+   * @param itemKeys - ItemKey/s that get removed from Group
+   * @param groupKeys - GroupKey/s of Group/s form which the ItemKey/s will be removed
    */
   public removeFromGroups(
-    primaryKeys: ItemKey | Array<ItemKey>,
-    groups: GroupKey | Array<GroupKey>
-  ) {
-    const _primaryKeys = normalizeArray(primaryKeys);
-    const _groups = normalizeArray(groups);
+    itemKeys: ItemKey | Array<ItemKey>,
+    groupKeys: GroupKey | Array<GroupKey>
+  ): void {
+    const _itemKeys = normalizeArray(itemKeys);
+    const _groupKeys = normalizeArray(groupKeys);
+    const removedFromGroupKeys: Array<GroupKey> = [];
 
-    _groups.forEach((groupKey) => {
-      // Return if group doesn't exist in collection
+    // Remove ItemKeys from Groups
+    _groupKeys.forEach((groupKey) => {
       if (!this.groups[groupKey]) {
         console.error(
-          `Agile: Couldn't find group('${groupKey}) in collection`,
-          this
+          `Agile: Couldn't find Group '${groupKey}' in Collection ${this.key}`
         );
         return;
       }
 
-      // Remove primaryKeys from Group
-      _primaryKeys.forEach((primaryKey) => {
+      // Remove ItemKeys from Group
+      _itemKeys.forEach((itemKey) => {
         const group = this.getGroup(groupKey);
-        group.remove(primaryKey);
+        group.remove(itemKey);
       });
+      removedFromGroupKeys.push(groupKey);
     });
+
+    // If Item got removed from all Groups of Collection remove it completely
+    if (removedFromGroupKeys.length >= this.groupsSize()) {
+      _itemKeys.forEach((itemKey) => this.removeData(itemKey));
+    }
   }
 
   //=========================================================================================================
   // Delete Data
   //=========================================================================================================
   /**
-   * @internal
-   * Deletes data directly form the collection
+   * @public
+   * Removes Item/s(ItemKey/s) from Group/s(GroupKey/s)
+   * @param itemKeys - ItemKey/s that get removed from Collection
    */
-  public removeData(primaryKeys: ItemKey | Array<ItemKey>) {
-    const _primaryKeys = normalizeArray<ItemKey>(primaryKeys);
-    const groupKeys = Object.keys(this.groups);
-    const selectorKeys = Object.keys(this.selectors);
-    const itemKeys = Object.keys(this.data);
+  public removeData(itemKeys: ItemKey | Array<ItemKey>): void {
+    const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
-    _primaryKeys.forEach((itemKey) => {
-      // Check if primaryKey exists in collection, if not return
-      if (itemKeys.findIndex((key) => itemKey.toString() === key) === -1) {
+    _itemKeys.forEach((itemKey) => {
+      if (!this.data[itemKey]) {
         console.error(
-          `Agile: Couldn't find primaryKey '${itemKey}' in collection`,
-          this
+          `Agile: Couldn't find itemKey '${itemKey}' in Collection '${this.key}'`
         );
         return;
       }
 
-      // Remove primaryKey from Groups (have to be above deleting the data because.. the remove function needs to know if the data exists or not)
-      groupKeys.forEach((groupKey) => {
-        this.groups[groupKey].remove(itemKey);
-      });
+      // Remove Item from Groups
+      for (let groupKey in this.groups) this.groups[groupKey].remove(itemKey);
 
-      // Remove Selectors with primaryKey
-      selectorKeys.forEach((selectorKey) => {
+      // Remove Selectors that represents this Item
+      for (let selectorKey in this.selectors)
         delete this.selectors[selectorKey];
-      });
 
-      // Remove primaryKey from collection data
+      // Remove Item from Collection
       delete this.data[itemKey];
 
-      // Decrease size
       this.size--;
-
-      // Storage
-      removeItem(itemKey, this);
     });
   }
 
@@ -683,7 +697,7 @@ export type CollectionKey = string | number;
 export type ItemKey = string | number; // Key Interface of Item in Collection
 
 /**
- * @param primaryKey - Key/Name of Collection
+ * @param key - Key/Name of Collection
  * @param groups - Groups of Collection
  * @param selectors - Selectors of Collection
  * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
@@ -701,7 +715,7 @@ export interface CollectionConfigInterface {
  * @param patch - If Item gets patched into existing Item
  * @param method - Way of adding Item to Collection (push, unshift)
  * @param forEachItem - Loops through collected Items
- * @param background - If collecting Item happens in the background (-> not causing any rerender)
+ * @param background - If collecting an Item happens in the background (-> not causing any rerender)
  */
 export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
@@ -712,10 +726,17 @@ export interface CollectConfigInterface<DataType = any> {
 
 /**
  * @param addNewProperties -
- * @param background - If collecting Item happens in the background (-> not causing any rerender)
+ * @param background - If updating an Item happens in the background (-> not causing any rerender)
  */
 export interface UpdateConfigInterface {
   addNewProperties?: boolean;
+  background?: boolean;
+}
+
+/**
+ * @param background - If updating the primaryKey of an Item happens in the background (-> not causing any rerender)
+ */
+export interface UpdateItemKeyInterface {
   background?: boolean;
 }
 

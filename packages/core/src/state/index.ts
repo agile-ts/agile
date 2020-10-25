@@ -113,13 +113,13 @@ export class State<ValueType = any> {
   public setKey(value: StateKey | undefined) {
     const oldKey = this._key;
 
-    // Change State Key
+    // Update State Key
     this._key = value;
 
-    // Change Key in Observer
+    // Update Key in Observer
     this.observer.key = value;
 
-    // Change Key in PersistManager
+    // Update Key in PersistManager
     if (this.isPersisted && this.persistent) {
       if (value && this.persistent.key === oldKey) this.persistent.key = value;
     }
@@ -140,7 +140,7 @@ export class State<ValueType = any> {
       background: false,
     });
 
-    // Check if Type is Correct (js)
+    // Check value has correct Type (js)
     if (this.valueType && !this.hasCorrectType(value)) {
       console.warn(`Agile: Incorrect type (${typeof value}) was provided.`);
       return this;

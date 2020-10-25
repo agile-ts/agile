@@ -118,7 +118,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       }
 
       // Check if ItemKey exists in Collection
-      if (!this.collection().findById(itemKey))
+      if (!this.collection().getItemById(itemKey))
         notExistingItemKeys.push(itemKey);
 
       // Remove ItemKey from Group
@@ -160,7 +160,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       const existsInGroup = this.nextStateValue.includes(itemKey);
 
       // Check if ItemKey exists in Collection
-      if (!this.collection().findById(itemKey))
+      if (!this.collection().getItemById(itemKey))
         notExistingItemKeys.push(itemKey);
 
       // Remove ItemKey from Group if overwriting otherwise return

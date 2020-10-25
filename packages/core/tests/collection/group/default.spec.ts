@@ -111,9 +111,9 @@ describe("Default Group Tests", () => {
       );
       expect(JSON.stringify(MY_COLLECTION.groups["default"].items)).to.eq(
         JSON.stringify([
-          MY_COLLECTION.findById(1),
-          MY_COLLECTION.findById(2),
-          MY_COLLECTION.findById(3),
+          MY_COLLECTION.getItemById(1),
+          MY_COLLECTION.getItemById(2),
+          MY_COLLECTION.getItemById(3),
         ]),
         "default Group has correct states"
       );
@@ -239,9 +239,9 @@ describe("Default Group Tests", () => {
       );
       expect(JSON.stringify(MY_COLLECTION.groups["default"].items)).to.eq(
         JSON.stringify([
-          MY_COLLECTION.findById(1),
-          MY_COLLECTION.findById(2),
-          MY_COLLECTION.findById(3),
+          MY_COLLECTION.getItemById(1),
+          MY_COLLECTION.getItemById(2),
+          MY_COLLECTION.getItemById(3),
         ]),
         "default has correct states"
       );
@@ -260,9 +260,9 @@ describe("Default Group Tests", () => {
       );
       expect(JSON.stringify(MY_COLLECTION.groups["group1"].items)).to.eq(
         JSON.stringify([
-          MY_COLLECTION.findById(1),
-          MY_COLLECTION.findById(2),
-          MY_COLLECTION.findById(3),
+          MY_COLLECTION.getItemById(1),
+          MY_COLLECTION.getItemById(2),
+          MY_COLLECTION.getItemById(3),
         ]),
         "group1 has correct states"
       );

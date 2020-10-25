@@ -10,12 +10,6 @@ import {
   StatePersistent,
 } from "../internal";
 
-export type SelectorKey = string | number;
-
-export interface SelectorConfigInterface {
-  key?: SelectorKey; // should be a unique key/name which identifies the selector
-}
-
 export class Selector<DataType = DefaultItem> extends Computed<
   DataType | undefined
 > {
@@ -87,8 +81,9 @@ export class Selector<DataType = DefaultItem> extends Computed<
   // Overwrite Persist (because in computed we overwrite it)
   //=========================================================================================================
   /**
-   * Saves the state in the local storage or in a own configured storage
-   * @param key - the storage key (if no key passed it will take the state key)
+   * @public
+   * Saves Selector Value into Agile Storage permanently
+   * @param key - Storage Key (Note: not needed if Selector has key/name)
    */
   public persist(key?: StorageKey): this {
     if (this.isPersisted && this.persistent) {
@@ -109,7 +104,7 @@ export class Selector<DataType = DefaultItem> extends Computed<
   //=========================================================================================================
   /**
    * @internal
-   *  Will return the perstiable Value of this state..
+   * Returns persistable Value of State
    */
   public getPersistableValue() {
     return this.id;
@@ -124,7 +119,7 @@ export class Selector<DataType = DefaultItem> extends Computed<
  */
 function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
   // Find data by id in collection
-  let item = collection.findById(id);
+  let item = collection.getItemById(id);
 
   // If data is not found, create placeholder item, so that when real data is collected it maintains connection and causes a rerender
   if (!item) {
@@ -150,4 +145,13 @@ function findData<DataType>(collection: Collection<DataType>, id: ItemKey) {
   if (!item.exists) return undefined;
 
   return finalValue;
+}
+
+export type SelectorKey = string | number;
+
+/**
+ * @param key - Key/Name of Selector
+ */
+export interface SelectorConfigInterface {
+  key?: SelectorKey;
 }

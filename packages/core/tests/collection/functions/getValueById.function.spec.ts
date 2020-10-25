@@ -45,7 +45,7 @@ describe("GetValueById Function Tests", () => {
   });
 
   it("Can't getValueById with not existing item id", () => {
-    const item = MY_COLLECTION.findById(5);
+    const item = MY_COLLECTION.getItemById(5);
 
     expect(item).to.eq(undefined, "item is undefined");
   });
