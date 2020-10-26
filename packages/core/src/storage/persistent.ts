@@ -40,7 +40,7 @@ export class Persistent<ValueType = any> {
    * -> Sometimes this class needs to be instantiated after some properties have been set in extended class
    * @param key - Key of Storage property
    */
-  public initPersistent(key?: StorageKey): boolean {
+  public async initPersistent(key?: StorageKey): Promise<boolean> {
     // Validate Key
     const finalKey = this.validateKey(key);
     if (!finalKey) {
@@ -49,11 +49,11 @@ export class Persistent<ValueType = any> {
     }
     this._key = finalKey;
 
-    // Load/Save persisted Value for the first Time
-    this.initialLoading(finalKey);
-
     this.agileInstance().storage.persistentInstances.add(this);
     this.ready = true;
+
+    // Load/Store persisted Value/s for the first Time
+    await this.initialLoading(finalKey);
 
     return true;
   }
@@ -67,10 +67,8 @@ export class Persistent<ValueType = any> {
    * @param key -  Key of Storage property
    */
   public async initialLoading(key: StorageKey) {
-    console.warn(
-      "Agile: Didn't set initialLoading function in Persistent ",
-      this.key
-    );
+    const success = await this.loadValue();
+    if (!success) this.updateValue();
   }
 
   //=========================================================================================================
@@ -78,24 +76,29 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Loads Value from Storage at this._key
+   * Loads Value from Storage
+   * @return Success?
    */
-  public async loadValue(): Promise<ValueType | undefined> {
-    if (!this.ready) return;
-    return this.agileInstance().storage.get(this._key);
+  public async loadValue(): Promise<boolean> {
+    console.warn(
+      `Agile: Didn't set loadValue function in Persistent '${this.key}'`
+    );
+    return false;
   }
 
   //=========================================================================================================
-  // Set Value
+  // Update Value
   //=========================================================================================================
   /**
    * @internal
-   * Saves/Updates Value in Storage at this._key
-   * @param value - new Value that gets set
+   * Saves/Updates Value in Storage
+   * @return Success?
    */
-  public setValue(value: ValueType): void {
-    if (!this.ready) return;
-    return this.agileInstance().storage.set(this._key, value);
+  public updateValue(): boolean {
+    console.warn(
+      `Agile: Didn't set setValue function in Persistent '${this.key}'`
+    );
+    return false;
   }
 
   //=========================================================================================================
@@ -103,11 +106,14 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Removes Value form Storage at this._key
+   * Removes Value form Storage
+   * @return Success?
    */
-  public removeValue(): void {
-    if (!this.ready) return;
-    return this.agileInstance().storage.remove(this._key);
+  public removeValue(): boolean {
+    console.warn(
+      `Agile: Didn't set removeValue function in Persistent '${this.key}'`
+    );
+    return false;
   }
 
   //=========================================================================================================
@@ -120,8 +126,7 @@ export class Persistent<ValueType = any> {
    */
   public validateKey(key?: StorageKey): StorageKey | null {
     console.warn(
-      "Agile: Didn't set validateKey function in Persistent ",
-      this.key
+      `Agile: Didn't set validateKey function in Persistent '${this.key}'`
     );
     return null;
   }

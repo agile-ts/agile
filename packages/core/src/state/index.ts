@@ -449,7 +449,7 @@ export class State<ValueType = any> {
     this.nextStateValue = copy(value);
 
     // Save changes in Storage
-    if (this.isPersisted && this.persistent) this.persistent.setValue(value);
+    if (this.isPersisted && this.persistent) this.persistent.updateValue();
   }
 
   //=========================================================================================================

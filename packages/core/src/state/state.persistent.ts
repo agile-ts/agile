@@ -13,13 +13,17 @@ export class StatePersistent<ValueType = any> extends Persistent {
   constructor(agileInstance: Agile, state: State<ValueType>, key?: StorageKey) {
     super(agileInstance);
     this.state = () => state;
-    if (this.initPersistent(key)) state.isPersisted = true;
+    this.initPersistent(key).then((success) => {
+      state.isPersisted = success;
+    });
   }
 
   public set key(value: StorageKey) {
-    // If persistent isn't ready try to init it again
+    // If persistent isn't ready try to init it
     if (!this.ready) {
-      this.initPersistent(value);
+      this.initPersistent(value).then((success) => {
+        this.state().isPersisted = success;
+      });
       return;
     }
 
@@ -33,7 +37,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     this._key = value;
 
     // Set value with new Key
-    this.setValue(this.state().value);
+    this.updateValue();
   }
 
   public get key(): StorageKey {
@@ -41,27 +45,52 @@ export class StatePersistent<ValueType = any> extends Persistent {
   }
 
   //=========================================================================================================
-  // Initial Loading
+  // Load Value
   //=========================================================================================================
   /**
    * @internal
-   * Loads/Saves State Value for the first Time
-   * @param key -  Key of Storage property
+   * Loads Value from Storage
+   * @return Success?
    */
-  public async initialLoading(key: StorageKey) {
-    const state = this.state();
-
-    // Get storage Value
-    const storageValue = await this.loadValue();
-
-    // If value doesn't exist in the storage, add it
-    if (!storageValue) {
-      this.setValue(state.getPersistableValue());
-      return;
+  public async loadValue(): Promise<boolean> {
+    if (!this.ready) return false;
+    const loadedValue = await this.agileInstance().storage.get(this._key);
+    if (loadedValue) {
+      this.state().set(loadedValue);
+      return true;
     }
+    return false;
+  }
 
-    // If value exists in storage, load it into State
-    state.set(storageValue);
+  //=========================================================================================================
+  // Set Value
+  //=========================================================================================================
+  /**
+   * @internal
+   * Saves/Updates Value in Storage
+   * @return Success?
+   */
+  public updateValue(): boolean {
+    if (!this.ready) return false;
+    this.agileInstance().storage.set(
+      this.key,
+      this.state().getPersistableValue()
+    );
+    return true;
+  }
+
+  //=========================================================================================================
+  // Remove Value
+  //=========================================================================================================
+  /**
+   * @internal
+   * Removes Value form Storage
+   * @return Success?
+   */
+  public removeValue(): boolean {
+    if (!this.ready) return false;
+    this.agileInstance().storage.remove(this.key);
+    return true;
   }
 
   //=========================================================================================================
