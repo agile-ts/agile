@@ -85,7 +85,9 @@ export class Selector<DataType = DefaultItem> extends State<
     this.item = newItem;
 
     // Add rebuildSelector to sideEffects of the Item
-    newItem.addSideEffect("rebuildSelector", this.rebuildSelector);
+    newItem.addSideEffect("rebuildSelector", () =>
+      this.rebuildSelector(config)
+    );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
     this.rebuildSelector(config);
@@ -93,7 +95,11 @@ export class Selector<DataType = DefaultItem> extends State<
     return this;
   }
 
+  //=========================================================================================================
+  // RebuildSelector
+  //=========================================================================================================
   /**
+   * @public
    * Rebuilds Selector
    * @param config - Config
    */
@@ -102,9 +108,6 @@ export class Selector<DataType = DefaultItem> extends State<
       background: false,
       sideEffects: true,
     });
-
-    console.log(this.item); // TODO REMOVE
-    console.log(this); // TODO REMOVE
 
     if (!this.item || this.item.isPlaceholder) {
       this._value = undefined;

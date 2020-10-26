@@ -104,7 +104,7 @@ describe("select Function Tests", () => {
       "MY_COLLECTION at id 100 doesn't exist"
     );
 
-    expect(rerenderCount).to.eq(2, "rerenderCount has been increased by 1");
+    expect(rerenderCount).to.eq(1, "rerenderCount stayed the same");
   });
 
   it("Can select another id", async () => {
@@ -130,7 +130,7 @@ describe("select Function Tests", () => {
       "MY_COLLECTION at id 100 has been removed"
     );
 
-    expect(rerenderCount).to.eq(3, "rerenderCount has been increased by 1");
+    expect(rerenderCount).to.eq(2, "rerenderCount has been increased by 1");
   });
 
   it("Can't select the same id", async () => {
@@ -156,7 +156,7 @@ describe("select Function Tests", () => {
       "MY_COLLECTION at id 100 has been removed"
     );
 
-    expect(rerenderCount).to.eq(3, "rerenderCount stayed the same");
+    expect(rerenderCount).to.eq(2, "rerenderCount stayed the same");
   });
 
   describe("Test background option", () => {
@@ -178,7 +178,7 @@ describe("select Function Tests", () => {
         "selector1 Selector has correct value"
       );
 
-      expect(rerenderCount).to.eq(4, "rerenderCount has been increased by 1");
+      expect(rerenderCount).to.eq(3, "rerenderCount has been increased by 1");
     });
 
     it("Doesn't call callBackFunction by selecting new id with background = true", async () => {
@@ -199,7 +199,7 @@ describe("select Function Tests", () => {
         "selector1 Selector has correct value"
       );
 
-      expect(rerenderCount).to.eq(4, "rerenderCount stayed the same");
+      expect(rerenderCount).to.eq(3, "rerenderCount stayed the same");
     });
   });
 });
