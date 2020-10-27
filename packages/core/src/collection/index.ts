@@ -13,6 +13,7 @@ import {
   isValidObject,
   normalizeArray,
   copy,
+  CollectionPersistent,
 } from "../internal";
 
 export class Collection<DataType = DefaultItem> {
@@ -24,6 +25,7 @@ export class Collection<DataType = DefaultItem> {
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
   public isPersisted: boolean = false; // If Collection is stored in Storage
+  public persistent: CollectionPersistent | undefined; // Manages storing Collection Value into Storage
 
   public groups: { [key: string]: Group<any> } = {};
   public selectors: { [key: string]: Selector<any> } = {};
@@ -457,7 +459,16 @@ export class Collection<DataType = DefaultItem> {
    * @param key - Storage Key (Note: not needed if Collection has key/name)
    */
   public persist(key?: StorageKey): this {
-    // TODO
+    // Check if Collection is already persisted if so only change key if provided
+    if (this.isPersisted && this.persistent) {
+      console.warn(`Agile: Collection '${this.key}' is already persisted!`);
+
+      // Update Persistent Key
+      if (key) this.persistent.key = key;
+      return this;
+    }
+
+    this.persistent = new CollectionPersistent(this.agileInstance(), this, key);
     return this;
   }
 

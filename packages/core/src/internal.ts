@@ -33,6 +33,7 @@ export * from "./collection";
 export * from "./collection/group";
 export * from "./collection/item";
 export * from "./collection/selector";
+export * from "./collection/collection.persistent";
 
 // Event
 export * from "./event";
