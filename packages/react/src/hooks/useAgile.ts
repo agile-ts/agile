@@ -90,7 +90,7 @@ export function useAgile<
 
   React.useEffect(function () {
     // Create a callback base subscription, Callback invokes re-render Trigger
-    const subscriptionContainer = agileInstance?.runtime.subController.subscribeWithSubsArray(
+    const subscriptionContainer = agileInstance?.subController.subscribeWithSubsArray(
       () => {
         set_({});
       },
@@ -99,7 +99,7 @@ export function useAgile<
 
     // Unsubscribe on Unmount
     return () =>
-      agileInstance?.runtime.subController.unsubscribe(subscriptionContainer);
+      agileInstance?.subController.unsubscribe(subscriptionContainer);
   }, []);
 
   return getReturnValue(depsArray);

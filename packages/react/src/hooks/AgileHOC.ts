@@ -65,14 +65,11 @@ export function AgileHOC(
 
       // Create HOC based Subscription with Array (Rerenders will here be caused via force Update)
       if (depsArray)
-        agileInstance?.runtime.subController.subscribeWithSubsArray(
-          this,
-          depsArray
-        );
+        agileInstance?.subController.subscribeWithSubsArray(this, depsArray);
 
       // Create HOC based Subscription with Object
       if (depsObject) {
-        const response = agileInstance?.runtime.subController.subscribeWithSubsObject(
+        const response = agileInstance?.subController.subscribeWithSubsObject(
           this,
           depsObject
         );
@@ -88,11 +85,11 @@ export function AgileHOC(
 
     componentDidMount() {
       if (agileInstance?.config.waitForMount)
-        agileInstance?.runtime.subController.mount(this);
+        agileInstance?.subController.mount(this);
     }
 
     componentWillUnmount() {
-      agileInstance?.runtime.subController.unsubscribe(this);
+      agileInstance?.subController.unsubscribe(this);
     }
 
     render() {
