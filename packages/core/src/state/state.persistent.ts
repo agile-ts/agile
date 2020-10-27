@@ -90,6 +90,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public removeValue(): boolean {
     if (!this.ready) return false;
     this.agileInstance().storage.remove(this.key);
+    this.state().isPersisted = false;
     return true;
   }
 

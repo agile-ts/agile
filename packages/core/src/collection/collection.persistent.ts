@@ -71,7 +71,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     await defaultGroup.persistent?.loadValue();
     if (defaultGroup.value.length === 0) isComplete = false;
 
-    // Get Items from Default Group
+    // Load Storage Value from Items
     for (let itemKey of defaultGroup.value) {
       const itemStorageKey = this.getItemStorageKey(itemKey);
 
@@ -108,6 +108,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Persist defaultGroup if it isn't persisted
     if (!defaultGroup.isPersisted) defaultGroup.persist();
 
+    // Persist Collection Items
     for (let itemKey of defaultGroup.value) {
       const itemStorageKey = this.getItemStorageKey(itemKey);
       const item = this.collection().getItemById(itemKey);
@@ -128,9 +129,24 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    * @return Success?
    */
   public removeValue(): boolean {
-    console.warn(
-      `Agile: Didn't set removeValue function in Persistent '${this.key}'`
+    // Get default Group
+    const defaultGroup = this.collection().getGroup(
+      this.collection().config.defaultGroupKey || "default"
     );
+
+    // Remove default Group
+    defaultGroup.persistent?.removeValue();
+
+    // Remove Collection Items
+    for (let itemKey of defaultGroup.value) {
+      const itemStorageKey = this.getItemStorageKey(itemKey);
+      const item = this.collection().getItemById(itemKey);
+
+      // Persist Item with build ItemStorageKey
+      item?.persistent?.removeValue();
+    }
+
+    this.collection().isPersisted = false;
     return false;
   }
 
