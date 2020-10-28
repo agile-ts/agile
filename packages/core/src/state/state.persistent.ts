@@ -30,14 +30,19 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Check if key has changed
     if (value === this._key) return;
 
-    // Remove value with old Key
-    this.removeValue();
+    // Updates Key in Storage
+    const updateKey = async () => {
+      // Remove value with old Key
+      await this.removeValue();
 
-    // Update Key
-    this._key = value;
+      // Update Key
+      this._key = value;
 
-    // Set value with new Key
-    this.updateValue();
+      // Set value with new Key
+      await this.updateValue();
+    };
+
+    updateKey();
   }
 
   public get key(): StorageKey {
@@ -70,12 +75,13 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * Saves/Updates Value in Storage
    * @return Success?
    */
-  public updateValue(): boolean {
+  public async updateValue(): Promise<boolean> {
     if (!this.ready) return false;
     this.agileInstance().storage.set(
       this.key,
       this.state().getPersistableValue()
     );
+    this.state().isPersisted = true;
     return true;
   }
 
@@ -87,7 +93,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * Removes Value form Storage
    * @return Success?
    */
-  public removeValue(): boolean {
+  public async removeValue(): Promise<boolean> {
     if (!this.ready) return false;
     this.agileInstance().storage.remove(this.key);
     this.state().isPersisted = false;

@@ -94,7 +94,7 @@ export class Persistent<ValueType = any> {
    * Saves/Updates Value in Storage
    * @return Success?
    */
-  public updateValue(): boolean {
+  public async updateValue(): Promise<boolean> {
     console.warn(
       `Agile: Didn't set setValue function in Persistent '${this.key}'`
     );
@@ -109,7 +109,7 @@ export class Persistent<ValueType = any> {
    * Removes Value form Storage
    * @return Success?
    */
-  public removeValue(): boolean {
+  public async removeValue(): Promise<boolean> {
     console.warn(
       `Agile: Didn't set removeValue function in Persistent '${this.key}'`
     );

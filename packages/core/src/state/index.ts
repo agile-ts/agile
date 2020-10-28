@@ -120,9 +120,12 @@ export class State<ValueType = any> {
     this.observer.key = value;
 
     // Update Key in PersistManager
-    if (this.isPersisted && this.persistent) {
-      if (value && this.persistent.key === oldKey) this.persistent.key = value;
-    }
+    if (
+      value !== undefined &&
+      this.persistent &&
+      this.persistent.key === oldKey
+    )
+      this.persistent.key = value;
   }
 
   //=========================================================================================================
@@ -217,10 +220,7 @@ export class State<ValueType = any> {
    */
   public reset(): this {
     this.set(this.initialStateValue);
-
-    // Remove State from Storage (since its the initial Value)
-    if (this.isPersisted && this.persistent) this.persistent.removeValue();
-
+    this.persistent?.removeValue(); // Remove State from Storage (since its the initial Value)
     return this;
   }
 
@@ -322,15 +322,13 @@ export class State<ValueType = any> {
    * @param key - Storage Key (Note: not needed if State has key/name)
    */
   public persist(key?: StorageKey): this {
-    // Check if State is already persisted if so only change key if provided
-    if (this.isPersisted && this.persistent) {
-      console.warn(`Agile: State '${this.key}' is already persisted!`);
-
-      // Update Persistent Key
+    // Update Persistent Key
+    if (this.persistent) {
       if (key) this.persistent.key = key;
       return this;
     }
 
+    // Create persistent -> Persist Value
     this.persistent = new StatePersistent<ValueType>(
       this.agileInstance(),
       this,
@@ -449,7 +447,7 @@ export class State<ValueType = any> {
     this.nextStateValue = copy(value);
 
     // Save changes in Storage
-    if (this.isPersisted && this.persistent) this.persistent.updateValue();
+    this.persistent?.updateValue();
   }
 
   //=========================================================================================================

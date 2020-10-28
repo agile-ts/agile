@@ -459,16 +459,26 @@ export class Collection<DataType = DefaultItem> {
    * @param key - Storage Key (Note: not needed if Collection has key/name)
    */
   public persist(key?: StorageKey): this {
-    // Check if Collection is already persisted if so only change key if provided
-    if (this.isPersisted && this.persistent) {
-      console.warn(`Agile: Collection '${this.key}' is already persisted!`);
-
-      // Update Persistent Key
+    // Update Persistent Key
+    if (this.persistent) {
       if (key) this.persistent.key = key;
       return this;
     }
 
+    // Create Persistent
     this.persistent = new CollectionPersistent(this.agileInstance(), this, key);
+
+    // Get default Group
+    const defaultGroup = this.getGroup(
+      this.config.defaultGroupKey || "default"
+    );
+
+    // Add update Value as sideEffect of defaultGroup
+    defaultGroup.addSideEffect("rebuildStorage", () => {
+      if (defaultGroup.value.length !== defaultGroup.previousStateValue.length)
+        this.persistent?.updateValue();
+    });
+
     return this;
   }
 
@@ -527,6 +537,9 @@ export class Collection<DataType = DefaultItem> {
 
     // Update Key/Name of Item
     if (item.key === oldItemKey) item.key = newItemKey;
+
+    // Update persist Key of Item (Doesn't get changed by setting new item key since persistKey is not ItemKey)
+    item.persist(this.persistent?.getItemStorageKey(newItemKey));
 
     // Update Groups
     for (let groupName in this.groups) {

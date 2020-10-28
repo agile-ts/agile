@@ -122,7 +122,7 @@ describe("Persist Function Tests", () => {
         MY_STATE.reset();
 
         expect(MY_STATE.isPersisted).to.eq(
-          true,
+          false,
           "MY_STATE has correct isPersisted"
         );
         expect(MY_STATE.key).to.eq("mySecondKey", "MY_STATE has correct key");
@@ -138,7 +138,8 @@ describe("Persist Function Tests", () => {
     });
 
     describe("Test set method on persist State", () => {
-      it("Updates the State in the Storage if it get changed", () => {
+      it("Updates State in the Storage if it get changed", () => {
+        console.log(MY_STATE);
         // Reset State
         MY_STATE.set(5);
 
@@ -149,7 +150,7 @@ describe("Persist Function Tests", () => {
         expect(
           MY_STATE.persistent !== undefined &&
             App.storage.persistentInstances.has(MY_STATE.persistent)
-        ).to.eq(true, "MY_STATE_WITH_KEY is in persistedStates");
+        ).to.eq(true, "MY_STATE is in persistedStates");
         expect(App.storage.get("mySecondKey")).to.eq(
           5,
           "MY_STATE_WITH_KEY is in storage and has been updated"
