@@ -628,6 +628,9 @@ export class Collection<DataType = DefaultItem> {
       for (let selectorKey in this.selectors)
         delete this.selectors[selectorKey];
 
+      // Remove Item from Storage
+      this.data[itemKey].persistent?.removeValue();
+
       // Remove Item from Collection
       delete this.data[itemKey];
 
