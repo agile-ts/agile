@@ -5,13 +5,10 @@
   "license": "ISC",
   "syncDir": "dist",
   "scripts": {
-    "build": "tsc -b packages/core packages/react packages/api",
+    "build": "lerna run build",
     "dev": "tsc-watch -b packages/core packages/react packages/api",
     "test": "mocha -r ts-node/register --exit packages/**/*.spec.ts",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test",
-    "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "new-version": "lerna version --conventional-commits --yes"
   },
   "repository": {
     "type": "git",
@@ -23,6 +20,7 @@
     "@types/node": "^14.6.0",
     "chai": "^4.2.0",
     "eslint-config-prettier": "^6.11.0",
+    "lerna": "^3.22.1",
     "mocha": "^8.1.1",
     "prettier": "2.0.5",
     "ts-node": "^8.10.2",
@@ -32,5 +30,6 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "name": "agile"
 }
