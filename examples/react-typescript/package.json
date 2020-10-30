@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@agile-ts/core": "file:../../packages/core",
-    "@agile-ts/react": "file:../../packages/react",
+    "@agile-ts/api": "file:.yalc/@agile-ts/api",
+    "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
@@ -27,7 +28,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "install-agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/api & npm install"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -8,7 +8,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev-publish": "yalc publish",
+    "dev-push": "yalc push"
   },
   "dependencies": {
     "@agile-ts/core": "file:../core"

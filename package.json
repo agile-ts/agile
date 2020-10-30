@@ -8,7 +8,10 @@
     "build": "lerna run build",
     "dev": "tsc-watch -b packages/core packages/react packages/api",
     "test": "mocha -r ts-node/register --exit packages/**/*.spec.ts",
-    "new-version": "lerna version --conventional-commits --yes"
+    "new-version": "lerna version --conventional-commits --yes",
+    "dev-publish": "lerna run dev-publish",
+    "dev-push": "lerna run build & lerna run dev-push",
+    "install": "lerna exec npm install"
   },
   "repository": {
     "type": "git",
@@ -31,5 +34,10 @@
   "workspaces": [
     "packages/*"
   ],
-  "name": "agile"
+  "name": "agile",
+  "dependencies": {
+    "@agile-ts/api": "file:packages/api",
+    "@agile-ts/core": "file:packages/core",
+    "@agile-ts/react": "file:packages/react"
+  }
 }
