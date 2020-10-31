@@ -14,12 +14,12 @@ describe("Persist Function Tests", () => {
           return myStorage[key];
         },
         set: (key, value) => {
+          console.log(`SET '${key}'`, value);
           myStorage[key] = value;
         },
         remove: (key) => {
-          console.log(`DELETE '${key}'`, myStorage[key]);
-          console.log(delete myStorage[key]);
-          console.log(`AFTER DELETE '${key}'`, myStorage[key]);
+          console.log(`DELETE '${key}'`);
+          delete myStorage[key];
         },
       },
     },
@@ -35,8 +35,8 @@ describe("Persist Function Tests", () => {
       // Create Collection
       const MY_COLLECTION = App.Collection<User>();
       MY_COLLECTION.persist("myCollection");
-      MY_COLLECTION.collect({ id: 1, name: "frank" });
       MY_COLLECTION.collect({ id: 2, name: "hans" });
+      MY_COLLECTION.collect({ id: 1, name: "frank" });
 
       // Needs some time to persist value
       await new Promise((resolve) => setTimeout(resolve, 100));

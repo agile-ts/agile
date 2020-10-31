@@ -51,6 +51,7 @@ export class Runtime {
     const job = new Job(observer, {
       background: config.background,
       sideEffects: config.sideEffects,
+      storage: config.storage,
     });
 
     // Logging

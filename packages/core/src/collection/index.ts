@@ -276,14 +276,21 @@ export class Collection<DataType = DefaultItem> {
       addNewProperties: config.addNewProperties,
     });
 
-    // Update primaryKey of Item if it has changed
-    if (item.value[primaryKey] !== newItemValue[primaryKey])
-      this.updateItemKey(item.value[primaryKey], newItemValue[primaryKey], {
-        background: config.background,
-      });
+    const oldItemKey = item.value[primaryKey];
+    const newItemKey = newItemValue[primaryKey];
+    const updateItemKey = oldItemKey !== newItemKey;
 
     // Apply changes to Item
-    item.set(newItemValue, { background: config.background });
+    item.set(newItemValue, {
+      background: config.background,
+      storage: !updateItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
+    });
+
+    // Update ItemKey at primaryKey
+    if (updateItemKey)
+      this.updateItemKey(oldItemKey, newItemKey, {
+        background: config.background,
+      });
 
     return this.data[newItemValue[primaryKey]];
   }
@@ -523,20 +530,19 @@ export class Collection<DataType = DefaultItem> {
     newItemKey: ItemKey,
     config?: UpdateItemKeyInterface
   ): void {
-    if (oldItemKey === newItemKey) return;
+    const item = this.data[oldItemKey];
     config = defineConfig(config, {
       background: false,
     });
-    const item = this.data[oldItemKey];
 
-    // Delete old Item at old ItemKey
+    if (oldItemKey === newItemKey) return;
+
+    // Remove Item from Data and add it to the new ItemKey
     delete this.data[oldItemKey];
-
-    // Add new Item at new ItemKey
     this.data[newItemKey] = item;
 
     // Update Key/Name of Item
-    if (item.key === oldItemKey) item.key = newItemKey;
+    item.key = newItemKey;
 
     // Update persist Key of Item (Doesn't get changed by setting new item key since persistKey is not ItemKey)
     item.persist(this.persistent?.getItemStorageKey(newItemKey));

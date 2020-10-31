@@ -435,22 +435,6 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
-  // Private Write
-  //=========================================================================================================
-  /**
-   * @internal
-   * Writes new Value into State
-   * @param value - New Value of State
-   */
-  public privateWrite(value: any) {
-    this._value = copy(value);
-    this.nextStateValue = copy(value);
-
-    // Save changes in Storage
-    this.persistent?.updateValue();
-  }
-
-  //=========================================================================================================
   // Is Correct Type
   //=========================================================================================================
   /**
@@ -494,10 +478,12 @@ export type StateKey = string | number;
 /**
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of State get executed
+ * @param storage - If State value gets saved in Agile Storage (only useful if using persist!)
  */
 export interface SetConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
+  storage?: boolean;
 }
 
 /**

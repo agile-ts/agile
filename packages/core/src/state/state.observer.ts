@@ -53,12 +53,12 @@ export class StateObserver<ValueType = any> extends Observer {
     config: StateJobConfigInterface = {}
   ): void {
     const state = this.state();
-
     config = defineConfig<JobConfigInterface>(config, {
       perform: true,
       background: false,
       sideEffects: true,
       forceRerender: false,
+      storage: true,
     });
 
     // If forceRerender, set background config to false since forceRerender is 'stronger' than background
@@ -70,7 +70,7 @@ export class StateObserver<ValueType = any> extends Observer {
       else this.nextStateValue = state.nextStateValue;
     } else this.nextStateValue = newStateValue;
 
-    // If nextStateValue and currentValue are equals return
+    // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey ;D)
     if (equal(state.value, this.nextStateValue) && !config.forceRerender) {
       if (this.agileInstance().config.logJobs)
         console.warn(
@@ -96,8 +96,12 @@ export class StateObserver<ValueType = any> extends Observer {
     // Set Previous State
     state.previousStateValue = copy(state.value);
 
-    // Write new value into the State
-    state.privateWrite(this.nextStateValue);
+    // Set new State Value
+    state._value = copy(this.nextStateValue);
+    state.nextStateValue = copy(this.nextStateValue);
+
+    // Save changes in Storage
+    if (job.config.storage) state.persistent?.updateValue();
 
     // Set isSet
     state.isSet = notEqual(this.nextStateValue, state.initialStateValue);

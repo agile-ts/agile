@@ -17,6 +17,7 @@ export class Job<ObserverType extends Observer = Observer> {
       background: false,
       sideEffects: true,
       forceRerender: false,
+      storage: true,
     });
     this.config = config;
     this.observer = observer;
@@ -30,9 +31,11 @@ export class Job<ObserverType extends Observer = Observer> {
  * @param background - If Job gets executed in the background -> not causing any rerender
  * @param sideEffects - If SideEffects gets performed
  * @param perform - If Job gets performed immediately
+ * @param storage - If Job value gets saved in Storage
  */
 export interface JobConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
   perform?: boolean;
+  storage?: boolean;
 }
