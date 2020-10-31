@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc",
     "dev-publish": "yalc publish",
-    "dev-push": "yalc push"
+    "dev-push": "yalc push",
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
   },
   "dependencies": {
     "@agile-ts/core": "file:../core"

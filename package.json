@@ -6,10 +6,10 @@
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
-    "dev": "tsc-watch -b packages/core packages/react packages/api",
+    "watch": "lerna run watch",
     "test": "mocha -r ts-node/register --exit packages/**/*.spec.ts",
     "new-version": "lerna version --conventional-commits --yes",
-    "dev-publish": "lerna run dev-publish",
+    "dev-publish": "lerna run build & lerna run dev-publish",
     "dev-push": "lerna run build & lerna run dev-push",
     "install": "lerna exec npm install"
   },
@@ -25,6 +25,7 @@
     "eslint-config-prettier": "^6.11.0",
     "lerna": "^3.22.1",
     "mocha": "^8.1.1",
+    "nodemon": "^2.0.6",
     "prettier": "2.0.5",
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
