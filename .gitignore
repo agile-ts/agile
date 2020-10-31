@@ -1,9 +1,5 @@
 node_modules/
 dist
-
-# local config files
-package-lock.json
-yalc.lock
 .yalc
 
 # local env files

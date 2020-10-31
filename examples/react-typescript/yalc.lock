@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "packages": {
+    "@agile-ts/core": {
+      "signature": "758fbcba2b7535a76d284fa15a159aa7",
+      "file": true
+    },
+    "@agile-ts/react": {
+      "signature": "6b736d753ef46fc876bf6497f472afbf",
+      "file": true
+    },
+    "@agile-ts/api": {
+      "signature": "fcb7134cc25b9d58d1b6bf262843220d",
+      "file": true
+    }
+  }
+}
