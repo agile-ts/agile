@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
-import { useAgile, useEvent } from "@agile-ts/react";
+import { useAgile, useEvent, useWatcher } from "@agile-ts/react";
 import {
   MY_COLLECTION,
   MY_COMPUTED,
@@ -15,9 +15,12 @@ const App = (props: any) => {
   const [myCollection] = useAgile([MY_COLLECTION.getGroup("myGroup")]);
   const mySelector = useAgile(MY_COLLECTION.getSelector("mySelector"));
 
-  // @ts-ignore
   useEvent(MY_EVENT, () => {
     console.log("Triggered Event");
+  });
+
+  useWatcher(MY_STATE, () => {
+    console.log("MY_STATE changes");
   });
 
   console.log("myComputed", MY_COMPUTED);
