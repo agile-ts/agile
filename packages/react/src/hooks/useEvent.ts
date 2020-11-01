@@ -6,7 +6,9 @@ export function useEvent<E extends Event>(
   callback: EventCallbackFunction<E["payload"]>
 ) {
   // Call event on component mount and remove event on component unmount
-  React.useEffect(function () {
-    return event.on(callback);
+  React.useEffect(() => {
+    return () => {
+      event.removeCallback(event.on(callback));
+    };
   }, []);
 }

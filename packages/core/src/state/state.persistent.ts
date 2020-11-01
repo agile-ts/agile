@@ -5,9 +5,9 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
   /**
    * @internal
-   * State Persist Manager - Handles permanent saving of State Value
+   * State Persist Manager - Handles permanent storing of State Value
    * @param agileInstance - An instance of Agile
-   * @param state - State
+   * @param state - State that gets stored
    * @param key - Key of Storage property
    */
   constructor(agileInstance: Agile, state: State<ValueType>, key?: StorageKey) {
@@ -19,30 +19,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   }
 
   public set key(value: StorageKey) {
-    // If persistent isn't ready try to init it
-    if (!this.ready) {
-      this.initPersistent(value).then((success) => {
-        this.state().isPersisted = success;
-      });
-      return;
-    }
-
-    // Check if key has changed
-    if (value === this._key) return;
-
-    // Updates Key in Storage
-    const updateKey = async () => {
-      // Remove value with old Key
-      await this.removeValue();
-
-      // Update Key
-      this._key = value;
-
-      // Set value with new Key
-      await this.updateValue();
-    };
-
-    updateKey();
+    this.setKey(value);
   }
 
   public get key(): StorageKey {
@@ -65,6 +42,36 @@ export class StatePersistent<ValueType = any> extends Persistent {
       return true;
     }
     return false;
+  }
+
+  //=========================================================================================================
+  // Set Key
+  //=========================================================================================================
+  /**
+   * @public
+   * Sets Key/Name of Persistent
+   * @param value - New Key/Name of Persistent
+   */
+  public async setKey(value: StorageKey) {
+    // If persistent isn't ready try to init it with the new Key
+    if (!this.ready) {
+      this.initPersistent(value).then((success) => {
+        this.state().isPersisted = success;
+      });
+      return;
+    }
+
+    // Check if key has changed
+    if (value === this._key) return;
+
+    // Remove value with old Key
+    await this.removeValue();
+
+    // Update Key
+    this._key = value;
+
+    // Set value with new Key
+    await this.updateValue();
   }
 
   //=========================================================================================================
@@ -117,7 +124,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Return null if no key found
     if (!key) return null;
 
-    // Set State Key to Storage Key if State key isn't set
+    // Set State Key to Storage Key if State has no key
     if (!state.key) state.key = key;
 
     return key;

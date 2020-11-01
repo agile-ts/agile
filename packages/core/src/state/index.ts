@@ -13,6 +13,7 @@ import {
   StateJobConfigInterface,
   isFunction,
   notEqual,
+  generateId,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -273,17 +274,42 @@ export class State<ValueType = any> {
 
   //=========================================================================================================
   // Watch
+  // https://stackoverflow.com/questions/12688275/is-there-a-way-to-do-method-overloading-in-typescript/12689054#12689054
   //=========================================================================================================
   /**
    * @public
    * Watches State and detects State changes
-   * @param key - Key of Watcher Function
-   * @param callback - Callback Function which will be called if State value changes
+   * @param callback - Callback Function that gets called if the State Value changes
+   * @return Key of Watcher
    */
-  public watch(key: string, callback: (value: ValueType) => void): this {
-    if (!isFunction(callback)) {
+  public watch(callback: Callback<ValueType>): string;
+  /**
+   * @public
+   * Watches State and detects State changes
+   * @param key - Key of Watcher Function
+   * @param callback - Callback Function that gets called if the State Value changes
+   */
+  public watch(key: string, callback: Callback<ValueType>): this;
+  public watch(
+    keyOrCallback: string | Callback<ValueType>,
+    callback?: Callback<ValueType>
+  ): this | string {
+    const generateKey = isFunction(keyOrCallback);
+    let _callback: Callback<ValueType>;
+    let key: string;
+
+    if (generateKey) {
+      key = generateId();
+      _callback = keyOrCallback as Callback<ValueType>;
+    } else {
+      key = keyOrCallback as string;
+      _callback = callback as Callback<ValueType>;
+    }
+
+    // Check if Callback is a Function
+    if (!isFunction(_callback)) {
       console.error(
-        "Agile: A watcher callback function has to be an function!"
+        "Agile: A Watcher Callback Function has to be an function!"
       );
       return this;
     }
@@ -296,8 +322,8 @@ export class State<ValueType = any> {
       return this;
     }
 
-    this.watchers[key] = callback;
-    return this;
+    this.watchers[key] = _callback;
+    return generateKey ? key : this;
   }
 
   //=========================================================================================================
@@ -311,6 +337,18 @@ export class State<ValueType = any> {
   public removeWatcher(key: string): this {
     delete this.watchers[key];
     return this;
+  }
+
+  //=========================================================================================================
+  // Has Watcher
+  //=========================================================================================================
+  /**
+   * @public
+   * Checks if watcher at given Key exists
+   * @param key - Key of Watcher
+   */
+  public hasWatcher(key: string): boolean {
+    return !!this.watchers[key];
   }
 
   //=========================================================================================================
@@ -334,6 +372,7 @@ export class State<ValueType = any> {
       this,
       key
     );
+
     return this;
   }
 
@@ -435,6 +474,18 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
+  // Has SideEffect
+  //=========================================================================================================
+  /**
+   * @internal
+   * Checks if sideEffect at given Key exists
+   * @param key - Key of SideEffect
+   */
+  public hasSideEffect(key: string): boolean {
+    return !!this.sideEffects[key];
+  }
+
+  //=========================================================================================================
   // Is Correct Type
   //=========================================================================================================
   /**
@@ -494,3 +545,5 @@ export interface PatchConfigInterface {
   addNewProperties?: boolean;
   background?: boolean;
 }
+
+export type Callback<T = any> = (value: T) => void;

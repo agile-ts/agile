@@ -17,10 +17,10 @@ describe("On Function Tests", () => {
   // Create Event
   const MY_EVENT = App.Event<EventPayload>();
 
-  MY_EVENT.on((payload) => {
+  MY_EVENT.on("myEvent", (payload) => {
     eventCallCount++;
     currentEventPayload = payload;
-  }, "myEvent");
+  });
 
   it("Has correct initial value", () => {
     expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");

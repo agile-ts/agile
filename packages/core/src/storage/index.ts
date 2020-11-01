@@ -3,8 +3,8 @@ import {
   isFunction,
   isJsonString,
   defineConfig,
+  Persistent,
 } from "../internal";
-import { Persistent } from "./persistent";
 
 export class Storage {
   public storageReady: boolean = false;
@@ -192,6 +192,7 @@ export class Storage {
 
 export type StorageKey = string | number;
 export type StorageType = "localStorage" | "custom";
+
 /**
  * @param async - If its an async storage
  * @param prefix - Prefix of Storage Property

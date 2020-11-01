@@ -79,10 +79,10 @@ describe("Default Event Tests", () => {
     // Create Event
     const MY_EVENT = App.Event<EventPayload>({ enabled: false });
 
-    MY_EVENT.on((payload) => {
+    MY_EVENT.on("myKey", (payload) => {
       eventCallCount++;
       currentEventPayload = payload;
-    }, "myKey");
+    });
 
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
@@ -128,10 +128,10 @@ describe("Default Event Tests", () => {
     // Create Event
     const MY_EVENT = App.Event<EventPayload>({ delay: 1000 });
 
-    MY_EVENT.on((payload) => {
+    MY_EVENT.on("myEvent123", (payload) => {
       eventCallCount++;
       currentEventPayload = payload;
-    }, "myEvent123");
+    });
 
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
@@ -196,10 +196,10 @@ describe("Default Event Tests", () => {
     // Create Event
     const MY_EVENT = App.Event<EventPayload>({ maxUses: 3 });
 
-    MY_EVENT.on((payload) => {
+    MY_EVENT.on("myEvent321", (payload) => {
       eventCallCount++;
       currentEventPayload = payload;
-    }, "myEvent321");
+    });
 
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");

@@ -29,7 +29,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     // Update rebuildGroupThatIncludePrimaryKey SideEffect
     this.removeSideEffect("rebuildGroup");
     this.addSideEffect("rebuildGroup", (properties: any) =>
-      this.collection().rebuildGroupsThatIncludePrimaryKey(value, properties)
+      this.collection().rebuildGroupsThatIncludeItemKey(value, properties)
     );
   }
 
@@ -39,7 +39,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    */
   public get key(): StateKey | undefined {
     // Note can't use 'super.key' because of 'https://github.com/Microsoft/TypeScript/issues/338'
-    // Can't remove this getter function.. since the setter function is set in this class -> Error if not setter and getter function set
+    // Can't remove this getter function.. because the setter function is set in this class -> Error if not setter and getter function set
 
     return this._key;
   }

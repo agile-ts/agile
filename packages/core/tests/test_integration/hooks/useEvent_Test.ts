@@ -23,7 +23,8 @@ export function useEvent_Test<E extends Event<any>>(
   }
 
   // Register CallbackFunction
-  event.on(callback, key);
+  if (!key) event.on(callback);
+  else event.on(key, callback);
 
   // Create a callback base subscription, Callback invokes re-render Trigger
   agileInstance?.subController.subscribeWithSubsArray(callbackFunction, [

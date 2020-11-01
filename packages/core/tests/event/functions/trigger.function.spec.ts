@@ -19,10 +19,10 @@ describe("Trigger Function Tests", () => {
   // Create Event
   const MY_EVENT = App.Event<EventPayload>();
 
-  MY_EVENT.on((payload) => {
+  MY_EVENT.on("myEvent", (payload) => {
     eventCallCount++;
     currentEventPayload = payload;
-  }, "myEvent");
+  });
 
   // @ts-ignore
   useEvent_Test(

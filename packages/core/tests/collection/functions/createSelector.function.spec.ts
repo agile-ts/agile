@@ -38,7 +38,7 @@ describe("createSelector Function Tests", () => {
       true,
       "MY_COLLECTION selector1 has been created"
     );
-    expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
       3,
       "selector1 is watching right id"
     );
@@ -65,7 +65,7 @@ describe("createSelector Function Tests", () => {
       true,
       "MY_COLLECTION selector1 has been created"
     );
-    expect(MY_COLLECTION.selectors["selector2"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector2"].itemKey).to.eq(
       1,
       "selector1 is watching right id"
     );
@@ -83,7 +83,7 @@ describe("createSelector Function Tests", () => {
       true,
       "MY_COLLECTION selector1 is still a selector"
     );
-    expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
       3,
       "selector1 id stayed the same (3)"
     );

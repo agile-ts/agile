@@ -14,77 +14,77 @@ export class Selector<DataType = DefaultItem> extends State<
 > {
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
-  public _id: ItemKey;
+  public _itemKey: ItemKey; // Key of Item the Selector represents
 
   /**
    * @public
-   * Selects and Watches Item of Collection
-   * @param collection - Collection the Item is in
-   * @param id - Id/ItemKey of the Item which the Selector represents
+   * Represents Item of Collection
+   * @param collection - Collection that contains the Item
+   * @param itemKey - ItemKey of Item that the Selector represents
    * @param config - Config
    */
   constructor(
     collection: Collection<DataType>,
-    id: ItemKey,
+    itemKey: ItemKey,
     config?: SelectorConfigInterface
   ) {
-    super(collection.agileInstance(), collection.getValueById(id));
+    super(collection.agileInstance(), collection.getValueById(itemKey));
     this.collection = () => collection;
     this.item = undefined;
-    this._id = id;
+    this._itemKey = itemKey;
     this.key = config?.key;
 
     // Initial Select
-    this.select(id);
+    this.select(itemKey);
   }
 
   /**
    * @public
-   * Update Id/ItemKey that the Selector is representing
+   * Set ItemKey that the Selector represents
    */
-  public set id(value: ItemKey) {
+  public set itemKey(value: ItemKey) {
     this.select(value);
   }
 
   /**
    * @public
-   * Get Id/ItemKey that the Selector is representing
+   * Get ItemKey that the Selector represents
    */
-  public get id() {
-    return this._id;
+  public get itemKey() {
+    return this._itemKey;
   }
 
   /**
    * @public
-   * Select new Id/ItemKey which the Selector represents
-   * @param id - New Id/ItemKey the Selector will represent
+   * Select new ItemKey that the Selector will represents
+   * @param itemKey - New ItemKey
    * @param config - Config
    */
-  public select(id: ItemKey, config: SelectConfigInterface = {}): this {
+  public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
     const oldItem = this.item;
-    let newItem = this.collection().getItemById(id);
+    let newItem = this.collection().getItemById(itemKey);
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
     });
 
     // Remove old Item from Collection if it is an Placeholder
-    if (oldItem?.isPlaceholder) delete this.collection().data[this.id];
+    if (oldItem?.isPlaceholder) delete this.collection().data[this.itemKey];
 
-    // Create dummy Item to hold reference
+    // Create dummy Item to hold reference if Item with ItemKey doesn't exist
     if (!newItem) {
-      newItem = new Item<DataType>(this.collection(), { id: id } as any);
+      newItem = new Item<DataType>(this.collection(), { id: itemKey } as any);
       newItem.isPlaceholder = true;
-      this.collection().data[id] = newItem;
+      this.collection().data[itemKey] = newItem;
     }
 
     // Remove Selector sideEffect from old Item
     oldItem?.removeSideEffect("rebuildSelector");
 
-    this._id = id;
+    this._itemKey = itemKey;
     this.item = newItem;
 
-    // Add rebuildSelector to sideEffects of the Item
+    // Add Selector sideEffect to Item
     newItem.addSideEffect("rebuildSelector", () =>
       this.rebuildSelector(config)
     );
@@ -109,6 +109,7 @@ export class Selector<DataType = DefaultItem> extends State<
       sideEffects: true,
     });
 
+    // Set Selector Value to undefined if Item doesn't exist
     if (!this.item || this.item.isPlaceholder) {
       this._value = undefined;
       return;
@@ -117,10 +118,10 @@ export class Selector<DataType = DefaultItem> extends State<
     // Assign ItemValue to Selector
     this.nextStateValue = this.item?.value;
 
-    // Fix initialStateValue and previousStateValue if they are still set from placeholder
-    if (equal(this.item.initialStateValue, { id: this.id }))
+    // Fix initialStateValue and previousStateValue if they are still set from the Placeholder
+    if (equal(this.item.initialStateValue, { id: this.itemKey }))
       this.item.initialStateValue = copy(this.item?.nextStateValue);
-    if (equal(this.item.previousStateValue, { id: this.id }))
+    if (equal(this.item.previousStateValue, { id: this.itemKey }))
       this.item.previousStateValue = copy(this.nextStateValue);
 
     // Ingest nextStateValue into Runtime
@@ -137,6 +138,10 @@ export interface SelectorConfigInterface {
   key?: SelectorKey;
 }
 
+/**
+ * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
+ * @param sideEffects - If Side Effects of Selector get executed
+ */
 export interface SelectConfigInterface {
   background?: boolean;
   sideEffects?: boolean;

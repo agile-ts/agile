@@ -43,7 +43,7 @@ describe("Default Selector Tests", () => {
         "selector1",
         "selector1 Selector has correct initial key"
       );
-      expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+      expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
         1,
         "selector1 Selector has correct initial id"
       );

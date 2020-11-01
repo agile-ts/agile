@@ -1,4 +1,9 @@
-import { Agile, defineConfig, generateId, isFunction } from "../internal";
+import {
+  Agile,
+  defineConfig,
+  generateId,
+  isFunction,
+} from "../internal";
 import { EventObserver } from "./event.observer";
 
 export class Event<PayloadType = DefaultEventPayload> {
@@ -54,34 +59,54 @@ export class Event<PayloadType = DefaultEventPayload> {
 
   //=========================================================================================================
   // On
+  // https://stackoverflow.com/questions/12688275/is-there-a-way-to-do-method-overloading-in-typescript/12689054#12689054
   //=========================================================================================================
   /**
    * @public
    * Registers new Callback Function that will be called if this Event gets triggered
-   * @param callback - Callback Function
-   * @param key - Key/Name of Callback Function
-   * @return Clean up Function that removes added Callback Function
+   * @param callback - Callback Function that gets called if the Event gets triggered
+   * * @return Key of Event
    */
+  public on(callback: EventCallbackFunction<PayloadType>): string;
+  /**
+   * @public
+   * Registers new Callback Function that will be called if this Event gets triggered
+   * @param key - Key of Callback Function
+   * @param callback - Callback Function that gets called if the Event gets triggered
+   */
+  public on(key: string, callback: EventCallbackFunction<PayloadType>): this;
   public on(
-    callback: EventCallbackFunction<PayloadType>,
-    key?: string
-  ): () => void {
-    const _key = key || generateId();
-    if (!isFunction(callback)) {
-      console.error("Agile: A event callback function has to be an function!");
-      return () => {};
+    keyOrCallback: string | EventCallbackFunction<PayloadType>,
+    callback?: EventCallbackFunction<PayloadType>
+  ): this | string {
+    const generateKey = isFunction(keyOrCallback);
+    let _callback: EventCallbackFunction<PayloadType>;
+    let key: string;
+
+    if (generateKey) {
+      key = generateId();
+      _callback = keyOrCallback as EventCallbackFunction<PayloadType>;
+    } else {
+      key = keyOrCallback as string;
+      _callback = callback as EventCallbackFunction<PayloadType>;
+    }
+
+    // Check if Callback is a Function
+    if (!isFunction(_callback)) {
+      console.error("Agile: A Event Callback Function has to be an function!");
+      return this;
     }
 
     // Check if Callback Function already exists
-    if (this.callbacks[_key]) {
+    if (this.callbacks[key]) {
       console.error(
         `Agile: Event Callback Function with the key/name ${key} already exists!`
       );
-      return () => this.removeCallback(_key);
+      return this;
     }
 
-    this.callbacks[_key] = callback;
-    return () => this.removeCallback(_key);
+    this.callbacks[key] = _callback;
+    return generateKey ? key : this;
   }
 
   //=========================================================================================================
@@ -146,7 +171,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * Removes Callback Function at given Key
    * @param key - Key of Callback Function that gets removed
    */
-  private removeCallback(key: string): this {
+  public removeCallback(key: string): this {
     delete this.callbacks[key];
     return this;
   }

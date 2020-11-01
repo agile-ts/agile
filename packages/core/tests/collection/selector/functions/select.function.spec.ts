@@ -40,7 +40,7 @@ describe("select Function Tests", () => {
       true,
       "selector1 Selector exists"
     );
-    expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
       1,
       "selector1 Selector is watching correct id"
     );
@@ -80,7 +80,7 @@ describe("select Function Tests", () => {
     // Needs some time to call callbackFunction
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
       100,
       "selector1 Selector is watching correct id"
     );
@@ -113,7 +113,7 @@ describe("select Function Tests", () => {
     // Needs some time to call callbackFunction
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
       2,
       "selector1 Selector is watching correct id"
     );
@@ -139,7 +139,7 @@ describe("select Function Tests", () => {
     // Needs some time to call callbackFunction
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+    expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
       2,
       "selector1 Selector is watching correct id"
     );
@@ -166,7 +166,7 @@ describe("select Function Tests", () => {
       // Needs some time to call callbackFunction
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+      expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
         1,
         "selector1 Selector is watching correct id"
       );
@@ -187,7 +187,7 @@ describe("select Function Tests", () => {
       // Needs some time to call callbackFunction
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      expect(MY_COLLECTION.selectors["selector1"].id).to.eq(
+      expect(MY_COLLECTION.selectors["selector1"].itemKey).to.eq(
         2,
         "selector1 Selector is watching correct id"
       );
