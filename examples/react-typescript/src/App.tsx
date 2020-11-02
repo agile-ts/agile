@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { useAgile, useEvent, useWatcher } from "@agile-ts/react";
 import {
@@ -9,6 +9,7 @@ import {
   MY_STATE_2,
   MY_STATE_3,
 } from "./core";
+import { globalBind } from "@agile-ts/core";
 
 const App = (props: any) => {
   const myComputed = useAgile(MY_COMPUTED);
@@ -33,6 +34,11 @@ const App = (props: any) => {
   console.log("myState2", MY_STATE_2);
   console.log("myCollection", MY_COLLECTION);
   console.log("myEvent", MY_EVENT);
+
+  useEffect(() => {
+    // Create global Instance of Core
+    globalBind("__core__", { ...require("./core") });
+  });
 
   return (
     <div className="App">

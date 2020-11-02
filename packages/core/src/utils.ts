@@ -81,7 +81,7 @@ export function getAgileInstance(instance: any): Agile | null {
     if (_instance) return instance;
 
     // Return global bound agileInstance (set in first instantiation of Agile)
-    return globalThis.__agile;
+    return globalThis.__agile__;
   } catch (e) {
     // fail silently
   }
@@ -248,4 +248,38 @@ export function generateId(length?: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+//=========================================================================================================
+// Clone
+//=========================================================================================================
+/**
+ * @internal
+ * Clones a Class
+ * @param instance - Instance of Class you want to clone
+ */
+export function clone<T>(instance: T): T {
+  const copy: T = Object.create(Object.getPrototypeOf(instance));
+  return Object.assign(copy, instance);
+}
+
+//=========================================================================================================
+// Global Bind
+//=========================================================================================================
+/**
+ * @internal
+ * Binds Instance Global
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+ * @param key - Key of Instance
+ * @param instance - Instance which becomes globally accessible (globalThis.key)
+ */
+export function globalBind(key: string, instance: any) {
+  try {
+    if (!globalThis[key]) globalThis[key] = instance;
+  } catch (e) {
+    console.warn(
+      `Agile: Failed to create global Instance called '${name}'`,
+      instance
+    );
+  }
 }

@@ -14,6 +14,7 @@ import {
   Integrations,
   Observer,
   SubController,
+  globalBind,
 } from "./internal";
 
 export class Agile {
@@ -36,8 +37,8 @@ export class Agile {
     this.subController = new SubController(this);
     this.storage = new Storage(config.storageConfig || {});
 
-    // Create global agileInstance
-    this.globalBind();
+    // Create global instance of Agile
+    globalBind("__agile__", this);
   }
 
   //=========================================================================================================
@@ -143,22 +144,6 @@ export class Agile {
    */
   public hasIntegration(): boolean {
     return this.integrations.hasIntegration();
-  }
-
-  //=========================================================================================================
-  // Global Bind
-  //=========================================================================================================
-  /**
-   * @internal
-   * Creates global reference to the first agileInstance
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
-   */
-  private globalBind() {
-    try {
-      if (!globalThis.__agile) globalThis.__agile = this;
-    } catch (error) {
-      console.warn("Agile: Failed to create global agileInstance");
-    }
   }
 }
 
