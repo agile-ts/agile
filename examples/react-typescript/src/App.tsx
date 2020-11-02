@@ -7,11 +7,16 @@ import {
   MY_EVENT,
   MY_STATE,
   MY_STATE_2,
+  MY_STATE_3,
 } from "./core";
 
 const App = (props: any) => {
-  const [myComputed] = useAgile([MY_COMPUTED]);
-  const [myState, myState2] = useAgile([MY_STATE, MY_STATE_2]);
+  const myComputed = useAgile(MY_COMPUTED);
+  const [myState, myState2, myState3] = useAgile([
+    MY_STATE,
+    MY_STATE_2,
+    MY_STATE_3,
+  ]);
   const [myCollection] = useAgile([MY_COLLECTION.getGroup("myGroup")]);
   const mySelector = useAgile(MY_COLLECTION.getSelector("mySelector"));
 

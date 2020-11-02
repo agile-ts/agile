@@ -33,15 +33,23 @@ type AgileHookType<T> = T extends Group<infer U>
   ? undefined
   : never;
 
-// Array
+/**
+ * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * @param deps - Agile Instances that will be subscribed to this Component
+ * @param agileInstance - An instance of Agile
+ */
 export function useAgile<X extends Array<State | Collection | undefined>>(
-  deps: X,
+  deps: X | [],
   agileInstance?: Agile
 ): AgileHookArrayType<X>;
 
-// No Array
+/**
+ * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * @param dep - Agile Instance that will be subscribed to this Component
+ * @param agileInstance - An instance of Agile
+ */
 export function useAgile<X extends State | Collection | undefined>(
-  deps: X,
+  dep: X,
   agileInstance?: Agile
 ): AgileHookType<X>;
 
@@ -52,26 +60,22 @@ export function useAgile<
   deps: X | Y,
   agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
-  // Normalize Dependencies
-  let depsArray = normalizeArray<State | Collection | undefined>(deps)
-    .map((item) =>
-      item instanceof Collection
-        ? item.getGroup(item.config.defaultGroupKey || "default")
-        : item
-    )
-    .filter((item) => item !== undefined) as State[];
+  // Normalize Dependencies and special Agile Instance Types
+  const depsArray = normalizeArray(deps).map((item) =>
+    item instanceof Collection
+      ? item.getGroup(item.config.defaultGroupKey || "default")
+      : item
+  ) as State[];
 
-  // Function which creates the return value
+  // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
     depsArray: State[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    // Return Public Value of State
     if (depsArray.length === 1 && !Array.isArray(deps))
       return depsArray[0]?.getPublicValue() as AgileHookType<Y>;
 
-    // Return Public Value of State in Array
-    return depsArray.map((dep) => {
-      return dep.getPublicValue();
+    return depsArray.map((state) => {
+      return state.getPublicValue();
     }) as AgileHookArrayType<X>;
   };
 
@@ -85,11 +89,11 @@ export function useAgile<
     agileInstance = tempAgileInstance;
   }
 
-  // This is a Trigger State used to force the component to Re-render
+  // Trigger State used to force the component to rerender
   const [_, set_] = React.useState({});
 
   React.useEffect(function () {
-    // Create a callback base subscription, Callback invokes re-render Trigger
+    // Create Callback based Subscription
     const subscriptionContainer = agileInstance?.subController.subscribeWithSubsArray(
       () => {
         set_({});
@@ -97,7 +101,7 @@ export function useAgile<
       depsArray.map((dep) => dep.observer)
     );
 
-    // Unsubscribe on Unmount
+    // Unsubscribe Callback based Subscription on Unmount
     return () =>
       agileInstance?.subController.unsubscribe(subscriptionContainer);
   }, []);
