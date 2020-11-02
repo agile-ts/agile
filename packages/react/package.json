@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/react",
-  "version": "0.0.4",
+  "version": "0.0.3",
   "author": "BennoDev",
   "license": "ISC",
   "description": "React extension for AgileTs",
@@ -21,14 +21,14 @@
   },
   "devDependencies": {
     "@types/node": "^14.6.0",
+    "@types/react": "^16.9.51",
     "eslint-config-prettier": "^6.11.0",
     "prettier": "2.0.5",
+    "react": "^16.13.1",
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.7",
-    "react": "^16.13.1",
-    "@types/react": "^16.9.51"
+    "typescript": "^3.9.7"
   },
   "publishConfig": {
     "access": "public"
