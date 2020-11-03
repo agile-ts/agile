@@ -19,6 +19,7 @@ const App = (props: any) => {
     MY_STATE_3,
   ]);
   const [myCollection] = useAgile([MY_COLLECTION.getGroup("myGroup")]);
+
   const mySelector = useAgile(MY_COLLECTION.getSelector("mySelector"));
 
   useEvent(MY_EVENT, () => {
@@ -136,6 +137,16 @@ const App = (props: any) => {
         </div>
 
         <p>MySelector: {mySelector?.name}</p>
+
+        <button
+          onClick={() =>
+            setTimeout(() => {
+              MY_COLLECTION.removeSelector("mySelector");
+            }, 1000)
+          }
+        >
+          Remove mySelector
+        </button>
       </header>
     </div>
   );

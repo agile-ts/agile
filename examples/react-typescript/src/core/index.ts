@@ -34,8 +34,8 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(
 ).persist();
 MY_COLLECTION.collect({ id: "id1", name: "test" });
 MY_COLLECTION.collect({ id: "id2", name: "test2" }, "myGroup");
-MY_COLLECTION.collect({ id: "id3", name: "frank" });
 MY_COLLECTION.update("id1", { id: "id1Updated", name: "testUpdated" });
+MY_COLLECTION.getGroup("myGroup").persist({ followCollectionPattern: true });
 
 console.log("Initial: myCollection ", MY_COLLECTION);
 

@@ -71,7 +71,7 @@ export function normalizeArray<DataType = any>(
  * If no agileInstance found it returns the global AgileInstance
  * @param instance - Instance that might hold an AgileInstance
  */
-export function getAgileInstance(instance: any): Agile | null {
+export function getAgileInstance(instance: any): Agile | undefined {
   try {
     // Try to find agileInstance in Instance
     if (instance instanceof State) return instance.agileInstance();
@@ -85,7 +85,7 @@ export function getAgileInstance(instance: any): Agile | null {
   } catch (e) {
     // fail silently
   }
-  return null;
+  return undefined;
 }
 
 //=========================================================================================================

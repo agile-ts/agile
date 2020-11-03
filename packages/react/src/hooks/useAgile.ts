@@ -60,7 +60,7 @@ export function useAgile<
   deps: X | Y,
   agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
-  // Normalize Dependencies and special Agile Instance Types
+  // Normalize Dependencies and special Agile Instance Types like Collection
   const depsArray = normalizeArray(deps).map((item) =>
     item instanceof Collection
       ? item.getGroup(item.config.defaultGroupKey || "default")
@@ -79,20 +79,18 @@ export function useAgile<
     }) as AgileHookArrayType<X>;
   };
 
-  // Get Agile Instance
-  if (!agileInstance) {
-    const tempAgileInstance = getAgileInstance(depsArray[0]);
-    if (!tempAgileInstance) {
-      console.error("Agile: Failed to get Agile Instance");
-      return getReturnValue(depsArray);
-    }
-    agileInstance = tempAgileInstance;
-  }
-
   // Trigger State used to force the component to rerender
   const [_, set_] = React.useState({});
 
-  React.useEffect(function () {
+  React.useEffect(() => {
+    // Get Agile Instance
+    if (!agileInstance) {
+      const tempAgileInstance = getAgileInstance(depsArray[0]);
+      if (!tempAgileInstance)
+        console.error("Agile: Failed to get Agile Instance");
+      agileInstance = tempAgileInstance;
+    }
+
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance?.subController.subscribeWithSubsArray(
       () => {
@@ -102,8 +100,9 @@ export function useAgile<
     );
 
     // Unsubscribe Callback based Subscription on Unmount
-    return () =>
+    return () => {
       agileInstance?.subController.unsubscribe(subscriptionContainer);
+    };
   }, []);
 
   return getReturnValue(depsArray);
