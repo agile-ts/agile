@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/react",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "BennoDev",
   "license": "ISC",
   "description": "React extension for AgileTs",
@@ -8,7 +8,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev-publish": "yalc publish",
+    "dev-push": "yalc push",
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
   },
   "dependencies": {
     "@agile-ts/core": "file:../core"
@@ -18,8 +21,10 @@
   },
   "devDependencies": {
     "@types/node": "^14.6.0",
+    "@types/react": "^16.9.51",
     "eslint-config-prettier": "^6.11.0",
     "prettier": "2.0.5",
+    "react": "^16.13.1",
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
     "tslib": "^2.0.0",

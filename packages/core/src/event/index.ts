@@ -1,199 +1,246 @@
-import {Agile, StateKey, defineConfig} from '../internal';
-
-export type DefaultEventPayload = { [key: string]: any };
-export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (payload?: PayloadType) => void;
-export type EventKey = string | number;
-
-export interface EventConfig {
-    key?: EventKey
-    enabled?: boolean
-    maxUses?: number
-    delay?: number
-}
+import {
+  Agile,
+  defineConfig,
+  generateId,
+  isFunction,
+} from "../internal";
+import { EventObserver } from "./event.observer";
 
 export class Event<PayloadType = DefaultEventPayload> {
-    public agileInstance: () => Agile;
+  public agileInstance: () => Agile;
 
-    public config: EventConfig;
+  public config: EventConfig;
 
-    public _key?: StateKey; // should be a unique key/name which identifies the event
-    public callbacks: Set<EventCallbackFunction<PayloadType>> = new Set(); // Stores callback functions
-    public uses: number = 0; // How often the event has been used
-    private currentTimeout: any; // The current timeout (function)
-    private queue: Array<PayloadType> = []; // Queue if something is currently in timeout
-    public enabled: boolean = true;
+  public _key?: EventKey;
+  public uses: number = 0;
+  public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
+  private currentTimeout: any; // Timeout which is active right now (delayed Event)
+  private queue: Array<PayloadType> = []; // Queue of delayed triggers
+  public enabled: boolean = true;
+  public observer: EventObserver;
 
-    // @ts-ignore
-    public payload: PayloadType; // Only holds reference to the PayloadType so that it can be read external (never defined)
+  // @ts-ignore
+  public payload: PayloadType; // Holds type of Payload so that it can be read external (never defined)
 
-    constructor(agileInstance: Agile, config: EventConfig = {}) {
-        this.agileInstance = () => agileInstance;
+  /**
+   * @public
+   * Event -  Class that holds a List of Functions which can be triggered at the same time
+   * @param agileInstance - An instance of Agile
+   * @param config - Config
+   */
+  constructor(agileInstance: Agile, config: EventConfig = {}) {
+    this.agileInstance = () => agileInstance;
+    this.config = defineConfig<EventConfig>(config, {
+      enabled: true,
+      rerender: false,
+    });
+    this.observer = new EventObserver(agileInstance, this, [], this.config.key);
+    this._key = this.config.key;
+    this.enabled =
+      this.config.enabled !== undefined ? this.config.enabled : true;
+  }
 
-        // Assign defaults to config
-        this.config = defineConfig<EventConfig>(config, {
-            enabled: true
-        });
+  /**
+   * @public
+   * Set Key/Name of Event
+   */
+  public set key(value: EventKey | undefined) {
+    this._key = value;
+    this.observer.key = value;
+  }
 
-        // Set Key
-        this._key = this.config.key;
+  /**
+   * @public
+   * Get Key/Name of Event
+   */
+  public get key(): EventKey | undefined {
+    return this._key;
+  }
 
-        // Set Enabled
-        if (this.config.enabled !== undefined)
-            this.enabled = this.config.enabled;
+  //=========================================================================================================
+  // On
+  // https://stackoverflow.com/questions/12688275/is-there-a-way-to-do-method-overloading-in-typescript/12689054#12689054
+  //=========================================================================================================
+  /**
+   * @public
+   * Registers new Callback Function that will be called if this Event gets triggered
+   * @param callback - Callback Function that gets called if the Event gets triggered
+   * * @return Key of Event
+   */
+  public on(callback: EventCallbackFunction<PayloadType>): string;
+  /**
+   * @public
+   * Registers new Callback Function that will be called if this Event gets triggered
+   * @param key - Key of Callback Function
+   * @param callback - Callback Function that gets called if the Event gets triggered
+   */
+  public on(key: string, callback: EventCallbackFunction<PayloadType>): this;
+  public on(
+    keyOrCallback: string | EventCallbackFunction<PayloadType>,
+    callback?: EventCallbackFunction<PayloadType>
+  ): this | string {
+    const generateKey = isFunction(keyOrCallback);
+    let _callback: EventCallbackFunction<PayloadType>;
+    let key: string;
+
+    if (generateKey) {
+      key = generateId();
+      _callback = keyOrCallback as EventCallbackFunction<PayloadType>;
+    } else {
+      key = keyOrCallback as string;
+      _callback = callback as EventCallbackFunction<PayloadType>;
     }
 
-    public set key(value: StateKey | undefined) {
-        this._key = value;
+    // Check if Callback is a Function
+    if (!isFunction(_callback)) {
+      console.error("Agile: A Event Callback Function has to be an function!");
+      return this;
     }
 
-    public get key(): StateKey | undefined {
-        return this._key;
+    // Check if Callback Function already exists
+    if (this.callbacks[key]) {
+      console.error(
+        `Agile: Event Callback Function with the key/name ${key} already exists!`
+      );
+      return this;
     }
 
+    this.callbacks[key] = _callback;
+    return generateKey ? key : this;
+  }
 
-    //=========================================================================================================
-    // On
-    //=========================================================================================================
-    /**
-     * Register Callback Function
-     */
-    public on(callback: EventCallbackFunction<PayloadType>) {
-        const cleanUpFunction = () => this.unsub(callback);
+  //=========================================================================================================
+  // Trigger
+  //=========================================================================================================
+  /**
+   * @public
+   * Triggers Event
+   * -> Calls all registered Callback Functions
+   * @param payload - Payload that gets passed into the Callback Functions
+   */
+  public trigger(payload?: PayloadType) {
+    if (!this.enabled) return this;
+    if (this.config.delay) this.delayedTrigger(payload);
+    else this.normalTrigger(payload);
+    return this;
+  }
 
-        // Add callback to Event Callbacks
-        this.callbacks.add(callback);
+  //=========================================================================================================
+  // Disable
+  //=========================================================================================================
+  /**
+   * @public
+   * Disables Event
+   */
+  public disable() {
+    this.enabled = false;
+    return this;
+  }
 
-        return cleanUpFunction;
+  //=========================================================================================================
+  // Enable
+  //=========================================================================================================
+  /**
+   * @public
+   * Enables Event
+   */
+  public enable() {
+    this.enabled = true;
+    return this;
+  }
+
+  //=========================================================================================================
+  // Reset
+  //=========================================================================================================
+  /**
+   * @public
+   * Resets Event
+   */
+  public reset() {
+    this.enabled = this.config.enabled || true;
+    this.uses = 0;
+    if (this.currentTimeout) clearTimeout(this.currentTimeout);
+    return this;
+  }
+
+  //=========================================================================================================
+  // Remove Callback
+  //=========================================================================================================
+  /**
+   * @public
+   * Removes Callback Function at given Key
+   * @param key - Key of Callback Function that gets removed
+   */
+  public removeCallback(key: string): this {
+    delete this.callbacks[key];
+    return this;
+  }
+
+  //=========================================================================================================
+  // Normal Trigger
+  //=========================================================================================================
+  /**
+   * @internal
+   * Triggers Event
+   */
+  private normalTrigger(payload?: PayloadType) {
+    // Call registered Callbacks
+    for (let key in this.callbacks) this.callbacks[key](payload);
+
+    // Cause rerender
+    if (this.config.rerender) this.observer.trigger();
+
+    this.uses++;
+
+    // Disable Event if maxUses got reached
+    if (this.config.maxUses && this.uses >= this.config.maxUses) this.disable();
+  }
+
+  //=========================================================================================================
+  // Delayed Trigger
+  //=========================================================================================================
+  /**
+   * @internal
+   * Triggers Event with some delay (config.delay)
+   */
+  private delayedTrigger(payload?: PayloadType) {
+    // Check if a Timeout is currently active if so add payload to queue
+    if (this.currentTimeout !== undefined) {
+      if (payload) this.queue.push(payload);
+      return;
     }
 
+    // Triggers Callback Functions and calls itself again if queue isn't empty
+    const looper = (payload?: PayloadType) => {
+      this.currentTimeout = setTimeout(() => {
+        this.currentTimeout = undefined;
+        this.normalTrigger(payload);
+        if (this.queue.length > 0) looper(this.queue.shift());
+      }, this.config.delay);
+    };
 
-    //=========================================================================================================
-    // Trigger
-    //=========================================================================================================
-    /**
-     * Run all callback Functions
-     */
-    public trigger(payload?: PayloadType) {
-        // If event is disabled, return
-        if (!this.enabled) return this;
+    looper(payload);
+    return;
+  }
+}
 
-        if (this.config.delay)
-            this.delayedTrigger(payload);
-        else
-            this.normalTrigger(payload);
+export type EventKey = string | number;
+export type DefaultEventPayload = { [key: string]: any };
+export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
+  payload?: PayloadType
+) => void;
 
-        return this;
-    }
-
-
-    //=========================================================================================================
-    // Disable
-    //=========================================================================================================
-    /**
-     * Disables the Event
-     */
-    public disable() {
-        this.enabled = false;
-        return this;
-    }
-
-    //=========================================================================================================
-    // Enable
-    //=========================================================================================================
-    /**
-     * Enables the Event
-     */
-    public enable() {
-        this.enabled = true;
-        return this;
-    }
-
-
-    //=========================================================================================================
-    // Reset
-    //=========================================================================================================
-    /**
-     * Resets the Event
-     */
-    public reset() {
-        // Set Enabled
-        this.enabled = this.config.enabled || true;
-
-        // Reset Uses
-        this.uses = 0;
-
-        // Clear active timeout
-        clearTimeout(this.currentTimeout);
-
-        return this;
-    }
-
-    //=========================================================================================================
-    // Unsub
-    //=========================================================================================================
-    /**
-     * @internal
-     * Unsubs a callback
-     */
-    private unsub(callback: EventCallbackFunction<PayloadType>) {
-        this.callbacks.delete(callback);
-    }
-
-
-    //=========================================================================================================
-    // Normal Trigger
-    //=========================================================================================================
-    /**
-     * @internal
-     * Call event instantly
-     */
-    private normalTrigger(payload?: PayloadType) {
-        // Call callbacks
-        this.callbacks.forEach(callback => callback(payload));
-
-        // Increase uses
-        this.uses++;
-
-        // Check if maxUses has been reached, if so disable event
-        if (this.config.maxUses && this.uses >= this.config.maxUses)
-            // Disable Event
-            this.disable();
-    }
-
-
-    //=========================================================================================================
-    // Delayed Trigger
-    //=========================================================================================================
-    /**
-     * @internal
-     * Call event after config.delay
-     */
-    private delayedTrigger(payload?: PayloadType) {
-        // Check if a timeout is currently active if so add the payload to a queue
-        if (this.currentTimeout !== undefined) {
-            if (payload) this.queue.push(payload);
-            return;
-        }
-
-        // Looper function which loops through the queue(payloads)
-        const looper = (payload?: PayloadType) => {
-            this.currentTimeout = setTimeout(() => {
-                // Reset currentTimeout
-                this.currentTimeout = undefined;
-
-                // Call normalTrigger
-                this.normalTrigger(payload);
-
-                // If items are in queue, continue with them
-                if (this.queue.length > 0)
-                    looper(this.queue.shift())
-            }, this.config.delay);
-        }
-
-        // Call looper with current Payload
-        looper(payload);
-
-        return;
-    }
-
+/**
+ * @param key - Key/Name of Event
+ * @param enabled - If Event can be triggered
+ * @param maxUses - How often the Event can be used/triggered
+ * @param delay - Delayed call of Event Callback Functions in seconds
+ * @param rerender - If triggering an Event should cause a rerender
+ */
+export interface EventConfig {
+  key?: EventKey;
+  enabled?: boolean;
+  maxUses?: number;
+  delay?: number;
+  rerender?: boolean;
 }
