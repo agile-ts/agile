@@ -357,15 +357,36 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Saves State Value into Agile Storage permanently
+   * Stores State Value into Agile Storage permanently
+   * @param config - Config
+   */
+  public persist(config?: StatePersistentConfigInterface): this;
+  /**
+   * @public
+   * Stores State Value into Agile Storage permanently
    * @param key - Storage Key (Note: not needed if State has key/name)
    * @param config - Config
    */
   public persist(
     key?: StorageKey,
+    config?: StatePersistentConfigInterface
+  ): this;
+  public persist(
+    keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
     config: StatePersistentConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    let _config: StatePersistentConfigInterface;
+    let key: StorageKey | undefined;
+
+    if (isValidObject(keyOrConfig)) {
+      _config = keyOrConfig as StatePersistentConfigInterface;
+      key = undefined;
+    } else {
+      _config = config || {};
+      key = keyOrConfig as StorageKey;
+    }
+
+    _config = defineConfig(_config, {
       instantiate: true,
     });
 
@@ -380,7 +401,7 @@ export class State<ValueType = any> {
       this.agileInstance(),
       this,
       key,
-      config
+      { instantiate: _config.instantiate }
     );
 
     return this;

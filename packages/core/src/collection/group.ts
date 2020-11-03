@@ -8,10 +8,10 @@ import {
   normalizeArray,
   Item,
   StorageKey,
-  StatePersistent,
   copy,
   StatePersistentConfigInterface,
   CollectionPersistent,
+  isValidObject,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -196,27 +196,45 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   //=========================================================================================================
   /**
    * @public
-   * Saves Group Value into Agile Storage permanently
-   * @param key - Storage Key (Note: not needed if State has key/name)
+   * Stores Group Value into Agile Storage permanently
    * @param config - Config
    */
+  public persist(config?: GroupPersistConfigInterface): this;
+  /**
+   * @public
+   * Stores Group Value into Agile Storage permanently
+   * @param key - Storage Key (Note: not needed if Group has key/name)
+   * @param config - Config
+   */
+  public persist(key?: StorageKey, config?: GroupPersistConfigInterface): this;
   public persist(
-    key?: StorageKey,
+    keyOrConfig: StorageKey | GroupPersistConfigInterface = {},
     config: GroupPersistConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    let _config: GroupPersistConfigInterface;
+    let key: StorageKey | undefined;
+
+    if (isValidObject(keyOrConfig)) {
+      _config = keyOrConfig as GroupPersistConfigInterface;
+      key = undefined;
+    } else {
+      _config = config || {};
+      key = keyOrConfig as StorageKey;
+    }
+
+    _config = defineConfig(_config, {
       instantiate: true,
       followCollectionPattern: false,
     });
 
-    if (config.followCollectionPattern) {
+    if (_config.followCollectionPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this.key,
         this.collection().key
       );
     }
 
-    super.persist(key, { instantiate: config.instantiate });
+    super.persist(key, { instantiate: _config.instantiate });
     return this;
   }
 

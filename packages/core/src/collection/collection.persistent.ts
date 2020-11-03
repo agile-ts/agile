@@ -161,7 +161,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     );
 
     // Persist default Group
-    defaultGroup.persist(defaultGroup.key, { followCollectionPattern: true });
+    defaultGroup.persist({ followCollectionPattern: true });
 
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     if (!defaultGroup.hasSideEffect(this.defaultGroupSideEffectKey))

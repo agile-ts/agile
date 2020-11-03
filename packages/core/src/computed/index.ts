@@ -1,4 +1,11 @@
-import { State, Agile, defineConfig, Observer } from "../internal";
+import {
+  State,
+  Agile,
+  defineConfig,
+  Observer,
+  StorageKey,
+  StatePersistentConfigInterface,
+} from "../internal";
 
 export class Computed<ComputedValueType = any> extends State<
   ComputedValueType
@@ -135,7 +142,10 @@ export class Computed<ComputedValueType = any> extends State<
     return this;
   }
 
-  public persist(key?: string): this {
+  public persist(
+    keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
+    config: StatePersistentConfigInterface = {}
+  ): this {
     console.error("Agile: You can't use persist method on Computed Function!");
     return this;
   }

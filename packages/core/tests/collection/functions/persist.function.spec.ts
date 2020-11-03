@@ -37,7 +37,9 @@ describe("Persist Function Tests", () => {
       MY_COLLECTION.persist("myCollection");
       MY_COLLECTION.collect({ id: 2, name: "hans" });
       MY_COLLECTION.collect({ id: 1, name: "frank" });
-      MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist();
+      MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist({
+        followCollectionPattern: true,
+      });
 
       // Needs some time to persist value
       await new Promise((resolve) => setTimeout(resolve, 100));
