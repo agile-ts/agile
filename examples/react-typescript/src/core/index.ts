@@ -40,3 +40,11 @@ MY_COLLECTION.update("id1", { id: "id1Updated", name: "testUpdated" });
 console.log("Initial: myCollection ", MY_COLLECTION);
 
 export const MY_EVENT = App.Event<{ name: string }>();
+
+MY_EVENT.on(() => {
+  console.log("Triggered Event (noId)");
+});
+
+MY_EVENT.on("Test", () => {
+  console.log("Triggered Event (Test)");
+});

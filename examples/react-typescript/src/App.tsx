@@ -22,7 +22,7 @@ const App = (props: any) => {
   const mySelector = useAgile(MY_COLLECTION.getSelector("mySelector"));
 
   useEvent(MY_EVENT, () => {
-    console.log("Triggered Event");
+    console.log("Triggered Event (useEvent)");
   });
 
   useWatcher(MY_STATE, () => {
