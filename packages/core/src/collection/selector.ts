@@ -116,7 +116,7 @@ export class Selector<DataType = DefaultItem> extends State<
     }
 
     // Assign ItemValue to Selector
-    this.nextStateValue = this.item?.value;
+    this.nextStateValue = copy(this.item?.value);
 
     // Fix initialStateValue and previousStateValue if they are still set from the Placeholder
     if (equal(this.item.initialStateValue, { id: this.itemKey }))

@@ -7,6 +7,11 @@ import {
   defineConfig,
   normalizeArray,
   Item,
+  StorageKey,
+  StatePersistent,
+  copy,
+  StatePersistentConfigInterface,
+  CollectionPersistent,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -102,6 +107,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeys: Array<ItemKey> = [];
+    let newGroupValue = copy(this.nextStateValue); // Copying nextStateValue because somehow a reference exists between nextStateValue and value
     config = defineConfig(config, {
       background: false,
     });
@@ -109,7 +115,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     // Remove ItemKeys from Group
     _itemKeys.forEach((itemKey) => {
       // Check if itemKey exists in Group
-      if (!this.nextStateValue.includes(itemKey)) {
+      if (!newGroupValue.includes(itemKey)) {
         console.error(
           `Agile: Couldn't find itemKey '${itemKey}' in Group!`,
           this
@@ -122,10 +128,9 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
         notExistingItemKeys.push(itemKey);
 
       // Remove ItemKey from Group
-      this.nextStateValue = this.nextStateValue.filter(
-        (key) => key !== itemKey
-      );
+      newGroupValue = newGroupValue.filter((key) => key !== itemKey);
     });
+    this.nextStateValue = newGroupValue;
 
     // If all removed ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
     if (notExistingItemKeys.length >= _itemKeys.length)
@@ -149,6 +154,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public add(itemKeys: ItemKey | ItemKey[], config: GroupAddConfig = {}): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeys: Array<ItemKey> = []; // ItemKeys that don't exist in Collection
+    let newGroupValue = copy(this.nextStateValue); // Copying nextStateValue because somehow a reference exists between nextStateValue and value
     config = defineConfig<GroupAddConfig>(config, {
       method: "push",
       overwrite: false,
@@ -157,7 +163,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
 
     // Add ItemKeys to Group
     _itemKeys.forEach((itemKey) => {
-      const existsInGroup = this.nextStateValue.includes(itemKey);
+      const existsInGroup = newGroupValue.includes(itemKey);
 
       // Check if ItemKey exists in Collection
       if (!this.collection().getItemById(itemKey))
@@ -166,15 +172,14 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       // Remove ItemKey from Group if it should get overwritten and exists
       if (existsInGroup) {
         if (config.overwrite)
-          this.nextStateValue = this.nextStateValue.filter(
-            (key) => key !== itemKey
-          );
+          newGroupValue = newGroupValue.filter((key) => key !== itemKey);
         else return;
       }
 
       // Add new ItemKey to Group
-      this.nextStateValue[config.method || "push"](itemKey);
+      newGroupValue[config.method || "push"](itemKey);
     });
+    this.nextStateValue = newGroupValue;
 
     // If all added ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
     if (notExistingItemKeys.length >= _itemKeys.length)
@@ -183,6 +188,35 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     // Ingest nextStateValue into Runtime
     this.ingest({ background: config.background });
 
+    return this;
+  }
+
+  //=========================================================================================================
+  // Persist
+  //=========================================================================================================
+  /**
+   * @public
+   * Saves Group Value into Agile Storage permanently
+   * @param key - Storage Key (Note: not needed if State has key/name)
+   * @param config - Config
+   */
+  public persist(
+    key?: StorageKey,
+    config: GroupPersistConfigInterface = {}
+  ): this {
+    config = defineConfig(config, {
+      instantiate: true,
+      followCollectionPattern: false,
+    });
+
+    if (config.followCollectionPattern) {
+      key = CollectionPersistent.getGroupStorageKey(
+        key || this.key,
+        this.collection().key
+      );
+    }
+
+    super.persist(key, { instantiate: config.instantiate });
     return this;
   }
 
@@ -248,4 +282,12 @@ export interface GroupRemoveConfig {
  */
 export interface GroupConfigInterface {
   key?: GroupKey;
+}
+
+/**
+ * @param useCollectionPattern - If Group storageKey follows the Collection Group StorageKey Pattern
+ */
+export interface GroupPersistConfigInterface
+  extends StatePersistentConfigInterface {
+  followCollectionPattern?: boolean;
 }

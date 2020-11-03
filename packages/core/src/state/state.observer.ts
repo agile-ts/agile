@@ -70,7 +70,7 @@ export class StateObserver<ValueType = any> extends Observer {
       else this.nextStateValue = state.nextStateValue;
     } else this.nextStateValue = newStateValue;
 
-    // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey ;D)
+    // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey)
     if (equal(state.value, this.nextStateValue) && !config.forceRerender) {
       if (this.agileInstance().config.logJobs)
         console.warn(
@@ -110,7 +110,7 @@ export class StateObserver<ValueType = any> extends Observer {
     if (state.isPlaceholder) state.isPlaceholder = false;
 
     // Update Observer value
-    this.value = this.nextStateValue;
+    this.value = copy(this.nextStateValue);
 
     // Perform SideEffects of the Perform Function
     this.sideEffects(job);

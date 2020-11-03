@@ -1,4 +1,10 @@
-import { Agile, Persistent, State, StorageKey } from "../internal";
+import {
+  Agile,
+  defineConfig,
+  Persistent,
+  State,
+  StorageKey,
+} from "../internal";
 
 export class StatePersistent<ValueType = any> extends Persistent {
   public state: () => State;
@@ -9,13 +15,23 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param agileInstance - An instance of Agile
    * @param state - State that gets stored
    * @param key - Key of Storage property
+   * @param config - Config
    */
-  constructor(agileInstance: Agile, state: State<ValueType>, key?: StorageKey) {
+  constructor(
+    agileInstance: Agile,
+    state: State<ValueType>,
+    key?: StorageKey,
+    config: StatePersistentConfigInterface = {}
+  ) {
     super(agileInstance);
-    this.state = () => state;
-    this.initPersistent(key).then((success) => {
-      state.isPersisted = success;
+    config = defineConfig(config, {
+      instantiate: true,
     });
+    this.state = () => state;
+    if (config.instantiate)
+      this.instantiatePersistent(key).then((success) => {
+        state.isPersisted = success;
+      });
   }
 
   public set key(value: StorageKey) {
@@ -24,24 +40,6 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
   public get key(): StorageKey {
     return this._key;
-  }
-
-  //=========================================================================================================
-  // Load Value
-  //=========================================================================================================
-  /**
-   * @internal
-   * Loads Value from Storage
-   * @return Success?
-   */
-  public async loadValue(): Promise<boolean> {
-    if (!this.ready) return false;
-    const loadedValue = await this.agileInstance().storage.get(this._key);
-    if (loadedValue) {
-      this.state().set(loadedValue);
-      return true;
-    }
-    return false;
   }
 
   //=========================================================================================================
@@ -55,7 +53,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public async setKey(value: StorageKey) {
     // If persistent isn't ready try to init it with the new Key
     if (!this.ready) {
-      this.initPersistent(value).then((success) => {
+      this.instantiatePersistent(value).then((success) => {
         this.state().isPersisted = success;
       });
       return;
@@ -72,6 +70,24 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     // Set value with new Key
     await this.updateValue();
+  }
+
+  //=========================================================================================================
+  // Load Value
+  //=========================================================================================================
+  /**
+   * @internal
+   * Loads Value from Storage
+   * @return Success?
+   */
+  public async loadValue(): Promise<boolean> {
+    if (!this.ready) return false;
+    const loadedValue = await this.agileInstance().storage.get(this._key);
+    if (loadedValue) {
+      this.state().set(loadedValue, { storage: false });
+      return true;
+    }
+    return false;
   }
 
   //=========================================================================================================
@@ -129,4 +145,11 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     return key;
   }
+}
+
+/**
+ * @param instantiate - If Persistent gets instantiated
+ */
+export interface StatePersistentConfigInterface {
+  instantiate?: boolean;
 }

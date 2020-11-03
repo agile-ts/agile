@@ -229,7 +229,7 @@ export class Collection<DataType = DefaultItem> {
     // Instantiate Items
     _items.forEach((data, index) => {
       const itemKey = data[primaryKey];
-      const itemExists = !!this.data[itemKey];
+      const itemExistsInCollection = !!this.data[itemKey];
 
       // Add Item to Collection
       const success = this.setData(data, {
@@ -238,6 +238,17 @@ export class Collection<DataType = DefaultItem> {
       });
       if (!success) return this;
 
+      // Ingest Groups that include the ItemKey into Runtime, which than rebuilds the Group (because output of group changed)
+      if (!itemExistsInCollection) {
+        for (let groupKey in this.groups) {
+          const group = this.getGroup(groupKey);
+          if (group.value.includes(itemKey)) {
+            if (!config.background)
+              group.ingest({ forceRerender: true, storage: false });
+          }
+        }
+      }
+
       // Add ItemKey to provided Groups
       groupKeys.forEach((groupKey) => {
         this.groups[groupKey].add(itemKey, {
@@ -245,16 +256,6 @@ export class Collection<DataType = DefaultItem> {
           background: config.background,
         });
       });
-
-      // Ingest Groups that include the ItemKey into Runtime, which than rebuilds the Group (because the value of Group hasn't changed but the output will change)
-      if (!itemExists) {
-        for (let groupKey in this.groups) {
-          const group = this.getGroup(groupKey);
-          if (group.value.includes(itemKey)) {
-            if (!config.background) group.ingest({ forceRerender: true });
-          }
-        }
-      }
 
       if (config.forEachItem) config.forEachItem(data, itemKey, index);
     });
@@ -297,7 +298,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Merge changes into ItemValue
-    const newItemValue = flatMerge(item.nextStateValue, changes, {
+    const newItemValue = flatMerge(copy(item.nextStateValue), changes, {
       addNewProperties: config.addNewProperties,
     });
 
@@ -580,7 +581,7 @@ export class Collection<DataType = DefaultItem> {
   private updateItemKey(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
-    config?: UpdateItemKeyInterface
+    config?: UpdateItemKeyConfigInterface
   ): void {
     const item = this.getItemById(oldItemKey);
     config = defineConfig(config, {
@@ -596,8 +597,8 @@ export class Collection<DataType = DefaultItem> {
     // Update Key/Name of Item
     item.key = newItemKey;
 
-    // Update persist Key of Item (Doesn't get changed by setting new item key because persistKey is not ItemKey)
-    item.persist(this.persistent?.getStorageKey(newItemKey));
+    // Update persist Key of Item (Doesn't get changed by setting new item key because PersistKey is not ItemKey)
+    item.persist(CollectionPersistent.getItemStorageKey(newItemKey, this.key));
 
     // Update Groups
     for (let groupName in this.groups) {
@@ -755,11 +756,12 @@ export class Collection<DataType = DefaultItem> {
    */
   public rebuildGroupsThatIncludeItemKey(
     itemKey: ItemKey,
-    config?: { background?: boolean; forceRerender?: boolean }
+    config: RebuildGroupsThatIncludeItemKeyConfigInterface = {}
   ): void {
     config = defineConfig(config, {
       background: false,
-      forceRerender: !config?.background, // because we have to forceRerender but only if background is false
+      forceRerender: !config?.background, // because we have to forceRerender but only if background is false (group value doesn't change but the group output)
+      sideEffects: true,
     });
 
     // Rebuild Groups that include ItemKey
@@ -770,6 +772,8 @@ export class Collection<DataType = DefaultItem> {
         group.ingest({
           background: config?.background,
           forceRerender: config?.forceRerender,
+          sideEffects: config?.sideEffects,
+          storage: false, // because Group only rebuilds and doesn't change its value
         });
       }
     }
@@ -820,8 +824,19 @@ export interface UpdateConfigInterface {
 /**
  * @param background - If updating the primaryKey of an Item happens in the background (-> not causing any rerender)
  */
-export interface UpdateItemKeyInterface {
+export interface UpdateItemKeyConfigInterface {
   background?: boolean;
+}
+
+/**
+ * @param background - If assigning a new value happens in the background (-> not causing any rerender)
+ * @param forceRerender - Force rerender no matter what happens
+ * @param sideEffects - If Side Effects of State get executed
+ */
+export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
+  background?: boolean;
+  forceRerender?: boolean;
+  sideEffects?: boolean;
 }
 
 export type CollectionConfig<DataType = DefaultItem> =

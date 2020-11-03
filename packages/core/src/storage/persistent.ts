@@ -40,7 +40,7 @@ export class Persistent<ValueType = any> {
    * -> Sometimes this class needs to be instantiated after some properties have been set in extended class
    * @param key - Key of Storage property
    */
-  public async initPersistent(key?: StorageKey): Promise<boolean> {
+  public async instantiatePersistent(key?: StorageKey): Promise<boolean> {
     // Validate Key
     const finalKey = this.validateKey(key);
     if (!finalKey) {
@@ -68,7 +68,7 @@ export class Persistent<ValueType = any> {
    */
   public async initialLoading(key: StorageKey) {
     const success = await this.loadValue();
-    if (!success) this.updateValue();
+    if (!success) await this.updateValue();
   }
 
   //=========================================================================================================

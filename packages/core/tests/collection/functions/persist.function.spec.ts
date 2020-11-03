@@ -37,6 +37,7 @@ describe("Persist Function Tests", () => {
       MY_COLLECTION.persist("myCollection");
       MY_COLLECTION.collect({ id: 2, name: "hans" });
       MY_COLLECTION.collect({ id: 1, name: "frank" });
+      MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist();
 
       // Needs some time to persist value
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -78,6 +79,7 @@ describe("Persist Function Tests", () => {
 
       MY_COLLECTION.update(3, { name: "Angela" });
       MY_COLLECTION.collect({ id: 4, name: "Paul" });
+      MY_COLLECTION.collect({ id: 99, name: "Jeff" });
 
       // Needs some time to collect/update value
       await new Promise((resolve) => setTimeout(resolve, 100));

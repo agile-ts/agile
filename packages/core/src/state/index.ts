@@ -14,6 +14,7 @@ import {
   isFunction,
   notEqual,
   generateId,
+  StatePersistentConfigInterface,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -55,9 +56,9 @@ export class State<ValueType = any> {
     this.agileInstance = () => agileInstance;
     this.initialStateValue = initialValue;
     this._key = key;
-    this._value = initialValue;
-    this.previousStateValue = initialValue;
-    this.nextStateValue = initialValue;
+    this._value = copy(initialValue);
+    this.previousStateValue = copy(initialValue);
+    this.nextStateValue = copy(initialValue);
     this.observer = new StateObserver<ValueType>(
       agileInstance,
       this,
@@ -358,8 +359,16 @@ export class State<ValueType = any> {
    * @public
    * Saves State Value into Agile Storage permanently
    * @param key - Storage Key (Note: not needed if State has key/name)
+   * @param config - Config
    */
-  public persist(key?: StorageKey): this {
+  public persist(
+    key?: StorageKey,
+    config: StatePersistentConfigInterface = {}
+  ): this {
+    config = defineConfig(config, {
+      instantiate: true,
+    });
+
     // Update Persistent Key
     if (this.persistent) {
       if (key) this.persistent.key = key;
@@ -370,7 +379,8 @@ export class State<ValueType = any> {
     this.persistent = new StatePersistent<ValueType>(
       this.agileInstance(),
       this,
-      key
+      key,
+      config
     );
 
     return this;
@@ -517,7 +527,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Returns persistable Value of State
+   * Returns Value that gets written into the Agile Storage
    */
   public getPersistableValue(): any {
     return this.value;
@@ -529,7 +539,7 @@ export type StateKey = string | number;
 /**
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of State get executed
- * @param storage - If State value gets saved in Agile Storage (only useful if using persist!)
+ * @param storage - If State value gets saved in Agile Storage (only useful if State is persisted)
  */
 export interface SetConfigInterface {
   background?: boolean;
