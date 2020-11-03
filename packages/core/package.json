@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "BennoDev",
   "license": "ISC",
   "description": "Global state and logic framework for reactive JavaScript & TypeScript applications.",
@@ -8,7 +8,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev-publish": "yalc publish",
+    "dev-push": "yalc push",
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
   },
   "devDependencies": {
     "@types/chai": "^4.2.12",

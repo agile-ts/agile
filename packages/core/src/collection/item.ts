@@ -1,27 +1,46 @@
-import {
-    State,
-    Collection,
-    DefaultDataItem
-} from '../internal';
+import { State, Collection, DefaultItem, StateKey } from "../internal";
 
-export class Item<DataType = DefaultDataItem> extends State<DataType> {
+export class Item<DataType = DefaultItem> extends State<DataType> {
+  private collection: () => Collection;
 
-    private collection: () => Collection;
+  /**
+   * @public
+   * Item of Collection
+   * @param collection - Collection to which the Item belongs
+   * @param data - Data that the Item holds
+   */
+  constructor(collection: Collection, data: DataType) {
+    super(collection.agileInstance(), data);
+    this.collection = () => collection;
 
-    // @ts-ignore
-    public output: DataType; // Defines the type of the output (will be set external)
+    // Setting primaryKey of Data to Key/Name of Item
+    this.key = data[collection.config?.primaryKey || "id"];
+  }
 
-    constructor(collection: Collection, data: DataType) {
-        super(collection.agileInstance(), data);
-        this.collection = () => collection;
+  /**
+   * @public
+   * Set Key/Name of Item
+   */
+  public set key(value: StateKey | undefined) {
+    // Note can't use 'super.key' because of 'https://github.com/Microsoft/TypeScript/issues/338'
+    this.setKey(value);
+    if (!value) return;
 
-        // Setting key of item to the data primaryKey
-        this.key = data && (data as any)[collection.config?.primaryKey || 'id'];
+    // Update rebuildGroupThatIncludePrimaryKey SideEffect
+    this.removeSideEffect("rebuildGroup");
+    this.addSideEffect("rebuildGroup", (properties: any) =>
+      this.collection().rebuildGroupsThatIncludeItemKey(value, properties)
+    );
+  }
 
-        // Add rebuildGroupsThatIncludePrimaryKey to sideEffects to rebuild the groups which includes the primaryKey if the state changes
-        this.sideEffects = () => collection.rebuildGroupsThatIncludePrimaryKey(this.key || '');
+  /**
+   * @public
+   * Get Key/Name of Item
+   */
+  public get key(): StateKey | undefined {
+    // Note can't use 'super.key' because of 'https://github.com/Microsoft/TypeScript/issues/338'
+    // Can't remove this getter function.. because the setter function is set in this class -> Error if not setter and getter function set
 
-        // Set type of State to object because a collection item is always an object
-        this.type(Object);
-    }
+    return this._key;
+  }
 }
