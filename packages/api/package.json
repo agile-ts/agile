@@ -8,7 +8,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev-publish": "yalc publish",
+    "dev-push": "yalc push",
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
   },
   "devDependencies": {
     "@types/chai": "^4.2.12",

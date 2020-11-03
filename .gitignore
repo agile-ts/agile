@@ -1,5 +1,6 @@
 node_modules/
 dist
+.yalc
 
 # local env files
 .env.local

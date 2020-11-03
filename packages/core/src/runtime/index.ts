@@ -1,205 +1,240 @@
 import {
-    Agile,
-    SubscriptionContainer,
-    defineConfig,
-    Observer,
-    Job,
-    JobConfigInterface,
-    CallbackSubscriptionContainer, ComponentSubscriptionContainer, StateObserver
-} from '../internal';
+  Agile,
+  SubscriptionContainer,
+  defineConfig,
+  Observer,
+  Job,
+  JobConfigInterface,
+  CallbackSubscriptionContainer,
+  ComponentSubscriptionContainer,
+} from "../internal";
 
 export class Runtime {
+  public agileInstance: () => Agile;
 
-    public agileInstance: () => Agile;
+  // Queue system
+  private currentJob: Job | null = null;
+  private jobQueue: Array<Job> = [];
+  private notReadyJobsToRerender: Array<Job> = []; // Jobs that are performed but not ready to rerender (wait for mount)
+  private jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
-    // Queue system
-    private currentJob: Job | null = null;
-    private jobQueue: Array<Job> = [];
-    private notReadyJobsToRerender: Array<Job> = [];
-    private jobsToRerender: Array<Job> = [];
+  // Tracking - Used to track computed dependencies
+  public trackObservers: boolean = false; // Check if Runtime have to track Observers
+  public foundObservers: Set<Observer> = new Set(); // Observers that got tracked during the 'trackObservers' time
 
-    // Used for tracking computed dependencies
-    public trackObserver: boolean = false; // Check if agile should track states
-    public foundObservers: Set<Observer> = new Set(); // States which were tracked during the track time
+  /**
+   * @internal
+   * Runtime - Performs ingested Observers
+   * @param agileInstance - An instance of Agile
+   */
+  constructor(agileInstance: Agile) {
+    this.agileInstance = () => agileInstance;
+  }
 
-    constructor(agileInstance: Agile) {
-        this.agileInstance = () => agileInstance;
+  //=========================================================================================================
+  // Ingest
+  //=========================================================================================================
+  /**
+   * @internal
+   * Ingests Observer into Runtime
+   * -> Creates Job which will be performed by the Runtime
+   * @param observer - Observer that gets performed by the Runtime
+   * @param config - Config
+   */
+  public ingest(observer: Observer, config: JobConfigInterface): void {
+    config = defineConfig<JobConfigInterface>(config, {
+      perform: true,
+      background: false,
+      sideEffects: true,
+    });
+
+    const job = new Job(observer, {
+      background: config.background,
+      sideEffects: config.sideEffects,
+      storage: config.storage,
+    });
+
+    // Logging
+    if (this.agileInstance().config.logJobs)
+      console.log(`Agile: Created Job(${job.observer.key})`, job);
+
+    // Add Job to JobQueue (-> no Job get missing)
+    this.jobQueue.push(job);
+
+    // Perform Job
+    if (config.perform) {
+      const performJob = this.jobQueue.shift();
+      if (performJob) this.perform(performJob);
+      else console.warn("Agile: No Job in queue!");
+    }
+  }
+
+  //=========================================================================================================
+  // Perform
+  //=========================================================================================================
+  /**
+   * @internal
+   * Performs Job and adds him to the rerender queue if necessary
+   * @param job - Job that gets performed
+   */
+  private perform(job: Job): void {
+    this.currentJob = job;
+
+    // Perform Job
+    job.observer.perform(job);
+    job.performed = true;
+
+    if (job.rerender) this.jobsToRerender.push(job);
+    this.currentJob = null;
+
+    // Logging
+    if (this.agileInstance().config.logJobs)
+      console.log(`Agile: Completed Job(${job.observer.key})`, job);
+
+    // Perform Jobs as long as Jobs are in queue, if no job left update/rerender Subscribers of performed Jobs
+    if (this.jobQueue.length > 0) {
+      const performJob = this.jobQueue.shift();
+      if (performJob) this.perform(performJob);
+      else console.warn("Agile: No Job in queue!");
+    } else {
+      // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
+      setTimeout(() => {
+        this.updateSubscribers();
+      });
+    }
+  }
+
+  //=========================================================================================================
+  // Update Subscribers
+  //=========================================================================================================
+  /**
+   * @internal
+   * Updates/Rerenders all Subscribed Components of the Job (Observer)
+   */
+  private updateSubscribers(): void {
+    if (!this.agileInstance().integrations.hasIntegration()) {
+      this.jobsToRerender = [];
+      return;
     }
 
-    public ingest(observer: Observer, options: JobConfigInterface): void {
-        options = defineConfig<JobConfigInterface>(options, {
-            perform: true,
-            background: false,
-            sideEffects: true,
-            forceRerender: false
-        });
+    // Subscriptions that has to be updated/rerendered (Set = For preventing double subscriptions without further checks)
+    const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<
+      SubscriptionContainer
+    >();
 
-        // Create Job
-        const job = new Job(observer, {
-            background: options.background,
-            sideEffects: options.sideEffects,
-            forceRerender: options.forceRerender
-        });
-
-        // Logging
-        if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Created Job(${job.observer.key})`, job);
-
-        // Push the Job to the Queue
-        this.jobQueue.push(job);
-
-        // Perform the Job and remove it from queue
-        if (options.perform) {
-            const performJob = this.jobQueue.shift();
-            if (performJob)
-                this.perform(performJob);
-            else
-                console.warn("Agile: No Job in queue ", job)
+    // Handle Object based Jobs and check if Job is ready
+    this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach((job) => {
+      job.observer.subs.forEach((subscriptionContainer) => {
+        // Check if Subscription is ready to rerender
+        if (!subscriptionContainer.ready) {
+          this.notReadyJobsToRerender.push(job);
+          if (this.agileInstance().config.logJobs)
+            console.warn(
+              "Agile: SubscriptionContainer/Component isn't ready to rerender!",
+              subscriptionContainer
+            );
+          return;
         }
-    }
 
+        if (subscriptionContainer.isObjectBased)
+          this.handleObjectBasedSubscription(subscriptionContainer, job);
 
-    //=========================================================================================================
-    // Perform
-    //=========================================================================================================
-    /**
-     * @internal
-     * Perform a State Update
-     */
-    private perform(job: Job): void {
-        this.currentJob = job;
+        subscriptionsToUpdate.add(subscriptionContainer);
+      });
+    });
 
-        // Perform Job
-        job.observer.perform(job);
-        job.performed = true;
+    // Update Subscriptions that has to be updated/rerendered
+    subscriptionsToUpdate.forEach((subscriptionContainer) => {
+      // Call callback function if Callback based Subscription
+      if (subscriptionContainer instanceof CallbackSubscriptionContainer)
+        subscriptionContainer.callback();
 
-        // Add to rerender
-        if (job.rerender)
-            this.jobsToRerender.push(job);
-
-        // Reset Current Job
-        this.currentJob = null;
-
-        // Logging
-        if (this.agileInstance().config.logJobs)
-            console.log(`Agile: Completed Job(${job.observer.key})`, job);
-
-        // Continue the Loop and perform the next job.. if no job is left update the Subscribers for each completed job
-        if (this.jobQueue.length > 0) {
-            const performJob = this.jobQueue.shift();
-            if (performJob)
-                this.perform(performJob);
-        } else {
-            // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
-            setTimeout(() => {
-                this.updateSubscribers();
-            });
-        }
-    }
-
-
-    //=========================================================================================================
-    // Update Subscribers
-    //=========================================================================================================
-    /**
-     * @internal
-     * Updates all Subscribers
-     */
-    private updateSubscribers(): void {
-        // Subscriptions that has to be updated
-        const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<SubscriptionContainer>();
-
-        // Map through Jobs to Rerender
-        this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach(job =>
-            job.observer.dep.subs.forEach(subscriptionContainer => {
-                // Check if subscriptionContainer is ready
-                if (!subscriptionContainer.ready) {
-                    this.notReadyJobsToRerender.push(job);
-                    if (this.agileInstance().config.logJobs)
-                        console.warn("Agile: SubscriptionContainer isn't ready yet ", subscriptionContainer);
-                    return;
-                }
-
-                // For a Container that require props to be passed
-                if (subscriptionContainer.passProps)
-                    this.handlePassProps(subscriptionContainer, job);
-
-                subscriptionsToUpdate.add(subscriptionContainer);
-            })
+      // Call update method if Component based Subscription
+      if (subscriptionContainer instanceof ComponentSubscriptionContainer)
+        this.agileInstance().integrations.update(
+          subscriptionContainer.component,
+          this.getObjectBasedProps(subscriptionContainer)
         );
+    });
 
-        // Rerender the Components via CallbackSubscriptions or ComponentSubscription
-        subscriptionsToUpdate.forEach(subscriptionContainer => {
-            if (subscriptionContainer instanceof CallbackSubscriptionContainer)
-                subscriptionContainer.callback();
+    // Logging
+    if (this.agileInstance().config.logJobs)
+      console.log(
+        "Agile: Updated/Rerendered Subscriptions ",
+        subscriptionsToUpdate
+      );
 
-            if (subscriptionContainer instanceof ComponentSubscriptionContainer)
-                this.agileInstance().integrations.update(subscriptionContainer.component, this.formatChangedPropKeys(subscriptionContainer));
-        });
+    this.jobsToRerender = [];
+  }
 
-        // Log Job
-        if (this.agileInstance().config.logJobs && subscriptionsToUpdate.size > 0)
-            console.log("Agile: Rerendered Components ", subscriptionsToUpdate);
+  //=========================================================================================================
+  // Handle Object Based Subscription
+  //=========================================================================================================
+  /**
+   * @internal
+   * Finds updated Key of SubscriptionContainer and adds it to 'changedObjectKeys'
+   * @param subscriptionContainer - Object based SubscriptionContainer
+   * @param job - Job that holds the SubscriptionContainer
+   */
+  public handleObjectBasedSubscription(
+    subscriptionContainer: SubscriptionContainer,
+    job: Job
+  ): void {
+    let localKey: string | null = null;
 
-        // Reset Jobs to Rerender
-        this.jobsToRerender = [];
-    }
+    if (!subscriptionContainer.isObjectBased) return;
 
+    // Find localKey of Job Observer in SubscriptionContainer
+    for (let key in subscriptionContainer.subsObject)
+      if (subscriptionContainer.subsObject[key] === job.observer)
+        localKey = key;
 
-    //=========================================================================================================
-    // Handle Pass Props
-    //=========================================================================================================
-    /**
-     * @internal
-     * Handle prop passing subscription
-     */
-    public handlePassProps(subscriptionContainer: SubscriptionContainer, job: Job) {
-        let localKey: string | null = null;
+    // Add localKey to changedObjectKeys
+    if (localKey) subscriptionContainer.changedObjectKeys.push(localKey);
+  }
 
-        // Find the local Key for this update by comparing the State instance from this Job to the State instances in the propStates object
-        for (let key in subscriptionContainer.subs)
-            if (subscriptionContainer.subs[key] === job.observer)
-                localKey = key;
+  //=========================================================================================================
+  // Get Object Based Props
+  //=========================================================================================================
+  /**
+   * @internal
+   * Builds Object from 'changedObjectKeys' with new Values provided by Observers
+   * @param subscriptionContainer - SubscriptionContainer from which the Object gets built
+   */
+  public getObjectBasedProps(
+    subscriptionContainer: SubscriptionContainer
+  ): { [key: string]: any } {
+    const finalObject: { [key: string]: any } = {};
 
-        // If matching key is found push it into the SubscriptionContainer propKeysChanged where it later will be build to an changed prop object
-        if (localKey)
-            subscriptionContainer.propKeysChanged.push(localKey);
-    }
+    // Map trough changed Keys and build finalObject
+    subscriptionContainer.changedObjectKeys.forEach((changedKey) => {
+      // Check if Observer at changedKey has value property, if so add it to final Object
+      if (
+        subscriptionContainer.subsObject &&
+        subscriptionContainer.subsObject[changedKey]["value"]
+      )
+        finalObject[changedKey] =
+          subscriptionContainer.subsObject[changedKey]["value"];
+    });
 
-    //=========================================================================================================
-    // Format Changed Prop Keys
-    //=========================================================================================================
-    /**
-     * @internal
-     * Builds an object out of propKeysChanged in the SubscriptionContainer
-     */
-    public formatChangedPropKeys(subscriptionContainer: SubscriptionContainer): { [key: string]: any } {
-        const finalObject: { [key: string]: any } = {};
+    subscriptionContainer.changedObjectKeys = [];
+    return finalObject;
+  }
 
-        // Build Object
-        subscriptionContainer.propKeysChanged.forEach(changedKey => {
-            if (subscriptionContainer.subs[changedKey] instanceof StateObserver)
-                finalObject[changedKey] = subscriptionContainer.subs[changedKey].value;
-        });
+  //=========================================================================================================
+  // Get Tracked Observers
+  //=========================================================================================================
+  /**
+   * @internal
+   * Returns tracked Observers and stops Runtime from tracking anymore Observers
+   */
+  public getTrackedObservers(): Set<Observer> {
+    const finalFoundObservers = this.foundObservers;
 
-        return finalObject;
-    }
+    // Reset tracking
+    this.trackObservers = false;
+    this.foundObservers = new Set();
 
-
-    //=========================================================================================================
-    // Get Found State
-    //=========================================================================================================
-    /**
-     * @internal
-     * Will return all tracked States
-     */
-    public getTrackedObservers(): Set<Observer> {
-        const finalFoundObservers = this.foundObservers;
-
-        // Reset tracking
-        this.trackObserver = false;
-        this.foundObservers = new Set();
-
-        return finalFoundObservers;
-    }
+    return finalFoundObservers;
+  }
 }

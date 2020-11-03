@@ -1,22 +1,22 @@
-import 'mocha';
-import {expect} from 'chai';
-import {Agile, Integration} from "../src";
+import "mocha";
+import { expect } from "chai";
+import { Agile, Integration } from "../src";
 
-describe('Custom Framework Tests', () => {
-    let boundFramework = false;
+describe("Custom Framework Tests", () => {
+  let boundFramework = false;
 
-    const customIntegration = new Integration({
-        name: 'test2',
-        updateMethod: () => {
-        },
-        bind: () => {
-        }
-    })
+  const customIntegration = new Integration({
+    name: "test2",
+    updateMethod: () => {},
+    bind: () => {
+      return true;
+    },
+  });
 
-    // Define Agile with framework
-    const App = new Agile();
+  // Define Agile with framework
+  const App = new Agile();
 
-    /*
+  /*
     it('Has bound custom Framework', () => {
         expect(boundFramework).to.eq(true, 'boundFramework has correct value');
         expect(App.integrations.integrations.size).to.eq(2, 'Integrations has correct size');

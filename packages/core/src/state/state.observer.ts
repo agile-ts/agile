@@ -1,122 +1,157 @@
 import {
-    Agile,
-    Observer,
-    State,
-    Computed,
-    Job,
-    JobConfigInterface,
-    copy,
-    defineConfig,
-    ObserverKey
-} from '../internal';
+  Agile,
+  Observer,
+  State,
+  Computed,
+  Job,
+  JobConfigInterface,
+  copy,
+  defineConfig,
+  ObserverKey,
+  equal,
+  notEqual,
+  isFunction,
+} from "../internal";
 
-export const internalIngestKey = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
+export const internalIngestKey =
+  "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
 export class StateObserver<ValueType = any> extends Observer {
+  public state: () => State<ValueType>;
+  public nextStateValue: ValueType; // Next State value
 
-    public state: () => State<ValueType>; // State on which the Observer is watching
-    public nextStateValue: ValueType; // The next State value
-    public value: ValueType;
+  /**
+   * @internal
+   * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
+   * @param agileInstance - An instance of Agile
+   * @param state - State
+   * @param deps - Initial Dependencies of State Observer
+   * @param key - Key/Name of State Observer
+   */
+  constructor(
+    agileInstance: Agile,
+    state: State<ValueType>,
+    deps?: Array<Observer>,
+    key?: ObserverKey
+  ) {
+    super(agileInstance, deps, key, state.value);
+    this.state = () => state;
+    this.nextStateValue = state.value;
+  }
 
-    constructor(agileInstance: Agile, state: State, deps?: Array<Observer>, key?: ObserverKey) {
-        super(agileInstance, deps, key);
-        this.state = () => state;
-        this.nextStateValue = state.value;
-        this.value = state.value;
+  //=========================================================================================================
+  // Ingest
+  //=========================================================================================================
+  /**
+   * @internal
+   * Ingests new State Value into Runtime and applies it to the State
+   * @param newStateValue - New Value of the State
+   * @param config - Config
+   */
+  public ingest(
+    newStateValue: ValueType | InternalIngestKeyType = internalIngestKey,
+    config: StateJobConfigInterface = {}
+  ): void {
+    const state = this.state();
+    config = defineConfig<JobConfigInterface>(config, {
+      perform: true,
+      background: false,
+      sideEffects: true,
+      forceRerender: false,
+      storage: true,
+    });
+
+    // If forceRerender, set background config to false since forceRerender is 'stronger' than background
+    if (config.forceRerender && config.background) config.background = false;
+
+    // Grab nextState or compute State if internalIngestKey got passed
+    if (newStateValue === internalIngestKey) {
+      if (state instanceof Computed) this.nextStateValue = state.computeValue();
+      else this.nextStateValue = state.nextStateValue;
+    } else this.nextStateValue = newStateValue;
+
+    // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey)
+    if (equal(state.value, this.nextStateValue) && !config.forceRerender) {
+      if (this.agileInstance().config.logJobs)
+        console.warn(
+          "Agile: Doesn't created job because state values are the same! "
+        );
+      return;
     }
 
+    this.agileInstance().runtime.ingest(this, config);
+  }
 
-    //=========================================================================================================
-    // Ingest
-    //=========================================================================================================
-    /**
-     * @internal
-     * Creates a Job out of State and new Value and than add it to a job queue
-     * Note: its not possible to set a state to undefined because undefined is used for internal activities!
-     */
-    public ingest(newStateValue?: any, options: JobConfigInterface = {}): void {
-        // Merge default values into options
-        options = defineConfig<JobConfigInterface>(options, {
-            perform: true,
-            background: false,
-            sideEffects: true,
-            forceRerender: false
-        });
+  //=========================================================================================================
+  // Perform
+  //=========================================================================================================
+  /**
+   * @internal
+   * Performs Job from Runtime
+   * @param job - Job that gets performed
+   */
+  public perform(job: Job<this>) {
+    const state = job.observer.state();
 
-        // Grab nextState if newState not passed or compute if needed
-        if (newStateValue === internalIngestKey) {
-            if (this.state() instanceof Computed)
-                // @ts-ignore
-                this.nextStateValue = this.state().computeValue();
-            else
-                this.nextStateValue = this.state().nextState
-        } else
-            this.nextStateValue = newStateValue;
+    // Set Previous State
+    state.previousStateValue = copy(state.value);
 
-        // Check if state value und newStateValue are the same.. if so return except force Rerender (stringifying because of possible object or array)
-        if (JSON.stringify(this.state().value) === JSON.stringify(this.nextStateValue) && !options.forceRerender) {
-            if (this.agileInstance().config.logJobs)
-                console.warn("Agile: Doesn't created job because state values are the same! ");
-            return;
-        }
+    // Set new State Value
+    state._value = copy(this.nextStateValue);
+    state.nextStateValue = copy(this.nextStateValue);
 
-        // Ingest into runtime
-        this.agileInstance().runtime.ingest(this, options);
-    }
+    // Store State changes in Storage
+    if (job.config.storage) state.persistent?.updateValue();
 
+    // Set isSet
+    state.isSet = notEqual(this.nextStateValue, state.initialStateValue);
 
-    //=========================================================================================================
-    // Perform
-    //=========================================================================================================
-    /**
-     * @internal
-     * TOD_O
-     */
-    public perform(job: Job<this>) {
-        const state = job.observer.state();
+    // Reset isPlaceholder since it got an value
+    if (state.isPlaceholder) state.isPlaceholder = false;
 
-        // Set Previous State
-        state.previousState = copy(state.value);
+    // Update Observer value
+    this.value = copy(this.nextStateValue);
 
-        // Write new value into the State
-        state.privateWrite(this.nextStateValue);
+    // Perform SideEffects of the Perform Function
+    this.sideEffects(job);
+  }
 
-        // Set isSet
-        state.isSet = this.nextStateValue !== state.initialState;
+  //=========================================================================================================
+  // Side Effect
+  //=========================================================================================================
+  /**
+   * @internal
+   * SideEffects of Perform Function
+   * @param job - Job whose SideEffects gets executed
+   */
+  private sideEffects(job: Job<this>) {
+    const state = job.observer.state();
 
-        // Set is placeholder to false, because it has got a value
-        if (state.isPlaceholder)
-            state.isPlaceholder = false;
+    // Call Watchers Functions
+    for (let watcherKey in state.watchers)
+      if (isFunction(state.watchers[watcherKey]))
+        state.watchers[watcherKey](state.getPublicValue());
 
-        // Set Observer value
-        this.value = this.nextStateValue;
+    // Call SideEffect Functions
+    if (job.config?.sideEffects)
+      for (let sideEffectKey in state.sideEffects)
+        if (isFunction(state.sideEffects[sideEffectKey]))
+          state.sideEffects[sideEffectKey](job.config);
 
-        // Perform SideEffects like watcher functions or state.sideEffects
-        this.sideEffects(job);
-    }
+    // Ingest Dependencies of Observer into Runtime
+    job.observer.deps.forEach(
+      (observer) =>
+        observer instanceof StateObserver &&
+        observer.ingest(internalIngestKey, { perform: false })
+    );
+  }
+}
 
+export type InternalIngestKeyType = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
-    //=========================================================================================================
-    // Side Effect
-    //=========================================================================================================
-    /**
-     * @internal
-     * SideEffects are sideEffects of the perform function.. for instance the watchers
-     */
-    private sideEffects(job: Job<this>) {
-        const state = job.observer.state();
-
-        // Call Watchers
-        for (let watcher in state.watchers)
-            if (typeof state.watchers[watcher] === 'function')
-                state.watchers[watcher](state.getPublicValue());
-
-        // Call State SideEffects
-        if (typeof state.sideEffects === 'function' && job.config?.sideEffects)
-            state.sideEffects();
-
-
-        // Ingest Dependencies of State (Perform is false because it will be performed anyway after this sideEffect)
-        job.observer.dep.deps.forEach((observer) => observer instanceof StateObserver && observer.ingest(internalIngestKey, {perform: false}));
-    }
+/**
+ * @param forceRerender - Force rerender no matter what happens
+ */
+export interface StateJobConfigInterface extends JobConfigInterface {
+  forceRerender?: boolean;
 }
