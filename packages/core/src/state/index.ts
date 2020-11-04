@@ -340,6 +340,19 @@ export class State<ValueType = any> {
     return this;
   }
 
+  /**
+   * @public
+   * Creates a Watcher that gets once called when the State Value changes for the first time and than destroys itself
+   * @param callback - Callback Function that gets called if the State Value changes
+   */
+  public onInaugurated(callback: Callback<ValueType>) {
+    const watcherKey = "onNext";
+    this.watch(watcherKey, () => {
+      callback(this.getPublicValue());
+      this.removeWatcher(watcherKey);
+    });
+  }
+
   //=========================================================================================================
   // Has Watcher
   //=========================================================================================================
