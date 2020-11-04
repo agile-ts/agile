@@ -346,7 +346,7 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public onInaugurated(callback: Callback<ValueType>) {
-    const watcherKey = "onNext";
+    const watcherKey = "InauguratedWatcher";
     this.watch(watcherKey, () => {
       callback(this.getPublicValue());
       this.removeWatcher(watcherKey);
