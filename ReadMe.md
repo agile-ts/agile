@@ -1,4 +1,4 @@
-# Agile Framework `v0.0.4`
+# Agile Framework `v0.0.5`
 
 _Agile is a global state and logic framework for reactive Typescript & Javascript applications. Supporting frameworks like React and React Native._
 
@@ -22,7 +22,10 @@ _Agile is a global state and logic framework for reactive Typescript & Javascrip
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
 
-##### Agile is strongly inspired by [PulseJs](https://github.com/pulse-framework/pulse)
+##### Agile is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
+Agile has a similar syntax as [PulseJs](https://pulsejs.org/) and works slightly different under the hood. 
+Maybe a little more sophisticated and extensible
+**BUT** I would recommend you to use PulfseJS right away as it is supported by a cool community and has nearly all features AgileTs offers.
 
 | Name                                                                     |                                                                               Latest Version                                                                                |
 | ------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |

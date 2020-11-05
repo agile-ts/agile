@@ -14,6 +14,7 @@ import {
   normalizeArray,
   copy,
   CollectionPersistent,
+  GroupAddConfig,
 } from "../internal";
 
 export class Collection<DataType = DefaultItem> {
@@ -566,6 +567,61 @@ export class Collection<DataType = DefaultItem> {
     let size = 0;
     for (let selector in this.selectors) size++;
     return size;
+  }
+
+  //=========================================================================================================
+  // Reset
+  //=========================================================================================================
+  /**
+   * @public
+   * Resets this Collection
+   */
+  public reset() {
+    // Remove Items from Storage
+    for (let key in this.data) {
+      const item = this.getItemById(key);
+      item?.persistent?.removeValue();
+    }
+
+    // Reset Groups
+    for (let key in this.groups) this.getGroup(key)?.reset();
+
+    // Reset Data
+    this.data = {};
+    this.size = 0;
+
+    // Reselect Items
+    for (let key in this.selectors) {
+      const selector = this.getSelector(key);
+      selector?.select(selector?.itemKey, { force: true });
+    }
+  }
+
+  //=========================================================================================================
+  // Put
+  //=========================================================================================================
+  /**
+   * @public
+   * Puts ItemKey/s into Group/s (GroupKey/s)
+   * @param itemKeys - ItemKey/s that get added to provided Group/s
+   * @param groupKeys - Group/s to which the ItemKey/s get added
+   * @param config - Config
+   */
+  public put(
+    itemKeys: ItemKey | Array<ItemKey>,
+    groupKeys: GroupKey | Array<GroupKey>,
+    config: GroupAddConfig = {}
+  ) {
+    const _itemKeys = normalizeArray(itemKeys);
+    const _groupKeys = normalizeArray(groupKeys);
+
+    // Add ItemKeys to Groups
+    _groupKeys.forEach((groupKey) => {
+      const group = this.getGroup(groupKey);
+      _itemKeys.forEach((itemKey) => {
+        group?.add(itemKey, config);
+      });
+    });
   }
 
   //=========================================================================================================

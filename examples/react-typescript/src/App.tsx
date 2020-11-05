@@ -13,9 +13,11 @@ import { globalBind } from "@agile-ts/core";
 
 const App = (props: any) => {
   const myComputed = useAgile(MY_COMPUTED);
-  const [myState, myState2, myState3] = useAgile([
+  const [myState, myState2, item, mySelector2, myState3] = useAgile([
     MY_STATE,
     MY_STATE_2,
+    MY_COLLECTION.getItemById("1"),
+    MY_COLLECTION.getSelector("mySelector"),
     MY_STATE_3,
   ]);
   const [myCollection] = useAgile([MY_COLLECTION.getGroup("myGroup")]);
@@ -29,12 +31,6 @@ const App = (props: any) => {
   useWatcher(MY_STATE, () => {
     console.log("MY_STATE changes");
   });
-
-  console.log("myComputed", MY_COMPUTED);
-  console.log("myState", MY_STATE);
-  console.log("myState2", MY_STATE_2);
-  console.log("myCollection", MY_COLLECTION);
-  console.log("myEvent", MY_EVENT);
 
   useEffect(() => {
     // Create global Instance of Core

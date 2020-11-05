@@ -6,6 +6,7 @@ import {
   Agile,
   getAgileInstance,
   normalizeArray,
+  StateObserver,
 } from "@agile-ts/core";
 
 // Array Type
@@ -65,17 +66,17 @@ export function useAgile<
     item instanceof Collection
       ? item.getGroup(item.config.defaultGroupKey || "default")
       : item
-  ) as State[];
+  );
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
-    depsArray: State[]
+    depsArray: (State | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
     if (depsArray.length === 1 && !Array.isArray(deps))
       return depsArray[0]?.getPublicValue() as AgileHookType<Y>;
 
     return depsArray.map((state) => {
-      return state.getPublicValue();
+      return state?.getPublicValue();
     }) as AgileHookArrayType<X>;
   };
 
@@ -91,12 +92,17 @@ export function useAgile<
       agileInstance = tempAgileInstance;
     }
 
+    // https://github.com/microsoft/TypeScript/issues/20812
+    const observers: StateObserver[] = depsArray
+      .map((dep) => dep?.observer)
+      .filter((dep): dep is StateObserver => dep !== undefined);
+
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance?.subController.subscribeWithSubsArray(
       () => {
         set_({});
       },
-      depsArray.map((dep) => dep.observer)
+      observers
     );
 
     // Unsubscribe Callback based Subscription on Unmount
