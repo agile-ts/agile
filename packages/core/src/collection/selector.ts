@@ -66,7 +66,13 @@ export class Selector<DataType = DefaultItem> extends State<
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
+      force: false,
     });
+
+    if (oldItem?.key === itemKey && !config.force) {
+      console.warn(`Agile: Selector has already selected key '${itemKey}'!`);
+      return this;
+    }
 
     // Remove old Item from Collection if it is an Placeholder
     if (oldItem?.isPlaceholder) delete this.collection().data[this.itemKey];
@@ -141,8 +147,10 @@ export interface SelectorConfigInterface {
 /**
  * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of Selector get executed
+ * @param force - Force to select this ItemKey
  */
 export interface SelectConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
+  force?: boolean;
 }
