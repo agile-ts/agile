@@ -2,15 +2,15 @@
   "version": "v1",
   "packages": {
     "@agile-ts/core": {
-      "signature": "0cf0ae46e62e6070cbf6637d348057e6",
+      "signature": "85340eb4776d83665290ba809ac83e68",
       "file": true
     },
     "@agile-ts/react": {
-      "signature": "6250e170057405b3b7883228130ecebd",
+      "signature": "7fffe6aa6e200bc8311ecfdb2db841cc",
       "file": true
     },
     "@agile-ts/api": {
-      "signature": "9ce1578ba87671de42f127b4522289e9",
+      "signature": "3cdc02e7e53889d42c4b743030742aea",
       "file": true
     }
   }

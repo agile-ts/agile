@@ -65,7 +65,6 @@ export class Runtime {
     if (config.perform) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
-      else console.warn("Agile: No Job in queue!");
     }
   }
 
@@ -95,12 +94,13 @@ export class Runtime {
     if (this.jobQueue.length > 0) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
-      else console.warn("Agile: No Job in queue!");
     } else {
-      // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
-      setTimeout(() => {
-        this.updateSubscribers();
-      });
+      if (this.jobsToRerender.length > 0) {
+        // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
+        setTimeout(() => {
+          this.updateSubscribers();
+        });
+      }
     }
   }
 
@@ -116,6 +116,7 @@ export class Runtime {
       this.jobsToRerender = [];
       return;
     }
+    if (this.jobsToRerender.length <= 0) return;
 
     // Subscriptions that has to be updated/rerendered (Set = For preventing double subscriptions without further checks)
     const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<
