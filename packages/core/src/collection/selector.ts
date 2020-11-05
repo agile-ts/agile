@@ -147,7 +147,7 @@ export interface SelectorConfigInterface {
 /**
  * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of Selector get executed
- * @param force - Force to select this ItemKey
+ * @param force - Force to select ItemKey
  */
 export interface SelectConfigInterface {
   background?: boolean;
