@@ -33,6 +33,7 @@ describe("Reset Function Tests", () => {
       JSON.stringify({ id: "3", name: "Hans" }),
       "MY_COLLECTION Item with id 3 exists"
     );
+    expect(MY_COLLECTION.size).to.eq(3, "MY_COLLECTION has correct size");
 
     expect(JSON.stringify(MY_COLLECTION.groups["default"].value)).to.eq(
       JSON.stringify(["1", "2", "3"]),
@@ -72,6 +73,7 @@ describe("Reset Function Tests", () => {
       true,
       "MY_COLLECTION Item with id 1 is Placeholder"
     );
+    expect(MY_COLLECTION.size).to.eq(0, "MY_COLLECTION size got reset");
 
     expect(JSON.stringify(MY_COLLECTION.groups["default"].value)).to.eq(
       JSON.stringify([]),
