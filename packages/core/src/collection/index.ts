@@ -569,6 +569,34 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Reset
+  //=========================================================================================================
+  /**
+   * @public
+   * Resets this Collection
+   */
+  public reset() {
+    // Remove Items from Storage
+    for (let key in this.data) {
+      const item = this.getItemById(key);
+      item?.persistent?.removeValue();
+    }
+
+    // Reset Groups
+    for (let key in this.groups) this.getGroup(key)?.reset();
+
+    // Reset Data
+    this.data = {};
+    this.size = 0;
+
+    // Reselect Items
+    for (let key in this.selectors) {
+      const selector = this.getSelector(key);
+      selector?.select(selector?.itemKey, { force: true });
+    }
+  }
+
+  //=========================================================================================================
   // Update Item Key
   //=========================================================================================================
   /**
