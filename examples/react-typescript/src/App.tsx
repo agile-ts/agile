@@ -32,12 +32,6 @@ const App = (props: any) => {
     console.log("MY_STATE changes");
   });
 
-  console.log("myComputed", MY_COMPUTED);
-  console.log("myState", MY_STATE);
-  console.log("myState2", MY_STATE_2);
-  console.log("myCollection", MY_COLLECTION);
-  console.log("myEvent", MY_EVENT);
-
   useEffect(() => {
     // Create global Instance of Core
     globalBind("__core__", { ...require("./core") });
