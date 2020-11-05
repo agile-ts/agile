@@ -1,0 +1,104 @@
+0 silly argv {
+0 silly argv   _: [ 'version' ],
+0 silly argv   'conventional-commits': true,
+0 silly argv   conventionalCommits: true,
+0 silly argv   yes: true,
+0 silly argv   y: true,
+0 silly argv   lernaVersion: '3.22.1',
+0 silly argv   '$0': 'node_modules\\lerna\\cli.js'
+0 silly argv }
+1 notice cli v3.22.1
+2 verbose rootPath C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile
+3 info current version 0.0.3
+4 silly isAnythingCommitted
+5 verbose isAnythingCommitted 1
+6 silly currentBranch
+7 verbose currentBranch v0.0.4
+8 silly remoteBranchExists
+9 silly isBehindUpstream
+10 silly isBehindUpstream v0.0.4 is behind origin/v0.0.4 by 0 commit(s) and ahead by 0
+11 silly hasTags
+12 verbose hasTags true
+13 silly git-describe.sync "a6eba7b" => {"refCount":"278","sha":"a6eba7b","isDirty":false}
+14 info Assuming all packages changed
+15 verbose updated @agile-ts/api
+16 verbose updated @agile-ts/core
+17 verbose updated @agile-ts/react
+18 verbose git-describe undefined => "a6eba7b"
+19 silly git-describe parsed => {"refCount":"278","sha":"a6eba7b","isDirty":false}
+20 silly fixed for @agile-ts/api at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\api
+21 verbose getChangelogConfig using preset "conventional-changelog-angular"
+22 silly npa Result {
+22 silly npa   type: 'tag',
+22 silly npa   registry: true,
+22 silly npa   where: undefined,
+22 silly npa   raw: 'conventional-changelog-angular',
+22 silly npa   name: 'conventional-changelog-angular',
+22 silly npa   escapedName: 'conventional-changelog-angular',
+22 silly npa   scope: undefined,
+22 silly npa   rawSpec: '',
+22 silly npa   saveSpec: null,
+22 silly npa   fetchSpec: 'latest',
+22 silly npa   gitRange: undefined,
+22 silly npa   gitCommittish: undefined,
+22 silly npa   hosted: undefined
+22 silly npa }
+23 verbose getChangelogConfig Attempting to resolve preset "conventional-changelog-angular"
+24 info getChangelogConfig Successfully resolved preset "conventional-changelog-angular"
+25 verbose fixed increment 0.0.3 by patch
+26 silly fixed for @agile-ts/core at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\core
+27 verbose fixed increment 0.0.3 by patch
+28 silly fixed for @agile-ts/react at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\react
+29 verbose fixed increment 0.0.3 by patch
+30 info auto-confirmed
+31 info execute Skipping releases
+32 silly lifecycle No script for "preversion" in "agile", continuing
+33 silly lifecycle No script for "preversion" in "@agile-ts/core", continuing
+34 silly lifecycle No script for "version" in "@agile-ts/core", continuing
+35 silly fixed for @agile-ts/core at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\core
+36 silly fixed writing new entry: "## 0.0.4 (2020-11-03)\n\n**Note:** Version bump only for package @agile-ts/core\n\n\n\n"
+37 verbose fixed wrote C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\core\CHANGELOG.md
+38 silly lifecycle No script for "preversion" in "@agile-ts/api", continuing
+39 silly lifecycle No script for "preversion" in "@agile-ts/react", continuing
+40 silly lifecycle No script for "version" in "@agile-ts/react", continuing
+41 silly fixed for @agile-ts/react at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\react
+42 silly lifecycle No script for "version" in "@agile-ts/api", continuing
+43 silly fixed for @agile-ts/api at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\api
+44 silly fixed writing new entry: "## 0.0.4 (2020-11-03)\n\n**Note:** Version bump only for package @agile-ts/api\n\n\n\n"
+45 silly fixed writing new entry: "## 0.0.4 (2020-11-03)\n\n**Note:** Version bump only for package @agile-ts/react\n\n\n\n"
+46 verbose fixed wrote C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\api\CHANGELOG.md
+47 verbose fixed wrote C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\packages\react\CHANGELOG.md
+48 silly root for agile at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile
+49 silly root writing new entry: "## 0.0.4 (2020-11-03)\n\n**Note:** Version bump only for package agile\n\n\n\n"
+50 verbose root wrote C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\CHANGELOG.md
+51 silly lifecycle No script for "version" in "agile", continuing
+52 silly gitAdd [
+52 silly gitAdd   'packages/core/package.json',
+52 silly gitAdd   'packages/core/package-lock.json',
+52 silly gitAdd   'packages/core/CHANGELOG.md',
+52 silly gitAdd   'packages/react/package.json',
+52 silly gitAdd   'packages/react/package-lock.json',
+52 silly gitAdd   'packages/api/package.json',
+52 silly gitAdd   'packages/api/package-lock.json',
+52 silly gitAdd   'packages/api/CHANGELOG.md',
+52 silly gitAdd   'packages/react/CHANGELOG.md',
+52 silly gitAdd   'CHANGELOG.md',
+52 silly gitAdd   'lerna.json'
+52 silly gitAdd ]
+53 silly gitCommit v0.0.4
+54 verbose git [ 'commit', '-m', 'v0.0.4' ]
+55 silly gitTag v0.0.4
+56 verbose git [ 'tag', 'v0.0.4', '-m', 'v0.0.4' ]
+57 silly lifecycle No script for "postversion" in "@agile-ts/api", continuing
+58 silly lifecycle No script for "postversion" in "@agile-ts/core", continuing
+59 silly lifecycle No script for "postversion" in "@agile-ts/react", continuing
+60 silly lifecycle No script for "postversion" in "agile", continuing
+61 info git Pushing tags...
+62 silly gitPush origin v0.0.4
+63 error Error: Command failed: git push --follow-tags --no-verify --atomic origin v0.0.4
+63 error error: src refspec v0.0.4 matches more than one
+63 error error: failed to push some refs to 'https://github.com/agile-ts/agile.git'
+63 error
+63 error     at makeError (C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\node_modules\execa\index.js:174:9)
+63 error     at C:\Users\benno\Desktop\Programming\WebApplication\Projects\Other\Agile\node_modules\execa\index.js:278:16
+63 error     at runMicrotasks (<anonymous>)
