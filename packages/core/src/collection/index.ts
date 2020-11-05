@@ -14,6 +14,7 @@ import {
   normalizeArray,
   copy,
   CollectionPersistent,
+  GroupAddConfig,
 } from "../internal";
 
 export class Collection<DataType = DefaultItem> {
@@ -594,6 +595,33 @@ export class Collection<DataType = DefaultItem> {
       const selector = this.getSelector(key);
       selector?.select(selector?.itemKey, { force: true });
     }
+  }
+
+  //=========================================================================================================
+  // Put
+  //=========================================================================================================
+  /**
+   * @public
+   * Puts ItemKey/s into Group/s (GroupKey/s)
+   * @param itemKeys - ItemKey/s that get added to provided Group/s
+   * @param groupKeys - Group/s to which the ItemKey/s get added
+   * @param config - Config
+   */
+  public put(
+    itemKeys: ItemKey | Array<ItemKey>,
+    groupKeys: GroupKey | Array<GroupKey>,
+    config: GroupAddConfig = {}
+  ) {
+    const _itemKeys = normalizeArray(itemKeys);
+    const _groupKeys = normalizeArray(groupKeys);
+
+    // Add ItemKeys to Groups
+    _groupKeys.forEach((groupKey) => {
+      const group = this.getGroup(groupKey);
+      _itemKeys.forEach((itemKey) => {
+        group?.add(itemKey, config);
+      });
+    });
   }
 
   //=========================================================================================================
