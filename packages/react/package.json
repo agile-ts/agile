@@ -13,11 +13,10 @@
     "dev-push": "yalc push",
     "watch": "tsc-watch --onSuccess \"npm run dev-push\""
   },
-  "dependencies": {
-    "@agile-ts/core": "file:../core"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "react": "^16.13.1"
+    "react": "^16.13.1",
+    "@agile-ts/core": "^0.0.4"
   },
   "devDependencies": {
     "@types/node": "^14.6.0",
@@ -28,7 +27,8 @@
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "@agile-ts/core": "file:../core"
   },
   "publishConfig": {
     "access": "public"
