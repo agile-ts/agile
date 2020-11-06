@@ -25,7 +25,7 @@ export class Collection<DataType = DefaultItem> {
   public size: number = 0; // Amount of Items stored in Collection
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
-  public isPersisted: boolean = false; // If Collection is stored in Storage
+  public isPersisted: boolean = false; // If Collection can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: CollectionPersistent | undefined; // Manages storing Collection Value into Storage
 
   public groups: { [key: string]: Group<any> } = {};

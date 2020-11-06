@@ -34,7 +34,7 @@ export class State<ValueType = any> {
     [key: string]: (properties?: { [key: string]: any }) => void;
   } = {}; // SideEffects of State (will be executed in Runtime)
 
-  public isPersisted: boolean = false; // If State is stored in Storage
+  public isPersisted: boolean = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
   public watchers: { [key: string]: (value: any) => void } = {};
@@ -222,7 +222,7 @@ export class State<ValueType = any> {
    */
   public reset(): this {
     this.set(this.initialStateValue);
-    this.persistent?.removeValue(); // Remove State from Storage (since its the initial Value)
+    this.persistent?.removeValue(); // Remove State Value from Storage (since its the initial Value)
     return this;
   }
 
@@ -417,6 +417,29 @@ export class State<ValueType = any> {
       { instantiate: _config.instantiate }
     );
 
+    return this;
+  }
+
+  //=========================================================================================================
+  // On Load
+  //=========================================================================================================
+  /**
+   * @public
+   * Callback Function gets called if persisted Value gets loaded into the State for the first Time
+   * Note: Only useful for persisted States!
+   * @param callback - Callback Function
+   */
+  public onLoad(callback: (success: boolean) => void): this {
+    if (this.persistent) {
+      this.persistent.onLoad = callback;
+
+      // If State isPersisted the loading was successful -> callback can be called
+      if (this.isPersisted) callback(true);
+    } else {
+      console.warn(
+        `Agile: Please make sure you persist the State '${this.key}' before using onLoad!`
+      );
+    }
     return this;
   }
 
