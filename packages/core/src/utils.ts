@@ -81,7 +81,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
     if (_instance) return instance;
 
     // Return global bound agileInstance (set in first instantiation of Agile)
-    return globalThis.__agile__;
+    return globalThis["__agile__"];
   } catch (e) {
     // fail silently
   }
@@ -270,12 +270,13 @@ export function clone<T>(instance: T): T {
  * @internal
  * Binds Instance Global
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+ * https://blog.logrocket.com/what-is-globalthis-why-use-it/
  * @param key - Key of Instance
  * @param instance - Instance which becomes globally accessible (globalThis.key)
  */
 export function globalBind(key: string, instance: any) {
   try {
-    if (!global[key]) global[key] = instance;
+    if (!globalThis[key]) globalThis[key] = instance;
   } catch (e) {
     console.warn(
       `Agile: Failed to create global Instance called '${name}'`,
