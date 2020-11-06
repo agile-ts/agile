@@ -494,11 +494,28 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Item by Id
    * @param itemKey - ItemKey of Item that might get found
+   * @param config - Config
    */
-  public getItemById(itemKey: ItemKey): Item<DataType> | undefined {
-    if (!this.data.hasOwnProperty(itemKey) || !this.data[itemKey].exists)
-      return undefined;
+  public getItemById(
+    itemKey: ItemKey,
+    config: GetItemByIdInterface = {}
+  ): Item<DataType> | undefined {
+    config = defineConfig(config, {
+      holdReference: true,
+    });
 
+    // Check if Item exists and create Placeholder Item if necessary
+    if (!this.data.hasOwnProperty(itemKey) || !this.data[itemKey].exists) {
+      // Create dummy Item to hold reference if Item with ItemKey doesn't exist
+      if (!this.data.hasOwnProperty(itemKey) && config.holdReference) {
+        const dummyItem = new Item<DataType>(this, { id: itemKey } as any);
+        dummyItem.isPlaceholder = true;
+        this.data[itemKey] = dummyItem;
+      }
+      return undefined;
+    }
+
+    // Get Item from Data
     const item = this.data[itemKey];
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
@@ -515,9 +532,13 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Value of Item by Id
    * @param itemKey - ItemKey of ItemValue that might get found
+   * @param config - Config
    */
-  public getValueById(itemKey: ItemKey): DataType | undefined {
-    let item = this.getItemById(itemKey);
+  public getValueById(
+    itemKey: ItemKey,
+    config: GetItemByIdInterface = {}
+  ): DataType | undefined {
+    let item = this.getItemById(itemKey, config);
     if (!item) return undefined;
     return item.value;
   }
@@ -893,6 +914,13 @@ export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   background?: boolean;
   forceRerender?: boolean;
   sideEffects?: boolean;
+}
+
+/**
+ * @param holdReference - If a Placeholder Item gets created to hold Reference
+ */
+export interface GetItemByIdInterface {
+  holdReference?: boolean;
 }
 
 export type CollectionConfig<DataType = DefaultItem> =

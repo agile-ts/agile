@@ -83,7 +83,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
     // Return global bound agileInstance (set in first instantiation of Agile)
     return globalThis["__agile__"];
   } catch (e) {
-    // fail silently
+    console.error("Agile: Failed to get Agile Instance");
   }
   return undefined;
 }

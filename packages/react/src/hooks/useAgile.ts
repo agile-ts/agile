@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Group,
-  State,
-  Collection,
   Agile,
+  Collection,
   getAgileInstance,
+  Group,
   normalizeArray,
+  State,
   StateObserver,
 } from "@agile-ts/core";
 
@@ -85,12 +85,7 @@ export function useAgile<
 
   React.useEffect(() => {
     // Get Agile Instance
-    if (!agileInstance) {
-      const tempAgileInstance = getAgileInstance(depsArray[0]);
-      if (!tempAgileInstance)
-        console.error("Agile: Failed to get Agile Instance");
-      agileInstance = tempAgileInstance;
-    }
+    if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
 
     // https://github.com/microsoft/TypeScript/issues/20812
     const observers: StateObserver[] = depsArray

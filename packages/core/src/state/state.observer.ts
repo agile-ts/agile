@@ -71,13 +71,8 @@ export class StateObserver<ValueType = any> extends Observer {
     } else this.nextStateValue = newStateValue;
 
     // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey)
-    if (equal(state.value, this.nextStateValue) && !config.forceRerender) {
-      if (this.agileInstance().config.logJobs)
-        console.warn(
-          "Agile: Doesn't created job because state values are the same! "
-        );
+    if (equal(state.value, this.nextStateValue) && !config.forceRerender)
       return;
-    }
 
     this.agileInstance().runtime.ingest(this, config);
   }
