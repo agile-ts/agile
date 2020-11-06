@@ -435,6 +435,10 @@ export class State<ValueType = any> {
 
       // If State isPersisted the loading was successful -> callback can be called
       if (this.isPersisted) callback(true);
+    } else {
+      console.warn(
+        `Agile: Please make sure you persist the State '${this.key}' before using onLoad!`
+      );
     }
     return this;
   }

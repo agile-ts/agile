@@ -5,7 +5,10 @@ export const App = new Agile({
 });
 
 export const MY_STATE = App.State<string>("MyState", "my-state"); //.persist();
-export const MY_STATE_2 = App.State<string>("MyState2"); //.persist("my-state2");
+export const MY_STATE_2 = App.State<string>("MyState2").persist("my-state2");
+MY_STATE_2.onLoad(() => {
+  console.log("On Load");
+});
 export const MY_STATE_3 = App.State<number>(1); //.persist("my-state2");
 
 MY_STATE.watch("test", (value: any) => {
