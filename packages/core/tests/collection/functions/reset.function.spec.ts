@@ -66,7 +66,7 @@ describe("Reset Function Tests", () => {
       "MY_COLLECTION Item with id 3 doesn't exists"
     );
     expect(JSON.stringify(MY_COLLECTION.data["1"].value)).to.eq(
-      JSON.stringify({ id: "1" }),
+      JSON.stringify({ id: "1", dummy: true }),
       "MY_COLLECTION Item with id 1 exists as Placeholder because of Selector"
     );
     expect(MY_COLLECTION.data["1"].isPlaceholder).to.eq(

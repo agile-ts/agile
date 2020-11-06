@@ -74,16 +74,18 @@ export function normalizeArray<DataType = any>(
 export function getAgileInstance(instance: any): Agile | undefined {
   try {
     // Try to find agileInstance in Instance
-    if (instance instanceof State) return instance.agileInstance();
-    if (instance instanceof Event) return instance.agileInstance();
-    if (instance instanceof Collection) return instance.agileInstance();
-    const _instance = instance["agileInstance"];
-    if (_instance) return instance;
+    if (instance) {
+      if (instance instanceof State) return instance.agileInstance();
+      if (instance instanceof Event) return instance.agileInstance();
+      if (instance instanceof Collection) return instance.agileInstance();
+      const _agileInstance = instance["agileInstance"];
+      if (_agileInstance) return instance;
+    }
 
     // Return global bound agileInstance (set in first instantiation of Agile)
     return globalThis["__agile__"];
   } catch (e) {
-    console.error("Agile: Failed to get Agile Instance");
+    console.error("Agile: Failed to get Agile Instance", e);
   }
   return undefined;
 }

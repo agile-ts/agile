@@ -3,7 +3,6 @@ import {
   copy,
   DefaultItem,
   defineConfig,
-  equal,
   Item,
   ItemKey,
   State,
@@ -62,7 +61,8 @@ export class Selector<DataType = DefaultItem> extends State<
    */
   public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
     const oldItem = this.item;
-    let newItem = this.collection().getItemById(itemKey);
+    let newItem = this.collection().getItemByIdwithReference(itemKey);
+    const rebuildSelectorSideEffectKey = "rebuildSelector";
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
@@ -77,21 +77,14 @@ export class Selector<DataType = DefaultItem> extends State<
     // Remove old Item from Collection if it is an Placeholder
     if (oldItem?.isPlaceholder) delete this.collection().data[this.itemKey];
 
-    // Create dummy Item to hold reference if Item with ItemKey doesn't exist
-    if (!newItem) {
-      newItem = new Item<DataType>(this.collection(), { id: itemKey } as any);
-      newItem.isPlaceholder = true;
-      this.collection().data[itemKey] = newItem;
-    }
-
     // Remove Selector sideEffect from old Item
-    oldItem?.removeSideEffect("rebuildSelector");
+    oldItem?.removeSideEffect(rebuildSelectorSideEffectKey);
 
     this._itemKey = itemKey;
     this.item = newItem;
 
     // Add Selector sideEffect to Item
-    newItem.addSideEffect("rebuildSelector", () =>
+    newItem.addSideEffect(rebuildSelectorSideEffectKey, () =>
       this.rebuildSelector(config)
     );
 
@@ -123,12 +116,6 @@ export class Selector<DataType = DefaultItem> extends State<
 
     // Assign ItemValue to Selector
     this.nextStateValue = copy(this.item?.value);
-
-    // Fix initialStateValue and previousStateValue if they are still set from the Placeholder
-    if (equal(this.item.initialStateValue, { id: this.itemKey }))
-      this.item.initialStateValue = copy(this.item?.nextStateValue);
-    if (equal(this.item.previousStateValue, { id: this.itemKey }))
-      this.item.previousStateValue = copy(this.nextStateValue);
 
     // Ingest nextStateValue into Runtime
     this.ingest(config);

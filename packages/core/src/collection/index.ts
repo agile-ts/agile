@@ -501,18 +501,42 @@ export class Collection<DataType = DefaultItem> {
     config: GetItemByIdInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {
-      holdReference: true,
+      notExisting: false,
     });
 
-    // Check if Item exists and create Placeholder Item if necessary
-    if (!this.data.hasOwnProperty(itemKey) || !this.data[itemKey].exists) {
-      // Create dummy Item to hold reference if Item with ItemKey doesn't exist
-      if (!this.data.hasOwnProperty(itemKey) && config.holdReference) {
-        const dummyItem = new Item<DataType>(this, { id: itemKey } as any);
-        dummyItem.isPlaceholder = true;
-        this.data[itemKey] = dummyItem;
-      }
+    // Check if Item exists
+    if (
+      !this.data.hasOwnProperty(itemKey) ||
+      (!config.notExisting && !this.data[itemKey].exists)
+    )
       return undefined;
+
+    // Get Item from Data
+    const item = this.data[itemKey];
+
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
+    if (this.agileInstance().runtime.trackObservers)
+      this.agileInstance().runtime.foundObservers.add(item.observer);
+
+    return item;
+  }
+
+  /**
+   * @public
+   * Get Item by Id
+   * If the Item doesn't exist.. it returns a reference of the Item that will be filled with the collected Item Data later
+   * @param itemKey - ItemKey of Item that might get found
+   */
+  public getItemByIdwithReference(itemKey: ItemKey): Item<DataType> {
+    // Create dummy Item to hold reference if Item with ItemKey doesn't exist
+    if (!this.data.hasOwnProperty(itemKey)) {
+      const dummyItem = new Item<DataType>(this, {
+        id: itemKey,
+        dummy: true,
+      } as any);
+      dummyItem.isPlaceholder = true;
+      this.data[itemKey] = dummyItem;
+      return dummyItem;
     }
 
     // Get Item from Data
@@ -532,13 +556,9 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Value of Item by Id
    * @param itemKey - ItemKey of ItemValue that might get found
-   * @param config - Config
    */
-  public getValueById(
-    itemKey: ItemKey,
-    config: GetItemByIdInterface = {}
-  ): DataType | undefined {
-    let item = this.getItemById(itemKey, config);
+  public getValueById(itemKey: ItemKey): DataType | undefined {
+    let item = this.getItemById(itemKey);
     if (!item) return undefined;
     return item.value;
   }
@@ -801,20 +821,17 @@ export class Collection<DataType = DefaultItem> {
     }
 
     const itemKey = _data[primaryKey];
-    let item: Item<DataType> = this.data[itemKey];
+    let item: Item<DataType> | undefined = this.data[itemKey];
 
     // Create or update Item
     if (item && config.patch)
-      item = item.patch(_data, { background: config.background });
+      item.patch(_data, { background: config.background });
     if (item && !config.patch)
-      item = item.set(_data, { background: config.background });
+      item.set(_data, { background: config.background });
     if (!item) {
       item = new Item<DataType>(this, _data);
       this.size++;
     }
-
-    // Reset isPlaceholder of Item since it got an value
-    if (item.isPlaceholder) item.isPlaceholder = false;
 
     // Set new Item at itemKey
     this.data[itemKey] = item;
@@ -917,10 +934,10 @@ export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
 }
 
 /**
- * @param holdReference - If a Placeholder Item gets created to hold Reference
+ * @param notExisting - If also official not existing Items like Placeholder get found
  */
 export interface GetItemByIdInterface {
-  holdReference?: boolean;
+  notExisting?: boolean;
 }
 
 export type CollectionConfig<DataType = DefaultItem> =

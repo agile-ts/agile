@@ -96,6 +96,7 @@ describe("select Function Tests", () => {
     expect(JSON.stringify(MY_COLLECTION.data[100].value)).to.eq(
       JSON.stringify({
         id: 100,
+        dummy: true,
       }),
       "MY_COLLECTION at id 100 has correct value"
     );

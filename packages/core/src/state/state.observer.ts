@@ -101,8 +101,12 @@ export class StateObserver<ValueType = any> extends Observer {
     // Set isSet
     state.isSet = notEqual(this.nextStateValue, state.initialStateValue);
 
-    // Reset isPlaceholder since it got an value
-    if (state.isPlaceholder) state.isPlaceholder = false;
+    // Reset isPlaceholder and set initial/previous Value to nextValue because the placeholder State had no proper value before
+    if (state.isPlaceholder) {
+      state.initialStateValue = copy(state.nextStateValue);
+      state.previousStateValue = copy(state.nextStateValue);
+      state.isPlaceholder = false;
+    }
 
     // Update Observer value
     this.value = copy(this.nextStateValue);

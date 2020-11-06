@@ -127,15 +127,33 @@ export class SubController {
     };
 
     // Unsubscribe callback based Subscription
-    if (subscriptionInstance instanceof CallbackSubscriptionContainer)
+    if (subscriptionInstance instanceof CallbackSubscriptionContainer) {
       unsub(subscriptionInstance);
+      this.callbackSubs.delete(subscriptionInstance);
+
+      // Logging
+      if (this.agileInstance().config.logJobs)
+        console.log(
+          "Agile: Unregistered Callback based Subscription ",
+          subscriptionInstance
+        );
+    }
 
     // Unsubscribe component based Subscription
     // Check if component/class has property componentSubscriptionContainer, which holds an instance of ComponentSubscriptionContainer
-    if (subscriptionInstance.componentSubscriptionContainer)
+    if (subscriptionInstance.componentSubscriptionContainer) {
       unsub(
         subscriptionInstance.componentSubscriptionContainer as ComponentSubscriptionContainer
       );
+      this.componentSubs.delete(subscriptionInstance);
+
+      // Logging
+      if (this.agileInstance().config.logJobs)
+        console.log(
+          "Agile: Unregistered Component based Subscription ",
+          subscriptionInstance
+        );
+    }
   }
 
   //=========================================================================================================

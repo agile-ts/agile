@@ -49,7 +49,7 @@ describe("Default Selector Tests", () => {
       );
       expect(MY_COLLECTION.selectors["selector1"].exists).to.eq(
         false,
-        "selector1 Selector doesn't exist"
+        "selector1 Selector does exist"
       );
       expect(JSON.stringify(MY_COLLECTION.selectors["selector1"].value)).to.eq(
         JSON.stringify(undefined),
@@ -71,20 +71,23 @@ describe("Default Selector Tests", () => {
       expect(JSON.stringify(MY_COLLECTION.data[1].value)).to.eq(
         JSON.stringify({
           id: 1,
+          dummy: true,
         }),
         "MY_COLLECTION data at id 1 has correct initial value"
       );
       expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
         JSON.stringify({
           id: 1,
+          dummy: true,
         }),
-        "MY_COLLECTION data at id 1 has correct initialState"
+        "MY_COLLECTION data at id 1 has correct previousStateValue"
       );
-      expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
+      expect(JSON.stringify(MY_COLLECTION.data[1].initialStateValue)).to.eq(
         JSON.stringify({
           id: 1,
+          dummy: true,
         }),
-        "MY_COLLECTION data at id 1 has correct initialState"
+        "MY_COLLECTION data at id 1 has correct initialStateValue"
       );
 
       expect(JSON.stringify(mySelector1)).to.eq(
@@ -132,14 +135,14 @@ describe("Default Selector Tests", () => {
           id: 1,
           name: "jeff",
         }),
-        "MY_COLLECTION data at id 1 has correct initialState"
+        "MY_COLLECTION data at id 1 has correct previousStateValue"
       );
-      expect(JSON.stringify(MY_COLLECTION.data[1].previousStateValue)).to.eq(
+      expect(JSON.stringify(MY_COLLECTION.data[1].initialStateValue)).to.eq(
         JSON.stringify({
           id: 1,
           name: "jeff",
         }),
-        "MY_COLLECTION data at id 1 has correct initialState"
+        "MY_COLLECTION data at id 1 has correct initialStateVaoue"
       );
 
       expect(rerenderCount).to.eq(1, "rerenderCount has been increased by 1");

@@ -165,8 +165,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     _itemKeys.forEach((itemKey) => {
       const existsInGroup = newGroupValue.includes(itemKey);
 
-      // Check if ItemKey exists in Collection (holdReference = false because the collect function checks extra if a group contains an item that didn't exist before)
-      if (!this.collection().getItemById(itemKey, { holdReference: false }))
+      // Check if ItemKey exists in Collection
+      if (!this.collection().getItemById(itemKey))
         notExistingItemKeys.push(itemKey);
 
       // Remove ItemKey from Group if it should get overwritten and exists
