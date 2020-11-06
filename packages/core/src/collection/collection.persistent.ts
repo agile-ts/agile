@@ -179,7 +179,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       item?.persist(itemStorageKey);
     }
 
-    this.collection().isPersisted = true;
+    this.isPersisted = true;
     return true;
   }
 
@@ -214,7 +214,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       item?.persistent?.removeValue();
     }
 
-    this.collection().isPersisted = false;
+    this.isPersisted = false;
     return false;
   }
 

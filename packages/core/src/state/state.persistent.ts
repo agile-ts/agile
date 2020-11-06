@@ -30,7 +30,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     this.state = () => state;
     if (config.instantiate)
       this.instantiatePersistent(key).then((success) => {
-        state.isPersisted = success;
+        this.state().isPersisted = success;
       });
   }
 
@@ -104,7 +104,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
       this.key,
       this.state().getPersistableValue()
     );
-    this.state().isPersisted = true;
+    this.isPersisted = true;
     return true;
   }
 
@@ -119,7 +119,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public async removeValue(): Promise<boolean> {
     if (!this.ready) return false;
     this.agileInstance().storage.remove(this.key);
-    this.state().isPersisted = false;
+    this.isPersisted = false;
     return true;
   }
 

@@ -5,6 +5,8 @@ export class Persistent<ValueType = any> {
 
   public _key: StorageKey = "unknown";
   public ready: boolean = false;
+  public isPersisted: boolean = false; // If Value is stored in Agile Storage
+  public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
 
   /**
    * @internal
@@ -68,6 +70,7 @@ export class Persistent<ValueType = any> {
    */
   public async initialLoading(key: StorageKey) {
     const success = await this.loadValue();
+    if (this.onLoad) this.onLoad(success);
     if (!success) await this.updateValue();
   }
 

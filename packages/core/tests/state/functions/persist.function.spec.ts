@@ -122,14 +122,18 @@ describe("Persist Function Tests", () => {
         MY_STATE.reset();
 
         expect(MY_STATE.isPersisted).to.eq(
-          false,
+          true,
           "MY_STATE has correct isPersisted"
         );
+        expect(MY_STATE.persistent.isPersisted).to.eq(
+          false,
+          "MY_STATE persistent has correct isPersisted"
+        );
         expect(MY_STATE.key).to.eq("mySecondKey", "MY_STATE has correct key");
-        expect(
-          MY_STATE.persistent !== undefined &&
-            App.storage.persistentInstances.has(MY_STATE.persistent)
-        ).to.eq(true, "MY_STATE is in persistedStates");
+        expect(App.storage.persistentInstances.has(MY_STATE.persistent)).to.eq(
+          true,
+          "MY_STATE is in persistedStates"
+        );
         expect(App.storage.get("mySecondKey")).to.eq(
           undefined,
           "MY_STATE isn't in storage"
