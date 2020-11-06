@@ -275,7 +275,7 @@ export function clone<T>(instance: T): T {
  */
 export function globalBind(key: string, instance: any) {
   try {
-    if (!globalThis[key]) globalThis[key] = instance;
+    if (!global[key]) global[key] = instance;
   } catch (e) {
     console.warn(
       `Agile: Failed to create global Instance called '${name}'`,
