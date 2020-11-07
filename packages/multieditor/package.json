@@ -1,0 +1,42 @@
+{
+  "name": "@agile-ts/multieditor",
+  "version": "0.0.5",
+  "author": "BennoDev",
+  "license": "ISC",
+  "description": "Editor extension for AgileTS.",
+  "keywords": [],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev-publish": "yalc publish",
+    "dev-push": "yalc push",
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.2",
+    "@types/node": "^14.6.0",
+    "chai": "^4.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "mocha": "^8.1.1",
+    "prettier": "2.0.5",
+    "ts-node": "^8.10.2",
+    "tsc-watch": "^4.1.0",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.7"
+  },
+  "peerDependencies": {
+    "@agile-ts/core": "^0.0.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agile-ts/agile.git"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}
