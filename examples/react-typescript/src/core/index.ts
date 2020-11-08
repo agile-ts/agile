@@ -1,4 +1,5 @@
 import { Agile, Collection } from "@agile-ts/core";
+import MultiEditor from "@agile-ts/multieditor";
 
 export const App = new Agile({
   logJobs: true,
@@ -51,3 +52,26 @@ MY_EVENT.on(() => {
 MY_EVENT.on("Test", () => {
   console.log("Triggered Event (Test)");
 });
+
+// MULTIEDITOR TEST
+
+export const multiEditor = new MultiEditor<string | undefined, boolean>(
+  App,
+  (editor) => ({
+    data: {
+      id: "myId",
+      email: undefined,
+      name: undefined,
+    },
+    onSubmit: async (data) => {
+      console.log("Submitted ", data);
+      return Promise.resolve(true);
+    },
+    fixedProperties: ["id"],
+    validateMethods: {
+      email: editor.Validator().email(),
+      name: editor.Validator().maxLength(10).minLength(2),
+    },
+    editableProperties: ["email", "name"],
+  })
+);

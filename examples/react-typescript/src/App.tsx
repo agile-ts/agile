@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import { useAgile, useEvent, useWatcher } from "@agile-ts/react";
 import {
+  multiEditor,
   MY_COLLECTION,
   MY_COMPUTED,
   MY_EVENT,
@@ -11,7 +12,11 @@ import {
 } from "./core";
 import { globalBind } from "@agile-ts/core";
 
+let rerenderCount = 0;
+
 const App = (props: any) => {
+  rerenderCount++;
+
   const myComputed = useAgile(MY_COMPUTED);
   const [myState, myState2, item, mySelector2, myState3] = useAgile([
     MY_STATE,
@@ -35,7 +40,7 @@ const App = (props: any) => {
   useEffect(() => {
     // Create global Instance of Core
     globalBind("__core__", { ...require("./core") });
-  });
+  }, []);
 
   return (
     <div className="App">
@@ -144,6 +149,33 @@ const App = (props: any) => {
           Remove mySelector
         </button>
       </header>
+
+      <form onSubmit={() => multiEditor.submit()}>
+        <label>Name</label>
+        <input
+          name={"name"}
+          onChange={(e) => multiEditor.setValue("name", e.target.value)}
+        />
+        {multiEditor.getStatus("name")?.type === "error" && (
+          <p style={{ color: "red" }}>
+            {multiEditor.getStatus("name")?.message}
+          </p>
+        )}
+
+        <label>Email</label>
+        <input
+          name={"email"}
+          onChange={(e) => multiEditor.setValue("email", e.target.value)}
+        />
+        {multiEditor.getStatus("email")?.type === "error" && (
+          <p style={{ color: "red" }}>
+            {multiEditor.getStatus("email")?.message}
+          </p>
+        )}
+
+        <button>Submit</button>
+        <p>{rerenderCount}</p>
+      </form>
     </div>
   );
 };

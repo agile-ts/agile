@@ -103,8 +103,8 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
       background: true,
     });
 
-    // Patch changes into Item
-    item.patch({ value: value }, config);
+    // Apply changes to Item
+    item.set(value, config);
 
     return this;
   }

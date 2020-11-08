@@ -46,7 +46,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
       key: string,
       value: DataType
     ) => {
-      if (Array.isArray(value)) {
+      if (Array.isArray(value) || typeof value === "string") {
         const isValid = value.length <= length;
         if (!isValid) {
           this.editor.setStatus(
@@ -58,6 +58,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
         return isValid;
       }
 
+      console.warn(
+        "Agile: Using maxLength on a none Array/String Input won't work"
+      );
       return true;
     };
     return this;
@@ -76,7 +79,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
       key: string,
       value: DataType
     ) => {
-      if (Array.isArray(value)) {
+      if (Array.isArray(value) || typeof value === "string") {
         const isValid = value.length >= length;
         if (!isValid) {
           this.editor.setStatus(
@@ -88,6 +91,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
         return isValid;
       }
 
+      console.warn(
+        "Agile: Using minLength on a none Array/String Input won't work"
+      );
       return true;
     };
     return this;
