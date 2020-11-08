@@ -5,12 +5,12 @@ const App = new Agile();
 
 const multiEditor = new MultiEditor<string, boolean>(App, (editor) => ({
   data: {
-    id: "",
+    id: "myId",
     email: undefined,
     name: undefined,
   },
   onSubmit: async (data) => {
-    console.log("Submitted");
+    console.log("Submitted ", data);
     return Promise.resolve(true);
   },
   fixedProperties: ["id"],

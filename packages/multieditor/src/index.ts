@@ -163,6 +163,11 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
       if (item.isSet) preparedData[key] = item.value;
       if (config.assignToInitial) this.updateInitialValue(key, item.value);
     }
+    for (let key in this.config.fixedProperties) {
+      const item = this.getItemById(key);
+      if (!item) continue;
+      preparedData[key] = item.value;
+    }
 
     return await this.config.onSubmit(preparedData, config);
   }
