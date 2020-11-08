@@ -1,6 +1,11 @@
-import { Agile, copy, defineConfig } from "@agile-ts/core";
+import { Agile, defineConfig, equal, Observer } from "@agile-ts/core";
 import { Validator } from "./validator";
-import { Item, StatusType, ValidationMethodInterface } from "./item";
+import {
+  Item,
+  StatusInterface,
+  StatusType,
+  ValidationMethodInterface,
+} from "./item";
 
 export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public agileInstance: () => Agile;
@@ -55,12 +60,15 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
 
   /**
    * @public
-   * Returns all Agile Dependencies of this Editor
+   * Dependencies of the MultiEditor
    */
   public get dependencies() {
-    // TODO return all dependencies that a component needs to rerender
-    //  return [this.propertiesWithStatus, this.initialData];
-    return null;
+    const deps: Array<Observer> = [];
+    for (let key in this.data) {
+      const item = this.data[key];
+      deps.push(item.observer);
+    }
+    return deps;
   }
 
   //=========================================================================================================
@@ -88,15 +96,17 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     key: string,
     value: DataType,
     config: SetValueConfigInterface = {}
-  ) {
+  ): this {
     const item = this.getItemById(key);
-    if (!item || !item.canBeEdited) return;
+    if (!item || !item.canBeEdited) return this;
     config = defineConfig(config, {
       background: true,
     });
 
     // Patch changes into Item
     item.patch({ value: value }, config);
+
+    return this;
   }
 
   //=========================================================================================================
@@ -113,9 +123,9 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     key: string,
     value: DataType,
     config: SetValueConfigInterface = {}
-  ) {
+  ): this {
     const item = this.getItemById(key);
-    if (!item) return;
+    if (!item) return this;
     config = defineConfig(config, {
       background: true,
     });
@@ -123,6 +133,8 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     // Item Initial Value and force Rerender
     item.initialStateValue = value;
     item.ingest({ forceRerender: true, ...config });
+
+    return this;
   }
 
   //=========================================================================================================
@@ -137,15 +149,44 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     config: SubmitConfigInterface = {}
   ): Promise<SubmitReturnType | false> {
     config = defineConfig(config, {
-      reset: true,
+      assignToInitial: true,
       onSubmitConfig: undefined,
     });
 
     // Check if Editor is Valid
     if (!this.isValid) return false;
 
-    // TODO create prepared Data
-    return await this.config.onSubmit({}, config);
+    // Create Prepared Data
+    const preparedData: DataObject<DataType> = {};
+    for (let key in this.data) {
+      const item = this.data[key];
+      if (item.isSet) preparedData[key] = item.value;
+      if (config.assignToInitial) this.updateInitialValue(key, item.value);
+    }
+
+    return await this.config.onSubmit(preparedData, config);
+  }
+
+  //=========================================================================================================
+  // Reset
+  //=========================================================================================================
+  /**
+   * @public
+   * Resets Editor
+   */
+  public reset(): this {
+    // Reset Items
+    for (let key in this.data) {
+      const item = this.data[key];
+      item.reset();
+      item.status = null;
+    }
+
+    // Reset Editor
+    this.isModified = false;
+    this.validate();
+
+    return this;
   }
 
   //=========================================================================================================
@@ -153,18 +194,61 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Set Status of an Item
+   * Assign new Status to an Item
    * @param key - Key/Name of Item
    * @param type - Status Type
    * @param message - Status Message
    */
-  public setStatus(key: string, type: StatusType, message: string) {
+  public setStatus(key: string, type: StatusType, message: string): this {
     const item = this.getItemById(key);
-    if (!item) return;
-    item.status = {
+    if (!item) return this;
+
+    // Create new Status and check if its different to the current Status
+    const newStatus = {
       type: type,
       message: message,
     };
+    if (equal(item.status, newStatus)) return this;
+
+    // Assign new Status and force Rerender
+    item.status = newStatus;
+    item.ingest({ forceRerender: true });
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Reset Status
+  //=========================================================================================================
+  /**
+   * @public
+   * Reset Status of Item
+   * @param key - Key/Name of Item
+   */
+  public resetStatus(key: string): this {
+    const item = this.getItemById(key);
+    if (!item || !item.status) return this;
+
+    // Reset Status and force Rerender
+    item.status = null;
+    item.ingest({ forceRerender: true });
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Get Status
+  //=========================================================================================================
+  /**
+   * @public
+   * Get Status of Item
+   * @param key - Key/Name of Item
+   */
+  public getStatus(key: string): StatusInterface | null {
+    const item = this.getItemById(key);
+    if (!item) return null;
+
+    return item.status;
   }
 
   //=========================================================================================================
@@ -237,15 +321,14 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @private
-   * Validates the Editor
+   * Validates Editor and updates this.isValid
    */
   public async validate(): Promise<boolean> {
     let isValid = true;
 
     // Check if Items are Valid
     for (let key in this.data) {
-      const item = this.getItemById(key);
-      if (!item) continue;
+      const item = this.data[key];
       isValid = item.isValid && isValid;
     }
 
@@ -297,11 +380,11 @@ export interface SetValueConfigInterface {
 }
 
 /**
- * @param reset - If Editor gets reset
+ * @param assignToInitial - Modified Value gets set to the Item Inital Value after submitting
  * @param onSubmitConfig - Config that gets passed into the onSubmit Function
  */
 export interface SubmitConfigInterface {
-  reset?: boolean;
+  assignToInitial?: boolean;
   onSubmitConfig?: any;
 }
 
