@@ -1,4 +1,5 @@
-import MultiEditor, { DataObject, ValidationMethodInterface } from "./index";
+import MultiEditor, { DataObject } from "./index";
+import { ValidationMethodInterface } from "./item";
 
 export class Validator<DataType = any, SubmitReturnType = void> {
   public validationMethods: DataObject<ValidationMethodInterface> = {};
@@ -13,6 +14,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     this.editor = editor;
   }
 
+  //=========================================================================================================
+  // Validate
+  //=========================================================================================================
   /**
    * @public
    * Validates that value Item at Key follow the Validator rules
@@ -29,6 +33,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     return isValid;
   }
 
+  //=========================================================================================================
+  // Max Length
+  //=========================================================================================================
   /**
    * @public
    * Checks if the EditorValue has a correct length
@@ -56,6 +63,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     return this;
   }
 
+  //=========================================================================================================
+  // Min Length
+  //=========================================================================================================
   /**
    * @public
    * Checks if the EditorValue has a correct length
@@ -83,6 +93,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     return this;
   }
 
+  //=========================================================================================================
+  // Required
+  //=========================================================================================================
   /**
    * @public
    * Checks that the EditorValue exists
@@ -101,6 +114,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     return this;
   }
 
+  //=========================================================================================================
+  // Email
+  //=========================================================================================================
   /**
    * @public
    * Checks that the EditorValue is a valid Email

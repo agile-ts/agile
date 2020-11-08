@@ -493,7 +493,7 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @public
    * Get Item by Id
-   * @param itemKey - ItemKey of Item that might get found
+   * @param itemKey - ItemKey of Item
    * @param config - Config
    */
   public getItemById(
@@ -555,7 +555,7 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @public
    * Get Value of Item by Id
-   * @param itemKey - ItemKey of ItemValue that might get found
+   * @param itemKey - ItemKey of Item that holds the Value
    */
   public getValueById(itemKey: ItemKey): DataType | undefined {
     let item = this.getItemById(itemKey);
