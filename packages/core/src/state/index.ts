@@ -6,7 +6,6 @@ import {
   flatMerge,
   isValidObject,
   StateObserver,
-  internalIngestKey,
   StatePersistent,
   Observer,
   equal,
@@ -29,7 +28,7 @@ export class State<ValueType = any> {
   public previousStateValue: ValueType;
   public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
-  public observer: StateObserver; // Handles deps and subs of State and is like an interface to the Runtime
+  public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
   public sideEffects: {
     [key: string]: (properties?: { [key: string]: any }) => void;
   } = {}; // SideEffects of State (will be executed in Runtime)
@@ -174,7 +173,7 @@ export class State<ValueType = any> {
       background: false,
       forceRerender: false,
     });
-    this.observer.ingest(internalIngestKey, config);
+    this.observer.ingest(config);
     return this;
   }
 

@@ -1,4 +1,4 @@
-import { State, Agile, Event, Collection } from "./internal";
+import { State, Agile, Event, Collection, Observer } from "./internal";
 
 //=========================================================================================================
 // Copy
@@ -78,6 +78,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
       if (instance instanceof State) return instance.agileInstance();
       if (instance instanceof Event) return instance.agileInstance();
       if (instance instanceof Collection) return instance.agileInstance();
+      if (instance instanceof Observer) return instance.agileInstance();
       const _agileInstance = instance["agileInstance"];
       if (_agileInstance) return instance;
     }
