@@ -1,6 +1,7 @@
-import { Agile, defineConfig, equal, Observer } from "@agile-ts/core";
+import { Agile, defineConfig, Observer } from "@agile-ts/core";
 import { ValidationMethodInterface, Validator } from "./validator";
-import { Item, StatusInterface, StatusType } from "./item";
+import { Item } from "./item";
+import { StatusInterface, StatusType } from "./status";
 
 export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public agileInstance: () => Agile;
@@ -8,6 +9,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public config: EditorConfigInterface<DataType, SubmitReturnType>;
   public isModified: boolean = false;
   public isValid: boolean = false;
+  public submitted: boolean = false;
 
   public _key?: EditorKey;
 
@@ -26,7 +28,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     this.agileInstance = () => agileInstance;
     if (typeof config === "function") config = config(this);
     this.config = this.config = defineConfig(config, {
-      reValidateMode: "onChange",
+      reValidateMode: "onSubmit",
     });
     this._key = config?.key;
 
@@ -62,6 +64,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       deps.push(item.observer);
+      deps.push(item.status.observer);
     }
     return deps;
   }
@@ -148,6 +151,22 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
       onSubmitConfig: undefined,
     });
 
+    // Assign Status to Items
+    if (
+      this.config.reValidateMode === "onSubmit" ||
+      (this.config.reValidateMode === "afterFirstSubmit" && !this.submitted)
+    )
+      for (let key in this.data) {
+        this.data[key].status.assignStatus();
+        this.data[key].showStatus = true;
+      }
+
+    this.submitted = true;
+
+    // Logging
+    if (this.agileInstance().config.logJobs)
+      console.log(`Agile: Submit MultiEditor ${this.key}`, this.isValid);
+
     // Check if Editor is Valid
     if (!this.isValid) return false;
 
@@ -155,10 +174,11 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     const preparedData: DataObject<DataType> = {};
     for (let key in this.data) {
       const item = this.data[key];
+      if (!item.canBeEdited) continue;
       if (item.isSet) preparedData[key] = item.value;
       if (config.assignToInitial) this.updateInitialValue(key, item.value);
     }
-    for (let key in this.config.fixedProperties) {
+    for (let key of this.config.fixedProperties) {
       const item = this.getItemById(key);
       if (!item) continue;
       preparedData[key] = item.value;
@@ -179,12 +199,13 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       item.reset();
-      item.status = null;
+      item.status.setStatus(null);
     }
 
     // Reset Editor
     this.isModified = false;
     this.validate();
+    this.submitted = false;
 
     return this;
   }
@@ -202,17 +223,21 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public setStatus(key: string, type: StatusType, message: string): this {
     const item = this.getItemById(key);
     if (!item) return this;
-
-    // Create new Status and check if its different to the current Status
-    const newStatus = {
+    item.status.setStatus({
       type: type,
       message: message,
-    };
-    if (equal(item.status, newStatus)) return this;
+    });
 
-    // Assign new Status and force Rerender
-    item.status = newStatus;
-    item.ingest({ forceRerender: true });
+    // Assign Status to Item
+    if (
+      this.config.reValidateMode === "onChange" ||
+      (this.config.reValidateMode === "afterFirstSubmit" && this.submitted)
+    )
+      item.status.assignStatus();
+
+    // Logging
+    if (this.agileInstance().config.logJobs)
+      console.log(`Agile: Set Status of Item '${key}'`);
 
     return this;
   }
@@ -228,10 +253,18 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public resetStatus(key: string): this {
     const item = this.getItemById(key);
     if (!item || !item.status) return this;
+    item.status.setStatus(null);
 
-    // Reset Status and force Rerender
-    item.status = null;
-    item.ingest({ forceRerender: true });
+    // If Status should get assigned if the status changes during the value updating
+    if (
+      this.config.reValidateMode === "onChange" ||
+      (this.config.reValidateMode === "afterFirstSubmit" && this.submitted)
+    )
+      item.status.assignStatus();
+
+    // Logging
+    if (this.agileInstance().config.logJobs)
+      console.log(`Agile: Reset Status of Item '${key}'`);
 
     return this;
   }
@@ -246,9 +279,9 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    */
   public getStatus(key: string): StatusInterface | null {
     const item = this.getItemById(key);
-    if (!item) return null;
+    if (!item || !item.showStatus) return null;
 
-    return item.status;
+    return item.status.status;
   }
 
   //=========================================================================================================
@@ -261,7 +294,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    */
   public getItemById(key: string): Item<DataType> | undefined {
     if (!this.data.hasOwnProperty(key)) {
-      console.error(`Agile: ${key} does not exists!`);
+      console.error(`Agile: Editor Item '${key}' does not exists!`);
       return undefined;
     }
     return this.data[key];
@@ -298,6 +331,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
         return new Validator(this, key).addValidationMethod(validation);
       }
     }
+
     return new Validator<DataType>(this, key);
   }
 
@@ -311,12 +345,24 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    */
   public areModified(keys: string[]): boolean {
     let _isModified = false;
-    for (let key in keys) {
+    for (let key of keys) {
       const item = this.getItemById(key);
       if (!item) continue;
       _isModified = _isModified || item?.isSet;
     }
     return _isModified;
+  }
+
+  //=========================================================================================================
+  // Update Is Modified
+  //=========================================================================================================
+  /**
+   * @internal
+   * Updates the is Modified property
+   */
+  public updateIsModified(): this {
+    this.isModified = this.areModified(this.config.editableProperties);
+    return this;
   }
 
   //=========================================================================================================
@@ -326,7 +372,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @private
    * Validates Editor and updates this.isValid
    */
-  public async validate(): Promise<boolean> {
+  public validate(): boolean {
     let isValid = true;
 
     // Check if Items are Valid
@@ -391,4 +437,4 @@ export interface SubmitConfigInterface {
   onSubmitConfig?: any;
 }
 
-export type RevalidateType = "onChange" | "onSubmit";
+export type RevalidateType = "onChange" | "onSubmit" | "afterFirstSubmit";

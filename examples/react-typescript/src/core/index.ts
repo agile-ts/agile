@@ -64,14 +64,15 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
       name: undefined,
     },
     onSubmit: async (data) => {
-      console.log("Submitted ", data);
+      console.log("Submitted MultiEditor", data);
       return Promise.resolve(true);
     },
     fixedProperties: ["id"],
     validateMethods: {
-      email: editor.Validator().email(),
-      name: editor.Validator().maxLength(10).minLength(2),
+      email: editor.Validator().email().required(),
+      name: editor.Validator().maxLength(10).minLength(2).required(),
     },
     editableProperties: ["email", "name"],
+    reValidateMode: "afterFirstSubmit",
   })
 );

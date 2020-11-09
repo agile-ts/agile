@@ -37,6 +37,8 @@ const App = (props: any) => {
     console.log("MY_STATE changes");
   });
 
+  useAgile(multiEditor.dependencies);
+
   useEffect(() => {
     // Create global Instance of Core
     globalBind("__core__", { ...require("./core") });
@@ -150,7 +152,7 @@ const App = (props: any) => {
         </button>
       </header>
 
-      <form onSubmit={() => multiEditor.submit()}>
+      <form>
         <label>Name</label>
         <input
           name={"name"}
@@ -173,9 +175,15 @@ const App = (props: any) => {
           </p>
         )}
 
-        <button>Submit</button>
         <p>{rerenderCount}</p>
       </form>
+      <button
+        onClick={() => {
+          multiEditor.submit();
+        }}
+      >
+        Submit
+      </button>
     </div>
   );
 };

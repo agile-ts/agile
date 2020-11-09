@@ -1,15 +1,22 @@
 import { defineConfig, State } from "@agile-ts/core";
 import MultiEditor from "./index";
 import { Validator } from "./validator";
+import { Status } from "./status";
 
 export class Item<DataType = any> extends State<DataType> {
   public editor: () => MultiEditor<DataType>;
-  public status: StatusInterface | null = null;
+
   public isValid: boolean = false;
   public validator: Validator<DataType>;
-  public isPrepared: boolean = false;
   public canBeEdited: boolean = false;
 
+  public status: Status;
+  public showStatus: boolean = false;
+
+  /**
+   * @public
+   * Item of an Editor
+   */
   constructor(
     editor: MultiEditor<DataType>,
     data: DataType,
@@ -23,29 +30,21 @@ export class Item<DataType = any> extends State<DataType> {
     this.editor = () => editor;
     this.validator = editor.getValidator(key);
     this.canBeEdited = config.canBeEdited || false;
+    this.status = new Status(this);
 
-    // Call ValidateMethods of Validator for first time
+    // Call ValidateMethods of Item for the first time
     this.validator
       .validate(key, this.value)
       .then((isValid) => (this.isValid = isValid));
 
-    // Add SideEffect that builds the Status depending on the validationMethod
-    this.addSideEffect("buildStatus", async () => {
+    // Add SideEffect that builds the Status depending on the Validator
+    this.addSideEffect("validateItem", async () => {
       this.isValid = await this.validator.validate(key, this.value);
-      await this.editor().validate();
+      this.showStatus = true;
+      this.editor().validate();
+      this.editor().updateIsModified();
     });
   }
-}
-
-export type StatusType = "error" | "success";
-
-/**
- * @param type - Type of the Status
- * @param message - Message of the Status
- */
-export interface StatusInterface {
-  type: StatusType;
-  message: string;
 }
 
 export interface ItemConfigInterface {

@@ -4,7 +4,7 @@ import { generateId, isFunction } from "@agile-ts/core";
 export class Validator<DataType = any, SubmitReturnType = void> {
   public _key?: ValidatorKey;
   public validationMethods: DataObject<ValidationMethodInterface> = {};
-  public editor: MultiEditor<DataType, SubmitReturnType>;
+  public editor: () => MultiEditor<DataType, SubmitReturnType>;
 
   /**
    * @public
@@ -16,7 +16,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     editor: MultiEditor<DataType, SubmitReturnType>,
     key?: ValidatorKey
   ) {
-    this.editor = editor;
+    this.editor = () => editor;
     this._key = key;
   }
 
@@ -47,12 +47,21 @@ export class Validator<DataType = any, SubmitReturnType = void> {
    */
   public async validate(key: string, value: DataType): Promise<boolean> {
     let isValid = true;
+    const item = this.editor().getItemById(key);
+    if (!item) return false;
+
+    // Track created Statuses during the validation time
+    item.status.trackStatus = true;
 
     // Call validationMethods
     for (let validationMethodKey in this.validationMethods)
       isValid =
         (await this.validationMethods[validationMethodKey](key, value)) &&
         isValid;
+
+    // Get Tracked Statuses and reset if no Status got set during the validation Time
+    const foundStatuses = item.status.getTrackedStatuses();
+    if (foundStatuses.size <= 0) this.editor().resetStatus(key);
 
     return isValid;
   }
@@ -70,6 +79,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
    * @public
    * Adds Validation Method to Validator
    * @param key - Key of Validation Method
+   * @param method - Validation Method
    */
   public addValidationMethod(
     key: string,
@@ -121,15 +131,17 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     this.addValidationMethod(
       "maxLength",
       async (key: string, value: DataType) => {
+        if (!value) return false;
         if (Array.isArray(value) || typeof value === "string") {
           const isValid = value.length <= length;
           if (!isValid) {
-            this.editor.setStatus(
+            this.editor().setStatus(
               key,
               "error",
               `${key} needs max ${length} length`
             );
           }
+
           return isValid;
         }
 
@@ -154,15 +166,17 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     this.addValidationMethod(
       "minLength",
       async (key: string, value: DataType) => {
+        if (!value) return false;
         if (Array.isArray(value) || typeof value === "string") {
           const isValid = value.length >= length;
           if (!isValid) {
-            this.editor.setStatus(
+            this.editor().setStatus(
               key,
               "error",
               `${key} needs min ${length} length`
             );
           }
+
           return isValid;
         }
 
@@ -188,8 +202,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
       async (key: string, value: DataType) => {
         const isValid = !!value;
         if (!isValid) {
-          this.editor.setStatus(key, "error", `${key} has to exist`);
+          this.editor().setStatus(key, "error", `${key} has to exist`);
         }
+
         return isValid;
       }
     );
@@ -209,8 +224,9 @@ export class Validator<DataType = any, SubmitReturnType = void> {
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const isValid = emailRegex.test(value.toLowerCase());
         if (!isValid) {
-          this.editor.setStatus(key, "error", `${key} is no valid Email`);
+          this.editor().setStatus(key, "error", `${key} is not valid Email`);
         }
+
         return isValid;
       }
       return false;

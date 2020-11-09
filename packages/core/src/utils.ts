@@ -230,7 +230,7 @@ export function equal(value1: any, value2: any): boolean {
  * @param value2 - Second Value
  */
 export function notEqual(value1: any, value2: any): boolean {
-  return value1 !== value2 && JSON.stringify(value1) !== JSON.stringify(value2);
+  return !equal(value1, value2);
 }
 
 //=========================================================================================================

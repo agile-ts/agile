@@ -1,3 +1,4 @@
+/*
 import { Agile } from "@agile-ts/core";
 import MultiEditor from "../src";
 
@@ -20,3 +21,5 @@ const multiEditor = new MultiEditor<string, boolean>(App, (editor) => ({
   },
   editableProperties: ["email", "name"],
 }));
+
+ */
