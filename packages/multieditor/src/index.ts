@@ -1,11 +1,6 @@
 import { Agile, defineConfig, equal, Observer } from "@agile-ts/core";
-import { Validator } from "./validator";
-import {
-  Item,
-  StatusInterface,
-  StatusType,
-  ValidationMethodInterface,
-} from "./item";
+import { ValidationMethodInterface, Validator } from "./validator";
+import { Item, StatusInterface, StatusType } from "./item";
 
 export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public agileInstance: () => Agile;
@@ -44,7 +39,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
 
   /**
    * @public
-   * Set Key/Name of State
+   * Set Key/Name of Editor
    */
   public set key(value: EditorKey | undefined) {
     this._key = value;
@@ -52,7 +47,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
 
   /**
    * @public
-   * Get Key/Name of State
+   * Get Key/Name of Editor
    */
   public get key(): EditorKey | undefined {
     return this._key;
@@ -289,18 +284,21 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Get ValidationMethod of Item
+   * Get Validator of Item
    * @param key - Key/Name of Item
    */
-  public getValidationMethod(key: string): ValidationMethodInterface {
-    // Prepare Validation Method
+  public getValidator(key: string): Validator<DataType> {
+    // Prepare Validator
     if (this.config.validateMethods.hasOwnProperty(key)) {
       const validation = this.config.validateMethods[key];
-      return validation instanceof Validator ? validation.validate : validation;
+      if (validation instanceof Validator) {
+        if (!validation.key) validation.key = key;
+        return validation;
+      } else {
+        return new Validator(this, key).addValidationMethod(validation);
+      }
     }
-
-    // Return Validation Method that does always return valid, if no validationMethod is given
-    return (): Promise<boolean> => Promise.resolve(true);
+    return new Validator<DataType>(this, key);
   }
 
   //=========================================================================================================
