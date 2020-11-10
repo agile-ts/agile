@@ -1,7 +1,7 @@
 import { Item } from "../item";
 import MultiEditor from "../index";
 import { StatusObserver } from "./status.observer";
-import { Agile } from "@agile-ts/core";
+import { Agile, copy } from "@agile-ts/core";
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
@@ -10,52 +10,61 @@ export class Status<DataType = any> {
   public editor: () => MultiEditor<DataType>;
   public observer: StatusObserver; // Handles deps and subs of Status and is like an interface to the Runtime
 
-  public showStatus: boolean = false;
-  public status: StatusInterface | null;
-  public nextStatus: StatusInterface | null;
+  public display: boolean = false;
+  public _value: StatusInterface | null;
+  public nextValue: StatusInterface | null;
+  public activeValues: Set<StatusInterface> = new Set();
 
-  public trackStatus: boolean = false;
-  public foundStatuses: Set<StatusInterface> = new Set();
+  // Tracking
+  public track: boolean = false;
+  public foundValues: Set<StatusInterface> = new Set();
 
   /**
    * @public
-   * Status of Item
-   * @param item - Item to which this Status belongs
+   * Status - Represents the Status of an Item
+   * @param item - Item to which the Status belongs
    */
   constructor(item: Item<DataType>) {
     this.item = item;
     this.editor = () => item.editor();
     this.agileInstance = () => item.agileInstance();
-    this.status = null;
-    this.nextStatus = null;
+    this._value = null;
+    this.nextValue = null;
     this.observer = new StatusObserver(this.agileInstance(), this);
   }
 
+  /**
+   * @public
+   * Get current Value of Status
+   * Note: Returns null if Status shouldn't get displayed
+   */
+  public get value(): StatusInterface | null {
+    return this.display ? this._value : null;
+  }
+
   //=========================================================================================================
-  // Set Status
+  // Set
   //=========================================================================================================
   /**
    * @public
-   * Set Status to Item
-   * @param status - new Status
+   * Set next Status Value that gets applied if the Status gets assigned
+   * @param value - next Status Value
    */
-  public setStatus(status: StatusInterface | null): this {
-    this.nextStatus = status;
-    if (this.trackStatus && status) {
-      this.foundStatuses.add(status);
-    }
+  public set(value: StatusInterface | null): this {
+    this.nextValue = copy(value);
+    if (this.track && value) this.foundValues.add(value);
     return this;
   }
 
   //=========================================================================================================
-  // Assign Status
+  // Assign
   //=========================================================================================================
   /**
    * @public
-   * Assign Status to Item that got set at last
+   * Assign next Status Value
    */
-  public assignStatus() {
-    this.observer.ingest();
+  public assign() {
+    this.observer.assign();
   }
 
   //=========================================================================================================
@@ -63,14 +72,14 @@ export class Status<DataType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Returns tracked Statuses and stops Status from tracking anymore Statuses
+   * Returns tracked Values and stops Status from tracking anymore Values
    */
-  public getTrackedStatuses(): Set<StatusInterface> {
-    const finalFoundStatuses = this.foundStatuses;
+  public getTrackedValues(): Set<StatusInterface> {
+    const finalFoundStatuses = this.foundValues;
 
     // Reset tracking
-    this.trackStatus = false;
-    this.foundStatuses = new Set();
+    this.track = false;
+    this.foundValues = new Set();
 
     return finalFoundStatuses;
   }
@@ -79,8 +88,8 @@ export class Status<DataType = any> {
 export type StatusType = "error" | "success";
 
 /**
- * @param type - Type of the Status
- * @param message - Message of the Status
+ * @param type - Type of Status
+ * @param message - Message of Status
  */
 export interface StatusInterface {
   type: StatusType;

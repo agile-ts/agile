@@ -12,11 +12,11 @@ import {
 
 export class StatusObserver extends Observer {
   public status: () => Status;
-  public nextStatus: StatusInterface | null;
+  public nextValue: StatusInterface | null;
 
   /**
    * @internal
-   * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
+   * Status Observer - Handles Status changes, dependencies (-> Interface to Runtime)
    * @param agileInstance - An instance of Agile
    * @param status - Status
    * @param deps - Initial Dependencies of State Observer
@@ -28,9 +28,9 @@ export class StatusObserver extends Observer {
     deps?: Array<Observer>,
     key?: ObserverKey
   ) {
-    super(agileInstance, deps, key, status.status);
+    super(agileInstance, deps, key, status._value);
     this.status = () => status;
-    this.nextStatus = status.status;
+    this.nextValue = copy(status._value);
   }
 
   //=========================================================================================================
@@ -38,11 +38,10 @@ export class StatusObserver extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests new State Value into Runtime and applies it to the State
+   * Assigns nextValue to _value
    * @param config - Config
    */
-  public ingest(config: StatusJobConfig = {}): void {
-    const status = this.status();
+  public assign(config: StatusJobConfig = {}): void {
     config = defineConfig(config, {
       perform: true,
       background: false,
@@ -55,10 +54,11 @@ export class StatusObserver extends Observer {
     if (config.forceRerender && config.background) config.background = false;
 
     // Set Next Status
-    this.nextStatus = status.nextStatus;
+    this.nextValue = copy(this.status().nextValue);
 
     // Check if Statuses stayed the same
-    if (equal(status.status, this.nextStatus) && !config.forceRerender) return;
+    if (equal(this.status()._value, this.nextValue) && !config.forceRerender)
+      return;
 
     this.agileInstance().runtime.ingest(this, config);
   }
@@ -72,14 +72,14 @@ export class StatusObserver extends Observer {
    * @param job - Job that gets performed
    */
   public perform(job: Job<this>) {
-    const state = job.observer.status();
+    const status = job.observer.status();
 
     // Set new State Value
-    state.status = copy(this.nextStatus);
-    state.nextStatus = copy(this.nextStatus);
+    status._value = copy(this.nextValue);
+    status.nextValue = copy(this.nextValue);
 
     // Update Observer value
-    this.value = copy(this.nextStatus);
+    this.value = copy(this.nextValue);
   }
 }
 

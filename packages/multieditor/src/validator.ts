@@ -53,19 +53,21 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     const item = this.editor().getItemById(key);
     if (!item) return false;
 
-    // Track created Statuses during the validation time
-    item._status.trackStatus = true;
+    // Track created Statuses during the Validation Time
+    item.status.track = true;
 
-    // Call validationMethods
+    // Call validationMethods (Validation Time)
     for (let validationMethodKey in this.validationMethods)
       isValid =
         (await this.validationMethods[validationMethodKey](key, value)) &&
         isValid;
 
-    // Get Tracked Statuses and reset if no Status got set during the validation Time
-    const foundStatuses = item._status.getTrackedStatuses();
+    // Handle tracked Statuses
+    const foundStatuses = item.status.getTrackedValues();
+    item.status.activeValues = new Set(foundStatuses);
     if (foundStatuses.size <= 0) this.editor().resetStatus(key);
 
+    // Logging
     if (this.agileInstance()) {
       console.log(
         `Agile: Validated Key '${key}' in Editor '${this.editor().key}'`,

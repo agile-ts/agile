@@ -68,7 +68,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       deps.push(item.observer);
-      deps.push(item._status.observer);
+      deps.push(item.status.observer);
     }
     return deps;
   }
@@ -160,8 +160,8 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
-        item._status.assignStatus();
-        item.showStatus = true;
+        item.status.assign();
+        item.status.display = true;
       }
     }
 
@@ -205,7 +205,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       item.reset();
-      item._status.setStatus(null);
+      item.status.set(null);
     }
 
     // Reset Editor
@@ -221,7 +221,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Assign new Status to an Item
+   * Assigns new Status to an Item
    * @param key - Key/Name of Item
    * @param type - Status Type
    * @param message - Status Message
@@ -229,17 +229,13 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public setStatus(key: ItemKey, type: StatusType, message: string): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    item._status.setStatus({
+    item.status.set({
       type: type,
       message: message,
     });
 
     // Assign Status to Item
-    if (this.canAssignStatusToItemOnChange(item)) item._status.assignStatus();
-
-    // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Set Status of Item '${key}'`);
+    if (this.canAssignStatusToItemOnChange(item)) item.status.assign();
 
     return this;
   }
@@ -255,14 +251,10 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public resetStatus(key: ItemKey): this {
     const item = this.getItemById(key);
     if (!item || !item.status) return this;
-    item._status.setStatus(null);
+    item.status.set(null);
 
     // Assign Status to Item
-    if (this.canAssignStatusToItemOnChange(item)) item._status.assignStatus();
-
-    // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Reset Status of Item '${key}'`);
+    if (this.canAssignStatusToItemOnChange(item)) item.status.assign();
 
     return this;
   }
@@ -278,7 +270,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
   public getStatus(key: ItemKey): StatusInterface | null {
     const item = this.getItemById(key);
     if (!item) return null;
-    return item.status;
+    return item.status.value;
   }
 
   //=========================================================================================================

@@ -10,8 +10,7 @@ export class Item<DataType = any> extends State<DataType> {
   public validator: Validator<DataType>;
   public canBeEdited: boolean = false;
 
-  public _status: Status;
-  public showStatus: boolean = false;
+  public status: Status;
 
   /**
    * @public
@@ -30,23 +29,15 @@ export class Item<DataType = any> extends State<DataType> {
     this.editor = () => editor;
     this.validator = editor.getValidator(key);
     this.canBeEdited = config.canBeEdited || false;
-    this._status = new Status(this);
+    this.status = new Status(this);
 
     // Add SideEffect that builds the Status depending on the Validator
     this.addSideEffect("validateItem", async () => {
       this.isValid = await this.validator.validate(key, this.value);
-      this.showStatus = true;
+      this.status.display = true;
       this.editor().validate();
       this.editor().updateIsModified();
     });
-  }
-
-  /**
-   * @public
-   * Get Status of Item
-   */
-  public get status(): StatusInterface | null {
-    return (this.showStatus && this._status.status) || null;
   }
 
   //=========================================================================================================

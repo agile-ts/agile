@@ -33,7 +33,7 @@ export class StateObserver<ValueType = any> extends Observer {
   ) {
     super(agileInstance, deps, key, state.value);
     this.state = () => state;
-    this.nextStateValue = state.value;
+    this.nextStateValue = copy(state.value);
   }
 
   //=========================================================================================================
