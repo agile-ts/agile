@@ -45,10 +45,15 @@ export class Item<DataType = any> extends State<DataType> {
   // Validate
   //=========================================================================================================
   /**
-   * Validates Item
+   * Validates Item and set is Valid
    */
   public async validate(): Promise<boolean> {
-    return this.validator.validate(this.key || "unknown", this.value);
+    const isValid = await this.validator.validate(
+      this.key || "unknown",
+      this.value
+    );
+    this.isValid = isValid;
+    return isValid;
   }
 }
 
