@@ -33,10 +33,13 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
     this._key = config?.key;
 
     // Add Items to Data Object
-    for (let key in config.data)
-      this.data[key] = new Item(this, config.data[key], key, {
+    for (let key in config.data) {
+      const item = new Item(this, config.data[key], key, {
         canBeEdited: config.editableProperties.includes(key),
       });
+      this.data[key] = item;
+      item.validate();
+    }
   }
 
   /**
@@ -91,7 +94,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @param config - Config
    */
   public setValue(
-    key: string,
+    key: ItemKey,
     value: DataType,
     config: SetValueConfigInterface = {}
   ): this {
@@ -118,7 +121,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @param config - Config
    */
   public updateInitialValue(
-    key: string,
+    key: ItemKey,
     value: DataType,
     config: SetValueConfigInterface = {}
   ): this {
@@ -220,7 +223,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @param type - Status Type
    * @param message - Status Message
    */
-  public setStatus(key: string, type: StatusType, message: string): this {
+  public setStatus(key: ItemKey, type: StatusType, message: string): this {
     const item = this.getItemById(key);
     if (!item) return this;
     item.status.setStatus({
@@ -250,7 +253,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * Reset Status of Item
    * @param key - Key/Name of Item
    */
-  public resetStatus(key: string): this {
+  public resetStatus(key: ItemKey): this {
     const item = this.getItemById(key);
     if (!item || !item.status) return this;
     item.status.setStatus(null);
@@ -277,7 +280,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * Get Status of Item
    * @param key - Key/Name of Item
    */
-  public getStatus(key: string): StatusInterface | null {
+  public getStatus(key: ItemKey): StatusInterface | null {
     const item = this.getItemById(key);
     if (!item || !item.showStatus) return null;
 
@@ -292,7 +295,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * Get Item by Id
    * @param key - Key/Name of Item
    */
-  public getItemById(key: string): Item<DataType> | undefined {
+  public getItemById(key: ItemKey): Item<DataType> | undefined {
     if (!this.data.hasOwnProperty(key)) {
       console.error(`Agile: Editor Item '${key}' does not exists!`);
       return undefined;
@@ -320,7 +323,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * Get Validator of Item
    * @param key - Key/Name of Item
    */
-  public getValidator(key: string): Validator<DataType> {
+  public getValidator(key: ItemKey): Validator<DataType> {
     // Prepare Validator
     if (this.config.validateMethods.hasOwnProperty(key)) {
       const validation = this.config.validateMethods[key];
@@ -343,7 +346,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
    * Check if Items at Keys are modified
    * @param keys - Keys/Names of Items
    */
-  public areModified(keys: string[]): boolean {
+  public areModified(keys: ItemKey[]): boolean {
     let _isModified = false;
     for (let key of keys) {
       const item = this.getItemById(key);
@@ -388,6 +391,7 @@ export default class MultiEditor<DataType = any, SubmitReturnType = void> {
 
 export type DataObject<T = any> = { [key: string]: T };
 export type EditorKey = string | number;
+export type ItemKey = string | number;
 
 /**
  * @param data - Data the Editor handles

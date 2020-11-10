@@ -1,7 +1,9 @@
-import MultiEditor, { DataObject } from "./index";
-import { generateId, isFunction } from "@agile-ts/core";
+import MultiEditor, { DataObject, ItemKey } from "./index";
+import { Agile, generateId, isFunction } from "@agile-ts/core";
 
 export class Validator<DataType = any, SubmitReturnType = void> {
+  public agileInstance: () => Agile;
+
   public _key?: ValidatorKey;
   public validationMethods: DataObject<ValidationMethodInterface> = {};
   public editor: () => MultiEditor<DataType, SubmitReturnType>;
@@ -17,6 +19,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     key?: ValidatorKey
   ) {
     this.editor = () => editor;
+    this.agileInstance = () => editor.agileInstance();
     this._key = key;
   }
 
@@ -45,7 +48,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
    * @param key - Key of Item
    * @param value - Value that gets validated
    */
-  public async validate(key: string, value: DataType): Promise<boolean> {
+  public async validate(key: ItemKey, value: DataType): Promise<boolean> {
     let isValid = true;
     const item = this.editor().getItemById(key);
     if (!item) return false;
@@ -62,6 +65,13 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     // Get Tracked Statuses and reset if no Status got set during the validation Time
     const foundStatuses = item.status.getTrackedStatuses();
     if (foundStatuses.size <= 0) this.editor().resetStatus(key);
+
+    if (this.agileInstance()) {
+      console.log(
+        `Agile: Validated Key '${key}' in Editor '${this.editor().key}'`,
+        isValid
+      );
+    }
 
     return isValid;
   }
@@ -82,16 +92,16 @@ export class Validator<DataType = any, SubmitReturnType = void> {
    * @param method - Validation Method
    */
   public addValidationMethod(
-    key: string,
+    key: ItemKey,
     method: ValidationMethodInterface<DataType>
   ): this;
   public addValidationMethod(
-    keyOrMethod: string | ValidationMethodInterface<DataType>,
+    keyOrMethod: ItemKey | ValidationMethodInterface<DataType>,
     method?: ValidationMethodInterface<DataType>
-  ): this | string {
+  ): this {
     const generateKey = isFunction(keyOrMethod);
     let _method: ValidationMethodInterface<DataType>;
-    let key: string;
+    let key: ItemKey;
 
     if (generateKey) {
       key = generateId();
@@ -130,7 +140,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
   public maxLength(length: number): this {
     this.addValidationMethod(
       "maxLength",
-      async (key: string, value: DataType) => {
+      async (key: ItemKey, value: DataType) => {
         if (!value) return false;
         if (Array.isArray(value) || typeof value === "string") {
           const isValid = value.length <= length;
@@ -165,7 +175,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
   public minLength(length: number): this {
     this.addValidationMethod(
       "minLength",
-      async (key: string, value: DataType) => {
+      async (key: ItemKey, value: DataType) => {
         if (!value) return false;
         if (Array.isArray(value) || typeof value === "string") {
           const isValid = value.length >= length;
@@ -199,7 +209,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
   public required(): this {
     this.addValidationMethod(
       "required",
-      async (key: string, value: DataType) => {
+      async (key: ItemKey, value: DataType) => {
         const isValid = !!value;
         if (!isValid) {
           this.editor().setStatus(key, "error", `${key} has to exist`);
@@ -219,7 +229,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
    * Checks that the EditorValue is a valid Email
    */
   public email(): this {
-    this.addValidationMethod("email", async (key: string, value: DataType) => {
+    this.addValidationMethod("email", async (key: ItemKey, value: DataType) => {
       if (typeof value === "string") {
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const isValid = emailRegex.test(value.toLowerCase());
@@ -237,6 +247,6 @@ export class Validator<DataType = any, SubmitReturnType = void> {
 
 export type ValidatorKey = string | number;
 export type ValidationMethodInterface<DataType = any> = (
-  key: string,
+  key: ItemKey,
   value: DataType
 ) => Promise<boolean>;

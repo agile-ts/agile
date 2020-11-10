@@ -31,6 +31,14 @@ export class Status<DataType = any> {
     this.observer = new StatusObserver(this.agileInstance(), this);
   }
 
+  //=========================================================================================================
+  // Set Status
+  //=========================================================================================================
+  /**
+   * @public
+   * Set Status to Item
+   * @param status - new Status
+   */
   public setStatus(status: StatusInterface | null): this {
     this.nextStatus = status;
     if (this.trackStatus && status) {
@@ -39,6 +47,13 @@ export class Status<DataType = any> {
     return this;
   }
 
+  //=========================================================================================================
+  // Assign Status
+  //=========================================================================================================
+  /**
+   * @public
+   * Assign Status to Item that got set at last
+   */
   public assignStatus() {
     this.observer.ingest();
   }

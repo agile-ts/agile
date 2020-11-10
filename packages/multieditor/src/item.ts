@@ -32,11 +32,6 @@ export class Item<DataType = any> extends State<DataType> {
     this.canBeEdited = config.canBeEdited || false;
     this.status = new Status(this);
 
-    // Call ValidateMethods of Item for the first time
-    this.validator
-      .validate(key, this.value)
-      .then((isValid) => (this.isValid = isValid));
-
     // Add SideEffect that builds the Status depending on the Validator
     this.addSideEffect("validateItem", async () => {
       this.isValid = await this.validator.validate(key, this.value);
@@ -44,6 +39,16 @@ export class Item<DataType = any> extends State<DataType> {
       this.editor().validate();
       this.editor().updateIsModified();
     });
+  }
+
+  //=========================================================================================================
+  // Validate
+  //=========================================================================================================
+  /**
+   * Validates Item
+   */
+  public async validate(): Promise<boolean> {
+    return this.validator.validate(this.key || "unknown", this.value);
   }
 }
 
