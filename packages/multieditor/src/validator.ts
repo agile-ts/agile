@@ -54,7 +54,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
     if (!item) return false;
 
     // Track created Statuses during the validation time
-    item.status.trackStatus = true;
+    item._status.trackStatus = true;
 
     // Call validationMethods
     for (let validationMethodKey in this.validationMethods)
@@ -63,7 +63,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
         isValid;
 
     // Get Tracked Statuses and reset if no Status got set during the validation Time
-    const foundStatuses = item.status.getTrackedStatuses();
+    const foundStatuses = item._status.getTrackedStatuses();
     if (foundStatuses.size <= 0) this.editor().resetStatus(key);
 
     if (this.agileInstance()) {

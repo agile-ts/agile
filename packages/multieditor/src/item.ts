@@ -1,7 +1,7 @@
 import { defineConfig, State } from "@agile-ts/core";
 import MultiEditor from "./index";
 import { Validator } from "./validator";
-import { Status } from "./status";
+import { Status, StatusInterface } from "./status";
 
 export class Item<DataType = any> extends State<DataType> {
   public editor: () => MultiEditor<DataType>;
@@ -10,7 +10,7 @@ export class Item<DataType = any> extends State<DataType> {
   public validator: Validator<DataType>;
   public canBeEdited: boolean = false;
 
-  public status: Status;
+  public _status: Status;
   public showStatus: boolean = false;
 
   /**
@@ -30,7 +30,7 @@ export class Item<DataType = any> extends State<DataType> {
     this.editor = () => editor;
     this.validator = editor.getValidator(key);
     this.canBeEdited = config.canBeEdited || false;
-    this.status = new Status(this);
+    this._status = new Status(this);
 
     // Add SideEffect that builds the Status depending on the Validator
     this.addSideEffect("validateItem", async () => {
@@ -41,11 +41,20 @@ export class Item<DataType = any> extends State<DataType> {
     });
   }
 
+  /**
+   * @public
+   * Get Status of Item
+   */
+  public get status(): StatusInterface | null {
+    return (this.showStatus && this._status.status) || null;
+  }
+
   //=========================================================================================================
   // Validate
   //=========================================================================================================
   /**
-   * Validates Item and set is Valid
+   * @public
+   * Validates Item and sets its isValid property
    */
   public async validate(): Promise<boolean> {
     const isValid = await this.validator.validate(
@@ -57,7 +66,9 @@ export class Item<DataType = any> extends State<DataType> {
   }
 }
 
+/**
+ * @param canBeEdited - If Item can be Edited
+ */
 export interface ItemConfigInterface {
-  key?: boolean;
   canBeEdited?: boolean;
 }

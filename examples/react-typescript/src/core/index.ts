@@ -72,7 +72,8 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
       email: editor.Validator().email().required(),
       name: editor.Validator().maxLength(10).minLength(2).required(),
     },
-    editableProperties: ["email", "name"],
-    reValidateMode: "afterFirstSubmit",
+    editableProperties: ["email"],
+    reValidateMode: "onChange",
+    validate: "editable",
   })
 );
