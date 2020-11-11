@@ -47,7 +47,7 @@ export class Item<DataType = any> extends State<DataType> {
   //=========================================================================================================
   /**
    * @public
-   * Validates Item and updates the isValid property
+   * Validates Item and updates its 'isValid' property
    */
   public async validate(): Promise<boolean> {
     const isValid = this.key
@@ -59,7 +59,7 @@ export class Item<DataType = any> extends State<DataType> {
 }
 
 /**
- * @param canBeEdited - If Item gets passed into the preparedData on Submit (if it got edited)
+ * @param canBeEdited - If Item Value gets passed into the preparedData on Submit (if it got edited)
  */
 export interface ItemConfigInterface {
   canBeEdited?: boolean;

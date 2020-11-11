@@ -398,7 +398,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @private
-   * Validates Editor and updates the isValid property
+   * Validates Editor and updates its 'isValid' property
    */
   public validate(): boolean {
     let isValid = true;

@@ -1,5 +1,6 @@
 import { Agile, defineConfig, generateId, isFunction } from "@agile-ts/core";
 import { DataObject, MultiEditor, ItemKey, StringValidator } from "../internal";
+import { NumberValidator } from "./types/number.validator";
 
 export class Validator<DataType = any> {
   public agileInstance: () => Agile;
@@ -11,7 +12,7 @@ export class Validator<DataType = any> {
 
   /**
    * @public
-   * Validator - Easy way to tell a Editor Value which conditions it has to follow to be valid
+   * Validator - Easy way to validate Editor Values
    * @param editor - Editor to that the Validator belongs
    * @param config - Config
    */
@@ -147,11 +148,22 @@ export class Validator<DataType = any> {
   }
 
   //=========================================================================================================
+  // Number
+  //=========================================================================================================
+  /**
+   * @public
+   * Get Number Validator
+   */
+  public number(): NumberValidator<DataType> {
+    return new NumberValidator<DataType>(this);
+  }
+
+  //=========================================================================================================
   // Required
   //=========================================================================================================
   /**
    * @public
-   * Checks that the EditorValue exists
+   * Checks if the Editor Value exists
    * @param errorMessage - Error Message
    */
   public required(errorMessage?: string): this {

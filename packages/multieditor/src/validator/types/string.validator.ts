@@ -1,4 +1,4 @@
-import { ItemKey, Validator } from "../../internal";
+import { Validator } from "../../internal";
 import { copy } from "@agile-ts/core";
 
 export class StringValidator<DataType = any> extends Validator<DataType> {
@@ -21,32 +21,24 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
   //=========================================================================================================
   /**
    * @public
-   * Checks if the EditorValue has a correct length
-   * @param length - maxLength
+   * Checks if Editor Value is to long
+   * @param length - max Length
    * @param errorMessage - Error Message
    */
   public max(length: number, errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("maxLength"),
-      async (key: ItemKey, value: DataType) => {
-        if (!value) return false;
-        if (Array.isArray(value) || typeof value === "string") {
-          const isValid = value.length <= length;
-          if (!isValid) {
-            this.editor().setStatus(
-              key,
-              "error",
-              errorMessage || `${key} has more than ${length} characters`
-            );
-          }
-
-          return isValid;
+      async (key, value) => {
+        if (!value || typeof value !== "string") return false;
+        const isValid = value.length <= length;
+        if (!isValid) {
+          this.editor().setStatus(
+            key,
+            "error",
+            errorMessage || `${key} has more than ${length} characters`
+          );
         }
-
-        console.warn(
-          "Agile: Using maxLength on a none Array/String Input won't work"
-        );
-        return true;
+        return isValid;
       }
     );
     return this;
@@ -57,32 +49,24 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
   //=========================================================================================================
   /**
    * @public
-   * Checks if the EditorValue has a correct length
-   * @param length - minLength
+   * Checks if Editor Value is to short
+   * @param length - min Length
    * @param errorMessage - Error Message
    */
   public min(length: number, errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("minLength"),
-      async (key: ItemKey, value: DataType) => {
-        if (!value) return false;
-        if (Array.isArray(value) || typeof value === "string") {
-          const isValid = value.length >= length;
-          if (!isValid) {
-            this.editor().setStatus(
-              key,
-              "error",
-              errorMessage || `${key} needs at least ${length} characters`
-            );
-          }
-
-          return isValid;
+      async (key, value) => {
+        if (!value || typeof value !== "string") return false;
+        const isValid = value.length >= length;
+        if (!isValid) {
+          this.editor().setStatus(
+            key,
+            "error",
+            errorMessage || `${key} needs at least ${length} characters`
+          );
         }
-
-        console.warn(
-          "Agile: Using minLength on a none Array/String Input won't work"
-        );
-        return true;
+        return isValid;
       }
     );
     return this;
@@ -93,29 +77,79 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
   //=========================================================================================================
   /**
    * @public
-   * Checks that the EditorValue is a valid Email
+   * Checks that the Editor Value is a valid Email
    * @param errorMessage - Error Message
    */
   public email(errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("email"),
-      async (key: ItemKey, value: DataType) => {
-        if (typeof value === "string") {
-          const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          const isValid = emailRegex.test(value.toLowerCase());
-          if (!isValid) {
-            this.editor().setStatus(
-              key,
-              "error",
-              errorMessage || `${key} is no valid email`
-            );
-          }
-
-          return isValid;
+      async (key, value) => {
+        if (!value || typeof value !== "string") return false;
+        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const isValid = emailRegex.test(value.toLowerCase());
+        if (!isValid) {
+          this.editor().setStatus(
+            key,
+            "error",
+            errorMessage || `${key} is no valid email`
+          );
         }
-        return false;
+        return isValid;
       }
     );
+    return this;
+  }
+
+  //=========================================================================================================
+  // Url
+  //=========================================================================================================
+  /**
+   * @public
+   * Checks that the Editor Value is a valid Url
+   * @param errorMessage - Error Message
+   */
+  public url(errorMessage?: string): this {
+    this.addValidationMethod(
+      this.getValidationMethodKey("email"),
+      async (key, value) => {
+        if (!value || typeof value !== "string") return false;
+        const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+        const isValid = urlRegex.test(value.toLowerCase());
+        if (!isValid) {
+          this.editor().setStatus(
+            key,
+            "error",
+            errorMessage || `${key} is no valid url`
+          );
+        }
+        return isValid;
+      }
+    );
+    return this;
+  }
+
+  //=========================================================================================================
+  // Regex
+  //=========================================================================================================
+  /**
+   * @public
+   * Checks that the Editor Value matches a specific Regex
+   * @param regex - Regex the Value should match
+   * @param errorMessage - Error Message
+   */
+  public matches(regex: RegExp, errorMessage?: string): this {
+    this.addValidationMethod(async (key, value) => {
+      if (!value || typeof value !== "string") return false;
+      const isValid = regex.test(value.toLowerCase());
+      if (!isValid) {
+        this.editor().setStatus(
+          key,
+          "error",
+          errorMessage || `${key} doesn't follow defined regex`
+        );
+      }
+      return isValid;
+    });
     return this;
   }
 }
