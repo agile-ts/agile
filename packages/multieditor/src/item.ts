@@ -1,7 +1,5 @@
 import { defineConfig, State } from "@agile-ts/core";
-import MultiEditor from "./index";
-import { Validator } from "./validator";
-import { Status, StatusInterface } from "./status";
+import { MultiEditor, Validator, Status } from "./internal";
 
 export class Item<DataType = any> extends State<DataType> {
   public editor: () => MultiEditor<DataType>;

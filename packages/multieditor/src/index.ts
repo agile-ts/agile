@@ -1,9 +1,13 @@
 import { Agile, defineConfig, Observer } from "@agile-ts/core";
-import { ValidationMethodInterface, Validator } from "./validator";
-import { Item } from "./item";
-import { StatusInterface, StatusType } from "./status";
+import {
+  Item,
+  Validator,
+  StatusType,
+  StatusInterface,
+  ValidationMethodInterface,
+} from "./internal";
 
-export default class MultiEditor<DataType = any, SubmitReturnType = void> {
+export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public agileInstance: () => Agile;
 
   public config: EditorConfigInterface<DataType, SubmitReturnType>;

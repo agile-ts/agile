@@ -1,7 +1,5 @@
-import { Item } from "../item";
-import MultiEditor from "../index";
-import { StatusObserver } from "./status.observer";
 import { Agile, copy } from "@agile-ts/core";
+import { Item, MultiEditor, StatusObserver } from "../internal";
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;

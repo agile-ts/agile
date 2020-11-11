@@ -1,5 +1,5 @@
 import { Agile, Collection } from "@agile-ts/core";
-import MultiEditor from "@agile-ts/multieditor";
+import { MultiEditor } from "@agile-ts/multieditor";
 
 export const App = new Agile({
   logJobs: true,

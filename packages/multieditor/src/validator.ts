@@ -1,5 +1,5 @@
-import MultiEditor, { DataObject, ItemKey } from "./index";
 import { Agile, generateId, isFunction } from "@agile-ts/core";
+import { DataObject, MultiEditor, ItemKey } from "./internal";
 
 export class Validator<DataType = any, SubmitReturnType = void> {
   public agileInstance: () => Agile;
