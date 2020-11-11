@@ -39,17 +39,21 @@ export class Collection<DataType = DefaultItem> {
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
-    if (typeof config === "function") config = config(this);
-    this.config = defineConfig<CollectionConfigInterface>(config, {
+    let _config = typeof config === "function" ? config(this) : config;
+    _config = defineConfig(_config, {
       primaryKey: "id",
       groups: {},
       selectors: {},
       defaultGroupKey: "default",
     });
-    this._key = this.config.key;
+    this._key = _config.key;
+    this.config = {
+      defaultGroupKey: _config.defaultGroupKey,
+      primaryKey: _config.primaryKey,
+    };
 
-    this.initGroups();
-    this.initSelectors();
+    this.initGroups(_config.groups as any);
+    this.initSelectors(_config.selectors as any);
   }
 
   /**
@@ -135,29 +139,30 @@ export class Collection<DataType = DefaultItem> {
    * @internal
    * Instantiates Groups
    */
-  private initGroups() {
-    const groups = copy(this.config.groups);
+  private initGroups(groups: { [key: string]: Group<any> } | string[]) {
     if (!groups) return;
-    let groupsObject: { [key: string]: Group } = {};
+    let groupsObject: { [key: string]: Group<DataType> } = {};
 
     // If groups is Array of SelectorNames transform it to Selector Object
     if (Array.isArray(groups)) {
       groups.forEach((groupKey) => {
-        groupsObject[groupKey] = new Group(this.agileInstance(), this, [], {
-          key: groupKey,
-        });
+        groupsObject[groupKey] = new Group<DataType>(
+          this.agileInstance(),
+          this,
+          [],
+          {
+            key: groupKey,
+          }
+        );
       });
     } else groupsObject = groups;
 
     // Add default Group
-    groupsObject[this.config.defaultGroupKey || "default"] = new Group(
-      this.agileInstance(),
-      this,
-      [],
-      {
-        key: this.config.defaultGroupKey || "default",
-      }
-    );
+    groupsObject[this.config.defaultGroupKey || "default"] = new Group<
+      DataType
+    >(this.agileInstance(), this, [], {
+      key: this.config.defaultGroupKey || "default",
+    });
 
     // Set Key/Name of Group to property Name
     for (let key in groupsObject)
@@ -173,17 +178,22 @@ export class Collection<DataType = DefaultItem> {
    * @internal
    * Instantiates Selectors
    */
-  private initSelectors() {
-    const selectors = copy(this.config.selectors);
+  private initSelectors(
+    selectors: { [key: string]: Selector<any> } | string[]
+  ) {
     if (!selectors) return;
-    let selectorsObject: { [key: string]: Selector } = {};
+    let selectorsObject: { [key: string]: Selector<DataType> } = {};
 
     // If selectors is Array of SelectorNames transform it to Selector Object
     if (Array.isArray(selectors)) {
       selectors.forEach((selectorKey) => {
-        selectorsObject[selectorKey] = new Selector(this, selectorKey, {
-          key: selectorKey,
-        });
+        selectorsObject[selectorKey] = new Selector<DataType>(
+          this,
+          selectorKey,
+          {
+            key: selectorKey,
+          }
+        );
       });
     } else selectorsObject = selectors;
 
@@ -278,7 +288,7 @@ export class Collection<DataType = DefaultItem> {
     itemKey: ItemKey,
     changes: DefaultItem | DataType,
     config: UpdateConfigInterface = {}
-  ): Item | undefined {
+  ): Item<DataType> | undefined {
     if (!this.data.hasOwnProperty(itemKey)) {
       console.error(
         `Agile: ItemKey '${itemKey} doesn't exist in Collection!`,
@@ -882,13 +892,19 @@ export type ItemKey = string | number; // Key Interface of Item in Collection
  * @param key - Key/Name of Collection
  * @param groups - Groups of Collection
  * @param selectors - Selectors of Collection
+ */
+export interface CreateCollectionConfigInterface
+  extends CollectionConfigInterface {
+  groups?: { [key: string]: Group<any> } | string[];
+  selectors?: { [key: string]: Selector<any> } | string[];
+  key?: CollectionKey;
+}
+
+/**
  * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
  * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
  */
 export interface CollectionConfigInterface {
-  groups?: { [key: string]: Group<any> } | string[];
-  selectors?: { [key: string]: Selector<any> } | string[];
-  key?: CollectionKey;
   primaryKey?: string;
   defaultGroupKey?: ItemKey;
 }
@@ -941,5 +957,5 @@ export interface GetItemByIdInterface {
 }
 
 export type CollectionConfig<DataType = DefaultItem> =
-  | CollectionConfigInterface
-  | ((collection: Collection<DataType>) => CollectionConfigInterface);
+  | CreateCollectionConfigInterface
+  | ((collection: Collection<DataType>) => CreateCollectionConfigInterface);

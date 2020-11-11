@@ -32,6 +32,7 @@ export class State<ValueType = any> {
   public sideEffects: {
     [key: string]: (properties?: { [key: string]: any }) => void;
   } = {}; // SideEffects of State (will be executed in Runtime)
+  public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted: boolean = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
@@ -506,6 +507,19 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
+  // Compute
+  //=========================================================================================================
+  /**
+   * @public
+   * Compute Value if it changes
+   * @param method - Method that will be used to compute the new Value
+   */
+  public compute(method: ComputeMethod<ValueType>): this {
+    this.computeMethod = method;
+    return this;
+  }
+
+  //=========================================================================================================
   // Add SideEffect
   //=========================================================================================================
   /**
@@ -613,3 +627,4 @@ export interface PatchConfigInterface {
 }
 
 export type Callback<T = any> = (value: T) => void;
+export type ComputeMethod<T = any> = (value: T) => T;

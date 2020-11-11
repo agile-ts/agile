@@ -16,10 +16,6 @@ describe("Default Collection Tests", () => {
     const MY_COLLECTION = App.Collection<userInterface>();
 
     it("Has correct initial values", () => {
-      expect(MY_COLLECTION.config.key).to.eq(
-        undefined,
-        "MY_COLLECTION has correct config.key"
-      );
       expect(MY_COLLECTION.config.primaryKey).to.eq(
         "id",
         "MY_COLLECTION has correct config.primaryKey"
@@ -27,14 +23,6 @@ describe("Default Collection Tests", () => {
       expect(MY_COLLECTION.config.defaultGroupKey).to.eq(
         "default",
         "MY_COLLECTION has correct config.defaultGroupKey"
-      );
-      expect(JSON.stringify(MY_COLLECTION.config.groups)).to.eq(
-        JSON.stringify({}),
-        "MY_COLLECTION has no config.groups"
-      );
-      expect(JSON.stringify(MY_COLLECTION.config.selectors)).to.eq(
-        JSON.stringify({}),
-        "MY_COLLECTION has no config.selectors"
       );
 
       expect(MY_COLLECTION.key).to.eq(

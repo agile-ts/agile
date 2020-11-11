@@ -83,7 +83,10 @@ export class StateObserver<ValueType = any> extends Observer {
     // If forceRerender, set background config to false since forceRerender is 'stronger' than background
     if (_config.forceRerender && _config.background) _config.background = false;
 
-    this.nextStateValue = copy(_newStateValue);
+    // Assign next State Value and compute it if necessary
+    this.nextStateValue = state.computeMethod
+      ? copy(state.computeMethod(_newStateValue))
+      : copy(_newStateValue);
 
     // Check if State Value and new/next Value are equals
     if (equal(state.value, this.nextStateValue) && !_config.forceRerender)

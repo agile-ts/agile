@@ -1,4 +1,4 @@
-import { Agile, defineConfig, Observer } from "@agile-ts/core";
+import { Agile, ComputeMethod, defineConfig, Observer } from "@agile-ts/core";
 import {
   Item,
   Validator,
@@ -10,10 +10,20 @@ import {
 export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public agileInstance: () => Agile;
 
-  public config: EditorConfigInterface<DataType, SubmitReturnType>;
+  public config: EditorConfigInterface;
   public isModified: boolean = false;
   public isValid: boolean = false;
   public submitted: boolean = false;
+  public fixedProperties: ItemKey[] = [];
+  public editableProperties: ItemKey[] = [];
+  public validateMethods: DataObject<
+    ValidationMethodInterface<DataType> | Validator<DataType>
+  > = {};
+  public computeMethods: DataObject<ComputeMethod<DataType>> = {};
+  public onSubmit: (
+    preparedData: DataObject<DataType>,
+    config?: any
+  ) => Promise<SubmitReturnType>;
 
   public _key?: EditorKey;
 
@@ -30,20 +40,37 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     config: EditorConfig<DataType, SubmitReturnType>
   ) {
     this.agileInstance = () => agileInstance;
-    if (typeof config === "function") config = config(this);
-    this.config = this.config = defineConfig(config, {
+    let _config = typeof config === "function" ? config(this) : config;
+    _config = defineConfig(_config, {
+      fixedProperties: [],
+      editableProperties: Object.keys(_config.data),
+      validateMethods: {},
+      computeMethods: {},
       reValidateMode: "onSubmit",
       validate: "editable",
     });
-    this._key = config?.key;
+    this._key = _config?.key;
+    this.onSubmit = _config.onSubmit as any;
+    this.fixedProperties = _config.fixedProperties as any;
+    this.editableProperties = _config.editableProperties as any;
+    this.validateMethods = _config.validateMethods as any;
+    this.computeMethods = _config.computeMethods as any;
+    this.config = {
+      reValidateMode: _config.reValidateMode,
+      validate: _config.validate,
+    };
 
     // Add Items to Data Object and validate it for the first Time
-    for (let key in config.data) {
-      const item = new Item<DataType>(this as any, config.data[key], key, {
-        canBeEdited: config.editableProperties.includes(key),
+    for (let key in _config.data) {
+      const item = new Item<DataType>(this as any, _config.data[key], key, {
+        canBeEdited: this.editableProperties.includes(key),
       });
       this.data[key] = item;
       item.validate();
+      if (this.computeMethods.hasOwnProperty(key)) {
+        const computeMethod = this.computeMethods[key];
+        item.compute(computeMethod);
+      }
     }
   }
 
@@ -192,13 +219,13 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     }
 
     // Add fixed Properties(Items) to Prepared Data
-    for (let key of this.config.fixedProperties) {
+    for (let key of this.fixedProperties) {
       const item = this.getItemById(key);
       if (!item) continue;
       preparedData[key] = item.value;
     }
 
-    return await this.config.onSubmit(preparedData, config);
+    return await this.onSubmit(preparedData, config);
   }
 
   //=========================================================================================================
@@ -340,8 +367,8 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @param key - Key/Name of Item
    */
   public getValidator(key: ItemKey): Validator<DataType> {
-    if (this.config.validateMethods.hasOwnProperty(key)) {
-      const validation = this.config.validateMethods[key];
+    if (this.validateMethods.hasOwnProperty(key)) {
+      const validation = this.validateMethods[key];
       if (validation instanceof Validator) {
         if (!validation.key) validation.key = key;
         return validation;
@@ -362,7 +389,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
    * Updates the isModified property
    */
   public updateIsModified(): this {
-    this.isModified = this.areModified(this.config.editableProperties);
+    this.isModified = this.areModified(this.editableProperties);
     return this;
   }
 
@@ -441,30 +468,38 @@ export type ItemKey = string | number;
  * @param reValidateMode - When the Editor and its Data gets revalidated
  * @param validate - Which Data gets validated
  */
-export interface EditorConfigInterface<
+export interface CreateEditorConfigInterface<
   DataType = any,
   SubmitReturnType = void
-> {
+> extends EditorConfigInterface {
   key?: string;
   data: DataObject<DataType>;
-  fixedProperties: string[];
-  editableProperties: string[];
-  validateMethods: DataObject<
+  fixedProperties?: string[];
+  editableProperties?: string[];
+  validateMethods?: DataObject<
     ValidationMethodInterface<DataType> | Validator<DataType>
   >;
+  computeMethods?: DataObject<ComputeMethod<DataType>>;
   onSubmit: (
     preparedData: DataObject<DataType>,
     config?: any
   ) => Promise<SubmitReturnType>;
-  reValidateMode?: RevalidateType;
-  validate?: "all" | "editable";
+}
+
+/**
+ * @param reValidateMode - When the Editor and its Data gets revalidated
+ * @param validate - Which Data gets validated
+ */
+export interface EditorConfigInterface {
+  reValidateMode?: RevalidationModeType;
+  validate?: ValidateType;
 }
 
 export type EditorConfig<DataType = any, SubmitReturnType = void> =
-  | EditorConfigInterface<DataType, SubmitReturnType>
+  | CreateEditorConfigInterface<DataType, SubmitReturnType>
   | ((
       editor: MultiEditor<DataType, SubmitReturnType>
-    ) => EditorConfigInterface<DataType, SubmitReturnType>);
+    ) => CreateEditorConfigInterface<DataType, SubmitReturnType>);
 
 /**
  * @param background - If assigning a new Item happens in the background (-> not causing any rerender)
@@ -482,4 +517,5 @@ export interface SubmitConfigInterface {
   onSubmitConfig?: any;
 }
 
-export type RevalidateType = "onChange" | "onSubmit" | "afterFirstSubmit";
+export type RevalidationModeType = "onChange" | "onSubmit" | "afterFirstSubmit";
+export type ValidateType = "all" | "editable";

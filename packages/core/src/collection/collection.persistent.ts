@@ -10,7 +10,7 @@ import {
 } from "../internal";
 
 export class CollectionPersistent<DataType = any> extends Persistent {
-  public collection: () => Collection;
+  public collection: () => Collection<DataType>;
   private defaultGroupSideEffectKey = "rebuildStorage";
 
   public static storageItemKeyPattern = "_${collectionKey}_item_${itemKey}";
@@ -249,7 +249,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    * Rebuilds Storage depending on Group
    * @param group - Group
    */
-  private rebuildStorageSideEffect(group: Group) {
+  private rebuildStorageSideEffect(group: Group<DataType>) {
     const collection = group.collection();
 
     // Return if only an ItemKey got updated -> length stayed the same

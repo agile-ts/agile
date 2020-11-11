@@ -1,7 +1,7 @@
 import { State, Collection, DefaultItem, StateKey } from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
-  private collection: () => Collection;
+  private collection: () => Collection<DataType>;
 
   /**
    * @public
@@ -9,7 +9,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    * @param collection - Collection to which the Item belongs
    * @param data - Data that the Item holds
    */
-  constructor(collection: Collection, data: DataType) {
+  constructor(collection: Collection<DataType>, data: DataType) {
     super(collection.agileInstance(), data);
     this.collection = () => collection;
 
