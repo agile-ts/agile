@@ -26,7 +26,7 @@ interface collectionValueInterface {
 }
 
 export const MY_COLLECTION = App.Collection<collectionValueInterface>(
-  (collection: Collection) => ({
+  (collection) => ({
     key: "my-collection",
     groups: {
       myGroup: collection.Group(),
@@ -88,6 +88,6 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
     },
     editableProperties: ["email"],
     reValidateMode: "afterFirstSubmit",
-    validate: "editable",
+    validate: "all",
   })
 );
