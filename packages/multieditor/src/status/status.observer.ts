@@ -19,7 +19,7 @@ export class StatusObserver extends Observer {
    * Status Observer - Handles Status changes, dependencies (-> Interface to Runtime)
    * @param agileInstance - An instance of Agile
    * @param status - Status
-   * @param deps - Initial Dependencies of State Observer
+   * @param deps - Initial Dependencies of Status Observer
    * @param key - Key/Name of State Observer
    */
   constructor(
@@ -38,7 +38,7 @@ export class StatusObserver extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Assigns nextValue to _value
+   * Assigns next Status Value to current Status Value
    * @param config - Config
    */
   public assign(config: StatusJobConfig = {}): void {
@@ -53,7 +53,7 @@ export class StatusObserver extends Observer {
     // If forceRerender, set background config to false since forceRerender is 'stronger' than background
     if (config.forceRerender && config.background) config.background = false;
 
-    // Set Next Status
+    // Set Next Status Value
     this.nextValue = copy(this.status().nextValue);
 
     // Check if Status changed

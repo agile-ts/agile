@@ -1,9 +1,8 @@
-/*
 import { Agile } from "@agile-ts/core";
-import {MultiEditor} from "../src";
+import { MultiEditor } from "../src";
 
 const App = new Agile();
-
+/*
 const multiEditor = new MultiEditor<string, boolean>(App, (editor) => ({
   data: {
     id: "myId",
@@ -16,10 +15,9 @@ const multiEditor = new MultiEditor<string, boolean>(App, (editor) => ({
   },
   fixedProperties: ["id"],
   validateMethods: {
-    email: editor.Validator().email(),
-    name: editor.Validator().maxLength(10).minLength(2),
+    email: editor.Validator().string().email().required(),
+    name: editor.Validator().string().max(10).min(2).required(),
   },
   editableProperties: ["email", "name"],
 }));
-
  */

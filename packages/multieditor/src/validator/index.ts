@@ -1,26 +1,30 @@
-import { Agile, generateId, isFunction } from "@agile-ts/core";
-import { DataObject, MultiEditor, ItemKey } from "./internal";
+import { Agile, defineConfig, generateId, isFunction } from "@agile-ts/core";
+import { DataObject, MultiEditor, ItemKey, StringValidator } from "../internal";
 
-export class Validator<DataType = any, SubmitReturnType = void> {
+export class Validator<DataType = any> {
   public agileInstance: () => Agile;
 
   public _key?: ValidatorKey;
+  public config: ValidatorConfigInterface = {};
   public validationMethods: DataObject<ValidationMethodInterface> = {};
-  public editor: () => MultiEditor<DataType, SubmitReturnType>;
+  public editor: () => MultiEditor<DataType>;
 
   /**
    * @public
-   * Validator - Easy way to tell the Editor conditions which the EditorValue has to follow
-   * @param editor - Editor in which this Validator validates Items
-   * @param key - Key/Name of Item the Validator validates
+   * Validator - Easy way to tell a Editor Value which conditions it has to follow to be valid
+   * @param editor - Editor to that the Validator belongs
+   * @param config - Config
    */
   constructor(
-    editor: MultiEditor<DataType, SubmitReturnType>,
-    key?: ValidatorKey
+    editor: MultiEditor<DataType>,
+    config: ValidatorConfigInterface = {}
   ) {
     this.editor = () => editor;
     this.agileInstance = () => editor.agileInstance();
-    this._key = key;
+    this.config = defineConfig(config, {
+      prefix: "default",
+    });
+    this._key = this.config.key;
   }
 
   /**
@@ -44,8 +48,8 @@ export class Validator<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Validates that value Item at Key follow the Validator rules
-   * @param key - Key of Item
+   * Validates Item Value at Key and updates its Status
+   * @param key - Key/Name of Item
    * @param value - Value that gets validated
    */
   public async validate(key: ItemKey, value: DataType): Promise<boolean> {
@@ -132,73 +136,14 @@ export class Validator<DataType = any, SubmitReturnType = void> {
   }
 
   //=========================================================================================================
-  // Max Length
+  // String
   //=========================================================================================================
   /**
    * @public
-   * Checks if the EditorValue has a correct length
-   * @param length - maxLength
+   * Get String Validator
    */
-  public maxLength(length: number): this {
-    this.addValidationMethod(
-      "maxLength",
-      async (key: ItemKey, value: DataType) => {
-        if (!value) return false;
-        if (Array.isArray(value) || typeof value === "string") {
-          const isValid = value.length <= length;
-          if (!isValid) {
-            this.editor().setStatus(
-              key,
-              "error",
-              `${key} needs max ${length} length`
-            );
-          }
-
-          return isValid;
-        }
-
-        console.warn(
-          "Agile: Using maxLength on a none Array/String Input won't work"
-        );
-        return true;
-      }
-    );
-    return this;
-  }
-
-  //=========================================================================================================
-  // Min Length
-  //=========================================================================================================
-  /**
-   * @public
-   * Checks if the EditorValue has a correct length
-   * @param length - minLength
-   */
-  public minLength(length: number): this {
-    this.addValidationMethod(
-      "minLength",
-      async (key: ItemKey, value: DataType) => {
-        if (!value) return false;
-        if (Array.isArray(value) || typeof value === "string") {
-          const isValid = value.length >= length;
-          if (!isValid) {
-            this.editor().setStatus(
-              key,
-              "error",
-              `${key} needs min ${length} length`
-            );
-          }
-
-          return isValid;
-        }
-
-        console.warn(
-          "Agile: Using minLength on a none Array/String Input won't work"
-        );
-        return true;
-      }
-    );
-    return this;
+  public string(): StringValidator<DataType> {
+    return new StringValidator<DataType>(this);
   }
 
   //=========================================================================================================
@@ -210,7 +155,7 @@ export class Validator<DataType = any, SubmitReturnType = void> {
    */
   public required(): this {
     this.addValidationMethod(
-      "required",
+      this.getValidationMethodKey("required"),
       async (key: ItemKey, value: DataType) => {
         const isValid = !!value;
         if (!isValid) {
@@ -224,26 +169,15 @@ export class Validator<DataType = any, SubmitReturnType = void> {
   }
 
   //=========================================================================================================
-  // Email
+  // Get Validation Method Key
   //=========================================================================================================
   /**
-   * @public
-   * Checks that the EditorValue is a valid Email
+   * @internal
+   * Creates Validation Method Key from provided key
+   * @param key - Key that gets converted into a Validation Method Key
    */
-  public email(): this {
-    this.addValidationMethod("email", async (key: ItemKey, value: DataType) => {
-      if (typeof value === "string") {
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const isValid = emailRegex.test(value.toLowerCase());
-        if (!isValid) {
-          this.editor().setStatus(key, "error", `${key} is not valid Email`);
-        }
-
-        return isValid;
-      }
-      return false;
-    });
-    return this;
+  public getValidationMethodKey(key: string): string {
+    return `_${this.config.prefix}_${key}`;
   }
 }
 
@@ -252,3 +186,12 @@ export type ValidationMethodInterface<DataType = any> = (
   key: ItemKey,
   value: DataType
 ) => Promise<boolean>;
+
+/**
+ * @param key - Key/Name of Validator
+ * @param prefix - Validation Method Prefix
+ */
+export interface ValidatorConfigInterface {
+  key?: ValidatorKey;
+  prefix?: string;
+}

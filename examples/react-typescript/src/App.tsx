@@ -15,6 +15,8 @@ import { globalBind } from "@agile-ts/core";
 let rerenderCount = 0;
 
 const App = (props: any) => {
+  // Note: Rerenders twice because of React Strickt Mode (also useState does trigger a rerender twice)
+  // https://stackoverflow.com/questions/54927622/usestate-do-double-render
   rerenderCount++;
 
   const myComputed = useAgile(MY_COMPUTED);

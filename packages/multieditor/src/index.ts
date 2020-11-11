@@ -21,7 +21,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
 
   /**
    * @public
-   * Editor - Handles a Form and its Values
+   * Editor - A simple From Handler
    * @param agileInstance - An instance of Agile
    * @param config - Config
    */
@@ -39,7 +39,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
 
     // Add Items to Data Object and validate it for the first Time
     for (let key in config.data) {
-      const item = new Item(this, config.data[key], key, {
+      const item = new Item<DataType>(this as any, config.data[key], key, {
         canBeEdited: config.editableProperties.includes(key),
       });
       this.data[key] = item;
@@ -49,7 +49,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
 
   /**
    * @public
-   * Set Key/Name of Editor
+   * Set Key/Name of MultiEditor
    */
   public set key(value: EditorKey | undefined) {
     this._key = value;
@@ -57,7 +57,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
 
   /**
    * @public
-   * Get Key/Name of Editor
+   * Get Key/Name of MultiEditor
    */
   public get key(): EditorKey | undefined {
     return this._key;
@@ -66,6 +66,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   /**
    * @public
    * Dependencies of the MultiEditor
+   * Note: Has to be subscribed to the Component that holds the Form
    */
   public get dependencies() {
     const deps: Array<Observer> = [];
@@ -82,10 +83,10 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Validator - Easy way to tell the Editor validation Conditions
+   * Validator - Create validation Conditions for an Item
    */
-  public Validator(): Validator<DataType, SubmitReturnType> {
-    return new Validator<DataType, SubmitReturnType>(this);
+  public Validator(): Validator<DataType> {
+    return new Validator<DataType>(this as any);
   }
 
   //=========================================================================================================
@@ -93,9 +94,9 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Assign new Value to Item
+   * Assigns new Value to Item at key
    * @param key - Key/Name of Item
-   * @param value - New Value of Item
+   * @param value - New Item Value
    * @param config - Config
    */
   public setValue(
@@ -120,9 +121,9 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Assign new initial Value to Item
+   * Assigns new initial Value to Item at key
    * @param key - Key/Name of Item
-   * @param value - New initial Value of Item
+   * @param value - New Item initial Value
    * @param config - Config
    */
   public updateInitialValue(
@@ -136,9 +137,10 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
       background: true,
     });
 
-    // Update initial Value and force Rerender
+    // Update initial Value
     item.initialStateValue = value;
-    if (!config.background) item.ingest({ forceRerender: true });
+    if (!config.background)
+      item.ingest({ ...{ forceRerender: true }, ...config });
 
     return this;
   }
@@ -148,7 +150,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Submit Editor
+   * Submits Editor
    * @param config - Config
    */
   public async submit(
@@ -180,16 +182,16 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     // Check if Editor is Valid
     if (!this.isValid) return false;
 
-    // Add changed Items to prepared Data
+    // Add prepared Items to prepared Data
     for (let key in this.data) {
       const item = this.data[key];
-      if (item.isSet && item.canBeEdited) {
+      if (item.isSet && item.config.canBeEdited) {
         preparedData[key] = item.value;
         if (config.assignToInitial) this.updateInitialValue(key, item.value);
       }
     }
 
-    // Add fixed Properties to Prepared Data
+    // Add fixed Properties(Items) to Prepared Data
     for (let key of this.config.fixedProperties) {
       const item = this.getItemById(key);
       if (!item) continue;
@@ -227,7 +229,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Assigns new Status to an Item
+   * Assigns new Status to Item at key
    * @param key - Key/Name of Item
    * @param type - Status Type
    * @param message - Status Message
@@ -235,6 +237,8 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public setStatus(key: ItemKey, type: StatusType, message: string): this {
     const item = this.getItemById(key);
     if (!item) return this;
+
+    // Set Status to Item
     item.status.set({
       type: type,
       message: message,
@@ -251,12 +255,14 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @public
-   * Reset Status of Item
+   * Resets Status of Item at key
    * @param key - Key/Name of Item
    */
   public resetStatus(key: ItemKey): this {
     const item = this.getItemById(key);
     if (!item || !item.status) return this;
+
+    // Set Status to Item
     item.status.set(null);
 
     // Assign Status to Item
@@ -308,27 +314,6 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   }
 
   //=========================================================================================================
-  // Get Validator
-  //=========================================================================================================
-  /**
-   * @private
-   * Get Validator of Item based on validateMethods
-   * @param key - Key/Name of Item
-   */
-  public getValidator(key: ItemKey): Validator<DataType> {
-    if (this.config.validateMethods.hasOwnProperty(key)) {
-      const validation = this.config.validateMethods[key];
-      if (validation instanceof Validator) {
-        if (!validation.key) validation.key = key;
-        return validation;
-      } else {
-        return new Validator(this, key).addValidationMethod(validation);
-      }
-    }
-    return new Validator<DataType>(this, key);
-  }
-
-  //=========================================================================================================
   // Are Modified
   //=========================================================================================================
   /**
@@ -347,11 +332,34 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   }
 
   //=========================================================================================================
+  // Get Validator
+  //=========================================================================================================
+  /**
+   * @private
+   * Get Validator of Item based on validateMethods
+   * @param key - Key/Name of Item
+   */
+  public getValidator(key: ItemKey): Validator<DataType> {
+    if (this.config.validateMethods.hasOwnProperty(key)) {
+      const validation = this.config.validateMethods[key];
+      if (validation instanceof Validator) {
+        if (!validation.key) validation.key = key;
+        return validation;
+      } else {
+        return new Validator<DataType>(this as any, {
+          key: key,
+        }).addValidationMethod(validation);
+      }
+    }
+    return new Validator<DataType>(this as any, { key: key });
+  }
+
+  //=========================================================================================================
   // Update Is Modified
   //=========================================================================================================
   /**
    * @internal
-   * Updates the is Modified property
+   * Updates the isModified property
    */
   public updateIsModified(): this {
     this.isModified = this.areModified(this.config.editableProperties);
@@ -363,7 +371,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @private
-   * Validates Editor and sets its isValid property
+   * Validates Editor and updates the isValid property
    */
   public validate(): boolean {
     let isValid = true;
@@ -371,7 +379,8 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     // Check if Items are Valid
     for (let key in this.data) {
       const item = this.data[key];
-      if (!item.canBeEdited && this.config.validate === "editable") continue;
+      if (!item.config.canBeEdited && this.config.validate === "editable")
+        continue;
       isValid = item.isValid && isValid;
     }
 
@@ -384,7 +393,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @private
-   * If Status gets assigned on Change
+   * If Status can be assigned on Change
    * @param item - Item to which the Status should get applied
    */
   public canAssignStatusToItemOnChange(item: Item): boolean {
@@ -393,7 +402,8 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
         (this.config.reValidateMode === "afterFirstSubmit" &&
           this.submitted)) &&
       (this.config.validate === "all" ||
-        (this.config.validate === "editable" && item.canBeEdited))
+        (this.config.validate === "editable" && item.config.canBeEdited) ||
+        false)
     );
   }
 
@@ -402,7 +412,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   //=========================================================================================================
   /**
    * @private
-   * If Status gets assigned on Submit
+   * If Status can be assigned on Submit
    * @param item - Item to which the Status should get applied
    */
   public canAssignStatusToItemOnSubmit(item: Item): boolean {
@@ -412,7 +422,8 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
           !this.submitted) ||
         (this.config.reValidateMode === "onChange" && !item.status.display)) &&
       (this.config.validate === "all" ||
-        (this.config.validate === "editable" && item.canBeEdited))
+        (this.config.validate === "editable" && item.config.canBeEdited) ||
+        false)
     );
   }
 }
@@ -422,13 +433,13 @@ export type EditorKey = string | number;
 export type ItemKey = string | number;
 
 /**
- * @param data - Data the Editor handles
+ * @param data - Data that gets registered
  * @param fixedProperties - Data that will always be passed into the 'onSubmit' Function
  * @param editableProperties - Properties that can be edited
  * @param validateMethods - Methods to validate the Data
  * @param onSubmit - Function that gets called if the Editor gets submitted
- * @param reValidateMode - When the Editor gets revalidated
- * @param validate - Which Items get validated
+ * @param reValidateMode - When the Editor and its Data gets revalidated
+ * @param validate - Which Data gets validated
  */
 export interface EditorConfigInterface<
   DataType = any,
@@ -439,7 +450,7 @@ export interface EditorConfigInterface<
   fixedProperties: string[];
   editableProperties: string[];
   validateMethods: DataObject<
-    ValidationMethodInterface<DataType> | Validator<DataType, SubmitReturnType>
+    ValidationMethodInterface<DataType> | Validator<DataType>
   >;
   onSubmit: (
     preparedData: DataObject<DataType>,
@@ -463,7 +474,7 @@ export interface SetValueConfigInterface {
 }
 
 /**
- * @param assignToInitial - Modified Value gets set to the Item Inital Value after submitting
+ * @param assignToInitial - If modified Value gets set to the initial Value of the Item
  * @param onSubmitConfig - Config that gets passed into the onSubmit Function
  */
 export interface SubmitConfigInterface {

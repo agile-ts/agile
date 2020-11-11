@@ -8,9 +8,9 @@ export class Status<DataType = any> {
   public observer: StatusObserver; // Handles deps and subs of Status and is like an interface to the Runtime
 
   public display: boolean = false;
-  public _value: StatusInterface | null;
-  public nextValue: StatusInterface | null;
-  public activeValues: Set<StatusInterface> = new Set();
+  public _value: StatusInterface | null; // The last assigned Value
+  public nextValue: StatusInterface | null; // The last set Value
+  public activeValues: Set<StatusInterface> = new Set(); // All Values that got set during the validation Time of the Validator
 
   // Tracking
   public track: boolean = false;
@@ -19,7 +19,7 @@ export class Status<DataType = any> {
   /**
    * @public
    * Status - Represents the Status of an Item
-   * @param item - Item to which the Status belongs
+   * @param item - Item to that the Status belongs
    */
   constructor(item: Item<DataType>) {
     this.item = item;
@@ -43,7 +43,7 @@ export class Status<DataType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Set next Status Value that gets applied if the Status gets assigned
+   * Set next Status Value that will be assigned to the Status
    * @param value - next Status Value
    */
   public set(value: StatusInterface | null): this {
@@ -57,7 +57,7 @@ export class Status<DataType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Assign next Status Value
+   * Assign last set Status Value to the current Status Value
    * @param config - Config
    */
   public assign(config: StatusJobConfig = {}) {

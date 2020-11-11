@@ -67,13 +67,27 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
       console.log("Submitted MultiEditor", data);
       return Promise.resolve(true);
     },
-    fixedProperties: ["id"],
+    fixedProperties: ["id", "name"],
     validateMethods: {
-      email: editor.Validator().email().required(),
-      name: editor.Validator().maxLength(10).minLength(2).required(),
+      email: editor.Validator().string().email().required(),
+      name: editor
+        .Validator()
+        .required()
+        .string()
+        .max(10)
+        .min(2)
+        .addValidationMethod("testFuck", (key, value) => {
+          const isValid = value !== "fuck";
+
+          if (!isValid) {
+            editor.setStatus(key, "error", "Fuck is no valid Name!");
+          }
+
+          return Promise.resolve(isValid);
+        }),
     },
     editableProperties: ["email"],
-    reValidateMode: "onChange",
+    reValidateMode: "afterFirstSubmit",
     validate: "editable",
   })
 );
