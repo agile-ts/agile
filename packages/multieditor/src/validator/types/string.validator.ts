@@ -23,8 +23,9 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    * @public
    * Checks if the EditorValue has a correct length
    * @param length - maxLength
+   * @param errorMessage - Error Message
    */
-  public max(length: number): this {
+  public max(length: number, errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("maxLength"),
       async (key: ItemKey, value: DataType) => {
@@ -35,7 +36,7 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
             this.editor().setStatus(
               key,
               "error",
-              `${key} needs max ${length} length`
+              errorMessage || `${key} has more than ${length} characters`
             );
           }
 
@@ -58,8 +59,9 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    * @public
    * Checks if the EditorValue has a correct length
    * @param length - minLength
+   * @param errorMessage - Error Message
    */
-  public min(length: number): this {
+  public min(length: number, errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("minLength"),
       async (key: ItemKey, value: DataType) => {
@@ -70,7 +72,7 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
             this.editor().setStatus(
               key,
               "error",
-              `${key} needs min ${length} length`
+              errorMessage || `${key} needs at least ${length} characters`
             );
           }
 
@@ -92,8 +94,9 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
   /**
    * @public
    * Checks that the EditorValue is a valid Email
+   * @param errorMessage - Error Message
    */
-  public email(): this {
+  public email(errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("email"),
       async (key: ItemKey, value: DataType) => {
@@ -101,7 +104,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
           const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           const isValid = emailRegex.test(value.toLowerCase());
           if (!isValid) {
-            this.editor().setStatus(key, "error", `${key} is not valid Email`);
+            this.editor().setStatus(
+              key,
+              "error",
+              errorMessage || `${key} is no valid email`
+            );
           }
 
           return isValid;

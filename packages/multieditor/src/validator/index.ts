@@ -119,14 +119,14 @@ export class Validator<DataType = any> {
 
     // Check if Validation Method is a Function
     if (!isFunction(_method)) {
-      console.error("Agile: A Validation Method has to be an function!");
+      console.error("Agile: A Validation Method has to be a function!");
       return this;
     }
 
     // Check if Validation Method already exists
     if (this.validationMethods[key]) {
       console.error(
-        `Agile: Validation Method with the key/name ${key} already exists!`
+        `Agile: Validation Method with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -152,14 +152,19 @@ export class Validator<DataType = any> {
   /**
    * @public
    * Checks that the EditorValue exists
+   * @param errorMessage - Error Message
    */
-  public required(): this {
+  public required(errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("required"),
       async (key: ItemKey, value: DataType) => {
         const isValid = !!value;
         if (!isValid) {
-          this.editor().setStatus(key, "error", `${key} has to exist`);
+          this.editor().setStatus(
+            key,
+            "error",
+            errorMessage || `${key} is a required field`
+          );
         }
 
         return isValid;

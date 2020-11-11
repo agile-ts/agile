@@ -67,7 +67,7 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
       console.log("Submitted MultiEditor", data);
       return Promise.resolve(true);
     },
-    fixedProperties: ["id", "name"],
+    fixedProperties: ["id"],
     validateMethods: {
       email: editor.Validator().string().email().required(),
       name: editor
@@ -86,7 +86,12 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
           return Promise.resolve(isValid);
         }),
     },
-    editableProperties: ["email"],
+    computeMethods: {
+      name: (value) => {
+        return value ? value?.charAt(0).toUpperCase() + value?.slice(1) : value;
+      },
+    },
+    editableProperties: ["email", "name"],
     reValidateMode: "afterFirstSubmit",
     validate: "all",
   })

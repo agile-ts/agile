@@ -158,7 +158,10 @@ const App = (props: any) => {
         <label>Name</label>
         <input
           name={"name"}
-          onChange={(e) => multiEditor.setValue("name", e.target.value)}
+          onChange={(e) => {
+            multiEditor.setValue("name", e.target.value, { background: false });
+          }}
+          value={multiEditor.getValueById("name")}
         />
         {multiEditor.getStatus("name")?.type === "error" && (
           <p style={{ color: "red" }}>
