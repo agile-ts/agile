@@ -1,11 +1,10 @@
 import { Agile, copy } from "@agile-ts/core";
-import { Item, MultiEditor, StatusObserver } from "../internal";
+import { Item, StatusJobConfig, StatusObserver } from "../internal";
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
 
   public item: Item<DataType>;
-  public editor: () => MultiEditor<DataType>;
   public observer: StatusObserver; // Handles deps and subs of Status and is like an interface to the Runtime
 
   public display: boolean = false;
@@ -24,7 +23,6 @@ export class Status<DataType = any> {
    */
   constructor(item: Item<DataType>) {
     this.item = item;
-    this.editor = () => item.editor();
     this.agileInstance = () => item.agileInstance();
     this._value = null;
     this.nextValue = null;
@@ -60,9 +58,10 @@ export class Status<DataType = any> {
   /**
    * @public
    * Assign next Status Value
+   * @param config - Config
    */
-  public assign() {
-    this.observer.assign();
+  public assign(config: StatusJobConfig = {}) {
+    this.observer.assign(config);
   }
 
   //=========================================================================================================

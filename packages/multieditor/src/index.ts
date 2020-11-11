@@ -164,7 +164,9 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
-        item.status.assign();
+        item.status.assign({
+          forceRerender: !item.status.display, // Force rerender if Status isn't displayed yet
+        });
         item.status.display = true;
       }
     }
@@ -407,7 +409,8 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     return (
       (this.config.reValidateMode === "onSubmit" ||
         (this.config.reValidateMode === "afterFirstSubmit" &&
-          !this.submitted)) &&
+          !this.submitted) ||
+        (this.config.reValidateMode === "onChange" && !item.status.display)) &&
       (this.config.validate === "all" ||
         (this.config.validate === "editable" && item.canBeEdited))
     );

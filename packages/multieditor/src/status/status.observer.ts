@@ -56,7 +56,7 @@ export class StatusObserver extends Observer {
     // Set Next Status
     this.nextValue = copy(this.status().nextValue);
 
-    // Check if Statuses stayed the same
+    // Check if Status changed
     if (equal(this.status()._value, this.nextValue) && !config.forceRerender)
       return;
 
