@@ -161,7 +161,7 @@ export class Runtime {
     // Logging
     if (this.agileInstance().config.logJobs)
       console.log(
-        "Agile: Updated/Rerendered Subscriptions ",
+        "Agile: Updated/Rerendered Subscriptions",
         subscriptionsToUpdate
       );
 

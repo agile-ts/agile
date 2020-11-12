@@ -1,6 +1,7 @@
 import { Observer } from "../../../internal";
 
 export class SubscriptionContainer {
+  public key?: SubscriptionContainerKeyType;
   public ready: boolean = false;
   public subs: Set<Observer> = new Set<Observer>([]); // Observers that are Subscribed to this SubscriptionContainer (Component)
 
@@ -14,8 +15,12 @@ export class SubscriptionContainer {
    * SubscriptionContainer - Represents Component/(Way to rerender Component) that is subscribed by Observer/s (Agile)
    * -> Used to cause rerender on Component
    * @param subs - Initial Subscriptions
+   * @param key - Key/Name of Subscription Container
    */
-  constructor(subs?: Set<Observer>) {
+  constructor(subs?: Set<Observer>, key?: SubscriptionContainerKeyType) {
     if (subs) this.subs = subs;
+    this.key = key;
   }
 }
+
+export type SubscriptionContainerKeyType = string | number;

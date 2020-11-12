@@ -7,6 +7,7 @@ import {
   normalizeArray,
   Observer,
   State,
+  SubscriptionContainerKeyType,
 } from "@agile-ts/core";
 
 // Array Type
@@ -41,19 +42,26 @@ type AgileHookType<T> = T extends Group<infer U>
 /**
  * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
  * @param deps - Agile Instances that will be subscribed to this Component
+ * @param key - Key/Name of SubscriptionContainer that gets created
  * @param agileInstance - An instance of Agile
  */
 export function useAgile<
   X extends Array<State | Collection | Observer | undefined>
->(deps: X | [], agileInstance?: Agile): AgileHookArrayType<X>;
+>(
+  deps: X | [],
+  key?: SubscriptionContainerKeyType,
+  agileInstance?: Agile
+): AgileHookArrayType<X>;
 
 /**
  * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
  * @param dep - Agile Instance that will be subscribed to this Component
+ * @param key - Key/Name of SubscriptionContainer that gets created
  * @param agileInstance - An instance of Agile
  */
 export function useAgile<X extends State | Collection | Observer | undefined>(
   dep: X,
+  key?: SubscriptionContainerKeyType,
   agileInstance?: Agile
 ): AgileHookType<X>;
 
@@ -62,6 +70,7 @@ export function useAgile<
   Y extends State | Collection | Observer | undefined
 >(
   deps: X | Y,
+  key?: SubscriptionContainerKeyType,
   agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   // Normalize Dependencies and special Agile Instance Types like Collection
@@ -110,7 +119,8 @@ export function useAgile<
       () => {
         set_({});
       },
-      observers
+      observers,
+      key
     );
 
     // Unsubscribe Callback based Subscription on Unmount
