@@ -1,4 +1,4 @@
-import { defineConfig, generateId, isFunction } from "@agile-ts/core";
+import { clone, defineConfig, generateId, isFunction } from "@agile-ts/core";
 import {
   DataObject,
   MultiEditor,
@@ -48,7 +48,7 @@ export class Validator<DataType = any> {
    * Validates Item Value at Key and updates its Status
    * @param key - Key/Name of Item
    * @param value - Value that gets validated
-   * @param editor - MultiEditor that holds the Item that gets validated
+   * @param editor - MultiEditor that holds the Item which gets validated
    */
   public async validate(
     key: ItemKey,
@@ -155,6 +155,17 @@ export class Validator<DataType = any> {
   }
 
   //=========================================================================================================
+  // Copy
+  //=========================================================================================================
+  /**
+   * @public
+   * Get a fresh copy of this Validator
+   */
+  public copy(): Validator<DataType> {
+    return clone(this);
+  }
+
+  //=========================================================================================================
   // Required
   //=========================================================================================================
   /**
@@ -174,7 +185,6 @@ export class Validator<DataType = any> {
             errorMessage || `${key} is a required field`
           );
         }
-
         return isValid;
       }
     );
