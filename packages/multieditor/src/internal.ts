@@ -4,7 +4,7 @@
 
 // !! All internal Agile Editor modules must be imported from here!!
 
-export * from "./index";
+export * from "./multieditor";
 export * from "./item";
 export * from "./validator";
 export * from "./validator/types/string.validator";

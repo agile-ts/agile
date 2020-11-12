@@ -1,5 +1,5 @@
 import { Agile } from "@agile-ts/core";
-import { MultiEditor } from "../src";
+import { MultiEditor } from "../src/multieditor";
 
 const App = new Agile();
 /*
