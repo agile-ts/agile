@@ -1,6 +1,11 @@
 import { Agile, defineConfig, generateId, isFunction } from "@agile-ts/core";
-import { DataObject, MultiEditor, ItemKey, StringValidator } from "../internal";
-import { NumberValidator } from "./types/number.validator";
+import {
+  DataObject,
+  MultiEditor,
+  ItemKey,
+  StringValidator,
+  NumberValidator,
+} from "../internal";
 
 export class Validator<DataType = any> {
   public agileInstance: () => Agile;

@@ -56,7 +56,6 @@ MY_EVENT.on("Test", () => {
 // MULTIEDITOR TEST
 
 export const multiEditor = new MultiEditor<string | undefined, boolean>(
-  App,
   (editor) => ({
     data: {
       id: "myId",

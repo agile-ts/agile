@@ -8,5 +8,6 @@ export * from "./multieditor";
 export * from "./item";
 export * from "./validator";
 export * from "./validator/types/string.validator";
+export * from "./validator/types/number.validator";
 export * from "./status/index";
 export * from "./status/status.observer";

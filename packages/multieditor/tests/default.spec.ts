@@ -3,7 +3,7 @@ import { MultiEditor } from "../src/multieditor";
 
 const App = new Agile();
 /*
-const multiEditor = new MultiEditor<string, boolean>(App, (editor) => ({
+const multiEditor = new MultiEditor<string, boolean>((editor) => ({
   data: {
     id: "myId",
     email: undefined,
@@ -19,5 +19,5 @@ const multiEditor = new MultiEditor<string, boolean>(App, (editor) => ({
     name: editor.Validator().string().max(10).min(2).required(),
   },
   editableProperties: ["email", "name"],
-}));
+}), App);
  */

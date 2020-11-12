@@ -1,4 +1,10 @@
-import { Agile, ComputeMethod, defineConfig, Observer } from "@agile-ts/core";
+import {
+  Agile,
+  ComputeMethod,
+  defineConfig,
+  getAgileInstance,
+  Observer,
+} from "@agile-ts/core";
 import {
   Item,
   Validator,
@@ -36,10 +42,13 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
-    config: EditorConfig<DataType, SubmitReturnType>
+    config: EditorConfig<DataType, SubmitReturnType>,
+    agileInstance?: Agile
   ) {
-    this.agileInstance = () => agileInstance;
+    if (!agileInstance) agileInstance = getAgileInstance(null);
+    if (!agileInstance)
+      console.log("Agile: No Global agileInstance found! Please pass an agileInstance into the MultiEditor!");
+    this.agileInstance = () => agileInstance as any;
     let _config = typeof config === "function" ? config(this) : config;
     _config = defineConfig(_config, {
       fixedProperties: [],
