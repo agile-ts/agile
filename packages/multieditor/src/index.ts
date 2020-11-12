@@ -93,12 +93,29 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   /**
    * @public
    * Dependencies of the MultiEditor
-   * Note: Has to be subscribed to the Component that holds the Form
    */
-  public get dependencies() {
+  public get deps(): Array<Observer> {
     const deps: Array<Observer> = [];
     for (let key in this.data) {
       const item = this.data[key];
+      deps.push(item.observer);
+      deps.push(item.status.observer);
+    }
+    return deps;
+  }
+
+  //=========================================================================================================
+  // Item Dependencies
+  //=========================================================================================================
+  /**
+   * @public
+   * Dependencies of specific Item
+   * @param key - Key/Name of Item
+   */
+  public itemDeps(key: ItemKey): Array<Observer> {
+    const deps: Array<Observer> = [];
+    const item = this.getItemById(key);
+    if (item) {
       deps.push(item.observer);
       deps.push(item.status.observer);
     }

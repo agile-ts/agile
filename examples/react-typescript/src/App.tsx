@@ -39,7 +39,7 @@ const App = (props: any) => {
     console.log("MY_STATE changes");
   });
 
-  useAgile(multiEditor.dependencies);
+  useAgile(multiEditor.deps);
 
   useEffect(() => {
     // Create global Instance of Core
