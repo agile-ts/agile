@@ -219,9 +219,10 @@ export class State<ValueType = any> {
   /**
    * @public
    * Resets State to its initial Value
+   * @param config - Config
    */
-  public reset(): this {
-    this.set(this.initialStateValue);
+  public reset(config: SetConfigInterface = {}): this {
+    this.set(this.initialStateValue, config);
     this.persistent?.removeValue(); // Remove State Value from Storage (since its the initial Value)
     return this;
   }

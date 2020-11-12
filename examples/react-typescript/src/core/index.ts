@@ -1,5 +1,5 @@
 import { Agile, Collection } from "@agile-ts/core";
-import { MultiEditor } from "@agile-ts/multieditor";
+import { MultiEditor, Validator } from "@agile-ts/multieditor";
 
 export const App = new Agile({
   logJobs: true,
@@ -55,6 +55,8 @@ MY_EVENT.on("Test", () => {
 
 // MULTIEDITOR TEST
 
+const emailValidator = new Validator().string().email().required();
+
 export const multiEditor = new MultiEditor<string | undefined, boolean>(
   (editor) => ({
     data: {
@@ -68,14 +70,14 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
     },
     fixedProperties: ["id"],
     validateMethods: {
-      email: editor.Validator().string().email().required(),
+      email: emailValidator,
       name: editor
         .Validator()
         .required()
         .string()
         .max(10)
         .min(2)
-        .addValidationMethod("testFuck", (key, value) => {
+        .addValidationMethod("testFuck", (key, value, editor) => {
           const isValid = value !== "Fuck";
 
           if (!isValid) {
@@ -91,7 +93,7 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
       },
     },
     editableProperties: ["email", "name"],
-    reValidateMode: "afterFirstSubmit",
+    reValidateMode: "onChange",
     validate: "all",
   })
 );

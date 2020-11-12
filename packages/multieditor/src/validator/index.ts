@@ -1,4 +1,4 @@
-import { Agile, defineConfig, generateId, isFunction } from "@agile-ts/core";
+import { defineConfig, generateId, isFunction } from "@agile-ts/core";
 import {
   DataObject,
   MultiEditor,
@@ -8,25 +8,16 @@ import {
 } from "../internal";
 
 export class Validator<DataType = any> {
-  public agileInstance: () => Agile;
-
   public _key?: ValidatorKey;
   public config: ValidatorConfigInterface = {};
   public validationMethods: DataObject<ValidationMethodInterface> = {};
-  public editor: () => MultiEditor<DataType>;
 
   /**
    * @public
    * Validator - Easy way to validate Editor Values
-   * @param editor - Editor to that the Validator belongs
    * @param config - Config
    */
-  constructor(
-    editor: MultiEditor<DataType>,
-    config: ValidatorConfigInterface = {}
-  ) {
-    this.editor = () => editor;
-    this.agileInstance = () => editor.agileInstance();
+  constructor(config: ValidatorConfigInterface = {}) {
     this.config = defineConfig(config, {
       prefix: "default",
     });
@@ -57,10 +48,15 @@ export class Validator<DataType = any> {
    * Validates Item Value at Key and updates its Status
    * @param key - Key/Name of Item
    * @param value - Value that gets validated
+   * @param editor - MultiEditor that holds the Item that gets validated
    */
-  public async validate(key: ItemKey, value: DataType): Promise<boolean> {
+  public async validate(
+    key: ItemKey,
+    value: DataType,
+    editor: MultiEditor<DataType>
+  ): Promise<boolean> {
     let isValid = true;
-    const item = this.editor().getItemById(key);
+    const item = editor.getItemById(key);
     if (!item) return false;
 
     // Track created Statuses during the Validation Time
@@ -69,21 +65,16 @@ export class Validator<DataType = any> {
     // Call validationMethods (Validation Time)
     for (let validationMethodKey in this.validationMethods)
       isValid =
-        (await this.validationMethods[validationMethodKey](key, value)) &&
-        isValid;
+        (await this.validationMethods[validationMethodKey](
+          key,
+          value,
+          editor
+        )) && isValid;
 
     // Handle tracked Statuses
     const foundStatuses = item.status.getTrackedValues();
     item.status.activeValues = new Set(foundStatuses);
-    if (foundStatuses.size <= 0) this.editor().resetStatus(key);
-
-    // Logging
-    if (this.agileInstance()) {
-      console.log(
-        `Agile: Validated Key '${key}' in Editor '${this.editor().key}'`,
-        isValid
-      );
-    }
+    if (foundStatuses.size <= 0) editor.resetStatus(key);
 
     return isValid;
   }
@@ -174,10 +165,10 @@ export class Validator<DataType = any> {
   public required(errorMessage?: string): this {
     this.addValidationMethod(
       this.getValidationMethodKey("required"),
-      async (key: ItemKey, value: DataType) => {
+      async (key: ItemKey, value: DataType, editor) => {
         const isValid = !!value;
         if (!isValid) {
-          this.editor().setStatus(
+          editor.setStatus(
             key,
             "error",
             errorMessage || `${key} is a required field`
@@ -206,7 +197,8 @@ export class Validator<DataType = any> {
 export type ValidatorKey = string | number;
 export type ValidationMethodInterface<DataType = any> = (
   key: ItemKey,
-  value: DataType
+  value: DataType,
+  editor: MultiEditor<DataType>
 ) => Promise<boolean>;
 
 /**

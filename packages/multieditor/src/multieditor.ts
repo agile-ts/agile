@@ -184,18 +184,24 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public updateInitialValue(
     key: ItemKey,
     value: DataType,
-    config: SetValueConfigInterface = {}
+    config: UpdateInitialValueConfigInterface = {}
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
     config = defineConfig(config, {
-      background: true,
+      background: false,
+      reset: true,
     });
 
     // Update initial Value
     item.initialStateValue = value;
-    if (!config.background)
+
+    // Force Rerender
+    if (!config.background && !config.reset)
       item.ingest({ ...{ forceRerender: true }, ...config });
+
+    // Reset Item (-> Assign current Value to the new Initial Value)
+    if (config.reset) item.reset({ background: config.background });
 
     return this;
   }
@@ -389,12 +395,12 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
         if (!validation.key) validation.key = key;
         return validation;
       } else {
-        return new Validator<DataType>(this as any, {
+        return new Validator<DataType>({
           key: key,
         }).addValidationMethod(validation);
       }
     }
-    return new Validator<DataType>(this as any, { key: key });
+    return new Validator<DataType>({ key: key });
   }
 
   //=========================================================================================================
@@ -531,6 +537,15 @@ export interface SetValueConfigInterface {
 export interface SubmitConfigInterface {
   assignToInitial?: boolean;
   onSubmitConfig?: any;
+}
+
+/**
+ * @param reset - If Item gets reset -> new Initial Value gets assigned to the Item Value
+ * @param background - If setting the new Item initial Value happens in the background (-> not causing any rerender)
+ */
+export interface UpdateInitialValueConfigInterface {
+  reset?: boolean;
+  background?: boolean;
 }
 
 export type RevalidationModeType = "onChange" | "onSubmit" | "afterFirstSubmit";

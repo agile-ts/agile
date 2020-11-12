@@ -1,4 +1,4 @@
-import { defineConfig, State } from "@agile-ts/core";
+import { defineConfig, SetConfigInterface, State } from "@agile-ts/core";
 import { MultiEditor, Validator, Status, ItemKey } from "./internal";
 
 export class Item<DataType = any> extends State<DataType> {
@@ -35,7 +35,11 @@ export class Item<DataType = any> extends State<DataType> {
 
     // Add SideEffect that rebuilds the Status depending of the Item value
     this.addSideEffect("validateItem", async () => {
-      this.isValid = await this.validator.validate(key, this.value);
+      this.isValid = await this.validator.validate(
+        key,
+        this.value,
+        this.editor()
+      );
       if (this.editor().canAssignStatusToItemOnChange(this))
         this.status.display = true;
       this.editor().validate();
@@ -52,7 +56,7 @@ export class Item<DataType = any> extends State<DataType> {
    */
   public async validate(): Promise<boolean> {
     const isValid = this.key
-      ? await this.validator.validate(this.key, this.value)
+      ? await this.validator.validate(this.key, this.value, this.editor())
       : false;
     this.isValid = isValid;
     return isValid;
@@ -64,9 +68,10 @@ export class Item<DataType = any> extends State<DataType> {
   /**
    * @public
    * Resets State to its initial Value
+   * @param config - Config
    */
-  public reset(): this {
-    super.reset();
+  public reset(config: SetConfigInterface = {}): this {
+    super.reset(config);
     this.status.display = false;
     return this;
   }
