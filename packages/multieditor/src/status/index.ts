@@ -48,7 +48,14 @@ export class Status<DataType = any> {
    */
   public set(value: StatusInterface | null): this {
     this.nextValue = copy(value);
+
+    // Track Status
     if (this.track && value) this.foundValues.add(value);
+
+    // Assign Status to Item
+    if (this.item.editor().canAssignStatusToItemOnChange(this.item))
+      this.assign();
+
     return this;
   }
 

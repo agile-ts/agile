@@ -47,7 +47,9 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
-      console.log("Agile: No Global agileInstance found! Please pass an agileInstance into the MultiEditor!");
+      console.log(
+        "Agile: No Global agileInstance found! Please pass an agileInstance into the MultiEditor!"
+      );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === "function" ? config(this) : config;
     _config = defineConfig(_config, {
@@ -205,6 +207,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @public
    * Submits Editor
    * @param config - Config
+   * @return false if MultiEditor is not valid
    */
   public async submit(
     config: SubmitConfigInterface = {}
@@ -266,13 +269,12 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     for (let key in this.data) {
       const item = this.data[key];
       item.reset();
-      item.status.set(null);
     }
 
     // Reset Editor
     this.isModified = false;
-    this.validate();
     this.submitted = false;
+    this.validate();
 
     return this;
   }
@@ -290,16 +292,10 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public setStatus(key: ItemKey, type: StatusType, message: string): this {
     const item = this.getItemById(key);
     if (!item) return this;
-
-    // Set Status to Item
     item.status.set({
       type: type,
       message: message,
     });
-
-    // Assign Status to Item
-    if (this.canAssignStatusToItemOnChange(item)) item.status.assign();
-
     return this;
   }
 
@@ -314,13 +310,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public resetStatus(key: ItemKey): this {
     const item = this.getItemById(key);
     if (!item || !item.status) return this;
-
-    // Set Status to Item
     item.status.set(null);
-
-    // Assign Status to Item
-    if (this.canAssignStatusToItemOnChange(item)) item.status.assign();
-
     return this;
   }
 

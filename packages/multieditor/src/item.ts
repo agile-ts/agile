@@ -36,7 +36,8 @@ export class Item<DataType = any> extends State<DataType> {
     // Add SideEffect that rebuilds the Status depending of the Item value
     this.addSideEffect("validateItem", async () => {
       this.isValid = await this.validator.validate(key, this.value);
-      this.status.display = true;
+      if (this.editor().canAssignStatusToItemOnChange(this))
+        this.status.display = true;
       this.editor().validate();
       this.editor().updateIsModified();
     });
@@ -55,6 +56,19 @@ export class Item<DataType = any> extends State<DataType> {
       : false;
     this.isValid = isValid;
     return isValid;
+  }
+
+  //=========================================================================================================
+  // Reset
+  //=========================================================================================================
+  /**
+   * @public
+   * Resets State to its initial Value
+   */
+  public reset(): this {
+    super.reset();
+    this.status.display = false;
+    return this;
   }
 }
 

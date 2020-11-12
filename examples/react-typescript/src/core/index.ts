@@ -76,7 +76,7 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
         .max(10)
         .min(2)
         .addValidationMethod("testFuck", (key, value) => {
-          const isValid = value !== "fuck";
+          const isValid = value !== "Fuck";
 
           if (!isValid) {
             editor.setStatus(key, "error", "Fuck is no valid Name!");
