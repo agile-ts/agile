@@ -1,6 +1,7 @@
 import {
   Agile,
   ComputeMethod,
+  copy,
   defineConfig,
   getAgileInstance,
   Observer,
@@ -13,7 +14,11 @@ import {
   ValidationMethodInterface,
 } from "./internal";
 
-export class MultiEditor<DataType = any, SubmitReturnType = void> {
+export class MultiEditor<
+  DataType = any,
+  SubmitReturnType = void,
+  OnSubmitConfigType = any
+> {
   public agileInstance: () => Agile;
 
   public config: EditorConfigInterface;
@@ -28,7 +33,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
   public computeMethods: DataObject<ComputeMethod<DataType>> = {};
   public onSubmit: (
     preparedData: DataObject<DataType>,
-    config?: any
+    config?: OnSubmitConfigType
   ) => Promise<SubmitReturnType>;
 
   public _key?: EditorKey;
@@ -42,7 +47,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @param config - Config
    */
   constructor(
-    config: EditorConfig<DataType, SubmitReturnType>,
+    config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
     agileInstance?: Agile
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
@@ -194,7 +199,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
     });
 
     // Update initial Value
-    item.initialStateValue = value;
+    item.initialStateValue = copy(value);
 
     // Force Rerender
     if (!config.background && !config.reset)
@@ -216,7 +221,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
    * @return false if MultiEditor is not valid
    */
   public async submit(
-    config: SubmitConfigInterface = {}
+    config: SubmitConfigInterface<OnSubmitConfigType> = {}
   ): Promise<SubmitReturnType | false> {
     const preparedData: DataObject<DataType> = {};
     config = defineConfig(config, {
@@ -260,7 +265,7 @@ export class MultiEditor<DataType = any, SubmitReturnType = void> {
       preparedData[key] = item.value;
     }
 
-    return await this.onSubmit(preparedData, config);
+    return await this.onSubmit(preparedData, config.onSubmitConfig);
   }
 
   //=========================================================================================================
@@ -492,7 +497,8 @@ export type ItemKey = string | number;
  */
 export interface CreateEditorConfigInterface<
   DataType = any,
-  SubmitReturnType = void
+  SubmitReturnType = void,
+  onSubmitConfig = any
 > extends EditorConfigInterface {
   key?: string;
   data: DataObject<DataType>;
@@ -504,7 +510,7 @@ export interface CreateEditorConfigInterface<
   computeMethods?: DataObject<ComputeMethod<DataType>>;
   onSubmit: (
     preparedData: DataObject<DataType>,
-    config?: any
+    config?: onSubmitConfig
   ) => Promise<SubmitReturnType>;
 }
 
@@ -517,11 +523,19 @@ export interface EditorConfigInterface {
   validate?: ValidateType;
 }
 
-export type EditorConfig<DataType = any, SubmitReturnType = void> =
-  | CreateEditorConfigInterface<DataType, SubmitReturnType>
+export type EditorConfig<
+  DataType = any,
+  SubmitReturnType = void,
+  OnSubmitConfigType = any
+> =
+  | CreateEditorConfigInterface<DataType, SubmitReturnType, OnSubmitConfigType>
   | ((
-      editor: MultiEditor<DataType, SubmitReturnType>
-    ) => CreateEditorConfigInterface<DataType, SubmitReturnType>);
+      editor: MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>
+    ) => CreateEditorConfigInterface<
+      DataType,
+      SubmitReturnType,
+      OnSubmitConfigType
+    >);
 
 /**
  * @param background - If assigning a new Item happens in the background (-> not causing any rerender)
@@ -534,9 +548,9 @@ export interface SetValueConfigInterface {
  * @param assignToInitial - If modified Value gets set to the initial Value of the Item
  * @param onSubmitConfig - Config that gets passed into the onSubmit Function
  */
-export interface SubmitConfigInterface {
+export interface SubmitConfigInterface<OnSubmitConfigType = any> {
   assignToInitial?: boolean;
-  onSubmitConfig?: any;
+  onSubmitConfig?: OnSubmitConfigType;
 }
 
 /**

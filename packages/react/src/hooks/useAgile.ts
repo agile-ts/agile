@@ -9,6 +9,7 @@ import {
   State,
   SubscriptionContainerKeyType,
 } from "@agile-ts/core";
+import { useIsomorphicLayoutEffect } from "../utils/useIsomorphicLayoutEffect";
 
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
@@ -95,9 +96,9 @@ export function useAgile<
   };
 
   // Trigger State used to force the component to rerender
-  const [_, set_] = React.useState({});
+  const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
-  React.useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     // Get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
 
@@ -117,7 +118,7 @@ export function useAgile<
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
       () => {
-        set_({});
+        forceRender();
       },
       observers,
       key

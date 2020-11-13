@@ -8,12 +8,15 @@ import { State, Agile, Event, Collection, Observer } from "./internal";
  * Creates a fresh copy of an Array/Object
  * @param value - Array/Object that gets copied
  */
-export function copy<T = any>(value: T): T;
-export function copy<T extends Array<T>>(value: T): T[];
-export function copy<T = any>(value: T): T | T[] {
-  if (Array.isArray(value)) return [...value];
-  if (isValidObject(value)) return { ...value };
-  return value;
+export function copy<T = any>(value: T): T {
+  if (typeof value !== "object") return value;
+  let temp;
+  let newObject: any = Array.isArray(value) ? [] : {};
+  for (let property in value) {
+    temp = value[property];
+    newObject[property] = typeof temp === "object" ? copy(temp) : temp;
+  }
+  return newObject as T;
 }
 
 //=========================================================================================================
