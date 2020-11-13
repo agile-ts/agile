@@ -6,14 +6,31 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    * @public
    * String Validator
    * @param validator - Validator
+   * @param errorMessage - Error Message
    */
-  constructor(validator: Validator<DataType>) {
+  constructor(validator: Validator<DataType>, errorMessage?: string) {
     super({ key: validator.key, prefix: "string" });
 
     // Copy ValidationMethods of old Validator into this Validator
     for (let key in validator.validationMethods) {
       this.validationMethods[key] = copy(validator.validationMethods[key]);
     }
+
+    // Add String Validation Method
+    this.addValidationMethod(
+      this.getValidationMethodKey("isString"),
+      async (key, value, editor) => {
+        const isValid = typeof value === "string";
+        if (!isValid) {
+          editor.setStatus(
+            key,
+            "error",
+            errorMessage || `${key} is no valid String!`
+          );
+        }
+        return isValid;
+      }
+    );
   }
 
   //=========================================================================================================

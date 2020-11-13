@@ -1,4 +1,4 @@
-import { clone, defineConfig, generateId, isFunction } from "@agile-ts/core";
+import { copy, defineConfig, generateId, isFunction } from "@agile-ts/core";
 import {
   DataObject,
   MultiEditor,
@@ -59,11 +59,14 @@ export class Validator<DataType = any> {
     const item = editor.getItemById(key);
     if (!item) return false;
 
+    // Reverse because the first validation Method should have the highest weight
+    const validationMethodKeys = Object.keys(this.validationMethods).reverse();
+
     // Track created Statuses during the Validation Time
     item.status.track = true;
 
     // Call validationMethods (Validation Time)
-    for (let validationMethodKey in this.validationMethods)
+    for (let validationMethodKey of validationMethodKeys)
       isValid =
         (await this.validationMethods[validationMethodKey](
           key,
@@ -155,14 +158,18 @@ export class Validator<DataType = any> {
   }
 
   //=========================================================================================================
-  // Copy
+  // Clone
   //=========================================================================================================
   /**
    * @public
-   * Get a fresh copy of this Validator
+   * Get a fresh clone of this Validator
    */
-  public copy(): Validator<DataType> {
-    return clone(this);
+  public clone(): Validator<DataType> {
+    const clone = new Validator<DataType>();
+    clone.validationMethods = copy(this.validationMethods);
+    clone._key = this._key;
+    clone.config = copy(this.config);
+    return clone;
   }
 
   //=========================================================================================================

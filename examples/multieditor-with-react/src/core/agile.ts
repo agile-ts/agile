@@ -1,5 +1,5 @@
 import { Agile } from "@agile-ts/core";
 
-const AgileInstance = new Agile();
+const App = new Agile();
 
-export default AgileInstance;
+export default App;

@@ -6,6 +6,7 @@ import { State, Agile, Event, Collection, Observer } from "./internal";
 /**
  * @internal
  * Creates a fresh copy of an Array/Object
+ * https://www.samanthaming.com/tidbits/70-3-ways-to-clone-objects/
  * @param value - Array/Object that gets copied
  */
 export function copy<T = any>(value: T): T {
@@ -264,7 +265,7 @@ export function generateId(length?: number) {
  * Clones a Class
  * @param instance - Instance of Class you want to clone
  */
-export function clone<T>(instance: T): T {
+export function clone<T = any>(instance: T): T {
   const copy: T = Object.create(Object.getPrototypeOf(instance));
   return Object.assign(copy, instance);
 }
