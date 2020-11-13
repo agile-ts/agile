@@ -3,6 +3,7 @@ import "./App.css";
 import ErrorMessage from "./components/ErrorMessage";
 import { useAgile } from "@agile-ts/react";
 import { signUpEditor } from "./core/signUpEditor";
+import { generateColor, generateId } from "./core/utils";
 
 const App = () => {
   useAgile(signUpEditor.deps);
@@ -62,6 +63,36 @@ const App = () => {
         onChange={(e) => signUpEditor.setValue("aboutYou", e.target.value)}
       />
       <ErrorMessage error={signUpEditor.getStatus("aboutYou")?.message} />
+
+      <label>Image</label>
+      <div
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
+        <div
+          style={{
+            backgroundColor: signUpEditor.getValueById("image")?.color,
+            width: 100,
+            height: 100,
+            borderRadius: 100,
+          }}
+        />
+        <button
+          style={{ marginLeft: 50 }}
+          onClick={() => {
+            signUpEditor.setValue(
+              "image",
+              {
+                id: generateId(),
+                color: generateColor(),
+              },
+              { background: false }
+            );
+          }}
+        >
+          Reset Image
+        </button>
+      </div>
+      <ErrorMessage error={signUpEditor.getStatus("image")?.message} />
 
       <input type="submit" />
     </form>

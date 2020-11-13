@@ -1,5 +1,6 @@
 import MultiEditor, { Validator } from "@agile-ts/multieditor";
 import App from "./agile";
+import { generateColor, generateId, isLight } from "./utils";
 
 export const isValidNameValidator = new Validator()
   .required()
@@ -19,6 +20,10 @@ export const signUpEditor = new MultiEditor(
       email: "",
       aboutYou: "",
       age: undefined,
+      image: {
+        id: generateId(),
+        color: generateColor(),
+      },
     },
     onSubmit: async (preparedData) => {
       alert(JSON.stringify(preparedData));
@@ -52,6 +57,14 @@ export const signUpEditor = new MultiEditor(
         }),
       age: editor.Validator().required().number().min(18).max(100),
       gender: editor.Validator().required(),
+      image: editor
+        .Validator()
+        .required()
+        .addValidationMethod(async (key, value, editor) => {
+          const isValid = isLight(value.color);
+          if (!isValid) editor.setStatus(key, "error", "The Image is to dark!");
+          return isValid;
+        }),
     },
     computeMethods: {
       lastName: (value) => {
