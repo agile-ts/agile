@@ -9,7 +9,7 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    * @param errorMessage - Error Message
    */
   constructor(validator: Validator<DataType>, errorMessage?: string) {
-    super({ key: validator.key, prefix: "string" });
+    super({ key: validator.key, prefix: "number" });
 
     // Copy ValidationMethods of old Validator into this Validator
     for (let key in validator.validationMethods) {

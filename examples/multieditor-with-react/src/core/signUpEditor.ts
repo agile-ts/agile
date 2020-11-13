@@ -14,11 +14,11 @@ export const signUpEditor = new MultiEditor(
       id: "myCoolId",
       firstName: "",
       lastName: "",
-      gender: null,
+      gender: undefined,
       userName: "",
       email: "",
       aboutYou: "",
-      age: null,
+      age: undefined,
     },
     onSubmit: async (preparedData) => {
       alert(JSON.stringify(preparedData));

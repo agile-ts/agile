@@ -59,7 +59,7 @@ export class Validator<DataType = any> {
     const item = editor.getItemById(key);
     if (!item) return false;
 
-    // Reverse because the first validation Method should have the highest weight
+    // Reverse because the first validation Method should have the highest weight (needs to be called as last to overwrite the Status)
     const validationMethodKeys = Object.keys(this.validationMethods).reverse();
 
     // Track created Statuses during the Validation Time

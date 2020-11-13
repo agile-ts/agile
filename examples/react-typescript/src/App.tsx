@@ -41,8 +41,8 @@ const App = (props: any) => {
 
   useAgile(multiEditor.deps);
 
+  // Create global Instance of Core (for better debugging)
   useEffect(() => {
-    // Create global Instance of Core
     globalBind("__core__", { ...require("./core") });
   }, []);
 

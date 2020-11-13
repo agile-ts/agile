@@ -35,7 +35,9 @@ const App = () => {
 
       <label>Gender</label>
       <select onChange={(e) => signUpEditor.setValue("gender", e.target.value)}>
-        <option value="">Select...</option>
+        <option selected value={""}>
+          Select...
+        </option>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
