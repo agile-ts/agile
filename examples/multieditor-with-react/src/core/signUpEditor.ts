@@ -13,8 +13,8 @@ export const signUpEditor = new MultiEditor(
   (editor) => ({
     data: {
       id: "myCoolId",
-      firstName: "",
-      lastName: "",
+      firstName: "Jeff",
+      lastName: "Anderson",
       gender: undefined,
       userName: "",
       email: "",

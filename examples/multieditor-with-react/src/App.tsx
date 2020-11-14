@@ -20,6 +20,7 @@ const App = () => {
       <label>First Name:</label>
       <input
         onChange={(e) => signUpEditor.setValue("firstName", e.target.value)}
+        value={signUpEditor.getValueById("firstName")}
       />
       <ErrorMessage error={signUpEditor.getStatus("firstName")?.message} />
 
@@ -33,6 +34,32 @@ const App = () => {
         value={signUpEditor.getValueById("lastName")}
       />
       <ErrorMessage error={signUpEditor.getStatus("lastName")?.message} />
+
+      <label>Image</label>
+      <div
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
+        <div
+          style={{
+            backgroundColor: signUpEditor.getValueById("image")?.color,
+            width: 100,
+            height: 100,
+            borderRadius: 100,
+          }}
+        />
+        <button
+          style={{ marginLeft: 50 }}
+          onClick={() => {
+            signUpEditor.setValue("image", {
+              id: generateId(),
+              color: generateColor(),
+            });
+          }}
+        >
+          Reset Image
+        </button>
+      </div>
+      <ErrorMessage error={signUpEditor.getStatus("image")?.message} />
 
       <label>Gender</label>
       <select onChange={(e) => signUpEditor.setValue("gender", e.target.value)}>
@@ -64,37 +91,7 @@ const App = () => {
       />
       <ErrorMessage error={signUpEditor.getStatus("aboutYou")?.message} />
 
-      <label>Image</label>
-      <div
-        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
-      >
-        <div
-          style={{
-            backgroundColor: signUpEditor.getValueById("image")?.color,
-            width: 100,
-            height: 100,
-            borderRadius: 100,
-          }}
-        />
-        <button
-          style={{ marginLeft: 50 }}
-          onClick={() => {
-            signUpEditor.setValue(
-              "image",
-              {
-                id: generateId(),
-                color: generateColor(),
-              },
-              { background: false }
-            );
-          }}
-        >
-          Reset Image
-        </button>
-      </div>
-      <ErrorMessage error={signUpEditor.getStatus("image")?.message} />
-
-      <input type="submit" />
+      <input type={"submit"} />
     </form>
   );
 };
