@@ -26,7 +26,7 @@ export * from "./state/state.observer";
 export * from "./state/state.persistent";
 
 // Computed
-export { Computed } from "./computed";
+export * from "./computed";
 
 // Collection
 export * from "./collection";

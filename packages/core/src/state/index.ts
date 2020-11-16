@@ -6,7 +6,6 @@ import {
   flatMerge,
   isValidObject,
   StateObserver,
-  internalIngestKey,
   StatePersistent,
   Observer,
   equal,
@@ -29,10 +28,11 @@ export class State<ValueType = any> {
   public previousStateValue: ValueType;
   public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
-  public observer: StateObserver; // Handles deps and subs of State and is like an interface to the Runtime
+  public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
   public sideEffects: {
     [key: string]: (properties?: { [key: string]: any }) => void;
   } = {}; // SideEffects of State (will be executed in Runtime)
+  public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted: boolean = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
@@ -152,7 +152,7 @@ export class State<ValueType = any> {
     }
 
     // Check if value has changed
-    if (equal(this.nextStateValue, value)) return this;
+    if (equal(this.nextStateValue, value) && !config.forceRerender) return this;
 
     // Ingest new value into runtime
     this.observer.ingest(value, config);
@@ -174,7 +174,7 @@ export class State<ValueType = any> {
       background: false,
       forceRerender: false,
     });
-    this.observer.ingest(internalIngestKey, config);
+    this.observer.ingest(config);
     return this;
   }
 
@@ -219,9 +219,10 @@ export class State<ValueType = any> {
   /**
    * @public
    * Resets State to its initial Value
+   * @param config - Config
    */
-  public reset(): this {
-    this.set(this.initialStateValue);
+  public reset(config: SetConfigInterface = {}): this {
+    this.set(this.initialStateValue, config);
     this.persistent?.removeValue(); // Remove State Value from Storage (since its the initial Value)
     return this;
   }
@@ -507,6 +508,19 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
+  // Compute
+  //=========================================================================================================
+  /**
+   * @public
+   * Compute Value if it changes
+   * @param method - Method that will be used to compute the new Value
+   */
+  public compute(method: ComputeMethod<ValueType>): this {
+    this.computeMethod = method;
+    return this;
+  }
+
+  //=========================================================================================================
   // Add SideEffect
   //=========================================================================================================
   /**
@@ -597,11 +611,13 @@ export type StateKey = string | number;
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of State get executed
  * @param storage - If State value gets saved in Agile Storage (only useful if State is persisted)
+ * @param forceRerender -  Force rerender no matter what happens
  */
 export interface SetConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
   storage?: boolean;
+  forceRerender?: boolean;
 }
 
 /**
@@ -614,3 +630,4 @@ export interface PatchConfigInterface {
 }
 
 export type Callback<T = any> = (value: T) => void;
+export type ComputeMethod<T = any> = (value: T) => T;

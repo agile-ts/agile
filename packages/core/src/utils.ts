@@ -1,4 +1,4 @@
-import { State, Agile, Event, Collection } from "./internal";
+import { State, Agile, Event, Collection, Observer } from "./internal";
 
 //=========================================================================================================
 // Copy
@@ -6,14 +6,19 @@ import { State, Agile, Event, Collection } from "./internal";
 /**
  * @internal
  * Creates a fresh copy of an Array/Object
+ * https://www.samanthaming.com/tidbits/70-3-ways-to-clone-objects/
  * @param value - Array/Object that gets copied
  */
-export function copy<T = any>(value: T): T;
-export function copy<T extends Array<T>>(value: T): T[];
-export function copy<T = any>(value: T): T | T[] {
-  if (Array.isArray(value)) return [...value];
-  if (isValidObject(value)) return { ...value };
-  return value;
+export function copy<T = any>(value: T): T {
+  // Extra checking '!value' because 'typeof null === object'
+  if (!value || typeof value !== "object") return value;
+  let temp;
+  let newObject: any = Array.isArray(value) ? [] : {};
+  for (let property in value) {
+    temp = value[property];
+    newObject[property] = typeof temp === "object" ? copy(temp) : temp;
+  }
+  return newObject as T;
 }
 
 //=========================================================================================================
@@ -54,11 +59,16 @@ export function isValidObject(value: any): boolean {
  * @internal
  * Transforms Item/s to an Item Array
  * @param items - Item/s that gets transformed to an Array
+ * @param config - Config
  */
 export function normalizeArray<DataType = any>(
-  items?: DataType | Array<DataType>
+  items?: DataType | Array<DataType>,
+  config: { createUndefinedArray?: boolean } = {}
 ): Array<DataType> {
-  if (!items) return [];
+  config = defineConfig(config, {
+    createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
+  });
+  if (!items && !config.createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 
@@ -78,6 +88,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
       if (instance instanceof State) return instance.agileInstance();
       if (instance instanceof Event) return instance.agileInstance();
       if (instance instanceof Collection) return instance.agileInstance();
+      if (instance instanceof Observer) return instance.agileInstance();
       const _agileInstance = instance["agileInstance"];
       if (_agileInstance) return instance;
     }
@@ -229,7 +240,7 @@ export function equal(value1: any, value2: any): boolean {
  * @param value2 - Second Value
  */
 export function notEqual(value1: any, value2: any): boolean {
-  return value1 !== value2 && JSON.stringify(value1) !== JSON.stringify(value2);
+  return !equal(value1, value2);
 }
 
 //=========================================================================================================
@@ -260,7 +271,7 @@ export function generateId(length?: number) {
  * Clones a Class
  * @param instance - Instance of Class you want to clone
  */
-export function clone<T>(instance: T): T {
+export function clone<T = any>(instance: T): T {
   const copy: T = Object.create(Object.getPrototypeOf(instance));
   return Object.assign(copy, instance);
 }

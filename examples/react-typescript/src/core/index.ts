@@ -1,4 +1,5 @@
 import { Agile, Collection } from "@agile-ts/core";
+import { MultiEditor, Validator } from "@agile-ts/multieditor";
 
 export const App = new Agile({
   logJobs: true,
@@ -25,7 +26,7 @@ interface collectionValueInterface {
 }
 
 export const MY_COLLECTION = App.Collection<collectionValueInterface>(
-  (collection: Collection) => ({
+  (collection) => ({
     key: "my-collection",
     groups: {
       myGroup: collection.Group(),
@@ -51,3 +52,48 @@ MY_EVENT.on(() => {
 MY_EVENT.on("Test", () => {
   console.log("Triggered Event (Test)");
 });
+
+// MULTIEDITOR TEST
+
+const emailValidator = new Validator().string().email().required();
+
+export const multiEditor = new MultiEditor<string | undefined, boolean>(
+  (editor) => ({
+    data: {
+      id: "myId",
+      email: undefined,
+      name: undefined,
+    },
+    onSubmit: async (data) => {
+      console.log("Submitted MultiEditor", data);
+      return Promise.resolve(true);
+    },
+    fixedProperties: ["id"],
+    validateMethods: {
+      email: emailValidator,
+      name: editor
+        .Validator()
+        .required()
+        .string()
+        .max(10)
+        .min(2)
+        .addValidationMethod("testFuck", (key, value, editor) => {
+          const isValid = value !== "Fuck";
+
+          if (!isValid) {
+            editor.setStatus(key, "error", "Fuck is no valid Name!");
+          }
+
+          return Promise.resolve(isValid);
+        }),
+    },
+    computeMethods: {
+      name: (value) => {
+        return value ? value?.charAt(0).toUpperCase() + value?.slice(1) : value;
+      },
+    },
+    editableProperties: ["email", "name"],
+    reValidateMode: "onChange",
+    validate: "all",
+  })
+);

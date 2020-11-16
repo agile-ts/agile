@@ -5,6 +5,7 @@ import {
   ComponentSubscriptionContainer,
   CallbackSubscriptionContainer,
   isFunction,
+  SubscriptionContainerKeyType,
 } from "../../internal";
 
 export class SubController {
@@ -30,10 +31,12 @@ export class SubController {
    * Subscribe with Object shaped Subscriptions
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscription Object
+   * @param key - Key/Name of SubscriptionContainer
    */
   public subscribeWithSubsObject(
     integrationInstance: any,
-    subs: { [key: string]: Observer } = {}
+    subs: { [key: string]: Observer } = {},
+    key?: SubscriptionContainerKeyType
   ): {
     subscriptionContainer: SubscriptionContainer;
     props: { [key: string]: Observer["value"] };
@@ -84,15 +87,18 @@ export class SubController {
    * Subscribe with Array shaped Subscriptions
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscription Array
+   * @param key - Key/Name of SubscriptionContainer
    */
   public subscribeWithSubsArray(
     integrationInstance: any,
-    subs: Array<Observer> = []
+    subs: Array<Observer> = [],
+    key?: SubscriptionContainerKeyType
   ): SubscriptionContainer {
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
       integrationInstance,
-      subs
+      subs,
+      key
     );
 
     // Register subs
@@ -164,14 +170,16 @@ export class SubController {
    * Registers SubscriptionContainer and decides weather integrationInstance is a callback or component based Subscription
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscriptions
+   * @param key - Key/Name of SubscriptionContainer
    */
   public registerSubscription(
     integrationInstance: any,
-    subs: Array<Observer> = []
+    subs: Array<Observer> = [],
+    key?: SubscriptionContainerKeyType
   ): SubscriptionContainer {
     if (isFunction(integrationInstance))
-      return this.registerCallbackSubscription(integrationInstance, subs);
-    return this.registerComponentSubscription(integrationInstance, subs);
+      return this.registerCallbackSubscription(integrationInstance, subs, key);
+    return this.registerComponentSubscription(integrationInstance, subs, key);
   }
 
   //=========================================================================================================
@@ -182,14 +190,17 @@ export class SubController {
    * Registers Component based Subscription
    * @param componentInstance - Component that got subscribed by Observer/s
    * @param subs - Initial Subscriptions
+   * @param key - Key/Name of SubscriptionContainer
    */
   private registerComponentSubscription(
     componentInstance: any,
-    subs: Array<Observer> = []
+    subs: Array<Observer> = [],
+    key?: SubscriptionContainerKeyType
   ): ComponentSubscriptionContainer {
     const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
-      new Set(subs)
+      new Set(subs),
+      key
     );
     this.componentSubs.add(componentSubscriptionContainer);
 
@@ -219,14 +230,17 @@ export class SubController {
    * Registers Callback based Subscription
    * @param callbackFunction - Callback Function that causes rerender on Component which got subscribed by Observer/s
    * @param subs - Initial Subscriptions
+   * @param key - Key/Name of SubscriptionContainer
    */
   private registerCallbackSubscription(
     callbackFunction: () => void,
-    subs: Array<Observer> = []
+    subs: Array<Observer> = [],
+    key?: SubscriptionContainerKeyType
   ): CallbackSubscriptionContainer {
     const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
       callbackFunction,
-      new Set(subs)
+      new Set(subs),
+      key
     );
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;

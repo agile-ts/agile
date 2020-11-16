@@ -13,9 +13,6 @@ import {
   isFunction,
 } from "../internal";
 
-export const internalIngestKey =
-  "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
-
 export class StateObserver<ValueType = any> extends Observer {
   public state: () => State<ValueType>;
   public nextStateValue: ValueType; // Next State value
@@ -36,7 +33,7 @@ export class StateObserver<ValueType = any> extends Observer {
   ) {
     super(agileInstance, deps, key, state.value);
     this.state = () => state;
-    this.nextStateValue = state.value;
+    this.nextStateValue = copy(state.value);
   }
 
   //=========================================================================================================
@@ -44,16 +41,38 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
+   * Ingests nextStateValue into Runtime and applies it to the State
+   * @param config - Config
+   */
+  public ingest(config: StateJobConfigInterface): void;
+  /**
+   * @internal
    * Ingests new State Value into Runtime and applies it to the State
    * @param newStateValue - New Value of the State
    * @param config - Config
    */
   public ingest(
-    newStateValue: ValueType | InternalIngestKeyType = internalIngestKey,
+    newStateValue: ValueType,
+    config: StateJobConfigInterface
+  ): void;
+  public ingest(
+    newStateValueOrConfig: ValueType | StateJobConfigInterface,
     config: StateJobConfigInterface = {}
   ): void {
     const state = this.state();
-    config = defineConfig<JobConfigInterface>(config, {
+    let _newStateValue: ValueType;
+    let _config: StateJobConfigInterface;
+
+    if (isStateJobConfigInterface(newStateValueOrConfig)) {
+      _config = newStateValueOrConfig;
+      if (state instanceof Computed) _newStateValue = state.computeValue();
+      else _newStateValue = state.nextStateValue;
+    } else {
+      _config = config;
+      _newStateValue = newStateValueOrConfig;
+    }
+
+    _config = defineConfig(_config, {
       perform: true,
       background: false,
       sideEffects: true,
@@ -62,19 +81,18 @@ export class StateObserver<ValueType = any> extends Observer {
     });
 
     // If forceRerender, set background config to false since forceRerender is 'stronger' than background
-    if (config.forceRerender && config.background) config.background = false;
+    if (_config.forceRerender && _config.background) _config.background = false;
 
-    // Grab nextState or compute State if internalIngestKey got passed
-    if (newStateValue === internalIngestKey) {
-      if (state instanceof Computed) this.nextStateValue = state.computeValue();
-      else this.nextStateValue = state.nextStateValue;
-    } else this.nextStateValue = newStateValue;
+    // Assign next State Value and compute it if necessary
+    this.nextStateValue = state.computeMethod
+      ? copy(state.computeMethod(_newStateValue))
+      : copy(_newStateValue);
 
-    // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey)
-    if (equal(state.value, this.nextStateValue) && !config.forceRerender)
+    // Check if State Value and new/next Value are equals
+    if (equal(state.value, this.nextStateValue) && !_config.forceRerender)
       return;
 
-    this.agileInstance().runtime.ingest(this, config);
+    this.agileInstance().runtime.ingest(this, _config);
   }
 
   //=========================================================================================================
@@ -104,8 +122,8 @@ export class StateObserver<ValueType = any> extends Observer {
 
     // Reset isPlaceholder and set initial/previous Value to nextValue because the placeholder State had no proper value before
     if (state.isPlaceholder) {
-      state.initialStateValue = copy(state.nextStateValue);
-      state.previousStateValue = copy(state.nextStateValue);
+      state.initialStateValue = copy(state.value);
+      state.previousStateValue = copy(state.value);
       state.isPlaceholder = false;
     }
 
@@ -141,17 +159,29 @@ export class StateObserver<ValueType = any> extends Observer {
     // Ingest Dependencies of Observer into Runtime
     job.observer.deps.forEach(
       (observer) =>
-        observer instanceof StateObserver &&
-        observer.ingest(internalIngestKey, { perform: false })
+        observer instanceof StateObserver && observer.ingest({ perform: false })
     );
   }
 }
-
-export type InternalIngestKeyType = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
 /**
  * @param forceRerender - Force rerender no matter what happens
  */
 export interface StateJobConfigInterface extends JobConfigInterface {
   forceRerender?: boolean;
+}
+
+// https://stackoverflow.com/questions/40081332/what-does-the-is-keyword-do-in-typescript
+export function isStateJobConfigInterface(
+  object: any
+): object is StateJobConfigInterface {
+  return (
+    object &&
+    typeof object === "object" &&
+    ("forceRerender" in object ||
+      "perform" in object ||
+      "background" in object ||
+      "sideEffects" in object ||
+      "storage" in object)
+  );
 }
