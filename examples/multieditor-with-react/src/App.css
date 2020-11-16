@@ -18,17 +18,21 @@ h1 {
   border-bottom: 1px solid rgb(79, 98, 148);
 }
 
+p {
+  color: white;
+}
+
 .form {
   background: #0e101c;
   max-width: 400px;
   margin: 0 auto;
 }
 
-p {
+.error {
   color: #bf1650;
 }
 
-p::before {
+.error::before {
   display: inline;
   content: "⚠ ";
 }

@@ -101,6 +101,8 @@ const App = () => {
       >
         Submit
       </button>
+      <p>Is Modified: {signUpEditor.isModified.toString()}</p>
+      <p>Is Valid: {signUpEditor.isValid.toString()}</p>
     </form>
   );
 };
