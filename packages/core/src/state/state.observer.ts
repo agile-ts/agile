@@ -176,6 +176,7 @@ export function isStateJobConfigInterface(
   object: any
 ): object is StateJobConfigInterface {
   return (
+    object &&
     typeof object === "object" &&
     ("forceRerender" in object ||
       "perform" in object ||

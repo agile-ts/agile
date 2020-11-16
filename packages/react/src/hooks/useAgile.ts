@@ -75,7 +75,9 @@ export function useAgile<
   agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   // Normalize Dependencies and special Agile Instance Types like Collection
-  const depsArray = normalizeArray(deps).map((item) =>
+  const depsArray = normalizeArray(deps, {
+    createUndefinedArray: true,
+  }).map((item) =>
     item instanceof Collection
       ? item.getGroup(item.config.defaultGroupKey || "default")
       : item
@@ -85,7 +87,7 @@ export function useAgile<
   const getReturnValue = (
     depsArray: (State | Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    if (depsArray.length === 1 && !Array.isArray(deps))
+    if (depsArray.length === 1 || !Array.isArray(deps))
       return depsArray[0] instanceof Observer
         ? depsArray[0]?.value
         : (depsArray[0]?.getPublicValue() as AgileHookType<Y>);

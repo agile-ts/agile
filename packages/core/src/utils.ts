@@ -10,7 +10,8 @@ import { State, Agile, Event, Collection, Observer } from "./internal";
  * @param value - Array/Object that gets copied
  */
 export function copy<T = any>(value: T): T {
-  if (typeof value !== "object") return value;
+  // Extra checking '!value' because 'typeof null === object'
+  if (!value || typeof value !== "object") return value;
   let temp;
   let newObject: any = Array.isArray(value) ? [] : {};
   for (let property in value) {
@@ -58,11 +59,16 @@ export function isValidObject(value: any): boolean {
  * @internal
  * Transforms Item/s to an Item Array
  * @param items - Item/s that gets transformed to an Array
+ * @param config - Config
  */
 export function normalizeArray<DataType = any>(
-  items?: DataType | Array<DataType>
+  items?: DataType | Array<DataType>,
+  config: { createUndefinedArray?: boolean } = {}
 ): Array<DataType> {
-  if (!items) return [];
+  config = defineConfig(config, {
+    createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
+  });
+  if (!items && !config.createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 
