@@ -1,5 +1,5 @@
-import { Agile, copy } from "@agile-ts/core";
-import { Item, StatusJobConfig, StatusObserver } from "../internal";
+import {Agile, copy, JobConfigInterface} from "@agile-ts/core";
+import { Item, StatusObserver } from "../internal";
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
@@ -67,7 +67,7 @@ export class Status<DataType = any> {
    * Assign last set Status Value to the current Status Value
    * @param config - Config
    */
-  public assign(config: StatusJobConfig = {}) {
+  public assign(config: JobConfigInterface = {}) {
     this.observer.assign(config);
   }
 

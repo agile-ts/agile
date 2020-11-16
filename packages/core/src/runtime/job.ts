@@ -16,7 +16,7 @@ export class Job<ObserverType extends Observer = Observer> {
     this.config = defineConfig<JobConfigInterface>(config, {
       background: false,
       sideEffects: true,
-      forceRerender: false,
+      force: false,
       storage: true,
     });
     this.config = config;
@@ -32,10 +32,12 @@ export class Job<ObserverType extends Observer = Observer> {
  * @param sideEffects - If SideEffects gets performed
  * @param perform - If Job gets performed immediately
  * @param storage - If Job value gets saved in Storage
+ * @param force - Force performing Job
  */
 export interface JobConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
   perform?: boolean;
   storage?: boolean;
+  force?: boolean;
 }

@@ -9,11 +9,10 @@ import {
   StatePersistent,
   Observer,
   equal,
-  StateJobConfigInterface,
   isFunction,
   notEqual,
   generateId,
-  StatePersistentConfigInterface,
+  StatePersistentConfigInterface, JobConfigInterface,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -143,6 +142,7 @@ export class State<ValueType = any> {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,
+      force: false
     });
 
     // Check value has correct Type (js)
@@ -152,7 +152,7 @@ export class State<ValueType = any> {
     }
 
     // Check if value has changed
-    if (equal(this.nextStateValue, value) && !config.forceRerender) return this;
+    if (equal(this.nextStateValue, value) && !config.force) return this;
 
     // Ingest new value into runtime
     this.observer.ingest(value, config);
@@ -168,11 +168,11 @@ export class State<ValueType = any> {
    * Ingests nextStateValue, computedValue into Runtime
    * @param config - Config
    */
-  public ingest(config: StateJobConfigInterface = {}): this {
+  public ingest(config: JobConfigInterface = {}): this {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,
-      forceRerender: false,
+      force: false,
     });
     this.observer.ingest(config);
     return this;
@@ -611,13 +611,13 @@ export type StateKey = string | number;
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of State get executed
  * @param storage - If State value gets saved in Agile Storage (only useful if State is persisted)
- * @param forceRerender -  Force rerender no matter what happens
+ * @param force -  Force creating and performing Job
  */
 export interface SetConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
   storage?: boolean;
-  forceRerender?: boolean;
+  force?: boolean;
 }
 
 /**

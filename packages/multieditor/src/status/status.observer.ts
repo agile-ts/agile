@@ -41,23 +41,20 @@ export class StatusObserver extends Observer {
    * Assigns next Status Value to current Status Value
    * @param config - Config
    */
-  public assign(config: StatusJobConfig = {}): void {
+  public assign(config: JobConfigInterface = {}): void {
     config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: true,
-      forceRerender: false,
+      force: false,
       storage: true,
     });
-
-    // If forceRerender, set background config to false since forceRerender is 'stronger' than background
-    if (config.forceRerender && config.background) config.background = false;
 
     // Set Next Status Value
     this.nextValue = copy(this.status().nextValue);
 
     // Check if Status changed
-    if (equal(this.status()._value, this.nextValue) && !config.forceRerender)
+    if (equal(this.status()._value, this.nextValue) && !config.force)
       return;
 
     this.agileInstance().runtime.ingest(this, config);
@@ -81,11 +78,4 @@ export class StatusObserver extends Observer {
     // Update Observer value
     this.value = copy(this.nextValue);
   }
-}
-
-/**
- * @param forceRerender - Force rerender no matter what happens
- */
-export interface StatusJobConfig extends JobConfigInterface {
-  forceRerender?: boolean;
 }

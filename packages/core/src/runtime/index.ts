@@ -46,6 +46,7 @@ export class Runtime {
       perform: true,
       background: false,
       sideEffects: true,
+      force: false,
     });
 
     const job = new Job(observer, {
