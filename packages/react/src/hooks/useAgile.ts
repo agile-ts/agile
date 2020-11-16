@@ -87,7 +87,7 @@ export function useAgile<
   const getReturnValue = (
     depsArray: (State | Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    if (depsArray.length === 1 || !Array.isArray(deps))
+    if (depsArray.length === 1 && !Array.isArray(deps))
       return depsArray[0] instanceof Observer
         ? depsArray[0]?.value
         : (depsArray[0]?.getPublicValue() as AgileHookType<Y>);
