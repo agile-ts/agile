@@ -206,7 +206,12 @@ export class MultiEditor<
       item.ingest({ ...{ forceRerender: true }, ...config });
 
     // Reset Item (-> Assign current Value to the new Initial Value)
-    if (config.reset) item.reset({ background: config.background });
+    if (config.reset) {
+      item.reset({
+        background: config.background,
+        forceRerender: !config.background,
+      });
+    }
 
     return this;
   }

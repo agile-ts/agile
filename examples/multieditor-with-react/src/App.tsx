@@ -9,13 +9,7 @@ const App = () => {
   useAgile(signUpEditor.deps);
 
   return (
-    <form
-      onSubmit={async (event) => {
-        event.preventDefault();
-        console.log(signUpEditor);
-        await signUpEditor.submit();
-      }}
-    >
+    <form>
       <h1>Sign Up</h1>
       <label>First Name:</label>
       <input
@@ -49,11 +43,16 @@ const App = () => {
         />
         <button
           style={{ marginLeft: 50 }}
-          onClick={() => {
-            signUpEditor.setValue("image", {
-              id: generateId(),
-              color: generateColor(),
-            });
+          onClick={(event) => {
+            signUpEditor.setValue(
+              "image",
+              {
+                id: generateId(),
+                color: generateColor(),
+              },
+              { background: false }
+            );
+            event.preventDefault();
           }}
         >
           Reset Image
@@ -62,10 +61,11 @@ const App = () => {
       <ErrorMessage error={signUpEditor.getStatus("image")?.message} />
 
       <label>Gender</label>
-      <select onChange={(e) => signUpEditor.setValue("gender", e.target.value)}>
-        <option selected value={""}>
-          Select...
-        </option>
+      <select
+        defaultValue={""}
+        onChange={(e) => signUpEditor.setValue("gender", e.target.value)}
+      >
+        <option value={""}>Select...</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
@@ -91,7 +91,16 @@ const App = () => {
       />
       <ErrorMessage error={signUpEditor.getStatus("aboutYou")?.message} />
 
-      <input type={"submit"} />
+      <button
+        style={{ marginLeft: 50 }}
+        onClick={async (event) => {
+          event.preventDefault();
+          console.log(signUpEditor);
+          await signUpEditor.submit();
+        }}
+      >
+        Submit
+      </button>
     </form>
   );
 };
