@@ -1,8 +1,9 @@
+/*
 import { Agile } from "@agile-ts/core";
 import { MultiEditor } from "../src/multieditor";
 
 const App = new Agile();
-/*
+
 const multiEditor = new MultiEditor<string, boolean>((editor) => ({
   data: {
     id: "myId",
