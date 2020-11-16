@@ -204,8 +204,8 @@ export class MultiEditor<
     // Reset Item (-> Assign current Value to the new Initial Value)
     if (config.reset) {
       item.reset({
-        background: config.background,
         force: true,
+        background: config.background,
       });
     } else {
       item.ingest({ force: true, background: config.background });

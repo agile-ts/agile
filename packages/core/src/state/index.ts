@@ -12,7 +12,8 @@ import {
   isFunction,
   notEqual,
   generateId,
-  StatePersistentConfigInterface, JobConfigInterface,
+  StatePersistentConfigInterface,
+  JobConfigInterface,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -142,7 +143,8 @@ export class State<ValueType = any> {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,
-      force: false
+      force: false,
+      storage: true,
     });
 
     // Check value has correct Type (js)

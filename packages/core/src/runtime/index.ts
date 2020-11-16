@@ -47,13 +47,10 @@ export class Runtime {
       background: false,
       sideEffects: true,
       force: false,
+      storage: true,
     });
 
-    const job = new Job(observer, {
-      background: config.background,
-      sideEffects: config.sideEffects,
-      storage: config.storage,
-    });
+    const job = new Job(observer, config);
 
     // Logging
     if (this.agileInstance().config.logJobs)
@@ -124,10 +121,9 @@ export class Runtime {
       SubscriptionContainer
     >();
 
-    // Handle Object based Jobs and check if Job is ready
+    // Check if Job Subscriptions are ready and add them to subscriptionsToUpdate
     this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach((job) => {
       job.observer.subs.forEach((subscriptionContainer) => {
-        // Check if Subscription is ready to rerender
         if (!subscriptionContainer.ready) {
           this.notReadyJobsToRerender.push(job);
           if (this.agileInstance().config.logJobs)
@@ -138,6 +134,7 @@ export class Runtime {
           return;
         }
 
+        // Handle Object based Subscription
         if (subscriptionContainer.isObjectBased)
           this.handleObjectBasedSubscription(subscriptionContainer, job);
 
@@ -147,11 +144,11 @@ export class Runtime {
 
     // Update Subscriptions that has to be updated/rerendered
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
-      // Call callback function if Callback based Subscription
+      // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
         subscriptionContainer.callback();
 
-      // Call update method if Component based Subscription
+      // Call 'update method' if Component based Subscription
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
