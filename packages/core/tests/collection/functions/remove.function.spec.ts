@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile, Item } from "../../../src";
-import { useAgile_Test } from "../../test_integration";
+import testIntegration from "../../test.integration";
 
 describe("Remove Function Tests", () => {
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   describe("Remove Function 'removeFromGroups'", () => {
     let rerenderCount = 0;
@@ -24,13 +24,13 @@ describe("Remove Function Tests", () => {
       },
     }));
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myGroup1, myGroup2] = useAgile_Test(
-      [MY_COLLECTION.getGroup("group1"), MY_COLLECTION.getGroup("group2")],
-      () => {
-        rerenderCount++;
-      }
-    );
+    // Subscribe Instances for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
+      rerenderCount++;
+    }, [
+      MY_COLLECTION.getGroup("group1")?.observer,
+      MY_COLLECTION.getGroup("group2")?.observer,
+    ]);
 
     MY_COLLECTION.collect([
       { id: 1, name: "jeff" },
@@ -191,13 +191,13 @@ describe("Remove Function Tests", () => {
       },
     }));
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myGroup1, myGroup2] = useAgile_Test(
-      [MY_COLLECTION.getGroup("group1"), MY_COLLECTION.getGroup("group2")],
-      () => {
-        rerenderCount++;
-      }
-    );
+    // Subscribe Instances for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
+      rerenderCount++;
+    }, [
+      MY_COLLECTION.getGroup("group1")?.observer,
+      MY_COLLECTION.getGroup("group2")?.observer,
+    ]);
 
     MY_COLLECTION.collect([
       { id: 1, name: "jeff" },

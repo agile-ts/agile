@@ -254,7 +254,11 @@ export class Collection<DataType = DefaultItem> {
         for (let groupKey in this.groups) {
           const group = this.getGroup(groupKey);
           if (group.value.includes(itemKey)) {
-              group.ingest({ force: true, background: config.background, storage: false });
+            group.ingest({
+              force: true,
+              background: config.background,
+              storage: false,
+            });
           }
         }
       }

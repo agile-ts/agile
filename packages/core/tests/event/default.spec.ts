@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile, Event } from "../../src";
-import { useEvent_Test } from "../test_integration";
+import testIntegration from "../test.integration";
 
 describe("Default Event Tests", () => {
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   interface EventPayload {
     title: string;
@@ -287,24 +287,15 @@ describe("Default Event Tests", () => {
   });
 
   describe("Event with rerender = true", () => {
-    let eventCallCount = 0;
     let rerenderCount = 0;
-    let currentEventPayload;
 
     // Create Event
     const MY_EVENT = App.Event<EventPayload>({ rerender: true });
 
-    useEvent_Test<Event<EventPayload>>(
-      MY_EVENT,
-      (payload) => {
-        eventCallCount++;
-        currentEventPayload = payload;
-      },
-      () => {
-        rerenderCount++;
-      },
-      "myKey"
-    );
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
+      rerenderCount++;
+    }, [MY_EVENT.observer]);
 
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
@@ -312,21 +303,9 @@ describe("Default Event Tests", () => {
         JSON.stringify({ enabled: true, rerender: true }),
         "MY_EVENT has correct initial config"
       );
-      expect(MY_EVENT.callbacks["myKey"] !== undefined).to.eq(
-        true,
-        "MY_EVENT has 'myKey' Callback"
-      );
       expect(MY_EVENT.enabled).to.eq(true, "MY_EVENT is enabled");
 
-      expect(eventCallCount).to.eq(
-        0,
-        "eventCallCount has correct initial value"
-      );
       expect(rerenderCount).to.eq(0, "rerenderCount has correct initial value");
-      expect(currentEventPayload).to.eq(
-        undefined,
-        "currentEventPayload has correct initial value"
-      );
     });
 
     it("Does rerender on trigger", async () => {
@@ -339,12 +318,7 @@ describe("Default Event Tests", () => {
       expect(MY_EVENT.uses).to.eq(1, "MY_EVENT uses stayed the same");
       expect(MY_EVENT.enabled).to.eq(true, "MY_EVENT is enabled");
 
-      expect(eventCallCount).to.eq(1, "eventCallCount has been increased by 1");
       expect(rerenderCount).to.eq(1, "rerenderCount has been increased by 1");
-      expect(JSON.stringify(currentEventPayload)).to.eq(
-        JSON.stringify({ title: "test", message: "messageTest" }),
-        "currentEventPayload has correct value"
-      );
     });
   });
 });

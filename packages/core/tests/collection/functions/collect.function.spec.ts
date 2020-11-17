@@ -1,12 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { Group, Agile } from "../../../src";
-import { useAgile_Test } from "../../test_integration";
+import testIntegration from "../../test.integration";
 
-// TODO ERROR in TEST & Submitting doesn't update the isSet property in items!! (multieditor)
 describe("Collect Function Tests", () => {
   // Define Agile
-  const App = new Agile();
+  const App = new Agile({ logJobs: true }).use(testIntegration);
 
   describe("Collection without primaryKey", () => {
     let rerenderCount = 0;
@@ -21,10 +20,10 @@ describe("Collect Function Tests", () => {
     // Create Collection
     const MY_COLLECTION = App.Collection<userInterface>();
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myHookCollection] = useAgile_Test([MY_COLLECTION], () => {
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    });
+    }, [MY_COLLECTION.getGroup("default")?.observer]);
 
     it("Has correct initial values", () => {
       expect(JSON.stringify(MY_COLLECTION.data)).to.eq(
@@ -40,10 +39,6 @@ describe("Collect Function Tests", () => {
         "MY_COLLECTION default Group has correct subs size"
       );
 
-      expect(JSON.stringify(myHookCollection)).to.eq(
-        JSON.stringify([]),
-        "myHookState has correct MY_COLLECTION value"
-      );
       expect(rerenderCount).to.eq(0, "rerenderCount is 0");
     });
 
@@ -488,10 +483,10 @@ describe("Collect Function Tests", () => {
       primaryKey: "key",
     });
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myHookCollection] = useAgile_Test([MY_COLLECTION], () => {
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    });
+    }, [MY_COLLECTION.getGroup("default")?.observer]);
 
     it("Has correct initial values", () => {
       expect(JSON.stringify(MY_COLLECTION.data)).to.eq(
@@ -505,11 +500,6 @@ describe("Collect Function Tests", () => {
       expect(MY_COLLECTION.groups["default"]?.observer.subs.size === 1).to.eq(
         true,
         "MY_COLLECTION default Group has correct subs size"
-      );
-
-      expect(JSON.stringify(myHookCollection)).to.eq(
-        JSON.stringify([]),
-        "myHookState has correct MY_COLLECTION value"
       );
     });
 

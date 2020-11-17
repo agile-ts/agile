@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile } from "../../../src";
-import { useEvent_Test } from "../../test_integration";
+import testIntegration from "../../test.integration";
 
 describe("Trigger Function Tests", () => {
   let eventCallCount = 0;
@@ -9,7 +9,7 @@ describe("Trigger Function Tests", () => {
   let rerenderCount = 0;
 
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   interface EventPayload {
     title: string;
@@ -24,18 +24,10 @@ describe("Trigger Function Tests", () => {
     currentEventPayload = payload;
   });
 
-  // @ts-ignore
-  useEvent_Test(
-    MY_EVENT,
-    (payload) => {
-      eventCallCount++;
-      currentEventPayload = payload;
-    },
-    () => {
-      rerenderCount++;
-    },
-    "myEvent_useEvent"
-  );
+  // Subscribe Instance for testing callback call functionality
+  App.subController.subscribeWithSubsArray(() => {
+    rerenderCount++;
+  }, [MY_EVENT.observer]);
 
   it("Has correct initial value", () => {
     expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
@@ -46,10 +38,6 @@ describe("Trigger Function Tests", () => {
     expect(MY_EVENT.callbacks["myEvent"] !== undefined).to.eq(
       true,
       "MY_EVENT has 'myEvent' in callbacks"
-    );
-    expect(MY_EVENT.callbacks["myEvent_useEvent"] !== undefined).to.eq(
-      true,
-      "MY_EVENT has 'myEvent_useEvent' in callbacks"
     );
     expect(MY_EVENT.enabled).to.eq(true, "MY_EVENT is enabled");
 
@@ -67,7 +55,7 @@ describe("Trigger Function Tests", () => {
 
     expect(MY_EVENT.uses).to.eq(1, "MY_EVENT uses has been increased by 1");
 
-    expect(eventCallCount).to.eq(2, "eventCallCount has been increased by 2");
+    expect(eventCallCount).to.eq(1, "eventCallCount has been increased by 1");
     expect(rerenderCount).to.eq(0, "rerenderCount stayed the same");
     expect(JSON.stringify(currentEventPayload)).to.eq(
       JSON.stringify({
@@ -87,7 +75,7 @@ describe("Trigger Function Tests", () => {
 
     expect(MY_EVENT.uses).to.eq(1, "MY_EVENT uses stayed the same");
 
-    expect(eventCallCount).to.eq(2, "eventCallCount stayed the same");
+    expect(eventCallCount).to.eq(1, "eventCallCount stayed the same");
     expect(rerenderCount).to.eq(0, "rerenderCount stayed the same");
     expect(JSON.stringify(currentEventPayload)).to.eq(
       JSON.stringify({

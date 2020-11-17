@@ -51,10 +51,7 @@ export class StateObserver<ValueType = any> extends Observer {
    * @param newStateValue - New Value of the State
    * @param config - Config
    */
-  public ingest(
-    newStateValue: ValueType,
-    config: JobConfigInterface
-  ): void;
+  public ingest(newStateValue: ValueType, config: JobConfigInterface): void;
   public ingest(
     newStateValueOrConfig: ValueType | JobConfigInterface,
     config: JobConfigInterface = {}
@@ -86,8 +83,7 @@ export class StateObserver<ValueType = any> extends Observer {
       : copy(_newStateValue);
 
     // Check if State Value and new/next Value are equals
-    if (equal(state.value, this.nextStateValue) && !_config.force)
-      return;
+    if (equal(state.value, this.nextStateValue) && !_config.force) return;
 
     this.agileInstance().runtime.ingest(this, _config);
   }

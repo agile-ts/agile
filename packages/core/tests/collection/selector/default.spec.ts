@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { useAgile_Test } from "../../test_integration";
 import { Agile, Selector, Item } from "../../../src";
+import testIntegration from "../../test.integration";
 
 describe("Default Selector Tests", () => {
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   describe("Selector", () => {
     let rerenderCount = 0;
@@ -23,13 +23,10 @@ describe("Default Selector Tests", () => {
       },
     }));
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [mySelector1] = useAgile_Test(
-      [MY_COLLECTION.getSelector("selector1")],
-      () => {
-        rerenderCount++;
-      }
-    );
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
+      rerenderCount++;
+    }, [MY_COLLECTION.getSelector("selector1")?.observer]);
 
     it("Has correct initial values", () => {
       expect(MY_COLLECTION.selectors["selector1"] instanceof Selector).to.eq(
@@ -90,10 +87,6 @@ describe("Default Selector Tests", () => {
         "MY_COLLECTION data at id 1 has correct initialStateValue"
       );
 
-      expect(JSON.stringify(mySelector1)).to.eq(
-        JSON.stringify(undefined),
-        "mySelector1 has correct MY_COLLECTION selector1 value"
-      );
       expect(rerenderCount).to.eq(0, "rerenderCount has correct value");
     });
 
