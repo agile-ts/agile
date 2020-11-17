@@ -14,7 +14,7 @@ export const signUpEditor = new MultiEditor(
     data: {
       id: "myCoolId",
       firstName: "Jeff",
-      lastName: "Anderson",
+      lastName: "",
       gender: undefined,
       userName: "",
       email: "",
@@ -75,7 +75,7 @@ export const signUpEditor = new MultiEditor(
       },
     },
     fixedProperties: ["id"],
-    reValidateMode: "onChange",
+    reValidateMode: "afterFirstSubmit",
   }),
   App
 );

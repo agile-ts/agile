@@ -248,7 +248,7 @@ export class MultiEditor<
 
     // Logging
     if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Submit MultiEditor ${this.key}`, this.isValid);
+      console.log(`Agile: Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
     if (!this.isValid) return false;

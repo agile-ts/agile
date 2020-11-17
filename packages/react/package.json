@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@types/react": "^16.9.51",
+    "react": "^16.9.51",
     "@agile-ts/core": "file:../core"
   },
   "peerDependencies": {
