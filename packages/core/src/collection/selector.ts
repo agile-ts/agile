@@ -61,7 +61,7 @@ export class Selector<DataType = DefaultItem> extends State<
    */
   public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
     const oldItem = this.item;
-    let newItem = this.collection().getItemByIdwithReference(itemKey);
+    let newItem = this.collection().getItemByIdWithReference(itemKey);
     const rebuildSelectorSideEffectKey = "rebuildSelector";
     config = defineConfig(config, {
       background: false,

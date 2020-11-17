@@ -540,7 +540,7 @@ export class Collection<DataType = DefaultItem> {
    * If the Item doesn't exist.. it returns a reference of the Item that will be filled with the collected Item Data later
    * @param itemKey - ItemKey of Item that might get found
    */
-  public getItemByIdwithReference(itemKey: ItemKey): Item<DataType> {
+  public getItemByIdWithReference(itemKey: ItemKey): Item<DataType> {
     // Create dummy Item to hold reference if Item with ItemKey doesn't exist
     if (!this.data.hasOwnProperty(itemKey)) {
       const dummyItem = new Item<DataType>(this, {
