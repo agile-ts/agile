@@ -24,18 +24,16 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   /**
    * @public
    * Group - Holds Items of Collection
-   * @param agileInstance - An instance of Agile
    * @param collection - Collection to that the Group belongs
    * @param initialItems - Initial Key of Items in this Group
    * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     collection: Collection<DataType>,
     initialItems?: Array<ItemKey>,
     config?: GroupConfigInterface
   ) {
-    super(agileInstance, initialItems || [], config?.key);
+    super(collection.agileInstance(), initialItems || [], config?.key);
     this.collection = () => collection;
 
     // Add rebuild to sideEffects so that it rebuilds the Group Output if the value changes
@@ -124,7 +122,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       }
 
       // Check if ItemKey exists in Collection
-      if (!this.collection().getItemById(itemKey))
+      if (!this.collection().getItem(itemKey))
         notExistingItemKeys.push(itemKey);
 
       // Remove ItemKey from Group
@@ -166,7 +164,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       const existsInGroup = newGroupValue.includes(itemKey);
 
       // Check if ItemKey exists in Collection
-      if (!this.collection().getItemById(itemKey))
+      if (!this.collection().getItem(itemKey))
         notExistingItemKeys.push(itemKey);
 
       // Remove ItemKey from Group if it should get overwritten and exists

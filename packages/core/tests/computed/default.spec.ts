@@ -39,7 +39,7 @@ describe("Default Computed Tests", () => {
       computedCallCount++;
       return `${MY_STATE.value}_${MY_STATE_2.value}_${
         MY_SELECTOR?.value?.name
-      }_${MY_COLLECTION.getItemById(2)?.value.name}`;
+      }_${MY_COLLECTION.getItem(2)?.value.name}`;
     });
 
     // Subscribe Instance for testing callback call functionality
@@ -70,7 +70,7 @@ describe("Default Computed Tests", () => {
           MY_STATE.observer,
           MY_STATE_2.observer,
           MY_SELECTOR.observer,
-          MY_COLLECTION.getItemById(2).observer,
+          MY_COLLECTION.getItem(2).observer,
         ]),
         "MY_COMPUTED has correct deps"
       );
@@ -160,7 +160,7 @@ describe("Default Computed Tests", () => {
       computedCallCount++;
       return `${MY_STATE.value}_${MY_STATE_2.value}_${
         MY_SELECTOR?.value?.name
-      }_${MY_COLLECTION.getItemById(2)?.value.name}`;
+      }_${MY_COLLECTION.getItem(2)?.value.name}`;
     }, [MY_STATE_3]);
 
     // Subscribe Instance for testing callback call functionality
@@ -192,7 +192,7 @@ describe("Default Computed Tests", () => {
           MY_STATE.observer,
           MY_STATE_2.observer,
           MY_SELECTOR.observer,
-          MY_COLLECTION.getItemById(2).observer,
+          MY_COLLECTION.getItem(2).observer,
         ]),
         "MY_COMPUTED has correct deps"
       );

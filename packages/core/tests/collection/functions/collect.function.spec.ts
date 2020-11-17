@@ -23,7 +23,7 @@ describe("Collect Function Tests", () => {
     // Subscribe Instance for testing callback call functionality
     App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    }, [MY_COLLECTION.getGroup("default")?.observer]);
+    }, [MY_COLLECTION.getGroup("default").observer]);
 
     it("Has correct initial values", () => {
       expect(JSON.stringify(MY_COLLECTION.data)).to.eq(

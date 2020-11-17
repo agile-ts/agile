@@ -96,6 +96,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       const defaultGroup = this.collection().getGroup(
         this.collection().config.defaultGroupKey || "default"
       );
+      if (!defaultGroup) return false;
 
       // Persist Default Group and instantiate it manually to await its instantiation
       const groupStorageKey = CollectionPersistent.getGroupStorageKey(
@@ -127,7 +128,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
         // Persist found Item that got created out of the Storage Value
         this.collection()
-          .getItemById(storageValue[primaryKey])
+          .getItem(storageValue[primaryKey])
           ?.persist(
             CollectionPersistent.getItemStorageKey(
               itemKey,
@@ -159,6 +160,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey || "default"
     );
+    if (!defaultGroup) return false;
 
     // Persist default Group
     defaultGroup.persist({ followCollectionPattern: true });
@@ -171,7 +173,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Persist Collection Items
     for (let itemKey of defaultGroup.value) {
-      const item = this.collection().getItemById(itemKey);
+      const item = this.collection().getItem(itemKey);
       const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
         this.collection().key
@@ -201,6 +203,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey || "default"
     );
+    if (!defaultGroup) return false;
 
     // Remove default Group from Storage
     defaultGroup.persistent?.removeValue();
@@ -210,7 +213,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Remove Collection Items from Storage
     for (let itemKey of defaultGroup.value) {
-      const item = this.collection().getItemById(itemKey);
+      const item = this.collection().getItem(itemKey);
       item?.persistent?.removeValue();
     }
 
@@ -264,7 +267,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Persist Added Keys
     addedKeys.forEach((itemKey) => {
-      const item = collection.getItemById(itemKey);
+      const item = collection.getItem(itemKey);
       if (!item?.isPersisted)
         item?.persist(
           CollectionPersistent.getItemStorageKey(itemKey, collection.key)
@@ -273,7 +276,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Unpersist removed Keys
     removedKeys.forEach((itemKey) => {
-      const item = collection.getItemById(itemKey);
+      const item = collection.getItem(itemKey);
       if (item?.isPersisted) item?.persistent?.removeValue();
     });
   }
