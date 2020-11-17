@@ -5,7 +5,7 @@ import testIntegration from "../../test.integration";
 
 describe("Collect Function Tests", () => {
   // Define Agile
-  const App = new Agile({ logJobs: true }).use(testIntegration);
+  const App = new Agile().use(testIntegration);
 
   describe("Collection without primaryKey", () => {
     let rerenderCount = 0;
