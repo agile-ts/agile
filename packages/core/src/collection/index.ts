@@ -108,12 +108,7 @@ export class Collection<DataType = DefaultItem> {
     initialItems?: Array<ItemKey>,
     config?: GroupConfigInterface
   ): Group<DataType> {
-    return new Group<DataType>(
-      this.agileInstance(),
-      this,
-      initialItems,
-      config
-    );
+    return new Group<DataType>(this, initialItems, config);
   }
 
   //=========================================================================================================
@@ -146,21 +141,16 @@ export class Collection<DataType = DefaultItem> {
     // If groups is Array of SelectorNames transform it to Selector Object
     if (Array.isArray(groups)) {
       groups.forEach((groupKey) => {
-        groupsObject[groupKey] = new Group<DataType>(
-          this.agileInstance(),
-          this,
-          [],
-          {
-            key: groupKey,
-          }
-        );
+        groupsObject[groupKey] = new Group<DataType>(this, [], {
+          key: groupKey,
+        });
       });
     } else groupsObject = groups;
 
     // Add default Group
     groupsObject[this.config.defaultGroupKey || "default"] = new Group<
       DataType
-    >(this.agileInstance(), this, [], {
+    >(this, [], {
       key: this.config.defaultGroupKey || "default",
     });
 
@@ -253,7 +243,7 @@ export class Collection<DataType = DefaultItem> {
       if (!itemExistsInCollection) {
         for (let groupKey in this.groups) {
           const group = this.getGroup(groupKey);
-          if (group.value.includes(itemKey)) {
+          if (group && group.value.includes(itemKey)) {
             group.ingest({
               force: true,
               background: config.background,
@@ -348,23 +338,20 @@ export class Collection<DataType = DefaultItem> {
     groupKey: GroupKey,
     initialItems?: Array<ItemKey>
   ): Group<DataType> {
+    let group = this.getGroup(groupKey);
+
+    // Create or update Group
+    if (group) {
+      group.set(initialItems || []);
+    } else {
+      group = new Group<DataType>(this, initialItems, { key: groupKey });
+      this.groups[groupKey] = group;
+    }
+
     if (this.groups.hasOwnProperty(groupKey)) {
       console.warn(`Agile: Group with the name '${groupKey}' already exists!`);
       return this.groups[groupKey];
     }
-
-    // Create new Group
-    const group = new Group<DataType>(
-      this.agileInstance(),
-      this,
-      initialItems,
-      { key: groupKey }
-    );
-    this.groups[groupKey] = group;
-
-    // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Created new Group called '${groupKey}'`, group);
 
     return group;
   }
@@ -382,22 +369,17 @@ export class Collection<DataType = DefaultItem> {
     selectorKey: SelectorKey,
     itemKey: ItemKey
   ): Selector<DataType> {
-    if (this.selectors.hasOwnProperty(selectorKey)) {
-      console.warn(
-        `Agile: The Selector with the name '${selectorKey}' already exists!`
-      );
-      return this.selectors[selectorKey];
+    let selector = this.getSelector(selectorKey);
+
+    // Create or update Selector
+    if (selector) {
+      selector.select(itemKey);
+    } else {
+      selector = new Selector<DataType>(this, itemKey, {
+        key: selectorKey,
+      });
+      this.selectors[selectorKey] = selector;
     }
-
-    // Create new Selector
-    const selector = new Selector<DataType>(this, itemKey, {
-      key: selectorKey,
-    });
-    this.selectors[selectorKey] = selector;
-
-    // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Created Selector called '${selectorKey}'`, selector);
 
     return selector;
   }
@@ -409,31 +391,70 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Group by Key/Name
    * @param groupKey - Name/Key of Group
+   * @param config - Config
    */
-  public getGroup(groupKey: GroupKey): Group<DataType> {
-    if (!this.groups[groupKey]) {
-      console.warn(
-        `Agile: Group with the key/name '${groupKey}' doesn't exist!`
-      );
+  public getGroup(
+    groupKey: GroupKey,
+    config: GetGroupConfigInterface = {}
+  ): Group<DataType> | undefined {
+    config = defineConfig(config, {
+      notExisting: false,
+    });
 
-      // Return empty group because it might get annoying to handle with undefined (can check if it exists with group.exists)
-      const group = new Group<DataType>(this.agileInstance(), this, [], {
-        key: "dummy",
-      });
-      group.isPlaceholder = true;
-      return group;
-    }
+    // Check if Group exists
+    if (
+      !this.groups.hasOwnProperty(groupKey) ||
+      (!config.notExisting && !this.groups[groupKey].exists)
+    )
+      return undefined;
 
-    return this.groups[groupKey];
+    // Get Group
+    const group = this.groups[groupKey];
+
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
+    if (this.agileInstance().runtime.trackObservers)
+      this.agileInstance().runtime.foundObservers.add(group.observer);
+
+    return group;
   }
 
   //=========================================================================================================
-  // Remove Selector
+  // Get Group With Reference
+  //=========================================================================================================
+  /**
+   * @public
+   * Get Group by Key/Name or a Reference to it if it doesn't exist
+   * If Group doesn't exist, it returns a reference of the Group that will be filled with the real data later
+   * @param groupKey - Name/Key of Group
+   */
+  public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
+    // Create dummy Group to hold reference
+    if (!this.groups[groupKey]) {
+      const dummyGroup = new Group<DataType>(this, [], {
+        key: groupKey,
+      });
+      dummyGroup.isPlaceholder = true;
+      this.groups[groupKey] = dummyGroup;
+      return dummyGroup;
+    }
+
+    // Get Group
+    const group = this.groups[groupKey];
+
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
+    if (this.agileInstance().runtime.trackObservers)
+      this.agileInstance().runtime.foundObservers.add(group.observer);
+
+    return group;
+  }
+
+  //=========================================================================================================
+  // Remove Group
   //=========================================================================================================
   /**
    * @public
    * Removes Group by Key/Name
-   * @param groupKey - Name/Key of Selector
+   * @param groupKey - Name/Key of Group
    */
   public removeGroup(groupKey: GroupKey): this {
     if (!this.groups[groupKey]) {
@@ -453,16 +474,63 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Selector by Key/Name
    * @param selectorKey - Name/Key of Selector
+   * @param config - Config
    */
-  public getSelector(selectorKey: SelectorKey): Selector<DataType> | undefined {
-    if (!this.selectors[selectorKey]) {
-      console.warn(
-        `Agile: Selector with the key/name '${selectorKey}' doesn't exist!`
-      );
+  public getSelector(
+    selectorKey: SelectorKey,
+    config: GetSelectorConfigInterface = {}
+  ): Selector<DataType> | undefined {
+    config = defineConfig(config, {
+      notExisting: false,
+    });
+
+    // Check if Selector exists
+    if (
+      !this.data.hasOwnProperty(selectorKey) ||
+      (!config.notExisting && !this.data[selectorKey].exists)
+    )
       return undefined;
+
+    // Get Selector
+    const selector = this.selectors[selectorKey];
+
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
+    if (this.agileInstance().runtime.trackObservers)
+      this.agileInstance().runtime.foundObservers.add(selector.observer);
+
+    return selector;
+  }
+
+  //=========================================================================================================
+  // Get Selector With Reference
+  //=========================================================================================================
+  /**
+   * @public
+   * Get Selector by Key/Name or a Reference to it if it doesn't exist
+   * If Selector doesn't exist, it returns a reference of the Selector that will be filled with the real data later
+   * @param selectorKey - Name/Key of Selector
+   */
+  public getSelectorWithReference(
+    selectorKey: SelectorKey
+  ): Selector<DataType> {
+    // Create dummy Group to hold reference
+    if (!this.selectors[selectorKey]) {
+      const dummySelector = new Selector<DataType>(this, "unknown", {
+        key: selectorKey,
+      });
+      dummySelector.isPlaceholder = true;
+      this.selectors[selectorKey] = dummySelector;
+      return dummySelector;
     }
 
-    return this.selectors[selectorKey];
+    // Get Selector
+    const selector = this.selectors[selectorKey];
+
+    // Add State to tracked Observers (for auto tracking used observers in computed function)
+    if (this.agileInstance().runtime.trackObservers)
+      this.agileInstance().runtime.foundObservers.add(selector.observer);
+
+    return selector;
   }
 
   //=========================================================================================================
@@ -505,13 +573,13 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Get Item by Id
+   * Get Item by Key/Name
    * @param itemKey - ItemKey of Item
    * @param config - Config
    */
-  public getItemById(
+  public getItem(
     itemKey: ItemKey,
-    config: GetItemByIdInterface = {}
+    config: GetItemConfigInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -524,7 +592,7 @@ export class Collection<DataType = DefaultItem> {
     )
       return undefined;
 
-    // Get Item from Data
+    // Get Item
     const item = this.data[itemKey];
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
@@ -536,13 +604,13 @@ export class Collection<DataType = DefaultItem> {
 
   /**
    * @public
-   * Get Item by Id
-   * If the Item doesn't exist.. it returns a reference of the Item that will be filled with the collected Item Data later
-   * @param itemKey - ItemKey of Item that might get found
+   * Get Item by Key/Name or a Reference to it if it doesn't exist
+   * If Item doesn't exist, it returns a reference of the Item that will be filled with the real data later
+   * @param itemKey - Name/Key of Item
    */
-  public getItemByIdWithReference(itemKey: ItemKey): Item<DataType> {
-    // Create dummy Item to hold reference if Item with ItemKey doesn't exist
-    if (!this.data.hasOwnProperty(itemKey)) {
+  public getItemWithReference(itemKey: ItemKey): Item<DataType> {
+    // Create dummy Item to hold reference
+    if (!this.data[itemKey]) {
       const dummyItem = new Item<DataType>(this, {
         id: itemKey,
         dummy: true,
@@ -552,7 +620,7 @@ export class Collection<DataType = DefaultItem> {
       return dummyItem;
     }
 
-    // Get Item from Data
+    // Get Item
     const item = this.data[itemKey];
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
@@ -567,11 +635,11 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Get Value of Item by Id
+   * Get Value of Item by Key/Name
    * @param itemKey - ItemKey of Item that holds the Value
    */
-  public getValueById(itemKey: ItemKey): DataType | undefined {
-    let item = this.getItemById(itemKey);
+  public getItemValue(itemKey: ItemKey): DataType | undefined {
+    let item = this.getItem(itemKey);
     if (!item) return undefined;
     return item.value;
   }
@@ -633,7 +701,7 @@ export class Collection<DataType = DefaultItem> {
   public reset() {
     // Remove Items from Storage
     for (let key in this.data) {
-      const item = this.getItemById(key);
+      const item = this.getItem(key);
       item?.persistent?.removeValue();
     }
 
@@ -693,7 +761,7 @@ export class Collection<DataType = DefaultItem> {
     newItemKey: ItemKey,
     config?: UpdateItemKeyConfigInterface
   ): void {
-    const item = this.getItemById(oldItemKey);
+    const item = this.getItem(oldItemKey);
     config = defineConfig(config, {
       background: false,
     });
@@ -713,7 +781,7 @@ export class Collection<DataType = DefaultItem> {
     // Update Groups
     for (let groupName in this.groups) {
       const group = this.getGroup(groupName);
-      if (group.isPlaceholder || !group.has(oldItemKey)) continue;
+      if (!group || group.isPlaceholder || !group.has(oldItemKey)) continue;
 
       // Replace old ItemKey with new ItemKey
       const newGroupValue = copy(group.value);
@@ -776,13 +844,13 @@ export class Collection<DataType = DefaultItem> {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
     _itemKeys.forEach((itemKey) => {
-      const item = this.getItemById(itemKey);
+      const item = this.getItem(itemKey);
       if (!item) return;
 
       // Remove Item from Groups
       for (let groupKey in this.groups) {
         const group = this.getGroup(groupKey);
-        if (group.has(itemKey)) group.remove(itemKey);
+        if (group && group.has(itemKey)) group.remove(itemKey);
       }
 
       // Remove Selectors that represents this Item
@@ -873,7 +941,7 @@ export class Collection<DataType = DefaultItem> {
     // Rebuild Groups that include ItemKey
     for (let groupKey in this.groups) {
       const group = this.getGroup(groupKey);
-      if (group.has(itemKey)) {
+      if (group && group.has(itemKey)) {
         // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
         group.ingest({
           background: config?.background,
@@ -954,7 +1022,21 @@ export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
 /**
  * @param notExisting - If also official not existing Items like Placeholder get found
  */
-export interface GetItemByIdInterface {
+export interface GetItemConfigInterface {
+  notExisting?: boolean;
+}
+
+/**
+ * @param notExisting - If also official not existing Groups like Placeholder get found
+ */
+export interface GetGroupConfigInterface {
+  notExisting?: boolean;
+}
+
+/**
+ * @param notExisting - If also official not existing Selectors like Placeholder get found
+ */
+export interface GetSelectorConfigInterface {
   notExisting?: boolean;
 }
 

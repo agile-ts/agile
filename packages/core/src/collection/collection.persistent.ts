@@ -127,7 +127,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
         // Persist found Item that got created out of the Storage Value
         this.collection()
-          .getItemById(storageValue[primaryKey])
+          .getItem(storageValue[primaryKey])
           ?.persist(
             CollectionPersistent.getItemStorageKey(
               itemKey,
@@ -171,7 +171,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Persist Collection Items
     for (let itemKey of defaultGroup.value) {
-      const item = this.collection().getItemById(itemKey);
+      const item = this.collection().getItem(itemKey);
       const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
         this.collection().key
@@ -210,7 +210,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Remove Collection Items from Storage
     for (let itemKey of defaultGroup.value) {
-      const item = this.collection().getItemById(itemKey);
+      const item = this.collection().getItem(itemKey);
       item?.persistent?.removeValue();
     }
 
@@ -264,7 +264,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Persist Added Keys
     addedKeys.forEach((itemKey) => {
-      const item = collection.getItemById(itemKey);
+      const item = collection.getItem(itemKey);
       if (!item?.isPersisted)
         item?.persist(
           CollectionPersistent.getItemStorageKey(itemKey, collection.key)
@@ -273,7 +273,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Unpersist removed Keys
     removedKeys.forEach((itemKey) => {
-      const item = collection.getItemById(itemKey);
+      const item = collection.getItem(itemKey);
       if (item?.isPersisted) item?.persistent?.removeValue();
     });
   }

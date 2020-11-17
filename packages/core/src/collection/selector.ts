@@ -27,7 +27,7 @@ export class Selector<DataType = DefaultItem> extends State<
     itemKey: ItemKey,
     config?: SelectorConfigInterface
   ) {
-    super(collection.agileInstance(), collection.getValueById(itemKey));
+    super(collection.agileInstance(), collection.getItemValue(itemKey));
     this.collection = () => collection;
     this.item = undefined;
     this._itemKey = itemKey;
@@ -61,7 +61,7 @@ export class Selector<DataType = DefaultItem> extends State<
    */
   public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
     const oldItem = this.item;
-    let newItem = this.collection().getItemByIdWithReference(itemKey);
+    let newItem = this.collection().getItemWithReference(itemKey);
     const rebuildSelectorSideEffectKey = "rebuildSelector";
     config = defineConfig(config, {
       background: false,
