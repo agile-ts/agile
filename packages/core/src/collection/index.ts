@@ -284,7 +284,7 @@ export class Collection<DataType = DefaultItem> {
   ): Item<DataType> | undefined {
     if (!this.data.hasOwnProperty(itemKey)) {
       console.error(
-        `Agile: ItemKey '${itemKey} doesn't exist in Collection!`,
+        `Agile: ItemKey '${itemKey}' doesn't exist in Collection!`,
         this
       );
       return undefined;

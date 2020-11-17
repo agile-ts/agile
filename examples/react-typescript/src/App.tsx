@@ -23,11 +23,13 @@ const App = (props: any) => {
   const [myState, myState2, item, mySelector2, myState3] = useAgile([
     MY_STATE,
     MY_STATE_2,
-    MY_COLLECTION.getItemById("1"),
+    MY_COLLECTION.getItem("1"),
     MY_COLLECTION.getSelector("mySelector"),
     MY_STATE_3,
   ]);
-  const [myCollection] = useAgile([MY_COLLECTION.getGroup("myGroup")]);
+  const [myCollection] = useAgile([
+    MY_COLLECTION.getGroupWithReference("myGroup"),
+  ]);
 
   const mySelector = useAgile(MY_COLLECTION.getSelector("mySelector"));
 
@@ -112,7 +114,7 @@ const App = (props: any) => {
           <button
             onClick={() =>
               setTimeout(() => {
-                MY_COLLECTION.getGroup("myGroup").add("id3");
+                MY_COLLECTION.getGroup("myGroup")?.add("id3");
               }, 1000)
             }
           >
