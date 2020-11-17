@@ -17,8 +17,9 @@ export * from "./runtime/subscription/container/ComponentSubscriptionContainer";
 export * from "./runtime/subscription/sub";
 
 // Storage
-export * from "./storage";
-export * from "./storage/persistent";
+export * from "./storages";
+export * from "./storages/storage";
+export * from "./storages/persistent";
 
 // State
 export * from "./state";

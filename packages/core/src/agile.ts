@@ -15,12 +15,13 @@ import {
   Observer,
   SubController,
   globalBind,
+  Storages,
 } from "./internal";
 
 export class Agile {
   public runtime: Runtime;
   public subController: SubController; // Handles subscriptions to Components
-  public storage: Storage; // Handles permanent saving
+  public storages: Storages; // Handles permanent saving
 
   // Integrations
   public integrations: Integrations; // Integrated frameworks
@@ -35,7 +36,7 @@ export class Agile {
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
-    this.storage = new Storage(config.storageConfig || {});
+    this.storages = new Storages(this, { localStorage: config.localStorage });
 
     // Create global instance of Agile
     globalBind("__agile__", this);
@@ -155,5 +156,5 @@ export class Agile {
 export interface AgileConfigInterface {
   logJobs?: boolean;
   waitForMount?: boolean;
-  storageConfig?: StorageConfigInterface;
+  localStorage?: boolean;
 }

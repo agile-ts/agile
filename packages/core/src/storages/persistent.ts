@@ -51,7 +51,7 @@ export class Persistent<ValueType = any> {
     }
     this._key = finalKey;
 
-    this.agileInstance().storage.persistentInstances.add(this);
+    this.agileInstance().storages.persistentInstances.add(this);
     this.ready = true;
 
     // Load/Store persisted Value/s for the first Time
