@@ -36,7 +36,7 @@ describe("GetValueById Function Tests", () => {
   });
 
   it("Can getValueById", () => {
-    const item = MY_COLLECTION.getValueById(1);
+    const item = MY_COLLECTION.getItemValue(1);
 
     expect(JSON.stringify(item)).to.eq(
       JSON.stringify({ id: 1, name: "jeff" }),
@@ -45,7 +45,7 @@ describe("GetValueById Function Tests", () => {
   });
 
   it("Can't getValueById with not existing item id", () => {
-    const item = MY_COLLECTION.getItemById(5);
+    const item = MY_COLLECTION.getItem(5);
 
     expect(item).to.eq(undefined, "item is undefined");
   });

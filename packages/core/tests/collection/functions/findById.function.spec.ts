@@ -36,7 +36,7 @@ describe("FindById Function Tests", () => {
   });
 
   it("Can findById", () => {
-    const item = MY_COLLECTION.getItemById(1);
+    const item = MY_COLLECTION.getItem(1);
 
     expect(item instanceof State).to.eq(true, "item is instanceof State");
     expect(JSON.stringify(item?.value)).to.eq(
@@ -46,7 +46,7 @@ describe("FindById Function Tests", () => {
   });
 
   it("Can't findById not existing item", () => {
-    const item = MY_COLLECTION.getItemById(5);
+    const item = MY_COLLECTION.getItem(5);
 
     expect(item).to.eq(undefined, "item is undefined");
   });

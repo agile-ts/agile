@@ -41,12 +41,10 @@ describe("getGroup Function Tests", () => {
     expect(myGroup.exists).to.eq(true, "myGroup does exist");
   });
 
-  it("Gets dummy Group, if trying to get a non existing group", () => {
+  it("Can't get Group which doesn't exist", () => {
     // Get Group
     const myGroup = MY_COLLECTION.getGroup("group3");
 
-    expect(myGroup instanceof Group).to.eq(true, "myGroup is a group");
-    expect(myGroup.key).to.eq("dummy", "myGroup has correct key");
-    expect(myGroup.exists).to.eq(false, "group3 doesn't exist");
+    expect(myGroup instanceof Group).to.eq(false, "myGroup is undefined");
   });
 });

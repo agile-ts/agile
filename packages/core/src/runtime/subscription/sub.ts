@@ -103,6 +103,8 @@ export class SubController {
 
     // Register subs
     subs.forEach((observable) => {
+      if (!observable) return;
+
       // Add Observer to SubscriptionContainer Subs
       subscriptionContainer.subs.add(observable);
 

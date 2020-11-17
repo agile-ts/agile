@@ -96,6 +96,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       const defaultGroup = this.collection().getGroup(
         this.collection().config.defaultGroupKey || "default"
       );
+      if (!defaultGroup) return false;
 
       // Persist Default Group and instantiate it manually to await its instantiation
       const groupStorageKey = CollectionPersistent.getGroupStorageKey(
@@ -159,6 +160,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey || "default"
     );
+    if (!defaultGroup) return false;
 
     // Persist default Group
     defaultGroup.persist({ followCollectionPattern: true });
@@ -201,6 +203,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey || "default"
     );
+    if (!defaultGroup) return false;
 
     // Remove default Group from Storage
     defaultGroup.persistent?.removeValue();

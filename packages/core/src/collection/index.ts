@@ -342,7 +342,9 @@ export class Collection<DataType = DefaultItem> {
 
     // Create or update Group
     if (group) {
+      if (!group.isPlaceholder) return group;
       group.set(initialItems || []);
+      group.isPlaceholder = false;
     } else {
       group = new Group<DataType>(this, initialItems, { key: groupKey });
       this.groups[groupKey] = group;
@@ -373,7 +375,9 @@ export class Collection<DataType = DefaultItem> {
 
     // Create or update Selector
     if (selector) {
+      if (!selector.isPlaceholder) return selector;
       selector.select(itemKey);
+      selector.isPlaceholder = false;
     } else {
       selector = new Selector<DataType>(this, itemKey, {
         key: selectorKey,
@@ -401,15 +405,12 @@ export class Collection<DataType = DefaultItem> {
       notExisting: false,
     });
 
-    // Check if Group exists
-    if (
-      !this.groups.hasOwnProperty(groupKey) ||
-      (!config.notExisting && !this.groups[groupKey].exists)
-    )
-      return undefined;
-
     // Get Group
     const group = this.groups[groupKey];
+
+    // Check if Group exists
+    if (!group || (!config.notExisting && group.isPlaceholder))
+      return undefined;
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
@@ -484,15 +485,12 @@ export class Collection<DataType = DefaultItem> {
       notExisting: false,
     });
 
-    // Check if Selector exists
-    if (
-      !this.data.hasOwnProperty(selectorKey) ||
-      (!config.notExisting && !this.data[selectorKey].exists)
-    )
-      return undefined;
-
     // Get Selector
     const selector = this.selectors[selectorKey];
+
+    // Check if Selector exists
+    if (!selector || (!config.notExisting && selector.isPlaceholder))
+      return undefined;
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
@@ -585,15 +583,11 @@ export class Collection<DataType = DefaultItem> {
       notExisting: false,
     });
 
-    // Check if Item exists
-    if (
-      !this.data.hasOwnProperty(itemKey) ||
-      (!config.notExisting && !this.data[itemKey].exists)
-    )
-      return undefined;
-
     // Get Item
     const item = this.data[itemKey];
+
+    // Check if Item exists
+    if (!item || (!config.notExisting && !item.exists)) return undefined;
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
