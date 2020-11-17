@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { Group, Agile } from "../../../src";
 import { useAgile_Test } from "../../test_integration";
 
+// TODO ERROR in TEST & Submitting doesn't update the isSet property in items!! (multieditor)
 describe("Collect Function Tests", () => {
   // Define Agile
   const App = new Agile();

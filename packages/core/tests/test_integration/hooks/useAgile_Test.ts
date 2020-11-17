@@ -5,6 +5,7 @@ import {
   Agile,
   getAgileInstance,
   normalizeArray,
+  Observer,
 } from "../../../src";
 
 //=========================================================================================================
@@ -19,6 +20,8 @@ type AgileHookArrayType<T> = {
     ? U[]
     : T[K] extends State<infer U>
     ? U
+    : T[K] extends Observer<infer U>
+    ? U
     : T[K] extends Collection<infer U>
     ? U[]
     : T[K] extends undefined
@@ -31,71 +34,75 @@ type AgileHookType<T> = T extends Group<infer U>
   ? U[]
   : T extends State<infer U>
   ? U
+  : T extends Observer<infer U>
+  ? U
   : T extends Collection<infer U>
   ? U[]
   : T extends undefined
   ? undefined
   : never;
 
-// Array
-export function useAgile_Test<X extends Array<State | Collection | undefined>>(
-  deps: X,
-  callbackFunction: Function,
+export function useAgile_Test<
+  X extends Array<State | Collection | Observer | undefined>
+>(
+  deps: X | [],
+  callbackFunction?: Function,
   agileInstance?: Agile
 ): AgileHookArrayType<X>;
-
-// No Array
-export function useAgile_Test<X extends State | Collection | undefined>(
-  deps: X,
-  callbackFunction: Function,
-  agileInstance?: Agile
-): AgileHookType<X>;
+export function useAgile_Test<
+  X extends State | Collection | Observer | undefined
+>(dep: X, callbackFunction: Function, agileInstance?: Agile): AgileHookType<X>;
 
 export function useAgile_Test<
-  X extends Array<State | Collection | undefined>,
-  Y extends State | Collection | undefined
+  X extends Array<State | Collection | Observer | undefined>,
+  Y extends State | Collection | Observer | undefined
 >(
   deps: X | Y,
   callbackFunction: Function,
   agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
-  // Normalize Dependencies
-  let depsArray = normalizeArray<State | Collection | undefined>(deps)
-    .map((item) =>
-      item instanceof Collection
-        ? item.getGroup(item.config.defaultGroupKey || "default")
-        : item
-    )
-    .filter((item) => item !== undefined) as State[];
+  // Normalize Dependencies and special Agile Instance Types like Collection
+  const depsArray = normalizeArray(deps, {
+    createUndefinedArray: true,
+  }).map((item) =>
+    item instanceof Collection
+      ? item.getGroup(item.config.defaultGroupKey || "default")
+      : item
+  );
 
-  // Function which creates the return value
+  // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
-    depsArray: State[]
+    depsArray: (State | Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    // Return Public Value of State
     if (depsArray.length === 1 && !Array.isArray(deps))
-      return depsArray[0]?.getPublicValue() as AgileHookType<Y>;
+      return depsArray[0] instanceof Observer
+        ? depsArray[0]?.value
+        : (depsArray[0]?.getPublicValue() as AgileHookType<Y>);
 
-    // Return Public Value of State in Array
     return depsArray.map((dep) => {
-      return dep.getPublicValue();
+      return dep instanceof Observer ? dep?.value : dep?.getPublicValue();
     }) as AgileHookArrayType<X>;
   };
 
   // Get Agile Instance
-  if (!agileInstance) {
-    const tempAgileInstance = getAgileInstance(depsArray[0]);
-    if (!tempAgileInstance) {
-      console.error("Agile: Failed to get Agile Instance");
-      return getReturnValue(depsArray);
-    }
-    agileInstance = tempAgileInstance;
+  if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
+
+  if (!agileInstance || !agileInstance.subController) {
+    console.error("Agile: Failed to subscribe Component with deps", depsArray);
+    return;
   }
 
-  // Create a callback base subscription, Callback invokes re-render Trigger
-  agileInstance?.subController.subscribeWithSubsArray(
-    callbackFunction,
-    depsArray.map((state) => state.observer)
+  // https://github.com/microsoft/TypeScript/issues/20812
+  const observers: Observer[] = depsArray
+    .map((dep) => (dep instanceof Observer ? dep : dep?.observer))
+    .filter((dep): dep is Observer => dep !== undefined);
+
+  // Create Callback based Subscription
+  const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
+    () => {
+      callbackFunction();
+    },
+    observers
   );
 
   return getReturnValue(depsArray);
