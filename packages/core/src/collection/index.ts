@@ -254,8 +254,11 @@ export class Collection<DataType = DefaultItem> {
         for (let groupKey in this.groups) {
           const group = this.getGroup(groupKey);
           if (group.value.includes(itemKey)) {
-            if (!config.background)
-              group.ingest({ forceRerender: true, storage: false });
+            group.ingest({
+              force: true,
+              background: config.background,
+              storage: false,
+            });
           }
         }
       }
@@ -864,7 +867,6 @@ export class Collection<DataType = DefaultItem> {
   ): void {
     config = defineConfig(config, {
       background: false,
-      forceRerender: !config?.background, // because we have to forceRerender but only if background is false (group value doesn't change but the group output)
       sideEffects: true,
     });
 
@@ -875,7 +877,7 @@ export class Collection<DataType = DefaultItem> {
         // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
         group.ingest({
           background: config?.background,
-          forceRerender: config?.forceRerender,
+          force: true, // because Group value doesn't change only the output changes
           sideEffects: config?.sideEffects,
           storage: false, // because Group only rebuilds and doesn't change its value
         });
@@ -940,12 +942,12 @@ export interface UpdateItemKeyConfigInterface {
 
 /**
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
- * @param forceRerender - Force rerender no matter what happens
+ * @param force - Force creating and performing Job
  * @param sideEffects - If Side Effects of State get executed
  */
 export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   background?: boolean;
-  forceRerender?: boolean;
+  force?: boolean;
   sideEffects?: boolean;
 }
 

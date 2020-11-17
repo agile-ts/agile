@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile, Group } from "../../../src";
-import { useAgile_Test } from "../../test_integration";
+import testIntegration from "../../test.integration";
 
 describe("Update Function Tests", () => {
   let rerenderCount = 0;
 
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   // Object Interface
   interface userInterface {
@@ -19,10 +19,10 @@ describe("Update Function Tests", () => {
   // Create Collection
   const MY_COLLECTION = App.Collection<userInterface>();
 
-  // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-  const [myHookCollection] = useAgile_Test([MY_COLLECTION], () => {
+  // Subscribe Instance for testing callback call functionality
+  App.subController.subscribeWithSubsArray(() => {
     rerenderCount++;
-  });
+  }, [MY_COLLECTION.getGroup("default")?.observer]);
 
   // Collect some items
   MY_COLLECTION.collect([
@@ -63,10 +63,6 @@ describe("Update Function Tests", () => {
       "MY_COLLECTION item at id 3 has correct value"
     );
 
-    expect(JSON.stringify(myHookCollection)).to.eq(
-      JSON.stringify([]),
-      "myHookState has correct MY_COLLECTION value"
-    );
     expect(rerenderCount).to.eq(1, "rerenderCount has correct value");
   });
 

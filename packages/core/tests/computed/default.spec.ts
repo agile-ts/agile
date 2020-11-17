@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile, Computed } from "../../src";
-import { useAgile_Test } from "../test_integration";
+import testIntegration from "../test.integration";
 
 describe("Default Computed Tests", () => {
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   interface userInterface {
     id: number;
@@ -42,10 +42,10 @@ describe("Default Computed Tests", () => {
       }_${MY_COLLECTION.getItemById(2)?.value.name}`;
     });
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myComputed] = useAgile_Test([MY_COMPUTED], () => {
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    });
+    }, [MY_COMPUTED.observer]);
 
     it("Has correct initial values", () => {
       expect(MY_COMPUTED instanceof Computed).to.eq(
@@ -163,10 +163,10 @@ describe("Default Computed Tests", () => {
       }_${MY_COLLECTION.getItemById(2)?.value.name}`;
     }, [MY_STATE_3]);
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myComputed] = useAgile_Test([MY_COMPUTED], () => {
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    });
+    }, [MY_COMPUTED.observer]);
 
     it("Has correct initial values", () => {
       expect(MY_COMPUTED instanceof Computed).to.eq(

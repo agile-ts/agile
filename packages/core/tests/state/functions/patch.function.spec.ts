@@ -1,14 +1,14 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile } from "../../../src";
-import { useAgile_Test } from "../../test_integration";
+import testIntegration from "../../test.integration";
 
 describe("Patch Function Tests", () => {
   let rerenderCount = 0;
   let sideEffectCount = 0;
 
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   // Object Interface
   interface userInterface {
@@ -24,10 +24,10 @@ describe("Patch Function Tests", () => {
     sideEffectCount++;
   });
 
-  // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-  const [myHookState] = useAgile_Test([MY_STATE], () => {
+  // Subscribe Instance for testing callback call functionality
+  App.subController.subscribeWithSubsArray(() => {
     rerenderCount++;
-  });
+  }, [MY_STATE.observer]);
 
   it("Has correct initial values", () => {
     expect(JSON.stringify(MY_STATE.value)).to.eq(
@@ -46,13 +46,6 @@ describe("Patch Function Tests", () => {
       "MY_STATE has sideEffect function"
     );
 
-    expect(JSON.stringify(myHookState)).to.eq(
-      JSON.stringify({
-        id: 1,
-        name: "jeff",
-      }),
-      "myHookState has correct MY_STATE value"
-    );
     expect(rerenderCount).to.eq(0, "rerenderCount is 0");
     expect(sideEffectCount).to.eq(0, "sideEffectCount is 0");
   });

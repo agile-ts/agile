@@ -1,4 +1,4 @@
-import { Agile, Integration } from "../../src";
+import { Agile, Integration } from "../src";
 
 const testIntegration = new Integration({
   name: "test",
@@ -11,6 +11,5 @@ const testIntegration = new Integration({
     // Nothing
   },
 });
-Agile.initialIntegrations.push(testIntegration);
 
 export default testIntegration;

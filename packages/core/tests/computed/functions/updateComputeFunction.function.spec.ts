@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import { Agile, Computed } from "../../../src";
-import { useAgile_Test } from "../../test_integration";
+import testIntegration from "../../test.integration";
 
 describe("updateComputeFunction Function test_integration", () => {
   let rerenderCount = 0;
 
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   // Create State
   const MY_STATE = App.State<string>("hello");
@@ -20,10 +20,10 @@ describe("updateComputeFunction Function test_integration", () => {
     return `${MY_STATE.value}_${MY_STATE_2.value}`;
   });
 
-  // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-  const [myComputed] = useAgile_Test([MY_COMPUTED], () => {
+  // Subscribe Instance for testing callback call functionality
+  App.subController.subscribeWithSubsArray(() => {
     rerenderCount++;
-  });
+  }, [MY_COMPUTED.observer]);
 
   it("Has correct initial values", () => {
     expect(MY_COMPUTED instanceof Computed).to.eq(
@@ -47,10 +47,6 @@ describe("updateComputeFunction Function test_integration", () => {
       "MY_COMPUTED has correct deps"
     );
 
-    expect(myComputed).to.eq(
-      "hello_bye",
-      "myComputed has correct initial value"
-    );
     expect(rerenderCount).to.eq(0, "rerenderCount has correct initial value");
   });
 

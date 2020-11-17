@@ -201,16 +201,14 @@ export class MultiEditor<
     // Update initial Value
     item.initialStateValue = copy(value);
 
-    // Force Rerender
-    if (!config.background && !config.reset)
-      item.ingest({ ...{ forceRerender: true }, ...config });
-
     // Reset Item (-> Assign current Value to the new Initial Value)
     if (config.reset) {
       item.reset({
+        force: true,
         background: config.background,
-        forceRerender: !config.background,
       });
+    } else {
+      item.ingest({ force: true, background: config.background });
     }
 
     return this;
@@ -239,7 +237,8 @@ export class MultiEditor<
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
         item.status.assign({
-          forceRerender: !item.status.display, // Force rerender if Status isn't displayed yet
+          force: true, // Force because value hasn't changed..
+          background: false,
         });
         item.status.display = true;
       }
@@ -249,7 +248,7 @@ export class MultiEditor<
 
     // Logging
     if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Submit MultiEditor ${this.key}`, this.isValid);
+      console.log(`Agile: Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
     if (!this.isValid) return false;

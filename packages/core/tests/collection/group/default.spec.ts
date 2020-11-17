@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { useAgile_Test } from "../../test_integration";
 import { Agile, Group } from "../../../src";
+import testIntegration from "../../test.integration";
 
 describe("Default Group Tests", () => {
   // Define Agile
-  const App = new Agile();
+  const App = new Agile().use(testIntegration);
 
   describe("Group", () => {
     let rerenderCount = 0;
@@ -23,11 +23,10 @@ describe("Default Group Tests", () => {
       },
     }));
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myGroup1] = useAgile_Test([MY_COLLECTION.getGroup("group1")], () => {
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    });
-
+    }, [MY_COLLECTION.getGroup("group1")?.observer]);
     it("Has correct initial values", () => {
       expect(MY_COLLECTION.groups["default"] instanceof Group).to.eq(
         true,
@@ -79,10 +78,6 @@ describe("Default Group Tests", () => {
         "group1 Group has correct initial key"
       );
 
-      expect(JSON.stringify(myGroup1)).to.eq(
-        JSON.stringify([]),
-        "myGroup1 has correct MY_COLLECTION group1 value"
-      );
       expect(rerenderCount).to.eq(0, "rerenderCount has correct value");
     });
 
@@ -151,10 +146,10 @@ describe("Default Group Tests", () => {
       },
     }));
 
-    // Set 'Hook' for testing the rerenderFunctionality with the callbackFunction (Note: the value of myHookState doesn't get changed because no rerenders happen -> no reassign of the value)
-    const [myGroup1] = useAgile_Test([MY_COLLECTION.getGroup("group1")], () => {
+    // Subscribe Instance for testing callback call functionality
+    App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    });
+    }, [MY_COLLECTION.getGroup("group1")?.observer]);
 
     it("Has correct initial values", () => {
       expect(MY_COLLECTION.groups["default"] instanceof Group).to.eq(
@@ -207,10 +202,6 @@ describe("Default Group Tests", () => {
         "group1 Group has correct initial key"
       );
 
-      expect(JSON.stringify(myGroup1)).to.eq(
-        JSON.stringify([]),
-        "myGroup1 has correct MY_COLLECTION group1 value"
-      );
       expect(rerenderCount).to.eq(0, "rerenderCount has correct value");
     });
 

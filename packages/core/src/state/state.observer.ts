@@ -44,24 +44,21 @@ export class StateObserver<ValueType = any> extends Observer {
    * Ingests nextStateValue into Runtime and applies it to the State
    * @param config - Config
    */
-  public ingest(config: StateJobConfigInterface): void;
+  public ingest(config: JobConfigInterface): void;
   /**
    * @internal
    * Ingests new State Value into Runtime and applies it to the State
    * @param newStateValue - New Value of the State
    * @param config - Config
    */
+  public ingest(newStateValue: ValueType, config: JobConfigInterface): void;
   public ingest(
-    newStateValue: ValueType,
-    config: StateJobConfigInterface
-  ): void;
-  public ingest(
-    newStateValueOrConfig: ValueType | StateJobConfigInterface,
-    config: StateJobConfigInterface = {}
+    newStateValueOrConfig: ValueType | JobConfigInterface,
+    config: JobConfigInterface = {}
   ): void {
     const state = this.state();
     let _newStateValue: ValueType;
-    let _config: StateJobConfigInterface;
+    let _config: JobConfigInterface;
 
     if (isStateJobConfigInterface(newStateValueOrConfig)) {
       _config = newStateValueOrConfig;
@@ -76,12 +73,9 @@ export class StateObserver<ValueType = any> extends Observer {
       perform: true,
       background: false,
       sideEffects: true,
-      forceRerender: false,
+      force: false,
       storage: true,
     });
-
-    // If forceRerender, set background config to false since forceRerender is 'stronger' than background
-    if (_config.forceRerender && _config.background) _config.background = false;
 
     // Assign next State Value and compute it if necessary
     this.nextStateValue = state.computeMethod
@@ -89,8 +83,7 @@ export class StateObserver<ValueType = any> extends Observer {
       : copy(_newStateValue);
 
     // Check if State Value and new/next Value are equals
-    if (equal(state.value, this.nextStateValue) && !_config.forceRerender)
-      return;
+    if (equal(state.value, this.nextStateValue) && !_config.force) return;
 
     this.agileInstance().runtime.ingest(this, _config);
   }
@@ -164,21 +157,14 @@ export class StateObserver<ValueType = any> extends Observer {
   }
 }
 
-/**
- * @param forceRerender - Force rerender no matter what happens
- */
-export interface StateJobConfigInterface extends JobConfigInterface {
-  forceRerender?: boolean;
-}
-
 // https://stackoverflow.com/questions/40081332/what-does-the-is-keyword-do-in-typescript
 export function isStateJobConfigInterface(
   object: any
-): object is StateJobConfigInterface {
+): object is JobConfigInterface {
   return (
     object &&
     typeof object === "object" &&
-    ("forceRerender" in object ||
+    ("force" in object ||
       "perform" in object ||
       "background" in object ||
       "sideEffects" in object ||
