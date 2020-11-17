@@ -1,8 +1,9 @@
 {
   "private": true,
-  "description": "Global state and logic framework for reactive React applications.",
+  "description": "Global state and logic framework for reactive Javascript & Typescript applications.",
   "author": "BennoDev",
   "license": "ISC",
+  "homepage": "https://agile-ts.org/",
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
