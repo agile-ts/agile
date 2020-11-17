@@ -867,7 +867,6 @@ export class Collection<DataType = DefaultItem> {
   ): void {
     config = defineConfig(config, {
       background: false,
-      force: true, // because group value doesn't change but the group output
       sideEffects: true,
     });
 
@@ -878,7 +877,7 @@ export class Collection<DataType = DefaultItem> {
         // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
         group.ingest({
           background: config?.background,
-          force: config?.force,
+          force: true, // because Group value doesn't change only the output changes
           sideEffects: config?.sideEffects,
           storage: false, // because Group only rebuilds and doesn't change its value
         });
