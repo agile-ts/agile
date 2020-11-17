@@ -398,7 +398,7 @@ export class Collection<DataType = DefaultItem> {
    * @param config - Config
    */
   public getGroup(
-    groupKey: GroupKey,
+    groupKey: GroupKey | undefined,
     config: GetGroupConfigInterface = {}
   ): Group<DataType> | undefined {
     config = defineConfig(config, {
@@ -406,7 +406,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Get Group
-    const group = this.groups[groupKey];
+    const group = groupKey ? this.groups[groupKey] : undefined;
 
     // Check if Group exists
     if (!group || (!config.notExisting && group.isPlaceholder))
@@ -428,19 +428,20 @@ export class Collection<DataType = DefaultItem> {
    * If Group doesn't exist, it returns a reference of the Group that will be filled with the real data later
    * @param groupKey - Name/Key of Group
    */
-  public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
+  public getGroupWithReference(
+    groupKey: GroupKey | undefined
+  ): Group<DataType> {
+    let group = groupKey ? this.groups[groupKey] : undefined;
+
     // Create dummy Group to hold reference
-    if (!this.groups[groupKey]) {
+    if (!group) {
       const dummyGroup = new Group<DataType>(this, [], {
         key: groupKey,
       });
       dummyGroup.isPlaceholder = true;
-      this.groups[groupKey] = dummyGroup;
+      this.groups[groupKey || "unknown"] = dummyGroup;
       return dummyGroup;
     }
-
-    // Get Group
-    const group = this.groups[groupKey];
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
@@ -478,7 +479,7 @@ export class Collection<DataType = DefaultItem> {
    * @param config - Config
    */
   public getSelector(
-    selectorKey: SelectorKey,
+    selectorKey: SelectorKey | undefined,
     config: GetSelectorConfigInterface = {}
   ): Selector<DataType> | undefined {
     config = defineConfig(config, {
@@ -486,7 +487,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Get Selector
-    const selector = this.selectors[selectorKey];
+    const selector = selectorKey ? this.selectors[selectorKey] : undefined;
 
     // Check if Selector exists
     if (!selector || (!config.notExisting && selector.isPlaceholder))
@@ -509,20 +510,19 @@ export class Collection<DataType = DefaultItem> {
    * @param selectorKey - Name/Key of Selector
    */
   public getSelectorWithReference(
-    selectorKey: SelectorKey
+    selectorKey: SelectorKey | undefined
   ): Selector<DataType> {
+    let selector = selectorKey ? this.selectors[selectorKey] : undefined;
+
     // Create dummy Group to hold reference
-    if (!this.selectors[selectorKey]) {
+    if (!selector) {
       const dummySelector = new Selector<DataType>(this, "unknown", {
         key: selectorKey,
       });
       dummySelector.isPlaceholder = true;
-      this.selectors[selectorKey] = dummySelector;
+      this.selectors[selectorKey || "unknown"] = dummySelector;
       return dummySelector;
     }
-
-    // Get Selector
-    const selector = this.selectors[selectorKey];
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
@@ -576,7 +576,7 @@ export class Collection<DataType = DefaultItem> {
    * @param config - Config
    */
   public getItem(
-    itemKey: ItemKey,
+    itemKey: ItemKey | undefined,
     config: GetItemConfigInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {
@@ -584,7 +584,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Get Item
-    const item = this.data[itemKey];
+    const item = itemKey ? this.data[itemKey] : undefined;
 
     // Check if Item exists
     if (!item || (!config.notExisting && !item.exists)) return undefined;
@@ -602,20 +602,19 @@ export class Collection<DataType = DefaultItem> {
    * If Item doesn't exist, it returns a reference of the Item that will be filled with the real data later
    * @param itemKey - Name/Key of Item
    */
-  public getItemWithReference(itemKey: ItemKey): Item<DataType> {
+  public getItemWithReference(itemKey: ItemKey | undefined): Item<DataType> {
+    let item = itemKey ? this.data[itemKey] : undefined;
+
     // Create dummy Item to hold reference
-    if (!this.data[itemKey]) {
+    if (!item) {
       const dummyItem = new Item<DataType>(this, {
         id: itemKey,
         dummy: true,
       } as any);
       dummyItem.isPlaceholder = true;
-      this.data[itemKey] = dummyItem;
+      this.data[itemKey || "unknown"] = dummyItem;
       return dummyItem;
     }
-
-    // Get Item
-    const item = this.data[itemKey];
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
@@ -632,7 +631,7 @@ export class Collection<DataType = DefaultItem> {
    * Get Value of Item by Key/Name
    * @param itemKey - ItemKey of Item that holds the Value
    */
-  public getItemValue(itemKey: ItemKey): DataType | undefined {
+  public getItemValue(itemKey: ItemKey | undefined): DataType | undefined {
     let item = this.getItem(itemKey);
     if (!item) return undefined;
     return item.value;
