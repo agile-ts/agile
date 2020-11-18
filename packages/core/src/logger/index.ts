@@ -1,12 +1,16 @@
-import { defineConfig, includesArray } from "../internal";
+import { defineConfig, includesArray } from "@agile-ts/core";
 
 export class Logger {
   public key?: LoggerKey;
 
   public config: LoggerConfigInterface;
   public allowedTags: string[] = [];
-  public logs: { [key: string]: LoggerCategoryInterface } = {};
+  public loggerCategories: { [key: string]: LoggerCategoryInterface } = {}; // Holds all registered Logger Categories
 
+  /**
+   * @public
+   * Logger -
+   */
   constructor(config: CreateLoggerConfigInterface = {}) {
     config = defineConfig(config, {
       prefix: "",
@@ -21,163 +25,241 @@ export class Logger {
     this.addDefaultLoggerCategories();
   }
 
+  /**
+   * @internal
+   * Adds Default Logger Categories
+   */
   private addDefaultLoggerCategories() {
-    this.addLoggerCategory({
+    this.createLoggerCategory({
+      key: "log",
+      level: 0,
+    });
+    this.createLoggerCategory({
       key: "debug",
       customStyle: "color: #3c3c3c;",
-      prefix: "Debug:",
+      prefix: "Debug",
       level: 0,
     });
-    this.addLoggerCategory({
+    this.createLoggerCategory({
       key: "info",
-      customStyle: "color: #19a8ee;",
-      prefix: "Info:",
+      customStyle: "color: #1972ee;",
+      prefix: "Info",
       level: 0,
     });
-    this.addLoggerCategory({
+    this.createLoggerCategory({
       key: "warn",
-      prefix: "Warn:",
+      prefix: "Warn",
       level: 0,
     });
-    this.addLoggerCategory({
+    this.createLoggerCategory({
       key: "error",
-      prefix: "Error:",
+      prefix: "Error",
       level: 0,
     });
-    this.addLoggerCategory({
+    this.createLoggerCategory({
       key: "trace",
-      prefix: "Trace:",
+      prefix: "Trace",
       level: 0,
     });
-    this.addLoggerCategory({
+    this.createLoggerCategory({
       key: "table",
       level: 0,
     });
   }
 
+  /**
+   * @public
+   *
+   * @param tags -
+   */
   public tag(tags: string[]) {
     if (includesArray(this.allowedTags, tags)) {
       return {
-        debug: (message: string, object?: any) => this.debug(message, object),
-        info: (message: string, object?: any) => this.info(message, object),
-        warn: (message: string, object?: any) => this.warn(message, object),
-        error: (message: string, object?: any) => this.error(message, object),
-        trace: (message: string, object?: any) => this.trace(message, object),
-        table: (message: string, object?: any) => this.table(message, object),
+        log: (...logs: any[]) => this.log(logs),
+        debug: (...logs: any[]) => this.debug(logs),
+        info: (...logs: any[]) => this.info(logs),
+        warn: (...logs: any[]) => this.warn(logs),
+        error: (...logs: any[]) => this.error(logs),
+        trace: (...logs: any[]) => this.trace(logs),
+        table: (...logs: any[]) => this.table(logs),
       };
     }
     return {
-      debug: (message: string, object?: any) => {},
-      info: (message: string, object?: any) => {},
-      warn: (message: string, object?: any) => {},
-      error: (message: string, object?: any) => {},
-      trace: (message: string, object?: any) => {},
-      table: (message: string, object?: any) => {},
+      log: (...logs: any[]) => {},
+      debug: (...logs: any[]) => {},
+      info: (...logs: any[]) => {},
+      warn: (...logs: any[]) => {},
+      error: (...logs: any[]) => {},
+      trace: (...logs: any[]) => {},
+      table: (...logs: any[]) => {},
     };
   }
 
-  public debug(message: string, object?: any) {
-    this.log(message, object, "debug", "log");
+  public log(...logs: any[]) {
+    this.invokeConsole(logs, "log", "log");
   }
 
-  public info(message: string, object?: any) {
-    this.log(message, object, "info", "log");
+  public debug(...logs: any[]) {
+    this.invokeConsole(
+      logs,
+      "debug",
+      typeof console.debug !== "undefined" ? "debug" : "log"
+    );
   }
 
-  public warn(message: string, object?: any) {
-    this.log(message, object, "warn", "warn");
+  public info(...logs: any[]) {
+    this.invokeConsole(
+      logs,
+      "info",
+      typeof console.info !== "undefined" ? "info" : "log"
+    );
   }
 
-  public error(message: string, object?: any) {
-    this.log(message, object, "error", "error");
+  public warn(...logs: any[]) {
+    this.invokeConsole(
+      logs,
+      "warn",
+      typeof console.warn !== "undefined" ? "warn" : "log"
+    );
   }
 
-  public trace(message: string, object?: any) {
-    this.log(message, object, "trace", "trace");
+  public error(...logs: any[]) {
+    this.invokeConsole(
+      logs,
+      "error",
+      typeof console.error !== "undefined" ? "error" : "log"
+    );
   }
 
-  public table(message: string, object: object, canLog?: boolean) {
-    this.log(message, object, "table", "table");
+  public trace(...logs: any[]) {
+    this.invokeConsole(
+      logs,
+      "trace",
+      typeof console.trace !== "undefined" ? "trace" : "log"
+    );
   }
 
-  private log(
-    message: string,
-    object: any,
+  public table(...logs: any[]) {
+    this.invokeConsole(
+      logs,
+      "table",
+      typeof console.table !== "undefined" ? "table" : "log"
+    );
+  }
+
+  /**
+   * @internal
+   * Logs message in Console
+   * @param logs -
+   * @param loggerCategoryKey - Key of Logger Category
+   * @param consoleLogProperty - console[consoleLogProperty]
+   */
+  private invokeConsole(
+    logs: any[],
     loggerCategoryKey: LoggerCategoryKey,
-    consoleLogProperty: "log" | "warn" | "error" | "trace" | "table"
+    consoleLogProperty: ConsoleLogType
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
     const canUseCustomStyle =
       loggerCategory.customStyle && this.config.canUseCustomStyles;
-    const categoryPrefix = loggerCategory.prefix
-      ? `${loggerCategory.prefix} `
-      : "";
-    const loggerPrefix = this.config.prefix ? `${this.config.prefix} ` : "";
-    const customStylesPrefix =
-      loggerCategory.customStyle && this.config.canUseCustomStyles ? "%c" : "";
 
-    if (object && canUseCustomStyle) {
-      console[consoleLogProperty](
-        `${customStylesPrefix}${loggerPrefix}${categoryPrefix}${message}\n`,
-        loggerCategory.customStyle,
-        object
-      );
-      return;
+    // Build Prefix of Log
+    const buildPrefix = (): string => {
+      let prefix: string = "";
+      if (this.config.prefix) prefix = prefix.concat(this.config.prefix);
+      if (loggerCategory.prefix)
+        prefix = prefix.concat(" " + loggerCategory.prefix);
+      if (this.config.prefix || loggerCategory.prefix)
+        prefix = prefix.concat(":");
+
+      return prefix;
+    };
+
+    // TODOI think you can only use %c in ONE string block!!
+    // https://stackoverflow.com/questions/24828107/javascript-adding-style-to-the-text-of-console-log
+    // Add Custom Build Prefix
+    logs.unshift(buildPrefix());
+
+    // Init Custom Styles
+    if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
+      const newLogs: any[] = [];
+      logs.forEach((log) => {
+        if (typeof log === "string") {
+          newLogs.push(`%c${log}`);
+          newLogs.push(loggerCategory.customStyle);
+        }
+      });
+      logs = newLogs;
     }
 
-    if (object) {
-      console[consoleLogProperty](
-        `${customStylesPrefix}${loggerPrefix}${categoryPrefix}${message}\n`,
-        object
-      );
-      return;
-    }
-
-    if (canUseCustomStyle) {
-      console[consoleLogProperty](
-        `${customStylesPrefix}${loggerPrefix}${categoryPrefix}${message}`,
-        loggerCategory.customStyle
-      );
-      return;
-    }
-
-    console[consoleLogProperty](
-      `${customStylesPrefix}${loggerPrefix}${categoryPrefix}${message}`
-    );
+    // Log
+    console[consoleLogProperty](...logs);
   }
 
-  public addLoggerCategory(loggerCategory: LoggerCategoryInterface) {
+  /**
+   * @public
+   * Create new Logger Category
+   * @param loggerCategory - Message that gets Logged
+   */
+  public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
     loggerCategory = defineConfig(loggerCategory, {
-      color: "#000000",
       prefix: "",
-      tags: [],
+      level: 0,
     });
-    this.logs[loggerCategory.key] = loggerCategory;
+    this.loggerCategories[loggerCategory.key] = loggerCategory;
   }
 
+  /**
+   * @public
+   * Get Logger Category
+   * @param key - Key/Name of Logger Category
+   */
   public getLoggerCategory(key: LoggerCategoryKey) {
-    return this.logs[key];
+    return this.loggerCategories[key];
   }
 }
 
 export type LoggerCategoryKey = string | number;
 export type LoggerKey = string | number;
 
+/**
+ * @param key - Key/Name of Logger Category
+ * @param customStyle - Css Styles that get applied to the log
+ * @param prefix - Prefix that gets written before each log of this Category
+ * @param level - Until which Level this Logger Category gets logged
+ */
 export interface LoggerCategoryInterface {
   key: LoggerCategoryKey;
   customStyle?: string;
   prefix?: string;
-  tags?: string[];
   level?: number;
 }
 
+/**
+ * @param prefix - Prefix that gets written before each log of this Logger
+ * @param canUseCustomStyles - If custom Styles can be applied to the Logs
+ */
 export interface LoggerConfigInterface {
   prefix: string;
   canUseCustomStyles: boolean;
 }
 
+/**
+ * @param prefix - Prefix that gets written before each log of this Logger
+ * @param allowedTags - Only Logs that have contains the allowed Tags or have no Tag get logged
+ * @param canUseCustomStyles - If custom Styles can be applied to the Logs
+ */
 export interface CreateLoggerConfigInterface {
   prefix?: string;
   allowedTags?: LoggerKey[];
   canUseCustomStyles?: boolean;
 }
+
+export type ConsoleLogType =
+  | "log"
+  | "warn"
+  | "error"
+  | "trace"
+  | "table"
+  | "info"
+  | "debug";
