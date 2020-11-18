@@ -3,7 +3,6 @@ import {
   Integration,
   State,
   Storage,
-  StorageConfigInterface,
   Collection,
   CollectionConfig,
   DefaultItem,
@@ -16,6 +15,7 @@ import {
   SubController,
   globalBind,
   Storages,
+  CreateStorageConfigInterface,
 } from "./internal";
 
 export class Agile {
@@ -63,7 +63,8 @@ export class Agile {
    * Storage - Handy Interface for storing Items permanently
    * @param config - Config
    */
-  public Storage = (config: StorageConfigInterface) => new Storage(config);
+  public Storage = (config: CreateStorageConfigInterface) =>
+    new Storage(config);
 
   //=========================================================================================================
   // State
@@ -116,24 +117,15 @@ export class Agile {
     new Event<PayloadType>(this, config);
 
   //=========================================================================================================
-  // Set Storage
+  // Register Storage
   //=========================================================================================================
   /**
    * @public
-   * Configures Agile Storage
-   * @param storage - Storage that will get used as Agile Storage
+   * Registers new Storage as Agile Storage
+   * @param storage - new Storage
    */
-  public configureStorage(storage: Storage): void {
-    // Get Observers that are already saved into a storage
-    const persistentInstances = this.storage.persistentInstances;
-
-    // Define new Storage
-    this.storage = storage;
-
-    // Transfer already saved items into new Storage
-    persistentInstances.forEach((persistent) =>
-      persistent.initialLoading(persistent.key)
-    );
+  public registerStorage(storage: Storage): void {
+    this.storages.register(storage);
   }
 
   //=========================================================================================================

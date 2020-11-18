@@ -4,11 +4,14 @@ import {
   isAsyncFunction,
   defineConfig,
   Persistent,
+  StorageKey,
+  StorageItemKey,
 } from "../internal";
 
 export class Storages {
   public agileInstance: () => Agile;
 
+  public defaultStorage?: Storage;
   public storages: { [key: string]: Storage } = {}; // All registered Storages
   public persistentInstances: Set<Persistent> = new Set();
 
@@ -46,10 +49,26 @@ export class Storages {
         remove: localStorage.removeItem.bind(localStorage),
       },
     });
-    this.register(_localStorage);
+    this.register(_localStorage, { default: true });
   }
 
-  public register(storage: Storage): boolean {
+  //=========================================================================================================
+  // Register
+  //=========================================================================================================
+  /**
+   * @internal
+   * Register new Storage as Agile Storage
+   * @param storage - new Storage
+   * @param config - Config
+   */
+  public register(
+    storage: Storage,
+    config: RegisterConfigInterface = {}
+  ): boolean {
+    config = defineConfig(config, {
+      default: false,
+    });
+
     // Check if Storage is async
     if (
       isAsyncFunction(storage.methods.get) ||
@@ -67,8 +86,104 @@ export class Storages {
     // Register Storage
     this.storages[storage.key] = storage;
     storage.ready = true;
+    if(config.default) this.defaultStorage = storage;
+
+    // Transfer already saved Items into new Storage
+    this.persistentInstances.forEach((persistent) => {
+      if (persistent.storageKeys.includes(storage.key))
+        persistent.initialLoading(persistent.key);
+    });
 
     return true;
+  }
+
+  //=========================================================================================================
+  // Get Storage
+  //=========================================================================================================
+  /**
+   * @public
+   * Get Storage at Key/Name
+   * @param key - Key/Name of Storage
+   */
+  public getStorage(key: StorageKey): Storage | undefined {
+    const storage = this.storages[key];
+
+    // Check if Storage exists
+    if (!storage) {
+      console.error(`Agile: Storage with the key/name '${key}' doesn't exist`);
+      return undefined;
+    }
+
+    // Check if Storage is ready
+    if (!storage.ready) {
+      console.error(`Agile: Storage with the key/name '${key}' isn't ready`);
+      return undefined;
+    }
+
+    return storage;
+  }
+
+  //=========================================================================================================
+  // Get
+  //=========================================================================================================
+  /**
+   * @public
+   * Gets value at provided Key
+   * @param key - Key of Storage property
+   * @param storageKey - Key/Name of Storage from which the Item is fetched (if not provided default Storage will be used)
+   */
+  public get<GetType = any>(
+    key: StorageItemKey,
+    storageKey: StorageKey
+  ): GetType | Promise<GetType> | undefined {
+    if (storageKey) {
+      const storage = this.getStorage(key);
+      return storage?.get(key);
+    }
+    return this.defaultStorage?.get(key);
+  }
+
+  //=========================================================================================================
+  // Set
+  //=========================================================================================================
+  /**
+   * @public
+   * Saves/Updates value at provided Key
+   * @param key - Key of Storage property
+   * @param value - new Value that gets set
+   * @param storageKeys - Key/Name of Storages where the Value gets set (if not provided default Storage will be used)
+   */
+  public set(
+    key: StorageItemKey,
+    value: any,
+    storageKeys?: StorageKey[]
+  ): void {
+    if (storageKeys) {
+      for (let storageKey in storageKeys) {
+        this.getStorage(key)?.set(key, value);
+      }
+      return;
+    }
+    this.defaultStorage?.set(key, value);
+  }
+
+  //=========================================================================================================
+  // Remove
+  //=========================================================================================================
+  /**
+   * @public
+   * Removes value at provided Key
+   * @param key - Key of Storage property
+   * @param storageKeys - Key/Name of Storages where the Value gets removed (if not provided default Storage will be used)
+   */
+  public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
+    if (storageKeys) {
+      for (let storageKey in storageKeys) {
+        this.getStorage(key)?.remove(key);
+      }
+      return;
+    }
+    this.defaultStorage?.remove(key);
   }
 
   //=========================================================================================================
@@ -94,4 +209,11 @@ export class Storages {
  */
 export interface StoragesConfigInterface {
   localStorage?: boolean;
+}
+
+/**
+ * @param default - If the registered Storage gets the default Storage
+ */
+export interface RegisterConfigInterface {
+  default?: boolean;
 }

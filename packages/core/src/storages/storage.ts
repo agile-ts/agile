@@ -33,7 +33,7 @@ export class Storage {
    * @param key - Key of Storage property
    */
   public get<GetType = any>(
-    key: StorageKey
+    key: StorageItemKey
   ): GetType | Promise<GetType> | undefined {
     if (!this.ready || !this.methods.get) return;
 
@@ -54,7 +54,7 @@ export class Storage {
    * Gets value at provided Key (async)
    * @param key - Key of Storage property
    */
-  private asyncGet<GetTpe = any>(key: StorageKey): Promise<GetTpe> {
+  private asyncGet<GetTpe = any>(key: StorageItemKey): Promise<GetTpe> {
     return new Promise((resolve, reject) => {
       this.methods
         ?.get(this.getStorageKey(key))
@@ -75,7 +75,7 @@ export class Storage {
    * @param key - Key of Storage property
    * @param value - new Value that gets set
    */
-  public set(key: StorageKey, value: any): void {
+  public set(key: StorageItemKey, value: any): void {
     if (!this.ready || !this.methods.set) return;
     this.methods.set(this.getStorageKey(key), JSON.stringify(value));
   }
@@ -88,7 +88,7 @@ export class Storage {
    * Removes value at provided Key
    * @param key - Key of Storage property
    */
-  public remove(key: StorageKey): void {
+  public remove(key: StorageItemKey): void {
     if (!this.ready || !this.methods.remove) return;
     this.methods.remove(this.getStorageKey(key));
   }
@@ -101,12 +101,13 @@ export class Storage {
    * Creates Storage Key from provided key
    * @param key - Key that gets converted into a Storage Key
    */
-  private getStorageKey(key: StorageKey): string {
+  private getStorageKey(key: StorageItemKey): string {
     return `_${this.config.prefix}_${key}`;
   }
 }
 
 export type StorageKey = string | number;
+export type StorageItemKey = string | number;
 
 /**
  * @param key - Key/Name of Storage
