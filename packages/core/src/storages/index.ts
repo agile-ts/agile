@@ -86,7 +86,7 @@ export class Storages {
     // Register Storage
     this.storages[storage.key] = storage;
     storage.ready = true;
-    if(config.default) this.defaultStorage = storage;
+    if (config.default) this.defaultStorage = storage;
 
     // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
