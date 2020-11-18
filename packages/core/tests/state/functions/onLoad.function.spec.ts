@@ -6,8 +6,10 @@ describe("OnLoad Function Tests", () => {
   let calledOnLoadCount = 0;
 
   // Define Agile with Storage
-  const App = new Agile({
-    storageConfig: {
+  const App = new Agile();
+  App.registerStorage(
+    App.Storage({
+      key: "testStorage",
       prefix: "test",
       methods: {
         get: (key) => {
@@ -20,8 +22,9 @@ describe("OnLoad Function Tests", () => {
           delete myStorage[key];
         },
       },
-    },
-  });
+    }),
+    { default: false }
+  );
 
   // Create State
   const MY_STATE = App.State<number>(1);
