@@ -65,6 +65,8 @@ export class Storages {
     storage: Storage,
     config: RegisterConfigInterface = {}
   ): boolean {
+    const storageExists = equal(this.storages, {});
+
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
       console.error(
@@ -74,8 +76,7 @@ export class Storages {
     }
 
     // Set first added Storage to default (if it isn't set)
-    if (equal(this.storages, {}) && config.default === undefined)
-      config.default = true;
+    if (storageExists && config.default === undefined) config.default = true;
 
     // Register Storage
     this.storages[storage.key] = storage;
@@ -84,7 +85,11 @@ export class Storages {
 
     // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
-      persistent.initialLoading(persistent.key);
+      if (
+        persistent.storageKeys &&
+        persistent.storageKeys.includes(storage.key)
+      )
+        persistent.initialLoading(persistent.key);
     });
 
     return true;

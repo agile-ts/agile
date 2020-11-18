@@ -17,9 +17,12 @@ import {
   Storages,
   CreateStorageConfigInterface,
   RegisterConfigInterface,
+  defineConfig,
 } from "./internal";
 
 export class Agile {
+  public config: AgileConfigInterface;
+
   public runtime: Runtime;
   public subController: SubController; // Handles subscriptions to Components
   public storages: Storages; // Handles permanent saving
@@ -33,11 +36,18 @@ export class Agile {
    * Agile - Global state and logic framework for reactive Typescript & Javascript applications
    * @param config - Config
    */
-  constructor(public config: AgileConfigInterface = {}) {
+  constructor(config: AgileConfigInterface = {}) {
+    this.config = defineConfig(config, {
+      localStorage: true,
+      logJobs: false,
+      waitForMount: false,
+    });
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
-    this.storages = new Storages(this, { localStorage: config.localStorage });
+    this.storages = new Storages(this, {
+      localStorage: this.config.localStorage,
+    });
 
     // Create global instance of Agile
     globalBind("__agile__", this);
