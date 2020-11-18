@@ -35,7 +35,7 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Validates the Storage
+   * Validates this Storage
    */
   public validate(): boolean {
     // Validate Functions

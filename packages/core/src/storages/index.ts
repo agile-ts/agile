@@ -5,7 +5,7 @@ import {
   Persistent,
   StorageKey,
   StorageItemKey,
-  equal,
+  notEqual,
 } from "../internal";
 
 export class Storages {
@@ -15,6 +15,12 @@ export class Storages {
   public storages: { [key: string]: Storage } = {}; // All registered Storages
   public persistentInstances: Set<Persistent> = new Set();
 
+  /**
+   * @internal
+   * Storages - Manages Storages of Agile
+   * @param agileInstance - An Instance of Agile
+   * @param config - Config
+   */
   constructor(agileInstance: Agile, config: StoragesConfigInterface = {}) {
     config = defineConfig(config, {
       localStorage: true,
@@ -65,7 +71,7 @@ export class Storages {
     storage: Storage,
     config: RegisterConfigInterface = {}
   ): boolean {
-    const storageExists = equal(this.storages, {});
+    const hasRegisteredStorage = notEqual(this.storages, {});
 
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
@@ -76,7 +82,8 @@ export class Storages {
     }
 
     // Set first added Storage to default (if it isn't set)
-    if (storageExists && config.default === undefined) config.default = true;
+    if (!hasRegisteredStorage && config.default === undefined)
+      config.default = true;
 
     // Register Storage
     this.storages[storage.key] = storage;
@@ -99,7 +106,7 @@ export class Storages {
   // Get Storage
   //=========================================================================================================
   /**
-   * @public
+   * @internal
    * Get Storage at Key/Name
    * @param key - Key/Name of Storage
    */
@@ -125,7 +132,7 @@ export class Storages {
   // Get
   //=========================================================================================================
   /**
-   * @public
+   * @internal
    * Gets value at provided Key
    * @param key - Key of Storage property
    * @param storageKey - Key/Name of Storage from which the Item is fetched (if not provided default Storage will be used)
@@ -142,7 +149,7 @@ export class Storages {
   // Set
   //=========================================================================================================
   /**
-   * @public
+   * @internal
    * Saves/Updates value at provided Key
    * @param key - Key of Storage property
    * @param value - new Value that gets set
@@ -165,7 +172,7 @@ export class Storages {
   // Remove
   //=========================================================================================================
   /**
-   * @public
+   * @internal
    * Removes value at provided Key
    * @param key - Key of Storage property
    * @param storageKeys - Key/Name of Storages where the Value gets removed (if not provided default Storage will be used)
