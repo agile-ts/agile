@@ -16,6 +16,7 @@ import {
   globalBind,
   Storages,
   CreateStorageConfigInterface,
+  RegisterConfigInterface,
 } from "./internal";
 
 export class Agile {
@@ -123,9 +124,13 @@ export class Agile {
    * @public
    * Registers new Storage as Agile Storage
    * @param storage - new Storage
+   * @param config - Config
    */
-  public registerStorage(storage: Storage): void {
-    this.storages.register(storage);
+  public registerStorage(
+    storage: Storage,
+    config: RegisterConfigInterface = {}
+  ): boolean {
+    return this.storages.register(storage, config);
   }
 
   //=========================================================================================================

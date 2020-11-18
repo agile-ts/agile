@@ -1,11 +1,11 @@
 import {
   Agile,
   Storage,
-  isAsyncFunction,
   defineConfig,
   Persistent,
   StorageKey,
   StorageItemKey,
+  equal,
 } from "../internal";
 
 export class Storages {
@@ -65,10 +65,6 @@ export class Storages {
     storage: Storage,
     config: RegisterConfigInterface = {}
   ): boolean {
-    config = defineConfig(config, {
-      default: false,
-    });
-
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
       console.error(
@@ -76,6 +72,10 @@ export class Storages {
       );
       return false;
     }
+
+    // Set first added Storage to default (if it isn't set)
+    if (equal(this.storages, {}) && config.default === undefined)
+      config.default = true;
 
     // Register Storage
     this.storages[storage.key] = storage;
@@ -129,10 +129,7 @@ export class Storages {
     key: StorageItemKey,
     storageKey?: StorageKey
   ): GetType | Promise<GetType> | undefined {
-    if (storageKey) {
-      const storage = this.getStorage(key);
-      return storage?.get(key);
-    }
+    if (storageKey) return this.getStorage(storageKey)?.get(key);
     return this.defaultStorage?.get(key);
   }
 
@@ -152,9 +149,8 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (storageKeys) {
-      for (let storageKey in storageKeys) {
-        this.getStorage(key)?.set(key, value);
-      }
+      for (let storageKey of storageKeys)
+        this.getStorage(storageKey)?.set(key, value);
       return;
     }
     this.defaultStorage?.set(key, value);
@@ -171,9 +167,8 @@ export class Storages {
    */
   public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
     if (storageKeys) {
-      for (let storageKey in storageKeys) {
-        this.getStorage(key)?.remove(key);
-      }
+      for (let storageKey of storageKeys)
+        this.getStorage(storageKey)?.remove(key);
       return;
     }
     this.defaultStorage?.remove(key);

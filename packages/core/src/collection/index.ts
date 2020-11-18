@@ -678,7 +678,8 @@ export class Collection<DataType = DefaultItem> {
 
     // Update Persistent Key
     if (this.persistent) {
-      if (key) this.persistent.key = key;
+      this.persistent.storageKeys = config.storageKeys;
+      if (key) this.persistent.setKey(key);
       return this;
     }
 
