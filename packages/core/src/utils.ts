@@ -53,6 +53,22 @@ export function isValidObject(value: any): boolean {
 }
 
 //=========================================================================================================
+// Includes Array
+//=========================================================================================================
+/**
+ * @internal
+ * Check if array1 contains all elements of array2
+ * @param array1 - Array 1
+ * @param array2 - Array 2
+ */
+export function includesArray<DataType = any>(
+  array1: Array<DataType>,
+  array2: Array<DataType>
+): boolean {
+  return array2.every((element) => array1.includes(element));
+}
+
+//=========================================================================================================
 // Normalize Array
 //=========================================================================================================
 /**
@@ -137,10 +153,10 @@ export function isAsyncFunction(value: any): boolean {
 export function isValidUrl(url: string): boolean {
   const pattern = new RegExp(
     "^(https?:\\/\\/)?" + // protocol
-    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-    "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
       "(\\#[-a-z\\d_]*)?$",
     "i"
   );
