@@ -21,7 +21,7 @@ export class Integration<F = any> {
  * @param updateMethod - Will be called if a Observer updates his subs (Only by Component based Subscription)
  */
 export interface IntegrationConfig<F = any> {
-  name?: string;
+  name: string;
   frameworkInstance?: F;
   bind?: (agileInstance: Agile) => boolean;
   updateMethod?: (componentInstance: any, updatedData: Object) => void;

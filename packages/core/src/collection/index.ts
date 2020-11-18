@@ -5,7 +5,6 @@ import {
   GroupKey,
   Selector,
   SelectorKey,
-  StateKey,
   StorageKey,
   GroupConfigInterface,
   defineConfig,
@@ -15,6 +14,7 @@ import {
   copy,
   CollectionPersistent,
   GroupAddConfig,
+  CollectionPersistentConfigInterface,
 } from "../internal";
 
 export class Collection<DataType = DefaultItem> {
@@ -60,7 +60,7 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Set Key/Name of Collection
    */
-  public set key(value: StateKey | undefined) {
+  public set key(value: CollectionKey | undefined) {
     this.setKey(value);
   }
 
@@ -68,7 +68,7 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Key/Name of Collection
    */
-  public get key(): StateKey | undefined {
+  public get key(): CollectionKey | undefined {
     return this._key;
   }
 
@@ -80,10 +80,10 @@ export class Collection<DataType = DefaultItem> {
    * Set Key/Name of Collection
    * @param value - New Key/Name of Collection
    */
-  public setKey(value: StateKey | undefined) {
+  public setKey(value: CollectionKey | undefined) {
     const oldKey = this._key;
 
-    // Update State Key
+    // Update Collection Key
     this._key = value;
 
     // Update Key in PersistManager
@@ -642,18 +642,52 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Stores Collection Value in Agile Storage
-   * @param key - Storage Key (Note: not needed if Collection has key/name)
+   * Stores Collection Value into Agile Storage permanently
+   * @param config - Config
    */
-  public persist(key?: StorageKey): this {
+  public persist(config?: CollectionPersistentConfigInterface): this;
+  /**
+   * @public
+   * Stores Collection Value into Agile Storage permanently
+   * @param key - Storage Key (Note: not needed if Collection has key/name)
+   * @param config - Config
+   */
+  public persist(
+    key?: StorageKey,
+    config?: CollectionPersistentConfigInterface
+  ): this;
+  public persist(
+    keyOrConfig: StorageKey | CollectionPersistentConfigInterface = {},
+    config: CollectionPersistentConfigInterface = {}
+  ): this {
+    let _config: CollectionPersistentConfigInterface;
+    let key: StorageKey | undefined;
+
+    if (isValidObject(keyOrConfig)) {
+      _config = keyOrConfig as CollectionPersistentConfigInterface;
+      key = undefined;
+    } else {
+      _config = config || {};
+      key = keyOrConfig as StorageKey;
+    }
+
+    _config = defineConfig(_config, {
+      instantiate: true,
+      storageKeys: undefined,
+    });
+
     // Update Persistent Key
     if (this.persistent) {
-      if (key) this.persistent.key = key;
+      this.persistent.storageKeys = config.storageKeys;
+      if (key) this.persistent.setKey(key);
       return this;
     }
 
     // Create persistent -> Persist Value
-    this.persistent = new CollectionPersistent(this.agileInstance(), this, key);
+    this.persistent = new CollectionPersistent<DataType>(this, key, {
+      instantiate: _config.instantiate,
+      storageKeys: _config.storageKeys,
+    });
 
     return this;
   }
@@ -1004,7 +1038,7 @@ export interface UpdateItemKeyConfigInterface {
 /**
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
  * @param force - Force creating and performing Job
- * @param sideEffects - If Side Effects of State get executed
+ * @param sideEffects - If Side Effects of Group gets executed
  */
 export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   background?: boolean;

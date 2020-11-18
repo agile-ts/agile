@@ -1,13 +1,15 @@
 import "mocha";
 import { expect } from "chai";
-import { Agile } from "../../../src";
+import { Agile, Persistent } from "../../../src";
 
 describe("Persist Function Tests", () => {
   const myStorage: any = {};
 
   // Define Agile with Storage
-  const App = new Agile({
-    storageConfig: {
+  const App = new Agile();
+  App.registerStorage(
+    App.Storage({
+      key: "testStorage",
       prefix: "test",
       methods: {
         get: (key) => {
@@ -20,8 +22,9 @@ describe("Persist Function Tests", () => {
           delete myStorage[key];
         },
       },
-    },
-  });
+    }),
+    { default: true }
+  );
 
   describe("State", () => {
     // Create State
@@ -39,7 +42,7 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE.persistent)
+          App.storages.persistentInstances.has(MY_STATE.persistent)
       ).to.eq(false, "MY_STATE isn't in persistedStates");
     });
 
@@ -65,14 +68,14 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE.persistent)
+          App.storages.persistentInstances.has(MY_STATE.persistent)
       ).to.eq(false, "MY_STATE isn't in persistedStates");
       expect(MY_STATE.key).to.eq(undefined, "MY_STATE has correct key");
       expect(
         MY_STATE.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE.persistent)
+          App.storages.persistentInstances.has(MY_STATE.persistent)
       ).to.eq(false, "MY_STATE isn't in persistedStates");
-      expect(App.storage.get("mySecondKey")).to.eq(
+      expect(App.storages.get("mySecondKey")).to.eq(
         undefined,
         "MY_STATE isn't in storage"
       );
@@ -103,7 +106,7 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE.persistent)
+          App.storages.persistentInstances.has(MY_STATE.persistent)
       ).to.eq(true, "MY_STATE is in persistedStates");
       expect(MY_STATE.key).to.eq(
         "mySecondKey",
@@ -111,9 +114,12 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE.persistent)
+          App.storages.persistentInstances.has(MY_STATE.persistent)
       ).to.eq(true, "MY_STATE isn't in persistedStates");
-      expect(App.storage.get("mySecondKey")).to.eq(1, "MY_STATE is in storage");
+      expect(App.storages.get("mySecondKey")).to.eq(
+        1,
+        "MY_STATE is in storage"
+      );
     });
 
     describe("Test reset method on persist State", () => {
@@ -125,16 +131,17 @@ describe("Persist Function Tests", () => {
           true,
           "MY_STATE has correct isPersisted"
         );
-        expect(MY_STATE.persistent.isPersisted).to.eq(
+        expect(MY_STATE.persistent?.isPersisted).to.eq(
           false,
           "MY_STATE persistent has correct isPersisted"
         );
         expect(MY_STATE.key).to.eq("mySecondKey", "MY_STATE has correct key");
-        expect(App.storage.persistentInstances.has(MY_STATE.persistent)).to.eq(
-          true,
-          "MY_STATE is in persistedStates"
-        );
-        expect(App.storage.get("mySecondKey")).to.eq(
+        expect(
+          App.storages.persistentInstances.has(
+            MY_STATE.persistent as Persistent
+          )
+        ).to.eq(true, "MY_STATE is in persistedStates");
+        expect(App.storages.get("mySecondKey")).to.eq(
           undefined,
           "MY_STATE isn't in storage"
         );
@@ -153,9 +160,9 @@ describe("Persist Function Tests", () => {
         );
         expect(
           MY_STATE.persistent !== undefined &&
-            App.storage.persistentInstances.has(MY_STATE.persistent)
+            App.storages.persistentInstances.has(MY_STATE.persistent)
         ).to.eq(true, "MY_STATE is in persistedStates");
-        expect(App.storage.get("mySecondKey")).to.eq(
+        expect(App.storages.get("mySecondKey")).to.eq(
           5,
           "MY_STATE_WITH_KEY is in storage and has been updated"
         );
@@ -186,9 +193,9 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE_WITH_KEY.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
+          App.storages.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
       ).to.eq(false, "MY_STATE_WITH_KEY isn't in persistedStates");
-      expect(App.storage.get("myKey")).to.eq(
+      expect(App.storages.get("myKey")).to.eq(
         undefined,
         "MY_STATE_WITH_KEY isn't in storage"
       );
@@ -219,9 +226,9 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE_WITH_KEY.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
+          App.storages.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
       ).to.eq(true, "MY_STATE_WITH_KEY is in persistedStates");
-      expect(App.storage.get("myKey")).to.eq(
+      expect(App.storages.get("myKey")).to.eq(
         "hello",
         "MY_STATE_WITH_KEY is in storage"
       );
@@ -256,13 +263,13 @@ describe("Persist Function Tests", () => {
       );
       expect(
         MY_STATE_WITH_KEY.persistent !== undefined &&
-          App.storage.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
+          App.storages.persistentInstances.has(MY_STATE_WITH_KEY.persistent)
       ).to.eq(true, "MY_STATE_WITH_KEY is in persistedStates");
-      expect(App.storage.get("myThirdKey")).to.eq(
+      expect(App.storages.get("myThirdKey")).to.eq(
         "hello",
         "MY_STATE_WITH_KEY with new key is in storage"
       );
-      expect(App.storage.get("myKey")).to.eq(
+      expect(App.storages.get("myKey")).to.eq(
         undefined,
         "MY_STATE_WITH_KEY with old key isn't in storage"
       );

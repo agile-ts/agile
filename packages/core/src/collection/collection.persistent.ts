@@ -1,7 +1,7 @@
 import {
-  Agile,
   Collection,
   CollectionKey,
+  defineConfig,
   Group,
   GroupKey,
   ItemKey,
@@ -19,28 +19,25 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Collection Persist Manager - Handles permanent storing of Collection Value
-   * @param agileInstance - An instance of Agile
    * @param collection - Collection that gets stored
    * @param key - Key of Storage property
+   * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     collection: Collection<DataType>,
-    key?: StorageKey
+    key?: StorageKey,
+    config: CollectionPersistentConfigInterface = {}
   ) {
-    super(agileInstance);
-    this.collection = () => collection;
-    this.instantiatePersistent(key).then((success) => {
-      collection.isPersisted = success;
+    super(collection.agileInstance());
+    config = defineConfig(config, {
+      instantiate: true,
     });
-  }
-
-  public set key(value: StorageKey) {
-    this.setKey(value);
-  }
-
-  public get key(): StorageKey {
-    return this._key;
+    this.collection = () => collection;
+    this.storageKeys = config.storageKeys;
+    if (config?.instantiate)
+      this.instantiatePersistent(key).then((success) => {
+        collection.isPersisted = success;
+      });
   }
 
   //=========================================================================================================
@@ -85,7 +82,10 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (!this.ready) return false;
 
     // Check if Collection is Persisted
-    const isPersisted = await this.agileInstance().storage.get(this.key);
+    const isPersisted = await this.agileInstance().storages.get(
+      this.key,
+      this.storageKeys && this.storageKeys[0]
+    );
     if (!isPersisted) return false;
 
     // Load Values into Collection
@@ -118,8 +118,12 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       // Load Storage Value from Items
       for (let itemKey of defaultGroup.value) {
         // Get Storage Value
-        const storageValue = await this.agileInstance().storage.get(
-          CollectionPersistent.getItemStorageKey(itemKey, this.collection().key)
+        const storageValue = await this.agileInstance().storages.get(
+          CollectionPersistent.getItemStorageKey(
+            itemKey,
+            this.collection().key
+          ),
+          this.storageKeys && this.storageKeys[0]
         );
         if (!storageValue) continue;
 
@@ -154,7 +158,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (!this.ready) return false;
 
     // Set Collection to Persisted (in Storage)
-    this.agileInstance().storage.set(this.key, true);
+    this.agileInstance().storages.set(this.key, true, this.storageKeys);
 
     // Get default Group
     const defaultGroup = this.collection().getGroup(
@@ -197,7 +201,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (!this.ready) return false;
 
     // Set Collection to not Persisted
-    this.agileInstance().storage.remove(this.key);
+    this.agileInstance().storages.remove(this.key, this.storageKeys);
 
     // Get default Group
     const defaultGroup = this.collection().getGroup(
@@ -332,4 +336,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       .replace("${collectionKey}", collectionKey.toString())
       .replace("${groupKey}", groupKey.toString());
   }
+}
+
+/**
+ * @param instantiate - If Persistent gets instantiated
+ * @param storageKeys - Key/Name of Storages which gets used to persist the Collection Value (NOTE: If not passed the default Storage will be used)
+ */
+export interface CollectionPersistentConfigInterface {
+  instantiate?: boolean;
+  storageKeys?: StorageKey[];
 }

@@ -6,8 +6,10 @@ describe("Persist Function Tests", () => {
   const myStorage: any = {};
 
   // Define Agile with Storage
-  const App = new Agile({
-    storageConfig: {
+  const App = new Agile();
+  App.registerStorage(
+    App.Storage({
+      key: "testStorage",
       prefix: "test",
       methods: {
         get: (key) => {
@@ -22,8 +24,8 @@ describe("Persist Function Tests", () => {
           delete myStorage[key];
         },
       },
-    },
-  });
+    })
+  );
 
   interface User {
     id: number;

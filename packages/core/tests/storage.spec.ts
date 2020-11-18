@@ -10,6 +10,7 @@ describe("Custom Storage Tests", () => {
 
   // Create Storage
   const storage = App.Storage({
+    key: "testStorage",
     prefix: "test",
     methods: {
       get: (key) => {

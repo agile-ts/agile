@@ -3,7 +3,6 @@ import {
   Integration,
   State,
   Storage,
-  StorageConfigInterface,
   Collection,
   CollectionConfig,
   DefaultItem,
@@ -15,12 +14,18 @@ import {
   Observer,
   SubController,
   globalBind,
+  Storages,
+  CreateStorageConfigInterface,
+  RegisterConfigInterface,
+  defineConfig,
 } from "./internal";
 
 export class Agile {
+  public config: AgileConfigInterface;
+
   public runtime: Runtime;
   public subController: SubController; // Handles subscriptions to Components
-  public storage: Storage; // Handles permanent saving
+  public storages: Storages; // Handles permanent saving
 
   // Integrations
   public integrations: Integrations; // Integrated frameworks
@@ -31,11 +36,18 @@ export class Agile {
    * Agile - Global state and logic framework for reactive Typescript & Javascript applications
    * @param config - Config
    */
-  constructor(public config: AgileConfigInterface = {}) {
+  constructor(config: AgileConfigInterface = {}) {
+    this.config = defineConfig(config, {
+      localStorage: true,
+      logJobs: false,
+      waitForMount: false,
+    });
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
-    this.storage = new Storage(config.storageConfig || {});
+    this.storages = new Storages(this, {
+      localStorage: this.config.localStorage,
+    });
 
     // Create global instance of Agile
     globalBind("__agile__", this);
@@ -62,7 +74,8 @@ export class Agile {
    * Storage - Handy Interface for storing Items permanently
    * @param config - Config
    */
-  public Storage = (config: StorageConfigInterface) => new Storage(config);
+  public Storage = (config: CreateStorageConfigInterface) =>
+    new Storage(config);
 
   //=========================================================================================================
   // State
@@ -115,24 +128,19 @@ export class Agile {
     new Event<PayloadType>(this, config);
 
   //=========================================================================================================
-  // Set Storage
+  // Register Storage
   //=========================================================================================================
   /**
    * @public
-   * Configures Agile Storage
-   * @param storage - Storage that will get used as Agile Storage
+   * Registers new Storage as Agile Storage
+   * @param storage - new Storage
+   * @param config - Config
    */
-  public configureStorage(storage: Storage): void {
-    // Get Observers that are already saved into a storage
-    const persistentInstances = this.storage.persistentInstances;
-
-    // Define new Storage
-    this.storage = storage;
-
-    // Transfer already saved items into new Storage
-    persistentInstances.forEach((persistent) =>
-      persistent.initialLoading(persistent.key)
-    );
+  public registerStorage(
+    storage: Storage,
+    config: RegisterConfigInterface = {}
+  ): boolean {
+    return this.storages.register(storage, config);
   }
 
   //=========================================================================================================
@@ -155,5 +163,5 @@ export class Agile {
 export interface AgileConfigInterface {
   logJobs?: boolean;
   waitForMount?: boolean;
-  storageConfig?: StorageConfigInterface;
+  localStorage?: boolean;
 }
