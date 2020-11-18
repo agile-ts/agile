@@ -1,4 +1,9 @@
-import { isJsonString, defineConfig } from "../internal";
+import {
+  isJsonString,
+  defineConfig,
+  isAsyncFunction,
+  isFunction,
+} from "../internal";
 
 export class Storage {
   public key: StorageKey;
@@ -22,6 +27,40 @@ export class Storage {
       prefix: config.prefix,
       async: config.async,
     };
+    this.ready = this.validate();
+  }
+
+  //=========================================================================================================
+  // Validate
+  //=========================================================================================================
+  /**
+   * @public
+   * Validates the Storage
+   */
+  public validate(): boolean {
+    // Validate Functions
+    if (!isFunction(this.methods?.get)) {
+      console.error("Agile: Your GET StorageMethod isn't valid!");
+      return false;
+    }
+    if (!isFunction(this.methods?.set)) {
+      console.error("Agile: Your SET StorageMethod isn't valid!");
+      return false;
+    }
+    if (!isFunction(this.methods?.remove)) {
+      console.error("Agile: Your REMOVE StorageMethod isn't valid!");
+      return false;
+    }
+
+    // Check if Storage is async
+    if (
+      isAsyncFunction(this.methods.get) ||
+      isAsyncFunction(this.methods.set) ||
+      isAsyncFunction(this.methods.remove)
+    )
+      this.config.async = true;
+
+    return true;
   }
 
   //=========================================================================================================

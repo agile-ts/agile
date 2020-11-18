@@ -69,17 +69,11 @@ export class Storages {
       default: false,
     });
 
-    // Check if Storage is async
-    if (
-      isAsyncFunction(storage.methods.get) ||
-      isAsyncFunction(storage.methods.set) ||
-      isAsyncFunction(storage.methods.remove)
-    )
-      storage.config.async = true;
-
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
-      console.error(`Agile: Storage `);
+      console.error(
+        `Agile: Storage with the key/name ${storage.key} already exists`
+      );
       return false;
     }
 
@@ -90,7 +84,7 @@ export class Storages {
 
     // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
-        persistent.initialLoading(persistent.key);
+      persistent.initialLoading(persistent.key);
     });
 
     return true;
