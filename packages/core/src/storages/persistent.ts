@@ -7,7 +7,7 @@ export class Persistent<ValueType = any> {
   public ready: boolean = false;
   public isPersisted: boolean = false; // If Value is stored in Agile Storage
   public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
-  public storageKeys: StorageKey[]; // StorageKeys in which the Persist Value gets saved
+  public storageKeys?: StorageKey[]; // StorageKeys in which the Persist Value gets saved
 
   /**
    * @internal
@@ -17,7 +17,7 @@ export class Persistent<ValueType = any> {
    */
   constructor(agileInstance: Agile, storageKeys?: StorageKey[]) {
     this.agileInstance = () => agileInstance;
-    this.storageKeys = storageKeys || [];
+    this.storageKeys = storageKeys;
   }
 
   /**
@@ -25,7 +25,7 @@ export class Persistent<ValueType = any> {
    * Set Key/Name of Persistent
    */
   public set key(value: StorageKey) {
-    this._key = value;
+    this.setKey(value);
   }
 
   /**
@@ -34,6 +34,18 @@ export class Persistent<ValueType = any> {
    */
   public get key(): StorageKey {
     return this._key;
+  }
+
+  //=========================================================================================================
+  // Set Key
+  //=========================================================================================================
+  /**
+   * @public
+   * Sets Key/Name of Persistent
+   * @param value - New Key/Name of Persistent
+   */
+  public setKey(value: StorageKey): void {
+    this._key = value;
   }
 
   //=========================================================================================================

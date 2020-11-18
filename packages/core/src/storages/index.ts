@@ -90,7 +90,6 @@ export class Storages {
 
     // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
-      if (persistent.storageKeys.includes(storage.key))
         persistent.initialLoading(persistent.key);
     });
 
@@ -134,7 +133,7 @@ export class Storages {
    */
   public get<GetType = any>(
     key: StorageItemKey,
-    storageKey: StorageKey
+    storageKey?: StorageKey
   ): GetType | Promise<GetType> | undefined {
     if (storageKey) {
       const storage = this.getStorage(key);

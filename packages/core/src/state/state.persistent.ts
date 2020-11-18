@@ -1,10 +1,4 @@
-import {
-  Agile,
-  defineConfig,
-  Persistent,
-  State,
-  StorageKey,
-} from "../internal";
+import { defineConfig, Persistent, State, StorageKey } from "../internal";
 
 export class StatePersistent<ValueType = any> extends Persistent {
   public state: () => State;
@@ -12,34 +6,25 @@ export class StatePersistent<ValueType = any> extends Persistent {
   /**
    * @internal
    * State Persist Manager - Handles permanent storing of State Value
-   * @param agileInstance - An instance of Agile
    * @param state - State that gets stored
    * @param key - Key of Storage property
    * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     state: State<ValueType>,
     key?: StorageKey,
     config: StatePersistentConfigInterface = {}
   ) {
-    super(agileInstance);
+    super(state.agileInstance(), config.storageKeys);
     config = defineConfig(config, {
       instantiate: true,
     });
     this.state = () => state;
-    if (config.instantiate)
+    this.storageKeys = config.storageKeys;
+    if (config?.instantiate)
       this.instantiatePersistent(key).then((success) => {
         this.state().isPersisted = success;
       });
-  }
-
-  public set key(value: StorageKey) {
-    this.setKey(value);
-  }
-
-  public get key(): StorageKey {
-    return this._key;
   }
 
   //=========================================================================================================
@@ -82,7 +67,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async loadValue(): Promise<boolean> {
     if (!this.ready) return false;
-    const loadedValue = await this.agileInstance().storage.get(this._key);
+    const loadedValue = await this.agileInstance().storages.get(
+      this._key,
+      this.storageKeys && this.storageKeys[0]
+    );
     if (loadedValue) {
       this.state().set(loadedValue, { storage: false });
       return true;
@@ -100,9 +88,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async updateValue(): Promise<boolean> {
     if (!this.ready) return false;
-    this.agileInstance().storage.set(
+    this.agileInstance().storages.set(
       this.key,
-      this.state().getPersistableValue()
+      this.state().getPersistableValue(),
+      this.storageKeys
     );
     this.isPersisted = true;
     return true;
@@ -118,7 +107,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async removeValue(): Promise<boolean> {
     if (!this.ready) return false;
-    this.agileInstance().storage.remove(this.key);
+    this.agileInstance().storages.remove(this.key, this.storageKeys);
     this.isPersisted = false;
     return true;
   }
@@ -149,7 +138,9 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
 /**
  * @param instantiate - If Persistent gets instantiated
+ * @param storageKeys - Key/Name of Storages which gets used to persist the State Value (NOTE: If not passed the default Storage will be used)
  */
 export interface StatePersistentConfigInterface {
   instantiate?: boolean;
+  storageKeys?: StorageKey[];
 }

@@ -404,6 +404,7 @@ export class State<ValueType = any> {
 
     _config = defineConfig(_config, {
       instantiate: true,
+      storageKeys: undefined,
     });
 
     // Update Persistent Key
@@ -413,12 +414,10 @@ export class State<ValueType = any> {
     }
 
     // Create persistent -> Persist Value
-    this.persistent = new StatePersistent<ValueType>(
-      this.agileInstance(),
-      this,
-      key,
-      { instantiate: _config.instantiate }
-    );
+    this.persistent = new StatePersistent<ValueType>(this, key, {
+      instantiate: _config.instantiate,
+      storageKeys: _config.storageKeys,
+    });
 
     return this;
   }
