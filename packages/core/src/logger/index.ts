@@ -52,18 +52,17 @@ export class Logger {
 
   /**
    * @public
-   * Handles Level of Logger
+   * Default Levels of Logger
    */
-  public get level() {
+  static get level() {
     return {
       TRACE: 1,
       DEBUG: 2,
-      TABLE: 4,
       LOG: 5,
-      INFO: 6,
-      WARN: 10,
-      ERROR: 20,
-      set: (level: number) => (this.config.level = level),
+      TABLE: 5,
+      INFO: 10,
+      WARN: 20,
+      ERROR: 50,
     };
   }
 
@@ -77,38 +76,38 @@ export class Logger {
   private addDefaultLoggerCategories() {
     this.createLoggerCategory({
       key: "log",
-      level: this.level.LOG,
+      level: Logger.level.LOG,
     });
     this.createLoggerCategory({
       key: "debug",
       customStyle: "color: #3c3c3c;",
       prefix: "Debug",
-      level: this.level.DEBUG,
+      level: Logger.level.DEBUG,
     });
     this.createLoggerCategory({
       key: "info",
-      customStyle: "color: #1972ee;",
+      customStyle: "color: #6c69a0;",
       prefix: "Info",
-      level: this.level.INFO,
+      level: Logger.level.INFO,
     });
     this.createLoggerCategory({
       key: "warn",
       prefix: "Warn",
-      level: this.level.WARN,
+      level: Logger.level.WARN,
     });
     this.createLoggerCategory({
       key: "error",
       prefix: "Error",
-      level: this.level.ERROR,
+      level: Logger.level.ERROR,
     });
     this.createLoggerCategory({
       key: "trace",
       prefix: "Trace",
-      level: this.level.TRACE,
+      level: Logger.level.TRACE,
     });
     this.createLoggerCategory({
       key: "table",
-      level: this.level.TABLE,
+      level: Logger.level.TABLE,
     });
   }
 
@@ -365,6 +364,20 @@ export class Logger {
    */
   public removeWatcher(key: string): this {
     delete this.watchers[key];
+    return this;
+  }
+
+  //=========================================================================================================
+  // Set Level
+  //=========================================================================================================
+  /**
+   * @public
+   * Assigns new Level to Logger
+   * NOTE: Default Levels can be found with 'Logger.level.x'
+   * @param level - Level
+   */
+  public setLevel(level: number): this {
+    this.config.level = level;
     return this;
   }
 }

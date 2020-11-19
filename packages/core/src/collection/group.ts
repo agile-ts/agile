@@ -261,7 +261,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Logging
-    if (this.agileInstance().config.logJobs && notFoundItemKeys.length > 0)
+    if (notFoundItemKeys.length > 0)
       Agile.logger.warn(
         `Couldn't find some Items in Collection '${this.key}'`,
         notFoundItemKeys

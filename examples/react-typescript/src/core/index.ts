@@ -1,9 +1,8 @@
-import { Agile, Collection } from "@agile-ts/core";
+import { Agile } from "@agile-ts/core";
 import { MultiEditor, Validator } from "@agile-ts/multieditor";
-import { Logger } from "@agile-ts/core";
 
 export const App = new Agile({
-  logJobs: true,
+  logConfig: { active: true },
 });
 
 export const MY_STATE = App.State<string>("MyState", "my-state"); //.persist();
