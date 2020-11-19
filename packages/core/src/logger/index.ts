@@ -9,29 +9,51 @@ export class Logger {
 
   /**
    * @public
-   * Logger -
+   * Logger - Handy Class to handle Logs
    */
-  constructor(config: CreateLoggerConfigInterface = {}) {
-    config = defineConfig(config, {
+  constructor(config: LoggerConfig = {}) {
+    let _config = typeof config === "function" ? config(this) : config;
+    _config = defineConfig(_config, {
       prefix: "",
       allowedTags: [],
       canUseCustomStyles: true,
+      active: true,
+      level: 0,
     });
-    this.allowedTags = config.allowedTags as any;
+    this.allowedTags = _config.allowedTags as any;
     this.config = {
-      prefix: config.prefix as any,
-      canUseCustomStyles: config.canUseCustomStyles as any,
+      prefix: _config.prefix as any,
+      canUseCustomStyles: _config.canUseCustomStyles as any,
+      active: _config.active as any,
+      level: _config.level as any,
     };
     this.addDefaultLoggerCategories();
   }
 
   /**
    * @public
-   * Create conditions when a log can be logged
+   * Adds Conditions to Logs
    */
   public get if() {
     return {
       tag: (tags: string[]) => this.tag(tags),
+    };
+  }
+
+  /**
+   * @public
+   * Handles Level of Logger
+   */
+  public get level() {
+    return {
+      TRACE: 1,
+      DEBUG: 2,
+      TABLE: 4,
+      LOG: 5,
+      INFO: 6,
+      WARN: 10,
+      ERROR: 20,
+      set: (level: number) => (this.config.level = level),
     };
   }
 
@@ -42,38 +64,38 @@ export class Logger {
   private addDefaultLoggerCategories() {
     this.createLoggerCategory({
       key: "log",
-      level: 0,
+      level: this.level.LOG,
     });
     this.createLoggerCategory({
       key: "debug",
       customStyle: "color: #3c3c3c;",
       prefix: "Debug",
-      level: 0,
+      level: this.level.DEBUG,
     });
     this.createLoggerCategory({
       key: "info",
       customStyle: "color: #1972ee;",
       prefix: "Info",
-      level: 0,
+      level: this.level.INFO,
     });
     this.createLoggerCategory({
       key: "warn",
       prefix: "Warn",
-      level: 0,
+      level: this.level.WARN,
     });
     this.createLoggerCategory({
       key: "error",
       prefix: "Error",
-      level: 0,
+      level: this.level.ERROR,
     });
     this.createLoggerCategory({
       key: "trace",
       prefix: "Trace",
-      level: 0,
+      level: this.level.TRACE,
     });
     this.createLoggerCategory({
       key: "table",
-      level: 0,
+      level: this.level.TABLE,
     });
   }
 
@@ -157,6 +179,10 @@ export class Logger {
     );
   }
 
+  public custom(loggerCategory: string, ...data: any[]) {
+    this.invokeConsole(data, loggerCategory, "log");
+  }
+
   /**
    * @internal
    * Logs message in Console
@@ -170,6 +196,9 @@ export class Logger {
     consoleLogProperty: ConsoleLogType
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
+
+    // Check if Logging is allowed
+    if (!this.config.active || loggerCategory.level < this.config.level) return;
 
     // Build Prefix of Log
     const buildPrefix = (): string => {
@@ -253,7 +282,7 @@ export interface LoggerCategoryInterface {
   key: LoggerCategoryKey;
   customStyle?: string;
   prefix?: string;
-  level?: number;
+  level: number;
 }
 
 /**
@@ -263,6 +292,8 @@ export interface LoggerCategoryInterface {
 export interface LoggerConfigInterface {
   prefix: string;
   canUseCustomStyles: boolean;
+  level: number;
+  active: boolean;
 }
 
 /**
@@ -274,7 +305,13 @@ export interface CreateLoggerConfigInterface {
   prefix?: string;
   allowedTags?: LoggerKey[];
   canUseCustomStyles?: boolean;
+  active?: boolean;
+  level?: number;
 }
+
+export type LoggerConfig =
+  | CreateLoggerConfigInterface
+  | ((logger: Logger) => CreateLoggerConfigInterface);
 
 export type ConsoleLogType =
   | "log"
