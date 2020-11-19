@@ -13,5 +13,6 @@ describe("Logger tests", () => {
     logger.warn("This is a Warning");
     logger.table("This is a Table", { test: "test" });
     logger.error("This is an Error");
+    logger.if.tag(["test"]).log("faranke");
   });
 });

@@ -4,7 +4,6 @@ import {
   isValidObject,
   generateId,
   isFunction,
-  Agile,
 } from "../internal";
 
 export class Logger {
@@ -133,13 +132,13 @@ export class Logger {
       };
     }
     return {
-      log: (...data: any[]) => {},
-      debug: (...data: any[]) => {},
-      info: (...data: any[]) => {},
-      warn: (...data: any[]) => {},
-      error: (...data: any[]) => {},
-      trace: (...data: any[]) => {},
-      table: (...data: any[]) => {},
+      log: () => {},
+      debug: () => {},
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      trace: () => {},
+      table: () => {},
     };
   }
 
@@ -416,8 +415,8 @@ export interface LoggerConfigInterface {
  * @param prefix - Prefix that gets written before each log of this Logger
  * @param allowedTags - Only Logs that, contains the allowed Tags or have no Tag get logged
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
- * @param active -
- * @param level -
+ * @param active - If Logger is active
+ * @param level - Handles which Logger Categories can be Logged
  */
 export interface CreateLoggerConfigInterface {
   prefix?: string;
