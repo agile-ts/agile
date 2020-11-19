@@ -1,7 +1,10 @@
 import React from "react";
-import { Callback, State } from "@agile-ts/core";
+import { StateWatcherCallback, State } from "@agile-ts/core";
 
-export function useWatcher<T = any>(state: State<T>, callback: Callback<T>) {
+export function useWatcher<T = any>(
+  state: State<T>,
+  callback: StateWatcherCallback<T>
+) {
   React.useEffect(() => {
     const generatedKey = state.watch(callback);
     return () => {

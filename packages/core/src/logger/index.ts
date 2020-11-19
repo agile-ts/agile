@@ -1,4 +1,10 @@
-import { defineConfig, includesArray } from "@agile-ts/core";
+import {
+  defineConfig,
+  includesArray,
+  isValidObject,
+  generateId,
+  isFunction,
+} from "../internal";
 
 export class Logger {
   public key?: LoggerKey;
@@ -6,6 +12,9 @@ export class Logger {
   public config: LoggerConfigInterface;
   public allowedTags: string[] = [];
   public loggerCategories: { [key: string]: LoggerCategoryInterface } = {}; // Holds all registered Logger Categories
+  public watchers: {
+    [key: string]: LoggerWatcherConfigInterface;
+  } = {};
 
   /**
    * @public
@@ -57,6 +66,9 @@ export class Logger {
     };
   }
 
+  //=========================================================================================================
+  // Add Default Logger Categories
+  //=========================================================================================================
   /**
    * @internal
    * Adds Default Logger Categories
@@ -99,6 +111,9 @@ export class Logger {
     });
   }
 
+  //=========================================================================================================
+  // Tag
+  //=========================================================================================================
   /**
    * @private
    * Only executes following 'command' if the given tags are allowed
@@ -183,6 +198,9 @@ export class Logger {
     this.invokeConsole(data, loggerCategory, "log");
   }
 
+  //=========================================================================================================
+  // Invoke Console
+  //=========================================================================================================
   /**
    * @internal
    * Logs message in Console
@@ -217,6 +235,14 @@ export class Logger {
       data[0] = buildPrefix().concat(" ").concat(data[0]);
     else data.unshift(buildPrefix());
 
+    // Watch
+    for (let key in this.watchers) {
+      const watcher = this.watchers[key];
+      if (loggerCategory.level >= (watcher.level || 0)) {
+        watcher.callback(loggerCategory, data);
+      }
+    }
+
     // Init Custom Styles
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
@@ -246,6 +272,9 @@ export class Logger {
     console[consoleLogProperty](...data);
   }
 
+  //=========================================================================================================
+  // Create Logger Category
+  //=========================================================================================================
   /**
    * @public
    * Create new Logger Category
@@ -259,6 +288,9 @@ export class Logger {
     this.loggerCategories[loggerCategory.key] = loggerCategory;
   }
 
+  //=========================================================================================================
+  // Get Logger Category
+  //=========================================================================================================
   /**
    * @public
    * Get Logger Category
@@ -266,6 +298,76 @@ export class Logger {
    */
   public getLoggerCategory(key: LoggerCategoryKey) {
     return this.loggerCategories[key];
+  }
+
+  //=========================================================================================================
+  // Watch
+  //=========================================================================================================
+  /**
+   * @public
+   * Watches Logger and detects Logs
+   * @param config - Config
+   * @return Key of Watcher
+   */
+  public watch(config: LoggerWatcherConfigInterface): string;
+  /**
+   * @public
+   * Watches Logger and detects Logs
+   * @param key - Key of Watcher Function
+   * @param config - Config
+   */
+  public watch(key: string, config: LoggerWatcherConfigInterface): this;
+  public watch(
+    keyOrConfig: string | LoggerWatcherConfigInterface,
+    config?: LoggerWatcherConfigInterface
+  ): this | string {
+    const generateKey = isValidObject(keyOrConfig);
+    let _config: LoggerWatcherConfigInterface;
+    let key: string;
+
+    if (generateKey) {
+      key = generateId();
+      _config = keyOrConfig as LoggerWatcherConfigInterface;
+    } else {
+      key = keyOrConfig as string;
+      _config = config as LoggerWatcherConfigInterface;
+    }
+
+    _config = defineConfig(_config, {
+      level: 0,
+    });
+
+    // Check if Callback is a Function
+    if (!isFunction(_config.callback)) {
+      console.error(
+        "Agile: A Watcher Callback Function has to be an function!"
+      );
+      return this;
+    }
+
+    // Check if Callback Function already exists
+    if (this.watchers[key]) {
+      console.error(
+        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
+      );
+      return this;
+    }
+
+    this.watchers[key] = _config;
+    return generateKey ? key : this;
+  }
+
+  //=========================================================================================================
+  // Remove Watcher
+  //=========================================================================================================
+  /**
+   * @public
+   * Removes Watcher at given Key
+   * @param key - Key of Watcher that gets removed
+   */
+  public removeWatcher(key: string): this {
+    delete this.watchers[key];
+    return this;
   }
 }
 
@@ -321,3 +423,17 @@ export type ConsoleLogType =
   | "table"
   | "info"
   | "debug";
+
+export type LoggerWatcherCallback = (
+  loggerCategory: LoggerCategoryInterface,
+  data: any[]
+) => void;
+
+/**
+ * @param callback - Callback Function that gets called if something gets Logged
+ * @param level - At which level the watcher is called
+ */
+export interface LoggerWatcherConfigInterface {
+  callback: LoggerWatcherCallback;
+  level?: number;
+}
