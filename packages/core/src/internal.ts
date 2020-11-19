@@ -45,3 +45,4 @@ export * from "./integrations/integration";
 
 // Utils
 export * from "./utils";
+export * from "./logger";

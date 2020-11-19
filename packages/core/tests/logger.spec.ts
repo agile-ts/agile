@@ -9,6 +9,7 @@ describe("Logger tests", () => {
     logger.debug("this is a test");
     logger.debug("this is a test", ["ello"]);
     logger.warn("This is a Warning");
+    logger.table("This is a Table", { test: "test" });
     logger.error("This is an Error");
     logger.trace("This is a Trace");
   });
