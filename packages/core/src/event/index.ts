@@ -1,16 +1,23 @@
-import { Agile, defineConfig, generateId, isFunction } from "../internal";
+import {
+  Agile,
+  defineConfig,
+  EventJob,
+  generateId,
+  isFunction,
+} from "../internal";
 import { EventObserver } from "./event.observer";
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;
 
-  public config: EventConfig;
+  public config: EventConfigInterface;
+  private initialConfig: CreateEventConfigInterface;
 
   public _key?: EventKey;
   public uses: number = 0;
   public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
   private currentTimeout: any; // Timeout which is active right now (delayed Event)
-  private queue: Array<PayloadType> = []; // Queue of delayed triggers
+  private queue: Array<EventJob> = []; // Queue of delayed triggers
   public enabled: boolean = true;
   public observer: EventObserver;
 
@@ -23,16 +30,23 @@ export class Event<PayloadType = DefaultEventPayload> {
    * @param agileInstance - An instance of Agile
    * @param config - Config
    */
-  constructor(agileInstance: Agile, config: EventConfig = {}) {
+  constructor(agileInstance: Agile, config: CreateEventConfigInterface = {}) {
     this.agileInstance = () => agileInstance;
-    this.config = defineConfig<EventConfig>(config, {
+    config = defineConfig<CreateEventConfigInterface>(config, {
       enabled: true,
       rerender: false,
+      maxUses: undefined,
+      delay: undefined,
     });
-    this.observer = new EventObserver(agileInstance, this, [], this.config.key);
-    this._key = this.config.key;
-    this.enabled =
-      this.config.enabled !== undefined ? this.config.enabled : true;
+    this._key = config.key;
+    this.observer = new EventObserver(agileInstance, this, [], config.key);
+    this.enabled = config.enabled as any;
+    this.config = {
+      rerender: config.rerender as any,
+      delay: config.delay,
+      maxUses: config.maxUses,
+    };
+    this.initialConfig = config;
   }
 
   /**
@@ -110,12 +124,13 @@ export class Event<PayloadType = DefaultEventPayload> {
   /**
    * @public
    * Triggers Event
-   * -> Calls all registered Callback Functions
    * @param payload - Payload that gets passed into the Callback Functions
+   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered will be triggered)
    */
-  public trigger(payload?: PayloadType) {
+  public trigger(payload: PayloadType, keys?: string[]) {
     if (!this.enabled) return this;
-    if (this.config.delay) this.delayedTrigger(payload);
+    if (this.config.delay)
+      this.delayedTrigger(payload, this.config.delay, keys);
     else this.normalTrigger(payload);
     return this;
   }
@@ -152,7 +167,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * Resets Event
    */
   public reset() {
-    this.enabled = this.config.enabled || true;
+    this.enabled = this.initialConfig.enabled as any;
     this.uses = 0;
     if (this.currentTimeout) clearTimeout(this.currentTimeout);
     return this;
@@ -177,10 +192,16 @@ export class Event<PayloadType = DefaultEventPayload> {
   /**
    * @internal
    * Triggers Event
+   * @param payload - Payload that gets passed into the Callback Functions
+   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered will be triggered)
    */
-  private normalTrigger(payload?: PayloadType) {
-    // Call registered Callbacks
-    for (let key in this.callbacks) this.callbacks[key](payload);
+  private normalTrigger(payload: PayloadType, keys?: string[]) {
+    // Call wished Callback Functions
+    if (!keys) {
+      for (let key in this.callbacks) this.callbacks[key](payload);
+    } else {
+      for (let key of keys) this.callbacks[key](payload);
+    }
 
     // Cause rerender
     if (this.config.rerender) this.observer.trigger();
@@ -196,22 +217,28 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @internal
-   * Triggers Event with some delay (config.delay)
+   * Triggers Event with some delay
+   * @param payload - Payload that gets passed into the Callback Functions
+   * @param delay - Delay until Events get triggered
+   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered will be triggered)
    */
-  private delayedTrigger(payload?: PayloadType) {
+  private delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
     // Check if a Timeout is currently active if so add payload to queue
     if (this.currentTimeout !== undefined) {
-      if (payload) this.queue.push(payload);
+      if (payload) this.queue.push(new EventJob<PayloadType>(payload));
       return;
     }
 
     // Triggers Callback Functions and calls itself again if queue isn't empty
-    const looper = (payload?: PayloadType) => {
+    const looper = (payload: PayloadType) => {
       this.currentTimeout = setTimeout(() => {
         this.currentTimeout = undefined;
-        this.normalTrigger(payload);
-        if (this.queue.length > 0) looper(this.queue.shift());
-      }, this.config.delay);
+        this.normalTrigger(payload, keys);
+        if (this.queue.length > 0) {
+          const nextEventJob = this.queue.shift();
+          if (nextEventJob) looper(nextEventJob.payload);
+        }
+      }, delay);
     };
 
     looper(payload);
@@ -222,7 +249,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 export type EventKey = string | number;
 export type DefaultEventPayload = { [key: string]: any };
 export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
-  payload?: PayloadType
+  payload: PayloadType
 ) => void;
 
 /**
@@ -232,10 +259,21 @@ export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
  * @param delay - Delayed call of Event Callback Functions in seconds
  * @param rerender - If triggering an Event should cause a rerender
  */
-export interface EventConfig {
+export interface CreateEventConfigInterface {
   key?: EventKey;
   enabled?: boolean;
   maxUses?: number;
   delay?: number;
   rerender?: boolean;
+}
+
+/**
+ * @param maxUses - How often the Event can be used/triggered
+ * @param delay - Delayed call of Event Callback Functions in seconds
+ * @param rerender - If triggering an Event should cause a rerender
+ */
+export interface EventConfigInterface {
+  maxUses?: number;
+  delay?: number;
+  rerender: boolean;
 }

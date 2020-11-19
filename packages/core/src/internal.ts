@@ -44,6 +44,8 @@ export * from "./collection/collection.persistent";
 
 // Event
 export * from "./event";
+export * from "./event/EventJob";
+export * from "./event/event.observer";
 
 // Integrations
 export * from "./integrations";

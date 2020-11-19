@@ -19,7 +19,7 @@ describe("Default Event Tests", () => {
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
       expect(JSON.stringify(MY_EVENT.config)).to.eq(
-        JSON.stringify({ enabled: true, rerender: false }),
+        JSON.stringify({ rerender: false }),
         "MY_EVENT has correct initial config"
       );
       expect(JSON.stringify(MY_EVENT.callbacks)).to.eq(
@@ -48,9 +48,7 @@ describe("Default Event Tests", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
       expect(JSON.stringify(MY_EVENT.config)).to.eq(
         JSON.stringify({
-          enabled: true,
           rerender: false,
-          key: "myKey",
         }),
         "MY_EVENT has correct initial config"
       );
@@ -87,7 +85,7 @@ describe("Default Event Tests", () => {
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
       expect(JSON.stringify(MY_EVENT.config)).to.eq(
-        JSON.stringify({ enabled: false, rerender: false }),
+        JSON.stringify({ rerender: false }),
         "MY_EVENT has correct initial config"
       );
       expect(MY_EVENT.callbacks["myKey"] !== undefined).to.eq(
@@ -137,7 +135,6 @@ describe("Default Event Tests", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
       expect(JSON.stringify(MY_EVENT.config)).to.eq(
         JSON.stringify({
-          enabled: true,
           rerender: false,
           delay: 1000,
         }),
@@ -205,7 +202,6 @@ describe("Default Event Tests", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
       expect(JSON.stringify(MY_EVENT.config)).to.eq(
         JSON.stringify({
-          enabled: true,
           rerender: false,
           maxUses: 3,
         }),
@@ -300,7 +296,7 @@ describe("Default Event Tests", () => {
     it("Has correct initial value", () => {
       expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
       expect(JSON.stringify(MY_EVENT.config)).to.eq(
-        JSON.stringify({ enabled: true, rerender: true }),
+        JSON.stringify({ rerender: true }),
         "MY_EVENT has correct initial config"
       );
       expect(MY_EVENT.enabled).to.eq(true, "MY_EVENT is enabled");

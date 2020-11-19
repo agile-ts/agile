@@ -8,7 +8,7 @@ import {
   DefaultItem,
   Computed,
   Event,
-  EventConfig,
+  CreateEventConfigInterface,
   DefaultEventPayload,
   Integrations,
   Observer,
@@ -136,8 +136,9 @@ export class Agile {
    * Event - Class that holds a List of Functions which can be triggered at the same time
    * @param config - Config
    */
-  public Event = <PayloadType = DefaultEventPayload>(config?: EventConfig) =>
-    new Event<PayloadType>(this, config);
+  public Event = <PayloadType = DefaultEventPayload>(
+    config?: CreateEventConfigInterface
+  ) => new Event<PayloadType>(this, config);
 
   //=========================================================================================================
   // Register Storage
