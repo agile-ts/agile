@@ -56,6 +56,7 @@ export class Agile {
       active: true,
       level: 0,
       canUseCustomStyles: true,
+      allowedTags: ["runtime", "storage", "subscription", "multieditor"],
     });
 
     // Create global instance of Agile

@@ -1,9 +1,4 @@
-import {
-  Agile,
-  defineConfig,
-  generateId,
-  isFunction,
-} from "../internal";
+import { Agile, defineConfig, generateId, isFunction } from "../internal";
 import { EventObserver } from "./event.observer";
 
 export class Event<PayloadType = DefaultEventPayload> {
@@ -93,14 +88,14 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
-      console.error("Agile: A Event Callback Function has to be an function!");
+      Agile.logger.error("A Event Callback Function has to be an function!");
       return this;
     }
 
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
-      console.error(
-        `Agile: Event Callback Function with the key/name ${key} already exists!`
+      Agile.logger.error(
+        `Event Callback Function with the key/name ${key} already exists!`
       );
       return this;
     }

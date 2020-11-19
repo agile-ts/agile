@@ -61,7 +61,7 @@ export class Persistent<ValueType = any> {
     // Validate Key
     const finalKey = this.validateKey(key);
     if (!finalKey) {
-      console.error("Agile: No persist Key found!");
+      Agile.logger.error("No persist Key found!");
       return false;
     }
     this._key = finalKey;
@@ -98,8 +98,8 @@ export class Persistent<ValueType = any> {
    * @return Success?
    */
   public async loadValue(): Promise<boolean> {
-    console.warn(
-      `Agile: Didn't set loadValue function in Persistent '${this.key}'`
+    Agile.logger.error(
+      `Didn't set loadValue function in Persistent '${this.key}'`
     );
     return false;
   }
@@ -113,8 +113,8 @@ export class Persistent<ValueType = any> {
    * @return Success?
    */
   public async updateValue(): Promise<boolean> {
-    console.warn(
-      `Agile: Didn't set setValue function in Persistent '${this.key}'`
+    Agile.logger.error(
+      `Didn't set setValue function in Persistent '${this.key}'`
     );
     return false;
   }
@@ -128,8 +128,8 @@ export class Persistent<ValueType = any> {
    * @return Success?
    */
   public async removeValue(): Promise<boolean> {
-    console.warn(
-      `Agile: Didn't set removeValue function in Persistent '${this.key}'`
+    Agile.logger.error(
+      `Didn't set removeValue function in Persistent '${this.key}'`
     );
     return false;
   }
@@ -143,8 +143,8 @@ export class Persistent<ValueType = any> {
    * @param key - Key that gets validated
    */
   public validateKey(key?: StorageKey): StorageKey | null {
-    console.warn(
-      `Agile: Didn't set validateKey function in Persistent '${this.key}'`
+    Agile.logger.error(
+      `Didn't set validateKey function in Persistent '${this.key}'`
     );
     return null;
   }

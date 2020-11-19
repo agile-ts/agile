@@ -4,6 +4,7 @@ import {
   isValidObject,
   generateId,
   isFunction,
+  Agile,
 } from "../internal";
 
 export class Logger {
@@ -338,16 +339,14 @@ export class Logger {
 
     // Check if Callback is a Function
     if (!isFunction(_config.callback)) {
-      console.error(
-        "Agile: A Watcher Callback Function has to be an function!"
-      );
+      Agile.logger.error("A Watcher Callback Function has to be an function!");
       return this;
     }
 
     // Check if Callback Function already exists
     if (this.watchers[key]) {
-      console.error(
-        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
+      Agile.logger.error(
+        `Watcher Callback Function with the key/name ${key} already exists!`
       );
       return this;
     }

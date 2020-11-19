@@ -53,7 +53,7 @@ export class MultiEditor<
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
       Agile.logger.error(
-        "Agile: No Global agileInstance found! Please pass an agileInstance into the MultiEditor!"
+        "No Global agileInstance found! Please pass an agileInstance into the MultiEditor!"
       );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === "function" ? config(this) : config;
@@ -249,7 +249,7 @@ export class MultiEditor<
     // Logging
     Agile.logger.if
       .tag(["multieditor"])
-      .info(`Agile: Submit MultiEditor '${this.key}'`, this.isValid);
+      .info(`Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
     if (!this.isValid) return false;
@@ -354,7 +354,7 @@ export class MultiEditor<
    */
   public getItemById(key: ItemKey): Item<DataType> | undefined {
     if (!this.data.hasOwnProperty(key)) {
-      Agile.logger.error(`Agile: Editor Item '${key}' does not exists!`);
+      Agile.logger.error(`Editor Item '${key}' does not exists!`);
       return undefined;
     }
     return this.data[key];

@@ -3,6 +3,7 @@ import {
   defineConfig,
   isAsyncFunction,
   isFunction,
+  Agile,
 } from "../internal";
 
 export class Storage {
@@ -40,15 +41,15 @@ export class Storage {
   public validate(): boolean {
     // Validate Functions
     if (!isFunction(this.methods?.get)) {
-      console.error("Agile: Your GET StorageMethod isn't valid!");
+      Agile.logger.error("Your GET StorageMethod isn't valid!");
       return false;
     }
     if (!isFunction(this.methods?.set)) {
-      console.error("Agile: Your SET StorageMethod isn't valid!");
+      Agile.logger.error("Your SET StorageMethod isn't valid!");
       return false;
     }
     if (!isFunction(this.methods?.remove)) {
-      console.error("Agile: Your REMOVE StorageMethod isn't valid!");
+      Agile.logger.error("Your REMOVE StorageMethod isn't valid!");
       return false;
     }
 

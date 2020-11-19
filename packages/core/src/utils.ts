@@ -112,7 +112,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
     // Return global bound agileInstance (set in first instantiation of Agile)
     return globalThis["__agile__"];
   } catch (e) {
-    console.error("Agile: Failed to get Agile Instance", e);
+    Agile.logger.error("Failed to get Agile Instance", e);
   }
   return undefined;
 }
@@ -307,8 +307,8 @@ export function globalBind(key: string, instance: any) {
   try {
     if (!globalThis[key]) globalThis[key] = instance;
   } catch (e) {
-    console.warn(
-      `Agile: Failed to create global Instance called '${name}'`,
+    Agile.logger.error(
+      `Failed to create global Instance called '${name}'`,
       instance
     );
   }

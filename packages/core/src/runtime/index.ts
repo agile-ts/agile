@@ -54,8 +54,8 @@ export class Runtime {
 
     // Logging
     Agile.logger.if
-      .tag(["core"])
-      .info(`Agile: Created Job(${job.observer.key})`, job);
+      .tag(["runtime"])
+      .info(`Created Job(${job.observer.key})`, job);
 
     // Add Job to JobQueue (-> no Job get missing)
     this.jobQueue.push(job);
@@ -87,8 +87,8 @@ export class Runtime {
 
     // Logging
     Agile.logger.if
-      .tag(["core"])
-      .info(`Agile: Completed Job(${job.observer.key})`, job);
+      .tag(["runtime"])
+      .info(`Completed Job(${job.observer.key})`, job);
 
     // Perform Jobs as long as Jobs are in queue, if no job left update/rerender Subscribers of performed Jobs
     if (this.jobQueue.length > 0) {
@@ -128,11 +128,12 @@ export class Runtime {
       job.observer.subs.forEach((subscriptionContainer) => {
         if (!subscriptionContainer.ready) {
           this.notReadyJobsToRerender.push(job);
-          if (this.agileInstance().config.logJobs)
-            console.warn(
-              "Agile: SubscriptionContainer/Component isn't ready to rerender!",
-              subscriptionContainer
-            );
+
+          // Logging
+          Agile.logger.warn(
+            "SubscriptionContainer/Component isn't ready to rerender!",
+            subscriptionContainer
+          );
           return;
         }
 
@@ -160,8 +161,8 @@ export class Runtime {
 
     // Logging
     Agile.logger.if
-      .tag(["core"])
-      .info("Agile: Updated/Rerendered Subscriptions", subscriptionsToUpdate);
+      .tag(["runtime"])
+      .info("Updated/Rerendered Subscriptions", subscriptionsToUpdate);
 
     this.jobsToRerender = [];
   }
