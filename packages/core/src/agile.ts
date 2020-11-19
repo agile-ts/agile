@@ -18,6 +18,7 @@ import {
   CreateStorageConfigInterface,
   RegisterConfigInterface,
   defineConfig,
+  Logger,
 } from "./internal";
 
 export class Agile {
@@ -30,6 +31,8 @@ export class Agile {
   // Integrations
   public integrations: Integrations; // Integrated frameworks
   static initialIntegrations: Integration[] = []; // External added Integrations
+
+  static logger = new Logger();
 
   /**
    * @public
@@ -47,6 +50,12 @@ export class Agile {
     this.subController = new SubController(this);
     this.storages = new Storages(this, {
       localStorage: this.config.localStorage,
+    });
+    Agile.logger = new Logger({
+      prefix: "Agile",
+      active: true,
+      level: 0,
+      canUseCustomStyles: true,
     });
 
     // Create global instance of Agile

@@ -1,4 +1,5 @@
 import {
+  Agile,
   Collection,
   copy,
   DefaultItem,
@@ -70,7 +71,9 @@ export class Selector<DataType = DefaultItem> extends State<
     });
 
     if (oldItem?.key === itemKey && !config.force) {
-      console.warn(`Agile: Selector has already selected key '${itemKey}'!`);
+      Agile.logger.warn(
+        `Agile: Selector has already a selected key '${itemKey}'!`
+      );
       return this;
     }
 

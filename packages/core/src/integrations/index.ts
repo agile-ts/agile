@@ -41,10 +41,9 @@ export class Integrations {
     else integration.ready = true;
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(
-        `Agile: Successfully integrated '${integration.config.name}'`
-      );
+    Agile.logger.info(
+      `Agile: Successfully integrated '${integration.config.name}'`
+    );
   }
 
   //=========================================================================================================
@@ -61,7 +60,7 @@ export class Integrations {
     this.integrations.forEach((integration) => {
       // Check if integration is ready
       if (!integration.ready) {
-        console.log(
+        Agile.logger.warn(
           `Agile: Integration '${integration.config.name}' isn't ready yet!`
         );
         return;

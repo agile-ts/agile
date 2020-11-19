@@ -3,7 +3,7 @@ import { MultiEditor, Validator } from "@agile-ts/multieditor";
 import { Logger } from "@agile-ts/core";
 
 export const App = new Agile({
-  logJobs: false,
+  logJobs: true,
 });
 
 export const MY_STATE = App.State<string>("MyState", "my-state"); //.persist();
@@ -101,6 +101,7 @@ export const multiEditor = new MultiEditor<string | undefined, boolean>(
 
 // LOGGER tests
 
+/*
 const logger = new Logger((l) => ({
   prefix: "Tests",
   allowedTags: ["coreWarning", "randomDebug"],
@@ -129,3 +130,6 @@ logger.trace("This is a Trace");
 logger.if.tag(["coreWarning"]).warn("My core Warning");
 logger.if.tag(["randomDebug"]).debug("My random Debug");
 logger.table("Test Table", { test: "test", test1: "test1" });
+
+
+ */

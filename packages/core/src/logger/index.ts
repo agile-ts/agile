@@ -116,7 +116,7 @@ export class Logger {
   //=========================================================================================================
   /**
    * @private
-   * Only executes following 'command' if the given tags are allowed
+   * Only executes following 'command' if all given tags are allowed (allowedTags)
    * @param tags - Tags
    */
   private tag(tags: string[]) {
@@ -205,13 +205,13 @@ export class Logger {
    * @internal
    * Logs message in Console
    * @param data - Data that gets logged into the Console
-   * @param loggerCategoryKey - Key of Logger Category
-   * @param consoleLogProperty - console[consoleLogProperty]
+   * @param loggerCategoryKey - Key/Name of Logger Category
+   * @param consoleLogType - console[consoleLogProperty]
    */
   private invokeConsole(
     data: any[],
     loggerCategoryKey: LoggerCategoryKey,
-    consoleLogProperty: ConsoleLogType
+    consoleLogType: ConsoleLogType
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
 
@@ -226,11 +226,10 @@ export class Logger {
         prefix = prefix.concat(" " + loggerCategory.prefix);
       if (this.config.prefix || loggerCategory.prefix)
         prefix = prefix.concat(":");
-
       return prefix;
     };
 
-    // Add Build Prefix (Have to do this this way because Styles can only be applied to one console.log block)
+    // Add built Prefix
     if (typeof data[0] === "string")
       data[0] = buildPrefix().concat(" ").concat(data[0]);
     else data.unshift(buildPrefix());
@@ -260,7 +259,7 @@ export class Logger {
     }
 
     // Handle Console Table Log
-    if (consoleLogProperty === "table") {
+    if (consoleLogType === "table") {
       if (typeof data[0] === "string") {
         console.log(data[0]);
         console.table(data.filter((d) => typeof d !== "string" && "number"));
@@ -268,8 +267,8 @@ export class Logger {
       return;
     }
 
-    // Log
-    console[consoleLogProperty](...data);
+    // Normal Log
+    console[consoleLogType](...data);
   }
 
   //=========================================================================================================
@@ -278,7 +277,7 @@ export class Logger {
   /**
    * @public
    * Create new Logger Category
-   * @param loggerCategory - Message that gets Logged
+   * @param loggerCategory - Logger Category
    */
   public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
     loggerCategory = defineConfig(loggerCategory, {
@@ -400,7 +399,7 @@ export interface LoggerConfigInterface {
 
 /**
  * @param prefix - Prefix that gets written before each log of this Logger
- * @param allowedTags - Only Logs that have contains the allowed Tags or have no Tag get logged
+ * @param allowedTags - Only Logs that, contains the allowed Tags or have no Tag get logged
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
  */
 export interface CreateLoggerConfigInterface {

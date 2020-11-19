@@ -53,8 +53,9 @@ export class Runtime {
     const job = new Job(observer, config);
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Created Job(${job.observer.key})`, job);
+    Agile.logger.if
+      .tag(["core"])
+      .info(`Agile: Created Job(${job.observer.key})`, job);
 
     // Add Job to JobQueue (-> no Job get missing)
     this.jobQueue.push(job);
@@ -85,8 +86,9 @@ export class Runtime {
     this.currentJob = null;
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Completed Job(${job.observer.key})`, job);
+    Agile.logger.if
+      .tag(["core"])
+      .info(`Agile: Completed Job(${job.observer.key})`, job);
 
     // Perform Jobs as long as Jobs are in queue, if no job left update/rerender Subscribers of performed Jobs
     if (this.jobQueue.length > 0) {
@@ -157,11 +159,9 @@ export class Runtime {
     });
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(
-        "Agile: Updated/Rerendered Subscriptions",
-        subscriptionsToUpdate
-      );
+    Agile.logger.if
+      .tag(["core"])
+      .info("Agile: Updated/Rerendered Subscriptions", subscriptionsToUpdate);
 
     this.jobsToRerender = [];
   }
