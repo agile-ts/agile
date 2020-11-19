@@ -26,6 +26,16 @@ export class Logger {
   }
 
   /**
+   * @public
+   * Create conditions when a log can be logged
+   */
+  public get if() {
+    return {
+      tag: (tags: string[]) => this.tag(tags),
+    };
+  }
+
+  /**
    * @internal
    * Adds Default Logger Categories
    */
@@ -68,80 +78,80 @@ export class Logger {
   }
 
   /**
-   * @public
-   *
-   * @param tags -
+   * @private
+   * Only executes following 'command' if the given tags are allowed
+   * @param tags - Tags
    */
-  public tag(tags: string[]) {
+  private tag(tags: string[]) {
     if (includesArray(this.allowedTags, tags)) {
       return {
-        log: (...logs: any[]) => this.log(logs),
-        debug: (...logs: any[]) => this.debug(logs),
-        info: (...logs: any[]) => this.info(logs),
-        warn: (...logs: any[]) => this.warn(logs),
-        error: (...logs: any[]) => this.error(logs),
-        trace: (...logs: any[]) => this.trace(logs),
-        table: (...logs: any[]) => this.table(logs),
+        log: (...data: any[]) => this.log(...data),
+        debug: (...data: any[]) => this.debug(...data),
+        info: (...data: any[]) => this.info(...data),
+        warn: (...data: any[]) => this.warn(...data),
+        error: (...data: any[]) => this.error(...data),
+        trace: (...data: any[]) => this.trace(...data),
+        table: (...data: any[]) => this.table(...data),
       };
     }
     return {
-      log: (...logs: any[]) => {},
-      debug: (...logs: any[]) => {},
-      info: (...logs: any[]) => {},
-      warn: (...logs: any[]) => {},
-      error: (...logs: any[]) => {},
-      trace: (...logs: any[]) => {},
-      table: (...logs: any[]) => {},
+      log: (...data: any[]) => {},
+      debug: (...data: any[]) => {},
+      info: (...data: any[]) => {},
+      warn: (...data: any[]) => {},
+      error: (...data: any[]) => {},
+      trace: (...data: any[]) => {},
+      table: (...data: any[]) => {},
     };
   }
 
-  public log(...logs: any[]) {
-    this.invokeConsole(logs, "log", "log");
+  public log(...data: any[]) {
+    this.invokeConsole(data, "log", "log");
   }
 
-  public debug(...logs: any[]) {
+  public debug(...data: any[]) {
     this.invokeConsole(
-      logs,
+      data,
       "debug",
       typeof console.debug !== "undefined" ? "debug" : "log"
     );
   }
 
-  public info(...logs: any[]) {
+  public info(...data: any[]) {
     this.invokeConsole(
-      logs,
+      data,
       "info",
       typeof console.info !== "undefined" ? "info" : "log"
     );
   }
 
-  public warn(...logs: any[]) {
+  public warn(...data: any[]) {
     this.invokeConsole(
-      logs,
+      data,
       "warn",
       typeof console.warn !== "undefined" ? "warn" : "log"
     );
   }
 
-  public error(...logs: any[]) {
+  public error(...data: any[]) {
     this.invokeConsole(
-      logs,
+      data,
       "error",
       typeof console.error !== "undefined" ? "error" : "log"
     );
   }
 
-  public trace(...logs: any[]) {
+  public trace(...data: any[]) {
     this.invokeConsole(
-      logs,
+      data,
       "trace",
       typeof console.trace !== "undefined" ? "trace" : "log"
     );
   }
 
-  public table(...logs: any[]) {
+  public table(...data: any[]) {
     this.invokeConsole(
-      logs,
+      data,
       "table",
       typeof console.table !== "undefined" ? "table" : "log"
     );
@@ -150,18 +160,16 @@ export class Logger {
   /**
    * @internal
    * Logs message in Console
-   * @param logs -
+   * @param data - Data that gets logged into the Console
    * @param loggerCategoryKey - Key of Logger Category
    * @param consoleLogProperty - console[consoleLogProperty]
    */
   private invokeConsole(
-    logs: any[],
+    data: any[],
     loggerCategoryKey: LoggerCategoryKey,
     consoleLogProperty: ConsoleLogType
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
-    const canUseCustomStyle =
-      loggerCategory.customStyle && this.config.canUseCustomStyles;
 
     // Build Prefix of Log
     const buildPrefix = (): string => {
@@ -175,25 +183,38 @@ export class Logger {
       return prefix;
     };
 
-    // TODOI think you can only use %c in ONE string block!!
-    // https://stackoverflow.com/questions/24828107/javascript-adding-style-to-the-text-of-console-log
-    // Add Custom Build Prefix
-    logs.unshift(buildPrefix());
+    // Add Build Prefix (Have to do this this way because Styles can only be applied to one console.log block)
+    if (typeof data[0] === "string")
+      data[0] = buildPrefix().concat(" ").concat(data[0]);
+    else data.unshift(buildPrefix());
 
     // Init Custom Styles
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
-      logs.forEach((log) => {
-        if (typeof log === "string") {
+      let hasStyledString = false; // NOTE: Only one style can be init for one String block!
+      for (let log of data) {
+        if (typeof log === "string" && !hasStyledString) {
           newLogs.push(`%c${log}`);
           newLogs.push(loggerCategory.customStyle);
+          hasStyledString = true;
+        } else {
+          newLogs.push(log);
         }
-      });
-      logs = newLogs;
+      }
+      data = newLogs;
+    }
+
+    // Handle Console Table Log
+    if (consoleLogProperty === "table") {
+      if (typeof data[0] === "string") {
+        console.log(data[0]);
+        console.table(data.filter((d) => typeof d !== "string" && "number"));
+      }
+      return;
     }
 
     // Log
-    console[consoleLogProperty](...logs);
+    console[consoleLogProperty](...data);
   }
 
   /**
