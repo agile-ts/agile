@@ -91,11 +91,11 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Load Values into Collection
     const loadValuesIntoCollection = async () => {
-      const primaryKey = this.collection().config.primaryKey || "id";
+      const primaryKey = this.collection().config.primaryKey;
 
       // Get Default Group
       const defaultGroup = this.collection().getGroup(
-        this.collection().config.defaultGroupKey || "default"
+        this.collection().config.defaultGroupKey
       );
       if (!defaultGroup) return false;
 
@@ -163,7 +163,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Get default Group
     const defaultGroup = this.collection().getGroup(
-      this.collection().config.defaultGroupKey || "default"
+      this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
 
@@ -206,7 +206,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Get default Group
     const defaultGroup = this.collection().getGroup(
-      this.collection().config.defaultGroupKey || "default"
+      this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
 

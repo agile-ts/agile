@@ -26,7 +26,7 @@ describe("Default Selector Tests", () => {
     // Subscribe Instance for testing callback call functionality
     App.subController.subscribeWithSubsArray(() => {
       rerenderCount++;
-    }, [MY_COLLECTION.getSelector("selector1")?.observer]);
+    }, [MY_COLLECTION.getSelectorWithReference("selector1").observer]);
 
     it("Has correct initial values", () => {
       expect(MY_COLLECTION.selectors["selector1"] instanceof Selector).to.eq(

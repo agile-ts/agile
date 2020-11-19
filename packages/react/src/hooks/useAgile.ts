@@ -79,7 +79,7 @@ export function useAgile<
     createUndefinedArray: true,
   }).map((item) =>
     item instanceof Collection
-      ? item.getGroupWithReference(item.config.defaultGroupKey || "default")
+      ? item.getGroupWithReference(item.config.defaultGroupKey)
       : item
   );
 

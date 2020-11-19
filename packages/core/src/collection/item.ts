@@ -14,7 +14,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     this.collection = () => collection;
 
     // Setting primaryKey of Data to Key/Name of Item
-    this.key = data[collection.config?.primaryKey || "id"];
+    this.key = data[collection.config.primaryKey];
   }
 
   /**

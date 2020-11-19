@@ -10,6 +10,7 @@ import {
 export class Logger {
   public key?: LoggerKey;
 
+  public isActive: boolean;
   public config: LoggerConfigInterface;
   public allowedTags: string[] = [];
   public loggerCategories: { [key: string]: LoggerCategoryInterface } = {}; // Holds all registered Logger Categories
@@ -19,7 +20,7 @@ export class Logger {
 
   /**
    * @public
-   * Logger - Handy Class to handle Logs
+   * Logger - Handy Class for handling console.logs
    */
   constructor(config: LoggerConfig = {}) {
     let _config = typeof config === "function" ? config(this) : config;
@@ -30,11 +31,11 @@ export class Logger {
       active: true,
       level: 0,
     });
+    this.isActive = _config.active as any;
     this.allowedTags = _config.allowedTags as any;
     this.config = {
       prefix: _config.prefix as any,
       canUseCustomStyles: _config.canUseCustomStyles as any,
-      active: _config.active as any,
       level: _config.level as any,
     };
     this.addDefaultLoggerCategories();
@@ -116,7 +117,7 @@ export class Logger {
   //=========================================================================================================
   /**
    * @private
-   * Only executes following 'command' if all given tags are allowed (allowedTags)
+   * Only executes following 'command' if all given tags are included in allowedTags
    * @param tags - Tags
    */
   private tag(tags: string[]) {
@@ -203,8 +204,8 @@ export class Logger {
   //=========================================================================================================
   /**
    * @internal
-   * Logs message in Console
-   * @param data - Data that gets logged into the Console
+   * Logs data in Console
+   * @param data - Data
    * @param loggerCategoryKey - Key/Name of Logger Category
    * @param consoleLogType - console[consoleLogProperty]
    */
@@ -215,8 +216,8 @@ export class Logger {
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
 
-    // Check if Logging is allowed
-    if (!this.config.active || loggerCategory.level < this.config.level) return;
+    // Check if Logger Category is allowed
+    if (!this.isActive || loggerCategory.level < this.config.level) return;
 
     // Build Prefix of Log
     const buildPrefix = (): string => {
@@ -234,7 +235,7 @@ export class Logger {
       data[0] = buildPrefix().concat(" ").concat(data[0]);
     else data.unshift(buildPrefix());
 
-    // Watch
+    // Call Watcher Callbacks
     for (let key in this.watchers) {
       const watcher = this.watchers[key];
       if (loggerCategory.level >= (watcher.level || 0)) {
@@ -242,12 +243,12 @@ export class Logger {
       }
     }
 
-    // Init Custom Styles
+    // Init Custom Style
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
-      let hasStyledString = false; // NOTE: Only one style can be init for one String block!
+      let hasStyledString = false; // NOTE: Only one style can be used for one String block!
       for (let log of data) {
-        if (typeof log === "string" && !hasStyledString) {
+        if (!hasStyledString && typeof log === "string") {
           newLogs.push(`%c${log}`);
           newLogs.push(loggerCategory.customStyle);
           hasStyledString = true;
@@ -276,7 +277,7 @@ export class Logger {
   //=========================================================================================================
   /**
    * @public
-   * Create new Logger Category
+   * Creates new Logger Category
    * @param loggerCategory - Logger Category
    */
   public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
@@ -306,7 +307,7 @@ export class Logger {
    * @public
    * Watches Logger and detects Logs
    * @param config - Config
-   * @return Key of Watcher
+   * @return Key of Watcher Function
    */
   public watch(config: LoggerWatcherConfigInterface): string;
   /**
@@ -338,14 +339,16 @@ export class Logger {
 
     // Check if Callback is a Function
     if (!isFunction(_config.callback)) {
-      Agile.logger.error("A Watcher Callback Function has to be an function!");
+      console.error(
+        "Agile: A Watcher Callback Function has to be an function!"
+      );
       return this;
     }
 
     // Check if Callback Function already exists
     if (this.watchers[key]) {
-      Agile.logger.error(
-        `Watcher Callback Function with the key/name ${key} already exists!`
+      console.error(
+        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
       );
       return this;
     }
@@ -373,7 +376,7 @@ export class Logger {
   /**
    * @public
    * Assigns new Level to Logger
-   * NOTE: Default Levels can be found with 'Logger.level.x'
+   * NOTE: Default Levels can be found in 'Logger.level.x'
    * @param level - Level
    */
   public setLevel(level: number): this {
@@ -387,8 +390,8 @@ export type LoggerKey = string | number;
 
 /**
  * @param key - Key/Name of Logger Category
- * @param customStyle - Css Styles that get applied to the log
- * @param prefix - Prefix that gets written before each log of this Category
+ * @param customStyle - Css Styles that get applied to the Logs
+ * @param prefix - Prefix that gets written before each Log of this Category
  * @param level - Until which Level this Logger Category gets logged
  */
 export interface LoggerCategoryInterface {
@@ -401,18 +404,20 @@ export interface LoggerCategoryInterface {
 /**
  * @param prefix - Prefix that gets written before each log of this Logger
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
+ * @param level - Handles which Logger Categories can be Logged
  */
 export interface LoggerConfigInterface {
   prefix: string;
   canUseCustomStyles: boolean;
   level: number;
-  active: boolean;
 }
 
 /**
  * @param prefix - Prefix that gets written before each log of this Logger
  * @param allowedTags - Only Logs that, contains the allowed Tags or have no Tag get logged
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
+ * @param active -
+ * @param level -
  */
 export interface CreateLoggerConfigInterface {
   prefix?: string;
