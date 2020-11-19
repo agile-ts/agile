@@ -114,8 +114,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     _itemKeys.forEach((itemKey) => {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
-        console.error(
-          `Agile: Couldn't find itemKey '${itemKey}' in Group!`,
+        Agile.logger.error(
+          `Couldn't find itemKey '${itemKey}' in Group!`,
           this
         );
         return;
@@ -261,9 +261,9 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Logging
-    if (this.agileInstance().config.logJobs && notFoundItemKeys.length > 0)
-      console.warn(
-        `Agile: Couldn't find some Items in Collection '${this.key}'`,
+    if (notFoundItemKeys.length > 0)
+      Agile.logger.warn(
+        `Couldn't find some Items in Collection '${this.key}'`,
         notFoundItemKeys
       );
 

@@ -4,6 +4,12 @@
 
 // !! All internal Agile modules must be imported from here!!
 
+// Logger
+export * from "./logger";
+
+// Utils
+export * from "./utils";
+
 // Agile
 export * from "./agile";
 
@@ -42,6 +48,3 @@ export * from "./event";
 // Integrations
 export * from "./integrations";
 export * from "./integrations/integration";
-
-// Utils
-export * from "./utils";

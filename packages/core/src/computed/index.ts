@@ -44,7 +44,7 @@ export class Computed<ComputedValueType = any> extends State<
    * Set Value of Computed
    */
   public set value(value: ComputedValueType) {
-    console.error("Agile: You can't mutate Computed value!");
+    Agile.logger.error("You can't mutate Computed value!");
   }
 
   /**
@@ -138,7 +138,7 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
 
   public patch() {
-    console.error("Agile: You can't use patch method on Computed Function!");
+    Agile.logger.error("You can't use patch method on Computed Function!");
     return this;
   }
 
@@ -146,12 +146,12 @@ export class Computed<ComputedValueType = any> extends State<
     keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
     config: StatePersistentConfigInterface = {}
   ): this {
-    console.error("Agile: You can't use persist method on Computed Function!");
+    Agile.logger.error("You can't use persist method on Computed Function!");
     return this;
   }
 
   public invert(): this {
-    console.error("Agile: You can't use invert method on Computed Function!");
+    Agile.logger.error("You can't use invert method on Computed Function!");
     return this;
   }
 }

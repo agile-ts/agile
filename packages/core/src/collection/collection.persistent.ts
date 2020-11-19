@@ -1,4 +1,5 @@
 import {
+  Agile,
   Collection,
   CollectionKey,
   defineConfig,
@@ -90,11 +91,11 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Load Values into Collection
     const loadValuesIntoCollection = async () => {
-      const primaryKey = this.collection().config.primaryKey || "id";
+      const primaryKey = this.collection().config.primaryKey;
 
       // Get Default Group
       const defaultGroup = this.collection().getGroup(
-        this.collection().config.defaultGroupKey || "default"
+        this.collection().config.defaultGroupKey
       );
       if (!defaultGroup) return false;
 
@@ -162,7 +163,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Get default Group
     const defaultGroup = this.collection().getGroup(
-      this.collection().config.defaultGroupKey || "default"
+      this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
 
@@ -205,7 +206,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Get default Group
     const defaultGroup = this.collection().getGroup(
-      this.collection().config.defaultGroupKey || "default"
+      this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
 
@@ -299,11 +300,11 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     collectionKey?: CollectionKey
   ): string {
     if (!itemKey) {
-      console.error("Agile: Failed to build Item StorageKey");
+      Agile.logger.error("Failed to build Item StorageKey");
       itemKey = "unknown";
     }
     if (!collectionKey) {
-      console.error("Agile: Failed to build Item StorageKey");
+      Agile.logger.error("Failed to build Item StorageKey");
       collectionKey = "unknown";
     }
     return this.storageItemKeyPattern
@@ -325,11 +326,11 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     collectionKey?: CollectionKey
   ): string {
     if (!groupKey) {
-      console.error("Agile: Failed to build Group StorageKey");
+      Agile.logger.error("Failed to build Group StorageKey");
       groupKey = "unknown";
     }
     if (!collectionKey) {
-      console.error("Agile: Failed to build Group StorageKey");
+      Agile.logger.error("Failed to build Group StorageKey");
       collectionKey = "unknown";
     }
     return this.storageGroupKeyPattern

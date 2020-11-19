@@ -140,8 +140,9 @@ export class SubController {
       this.callbackSubs.delete(subscriptionInstance);
 
       // Logging
-      if (this.agileInstance().config.logJobs)
-        console.log(
+      Agile.logger.if
+        .tag(["core", "subscription"])
+        .info(
           "Agile: Unregistered Callback based Subscription ",
           subscriptionInstance
         );
@@ -156,8 +157,9 @@ export class SubController {
       this.componentSubs.delete(subscriptionInstance);
 
       // Logging
-      if (this.agileInstance().config.logJobs)
-        console.log(
+      Agile.logger.if
+        .tag(["core", "subscription"])
+        .info(
           "Agile: Unregistered Component based Subscription ",
           subscriptionInstance
         );
@@ -215,8 +217,9 @@ export class SubController {
       componentSubscriptionContainer.ready = true;
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(
+    Agile.logger.if
+      .tag(["core", "subscription"])
+      .info(
         "Agile: Registered Component based Subscription ",
         componentSubscriptionContainer
       );
@@ -248,8 +251,9 @@ export class SubController {
     callbackSubscriptionContainer.ready = true;
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(
+    Agile.logger.if
+      .tag(["core", "subscription"])
+      .info(
         "Agile: Registered Callback based Subscription ",
         callbackSubscriptionContainer
       );

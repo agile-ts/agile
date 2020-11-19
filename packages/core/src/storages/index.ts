@@ -39,8 +39,8 @@ export class Storages {
   private instantiateLocalStorage() {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
-      console.warn(
-        "Agile: Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
+      Agile.logger.warn(
+        "Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
       );
       return;
     }
@@ -75,8 +75,8 @@ export class Storages {
 
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
-      console.error(
-        `Agile: Storage with the key/name ${storage.key} already exists`
+      Agile.logger.error(
+        `Storage with the key/name ${storage.key} already exists`
       );
       return false;
     }
@@ -115,13 +115,13 @@ export class Storages {
 
     // Check if Storage exists
     if (!storage) {
-      console.error(`Agile: Storage with the key/name '${key}' doesn't exist`);
+      Agile.logger.error(`Storage with the key/name '${key}' doesn't exist`);
       return undefined;
     }
 
     // Check if Storage is ready
     if (!storage.ready) {
-      console.error(`Agile: Storage with the key/name '${key}' isn't ready`);
+      Agile.logger.error(`Storage with the key/name '${key}' isn't ready`);
       return undefined;
     }
 

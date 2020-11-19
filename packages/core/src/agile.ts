@@ -18,6 +18,8 @@ import {
   CreateStorageConfigInterface,
   RegisterConfigInterface,
   defineConfig,
+  Logger,
+  CreateLoggerConfigInterface,
 } from "./internal";
 
 export class Agile {
@@ -31,6 +33,8 @@ export class Agile {
   public integrations: Integrations; // Integrated frameworks
   static initialIntegrations: Integration[] = []; // External added Integrations
 
+  static logger = new Logger();
+
   /**
    * @public
    * Agile - Global state and logic framework for reactive Typescript & Javascript applications
@@ -39,8 +43,14 @@ export class Agile {
   constructor(config: AgileConfigInterface = {}) {
     this.config = defineConfig(config, {
       localStorage: true,
-      logJobs: false,
       waitForMount: false,
+    });
+    this.config.logConfig = defineConfig(config.logConfig, {
+      prefix: "Agile",
+      active: false,
+      level: 0,
+      canUseCustomStyles: true,
+      allowedTags: ["runtime", "storage", "subscription", "multieditor"],
     });
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
@@ -48,6 +58,8 @@ export class Agile {
     this.storages = new Storages(this, {
       localStorage: this.config.localStorage,
     });
+
+    Agile.logger = new Logger(this.config.logConfig);
 
     // Create global instance of Agile
     globalBind("__agile__", this);
@@ -161,7 +173,7 @@ export class Agile {
  * @param storageConfig - To configure Agile Storage
  */
 export interface AgileConfigInterface {
-  logJobs?: boolean;
+  logConfig?: CreateLoggerConfigInterface;
   waitForMount?: boolean;
   localStorage?: boolean;
 }

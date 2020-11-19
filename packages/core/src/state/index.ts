@@ -37,7 +37,7 @@ export class State<ValueType = any> {
   public isPersisted: boolean = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
-  public watchers: { [key: string]: (value: any) => void } = {};
+  public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
 
   /**
    * @public
@@ -149,7 +149,7 @@ export class State<ValueType = any> {
 
     // Check value has correct Type (js)
     if (this.valueType && !this.hasCorrectType(value)) {
-      console.warn(`Agile: Incorrect type (${typeof value}) was provided.`);
+      Agile.logger.error(`Incorrect type (${typeof value}) was provided.`);
       return this;
     }
 
@@ -194,8 +194,8 @@ export class State<ValueType = any> {
 
     // Check if type is a supported Type
     if (!supportedTypes.includes(type.name)) {
-      console.warn(
-        `Agile: '${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`
+      Agile.logger.warn(
+        `'${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`
       );
       return this;
     }
@@ -249,14 +249,14 @@ export class State<ValueType = any> {
     });
 
     if (!isValidObject(this.nextStateValue)) {
-      console.warn(
-        "Agile: You can't use the patch method on a non object States!"
+      Agile.logger.error(
+        "You can't use the patch method on a non object States!"
       );
       return this;
     }
 
     if (!isValidObject(targetWithChanges)) {
-      console.warn("Agile: TargetWithChanges has to be an object!");
+      Agile.logger.error("TargetWithChanges has to be an object!");
       return this;
     }
 
@@ -286,42 +286,40 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called if the State Value changes
    * @return Key of Watcher
    */
-  public watch(callback: Callback<ValueType>): string;
+  public watch(callback: StateWatcherCallback<ValueType>): string;
   /**
    * @public
    * Watches State and detects State changes
    * @param key - Key of Watcher Function
    * @param callback - Callback Function that gets called if the State Value changes
    */
-  public watch(key: string, callback: Callback<ValueType>): this;
+  public watch(key: string, callback: StateWatcherCallback<ValueType>): this;
   public watch(
-    keyOrCallback: string | Callback<ValueType>,
-    callback?: Callback<ValueType>
+    keyOrCallback: string | StateWatcherCallback<ValueType>,
+    callback?: StateWatcherCallback<ValueType>
   ): this | string {
     const generateKey = isFunction(keyOrCallback);
-    let _callback: Callback<ValueType>;
+    let _callback: StateWatcherCallback<ValueType>;
     let key: string;
 
     if (generateKey) {
       key = generateId();
-      _callback = keyOrCallback as Callback<ValueType>;
+      _callback = keyOrCallback as StateWatcherCallback<ValueType>;
     } else {
       key = keyOrCallback as string;
-      _callback = callback as Callback<ValueType>;
+      _callback = callback as StateWatcherCallback<ValueType>;
     }
 
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
-      console.error(
-        "Agile: A Watcher Callback Function has to be an function!"
-      );
+      Agile.logger.error("A Watcher Callback Function has to be an function!");
       return this;
     }
 
     // Check if Callback Function already exists
     if (this.watchers[key]) {
-      console.error(
-        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
+      Agile.logger.error(
+        `Watcher Callback Function with the key/name ${key} already exists!`
       );
       return this;
     }
@@ -348,7 +346,7 @@ export class State<ValueType = any> {
    * Creates a Watcher that gets once called when the State Value changes for the first time and than destroys itself
    * @param callback - Callback Function that gets called if the State Value changes
    */
-  public onInaugurated(callback: Callback<ValueType>) {
+  public onInaugurated(callback: StateWatcherCallback<ValueType>) {
     const watcherKey = "InauguratedWatcher";
     this.watch(watcherKey, () => {
       callback(this.getPublicValue());
@@ -439,8 +437,8 @@ export class State<ValueType = any> {
       // If State isPersisted the loading was successful -> callback can be called
       if (this.isPersisted) callback(true);
     } else {
-      console.warn(
-        `Agile: Please make sure you persist the State '${this.key}' before using onLoad!`
+      Agile.logger.warn(
+        `Please make sure you persist the State '${this.key}' before using onLoad!`
       );
     }
     return this;
@@ -502,7 +500,7 @@ export class State<ValueType = any> {
    */
   public invert(): this {
     if (typeof this._value !== "boolean") {
-      console.warn("Agile: You can only invert boolean based States!");
+      Agile.logger.error("You can only invert boolean based States!");
       return this;
     }
     this.set(this._value);
@@ -536,7 +534,7 @@ export class State<ValueType = any> {
     sideEffect: (properties?: { [key: string]: any }) => void
   ): this {
     if (!isFunction(sideEffect)) {
-      console.error("Agile: A sideEffect function has to be an function!");
+      Agile.logger.error("A sideEffect function has to be an function!");
       return this;
     }
     this.sideEffects[key] = sideEffect;
@@ -631,5 +629,5 @@ export interface PatchConfigInterface {
   background?: boolean;
 }
 
-export type Callback<T = any> = (value: T) => void;
+export type StateWatcherCallback<T = any> = (value: T) => void;
 export type ComputeMethod<T = any> = (value: T) => T;

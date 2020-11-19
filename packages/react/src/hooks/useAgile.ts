@@ -79,7 +79,7 @@ export function useAgile<
     createUndefinedArray: true,
   }).map((item) =>
     item instanceof Collection
-      ? item.getGroupWithReference(item.config.defaultGroupKey || "default")
+      ? item.getGroupWithReference(item.config.defaultGroupKey)
       : item
   );
 
@@ -105,10 +105,7 @@ export function useAgile<
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
 
     if (!agileInstance || !agileInstance.subController) {
-      console.error(
-        "Agile: Failed to subscribe Component with deps",
-        depsArray
-      );
+      Agile.logger.error("Failed to subscribe Component with deps", depsArray);
       return;
     }
 

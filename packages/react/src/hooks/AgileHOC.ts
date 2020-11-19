@@ -26,7 +26,7 @@ export function AgileHOC(
         const tempAgileInstance = getAgileInstance(depsArray[0]);
         agileInstance = tempAgileInstance || undefined;
       } else {
-        console.warn("Agile: Please don't pass an empty array!");
+        Agile.logger.error("Please don't pass an empty array!");
       }
     }
   } else if (typeof deps === "object") {
@@ -41,17 +41,17 @@ export function AgileHOC(
         const tempAgileInstance = getAgileInstance(depsObject[objectKeys[0]]);
         agileInstance = tempAgileInstance || undefined;
       } else {
-        console.warn("Agile: Please don't pass an empty object!");
+        Agile.logger.error("Please don't pass an empty object!");
       }
     }
   } else {
-    console.error("Agile: No Valid AgileHOC properties");
+    Agile.logger.error("No Valid AgileHOC properties");
     return ReactComponent;
   }
 
   // Check if agile Instance exists
   if (!agileInstance) {
-    console.error("Agile: Failed to get Agile Instance");
+    Agile.logger.error("Failed to get Agile Instance");
     return ReactComponent;
   }
 

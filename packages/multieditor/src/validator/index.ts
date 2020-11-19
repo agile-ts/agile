@@ -1,4 +1,10 @@
-import { copy, defineConfig, generateId, isFunction } from "@agile-ts/core";
+import {
+  Agile,
+  copy,
+  defineConfig,
+  generateId,
+  isFunction,
+} from "@agile-ts/core";
 import {
   DataObject,
   MultiEditor,
@@ -119,14 +125,14 @@ export class Validator<DataType = any> {
 
     // Check if Validation Method is a Function
     if (!isFunction(_method)) {
-      console.error("Agile: A Validation Method has to be a function!");
+      Agile.logger.error("A Validation Method has to be a function!");
       return this;
     }
 
     // Check if Validation Method already exists
     if (this.validationMethods[key]) {
-      console.error(
-        `Agile: Validation Method with the key/name '${key}' already exists!`
+      Agile.logger.error(
+        `Validation Method with the key/name '${key}' already exists!`
       );
       return this;
     }

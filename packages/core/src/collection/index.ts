@@ -39,6 +39,14 @@ export class Collection<DataType = DefaultItem> {
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
+
+    // Set temp Config for creating proper Placeholder Items (of Selector)
+    this.config = {
+      defaultGroupKey: "default",
+      primaryKey: "id",
+    };
+
+    // Assign Properties
     let _config = typeof config === "function" ? config(this) : config;
     _config = defineConfig(_config, {
       primaryKey: "id",
@@ -48,8 +56,8 @@ export class Collection<DataType = DefaultItem> {
     });
     this._key = _config.key;
     this.config = {
-      defaultGroupKey: _config.defaultGroupKey,
-      primaryKey: _config.primaryKey,
+      defaultGroupKey: _config.defaultGroupKey as any,
+      primaryKey: _config.primaryKey as any,
     };
 
     this.initGroups(_config.groups as any);
@@ -148,10 +156,8 @@ export class Collection<DataType = DefaultItem> {
     } else groupsObject = groups;
 
     // Add default Group
-    groupsObject[this.config.defaultGroupKey || "default"] = new Group<
-      DataType
-    >(this, [], {
-      key: this.config.defaultGroupKey || "default",
+    groupsObject[this.config.defaultGroupKey] = new Group<DataType>(this, [], {
+      key: this.config.defaultGroupKey,
     });
 
     // Set Key/Name of Group to property Name
@@ -211,8 +217,8 @@ export class Collection<DataType = DefaultItem> {
   ): this {
     const _items = normalizeArray<DataType>(items);
     const groupKeys = normalizeArray<GroupKey>(groups);
-    const defaultGroupKey = this.config.defaultGroupKey || "default";
-    const primaryKey = this.config.primaryKey || "id";
+    const defaultGroupKey = this.config.defaultGroupKey;
+    const primaryKey = this.config.primaryKey;
     config = defineConfig<CollectConfigInterface>(config, {
       method: "push",
       background: false,
@@ -295,7 +301,7 @@ export class Collection<DataType = DefaultItem> {
     }
 
     const item = this.data[itemKey];
-    const primaryKey = this.config.primaryKey || "";
+    const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
       addNewProperties: true,
       background: false,
@@ -608,7 +614,7 @@ export class Collection<DataType = DefaultItem> {
     // Create dummy Item to hold reference
     if (!item) {
       const dummyItem = new Item<DataType>(this, {
-        id: itemKey,
+        [this.config.primaryKey]: itemKey,
         dummy: true,
       } as any);
       dummyItem.isPlaceholder = true;
@@ -910,7 +916,7 @@ export class Collection<DataType = DefaultItem> {
     config: { patch?: boolean; background?: boolean } = {}
   ): boolean {
     const _data = data as any; // Transformed Data to any because of unknown Object (DataType)
-    const primaryKey = this.config.primaryKey || "id";
+    const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
       patch: false,
       background: false,
@@ -989,12 +995,15 @@ export type ItemKey = string | number; // Key Interface of Item in Collection
  * @param key - Key/Name of Collection
  * @param groups - Groups of Collection
  * @param selectors - Selectors of Collection
+ * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
+ * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
  */
-export interface CreateCollectionConfigInterface
-  extends CollectionConfigInterface {
+export interface CreateCollectionConfigInterface {
   groups?: { [key: string]: Group<any> } | string[];
   selectors?: { [key: string]: Selector<any> } | string[];
   key?: CollectionKey;
+  primaryKey?: string;
+  defaultGroupKey?: ItemKey;
 }
 
 /**
@@ -1002,8 +1011,8 @@ export interface CreateCollectionConfigInterface
  * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
  */
 export interface CollectionConfigInterface {
-  primaryKey?: string;
-  defaultGroupKey?: ItemKey;
+  primaryKey: string;
+  defaultGroupKey: ItemKey;
 }
 
 /**

@@ -52,8 +52,8 @@ export class MultiEditor<
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
-      console.log(
-        "Agile: No Global agileInstance found! Please pass an agileInstance into the MultiEditor!"
+      Agile.logger.error(
+        "No Global agileInstance found! Please pass an agileInstance into the MultiEditor!"
       );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === "function" ? config(this) : config;
@@ -72,8 +72,8 @@ export class MultiEditor<
     this.validateMethods = _config.validateMethods as any;
     this.computeMethods = _config.computeMethods as any;
     this.config = {
-      reValidateMode: _config.reValidateMode,
-      validate: _config.validate,
+      reValidateMode: _config.reValidateMode as any,
+      validate: _config.validate as any,
     };
 
     // Add Items to Data Object and validate it for the first Time
@@ -247,8 +247,9 @@ export class MultiEditor<
     this.submitted = true;
 
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(`Agile: Submit MultiEditor '${this.key}'`, this.isValid);
+    Agile.logger.if
+      .tag(["multieditor"])
+      .info(`Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
     if (!this.isValid) return false;
@@ -353,7 +354,7 @@ export class MultiEditor<
    */
   public getItemById(key: ItemKey): Item<DataType> | undefined {
     if (!this.data.hasOwnProperty(key)) {
-      console.error(`Agile: Editor Item '${key}' does not exists!`);
+      Agile.logger.error(`Editor Item '${key}' does not exists!`);
       return undefined;
     }
     return this.data[key];
@@ -498,12 +499,14 @@ export type ItemKey = string | number;
  * @param onSubmit - Function that gets called if the Editor gets submitted
  * @param reValidateMode - When the Editor and its Data gets revalidated
  * @param validate - Which Data gets validated
+ * @param reValidateMode - When the Editor and its Data gets revalidated
+ * @param validate - Which Data gets validated
  */
 export interface CreateEditorConfigInterface<
   DataType = any,
   SubmitReturnType = void,
   onSubmitConfig = any
-> extends EditorConfigInterface {
+> {
   key?: string;
   data: DataObject<DataType>;
   fixedProperties?: string[];
@@ -516,6 +519,8 @@ export interface CreateEditorConfigInterface<
     preparedData: DataObject<DataType>,
     config?: onSubmitConfig
   ) => Promise<SubmitReturnType>;
+  reValidateMode?: RevalidationModeType;
+  validate?: ValidateType;
 }
 
 /**
@@ -523,8 +528,8 @@ export interface CreateEditorConfigInterface<
  * @param validate - Which Data gets validated
  */
 export interface EditorConfigInterface {
-  reValidateMode?: RevalidationModeType;
-  validate?: ValidateType;
+  reValidateMode: RevalidationModeType;
+  validate: ValidateType;
 }
 
 export type EditorConfig<
