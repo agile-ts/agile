@@ -131,7 +131,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     if (!this.enabled) return this;
     if (this.config.delay)
       this.delayedTrigger(payload, this.config.delay, keys);
-    else this.normalTrigger(payload);
+    else this.normalTrigger(payload, keys);
     return this;
   }
 

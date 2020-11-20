@@ -4,7 +4,7 @@ export class EventJob<PayloadType = any> {
 
   /**
    * @public
-   * Event Job - 
+   * Event Job -
    * @param payload - Payload
    */
   constructor(payload: PayloadType) {

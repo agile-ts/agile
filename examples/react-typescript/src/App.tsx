@@ -53,26 +53,14 @@ const App = (props: any) => {
       <header className="App-header">
         <div className={"Container"}>
           <h3 className={"Title"}>My State</h3>
-          <button
-            onClick={() =>
-              setTimeout(() => {
-                MY_STATE.set("Test10");
-              }, 1000)
-            }
-          >
+          <button onClick={() => MY_STATE.set("Test10")}>
             {myState}_{myState2}
           </button>
         </div>
 
         <div className={"Container"}>
           <h3 className={"Title"}>My State_2</h3>
-          <button
-            onClick={() =>
-              setTimeout(() => {
-                MY_STATE_2.set("Test3");
-              }, 1000)
-            }
-          >
+          <button onClick={() => MY_STATE_2.set("Test3")}>
             {myState}_{myState2}
           </button>
         </div>
@@ -84,13 +72,7 @@ const App = (props: any) => {
 
         <div className={"Container"}>
           <h3 className={"Title"}>My Event</h3>
-          <button
-            onClick={() =>
-              setTimeout(() => {
-                MY_EVENT.trigger({ name: "test" });
-              }, 1000)
-            }
-          >
+          <button onClick={() => MY_EVENT.trigger({ name: "test" })}>
             Trigger
           </button>
         </div>
@@ -103,55 +85,31 @@ const App = (props: any) => {
             ))}
           </div>
           <button
-            onClick={() =>
-              setTimeout(() => {
-                MY_COLLECTION.collect({ id: "id3", name: "Test3" });
-              }, 1000)
-            }
+            onClick={() => MY_COLLECTION.collect({ id: "id3", name: "Test3" })}
           >
             Collect
           </button>
-          <button
-            onClick={() =>
-              setTimeout(() => {
-                MY_COLLECTION.getGroup("myGroup")?.add("id3");
-              }, 1000)
-            }
-          >
+          <button onClick={() => MY_COLLECTION.getGroup("myGroup")?.add("id3")}>
             Add to myGroup
           </button>
           <button
             onClick={() =>
-              setTimeout(() => {
-                MY_COLLECTION.update("id3", {
-                  id: "newId3",
-                  name: "Test3_Changed",
-                });
-              }, 1000)
+              MY_COLLECTION.update("id3", {
+                id: "newId3",
+                name: "Test3_Changed",
+              })
             }
           >
             Update id3
           </button>
-          <button
-            onClick={() =>
-              setTimeout(() => {
-                MY_COLLECTION.remove("newId3").everywhere();
-              }, 1000)
-            }
-          >
+          <button onClick={() => MY_COLLECTION.remove("newId3").everywhere()}>
             Remove newId3
           </button>
         </div>
 
         <p>MySelector: {mySelector?.name}</p>
 
-        <button
-          onClick={() =>
-            setTimeout(() => {
-              MY_COLLECTION.removeSelector("mySelector");
-            }, 1000)
-          }
-        >
+        <button onClick={() => MY_COLLECTION.removeSelector("mySelector")}>
           Remove mySelector
         </button>
       </header>
