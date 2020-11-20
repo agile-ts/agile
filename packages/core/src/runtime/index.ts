@@ -19,8 +19,8 @@ export class Runtime {
   private jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
   // Tracking - Used to track computed dependencies
-  public trackObservers: boolean = false; // Check if Runtime have to track Observers
-  public foundObservers: Set<Observer> = new Set(); // Observers that got tracked during the 'trackObservers' time
+  public trackObservers: boolean = false; // Check if Runtime tracks Observers
+  public foundObservers: Set<Observer> = new Set(); // Observers that got tracked (reset after stop tracking)
 
   /**
    * @internal
