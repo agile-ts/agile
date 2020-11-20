@@ -20,12 +20,20 @@ const App = (props: any) => {
   rerenderCount++;
 
   const myComputed = useAgile(MY_COMPUTED);
-  const [myState, myState2, item, mySelector2, myState3] = useAgile([
+  const [
+    myState,
+    myState2,
+    item,
+    mySelector2,
+    myState3,
+    myUndefined,
+  ] = useAgile([
     MY_STATE,
     MY_STATE_2,
     MY_COLLECTION.getItem("1"),
     MY_COLLECTION.getSelector("mySelector"),
     MY_STATE_3,
+    undefined,
   ]);
   const [myCollection] = useAgile([
     MY_COLLECTION.getGroupWithReference("myGroup"),
