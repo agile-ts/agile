@@ -21,6 +21,7 @@ export class Collection<DataType = DefaultItem> {
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
+  private initialConfig: CreateCollectionConfigInterface;
 
   public size: number = 0; // Amount of Items stored in Collection
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
@@ -59,6 +60,7 @@ export class Collection<DataType = DefaultItem> {
       defaultGroupKey: _config.defaultGroupKey as any,
       primaryKey: _config.primaryKey as any,
     };
+    this.initialConfig = _config;
 
     this.initGroups(_config.groups as any);
     this.initSelectors(_config.selectors as any);

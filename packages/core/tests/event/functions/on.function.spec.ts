@@ -25,7 +25,7 @@ describe("On Function Tests", () => {
   it("Has correct initial value", () => {
     expect(MY_EVENT.uses).to.eq(0, "MY_EVENT uses has correct initial value");
     expect(JSON.stringify(MY_EVENT.config)).to.eq(
-      JSON.stringify({ enabled: true, rerender: false }),
+      JSON.stringify({ rerender: false }),
       "MY_EVENT has correct initial config"
     );
     expect(MY_EVENT.callbacks["myEvent"] !== undefined).to.eq(

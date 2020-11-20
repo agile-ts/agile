@@ -101,9 +101,7 @@ export function useAgile<
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
   useIsomorphicLayoutEffect(() => {
-    // Get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
-
     if (!agileInstance || !agileInstance.subController) {
       Agile.logger.error("Failed to subscribe Component with deps", depsArray);
       return;

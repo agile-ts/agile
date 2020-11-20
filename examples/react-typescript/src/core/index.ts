@@ -43,7 +43,9 @@ MY_COLLECTION.getGroup("myGroup")?.persist({ followCollectionPattern: true });
 
 console.log("Initial: myCollection ", MY_COLLECTION);
 
-export const MY_EVENT = App.Event<{ name: string }>();
+export const MY_EVENT = App.Event<{ name: string }>({
+  delay: 3000,
+});
 
 MY_EVENT.on(() => {
   console.log("Triggered Event (noId)");
