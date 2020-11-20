@@ -24,6 +24,14 @@ type AgileHookArrayType<T> = {
     ? U[]
     : T[K] extends undefined
     ? undefined
+    : T[K] extends Group<infer U> | undefined
+    ? U[] | undefined
+    : T[K] extends State<infer U> | undefined
+    ? U | undefined
+    : T[K] extends Observer<infer U> | undefined
+    ? U | undefined
+    : T[K] extends Collection<infer U> | undefined
+    ? U[] | undefined
     : never;
 };
 
@@ -38,6 +46,14 @@ type AgileHookType<T> = T extends Group<infer U>
   ? U[]
   : T extends undefined
   ? undefined
+  : T extends Group<infer U> | undefined
+  ? U[] | undefined
+  : T extends State<infer U> | undefined
+  ? U | undefined
+  : T extends Observer<infer U> | undefined
+  ? U | undefined
+  : T extends Collection<infer U> | undefined
+  ? U[] | undefined
   : never;
 
 /**
