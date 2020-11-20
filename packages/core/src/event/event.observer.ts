@@ -6,10 +6,10 @@ export class EventObserver<PayloadType = any> extends Observer {
   /**
    * @internal
    * Event Observer - Handles Event dependencies and ingests Event triggers into the Runtime
-   * @param {Agile} agileInstance - An instance of Agile
-   * @param {Event} event - Event
-   * @param {Array<Observer>} deps - Initial Dependencies of the Event
-   * @param {ObserverKey} key - Key/Name of Event Observer
+   * @param agileInstance - An instance of Agile
+   * @param event - Event
+   * @param deps - Initial Dependencies of the Event
+   * @param key - Key/Name of Event Observer
    */
   constructor(
     agileInstance: Agile,
@@ -26,7 +26,7 @@ export class EventObserver<PayloadType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Triggers a rerender on Components which got subscribed by this Event
+   * Ingests Event into Runtime and causes Rerender on Components that got subscribed by the Event (Observer)
    */
   public trigger(): void {
     this.agileInstance().runtime.ingest(this, {});

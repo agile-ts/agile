@@ -8,7 +8,7 @@ export class Job<ObserverType extends Observer = Observer> {
 
   /**
    * @internal
-   * Job - Holds Observer and gets executed/performed by Runtime
+   * Job - Holds Observer and gets executed/performed by the Runtime
    * @param observer - Observer that is represented by this Job and gets performed
    * @param config - Config
    */

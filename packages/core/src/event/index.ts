@@ -16,8 +16,8 @@ export class Event<PayloadType = DefaultEventPayload> {
   public _key?: EventKey;
   public uses: number = 0;
   public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
-  private currentTimeout: any; // Timeout which is active right now (delayed Event)
-  private queue: Array<EventJob> = []; // Queue of delayed triggers
+  private currentTimeout: any; // Timeout that is active right now (delayed Event)
+  private queue: Array<EventJob> = []; // Queue of delayed Events
   public enabled: boolean = true;
   public observer: EventObserver;
 
@@ -123,9 +123,9 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @public
-   * Triggers Event
+   * Triggers all or specific Events
    * @param payload - Payload that gets passed into the Callback Functions
-   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered will be triggered)
+   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
   public trigger(payload: PayloadType, keys?: string[]) {
     if (!this.enabled) return this;
@@ -193,7 +193,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * @internal
    * Triggers Event
    * @param payload - Payload that gets passed into the Callback Functions
-   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered will be triggered)
+   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
   private normalTrigger(payload: PayloadType, keys?: string[]) {
     // Call wished Callback Functions
@@ -220,7 +220,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * Triggers Event with some delay
    * @param payload - Payload that gets passed into the Callback Functions
    * @param delay - Delay until Events get triggered
-   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered will be triggered)
+   * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
   private delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
     // Check if a Timeout is currently active if so add payload to queue
@@ -256,7 +256,7 @@ export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
  * @param key - Key/Name of Event
  * @param enabled - If Event can be triggered
  * @param maxUses - How often the Event can be used/triggered
- * @param delay - Delayed call of Event Callback Functions in seconds
+ * @param delay - Delayed call of Event Callback Functions in milliseconds
  * @param rerender - If triggering an Event should cause a rerender
  */
 export interface CreateEventConfigInterface {

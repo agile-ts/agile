@@ -4,8 +4,8 @@ export class EventJob<PayloadType = any> {
 
   /**
    * @public
-   * Event Job -
-   * @param payload - Payload
+   * Event Job - Holds Payload and gets executed/performed by the Event
+   * @param payload - Payload that is represented by this Job
    */
   constructor(payload: PayloadType) {
     this.payload = payload;
