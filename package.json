@@ -35,10 +35,5 @@
   "workspaces": [
     "packages/*"
   ],
-  "jest": {
-    "testPathIgnorePatterns": [
-      "old"
-    ]
-  },
   "name": "agile"
 }
