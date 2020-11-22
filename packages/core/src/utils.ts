@@ -1,4 +1,5 @@
 import { State, Agile, Event, Collection, Observer } from "./internal";
+import _ from "lodash";
 
 //=========================================================================================================
 // Copy
@@ -138,7 +139,12 @@ export function isFunction(value: any): boolean {
  * @param value - Value that gets tested if its an async function
  */
 export function isAsyncFunction(value: any): boolean {
-  return isFunction(value) && value.constructor.name === "AsyncFunction";
+  const valueString = value.toString();
+  return (
+    isFunction(value) &&
+    (value.constructor.name === "AsyncFunction" ||
+      valueString.includes("__awaiter"))
+  );
 }
 
 //=========================================================================================================
@@ -172,6 +178,7 @@ export function isValidUrl(url: string): boolean {
  * @param value - Value that gets checked
  */
 export function isJsonString(value: any): boolean {
+  if (typeof value !== "string") return false;
   try {
     JSON.parse(value);
   } catch (e) {
@@ -267,7 +274,7 @@ export function notEqual(value1: any, value2: any): boolean {
  * Generates random Id
  * @param length - Length of generated Id
  */
-export function generateId(length?: number) {
+export function generateId(length?: number): string {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
@@ -288,8 +295,9 @@ export function generateId(length?: number) {
  * @param instance - Instance of Class you want to clone
  */
 export function clone<T = any>(instance: T): T {
-  const copy: T = Object.create(Object.getPrototypeOf(instance));
-  return Object.assign(copy, instance);
+  // const copy: T = Object.create(Object.getPrototypeOf(instance));
+  // return Object.assign(copy, instance);
+  return _.cloneDeep(instance);
 }
 
 //=========================================================================================================

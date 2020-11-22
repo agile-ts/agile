@@ -1,14 +1,18 @@
 import {
+  clone,
   copy,
   defineConfig,
   equal,
   flatMerge,
+  generateId,
   includesArray,
+  isAsyncFunction,
   isFunction,
   isJsonString,
   isValidObject,
   isValidUrl,
   normalizeArray,
+  notEqual,
 } from "../src";
 
 describe("Utils", () => {
@@ -18,6 +22,7 @@ describe("Utils", () => {
       const myCopiedArray = copy(myArray);
 
       expect(myCopiedArray).toStrictEqual([1, 2, 3, 4, 5]);
+      expect(myArray).toStrictEqual([1, 2, 3, 4, 5]);
 
       myCopiedArray.push(6);
 
@@ -30,11 +35,46 @@ describe("Utils", () => {
       const myCopiedObject = copy(myObject);
 
       expect(myCopiedObject).toStrictEqual({ id: 1, name: "jeff" });
-
-      myCopiedObject.name = "hans";
-
-      expect(myCopiedObject).toStrictEqual({ id: 1, name: "hans" });
       expect(myObject).toStrictEqual({ id: 1, name: "jeff" });
+
+      myObject.name = "hans";
+
+      expect(myObject).toStrictEqual({ id: 1, name: "hans" });
+      expect(myCopiedObject).toStrictEqual({ id: 1, name: "jeff" });
+    });
+
+    it("should copy deep Object without any reference", () => {
+      const myObject = {
+        id: 1,
+        name: "jeff",
+        location: { country: "Germany", state: "Bayern" },
+      };
+      const myCopiedObject = copy(myObject);
+
+      expect(myCopiedObject).toStrictEqual({
+        id: 1,
+        name: "jeff",
+        location: { country: "Germany", state: "Bayern" },
+      });
+      expect(myObject).toStrictEqual({
+        id: 1,
+        name: "jeff",
+        location: { country: "Germany", state: "Bayern" },
+      });
+
+      myObject.name = "hans";
+      myObject.location.state = "Sachsen";
+
+      expect(myObject).toStrictEqual({
+        id: 1,
+        name: "hans",
+        location: { country: "Germany", state: "Sachsen" },
+      });
+      expect(myCopiedObject).toStrictEqual({
+        id: 1,
+        name: "jeff",
+        location: { country: "Germany", state: "Bayern" },
+      });
     });
 
     it("should copy default Types", () => {
@@ -44,31 +84,26 @@ describe("Utils", () => {
       const myCopiedString = copy(myString);
 
       expect(myCopiedNumber).toBe(5);
+      expect(myNumber).toBe(5);
       expect(myCopiedString).toBe("frank");
+      expect(myString).toBe("frank");
     });
   });
 
   describe("isValidObject", () => {
-    it("should return false if passing Array", () => {
-      expect(isValidObject([1, 2])).toBe(false);
-    });
+    // Can't be Tested in not Web-Environment
+    // it("should return false if passing HTML Element", () => {
+    //   expect(isValidObject(HTMLElement)).toBe(false);
+    // });
 
-    it("should return false if passing default Types", () => {
+    it("should return false if passing not valid Object", () => {
+      expect(isValidObject(null)).toBe(false);
       expect(isValidObject("Hello")).toBe(false);
+      expect(isValidObject([1, 2])).toBe(false);
       expect(isValidObject(123)).toBe(false);
     });
 
-    /* Can't be Tested in not Web-Environment
-            it("should return false if passing HTML Element", () => {
-              expect(isValidObject(HTMLElement)).toBe(false);
-            });
-             */
-
-    it("should return false if passing null", () => {
-      expect(isValidObject(null)).toBe(false);
-    });
-
-    it("should return true if passing object", () => {
+    it("should return true if passing valid Object", () => {
       expect(isValidObject({ hello: "jeff" })).toBe(true);
     });
   });
@@ -118,11 +153,11 @@ describe("Utils", () => {
   });
 
   describe("isFunction", () => {
-    it("should return true if passing aFunction", () => {
+    it("should return true if passing valid Function", () => {
       expect(isFunction(() => {})).toBe(true);
     });
 
-    it("should return false if not passing a Function", () => {
+    it("should return false if not passing valid Function", () => {
       expect(isFunction("hello")).toBe(false);
       expect(isFunction(1)).toBe(false);
       expect(isFunction([1, 2, 3])).toBe(false);
@@ -130,13 +165,24 @@ describe("Utils", () => {
     });
   });
 
+  describe("isAsyncFunction", () => {
+    it("should return true if passing valid async Function", () => {
+      expect(isAsyncFunction(async () => {})).toBe(true);
+    });
+
+    it("should return false if not passing a async Function", () => {
+      expect(isAsyncFunction("hello")).toBe(false);
+      expect(isAsyncFunction(1)).toBe(false);
+      expect(isAsyncFunction([1, 2, 3])).toBe(false);
+      expect(isAsyncFunction({ hello: "jeff" })).toBe(false);
+      expect(isAsyncFunction(() => {})).toBe(false);
+    });
+  });
+
   describe("isValidUrl", () => {
     it("should return true if passing valid Url", () => {
       expect(isValidUrl("https://www.google.com/")).toBe(true);
-      expect(isValidUrl("www.google.com")).toBe(true);
-      // expect(isValidUrl("https://en.wikipedia.org/wiki/Procter_&_Gamble")).toBe(
-      //   true
-      // );
+      expect(isValidUrl("www.google.com")).toBe(true); // expect(isValidUrl("https://en.wikipedia.org/wiki/Procter_&_Gamble")).toBe( //   true // ); });
     });
 
     it("should return false if not passing valid Url", () => {
@@ -158,6 +204,8 @@ describe("Utils", () => {
       expect(isJsonString('{name":"John", "age":31, "city":"New York"}')).toBe(
         false
       );
+      expect(isJsonString(10)).toBe(false);
+      expect(isJsonString({ name: "John", age: 31 })).toBe(false);
     });
   });
 
@@ -282,6 +330,91 @@ describe("Utils", () => {
       expect(equal(12, 12)).toBe(true);
     });
 
-    it("should return false if value1 and value2 are not equal", () => {});
+    it("should return false if value1 and value2 are not equal", () => {
+      expect(equal({ id: 123, name: "jeff" }, { id: 123, name: "hans" })).toBe(
+        false
+      );
+      expect(equal([1, 2], [3, 5])).toBe(false);
+      expect(equal(12, 13)).toBe(false);
+    });
+  });
+
+  describe("notEqual", () => {
+    it("should return false if value1 and value2 are equal", () => {
+      expect(
+        notEqual({ id: 123, name: "jeff" }, { id: 123, name: "jeff" })
+      ).toBe(false);
+      expect(notEqual([1, 2, 3], [1, 2, 3])).toBe(false);
+      expect(notEqual(12, 12)).toBe(false);
+    });
+
+    it("should return true if value1 and value2 are not equal", () => {
+      expect(
+        notEqual({ id: 123, name: "jeff" }, { id: 123, name: "hans" })
+      ).toBe(true);
+      expect(notEqual([1, 2], [3, 5])).toBe(true);
+      expect(notEqual(12, 13)).toBe(true);
+    });
+  });
+
+  describe("generateId", () => {
+    it("should returned generated Id", () => {
+      expect(generateId()).toMatch(/^[a-zA-Z0-9]*$/);
+    });
+
+    it("should returned generated Id with right length if passing length", () => {
+      expect(generateId(10)).toMatch(/^[a-zA-Z0-9]*$/);
+      expect(generateId(10).length).toEqual(10);
+      expect(generateId(5).length).toEqual(5);
+      expect(generateId(-10).length).toEqual(0);
+    });
+  });
+
+  describe("clone", () => {
+    it("should clone Object/Class without any reference", () => {
+      class DummyClass {
+        constructor(
+          public id: number,
+          public name: string,
+          public location: { country: string; state: string }
+        ) {}
+      }
+      const dummyClass = new DummyClass(10, "jeff", {
+        country: "USA",
+        state: "California",
+      });
+      const clonedDummyClass = clone(dummyClass);
+
+      expect(dummyClass).toBeInstanceOf(DummyClass);
+      expect(clonedDummyClass).toBeInstanceOf(DummyClass);
+      expect(dummyClass.name).toBe("jeff");
+      expect(dummyClass.id).toBe(10);
+      expect(dummyClass.location).toStrictEqual({
+        country: "USA",
+        state: "California",
+      });
+      expect(clonedDummyClass.name).toBe("jeff");
+      expect(clonedDummyClass.id).toBe(10);
+      expect(clonedDummyClass.location).toStrictEqual({
+        country: "USA",
+        state: "California",
+      });
+
+      dummyClass.name = "frank";
+      dummyClass.location.state = "Florida";
+
+      expect(dummyClass.name).toBe("frank");
+      expect(dummyClass.id).toBe(10);
+      expect(dummyClass.location).toStrictEqual({
+        country: "USA",
+        state: "Florida",
+      });
+      expect(clonedDummyClass.name).toBe("jeff");
+      expect(clonedDummyClass.id).toBe(10);
+      expect(clonedDummyClass.location).toStrictEqual({
+        country: "USA",
+        state: "California",
+      });
+    });
   });
 });
