@@ -105,6 +105,9 @@ describe("Utils", () => {
 
     it("should return true if passing valid Object", () => {
       expect(isValidObject({ hello: "jeff" })).toBe(true);
+      expect(isValidObject({ hello: "jeff", deep: { hello: "franz" } })).toBe(
+        true
+      );
     });
   });
 
@@ -137,11 +140,11 @@ describe("Utils", () => {
       ]);
     });
 
-    it("should normalize Item", () => {
+    it("should normalize single Item", () => {
       expect(normalizeArray(1)).toStrictEqual([1]);
     });
 
-    it("shouldn't normalize undefined", () => {
+    it("shouldn't normalize undefined and return empty array", () => {
       expect(normalizeArray(undefined)).toStrictEqual([]);
     });
 
@@ -168,6 +171,7 @@ describe("Utils", () => {
   describe("isAsyncFunction", () => {
     it("should return true if passing valid async Function", () => {
       expect(isAsyncFunction(async () => {})).toBe(true);
+      expect(isAsyncFunction(async function () {})).toBe(true);
     });
 
     it("should return false if not passing a async Function", () => {
@@ -176,19 +180,26 @@ describe("Utils", () => {
       expect(isAsyncFunction([1, 2, 3])).toBe(false);
       expect(isAsyncFunction({ hello: "jeff" })).toBe(false);
       expect(isAsyncFunction(() => {})).toBe(false);
+      expect(isAsyncFunction(function () {})).toBe(false);
     });
   });
 
   describe("isValidUrl", () => {
     it("should return true if passing valid Url", () => {
       expect(isValidUrl("https://www.google.com/")).toBe(true);
-      expect(isValidUrl("www.google.com")).toBe(true); // expect(isValidUrl("https://en.wikipedia.org/wiki/Procter_&_Gamble")).toBe( //   true // ); });
+      expect(isValidUrl("www.google.com")).toBe(true);
+      expect(isValidUrl("google.com")).toBe(true);
+      expect(isValidUrl("https://en.wikipedia.org/wiki/Procter_&_Gamble")).toBe(
+        true
+      );
     });
 
     it("should return false if not passing valid Url", () => {
       expect(isValidUrl("hello")).toBe(false);
       expect(isValidUrl("https://sdfasd")).toBe(false);
       expect(isValidUrl("https://")).toBe(false);
+      expect(isValidUrl("")).toBe(false);
+      expect(isValidUrl("www.google")).toBe(false);
     });
   });
 
@@ -199,7 +210,7 @@ describe("Utils", () => {
       );
     });
 
-    it("should return false if passing not valid Json String", () => {
+    it("should return false if passing invalid Json String", () => {
       expect(isJsonString("frank")).toBe(false);
       expect(isJsonString('{name":"John", "age":31, "city":"New York"}')).toBe(
         false
@@ -328,6 +339,7 @@ describe("Utils", () => {
       );
       expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
       expect(equal(12, 12)).toBe(true);
+      expect(equal("hi", "hi")).toBe(true);
     });
 
     it("should return false if value1 and value2 are not equal", () => {
@@ -336,6 +348,7 @@ describe("Utils", () => {
       );
       expect(equal([1, 2], [3, 5])).toBe(false);
       expect(equal(12, 13)).toBe(false);
+      expect(equal("hi", "bye")).toBe(false);
     });
   });
 
@@ -346,6 +359,7 @@ describe("Utils", () => {
       ).toBe(false);
       expect(notEqual([1, 2, 3], [1, 2, 3])).toBe(false);
       expect(notEqual(12, 12)).toBe(false);
+      expect(equal("hi", "bye")).toBe(false);
     });
 
     it("should return true if value1 and value2 are not equal", () => {
@@ -354,11 +368,12 @@ describe("Utils", () => {
       ).toBe(true);
       expect(notEqual([1, 2], [3, 5])).toBe(true);
       expect(notEqual(12, 13)).toBe(true);
+      expect(equal("hi", "bye")).toBe(true);
     });
   });
 
   describe("generateId", () => {
-    it("should returned generated Id", () => {
+    it("should returned generated Id that matches the wished regex", () => {
       expect(generateId()).toMatch(/^[a-zA-Z0-9]*$/);
     });
 
