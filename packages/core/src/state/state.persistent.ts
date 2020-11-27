@@ -67,7 +67,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async loadValue(): Promise<boolean> {
     if (!this.ready) return false;
-    const loadedValue = await this.agileInstance().storages.get(
+    const loadedValue = await this.agileInstance().storages.get<ValueType>(
       this._key,
       this.storageKeys && this.storageKeys[0]
     );

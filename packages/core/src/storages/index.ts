@@ -140,9 +140,15 @@ export class Storages {
   public get<GetType = any>(
     key: StorageItemKey,
     storageKey?: StorageKey
-  ): GetType | Promise<GetType> | undefined {
-    if (storageKey) return this.getStorage(storageKey)?.get(key);
-    return this.defaultStorage?.get(key);
+  ): Promise<GetType | undefined> {
+    if (storageKey)
+      return (
+        this.getStorage(storageKey)?.asyncGet<GetType>(key) ||
+        Promise.resolve(undefined)
+      );
+    return (
+      this.defaultStorage?.asyncGet<GetType>(key) || Promise.resolve(undefined)
+    );
   }
 
   //=========================================================================================================

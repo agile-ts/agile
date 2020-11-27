@@ -15,8 +15,8 @@ import {
   notEqual,
 } from "../src";
 
-describe("Utils", () => {
-  describe("copy", () => {
+describe("Utils Tests", () => {
+  describe("copy function tests", () => {
     it("should copy Array without any reference", () => {
       const myArray = [1, 2, 3, 4, 5];
       const myCopiedArray = copy(myArray);
@@ -90,7 +90,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("isValidObject", () => {
+  describe("isValidObject function tests", () => {
     // Can't be Tested in not Web-Environment
     // it("should return false if passing HTML Element", () => {
     //   expect(isValidObject(HTMLElement)).toBe(false);
@@ -155,7 +155,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("isFunction", () => {
+  describe("isFunction function tests", () => {
     it("should return true if passing valid Function", () => {
       expect(isFunction(() => {})).toBe(true);
     });
@@ -168,7 +168,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("isAsyncFunction", () => {
+  describe("isAsyncFunction function tests", () => {
     it("should return true if passing valid async Function", () => {
       expect(isAsyncFunction(async () => {})).toBe(true);
       expect(isAsyncFunction(async function () {})).toBe(true);
@@ -184,7 +184,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("isValidUrl", () => {
+  describe("isValidUrl function tests", () => {
     it("should return true if passing valid Url", () => {
       expect(isValidUrl("https://www.google.com/")).toBe(true);
       expect(isValidUrl("www.google.com")).toBe(true);
@@ -203,7 +203,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("isJsonString", () => {
+  describe("isJsonString function tests", () => {
     it("should return true if passing valid Json String", () => {
       expect(isJsonString('{"name":"John", "age":31, "city":"New York"}')).toBe(
         true
@@ -220,7 +220,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("defineConfig", () => {
+  describe("defineConfig function tests", () => {
     it("should merge defaults into config", () => {
       const config = {
         allowLogging: true,
@@ -245,7 +245,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("flatMerge", () => {
+  describe("flatMerge function tests", () => {
     it("should merge changes into source", () => {
       const source = {
         id: 123,
@@ -332,7 +332,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("equal", () => {
+  describe("equal function tests", () => {
     it("should return true if value1 and value2 are equal", () => {
       expect(equal({ id: 123, name: "jeff" }, { id: 123, name: "jeff" })).toBe(
         true
@@ -352,7 +352,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("notEqual", () => {
+  describe("notEqual function tests", () => {
     it("should return false if value1 and value2 are equal", () => {
       expect(
         notEqual({ id: 123, name: "jeff" }, { id: 123, name: "jeff" })
@@ -372,7 +372,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("generateId", () => {
+  describe("generateId function tests", () => {
     it("should returned generated Id that matches the wished regex", () => {
       expect(generateId()).toMatch(/^[a-zA-Z0-9]*$/);
     });
@@ -385,7 +385,7 @@ describe("Utils", () => {
     });
   });
 
-  describe("clone", () => {
+  describe("clone function tests", () => {
     it("should clone Object/Class without any reference", () => {
       class DummyClass {
         constructor(

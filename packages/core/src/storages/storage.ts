@@ -8,7 +8,7 @@ import {
 
 export class Storage {
   public key: StorageKey;
-  public ready: boolean = false;
+  public ready = false;
   public methods: StorageMethodsInterface;
   public config: StorageConfigInterface;
 
@@ -74,13 +74,21 @@ export class Storage {
    */
   public get<GetType = any>(
     key: StorageItemKey
-  ): GetType | Promise<GetType> | undefined {
-    if (!this.ready || !this.methods.get) return;
-
-    // Async Get
+  ): GetType | undefined | Promise<GetType | undefined> {
     if (this.config.async) return this.asyncGet<GetType>(key);
+    return this.normalGet<GetType>(key);
+  }
 
-    // Normal Get
+  //=========================================================================================================
+  // Normal Get
+  //=========================================================================================================
+  /**
+   * @internal
+   * Gets value at provided Key (normal)
+   * @param key - Key of Storage property
+   */
+  public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
+    if (!this.ready || !this.methods.get) return;
     const res = this.methods.get(this.getStorageKey(key));
     if (isJsonString(res)) return JSON.parse(res);
     return res;
@@ -94,12 +102,15 @@ export class Storage {
    * Gets value at provided Key (async)
    * @param key - Key of Storage property
    */
-  private asyncGet<GetTpe = any>(key: StorageItemKey): Promise<GetTpe> {
+  public asyncGet<GetTpe = any>(
+    key: StorageItemKey
+  ): Promise<GetTpe | undefined> {
+    if (!this.ready || !this.methods.get) return Promise.resolve(undefined);
     return new Promise((resolve, reject) => {
       this.methods
         ?.get(this.getStorageKey(key))
         .then((res: any) => {
-          if (isJsonString(res)) return resolve(JSON.parse(res));
+          if (isJsonString(res)) resolve(JSON.parse(res));
           resolve(res);
         })
         .catch(reject);
@@ -142,7 +153,9 @@ export class Storage {
    * @param key - Key that gets converted into a Storage Key
    */
   private getStorageKey(key: StorageItemKey): string {
-    return `_${this.config.prefix}_${key}`;
+    return this.config.prefix
+      ? `_${this.config.prefix}_${key}`
+      : key.toString();
   }
 }
 
