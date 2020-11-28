@@ -681,14 +681,12 @@ export class Collection<DataType = DefaultItem> {
 
     _config = defineConfig(_config, {
       instantiate: true,
-      storageKeys: undefined,
     });
 
-    // Update Persistent Key
     if (this.persistent) {
-      this.persistent.storageKeys = config.storageKeys;
-      if (key) this.persistent.setKey(key);
-      return this;
+      Agile.logger.warn(
+        "By persisting a Collection twice you overwrite the old Persistent Instance!"
+      );
     }
 
     // Create persistent -> Persist Value
@@ -811,7 +809,9 @@ export class Collection<DataType = DefaultItem> {
     item.key = newItemKey;
 
     // Update persist Key of Item (Doesn't get changed by setting new item key because PersistKey is not ItemKey)
-    item.persist(CollectionPersistent.getItemStorageKey(newItemKey, this.key));
+    item.persistent?.setKey(
+      CollectionPersistent.getItemStorageKey(newItemKey, this.key)
+    );
 
     // Update Groups
     for (let groupName in this.groups) {

@@ -33,7 +33,12 @@ export class Agile {
   public integrations: Integrations; // Integrated frameworks
   static initialIntegrations: Integration[] = []; // External added Integrations
 
-  static logger = new Logger();
+  // Static Logger with default config -> will be overwritten by config of created Agile Instance
+  static logger = new Logger({
+    prefix: "Agile",
+    active: false,
+    level: 0,
+  });
 
   /**
    * @public
@@ -59,6 +64,7 @@ export class Agile {
       localStorage: this.config.localStorage,
     });
 
+    // Assign customized config to Logger
     Agile.logger = new Logger(this.config.logConfig);
 
     // Create global instance of Agile

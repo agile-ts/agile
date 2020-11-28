@@ -121,13 +121,8 @@ export class State<ValueType = any> {
     // Update Key in Observer
     this.observer.key = value;
 
-    // Update Key in PersistManager
-    if (
-      value !== undefined &&
-      this.persistent &&
-      this.persistent.key === oldKey
-    )
-      this.persistent.key = value;
+    // Update Key in PersistManager (only if the Keys are the same -> otherwise the PersistKey got formatted and will be set where other)
+    if (this.persistent?.key === oldKey) this.persistent?.setKey(value);
   }
 
   //=========================================================================================================
@@ -402,14 +397,12 @@ export class State<ValueType = any> {
 
     _config = defineConfig(_config, {
       instantiate: true,
-      storageKeys: undefined,
     });
 
-    // Update Persistent Key
     if (this.persistent) {
-      this.persistent.storageKeys = config.storageKeys;
-      if (key) this.persistent.setKey(key);
-      return this;
+      Agile.logger.warn(
+        "By persisting a State twice you overwrite the old Persistent Instance!"
+      );
     }
 
     // Create persistent -> Persist Value

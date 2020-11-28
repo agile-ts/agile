@@ -1,4 +1,10 @@
-import { defineConfig, Persistent, State, StorageKey } from "../internal";
+import {
+  defineConfig,
+  Persistent,
+  PersistentKey,
+  State,
+  StorageKey,
+} from "../internal";
 
 export class StatePersistent<ValueType = any> extends Persistent {
   public state: () => State;
@@ -15,15 +21,21 @@ export class StatePersistent<ValueType = any> extends Persistent {
     key?: StorageKey,
     config: StatePersistentConfigInterface = {}
   ) {
-    super(state.agileInstance(), config.storageKeys);
+    super(state.agileInstance());
     config = defineConfig(config, {
       instantiate: true,
     });
     this.state = () => state;
-    this.storageKeys = config.storageKeys;
-    if (config?.instantiate)
-      this.instantiatePersistent(key).then((success) => {
-        this.state().isPersisted = success;
+
+    this.instantiatePersistent({
+      key: key,
+      storageKeys: config.storageKeys,
+    });
+
+    // Load/Store persisted Value/s for the first Time
+    if (this.ready && config.instantiate)
+      this.initialLoading().then(() => {
+        this.state().isPersisted = true;
       });
   }
 
@@ -31,30 +43,33 @@ export class StatePersistent<ValueType = any> extends Persistent {
   // Set Key
   //=========================================================================================================
   /**
-   * @public
+   * @internal
    * Sets Key/Name of Persistent
    * @param value - New Key/Name of Persistent
    */
-  public async setKey(value: StorageKey) {
-    // If persistent isn't ready try to init it with the new Key
-    if (!this.ready) {
-      this.instantiatePersistent(value).then((success) => {
-        this.state().isPersisted = success;
+  public async setKey(value?: StorageKey): Promise<void> {
+    const oldKey = this._key;
+    const wasReady = this.ready;
+
+    // Assign Key
+    if (value === this._key) return;
+    this._key = value || Persistent.placeHolderKey;
+
+    const isValid = this.validatePersistent();
+
+    // Try to Initial Load Value if persistent wasn't ready
+    if (!wasReady && isValid) {
+      this.initialLoading().then(() => {
+        this.state().isPersisted = true;
       });
       return;
     }
 
-    // Check if key has changed
-    if (value === this._key) return;
+    // Remove value at old Key
+    await this.removeValue(oldKey);
 
-    // Remove value with old Key
-    await this.removeValue();
-
-    // Update Key
-    this._key = value;
-
-    // Set value with new Key
-    await this.updateValue();
+    // Assign Value to new Key
+    if (isValid) await this.updateValue(value);
   }
 
   //=========================================================================================================
@@ -63,18 +78,24 @@ export class StatePersistent<ValueType = any> extends Persistent {
   /**
    * @internal
    * Loads Value from Storage
-   * @return Success?
+   * @return Value got loaded
    */
-  public async loadValue(): Promise<boolean> {
+  public async loadValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
+    const _key = key || this.key;
+
+    // Load Value from default Storage
     const loadedValue = await this.agileInstance().storages.get<ValueType>(
-      this._key,
-      this.storageKeys && this.storageKeys[0]
+      _key,
+      this.defaultStorageKey
     );
+
+    // If Storage Value found assign it to the State
     if (loadedValue) {
       this.state().set(loadedValue, { storage: false });
       return true;
     }
+
     return false;
   }
 
@@ -86,13 +107,17 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * Saves/Updates Value in Storage
    * @return Success?
    */
-  public async updateValue(): Promise<boolean> {
+  public async updateValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
+    const _key = key || this.key;
+
+    // Update/Create Value in Storage
     this.agileInstance().storages.set(
-      this.key,
+      _key,
       this.state().getPersistableValue(),
       this.storageKeys
     );
+
     this.isPersisted = true;
     return true;
   }
@@ -105,29 +130,32 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * Removes Value form Storage
    * @return Success?
    */
-  public async removeValue(): Promise<boolean> {
+  public async removeValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    this.agileInstance().storages.remove(this.key, this.storageKeys);
+    const _key = key || this.key;
+
+    // Remove Value from Storage
+    this.agileInstance().storages.remove(_key, this.storageKeys);
+
     this.isPersisted = false;
     return true;
   }
 
   //=========================================================================================================
-  // Validate Key
+  // Format Key
   //=========================================================================================================
   /**
    * @internal
-   * Validates Storage Key
-   * @param key - Key that gets validated
+   * Formats Storage Key
+   * @param key - Key that gets formatted
    */
-  public validateKey(key?: StorageKey): StorageKey | null {
+  public formatKey(key?: StorageKey): StorageKey | undefined {
     const state = this.state();
 
     // Get key from State
     if (!key && state.key) return state.key;
 
-    // Return null if no key found
-    if (!key) return null;
+    if (!key) return;
 
     // Set State Key to Storage Key if State has no key
     if (!state.key) state.key = key;

@@ -3,21 +3,23 @@ import { Agile, StorageKey } from "../internal";
 export class Persistent<ValueType = any> {
   public agileInstance: () => Agile;
 
-  public _key: StorageKey = "unknown";
+  public static placeHolderKey = "__THIS_IS_A_PLACEHOLDER__";
+
+  public _key: PersistentKey;
   public ready: boolean = false;
   public isPersisted: boolean = false; // If Value is stored in Agile Storage
   public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
-  public storageKeys?: StorageKey[]; // StorageKeys in which the Persist Value gets saved
+  public storageKeys: StorageKey[] = []; // StorageKeys of Storages in that the Persisted Value gets saved
+  public defaultStorageKey: StorageKey | undefined;
 
   /**
    * @internal
    * Persistent - Handles storing of Agile Instances
    * @param agileInstance - An instance of Agile
-   * @param storageKeys - Key/Name of Storages in which the Persist Value gets saved
    */
-  constructor(agileInstance: Agile, storageKeys?: StorageKey[]) {
+  constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
-    this.storageKeys = storageKeys;
+    this._key = Persistent.placeHolderKey;
   }
 
   /**
@@ -49,30 +51,73 @@ export class Persistent<ValueType = any> {
   }
 
   //=========================================================================================================
-  // Init Persistent
+  // Instantiate Persistent
   //=========================================================================================================
   /**
    * @internal
-   * Inits Persistent (this class)
-   * -> Sometimes this class needs to be instantiated after some properties have been set in extended class
-   * @param key - Key of Storage property
+   * Instantiates this Class
+   * Note: Had to outsource it from the constructor because some extending classes
+   * have to define some stuff before being able to instantiate the parent (this)
    */
-  public async instantiatePersistent(key?: StorageKey): Promise<boolean> {
+  public instantiatePersistent(config: PersistentConfigInterface = {}) {
+    this._key = this.formatKey(config.key) || Persistent.placeHolderKey;
+    this.assignStorageKeys(config.storageKeys);
+    this.validatePersistent();
+    this.agileInstance().storages.persistentInstances.add(this);
+  }
+
+  //=========================================================================================================
+  // Validate Persistent
+  //=========================================================================================================
+  /**
+   * @internal
+   * Validates Persistent and updates its 'ready' property
+   */
+  public validatePersistent(): boolean {
     // Validate Key
-    const finalKey = this.validateKey(key);
-    if (!finalKey) {
-      Agile.logger.error("No persist Key found!");
+    if (this._key === Persistent.placeHolderKey) {
+      Agile.logger.error(
+        "No valid persist Key found! Please provide a Key or assign one to the parent instance."
+      );
       return false;
     }
-    this._key = finalKey;
 
-    this.agileInstance().storages.persistentInstances.add(this);
+    // Validate StorageKeys
+    if (!this.defaultStorageKey || this.storageKeys.length <= 0) {
+      Agile.logger.error(
+        "No persist Storage Key found! Please provide at least one Storage Key."
+      );
+      return false;
+    }
+
     this.ready = true;
-
-    // Load/Store persisted Value/s for the first Time
-    await this.initialLoading(finalKey);
-
     return true;
+  }
+
+  //=========================================================================================================
+  // Assign StorageKeys
+  //=========================================================================================================
+  /**
+   * @internal
+   * Assign StorageKeys to Persistent and overwrite the old ones
+   * @param storageKeys - New Storage Keys
+   */
+  private assignStorageKeys(storageKeys?: StorageKey[]) {
+    const storages = this.agileInstance().storages;
+
+    // Set default Agile Storage to defaultStorage if no storageKey provided
+    if (!storageKeys) {
+      this.storageKeys = [];
+      if (storages.defaultStorage) {
+        const key = storages.defaultStorage.key;
+        this.defaultStorageKey = key;
+        this.storageKeys.push(key);
+      }
+      return;
+    }
+
+    this.storageKeys = storageKeys;
+    this.defaultStorageKey = storageKeys[0];
   }
 
   //=========================================================================================================
@@ -81,9 +126,8 @@ export class Persistent<ValueType = any> {
   /**
    * @internal
    * Loads/Saves Storage Value for the first Time
-   * @param key -  Key of Storage property
    */
-  public async initialLoading(key: StorageKey) {
+  public async initialLoading() {
     const success = await this.loadValue();
     if (this.onLoad) this.onLoad(success);
     if (!success) await this.updateValue();
@@ -97,7 +141,7 @@ export class Persistent<ValueType = any> {
    * Loads Value from Storage
    * @return Success?
    */
-  public async loadValue(): Promise<boolean> {
+  public async loadValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
       `Didn't set loadValue function in Persistent '${this.key}'`
     );
@@ -112,7 +156,7 @@ export class Persistent<ValueType = any> {
    * Saves/Updates Value in Storage
    * @return Success?
    */
-  public async updateValue(): Promise<boolean> {
+  public async updateValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
       `Didn't set setValue function in Persistent '${this.key}'`
     );
@@ -127,7 +171,7 @@ export class Persistent<ValueType = any> {
    * Removes Value form Storage
    * @return Success?
    */
-  public async removeValue(): Promise<boolean> {
+  public async removeValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
       `Didn't set removeValue function in Persistent '${this.key}'`
     );
@@ -142,10 +186,21 @@ export class Persistent<ValueType = any> {
    * Validates Storage Key
    * @param key - Key that gets validated
    */
-  public validateKey(key?: StorageKey): StorageKey | null {
+  public formatKey(key?: StorageKey): PersistentKey | undefined {
     Agile.logger.error(
       `Didn't set validateKey function in Persistent '${this.key}'`
     );
-    return null;
+    return;
   }
+}
+
+export type PersistentKey = string | number;
+
+/**
+ * key - Key/Name of Persistent
+ * storageKeys - Keys of Storages in that the persisted Value gets saved
+ */
+export interface PersistentConfigInterface {
+  key?: PersistentKey;
+  storageKeys?: StorageKey[];
 }

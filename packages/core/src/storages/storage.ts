@@ -65,30 +65,22 @@ export class Storage {
   }
 
   //=========================================================================================================
-  // Get
-  //=========================================================================================================
-  /**
-   * @public
-   * Gets value at provided Key
-   * @param key - Key of Storage property
-   */
-  public get<GetType = any>(
-    key: StorageItemKey
-  ): GetType | undefined | Promise<GetType | undefined> {
-    if (this.config.async) return this.asyncGet<GetType>(key);
-    return this.normalGet<GetType>(key);
-  }
-
-  //=========================================================================================================
   // Normal Get
   //=========================================================================================================
   /**
    * @internal
    * Gets value at provided Key (normal)
+   * Note: Only use this if you are 100% sure this Storage doesn't work async
    * @param key - Key of Storage property
    */
   public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
     if (!this.ready || !this.methods.get) return;
+    if (isAsyncFunction(this.methods.get))
+      Agile.logger.warn(
+        "Be aware that 'normalGet' does return a plain Promise if using it in an async Storage!"
+      );
+
+    // Get Value
     const res = this.methods.get(this.getStorageKey(key));
     if (isJsonString(res)) return JSON.parse(res);
     return res;
@@ -102,10 +94,14 @@ export class Storage {
    * Gets value at provided Key (async)
    * @param key - Key of Storage property
    */
-  public asyncGet<GetTpe = any>(
-    key: StorageItemKey
-  ): Promise<GetTpe | undefined> {
+  public get<GetTpe = any>(key: StorageItemKey): Promise<GetTpe | undefined> {
     if (!this.ready || !this.methods.get) return Promise.resolve(undefined);
+
+    // Get Value in 'dummy' promise if get method isn't async
+    if (!isAsyncFunction(this.methods.get))
+      return Promise.resolve(this.normalGet(key));
+
+    // Get Value (async)
     return new Promise((resolve, reject) => {
       this.methods
         ?.get(this.getStorageKey(key))

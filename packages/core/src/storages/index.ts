@@ -23,7 +23,7 @@ export class Storages {
    */
   constructor(agileInstance: Agile, config: StoragesConfigInterface = {}) {
     config = defineConfig(config, {
-      localStorage: true,
+      localStorage: false,
     });
     this.agileInstance = () => agileInstance;
     if (config.localStorage) this.instantiateLocalStorage();
@@ -87,16 +87,12 @@ export class Storages {
 
     // Register Storage
     this.storages[storage.key] = storage;
-    storage.ready = true;
     if (config.default) this.defaultStorage = storage;
 
     // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
-      if (
-        persistent.storageKeys &&
-        persistent.storageKeys.includes(storage.key)
-      )
-        persistent.initialLoading(persistent.key);
+      if (persistent.storageKeys.includes(storage.key))
+        persistent.initialLoading();
     });
 
     return true;
@@ -143,12 +139,10 @@ export class Storages {
   ): Promise<GetType | undefined> {
     if (storageKey)
       return (
-        this.getStorage(storageKey)?.asyncGet<GetType>(key) ||
+        this.getStorage(storageKey)?.get<GetType>(key) ||
         Promise.resolve(undefined)
       );
-    return (
-      this.defaultStorage?.asyncGet<GetType>(key) || Promise.resolve(undefined)
-    );
+    return this.defaultStorage?.get<GetType>(key) || Promise.resolve(undefined);
   }
 
   //=========================================================================================================

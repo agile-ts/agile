@@ -83,18 +83,6 @@ describe("Storage Tests", () => {
       });
     });
 
-    it("has created Storage Class", () => {
-      expect(storage.key).toBe("customStorage");
-      expect(storage.ready).toBe(true);
-      expect(storage.config).toStrictEqual({
-        async: false,
-        prefix: "agile",
-      });
-      expect(storage).toHaveProperty("remove");
-      expect(storage).toHaveProperty("get");
-      expect(storage).toHaveProperty("set");
-    });
-
     describe("set function tests", () => {
       it("should add Value to Storage", () => {
         storage.set("myTestKey", "hello there");
@@ -201,18 +189,6 @@ describe("Storage Tests", () => {
           },
         },
       });
-    });
-
-    it("has created Storage Class", () => {
-      expect(storage.key).toBe("customStorage");
-      expect(storage.ready).toBe(true);
-      expect(storage.config).toStrictEqual({
-        async: true,
-        prefix: "agile",
-      });
-      expect(storage).toHaveProperty("remove");
-      expect(storage).toHaveProperty("get");
-      expect(storage).toHaveProperty("set");
     });
 
     describe("get function tests", () => {
