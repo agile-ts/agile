@@ -1,7 +1,7 @@
 import { Storage } from "../../../src";
 
 describe("Storage Tests", () => {
-  it("should create Storage with default Settings", () => {
+  it("should create normal Storage with default Settings and normal Storage Methods", () => {
     const storage = new Storage({
       key: "customStorage",
       methods: {
@@ -21,7 +21,7 @@ describe("Storage Tests", () => {
     expect(storage).toHaveProperty("set");
   });
 
-  it("should create Storage with config.async = true and config.prefix = 'test' Settings", () => {
+  it("should create async Storage with config.async = true and config.prefix = 'test' Settings and normal Storage Methods", () => {
     const storage = new Storage({
       key: "customStorage",
       methods: {
@@ -43,7 +43,7 @@ describe("Storage Tests", () => {
     expect(storage).toHaveProperty("set");
   });
 
-  it("should create async Storage with default Settings", () => {
+  it("should create async Storage with default Settings and async Storage Methods", () => {
     const storage = new Storage({
       key: "customStorage",
       methods: {
@@ -112,7 +112,13 @@ describe("Storage Tests", () => {
         });
       });
 
-      it("should get existing Value from Storage", () => {
+      it("should get existing Value from Storage with 'get' method", () => {
+        return storage.get("myTestKey").then((value) => {
+          expect(value).toBe("hello there");
+        });
+      });
+
+      it("should get existing Value from Storage with 'normalGet' method without any warnings", () => {
         const myStorageValue = storage.normalGet("myTestKey");
 
         expect(myStorageValue).toBe("hello there");
@@ -202,21 +208,32 @@ describe("Storage Tests", () => {
         });
       });
 
-      it("should get existing Value from Storage", () => {
-        return storage.asyncGet("myTestKey").then((value) => {
+      it("should get existing Value from Storage with 'get' method", () => {
+        return storage.get("myTestKey").then((value) => {
           expect(value).toBe("hello there");
         });
       });
 
+      it("should get existing Value stringified from Storage with 'normalGet' method and a warning", () => {
+        console.warn = jest.fn();
+
+        return storage.normalGet("myTestKey").then((value) => {
+          expect(value).toBe(JSON.stringify("hello there"));
+          expect(console.warn).toHaveBeenCalledWith(
+            "Agile Warn: Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
+          );
+        });
+      });
+
       it("shouldn't get not existing Value from Storage", () => {
-        return storage.asyncGet("myNotExistingKey").then((value) => {
+        return storage.get("myNotExistingKey").then((value) => {
           expect(value).toBeUndefined();
         });
       });
 
       it("shouldn't get existing Value from not ready Storage", () => {
         storage.ready = false;
-        return storage.asyncGet("myTestKey").then((value) => {
+        return storage.get("myTestKey").then((value) => {
           expect(value).toBeUndefined();
         });
       });

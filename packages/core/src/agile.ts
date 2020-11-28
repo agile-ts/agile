@@ -36,8 +36,8 @@ export class Agile {
   // Static Logger with default config -> will be overwritten by config of created Agile Instance
   static logger = new Logger({
     prefix: "Agile",
-    active: false,
-    level: 0,
+    active: true,
+    level: Logger.level.WARN,
   });
 
   /**
@@ -52,8 +52,8 @@ export class Agile {
     });
     this.config.logConfig = defineConfig(config.logConfig, {
       prefix: "Agile",
-      active: false,
-      level: 0,
+      active: true,
+      level: Logger.level.WARN,
       canUseCustomStyles: true,
       allowedTags: ["runtime", "storage", "subscription", "multieditor"],
     });

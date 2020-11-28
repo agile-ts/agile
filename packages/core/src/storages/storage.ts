@@ -77,7 +77,7 @@ export class Storage {
     if (!this.ready || !this.methods.get) return;
     if (isAsyncFunction(this.methods.get))
       Agile.logger.warn(
-        "Be aware that 'normalGet' does return a plain Promise if using it in an async Storage!"
+        "Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
       );
 
     // Get Value
