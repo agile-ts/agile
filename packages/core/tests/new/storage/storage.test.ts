@@ -1,4 +1,4 @@
-import { Storage } from "../src";
+import { Storage } from "../../../src";
 
 describe("Storage Tests", () => {
   it("should create Storage with default Settings", () => {

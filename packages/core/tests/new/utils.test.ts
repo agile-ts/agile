@@ -13,7 +13,7 @@ import {
   isValidUrl,
   normalizeArray,
   notEqual,
-} from "../src";
+} from "../../src";
 
 describe("Utils Tests", () => {
   describe("copy function tests", () => {
