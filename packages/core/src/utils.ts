@@ -1,5 +1,4 @@
 import { State, Agile, Event, Collection, Observer } from "./internal";
-import _ from "lodash";
 
 //=========================================================================================================
 // Copy
@@ -295,9 +294,14 @@ export function generateId(length?: number): string {
  * @param instance - Instance of Class you want to clone
  */
 export function clone<T = any>(instance: T): T {
-  // const copy: T = Object.create(Object.getPrototypeOf(instance));
-  // return Object.assign(copy, instance);
-  return _.cloneDeep(instance);
+  // Clone Class
+  const objectCopy: T = Object.create(Object.getPrototypeOf(instance));
+  const objectClone = Object.assign(objectCopy, instance);
+
+  // Copy Properties of Class
+  for (let key in objectClone) objectClone[key] = copy(objectClone[key]);
+
+  return objectClone;
 }
 
 //=========================================================================================================
