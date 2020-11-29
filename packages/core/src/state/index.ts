@@ -12,7 +12,6 @@ import {
   isFunction,
   notEqual,
   generateId,
-  StatePersistentConfigInterface,
   JobConfigInterface,
 } from "../internal";
 
@@ -406,9 +405,10 @@ export class State<ValueType = any> {
     }
 
     // Create persistent -> Persist Value
-    this.persistent = new StatePersistent<ValueType>(this, key, {
+    this.persistent = new StatePersistent<ValueType>(this, {
       instantiate: _config.instantiate,
       storageKeys: _config.storageKeys,
+      key: key,
     });
 
     return this;
@@ -620,6 +620,15 @@ export interface SetConfigInterface {
 export interface PatchConfigInterface {
   addNewProperties?: boolean;
   background?: boolean;
+}
+
+/**
+ * @param instantiate - If Persistent gets instantiated
+ * @param storageKeys - Key/Name of Storages which gets used to persist the State Value (NOTE: If not passed the default Storage will be used)
+ */
+export interface StatePersistentConfigInterface {
+  instantiate?: boolean;
+  storageKeys?: StorageKey[];
 }
 
 export type StateWatcherCallback<T = any> = (value: T) => void;

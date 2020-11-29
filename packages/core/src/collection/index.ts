@@ -14,7 +14,6 @@ import {
   copy,
   CollectionPersistent,
   GroupAddConfig,
-  CollectionPersistentConfigInterface,
 } from "../internal";
 
 export class Collection<DataType = DefaultItem> {
@@ -690,9 +689,10 @@ export class Collection<DataType = DefaultItem> {
     }
 
     // Create persistent -> Persist Value
-    this.persistent = new CollectionPersistent<DataType>(this, key, {
+    this.persistent = new CollectionPersistent<DataType>(this, {
       instantiate: _config.instantiate,
       storageKeys: _config.storageKeys,
+      key: key,
     });
 
     return this;
@@ -1076,6 +1076,15 @@ export interface GetGroupConfigInterface {
  */
 export interface GetSelectorConfigInterface {
   notExisting?: boolean;
+}
+
+/**
+ * @param instantiate - If Persistent gets instantiated
+ * @param storageKeys - Key/Name of Storages which gets used to persist the Collection Value (NOTE: If not passed the default Storage will be used)
+ */
+export interface CollectionPersistentConfigInterface {
+  instantiate?: boolean;
+  storageKeys?: StorageKey[];
 }
 
 export type CollectionConfig<DataType = DefaultItem> =

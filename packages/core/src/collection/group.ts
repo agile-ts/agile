@@ -9,9 +9,9 @@ import {
   Item,
   StorageKey,
   copy,
-  StatePersistentConfigInterface,
   CollectionPersistent,
   isValidObject,
+  StatePersistentConfigInterface,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -232,7 +232,11 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       );
     }
 
-    super.persist(key, { instantiate: _config.instantiate });
+    super.persist(key, {
+      instantiate: _config.instantiate,
+      storageKeys: _config.storageKeys,
+    });
+
     return this;
   }
 

@@ -7,6 +7,7 @@ import {
   GroupKey,
   ItemKey,
   Persistent,
+  PersistentConfigInterface,
   PersistentKey,
   StorageKey,
 } from "../internal";
@@ -22,30 +23,23 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    * @internal
    * Collection Persist Manager - Handles permanent storing of Collection Value
    * @param collection - Collection that gets stored
-   * @param key - Key of Storage property
    * @param config - Config
    */
   constructor(
     collection: Collection<DataType>,
-    key?: StorageKey,
-    config: CollectionPersistentConfigInterface = {}
+    config: PersistentConfigInterface = {}
   ) {
-    super(collection.agileInstance());
+    super(collection.agileInstance(), {
+      instantiate: false,
+    });
     config = defineConfig(config, {
       instantiate: true,
     });
     this.collection = () => collection;
-
-    this.instantiatePersistent({
-      key: key,
-      storageKeys: config.storageKeys,
-    });
+    this.instantiatePersistent(config);
 
     // Load/Store persisted Value/s for the first Time
-    if (this.ready && config.instantiate)
-      this.initialLoading().then(() => {
-        this.collection().isPersisted = true;
-      });
+    if (this.ready && config.instantiate) this.initialLoading();
   }
 
   //=========================================================================================================
@@ -68,9 +62,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Try to Initial Load Value if persistent wasn't ready
     if (!wasReady && isValid) {
-      this.initialLoading().then(() => {
-        this.collection().isPersisted = true;
-      });
+      this.initialLoading();
       return;
     }
 
@@ -79,6 +71,19 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Assign Value to new Key
     if (isValid) await this.updateValue(value);
+  }
+
+  //=========================================================================================================
+  // Initial Loading
+  //=========================================================================================================
+  /**
+   * @internal
+   * Loads/Saves Storage Value for the first Time
+   */
+  public async initialLoading() {
+    super.initialLoading().then(() => {
+      this.collection().isPersisted = true;
+    });
   }
 
   //=========================================================================================================
@@ -349,13 +354,4 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       .replace("${collectionKey}", collectionKey.toString())
       .replace("${groupKey}", groupKey.toString());
   }
-}
-
-/**
- * @param instantiate - If Persistent gets instantiated
- * @param storageKeys - Key/Name of Storages which gets used to persist the Collection Value (NOTE: If not passed the default Storage will be used)
- */
-export interface CollectionPersistentConfigInterface {
-  instantiate?: boolean;
-  storageKeys?: StorageKey[];
 }

@@ -1,6 +1,7 @@
 import {
   defineConfig,
   Persistent,
+  PersistentConfigInterface,
   PersistentKey,
   State,
   StorageKey,
@@ -13,30 +14,20 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @internal
    * State Persist Manager - Handles permanent storing of State Value
    * @param state - State that gets stored
-   * @param key - Key of Storage property
    * @param config - Config
    */
-  constructor(
-    state: State<ValueType>,
-    key?: StorageKey,
-    config: StatePersistentConfigInterface = {}
-  ) {
-    super(state.agileInstance());
+  constructor(state: State<ValueType>, config: PersistentConfigInterface = {}) {
+    super(state.agileInstance(), {
+      instantiate: false,
+    });
     config = defineConfig(config, {
       instantiate: true,
     });
     this.state = () => state;
-
-    this.instantiatePersistent({
-      key: key,
-      storageKeys: config.storageKeys,
-    });
+    this.instantiatePersistent(config);
 
     // Load/Store persisted Value/s for the first Time
-    if (this.ready && config.instantiate)
-      this.initialLoading().then(() => {
-        this.state().isPersisted = true;
-      });
+    if (this.ready && config.instantiate) this.initialLoading();
   }
 
   //=========================================================================================================
@@ -59,9 +50,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     // Try to Initial Load Value if persistent wasn't ready
     if (!wasReady && isValid) {
-      this.initialLoading().then(() => {
-        this.state().isPersisted = true;
-      });
+      this.initialLoading();
       return;
     }
 
@@ -70,6 +59,19 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     // Assign Value to new Key
     if (isValid) await this.updateValue(value);
+  }
+
+  //=========================================================================================================
+  // Initial Loading
+  //=========================================================================================================
+  /**
+   * @internal
+   * Loads/Saves Storage Value for the first Time
+   */
+  public async initialLoading() {
+    super.initialLoading().then(() => {
+      this.state().isPersisted = true;
+    });
   }
 
   //=========================================================================================================
@@ -162,13 +164,4 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     return key;
   }
-}
-
-/**
- * @param instantiate - If Persistent gets instantiated
- * @param storageKeys - Key/Name of Storages which gets used to persist the State Value (NOTE: If not passed the default Storage will be used)
- */
-export interface StatePersistentConfigInterface {
-  instantiate?: boolean;
-  storageKeys?: StorageKey[];
 }

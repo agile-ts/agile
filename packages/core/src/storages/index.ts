@@ -22,10 +22,10 @@ export class Storages {
    * @param config - Config
    */
   constructor(agileInstance: Agile, config: StoragesConfigInterface = {}) {
+    this.agileInstance = () => agileInstance;
     config = defineConfig(config, {
       localStorage: false,
     });
-    this.agileInstance = () => agileInstance;
     if (config.localStorage) this.instantiateLocalStorage();
   }
 
@@ -36,13 +36,13 @@ export class Storages {
    * @internal
    * Instantiates Local Storage
    */
-  private instantiateLocalStorage() {
+  private instantiateLocalStorage(): boolean {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
       Agile.logger.warn(
         "Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
       );
-      return;
+      return false;
     }
 
     // Create and register Local Storage
@@ -55,7 +55,7 @@ export class Storages {
         remove: localStorage.removeItem.bind(localStorage),
       },
     });
-    this.register(_localStorage, { default: true });
+    return this.register(_localStorage, { default: true });
   }
 
   //=========================================================================================================
@@ -71,28 +71,40 @@ export class Storages {
     storage: Storage,
     config: RegisterConfigInterface = {}
   ): boolean {
-    const hasRegisteredStorage = notEqual(this.storages, {});
+    const hasRegisteredAnyStorage = notEqual(this.storages, {});
 
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
       Agile.logger.error(
-        `Storage with the key/name ${storage.key} already exists`
+        `Storage with the key/name '${storage.key}' already exists`
       );
       return false;
     }
 
-    // Set first added Storage to default (if it isn't set)
-    if (!hasRegisteredStorage && config.default === undefined)
-      config.default = true;
+    // Set first added Storage as default Storage
+    if (!hasRegisteredAnyStorage && config.default === false) {
+      Agile.logger.warn(
+        "Be aware that Agile has to assign the first added Storage as default Storage!"
+      );
+    }
+    if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
     this.storages[storage.key] = storage;
     if (config.default) this.defaultStorage = storage;
 
-    // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
+      // If Persistent isn't ready and has no default StorageKey.. reassignStorageKeys and try to load it
+      if (!persistent.ready && !persistent.defaultStorageKey) {
+        persistent.assignStorageKeys();
+        const isValid = persistent.validatePersistent();
+        if (isValid) persistent.initialLoading();
+        return;
+      }
+
+      // Add Value to newly registered StorageKey
       if (persistent.storageKeys.includes(storage.key))
-        persistent.initialLoading();
+        persistent.updateValue();
     });
 
     return true;

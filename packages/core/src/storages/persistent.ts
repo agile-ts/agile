@@ -1,25 +1,35 @@
-import { Agile, StorageKey } from "../internal";
+import { Agile, defineConfig, StorageKey } from "../internal";
 
 export class Persistent<ValueType = any> {
   public agileInstance: () => Agile;
 
   public static placeHolderKey = "__THIS_IS_A_PLACEHOLDER__";
 
+  public config: PersistentConfigInterface;
+
   public _key: PersistentKey;
   public ready: boolean = false;
   public isPersisted: boolean = false; // If Value is stored in Agile Storage
   public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
-  public storageKeys: StorageKey[] = []; // StorageKeys of Storages in that the Persisted Value gets saved
+
+  // StorageKeys of Storages in that the Persisted Value gets saved
+  public storageKeys: StorageKey[] = [];
   public defaultStorageKey: StorageKey | undefined;
 
   /**
    * @internal
    * Persistent - Handles storing of Agile Instances
    * @param agileInstance - An instance of Agile
+   * @param config - Config
    */
-  constructor(agileInstance: Agile) {
+  constructor(agileInstance: Agile, config: PersistentConfigInterface = {}) {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
+    this.config = defineConfig(config, {
+      instantiate: true,
+    });
+    this.agileInstance().storages.persistentInstances.add(this);
+    if (this.config.instantiate) this.instantiatePersistent(config);
   }
 
   /**
@@ -58,12 +68,13 @@ export class Persistent<ValueType = any> {
    * Instantiates this Class
    * Note: Had to outsource it from the constructor because some extending classes
    * have to define some stuff before being able to instantiate the parent (this)
+   * @param config - Config
    */
   public instantiatePersistent(config: PersistentConfigInterface = {}) {
-    this._key = this.formatKey(config.key) || Persistent.placeHolderKey;
-    this.assignStorageKeys(config.storageKeys);
+    if (config) this.config = config;
+    this._key = this.formatKey(this.config.key) || Persistent.placeHolderKey;
+    this.assignStorageKeys(this.config.storageKeys);
     this.validatePersistent();
-    this.agileInstance().storages.persistentInstances.add(this);
   }
 
   //=========================================================================================================
@@ -99,10 +110,10 @@ export class Persistent<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Assign StorageKeys to Persistent and overwrite the old ones
+   * Assign new StorageKeys to Persistent and overwrite the old ones
    * @param storageKeys - New Storage Keys
    */
-  private assignStorageKeys(storageKeys?: StorageKey[]) {
+  public assignStorageKeys(storageKeys?: StorageKey[]) {
     const storages = this.agileInstance().storages;
 
     // Set default Agile Storage to defaultStorage if no storageKey provided
@@ -197,10 +208,12 @@ export class Persistent<ValueType = any> {
 export type PersistentKey = string | number;
 
 /**
- * key - Key/Name of Persistent
- * storageKeys - Keys of Storages in that the persisted Value gets saved
+ * @param key - Key/Name of Persistent
+ * @param storageKeys - Keys of Storages in that the persisted Value gets saved
+ * @param instantiate - If Persistent gets Instantiated immediately
  */
 export interface PersistentConfigInterface {
   key?: PersistentKey;
   storageKeys?: StorageKey[];
+  instantiate?: boolean;
 }
