@@ -149,11 +149,18 @@ export class Storages {
     key: StorageItemKey,
     storageKey?: StorageKey
   ): Promise<GetType | undefined> {
-    if (storageKey)
-      return (
-        this.getStorage(storageKey)?.get<GetType>(key) ||
-        Promise.resolve(undefined)
-      );
+    if (!this.hasStorage()) {
+      Agile.logger.error("No Storage found!");
+      return Promise.resolve(undefined);
+    }
+
+    // Call get Method in specific Storage
+    if (storageKey) {
+      const storage = this.getStorage(storageKey);
+      if (storage) return storage.get<GetType>(key);
+    }
+
+    // Call get Method in default Storage
     return this.defaultStorage?.get<GetType>(key) || Promise.resolve(undefined);
   }
 
@@ -172,11 +179,19 @@ export class Storages {
     value: any,
     storageKeys?: StorageKey[]
   ): void {
+    if (!this.hasStorage()) {
+      Agile.logger.error("No Storage found!");
+      return;
+    }
+
+    // Call set Method in specific Storages
     if (storageKeys) {
       for (let storageKey of storageKeys)
         this.getStorage(storageKey)?.set(key, value);
       return;
     }
+
+    // Call set Method in default Storage
     this.defaultStorage?.set(key, value);
   }
 
@@ -190,12 +205,31 @@ export class Storages {
    * @param storageKeys - Key/Name of Storages where the Value gets removed (if not provided default Storage will be used)
    */
   public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
+    if (!this.hasStorage()) {
+      Agile.logger.error("No Storage found!");
+      return;
+    }
+
+    // Call remove Method in specific Storages
     if (storageKeys) {
       for (let storageKey of storageKeys)
         this.getStorage(storageKey)?.remove(key);
       return;
     }
+
+    // Call remove Method in default Storage
     this.defaultStorage?.remove(key);
+  }
+
+  //=========================================================================================================
+  // Has Storage
+  //=========================================================================================================
+  /**
+   * @internal
+   * Check if a Storage got registered
+   */
+  public hasStorage(): boolean {
+    return notEqual(this.storages, {});
   }
 
   //=========================================================================================================

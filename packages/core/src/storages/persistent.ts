@@ -154,7 +154,7 @@ export class Persistent<ValueType = any> {
    */
   public async loadValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `Didn't set loadValue function in Persistent '${this.key}'`
+      `Load Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
@@ -169,7 +169,7 @@ export class Persistent<ValueType = any> {
    */
   public async updateValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `Didn't set setValue function in Persistent '${this.key}'`
+      `Update Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
@@ -184,24 +184,21 @@ export class Persistent<ValueType = any> {
    */
   public async removeValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `Didn't set removeValue function in Persistent '${this.key}'`
+      `Remove Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
 
   //=========================================================================================================
-  // Validate Key
+  // Format Key
   //=========================================================================================================
   /**
    * @internal
    * Validates Storage Key
    * @param key - Key that gets validated
    */
-  public formatKey(key?: StorageKey): PersistentKey | undefined {
-    Agile.logger.error(
-      `Didn't set validateKey function in Persistent '${this.key}'`
-    );
-    return;
+  public formatKey(key?: PersistentKey): PersistentKey | undefined {
+    return key;
   }
 }
 
