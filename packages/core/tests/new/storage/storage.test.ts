@@ -184,7 +184,7 @@ describe("Storage Tests", () => {
         key: "customStorage",
         methods: {
           get: async (key) => {
-            await new Promise((res) => setTimeout(res, 3000));
+            await new Promise((res) => setTimeout(res, 1000));
             return myStorage[key];
           },
           set: (key, value) => {
