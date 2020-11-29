@@ -25,15 +25,15 @@ import {
 export class Agile {
   public config: AgileConfigInterface;
 
-  public runtime: Runtime;
+  public runtime: Runtime; // Handles assigning Values to Agile Instances
   public subController: SubController; // Handles subscriptions to Components
   public storages: Storages; // Handles permanent saving
 
   // Integrations
   public integrations: Integrations; // Integrated frameworks
-  static initialIntegrations: Integration[] = []; // External added Integrations
+  static initialIntegrations: Integration[] = []; // External added initial Integrations
 
-  // Static Logger with default config -> will be overwritten by config of created Agile Instance
+  // Static Logger with default config -> will be overwritten by config of last created Agile Instance
   static logger = new Logger({
     prefix: "Agile",
     active: true,
@@ -69,19 +69,6 @@ export class Agile {
 
     // Create global instance of Agile
     globalBind("__agile__", this);
-  }
-
-  //=========================================================================================================
-  // Use
-  //=========================================================================================================
-  /**
-   * @public
-   * Integrates framework into Agile
-   * @param integration - Integration that gets registered/integrated
-   */
-  public use(integration: Integration) {
-    this.integrations.integrate(integration);
-    return this;
   }
 
   //=========================================================================================================
@@ -146,6 +133,19 @@ export class Agile {
   ) => new Event<PayloadType>(this, config);
 
   //=========================================================================================================
+  // Integrate
+  //=========================================================================================================
+  /**
+   * @public
+   * Integrates framework into Agile
+   * @param integration - Integration that gets registered/integrated
+   */
+  public integrate(integration: Integration) {
+    this.integrations.integrate(integration);
+    return this;
+  }
+
+  //=========================================================================================================
   // Register Storage
   //=========================================================================================================
   /**
@@ -157,8 +157,9 @@ export class Agile {
   public registerStorage(
     storage: Storage,
     config: RegisterConfigInterface = {}
-  ): boolean {
-    return this.storages.register(storage, config);
+  ): this {
+    this.storages.register(storage, config);
+    return this;
   }
 
   //=========================================================================================================
@@ -170,6 +171,17 @@ export class Agile {
    */
   public hasIntegration(): boolean {
     return this.integrations.hasIntegration();
+  }
+
+  //=========================================================================================================
+  // Has Storage
+  //=========================================================================================================
+  /**
+   * @public
+   * Checks if Agile has any registered Storage
+   */
+  public hasStorage(): boolean {
+    return this.storages.hasStorage();
   }
 }
 
