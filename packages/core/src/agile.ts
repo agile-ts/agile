@@ -131,7 +131,6 @@ export class Agile {
   public Computed = <ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     deps?: Array<Observer | State | Event>
-    // @ts-ignore
   ) => new Computed<ComputedValueType>(this, computeFunction, deps);
 
   //=========================================================================================================

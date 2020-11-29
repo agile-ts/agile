@@ -5,6 +5,7 @@ import {
   Observer,
   StorageKey,
   StatePersistentConfigInterface,
+  Event
 } from "../internal";
 
 export class Computed<ComputedValueType = any> extends State<
