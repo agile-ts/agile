@@ -49,13 +49,13 @@ export class Agile {
     this.config = defineConfig(config, {
       localStorage: true,
       waitForMount: false,
-    });
-    this.config.logConfig = defineConfig(config.logConfig, {
-      prefix: "Agile",
-      active: true,
-      level: Logger.level.WARN,
-      canUseCustomStyles: true,
-      allowedTags: ["runtime", "storage", "subscription", "multieditor"],
+      logConfig: defineConfig(config.logConfig, {
+        prefix: "Agile",
+        active: true,
+        level: Logger.level.WARN,
+        canUseCustomStyles: true,
+        allowedTags: ["runtime", "storage", "subscription", "multieditor"],
+      }),
     });
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
