@@ -45,8 +45,8 @@ export class Agile {
    * Agile - Global state and logic framework for reactive Typescript & Javascript applications
    * @param config - Config
    */
-  constructor(config: AgileConfigInterface = {}) {
-    this.config = defineConfig(config, {
+  constructor(config: CreateAgileConfigInterface = {}) {
+    config = defineConfig(config, {
       localStorage: true,
       waitForMount: false,
       logConfig: defineConfig(config.logConfig, {
@@ -57,15 +57,18 @@ export class Agile {
         allowedTags: ["runtime", "storage", "subscription", "multieditor"],
       }),
     });
+    this.config = {
+      waitForMount: config.waitForMount as any,
+    };
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
     this.storages = new Storages(this, {
-      localStorage: this.config.localStorage,
+      localStorage: config.localStorage,
     });
 
     // Assign customized config to Logger
-    Agile.logger = new Logger(this.config.logConfig);
+    Agile.logger = new Logger(config.logConfig);
 
     // Create global instance of Agile
     globalBind("__agile__", this);
@@ -190,8 +193,15 @@ export class Agile {
  * @param waitForMount - If Agile should wait until the component mounts
  * @param storageConfig - To configure Agile Storage
  */
-export interface AgileConfigInterface {
+export interface CreateAgileConfigInterface {
   logConfig?: CreateLoggerConfigInterface;
   waitForMount?: boolean;
   localStorage?: boolean;
+}
+
+/**
+ * @param waitForMount - If Agile should wait until the component mounts
+ */
+export interface AgileConfigInterface {
+  waitForMount: boolean;
 }
