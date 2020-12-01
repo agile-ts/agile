@@ -39,9 +39,12 @@ describe("Agile Tests", () => {
     SubControllerMock.mockClear();
     StoragesMock.mockClear();
     IntegrationsMock.mockClear();
+
+    // Reset Global This
+    globalThis["__agile__"] = undefined;
   });
 
-  it("should instantiate Agile properties with default config", () => {
+  it("should instantiate Agile with default config", () => {
     const agile = new Agile();
 
     // Check if Agile properties got instantiated properly
@@ -72,6 +75,45 @@ describe("Agile Tests", () => {
       "multieditor",
     ]);
     expect(Agile.logger.isActive).toBeTruthy();
+
+    // Check if global Agile Instance got created
+    expect(globalThis["__agile__"]).toBe(agile);
+  });
+
+  it("should instantiate Agile with specific config", () => {
+    const agile = new Agile({
+      waitForMount: true,
+      localStorage: false,
+      logConfig: {
+        level: Logger.level.DEBUG,
+        active: false,
+        prefix: "Jeff",
+      },
+    });
+
+    // Check if Agile properties got instantiated properly
+    expect(agile.config).toStrictEqual({
+      waitForMount: true,
+    });
+    expect(IntegrationsMock).toHaveBeenCalledWith(agile);
+    expect(agile.integrations).toBeInstanceOf(Integrations);
+    expect(RuntimeMock).toHaveBeenCalledWith(agile);
+    expect(agile.runtime).toBeInstanceOf(Runtime);
+    expect(SubControllerMock).toHaveBeenCalledWith(agile);
+    expect(agile.subController).toBeInstanceOf(SubController);
+    expect(StoragesMock).toHaveBeenCalledWith(agile, {
+      localStorage: false,
+    });
+    expect(agile.storages).toBeInstanceOf(Storages);
+
+    // Check if Static Logger has correct config
+    expect(Agile.logger.config).toStrictEqual({
+      prefix: "Jeff",
+      level: Logger.level.DEBUG,
+      canUseCustomStyles: true,
+    });
+    expect(Agile.logger.allowedTags).toStrictEqual([]);
+    expect(Agile.logger.isActive).toBeFalsy();
 
     // Check if global Agile Instance got created
     expect(globalThis["__agile__"]).toBe(agile);
