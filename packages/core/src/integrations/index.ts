@@ -38,7 +38,7 @@ export class Integrations {
     this.integrations.add(integration);
     if (integration.config.bind)
       integration.ready = await integration.config.bind(this.agileInstance());
-    else integration.ready = true;
+    else integration.ready = false;
 
     // Logging
     Agile.logger.info(
@@ -52,7 +52,7 @@ export class Integrations {
   /**
    * @internal
    * Updates Integrations
-   * -> calls 'updateMethod' in registered Integrations
+   * -> calls 'updateMethod' in all registered Integrations
    * @param componentInstance - Component that gets updated
    * @param updatedData - Updated Properties with new Value (Note: properties with no value won't get passed)
    */
