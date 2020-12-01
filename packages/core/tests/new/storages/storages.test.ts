@@ -1,7 +1,7 @@
 import { Storages, Agile, Storage, Persistent } from "../../../src";
 
 describe("Storages Tests", () => {
-  const agile = new Agile();
+  const agile = new Agile({ localStorage: false });
 
   it("should create Storages with default Settings", () => {
     const storages = new Storages(agile);
@@ -147,7 +147,7 @@ describe("Storages Tests", () => {
         expect(success2).toBeTruthy();
       });
 
-      it("shouldn't register a Storage with the same key twice", () => {
+      it("shouldn't register Storage with the same key twice", () => {
         console.error = jest.fn();
 
         const success1 = storages.register(storage1);
@@ -172,6 +172,9 @@ describe("Storages Tests", () => {
         expect(persistent.defaultStorageKey).toBe("storage1");
 
         const success = storages.register(storage1);
+
+        expect(persistent.ready).toBeTruthy();
+        expect(persistent.defaultStorageKey).toBe("storage1");
 
         expect(persistent.updateValue).toHaveBeenCalled();
 

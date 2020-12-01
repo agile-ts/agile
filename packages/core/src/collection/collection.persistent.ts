@@ -2,6 +2,7 @@ import {
   Agile,
   Collection,
   CollectionKey,
+  CreatePersistentConfigInterface,
   defineConfig,
   Group,
   GroupKey,
@@ -27,7 +28,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    */
   constructor(
     collection: Collection<DataType>,
-    config: PersistentConfigInterface = {}
+    config: CreatePersistentConfigInterface = {}
   ) {
     super(collection.agileInstance(), {
       instantiate: false,

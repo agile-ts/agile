@@ -5,8 +5,6 @@ export class Persistent<ValueType = any> {
 
   public static placeHolderKey = "__THIS_IS_A_PLACEHOLDER__";
 
-  public config: PersistentConfigInterface;
-
   public _key: PersistentKey;
   public ready: boolean = false;
   public isPersisted: boolean = false; // If Value is stored in Agile Storage
@@ -22,14 +20,21 @@ export class Persistent<ValueType = any> {
    * @param agileInstance - An instance of Agile
    * @param config - Config
    */
-  constructor(agileInstance: Agile, config: PersistentConfigInterface = {}) {
+  constructor(
+    agileInstance: Agile,
+    config: CreatePersistentConfigInterface = {}
+  ) {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
-    this.config = defineConfig(config, {
+    config = defineConfig(config, {
       instantiate: true,
     });
     this.agileInstance().storages.persistentInstances.add(this);
-    if (this.config.instantiate) this.instantiatePersistent(config);
+    if (config.instantiate)
+      this.instantiatePersistent({
+        storageKeys: config.storageKeys,
+        key: config.key,
+      });
   }
 
   /**
@@ -71,9 +76,8 @@ export class Persistent<ValueType = any> {
    * @param config - Config
    */
   public instantiatePersistent(config: PersistentConfigInterface = {}) {
-    if (config) this.config = config;
-    this._key = this.formatKey(this.config.key) || Persistent.placeHolderKey;
-    this.assignStorageKeys(this.config.storageKeys);
+    this._key = this.formatKey(config.key) || Persistent.placeHolderKey;
+    this.assignStorageKeys(config.storageKeys);
     this.validatePersistent();
   }
 
@@ -117,7 +121,7 @@ export class Persistent<ValueType = any> {
     const storages = this.agileInstance().storages;
 
     // Set default Agile Storage to defaultStorage if no storageKey provided
-    if (!storageKeys) {
+    if (!storageKeys || storageKeys.length <= 0) {
       this.storageKeys = [];
       if (storages.defaultStorage) {
         const key = storages.defaultStorage.key;
@@ -209,8 +213,17 @@ export type PersistentKey = string | number;
  * @param storageKeys - Keys of Storages in that the persisted Value gets saved
  * @param instantiate - If Persistent gets Instantiated immediately
  */
-export interface PersistentConfigInterface {
+export interface CreatePersistentConfigInterface {
   key?: PersistentKey;
   storageKeys?: StorageKey[];
   instantiate?: boolean;
+}
+
+/**
+ * @param key - Key/Name of Persistent
+ * @param storageKeys - Keys of Storages in that the persisted Value gets saved
+ */
+export interface PersistentConfigInterface {
+  key?: PersistentKey;
+  storageKeys?: StorageKey[];
 }

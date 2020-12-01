@@ -16,9 +16,9 @@ describe("Storage Tests", () => {
       async: false,
       prefix: "agile",
     });
-    expect(storage).toHaveProperty("remove");
-    expect(storage).toHaveProperty("get");
-    expect(storage).toHaveProperty("set");
+    expect(storage.methods).toHaveProperty("remove");
+    expect(storage.methods).toHaveProperty("get");
+    expect(storage.methods).toHaveProperty("set");
   });
 
   it("should create async Storage with config.async = true and config.prefix = 'test' Settings and normal Storage Methods", () => {
@@ -38,9 +38,9 @@ describe("Storage Tests", () => {
       async: true,
       prefix: "test",
     });
-    expect(storage).toHaveProperty("remove");
-    expect(storage).toHaveProperty("get");
-    expect(storage).toHaveProperty("set");
+    expect(storage.methods).toHaveProperty("remove");
+    expect(storage.methods).toHaveProperty("get");
+    expect(storage.methods).toHaveProperty("set");
   });
 
   it("should create async Storage with default Settings and async Storage Methods", () => {
@@ -58,9 +58,9 @@ describe("Storage Tests", () => {
       async: true,
       prefix: "agile",
     });
-    expect(storage).toHaveProperty("remove");
-    expect(storage).toHaveProperty("get");
-    expect(storage).toHaveProperty("set");
+    expect(storage.methods).toHaveProperty("remove");
+    expect(storage.methods).toHaveProperty("get");
+    expect(storage.methods).toHaveProperty("set");
   });
 
   describe("Normal Storage Tests", () => {

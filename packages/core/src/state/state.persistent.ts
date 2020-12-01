@@ -1,7 +1,7 @@
 import {
+  CreatePersistentConfigInterface,
   defineConfig,
   Persistent,
-  PersistentConfigInterface,
   PersistentKey,
   State,
   StorageKey,
@@ -16,7 +16,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param state - State that gets stored
    * @param config - Config
    */
-  constructor(state: State<ValueType>, config: PersistentConfigInterface = {}) {
+  constructor(
+    state: State<ValueType>,
+    config: CreatePersistentConfigInterface = {}
+  ) {
     super(state.agileInstance(), {
       instantiate: false,
     });
