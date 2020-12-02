@@ -57,18 +57,14 @@ export class Integrations {
    * Updates Integrations
    * -> calls 'updateMethod' in all registered Integrations
    * @param componentInstance - Component that gets updated
-   * @param updatedData - Updated Properties with new Value (Note: properties with no value won't get passed)
+   * @param updatedData - Updated Properties
    */
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
-      // Check if integration is ready
       if (!integration.ready) {
-        Agile.logger.warn(
-          `Agile: Integration '${integration.key}' isn't ready yet!`
-        );
+        Agile.logger.warn(`Integration '${integration.key}' isn't ready yet!`);
         return;
       }
-
       if (integration.methods.updateMethod)
         integration.methods.updateMethod(componentInstance, updatedData);
     });
@@ -79,7 +75,7 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Checks if Agile has registered any Integration
+   *  Check if at least one Integration got registered
    */
   public hasIntegration(): boolean {
     return this.integrations.size > 0;

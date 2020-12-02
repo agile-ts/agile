@@ -226,7 +226,7 @@ export class Storages {
   //=========================================================================================================
   /**
    * @internal
-   * Check if a Storage got registered
+   * Check if at least one Storage got registered
    */
   public hasStorage(): boolean {
     return notEqual(this.storages, {});
