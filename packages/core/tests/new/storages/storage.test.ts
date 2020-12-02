@@ -63,7 +63,7 @@ describe("Storage Tests", () => {
     expect(storage.methods).toHaveProperty("set");
   });
 
-  describe("Normal Storage Tests", () => {
+  describe("Storage Function Tests", () => {
     let myStorage = {};
     let storage: Storage;
 

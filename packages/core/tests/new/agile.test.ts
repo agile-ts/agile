@@ -119,7 +119,7 @@ describe("Agile Tests", () => {
     expect(globalThis["__agile__"]).toBe(agile);
   });
 
-  describe("Normal Agile Tests", () => {
+  describe("Agile Function Tests", () => {
     let agile: Agile;
 
     beforeEach(() => {

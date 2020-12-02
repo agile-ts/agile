@@ -36,7 +36,7 @@ describe("Integrations Tests", () => {
     });
   });
 
-  describe("Default Integrations Tests", () => {
+  describe("Integrations Function Tests", () => {
     let integrations: Integrations;
     let integration1: Integration;
     let integration2: Integration;

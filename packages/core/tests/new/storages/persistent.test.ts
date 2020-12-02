@@ -121,7 +121,7 @@ describe("Persistent Tests", () => {
     expect(console.error).not.toHaveBeenCalled();
   });
 
-  describe("Normal Persistent Tests", () => {
+  describe("Persistent Function Tests", () => {
     describe("instantiatePersistent function tests", () => {
       let persistent: Persistent;
 

@@ -23,7 +23,7 @@ describe("Storages Tests", () => {
     expect(storages.persistentInstances.size).toBe(0);
   });
 
-  describe("Normal Storages Tests", () => {
+  describe("Storages Function Tests", () => {
     let storages: Storages;
     let myStorage1 = {};
     let myStorage2 = {};
