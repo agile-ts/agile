@@ -1,7 +1,7 @@
 import { Integration } from "../../../src";
 
 describe("Integration Tests", () => {
-  it("should instantiate Integration", () => {
+  it("should create Integration", () => {
     const methods = {
       bind: () => Promise.resolve(true),
       updateMethod: () => {},

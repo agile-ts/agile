@@ -10,13 +10,13 @@ describe("Integrations Tests", () => {
     Agile.initialIntegrations = [];
   });
 
-  it("should instantiate Integrations", () => {
+  it("should create Integrations", () => {
     const integrations = new Integrations(agile);
 
     expect(integrations.integrations.size).toBe(0);
   });
 
-  it("should instantiate Integrations and integrate Agile initialIntegrations", () => {
+  it("should create Integrations and integrate Agile initialIntegrations", () => {
     const integration1 = new Integration({
       key: "initialIntegration1",
     });
