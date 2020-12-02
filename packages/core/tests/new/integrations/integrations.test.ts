@@ -28,7 +28,7 @@ describe("Integrations Tests", () => {
 
     const integrations = new Integrations(agile);
 
-    // Sleep 5ms because initialIntegrations gets integrated async
+    // Sleep 5ms because initialIntegrations get integrated async
     return new Promise((resolve) => setTimeout(resolve, 5)).then(() => {
       expect(integrations.integrations.size).toBe(2);
       expect(integrations.integrations.has(integration1)).toBeTruthy();
@@ -112,7 +112,7 @@ describe("Integrations Tests", () => {
         integrations.integrate(integration2);
       });
 
-      it("should call update on each ready Integration", () => {
+      it("should call updateMethod on each ready Integration", () => {
         integration1.ready = false;
         integration1.methods.updateMethod = jest.fn();
         integration2.methods.updateMethod = jest.fn();
@@ -132,12 +132,11 @@ describe("Integrations Tests", () => {
     });
 
     describe("hasIntegration function tests", () => {
-      it("should return false if no integrated Integration got found", () => {
-        console.log(integrations);
+      it("should return false if Integrations has no integrated Integration", () => {
         expect(integrations.hasIntegration()).toBeFalsy();
       });
 
-      it("should return true if integrated Integration got found", () => {
+      it("should return true if Integrations has at least one integrated Integration", () => {
         integrations.integrate(integration1);
 
         expect(integrations.hasIntegration()).toBeTruthy();
