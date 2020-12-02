@@ -11,6 +11,7 @@ import {
   equal,
   notEqual,
   isFunction,
+  SubscriptionContainer,
 } from "../internal";
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -22,16 +23,23 @@ export class StateObserver<ValueType = any> extends Observer {
    * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
    * @param agileInstance - An instance of Agile
    * @param state - State
-   * @param deps - Initial Dependencies of State Observer
-   * @param key - Key/Name of State Observer
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     state: State<ValueType>,
-    deps?: Array<Observer>,
-    key?: ObserverKey
+    config: CreateStateObserverConfigInterface = {}
   ) {
-    super(agileInstance, deps, key, state.value);
+    config = defineConfig(config, {
+      deps: [],
+      subs: [],
+    });
+    super(agileInstance, {
+      deps: config.deps,
+      value: state.value,
+      key: config.key,
+      subs: config.subs,
+    });
     this.state = () => state;
     this.nextStateValue = copy(state.value);
   }
@@ -170,4 +178,15 @@ export function isStateJobConfigInterface(
       "sideEffects" in object ||
       "storage" in object)
   );
+}
+
+/**
+ * @param deps - Initial Dependencies of State Observer
+ * @param subs - Initial Subscriptions of State Observer
+ * @param key - Key/Name of State Observer
+ */
+export interface CreateStateObserverConfigInterface {
+  deps?: Array<Observer>;
+  subs?: Array<SubscriptionContainer>;
+  key?: ObserverKey;
 }

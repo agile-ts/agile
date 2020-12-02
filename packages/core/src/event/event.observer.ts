@@ -1,4 +1,12 @@
-import { Agile, Observer, Job, ObserverKey, Event } from "../internal";
+import {
+  Agile,
+  Observer,
+  Job,
+  ObserverKey,
+  Event,
+  SubscriptionContainer,
+  defineConfig,
+} from "../internal";
 
 export class EventObserver<PayloadType = any> extends Observer {
   public event: () => Event<PayloadType>;
@@ -8,16 +16,22 @@ export class EventObserver<PayloadType = any> extends Observer {
    * Event Observer - Handles Event dependencies and ingests Event triggers into the Runtime
    * @param agileInstance - An instance of Agile
    * @param event - Event
-   * @param deps - Initial Dependencies of the Event
-   * @param key - Key/Name of Event Observer
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     event: Event<PayloadType>,
-    deps?: Array<Observer>,
-    key?: ObserverKey
+    config: CreateEventObserverConfigInterface = {}
   ) {
-    super(agileInstance, deps, key);
+    config = defineConfig(config, {
+      deps: [],
+      subs: [],
+    });
+    super(agileInstance, {
+      deps: config.deps,
+      key: config.key,
+      subs: config.subs,
+    });
     this.event = () => event;
   }
 
@@ -43,4 +57,15 @@ export class EventObserver<PayloadType = any> extends Observer {
   public perform(job: Job<this>) {
     // Noting to perform
   }
+}
+
+/**
+ * @param deps - Initial Dependencies of Event Observer
+ * @param subs - Initial Subscriptions of Event Observer
+ * @param key - Key/Name of Event Observer
+ */
+export interface CreateEventObserverConfigInterface {
+  deps?: Array<Observer>;
+  subs?: Array<SubscriptionContainer>;
+  key?: ObserverKey;
 }

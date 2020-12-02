@@ -1,4 +1,10 @@
-import { Agile, StateKey, Job, SubscriptionContainer } from "../internal";
+import {
+  Agile,
+  StateKey,
+  Job,
+  SubscriptionContainer,
+  defineConfig,
+} from "../internal";
 
 export type ObserverKey = string | number;
 
@@ -14,20 +20,23 @@ export class Observer<ValueType = any> {
    * @internal
    * Observer - Handles subscriptions and dependencies of an Agile Class and is like an instance to the Runtime
    * @param agileInstance - An instance of Agile
-   * @param value - Initial Value of Observer
-   * @param deps - Initial Dependencies of Observer
-   * @param key - Key/Name of Observer
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
-    deps?: Array<Observer>,
-    key?: ObserverKey,
-    value?: ValueType
+    config: CreateObserverConfigInterface<ValueType> = {}
   ) {
+    config = defineConfig(config, {
+      deps: [],
+      subs: [],
+    });
     this.agileInstance = () => agileInstance;
-    this._key = key;
-    this.value = value;
-    deps?.forEach((observer) => this.deps.add(observer));
+    this._key = config.key;
+    this.value = config.value;
+    config.deps?.forEach((observer) => this.deps.add(observer));
+    config.subs?.forEach((subscriptionContainer) =>
+      this.subs.add(subscriptionContainer)
+    );
   }
 
   /**
@@ -95,4 +104,17 @@ export class Observer<ValueType = any> {
     if (this.subs.has(subscriptionContainer))
       this.subs.delete(subscriptionContainer);
   }
+}
+
+/**
+ * @param deps - Initial Dependencies of Observer
+ * @param subs - Initial Subscriptions of Observer
+ * @param key - Key/Name of Observer
+ * @param value - Initial Value of Observer
+ */
+export interface CreateObserverConfigInterface<ValueType = any> {
+  deps?: Array<Observer>;
+  subs?: Array<SubscriptionContainer>;
+  key?: ObserverKey;
+  value?: ValueType;
 }
