@@ -55,21 +55,26 @@ export function AgileHOC(
     return ReactComponent;
   }
 
-  return class extends React.Component {
-    public componentSubscriptionContainer: ComponentSubscriptionContainer | null = null; // Will be set and used in sub.ts
+  return class extends ReactComponent {
+    public agileInstance: () => Agile;
 
+    public componentSubscriptionContainer: ComponentSubscriptionContainer | null = null; // Will be set and used in sub.ts
     public updatedProps = this.props;
 
     constructor(props: any) {
       super(props);
+      this.agileInstance = (() => agileInstance) as any;
 
       // Create HOC based Subscription with Array (Rerenders will here be caused via force Update)
       if (depsArray)
-        agileInstance?.subController.subscribeWithSubsArray(this, depsArray);
+        this.agileInstance().subController.subscribeWithSubsArray(
+          this,
+          depsArray
+        );
 
       // Create HOC based Subscription with Object
       if (depsObject) {
-        const response = agileInstance?.subController.subscribeWithSubsObject(
+        const response = this.agileInstance().subController.subscribeWithSubsObject(
           this,
           depsObject
         );
@@ -84,16 +89,26 @@ export function AgileHOC(
     }
 
     componentDidMount() {
-      if (agileInstance?.config.waitForMount)
-        agileInstance?.subController.mount(this);
+      if (this.agileInstance().config.waitForMount)
+        this.agileInstance().subController.mount(this);
     }
 
     componentWillUnmount() {
-      agileInstance?.subController.unsubscribe(this);
+      this.agileInstance().subController.unsubscribe(this);
     }
 
     render() {
       return React.createElement(ReactComponent, this.updatedProps);
     }
   };
+}
+
+// Just for having a type save base in react.integration
+export class AgileReactComponent extends React.Component {
+  public componentSubscriptionContainer: ComponentSubscriptionContainer | null = null; // Will be set and used in sub.ts
+  public updatedProps = this.props;
+
+  constructor(props: any) {
+    super(props);
+  }
 }

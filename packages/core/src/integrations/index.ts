@@ -25,25 +25,28 @@ export class Integrations {
   /**
    * @internal
    * Integrates Framework (Integration) into Agile
-   * @param integration - Integration that gets registered/integrated
+   * @param integration - Integration/Framework that gets integrated
    */
-  public async integrate(integration: Integration) {
-    // Check if integration is valid
-    if (!integration.config.name) {
-      console.error("Agile: Failed to integrate framework!");
-      return;
+  public async integrate(integration: Integration): Promise<boolean> {
+    // Check if Integration is valid
+    if (!integration.key) {
+      Agile.logger.error("Failed to integrate framework!");
+      return false;
     }
 
-    // Integrate Integration/Framework
+    // Bind Framework to Agile
+    if (integration.methods.bind)
+      integration.ready = await integration.methods.bind(this.agileInstance());
+    else integration.ready = true;
+
+    // Integrate Framework
     this.integrations.add(integration);
-    if (integration.config.bind)
-      integration.ready = await integration.config.bind(this.agileInstance());
-    else integration.ready = false;
+    integration.integrated = true;
 
     // Logging
-    Agile.logger.info(
-      `Agile: Successfully integrated '${integration.config.name}'`
-    );
+    Agile.logger.info(`Successfully integrated '${integration.key}'`);
+
+    return true;
   }
 
   //=========================================================================================================
@@ -61,13 +64,13 @@ export class Integrations {
       // Check if integration is ready
       if (!integration.ready) {
         Agile.logger.warn(
-          `Agile: Integration '${integration.config.name}' isn't ready yet!`
+          `Agile: Integration '${integration.key}' isn't ready yet!`
         );
         return;
       }
 
-      if (integration.config.updateMethod)
-        integration.config.updateMethod(componentInstance, updatedData);
+      if (integration.methods.updateMethod)
+        integration.methods.updateMethod(componentInstance, updatedData);
     });
   }
 

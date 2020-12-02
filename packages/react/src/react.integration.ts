@@ -1,14 +1,15 @@
 import { Agile, Integration } from "@agile-ts/core";
+import { AgileReactComponent } from "./hooks/AgileHOC";
 import React from "react";
 
-const reactIntegration = new Integration({
-  name: "react",
+const reactIntegration = new Integration<typeof React, AgileReactComponent>({
+  key: "react",
   frameworkInstance: React,
   bind(agileInstance: Agile) {
     // Nothing to bind ;D
-    return true;
+    return Promise.resolve(true);
   },
-  updateMethod(componentInstance: any, updatedData: Object) {
+  updateMethod(componentInstance, updatedData: Object) {
     // UpdatedData will be empty if the AgileHOC doesn't get an object as deps
 
     if (Object.keys(updatedData).length !== 0) {
