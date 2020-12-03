@@ -8,6 +8,10 @@ describe("Persistent Tests", () => {
     agile = new Agile({ localStorage: false });
   });
 
+  // Note: Had to test the constructor in detail (not the 'cleanest' way)
+  // because I couldn't figure out how to mock a function (instantiatePersistent) that gets called in the constructor
+  // the with 'x' marked properties changed
+
   it("should create Persistent with default Settings", () => {
     const persistent = new Persistent(agile);
 
@@ -46,7 +50,7 @@ describe("Persistent Tests", () => {
     const persistent = new Persistent(agile, { key: "coolKey" });
 
     expect(persistent).toBeInstanceOf(Persistent);
-    expect(persistent.key).toBe("coolKey");
+    expect(persistent.key).toBe("coolKey"); // x
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
@@ -70,8 +74,8 @@ describe("Persistent Tests", () => {
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
-    expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]);
-    expect(persistent.defaultStorageKey).toBe("test1");
+    expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
+    expect(persistent.defaultStorageKey).toBe("test1"); // x
 
     expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
 
@@ -87,12 +91,12 @@ describe("Persistent Tests", () => {
     });
 
     expect(persistent).toBeInstanceOf(Persistent);
-    expect(persistent.key).toBe("coolKey");
-    expect(persistent.ready).toBeTruthy();
+    expect(persistent.key).toBe("coolKey"); // x
+    expect(persistent.ready).toBeTruthy(); // x
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
-    expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]);
-    expect(persistent.defaultStorageKey).toBe("test1");
+    expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
+    expect(persistent.defaultStorageKey).toBe("test1"); // x
 
     expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
 
@@ -129,12 +133,10 @@ describe("Persistent Tests", () => {
         persistent = new Persistent(agile, { instantiate: false });
       });
 
-      it("should be possible to instantiate Persistent later", () => {
+      it("should be possible to instantiate Persistent after the 'real' instantiation", () => {
         const persistent = new Persistent(agile, {
           instantiate: false,
         });
-
-        expect(persistent.ready).toBeFalsy();
 
         persistent.instantiatePersistent({
           key: "myCoolPersistent",
@@ -281,7 +283,7 @@ describe("Persistent Tests", () => {
       });
     });
 
-    describe("function that get overwritten tests | because Persistent is no stand alone class", () => {
+    describe("functions that get overwritten tests | because Persistent is no stand alone class", () => {
       let persistent: Persistent;
 
       beforeEach(() => {

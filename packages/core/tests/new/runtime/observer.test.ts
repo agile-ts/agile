@@ -114,7 +114,7 @@ describe("Observer Tests", () => {
       });
     });
 
-    describe("function that get overwritten tests | because Observer is no stand alone class", () => {
+    describe("functions that get overwritten tests | because Observer is no stand alone class", () => {
       describe("perform function tests", () => {
         it("should print warning", () => {
           const job = new Job(observer);
