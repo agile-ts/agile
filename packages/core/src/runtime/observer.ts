@@ -64,7 +64,9 @@ export class Observer<ValueType = any> {
    * @param job - Job that gets performed
    */
   public perform(job: Job) {
-    Agile.logger.warn("Didn't set perform function in Observer ", this.key);
+    Agile.logger.warn(
+      "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
+    );
   }
 
   //=========================================================================================================

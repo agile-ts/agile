@@ -4,8 +4,8 @@ describe("Persistent Tests", () => {
   let agile: Agile;
 
   beforeEach(() => {
-    agile = new Agile({ localStorage: false });
     console.error = jest.fn();
+    agile = new Agile({ localStorage: false });
   });
 
   it("should create Persistent with default Settings", () => {
@@ -286,7 +286,6 @@ describe("Persistent Tests", () => {
 
       beforeEach(() => {
         persistent = new Persistent(agile);
-        console.error = jest.fn();
       });
 
       describe("onLoad function tests", () => {
