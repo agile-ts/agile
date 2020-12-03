@@ -41,13 +41,11 @@ export class SubController {
     subscriptionContainer: SubscriptionContainer;
     props: { [key: string]: Observer["value"] };
   } {
-    const props: { [key: string]: Observer } = {};
+    const props: { [key: string]: Observer["value"] } = {};
 
     // Create subsArray
     const subsArray: Observer[] = [];
-    for (let key in subs) {
-      subsArray.push(subs[key]);
-    }
+    for (let key in subs) subsArray.push(subs[key]);
 
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
@@ -69,7 +67,7 @@ export class SubController {
       // Add SubscriptionContainer to Observer Subs
       observer.subscribe(subscriptionContainer);
 
-      // Add Value to props if Observer has value
+      // Add Observer Value to props
       if (observer.value) props[key] = observer.value;
     }
 

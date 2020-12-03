@@ -13,7 +13,7 @@ export class Observer<ValueType = any> {
 
   public _key?: ObserverKey;
   public deps: Set<Observer> = new Set(); // Observers that depends on this Observer
-  public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers(Components) which this Observer has subscribed
+  public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer has subscribed
   public value?: ValueType; // Value of Observer
 
   /**
