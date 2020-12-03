@@ -2,11 +2,11 @@ import { Agile, Persistent, Storage } from "../../../src";
 // jest.mock("../../../src/storages/persistent"); // // Can't mock Persistent because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe("Persistent Tests", () => {
-  let agile: Agile;
+  let dummyAgile: Agile;
 
   beforeEach(() => {
     console.error = jest.fn();
-    agile = new Agile({ localStorage: false });
+    dummyAgile = new Agile({ localStorage: false });
   });
 
   // Note: Had to test the constructor in detail (not the 'cleanest' way)
@@ -14,7 +14,7 @@ describe("Persistent Tests", () => {
   // the with 'x' marked properties changed
 
   it("should create Persistent with default Settings", () => {
-    const persistent = new Persistent(agile);
+    const persistent = new Persistent(dummyAgile);
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.key).toBe(Persistent.placeHolderKey);
@@ -24,7 +24,9 @@ describe("Persistent Tests", () => {
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBe(undefined);
 
-    expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
@@ -32,7 +34,7 @@ describe("Persistent Tests", () => {
   });
 
   it("should create Persistent with config.instantiate = false", () => {
-    const persistent = new Persistent(agile, { instantiate: false });
+    const persistent = new Persistent(dummyAgile, { instantiate: false });
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.key).toBe(Persistent.placeHolderKey);
@@ -42,13 +44,15 @@ describe("Persistent Tests", () => {
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBe(undefined);
 
-    expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     expect(console.error).not.toHaveBeenCalled();
   });
 
   it("should create Persistent with config.key", () => {
-    const persistent = new Persistent(agile, { key: "coolKey" });
+    const persistent = new Persistent(dummyAgile, { key: "coolKey" });
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.key).toBe("coolKey"); // x
@@ -58,7 +62,9 @@ describe("Persistent Tests", () => {
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBe(undefined);
 
-    expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No persist Storage Key found! Please provide at least one Storage Key."
@@ -66,7 +72,7 @@ describe("Persistent Tests", () => {
   });
 
   it("should create Persistent with config.storageKeys", () => {
-    const persistent = new Persistent(agile, {
+    const persistent = new Persistent(dummyAgile, {
       storageKeys: ["test1", "test2"],
     });
 
@@ -78,7 +84,9 @@ describe("Persistent Tests", () => {
     expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
     expect(persistent.defaultStorageKey).toBe("test1"); // x
 
-    expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
@@ -86,7 +94,7 @@ describe("Persistent Tests", () => {
   });
 
   it("should create Persistent with config.key and config.storageKeys", () => {
-    const persistent = new Persistent(agile, {
+    const persistent = new Persistent(dummyAgile, {
       key: "coolKey",
       storageKeys: ["test1", "test2"],
     });
@@ -99,13 +107,15 @@ describe("Persistent Tests", () => {
     expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
     expect(persistent.defaultStorageKey).toBe("test1"); // x
 
-    expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     expect(console.error).not.toHaveBeenCalled();
   });
 
   it("should create Persistent with config.key, config.storageKeys config.instantiate = false", () => {
-    const persistent = new Persistent(agile, {
+    const persistent = new Persistent(dummyAgile, {
       instantiate: false,
       storageKeys: ["hello", "there"],
       key: "coolKey",
@@ -121,7 +131,9 @@ describe("Persistent Tests", () => {
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBeUndefined();
 
-    expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     expect(console.error).not.toHaveBeenCalled();
   });
@@ -131,11 +143,11 @@ describe("Persistent Tests", () => {
       let persistent: Persistent;
 
       beforeEach(() => {
-        persistent = new Persistent(agile, { instantiate: false });
+        persistent = new Persistent(dummyAgile, { instantiate: false });
       });
 
       it("should be possible to instantiate Persistent after the 'real' instantiation", () => {
-        const persistent = new Persistent(agile, {
+        const persistent = new Persistent(dummyAgile, {
           instantiate: false,
         });
 
@@ -152,7 +164,9 @@ describe("Persistent Tests", () => {
         expect(persistent.storageKeys).toStrictEqual(["myName", "is", "jeff"]);
         expect(persistent.defaultStorageKey).toBe("myName");
 
-        expect(agile.storages.persistentInstances.has(persistent)).toBeTruthy();
+        expect(
+          dummyAgile.storages.persistentInstances.has(persistent)
+        ).toBeTruthy();
       });
     });
 
@@ -160,7 +174,7 @@ describe("Persistent Tests", () => {
       let persistent: Persistent;
 
       beforeEach(() => {
-        persistent = new Persistent(agile);
+        persistent = new Persistent(dummyAgile);
         persistent.key = Persistent.placeHolderKey;
         persistent.defaultStorageKey = undefined;
         persistent.storageKeys = [];
@@ -217,7 +231,7 @@ describe("Persistent Tests", () => {
       let persistent: Persistent;
 
       beforeEach(() => {
-        persistent = new Persistent(agile);
+        persistent = new Persistent(dummyAgile);
       });
 
       it("should assign StorageKeys and make first one as default StorageKey", () => {
@@ -232,7 +246,7 @@ describe("Persistent Tests", () => {
       });
 
       it("should try to get default StorageKey if no StorageKeys passed", () => {
-        agile.storages.register(
+        dummyAgile.storages.register(
           new Storage({
             key: "storage1",
             methods: {
@@ -255,7 +269,7 @@ describe("Persistent Tests", () => {
       let onLoadSuccess = undefined;
 
       beforeEach(() => {
-        persistent = new Persistent(agile);
+        persistent = new Persistent(dummyAgile);
         persistent.onLoad = (success) => {
           onLoadSuccess = success;
         };
@@ -288,7 +302,7 @@ describe("Persistent Tests", () => {
       let persistent: Persistent;
 
       beforeEach(() => {
-        persistent = new Persistent(agile);
+        persistent = new Persistent(dummyAgile);
       });
 
       describe("onLoad function tests", () => {

@@ -84,7 +84,7 @@ describe("Storage Tests", () => {
     });
 
     describe("set function tests", () => {
-      it("should add Value to Storage", () => {
+      it("should add Value to ready Storage", () => {
         storage.set("myTestKey", "hello there");
 
         expect(myStorage).toHaveProperty("_agile_myTestKey");
@@ -93,7 +93,7 @@ describe("Storage Tests", () => {
         );
       });
 
-      it("shouldn't add Value to Storage if Storage isn't ready", () => {
+      it("shouldn't add Value to not ready Storage", () => {
         storage.ready = false;
         storage.set("myTestKey", "hello there");
 

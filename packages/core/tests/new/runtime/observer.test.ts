@@ -1,7 +1,7 @@
 import { Observer, Agile, SubscriptionContainer, Job } from "../../../src";
 
 describe("Observer Tests", () => {
-  let agile: Agile;
+  let dummyAgile: Agile;
   let dummyObserver1: Observer;
   let dummyObserver2: Observer;
   let dummySubscription1: SubscriptionContainer;
@@ -9,15 +9,15 @@ describe("Observer Tests", () => {
 
   beforeEach(() => {
     console.warn = jest.fn();
-    agile = new Agile();
-    dummyObserver1 = new Observer(agile, { key: "dummyObserver1" });
-    dummyObserver2 = new Observer(agile, { key: "dummyObserver2" });
+    dummyAgile = new Agile();
+    dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
+    dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
     dummySubscription1 = new SubscriptionContainer();
     dummySubscription2 = new SubscriptionContainer();
   });
 
   it("should create Observer", () => {
-    const observer = new Observer(agile, {
+    const observer = new Observer(dummyAgile, {
       key: "testKey",
       subs: [dummySubscription1, dummySubscription2],
       deps: [dummyObserver1, dummyObserver2],
@@ -38,7 +38,7 @@ describe("Observer Tests", () => {
     let observer: Observer;
 
     beforeEach(() => {
-      observer = new Observer(agile, { key: "observer" });
+      observer = new Observer(dummyAgile, { key: "observer" });
     });
 
     describe("depend function tests", () => {
@@ -46,8 +46,8 @@ describe("Observer Tests", () => {
       let dummyObserver2: Observer;
 
       beforeEach(() => {
-        dummyObserver1 = new Observer(agile, { key: "dummyObserver1" });
-        dummyObserver2 = new Observer(agile, { key: "dummyObserver2" });
+        dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
+        dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
       });
 
       it("should add observer to deps", () => {
@@ -117,8 +117,8 @@ describe("Observer Tests", () => {
     describe("functions that get overwritten tests | because Observer is no stand alone class", () => {
       describe("perform function tests", () => {
         it("should print warning", () => {
-          const job = new Job(observer);
-          observer.perform(job);
+          const dummyJob = new Job(observer);
+          observer.perform(dummyJob);
 
           expect(console.warn).toHaveBeenCalledWith(
             "Agile Warn: Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"

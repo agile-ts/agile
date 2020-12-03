@@ -14,7 +14,7 @@ import {
 import testIntegration from "../helper/test.integration";
 
 jest.mock("../../src/runtime/index");
-jest.mock("../../src/runtime/subscription/sub");
+jest.mock("../../src/runtime/subscription/sub.controller");
 jest.mock("../../src/storages/index");
 jest.mock("../../src/integrations/index");
 jest.mock("../../src/storages/storage");

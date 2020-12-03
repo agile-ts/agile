@@ -1,10 +1,10 @@
 import { Storages, Agile, Storage, Persistent } from "../../../src";
 
 describe("Storages Tests", () => {
-  const agile = new Agile({ localStorage: false });
+  const dummyAgile = new Agile({ localStorage: false });
 
   it("should create Storages with default Settings", () => {
-    const storages = new Storages(agile);
+    const storages = new Storages(dummyAgile);
 
     expect(storages.defaultStorage).toBeUndefined();
     expect(storages.storages).toStrictEqual({});
@@ -13,7 +13,7 @@ describe("Storages Tests", () => {
 
   it("should create Storages with config.localStorage = true and get a warning", () => {
     console.warn = jest.fn();
-    const storages = new Storages(agile, { localStorage: true });
+    const storages = new Storages(dummyAgile, { localStorage: true });
 
     expect(console.warn).toHaveBeenCalledWith(
       "Agile Warn: Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
@@ -28,15 +28,16 @@ describe("Storages Tests", () => {
     let myStorage1 = {};
     let myStorage2 = {};
     let myStorage3 = {};
-    let storage1: Storage;
-    let storage2: Storage;
-    let storage3: Storage;
+    let dummyStorage1: Storage;
+    let dummyStorage2: Storage;
+    let dummyStorage3: Storage;
 
     beforeEach(() => {
-      storages = new Storages(agile);
-      agile.storages = storages;
+      storages = new Storages(dummyAgile);
+      dummyAgile.storages = storages;
+
       myStorage1 = {};
-      storage1 = new Storage({
+      dummyStorage1 = new Storage({
         key: "storage1",
         methods: {
           get: (key) => myStorage1[key],
@@ -50,7 +51,7 @@ describe("Storages Tests", () => {
       });
 
       myStorage2 = {};
-      storage2 = new Storage({
+      dummyStorage2 = new Storage({
         key: "storage2",
         methods: {
           get: (key) => myStorage2[key],
@@ -64,7 +65,7 @@ describe("Storages Tests", () => {
       });
 
       myStorage3 = {};
-      storage3 = new Storage({
+      dummyStorage3 = new Storage({
         key: "storage3",
         methods: {
           get: (key) => myStorage3[key],
@@ -80,7 +81,7 @@ describe("Storages Tests", () => {
 
     describe("register function tests", () => {
       it("should register Storage with default config and should assign it as default Storage", () => {
-        const success = storages.register(storage1);
+        const success = storages.register(dummyStorage1);
 
         expect(storages.storages).toHaveProperty("storage1");
         expect(storages.storages["storage1"]).toBeInstanceOf(Storage);
@@ -95,7 +96,7 @@ describe("Storages Tests", () => {
       it("should register Storage with config.default = false and should assign it as default Storage with a warning", () => {
         console.warn = jest.fn();
 
-        const success = storages.register(storage1, { default: false });
+        const success = storages.register(dummyStorage1, { default: false });
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: Be aware that Agile has to assign the first added Storage as default Storage!"
@@ -112,8 +113,8 @@ describe("Storages Tests", () => {
       });
 
       it("should register second Storage with default config and shouldn't assign it as default Storage", () => {
-        const success1 = storages.register(storage1);
-        const success2 = storages.register(storage2);
+        const success1 = storages.register(dummyStorage1);
+        const success2 = storages.register(dummyStorage2);
 
         expect(storages.storages).toHaveProperty("storage1");
         expect(storages.storages["storage1"]).toBeInstanceOf(Storage);
@@ -130,8 +131,8 @@ describe("Storages Tests", () => {
       });
 
       it("should register second Storage with config.default = true and should assign it as default Storage", () => {
-        const success1 = storages.register(storage1);
-        const success2 = storages.register(storage2, { default: true });
+        const success1 = storages.register(dummyStorage1);
+        const success2 = storages.register(dummyStorage2, { default: true });
 
         expect(storages.storages).toHaveProperty("storage1");
         expect(storages.storages["storage1"]).toBeInstanceOf(Storage);
@@ -150,8 +151,8 @@ describe("Storages Tests", () => {
       it("shouldn't register Storage with the same key twice", () => {
         console.error = jest.fn();
 
-        const success1 = storages.register(storage1);
-        const success2 = storages.register(storage1);
+        const success1 = storages.register(dummyStorage1);
+        const success2 = storages.register(dummyStorage1);
 
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: Storage with the key/name 'storage1' already exists"
@@ -162,7 +163,7 @@ describe("Storages Tests", () => {
       });
 
       it("should call updateValue method on all persistent Instances that have the new registered StorageKey", () => {
-        const persistent = new Persistent(agile, {
+        const persistent = new Persistent(dummyAgile, {
           key: "persistent1",
           storageKeys: ["storage1"],
         });
@@ -171,7 +172,7 @@ describe("Storages Tests", () => {
         expect(persistent.ready).toBeTruthy();
         expect(persistent.defaultStorageKey).toBe("storage1");
 
-        const success = storages.register(storage1);
+        const success = storages.register(dummyStorage1);
 
         expect(persistent.ready).toBeTruthy();
         expect(persistent.defaultStorageKey).toBe("storage1");
@@ -182,7 +183,7 @@ describe("Storages Tests", () => {
       });
 
       it("should reassignStorageKeys, revalidate and initialLoad Persistents that have no defined defaultStorage", () => {
-        const persistent = new Persistent(agile, {
+        const persistent = new Persistent(dummyAgile, {
           key: "persistent1",
         });
         const assignStorageKeysSpy = jest.spyOn(
@@ -198,7 +199,7 @@ describe("Storages Tests", () => {
         expect(persistent.ready).toBeFalsy();
         expect(persistent.defaultStorageKey).toBeUndefined();
 
-        const success = storages.register(storage1);
+        const success = storages.register(dummyStorage1);
 
         expect(persistent.ready).toBeTruthy();
         expect(persistent.defaultStorageKey).toBe("storage1");
@@ -213,8 +214,8 @@ describe("Storages Tests", () => {
 
     describe("getStorage function tests", () => {
       beforeEach(() => {
-        storages.register(storage1);
-        storages.register(storage2);
+        storages.register(dummyStorage1);
+        storages.register(dummyStorage2);
       });
 
       it("should get existing Storage", () => {
@@ -239,7 +240,7 @@ describe("Storages Tests", () => {
 
       it("shouldn't get existing and not ready Storage", () => {
         console.error = jest.fn();
-        storage1.ready = false;
+        dummyStorage1.ready = false;
         const storage = storages.getStorage("storage1");
 
         expect(storage).toBeUndefined();
@@ -254,16 +255,16 @@ describe("Storages Tests", () => {
       let storage2GetSpy;
 
       beforeEach(() => {
-        storage1GetSpy = jest.spyOn(storage1, "get");
-        storage2GetSpy = jest.spyOn(storage2, "get");
+        storage1GetSpy = jest.spyOn(dummyStorage1, "get");
+        storage2GetSpy = jest.spyOn(dummyStorage2, "get");
 
-        storages.register(storage1);
-        storages.register(storage2);
+        storages.register(dummyStorage1);
+        storages.register(dummyStorage2);
 
-        storage1.set("value1", "storage1Value1");
-        storage1.set("value2", "storage1Value2");
-        storage2.set("value1", "storage2Value1");
-        storage2.set("value2", "storage2Value2");
+        dummyStorage1.set("value1", "storage1Value1");
+        dummyStorage1.set("value2", "storage1Value2");
+        dummyStorage2.set("value1", "storage2Value1");
+        dummyStorage2.set("value2", "storage2Value2");
       });
 
       it("should get existing Value from default Storage", () => {
@@ -300,7 +301,7 @@ describe("Storages Tests", () => {
 
       it("shouldn't get any Value from Storages with no registered Storage", () => {
         console.error = jest.fn();
-        const storages2 = new Storages(agile);
+        const storages2 = new Storages(dummyAgile);
 
         return storages2.get("value1").then((value) => {
           expect(value).toBe(undefined);
@@ -317,13 +318,13 @@ describe("Storages Tests", () => {
       let storage3SetSpy;
 
       beforeEach(() => {
-        storage1SetSpy = jest.spyOn(storage1, "set");
-        storage2SetSpy = jest.spyOn(storage2, "set");
-        storage3SetSpy = jest.spyOn(storage2, "set");
+        storage1SetSpy = jest.spyOn(dummyStorage1, "set");
+        storage2SetSpy = jest.spyOn(dummyStorage2, "set");
+        storage3SetSpy = jest.spyOn(dummyStorage2, "set");
 
-        storages.register(storage1);
-        storages.register(storage2);
-        storages.register(storage3);
+        storages.register(dummyStorage1);
+        storages.register(dummyStorage2);
+        storages.register(dummyStorage3);
       });
 
       it("should set Value in default Storage", () => {
@@ -344,7 +345,7 @@ describe("Storages Tests", () => {
 
       it("shouldn't set Value in Storages with no registered Storage", () => {
         console.error = jest.fn();
-        const storages2 = new Storages(agile);
+        const storages2 = new Storages(dummyAgile);
 
         storages2.set("value1", "testValue");
 
@@ -360,13 +361,13 @@ describe("Storages Tests", () => {
       let storage3RemoveSpy;
 
       beforeEach(() => {
-        storage1RemoveSpy = jest.spyOn(storage1, "remove");
-        storage2RemoveSpy = jest.spyOn(storage2, "remove");
-        storage3RemoveSpy = jest.spyOn(storage2, "remove");
+        storage1RemoveSpy = jest.spyOn(dummyStorage1, "remove");
+        storage2RemoveSpy = jest.spyOn(dummyStorage2, "remove");
+        storage3RemoveSpy = jest.spyOn(dummyStorage2, "remove");
 
-        storages.register(storage1);
-        storages.register(storage2);
-        storages.register(storage3);
+        storages.register(dummyStorage1);
+        storages.register(dummyStorage2);
+        storages.register(dummyStorage3);
       });
 
       it("should remove Value in default Storage", () => {
@@ -387,7 +388,7 @@ describe("Storages Tests", () => {
 
       it("shouldn't remove Value in Storages with no registered Storage", () => {
         console.error = jest.fn();
-        const storages2 = new Storages(agile);
+        const storages2 = new Storages(dummyAgile);
 
         storages2.remove("value1");
 
@@ -399,7 +400,7 @@ describe("Storages Tests", () => {
 
     describe("hasStorage function tests", () => {
       it("should return true if Storages has registered Storages", () => {
-        storages.register(storage1);
+        storages.register(dummyStorage1);
 
         expect(storages.hasStorage()).toBeTruthy();
       });
