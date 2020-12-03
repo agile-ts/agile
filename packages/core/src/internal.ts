@@ -20,7 +20,7 @@ export * from "./runtime/job";
 export * from "./runtime/subscription/container/SubscriptionContainer";
 export * from "./runtime/subscription/container/CallbackSubscriptionContainer";
 export * from "./runtime/subscription/container/ComponentSubscriptionContainer";
-export * from "./runtime/subscription/sub";
+export * from "./runtime/subscription/sub.controller";
 
 // Storage
 export * from "./storages";
