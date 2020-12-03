@@ -44,7 +44,7 @@ describe("Job Tests", () => {
     expect(job.performed).toBeFalsy();
   });
 
-  it("should instantiate Job with config.background = false and agile that has integrations", () => {
+  it("should instantiate Job with config.background = true and agile that has integrations", () => {
     agile.integrate(integration);
     const job = new Job(observer, { background: true });
 
