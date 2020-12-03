@@ -1,4 +1,5 @@
 import { Agile, Persistent, Storage } from "../../../src";
+// jest.mock("../../../src/storages/persistent"); // // Can't mock Persistent because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe("Persistent Tests", () => {
   let agile: Agile;
