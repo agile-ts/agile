@@ -15,6 +15,7 @@ describe("Job Tests", () => {
 
   it("should instantiate Job with default config and agile that has integrations", () => {
     dummyAgile.integrate(dummyIntegration);
+
     const job = new Job(dummyObserver);
 
     expect(job.observer).toBe(dummyObserver);
@@ -29,7 +30,7 @@ describe("Job Tests", () => {
     expect(job.performed).toBeFalsy();
   });
 
-  it("should instantiate Job with default config and agile that has integrations", () => {
+  it("should instantiate Job with default config and agile that has no integrations", () => {
     const job = new Job(dummyObserver);
 
     expect(job.observer).toBe(dummyObserver);
@@ -46,6 +47,7 @@ describe("Job Tests", () => {
 
   it("should instantiate Job with config.background = true and agile that has integrations", () => {
     dummyAgile.integrate(dummyIntegration);
+
     const job = new Job(dummyObserver, { background: true });
 
     expect(job.observer).toBe(dummyObserver);

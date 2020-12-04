@@ -10,6 +10,7 @@ describe("Storage Tests", () => {
         set: (key, value) => {},
       },
     });
+
     expect(storage.key).toBe("customStorage");
     expect(storage.ready).toBe(true);
     expect(storage.config).toStrictEqual({
@@ -32,6 +33,7 @@ describe("Storage Tests", () => {
       async: true,
       prefix: "test",
     });
+
     expect(storage.key).toBe("customStorage");
     expect(storage.ready).toBe(true);
     expect(storage.config).toStrictEqual({
@@ -52,6 +54,7 @@ describe("Storage Tests", () => {
         set: (key, value) => {},
       },
     });
+
     expect(storage.key).toBe("customStorage");
     expect(storage.ready).toBe(true);
     expect(storage.config).toStrictEqual({
@@ -95,6 +98,7 @@ describe("Storage Tests", () => {
 
       it("shouldn't add Value to not ready Storage", () => {
         storage.ready = false;
+
         storage.set("myTestKey", "hello there");
 
         expect(myStorage).toStrictEqual({});
@@ -132,6 +136,7 @@ describe("Storage Tests", () => {
 
       it("shouldn't get existing Value from not ready Storage", () => {
         storage.ready = false;
+
         const myStorageValue = storage.normalGet("myTestKey");
 
         expect(myStorageValue).toBeUndefined();
@@ -165,6 +170,7 @@ describe("Storage Tests", () => {
 
       it("shouldn't remove existing Value from not ready Storage", () => {
         storage.ready = false;
+
         storage.remove("myNotExistingKey");
 
         expect(myStorage).toStrictEqual({
@@ -233,6 +239,7 @@ describe("Storage Tests", () => {
 
       it("shouldn't get existing Value from not ready Storage", () => {
         storage.ready = false;
+
         return storage.get("myTestKey").then((value) => {
           expect(value).toBeUndefined();
         });

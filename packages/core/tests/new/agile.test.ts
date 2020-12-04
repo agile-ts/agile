@@ -172,6 +172,7 @@ describe("Agile Tests", () => {
           defaultGroupKey: "frank",
           key: "myCoolCollection",
         };
+
         const collection = agile.Collection(collectionConfig);
 
         expect(collection).toBeInstanceOf(Collection);
@@ -188,8 +189,9 @@ describe("Agile Tests", () => {
 
       it("should create Computed", () => {
         const computedFunction = () => {
-          console.log("Hello Jeff");
+          // console.log("Hello Jeff");
         };
+
         const computed = agile.Computed(computedFunction, []);
 
         expect(computed).toBeInstanceOf(Computed);
@@ -211,6 +213,7 @@ describe("Agile Tests", () => {
           enabled: true,
           key: "myCoolEvent",
         };
+
         const event = agile.Event(eventConfig);
 
         expect(event).toBeInstanceOf(Event);
@@ -240,6 +243,7 @@ describe("Agile Tests", () => {
           },
           key: "myTestStorage",
         });
+
         const returnedAgile = agile.registerStorage(dummyStorage, {
           default: false,
         });

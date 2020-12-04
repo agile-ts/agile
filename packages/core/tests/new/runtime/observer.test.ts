@@ -118,6 +118,7 @@ describe("Observer Tests", () => {
       describe("perform function tests", () => {
         it("should print warning", () => {
           const dummyJob = new Job(observer);
+
           observer.perform(dummyJob);
 
           expect(console.warn).toHaveBeenCalledWith(

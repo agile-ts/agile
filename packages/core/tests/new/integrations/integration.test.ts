@@ -11,6 +11,7 @@ describe("Integration Tests", () => {
       key: "test",
       ...methods,
     };
+
     const integration = new Integration(integrationConfig);
 
     expect(integration.ready).toBeFalsy();

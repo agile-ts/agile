@@ -193,6 +193,7 @@ describe("Persistent Tests", () => {
 
       it("should return false if set key and no set StorageKeys", () => {
         persistent.key = "test";
+
         const isValid = persistent.validatePersistent();
 
         expect(isValid).toBeFalsy();
@@ -206,6 +207,7 @@ describe("Persistent Tests", () => {
       it("should return false if no set key and set StorageKeys", () => {
         persistent.defaultStorageKey = "test";
         persistent.storageKeys = ["test"];
+
         const isValid = persistent.validatePersistent();
 
         expect(isValid).toBeFalsy();
@@ -220,6 +222,7 @@ describe("Persistent Tests", () => {
         persistent.key = "test";
         persistent.defaultStorageKey = "test";
         persistent.storageKeys = ["test"];
+
         const isValid = persistent.validatePersistent();
 
         expect(isValid).toBeTruthy();
@@ -257,6 +260,7 @@ describe("Persistent Tests", () => {
           }),
           { default: true }
         );
+
         persistent.assignStorageKeys([]);
 
         expect(persistent.storageKeys).toStrictEqual(["storage1"]);

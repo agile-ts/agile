@@ -1,7 +1,13 @@
 import { Storages, Agile, Storage, Persistent } from "../../../src";
 
 describe("Storages Tests", () => {
-  const dummyAgile = new Agile({ localStorage: false });
+  let dummyAgile;
+
+  beforeEach(() => {
+    console.error = jest.fn();
+    console.warn = jest.fn();
+    dummyAgile = new Agile({ localStorage: false });
+  });
 
   it("should create Storages with default Settings", () => {
     const storages = new Storages(dummyAgile);
@@ -12,7 +18,6 @@ describe("Storages Tests", () => {
   });
 
   it("should create Storages with config.localStorage = true and get a warning", () => {
-    console.warn = jest.fn();
     const storages = new Storages(dummyAgile, { localStorage: true });
 
     expect(console.warn).toHaveBeenCalledWith(
@@ -94,8 +99,6 @@ describe("Storages Tests", () => {
       });
 
       it("should register Storage with config.default = false and should assign it as default Storage with a warning", () => {
-        console.warn = jest.fn();
-
         const success = storages.register(dummyStorage1, { default: false });
 
         expect(console.warn).toHaveBeenCalledWith(
@@ -149,8 +152,6 @@ describe("Storages Tests", () => {
       });
 
       it("shouldn't register Storage with the same key twice", () => {
-        console.error = jest.fn();
-
         const success1 = storages.register(dummyStorage1);
         const success2 = storages.register(dummyStorage1);
 
@@ -169,16 +170,9 @@ describe("Storages Tests", () => {
         });
         persistent.updateValue = jest.fn();
 
-        expect(persistent.ready).toBeTruthy();
-        expect(persistent.defaultStorageKey).toBe("storage1");
-
         const success = storages.register(dummyStorage1);
 
-        expect(persistent.ready).toBeTruthy();
-        expect(persistent.defaultStorageKey).toBe("storage1");
-
         expect(persistent.updateValue).toHaveBeenCalled();
-
         expect(success).toBeTruthy();
       });
 
@@ -195,9 +189,6 @@ describe("Storages Tests", () => {
           "validatePersistent"
         );
         const initialLoadingSpy = jest.spyOn(persistent, "initialLoading");
-
-        expect(persistent.ready).toBeFalsy();
-        expect(persistent.defaultStorageKey).toBeUndefined();
 
         const success = storages.register(dummyStorage1);
 
@@ -229,7 +220,6 @@ describe("Storages Tests", () => {
       });
 
       it("shouldn't get not existing Storage", () => {
-        console.error = jest.fn();
         const storage = storages.getStorage("notExistingStorage");
 
         expect(storage).toBeUndefined();
@@ -239,8 +229,8 @@ describe("Storages Tests", () => {
       });
 
       it("shouldn't get existing and not ready Storage", () => {
-        console.error = jest.fn();
         dummyStorage1.ready = false;
+
         const storage = storages.getStorage("storage1");
 
         expect(storage).toBeUndefined();
@@ -282,8 +272,6 @@ describe("Storages Tests", () => {
       });
 
       it("should get Value from default Storage if trying to get it from a not existing Storage at specific Key", () => {
-        console.error = jest.fn();
-
         return storages.get("value2", "notExistingStorage").then((value) => {
           expect(value).toBe("storage1Value2");
           expect(console.error).toHaveBeenCalledWith(
@@ -300,7 +288,6 @@ describe("Storages Tests", () => {
       });
 
       it("shouldn't get any Value from Storages with no registered Storage", () => {
-        console.error = jest.fn();
         const storages2 = new Storages(dummyAgile);
 
         return storages2.get("value1").then((value) => {
@@ -344,7 +331,6 @@ describe("Storages Tests", () => {
       });
 
       it("shouldn't set Value in Storages with no registered Storage", () => {
-        console.error = jest.fn();
         const storages2 = new Storages(dummyAgile);
 
         storages2.set("value1", "testValue");
@@ -387,7 +373,6 @@ describe("Storages Tests", () => {
       });
 
       it("shouldn't remove Value in Storages with no registered Storage", () => {
-        console.error = jest.fn();
         const storages2 = new Storages(dummyAgile);
 
         storages2.remove("value1");
