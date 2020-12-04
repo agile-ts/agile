@@ -5,7 +5,7 @@ import {
   Observer,
   SubController,
   SubscriptionContainer,
-} from "../../../src";
+} from "../../../../src";
 
 describe("SubController Tests", () => {
   let agile: Agile;

@@ -1,4 +1,4 @@
-import { Agile, Observer, SubscriptionContainer } from "../../../src";
+import { Agile, Observer, SubscriptionContainer } from "../../../../../src";
 
 describe("SubscriptionContainer Tests", () => {
   let dummyAgile: Agile;
