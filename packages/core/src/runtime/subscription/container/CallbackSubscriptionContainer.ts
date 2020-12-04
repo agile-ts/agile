@@ -16,7 +16,7 @@ export class CallbackSubscriptionContainer extends SubscriptionContainer {
    */
   constructor(
     callback: Function,
-    subs?: Set<Observer>,
+    subs: Array<Observer> = [],
     key?: SubscriptionContainerKeyType
   ) {
     super(subs, key);

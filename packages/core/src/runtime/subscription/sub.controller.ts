@@ -210,7 +210,7 @@ export class SubController {
   ): ComponentSubscriptionContainer {
     const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
-      new Set(subs),
+      subs,
       key
     );
     this.componentSubs.add(componentSubscriptionContainer);
@@ -252,7 +252,7 @@ export class SubController {
   ): CallbackSubscriptionContainer {
     const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
       callbackFunction,
-      new Set(subs),
+      subs,
       key
     );
     this.callbackSubs.add(callbackSubscriptionContainer);
