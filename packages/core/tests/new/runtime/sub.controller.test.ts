@@ -379,17 +379,21 @@ describe("SubController Tests", () => {
     });
 
     describe("mount function tests", () => {
-      it("should add componentInstance to mountedComponents and set its subscriptionContainer to ready", () => {
+      const dummyIntegration: any = {
+        dummy: "integration",
+      };
+      let componentSubscriptionContainer: ComponentSubscriptionContainer;
+
+      beforeEach(() => {
         agile.config.waitForMount = true;
-        const dummyIntegration: any = {
-          dummy: "integration",
-        };
-        const componentSubscriptionContainer = subController.registerComponentSubscription(
+        componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
           "myKey"
         );
+      });
 
+      it("should add componentInstance to mountedComponents and set its subscriptionContainer to ready", () => {
         subController.mount(dummyIntegration);
 
         expect(componentSubscriptionContainer.ready).toBeTruthy();
@@ -401,7 +405,27 @@ describe("SubController Tests", () => {
     });
 
     describe("unmount function tests", () => {
-      // TODO
+      const dummyIntegration: any = {
+        dummy: "integration",
+      };
+      let componentSubscriptionContainer: ComponentSubscriptionContainer;
+
+      beforeEach(() => {
+        agile.config.waitForMount = true;
+        componentSubscriptionContainer = subController.registerComponentSubscription(
+          dummyIntegration,
+          [dummyObserver1, dummyObserver2],
+          "myKey"
+        );
+        subController.mount(dummyIntegration);
+      });
+
+      it("should remove componentInstance from mountedComponents and set its subscriptionContainer to not ready", () => {
+        subController.unmount(dummyIntegration);
+
+        expect(componentSubscriptionContainer.ready).toBeFalsy();
+        expect(subController.mountedComponents.size).toBe(0);
+      });
     });
   });
 });

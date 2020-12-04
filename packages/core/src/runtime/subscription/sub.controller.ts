@@ -103,14 +103,14 @@ export class SubController {
     );
 
     // Register subs
-    subs.forEach((observable) => {
-      if (!observable) return;
+    subs.forEach((observer) => {
+      if (!observer) return;
 
       // Add Observer to SubscriptionContainer Subs
-      subscriptionContainer.subs.add(observable);
+      subscriptionContainer.subs.add(observer);
 
       // Add SubscriptionContainer to Observer Subs
-      observable.subscribe(subscriptionContainer);
+      observer.subscribe(subscriptionContainer);
     });
 
     return subscriptionContainer;
@@ -125,7 +125,7 @@ export class SubController {
    * @param subscriptionInstance - SubscriptionContainer or Component that holds an SubscriptionContainer
    */
   public unsubscribe(subscriptionInstance: any) {
-    // Helper function to unsubscribe SubscriptionContainer from Observer
+    // Helper function to remove SubscriptionContainer from Observer
     const unsub = (subscriptionContainer: SubscriptionContainer) => {
       subscriptionContainer.ready = false;
 
