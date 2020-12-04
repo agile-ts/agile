@@ -14,6 +14,8 @@ export class SubController {
   public componentSubs: Set<ComponentSubscriptionContainer> = new Set(); // Holds all registered Component based Subscriptions
   public callbackSubs: Set<CallbackSubscriptionContainer> = new Set(); // Holds all registered Callback based Subscriptions
 
+  public mountedComponents: Set<any> = new Set(); // Holds all mounted Components (only if agileInstance.config.mount = true)
+
   /**
    * @internal
    * SubController - Handles subscriptions to Components
@@ -50,7 +52,8 @@ export class SubController {
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
       integrationInstance,
-      subsArray
+      subsArray,
+      key
     );
 
     // Set SubscriptionContainer to Object based
@@ -122,11 +125,11 @@ export class SubController {
    * @param subscriptionInstance - SubscriptionContainer or Component that holds an SubscriptionContainer
    */
   public unsubscribe(subscriptionInstance: any) {
-    // Helper function to unsubscribe callback or component based subscription
+    // Helper function to unsubscribe SubscriptionContainer from Observer
     const unsub = (subscriptionContainer: SubscriptionContainer) => {
       subscriptionContainer.ready = false;
 
-      // Removes SubscriptionContainer from Observer subs
+      // Remove SubscriptionContainers from Observer
       subscriptionContainer.subs.forEach((observer) => {
         observer.unsubscribe(subscriptionContainer);
       });
@@ -141,26 +144,44 @@ export class SubController {
       Agile.logger.if
         .tag(["core", "subscription"])
         .info(
-          "Agile: Unregistered Callback based Subscription ",
+          "Unregistered Callback based Subscription ",
           subscriptionInstance
         );
+      return;
     }
 
     // Unsubscribe component based Subscription
-    // Check if component/class has property componentSubscriptionContainer, which holds an instance of ComponentSubscriptionContainer
-    if (subscriptionInstance.componentSubscriptionContainer) {
-      unsub(
-        subscriptionInstance.componentSubscriptionContainer as ComponentSubscriptionContainer
-      );
+    if (subscriptionInstance instanceof ComponentSubscriptionContainer) {
+      unsub(subscriptionInstance);
       this.componentSubs.delete(subscriptionInstance);
 
       // Logging
       Agile.logger.if
         .tag(["core", "subscription"])
         .info(
-          "Agile: Unregistered Component based Subscription ",
+          "Unregistered Component based Subscription ",
           subscriptionInstance
         );
+      return;
+    }
+
+    // Unsubscribe component based Subscription with subscriptionInstance that holds a componentSubscriptionContainer
+    if (subscriptionInstance.componentSubscriptionContainer) {
+      unsub(
+        subscriptionInstance.componentSubscriptionContainer as ComponentSubscriptionContainer
+      );
+      this.componentSubs.delete(
+        subscriptionInstance.componentSubscriptionContainer
+      );
+
+      // Logging
+      Agile.logger.if
+        .tag(["core", "subscription"])
+        .info(
+          "Unregistered Component based Subscription ",
+          subscriptionInstance
+        );
+      return;
     }
   }
 
@@ -194,7 +215,7 @@ export class SubController {
    * @param subs - Initial Subscriptions
    * @param key - Key/Name of SubscriptionContainer
    */
-  private registerComponentSubscription(
+  public registerComponentSubscription(
     componentInstance: any,
     subs: Array<Observer> = [],
     key?: SubscriptionContainerKeyType
@@ -206,19 +227,20 @@ export class SubController {
     );
     this.componentSubs.add(componentSubscriptionContainer);
 
-    // To have an instance of a SubscriptionContainer in the Component (needed to unsubscribe component later)
-    if (componentInstance.componentSubscriptionContainer)
-      componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
-
     // Set to ready if not waiting for component to mount
-    if (!this.agileInstance().config.waitForMount)
-      componentSubscriptionContainer.ready = true;
+    if (this.agileInstance().config.waitForMount) {
+      if (this.mountedComponents.has(componentInstance))
+        componentSubscriptionContainer.ready = true;
+    } else componentSubscriptionContainer.ready = true;
+
+    // To have an instance of the SubscriptionContainer in the Component (necessary to unsubscribe component later)
+    componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
 
     // Logging
     Agile.logger.if
       .tag(["core", "subscription"])
       .info(
-        "Agile: Registered Component based Subscription ",
+        "Registered Component based Subscription ",
         componentSubscriptionContainer
       );
 
@@ -235,7 +257,7 @@ export class SubController {
    * @param subs - Initial Subscriptions
    * @param key - Key/Name of SubscriptionContainer
    */
-  private registerCallbackSubscription(
+  public registerCallbackSubscription(
     callbackFunction: () => void,
     subs: Array<Observer> = [],
     key?: SubscriptionContainerKeyType
@@ -252,7 +274,7 @@ export class SubController {
     Agile.logger.if
       .tag(["core", "subscription"])
       .info(
-        "Agile: Registered Callback based Subscription ",
+        "Registered Callback based Subscription ",
         callbackSubscriptionContainer
       );
 
@@ -268,7 +290,24 @@ export class SubController {
    * @param componentInstance - SubscriptionContainer(Component) that gets mounted
    */
   public mount(componentInstance: any) {
-    if (!componentInstance.componentSubscriptionContainer) return;
-    componentInstance.componentSubscriptionContainer.ready = true;
+    if (componentInstance.componentSubscriptionContainer)
+      componentInstance.componentSubscriptionContainer.ready = true;
+
+    this.mountedComponents.add(componentInstance);
+  }
+
+  //=========================================================================================================
+  // Unmount
+  //=========================================================================================================
+  /**
+   * @internal
+   * Unmounts Component based SubscriptionContainer
+   * @param componentInstance - SubscriptionContainer(Component) that gets unmounted
+   */
+  public unmount(componentInstance: any) {
+    if (componentInstance.componentSubscriptionContainer)
+      componentInstance.componentSubscriptionContainer.ready = false;
+
+    this.mountedComponents.delete(componentInstance);
   }
 }
