@@ -6,7 +6,7 @@ export class SubscriptionContainer {
   public subs: Set<Observer> = new Set<Observer>([]); // Observers that are Subscribed to this SubscriptionContainer (Component)
 
   // For Object based Subscription
-  public isObjectBased: boolean = false;
+  public isObjectBased = false;
   public changedObjectKeys: Array<string> = []; // Holds temporary changed Object Keys (Runtime)
   public subsObject?: { [key: string]: Observer }; // Same as subs but in Object form
 

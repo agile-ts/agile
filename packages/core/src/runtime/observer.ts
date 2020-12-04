@@ -33,9 +33,9 @@ export class Observer<ValueType = any> {
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.value = config.value;
-    config.deps?.forEach((observer) => this.deps.add(observer));
+    config.deps?.forEach((observer) => this.depend(observer));
     config.subs?.forEach((subscriptionContainer) =>
-      this.subs.add(subscriptionContainer)
+      this.subscribe(subscriptionContainer)
     );
   }
 
@@ -90,8 +90,12 @@ export class Observer<ValueType = any> {
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
    */
   public subscribe(subscriptionContainer: SubscriptionContainer) {
-    if (!this.subs.has(subscriptionContainer))
+    if (!this.subs.has(subscriptionContainer)) {
       this.subs.add(subscriptionContainer);
+
+      // Add this to subscriptionContainer to keep track of the Observers the subscriptionContainer hold
+      subscriptionContainer.subs.add(this);
+    }
   }
 
   //=========================================================================================================
@@ -103,8 +107,10 @@ export class Observer<ValueType = any> {
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
    */
   public unsubscribe(subscriptionContainer: SubscriptionContainer) {
-    if (this.subs.has(subscriptionContainer))
+    if (this.subs.has(subscriptionContainer)) {
       this.subs.delete(subscriptionContainer);
+      subscriptionContainer.subs.delete(this);
+    }
   }
 }
 

@@ -84,6 +84,11 @@ describe("Observer Tests", () => {
         expect(observer.subs.size).toBe(2);
         expect(observer.subs.has(dummySubscriptionContainer1));
         expect(observer.subs.has(dummySubscriptionContainer2));
+
+        expect(dummySubscriptionContainer1.subs.size).toBe(1);
+        expect(dummySubscriptionContainer1.subs.has(observer)).toBeTruthy();
+        expect(dummySubscriptionContainer2.subs.size).toBe(1);
+        expect(dummySubscriptionContainer2.subs.has(observer)).toBeTruthy();
       });
 
       it("shouldn't add same subscriptionContainer twice to subs", () => {
@@ -92,6 +97,9 @@ describe("Observer Tests", () => {
 
         expect(observer.subs.size).toBe(1);
         expect(observer.subs.has(dummySubscriptionContainer1));
+
+        expect(dummySubscriptionContainer1.subs.size).toBe(1);
+        expect(dummySubscriptionContainer1.subs.has(observer)).toBeTruthy();
       });
     });
 
@@ -111,6 +119,10 @@ describe("Observer Tests", () => {
 
         expect(observer.subs.size).toBe(1);
         expect(observer.subs.has(dummySubscriptionContainer1));
+
+        expect(dummySubscriptionContainer1.subs.size).toBe(0);
+        expect(dummySubscriptionContainer2.subs.size).toBe(1);
+        expect(dummySubscriptionContainer2.subs.has(observer)).toBeTruthy();
       });
     });
 

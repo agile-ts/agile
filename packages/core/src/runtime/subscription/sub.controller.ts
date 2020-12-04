@@ -64,10 +64,6 @@ export class SubController {
     for (let key in subs) {
       const observer = subs[key];
 
-      // Add Observer to SubscriptionContainer Subs
-      subscriptionContainer.subs.add(observer);
-
-      // Add SubscriptionContainer to Observer Subs
       observer.subscribe(subscriptionContainer);
 
       // Add Observer Value to props
@@ -103,15 +99,7 @@ export class SubController {
     );
 
     // Register subs
-    subs.forEach((observer) => {
-      if (!observer) return;
-
-      // Add Observer to SubscriptionContainer Subs
-      subscriptionContainer.subs.add(observer);
-
-      // Add SubscriptionContainer to Observer Subs
-      observer.subscribe(subscriptionContainer);
-    });
+    subs.forEach((observer) => observer.subscribe(subscriptionContainer));
 
     return subscriptionContainer;
   }

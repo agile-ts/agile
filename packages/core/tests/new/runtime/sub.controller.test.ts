@@ -43,8 +43,8 @@ describe("SubController Tests", () => {
         subController.registerSubscription = jest.fn(
           () => dummySubscriptionContainer
         );
-        dummyObserver1.subscribe = jest.fn();
-        dummyObserver2.subscribe = jest.fn();
+        jest.spyOn(dummyObserver1, "subscribe");
+        jest.spyOn(dummyObserver2, "subscribe");
       });
 
       it("should create subContainer and add in Object shape passed observers to it", () => {
@@ -102,8 +102,8 @@ describe("SubController Tests", () => {
         subController.registerSubscription = jest.fn(
           () => dummySubscriptionContainer
         );
-        dummyObserver1.subscribe = jest.fn();
-        dummyObserver2.subscribe = jest.fn();
+        jest.spyOn(dummyObserver1, "subscribe");
+        jest.spyOn(dummyObserver2, "subscribe");
       });
 
       it("should create subContainer and add in Array Shape passed observers to it", () => {

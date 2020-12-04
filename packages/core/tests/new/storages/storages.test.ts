@@ -180,24 +180,18 @@ describe("Storages Tests", () => {
         const persistent = new Persistent(dummyAgile, {
           key: "persistent1",
         });
-        const assignStorageKeysSpy = jest.spyOn(
-          persistent,
-          "assignStorageKeys"
-        );
-        const validatePersistentSpy = jest.spyOn(
-          persistent,
-          "validatePersistent"
-        );
-        const initialLoadingSpy = jest.spyOn(persistent, "initialLoading");
+        jest.spyOn(persistent, "assignStorageKeys");
+        jest.spyOn(persistent, "validatePersistent");
+        jest.spyOn(persistent, "initialLoading");
 
         const success = storages.register(dummyStorage1);
 
         expect(persistent.ready).toBeTruthy();
         expect(persistent.defaultStorageKey).toBe("storage1");
 
-        expect(assignStorageKeysSpy).toHaveBeenCalled();
-        expect(validatePersistentSpy).toHaveBeenCalled();
-        expect(initialLoadingSpy).toHaveBeenCalled();
+        expect(persistent.assignStorageKeys).toHaveBeenCalled();
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).toHaveBeenCalled();
 
         expect(success).toBeTruthy();
       });
@@ -241,12 +235,9 @@ describe("Storages Tests", () => {
     });
 
     describe("get function tests", () => {
-      let storage1GetSpy;
-      let storage2GetSpy;
-
       beforeEach(() => {
-        storage1GetSpy = jest.spyOn(dummyStorage1, "get");
-        storage2GetSpy = jest.spyOn(dummyStorage2, "get");
+        jest.spyOn(dummyStorage1, "get");
+        jest.spyOn(dummyStorage2, "get");
 
         storages.register(dummyStorage1);
         storages.register(dummyStorage2);
@@ -260,14 +251,14 @@ describe("Storages Tests", () => {
       it("should get existing Value from default Storage", () => {
         return storages.get("value1").then((value) => {
           expect(value).toBe("storage1Value1");
-          expect(storage1GetSpy).toHaveBeenCalledWith("value1");
+          expect(dummyStorage1.get).toHaveBeenCalledWith("value1");
         });
       });
 
       it("should get existing Value from existing Storage at specific Key", () => {
         return storages.get("value1", "storage2").then((value) => {
           expect(value).toBe("storage2Value1");
-          expect(storage2GetSpy).toHaveBeenCalledWith("value1");
+          expect(dummyStorage2.get).toHaveBeenCalledWith("value1");
         });
       });
 
@@ -283,7 +274,7 @@ describe("Storages Tests", () => {
       it("shouldn't get not existing Value from default Storage", () => {
         return storages.get("unknownValue").then((value) => {
           expect(value).toBeUndefined();
-          expect(storage1GetSpy).toHaveBeenCalledWith("unknownValue");
+          expect(dummyStorage1.get).toHaveBeenCalledWith("unknownValue");
         });
       });
 
@@ -300,14 +291,10 @@ describe("Storages Tests", () => {
     });
 
     describe("set function tests", () => {
-      let storage1SetSpy;
-      let storage2SetSpy;
-      let storage3SetSpy;
-
       beforeEach(() => {
-        storage1SetSpy = jest.spyOn(dummyStorage1, "set");
-        storage2SetSpy = jest.spyOn(dummyStorage2, "set");
-        storage3SetSpy = jest.spyOn(dummyStorage2, "set");
+        jest.spyOn(dummyStorage1, "set");
+        jest.spyOn(dummyStorage2, "set");
+        jest.spyOn(dummyStorage3, "set");
 
         storages.register(dummyStorage1);
         storages.register(dummyStorage2);
@@ -317,17 +304,17 @@ describe("Storages Tests", () => {
       it("should set Value in default Storage", () => {
         storages.set("value1", "testValue");
 
-        expect(storage1SetSpy).toHaveBeenCalledWith("value1", "testValue");
-        expect(storage2SetSpy).not.toHaveBeenCalled();
-        expect(storage3SetSpy).not.toHaveBeenCalled();
+        expect(dummyStorage1.set).toHaveBeenCalledWith("value1", "testValue");
+        expect(dummyStorage2.set).not.toHaveBeenCalled();
+        expect(dummyStorage3.set).not.toHaveBeenCalled();
       });
 
       it("should set Value in Storages at specific Keys", () => {
         storages.set("value1", "testValue", ["storage2", "storage3"]);
 
-        expect(storage1SetSpy).not.toHaveBeenCalled();
-        expect(storage2SetSpy).toHaveBeenCalledWith("value1", "testValue");
-        expect(storage3SetSpy).toHaveBeenCalledWith("value1", "testValue");
+        expect(dummyStorage1.set).not.toHaveBeenCalled();
+        expect(dummyStorage2.set).toHaveBeenCalledWith("value1", "testValue");
+        expect(dummyStorage3.set).toHaveBeenCalledWith("value1", "testValue");
       });
 
       it("shouldn't set Value in Storages with no registered Storage", () => {
@@ -342,14 +329,10 @@ describe("Storages Tests", () => {
     });
 
     describe("remove function tests", () => {
-      let storage1RemoveSpy;
-      let storage2RemoveSpy;
-      let storage3RemoveSpy;
-
       beforeEach(() => {
-        storage1RemoveSpy = jest.spyOn(dummyStorage1, "remove");
-        storage2RemoveSpy = jest.spyOn(dummyStorage2, "remove");
-        storage3RemoveSpy = jest.spyOn(dummyStorage2, "remove");
+        jest.spyOn(dummyStorage1, "remove");
+        jest.spyOn(dummyStorage2, "remove");
+        jest.spyOn(dummyStorage3, "remove");
 
         storages.register(dummyStorage1);
         storages.register(dummyStorage2);
@@ -359,17 +342,17 @@ describe("Storages Tests", () => {
       it("should remove Value in default Storage", () => {
         storages.remove("value1");
 
-        expect(storage1RemoveSpy).toHaveBeenCalledWith("value1");
-        expect(storage2RemoveSpy).not.toHaveBeenCalled();
-        expect(storage3RemoveSpy).not.toHaveBeenCalled();
+        expect(dummyStorage1.remove).toHaveBeenCalledWith("value1");
+        expect(dummyStorage2.remove).not.toHaveBeenCalled();
+        expect(dummyStorage3.remove).not.toHaveBeenCalled();
       });
 
       it("should remove Value in Storages at specific Keys", () => {
         storages.remove("value1", ["storage2", "storage3"]);
 
-        expect(storage1RemoveSpy).not.toHaveBeenCalled();
-        expect(storage2RemoveSpy).toHaveBeenCalledWith("value1");
-        expect(storage3RemoveSpy).toHaveBeenCalledWith("value1");
+        expect(dummyStorage1.remove).not.toHaveBeenCalled();
+        expect(dummyStorage2.remove).toHaveBeenCalledWith("value1");
+        expect(dummyStorage3.remove).toHaveBeenCalledWith("value1");
       });
 
       it("shouldn't remove Value in Storages with no registered Storage", () => {
