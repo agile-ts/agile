@@ -111,7 +111,7 @@ export class Runtime {
    * @internal
    * Updates/Rerenders all Subscribed Components of the Job (Observer)
    */
-  private updateSubscribers(): void {
+  public updateSubscribers(): void {
     if (!this.agileInstance().integrations.hasIntegration()) {
       this.jobsToRerender = [];
       return;
