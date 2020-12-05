@@ -277,11 +277,11 @@ describe("Persistent Tests", () => {
         persistent.onLoad = (success) => {
           onLoadSuccess = success;
         };
+        jest.spyOn(persistent, "updateValue");
       });
 
       it("shouldn't call updateValue if value got loaded", () => {
         persistent.loadValue = jest.fn(() => Promise.resolve(true));
-        persistent.updateValue = jest.fn();
 
         persistent.initialLoading().then(() => {
           expect(persistent.loadValue).toHaveBeenCalled();
@@ -292,7 +292,6 @@ describe("Persistent Tests", () => {
 
       it("should call updateValue if value doesn't got loaded", () => {
         persistent.loadValue = jest.fn(() => Promise.resolve(false));
-        persistent.updateValue = jest.fn();
 
         persistent.initialLoading().then(() => {
           expect(persistent.loadValue).toHaveBeenCalled();

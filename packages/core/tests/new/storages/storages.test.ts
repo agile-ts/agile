@@ -168,7 +168,7 @@ describe("Storages Tests", () => {
           key: "persistent1",
           storageKeys: ["storage1"],
         });
-        persistent.updateValue = jest.fn();
+        jest.spyOn(persistent, "updateValue");
 
         const success = storages.register(dummyStorage1);
 

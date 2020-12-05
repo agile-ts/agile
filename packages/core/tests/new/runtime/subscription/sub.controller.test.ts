@@ -153,8 +153,8 @@ describe("SubController Tests", () => {
         subController.registerComponentSubscription = jest.fn(
           () => dummySubscriptionContainer as ComponentSubscriptionContainer
         );
-        dummyObserver1.subscribe = jest.fn();
-        dummyObserver2.subscribe = jest.fn();
+        jest.spyOn(dummyObserver1, "subscribe");
+        jest.spyOn(dummyObserver2, "subscribe");
       });
 
       it("should call registerCallbackSubscription if passed integrationInstance is Function", () => {
@@ -309,8 +309,8 @@ describe("SubController Tests", () => {
 
     describe("unsubscribe function tests", () => {
       beforeEach(() => {
-        dummyObserver1.unsubscribe = jest.fn();
-        dummyObserver2.unsubscribe = jest.fn();
+        jest.spyOn(dummyObserver1, "unsubscribe");
+        jest.spyOn(dummyObserver2, "unsubscribe");
       });
 
       it("should unsubscribe callbackSubscriptionContainer", () => {
