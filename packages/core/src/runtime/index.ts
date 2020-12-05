@@ -72,7 +72,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job and adds him to the rerender queue if necessary
+   * Performs Job and adds it to the rerender queue if necessary
    * @param job - Job that gets performed
    */
   public perform(job: Job): void {
@@ -90,7 +90,7 @@ export class Runtime {
       .tag(["runtime"])
       .info(`Completed Job '${job.observer.key}'`, job);
 
-    // Perform Jobs as long as Jobs are in queue, if no job left update/rerender Subscribers of performed Jobs
+    // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
     if (this.jobQueue.length > 0) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
