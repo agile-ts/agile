@@ -1,4 +1,4 @@
-import { Observer, defineConfig } from "../internal";
+import { Observer, defineConfig, SubscriptionContainer } from "../internal";
 
 export class Job<ObserverType extends Observer = Observer> {
   public _key?: JobKey;
@@ -6,6 +6,7 @@ export class Job<ObserverType extends Observer = Observer> {
   public config: JobConfigInterface;
   public rerender: boolean; // If Job will cause rerender on subscriptionContainer in Observer
   public performed = false; // If Job has been performed by Runtime
+  public subscriptionContainersToUpdate: Set<SubscriptionContainer> = new Set(); // SubscriptionContainer that have to be updated/rerendered
 
   /**
    * @internal
@@ -32,6 +33,7 @@ export class Job<ObserverType extends Observer = Observer> {
       !config.background &&
       this.observer.agileInstance().integrations.hasIntegration();
     this._key = config.key;
+    this.subscriptionContainersToUpdate = observer.subs;
   }
 
   public get key(): JobKey | undefined {

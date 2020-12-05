@@ -15,7 +15,7 @@ export class Runtime {
   // Queue system
   public currentJob: Job | null = null;
   public jobQueue: Array<Job> = [];
-  public notReadyJobsToRerender: Array<Job> = []; // Jobs that are performed but not ready to rerender (wait for mount)
+  public notReadyJobsToRerender: Set<Job> = new Set(); // Jobs that got performed but aren't ready to get rerendered (wait for mount)
   public jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
   // Tracking - Used to track computed dependencies
@@ -112,7 +112,7 @@ export class Runtime {
    * Updates/Rerenders all Subscribed Components of the Job (Observer)
    */
   public updateSubscribers(): void {
-    if (!this.agileInstance().integrations.hasIntegration()) {
+    if (!this.agileInstance().hasIntegration()) {
       this.jobsToRerender = [];
       return;
     }
@@ -123,11 +123,17 @@ export class Runtime {
       SubscriptionContainer
     >();
 
+    const jobsToRerender = this.jobsToRerender.concat(
+      Array.from(this.notReadyJobsToRerender)
+    );
+    this.notReadyJobsToRerender = new Set();
+    this.jobsToRerender = [];
+
     // Check if Job Subscriptions are ready and add them to subscriptionsToUpdate
-    this.jobsToRerender.concat(this.notReadyJobsToRerender).forEach((job) => {
-      job.observer.subs.forEach((subscriptionContainer) => {
+    jobsToRerender.forEach((job) => {
+      job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
         if (!subscriptionContainer.ready) {
-          this.notReadyJobsToRerender.push(job);
+          this.notReadyJobsToRerender.add(job);
 
           // Logging
           Agile.logger.warn(
@@ -142,6 +148,7 @@ export class Runtime {
           this.handleObjectBasedSubscription(subscriptionContainer, job);
 
         subscriptionsToUpdate.add(subscriptionContainer);
+        job.subscriptionContainersToUpdate.delete(subscriptionContainer);
       });
     });
 
@@ -163,8 +170,6 @@ export class Runtime {
     Agile.logger.if
       .tag(["runtime"])
       .info("Updated/Rerendered Subscriptions", subscriptionsToUpdate);
-
-    this.jobsToRerender = [];
   }
 
   //=========================================================================================================
