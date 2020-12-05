@@ -1,25 +1,25 @@
 import {
   Agile,
   SubscriptionContainer,
-  defineConfig,
   Observer,
   Job,
-  JobConfigInterface,
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
+  CreateJobConfigInterface,
+  defineConfig,
 } from "../internal";
 
 export class Runtime {
   public agileInstance: () => Agile;
 
   // Queue system
-  private currentJob: Job | null = null;
-  private jobQueue: Array<Job> = [];
-  private notReadyJobsToRerender: Array<Job> = []; // Jobs that are performed but not ready to rerender (wait for mount)
-  private jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
+  public currentJob: Job | null = null;
+  public jobQueue: Array<Job> = [];
+  public notReadyJobsToRerender: Array<Job> = []; // Jobs that are performed but not ready to rerender (wait for mount)
+  public jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
   // Tracking - Used to track computed dependencies
-  public trackObservers: boolean = false; // Check if Runtime tracks Observers
+  public trackObservers = false;
   public foundObservers: Set<Observer> = new Set(); // Observers that got tracked (reset after stop tracking)
 
   /**
@@ -41,24 +41,24 @@ export class Runtime {
    * @param observer - Observer that gets performed by the Runtime
    * @param config - Config
    */
-  public ingest(observer: Observer, config: JobConfigInterface): void {
-    config = defineConfig<JobConfigInterface>(config, {
+  public ingest(observer: Observer, config: IngestConfigInterface = {}): void {
+    config = defineConfig(config, {
       perform: true,
-      background: false,
-      sideEffects: true,
-      force: false,
-      storage: true,
     });
 
-    const job = new Job(observer, config);
+    const job = new Job(observer, {
+      storage: config.storage,
+      sideEffects: config.sideEffects,
+      force: config.force,
+      background: config.background,
+      key: config.key,
+    });
+    this.jobQueue.push(job);
 
     // Logging
     Agile.logger.if
       .tag(["runtime"])
       .info(`Created Job(${job.observer.key})`, job);
-
-    // Add Job to JobQueue (-> no Job get missing)
-    this.jobQueue.push(job);
 
     // Perform Job
     if (config.perform) {
@@ -75,7 +75,7 @@ export class Runtime {
    * Performs Job and adds him to the rerender queue if necessary
    * @param job - Job that gets performed
    */
-  private perform(job: Job): void {
+  public perform(job: Job): void {
     this.currentJob = job;
 
     // Perform Job
@@ -88,7 +88,7 @@ export class Runtime {
     // Logging
     Agile.logger.if
       .tag(["runtime"])
-      .info(`Completed Job(${job.observer.key})`, job);
+      .info(`Completed Job '${job.observer.key}'`, job);
 
     // Perform Jobs as long as Jobs are in queue, if no job left update/rerender Subscribers of performed Jobs
     if (this.jobQueue.length > 0) {
@@ -237,4 +237,11 @@ export class Runtime {
 
     return finalFoundObservers;
   }
+}
+
+/**
+ * @param perform - If Job gets performed immediately
+ */
+export interface IngestConfigInterface extends CreateJobConfigInterface {
+  perform?: boolean;
 }
