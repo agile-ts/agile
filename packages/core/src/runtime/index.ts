@@ -114,6 +114,7 @@ export class Runtime {
   public updateSubscribers(): void {
     if (!this.agileInstance().hasIntegration()) {
       this.jobsToRerender = [];
+      this.notReadyJobsToRerender = new Set();
       return;
     }
     if (this.jobsToRerender.length <= 0) return;

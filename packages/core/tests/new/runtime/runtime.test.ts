@@ -1,9 +1,18 @@
-import { Agile, Job, Observer, Runtime } from "../../../src";
+import {
+  Agile,
+  CallbackSubscriptionContainer,
+  ComponentSubscriptionContainer,
+  Job,
+  Observer,
+  Runtime,
+} from "../../../src";
+import testIntegration from "../../helper/test.integration";
 
 describe("Runtime Tests", () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    console.warn = jest.fn();
     dummyAgile = new Agile({ localStorage: false });
   });
 
@@ -12,7 +21,7 @@ describe("Runtime Tests", () => {
 
     expect(runtime.currentJob).toBeNull();
     expect(runtime.jobQueue).toStrictEqual([]);
-    expect(runtime.notReadyJobsToRerender).toStrictEqual([]);
+    expect(runtime.notReadyJobsToRerender.size).toBe(0);
     expect(runtime.jobsToRerender).toStrictEqual([]);
     expect(runtime.trackObservers).toBeFalsy();
     expect(runtime.foundObservers.size).toBe(0);
@@ -22,17 +31,20 @@ describe("Runtime Tests", () => {
     let runtime: Runtime;
     let dummyObserver1: Observer;
     let dummyObserver2: Observer;
-    let dummyJob: Job;
+    let dummyObserver3: Observer;
 
     beforeEach(() => {
       runtime = new Runtime(dummyAgile);
       dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
       dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
-      dummyJob = new Job(dummyObserver1);
+      dummyObserver3 = new Observer(dummyAgile, { key: "dummyObserver3" });
     });
 
     describe("ingest function tests", () => {
+      let dummyJob: Job;
+
       beforeEach(() => {
+        dummyJob = new Job(dummyObserver1);
         runtime.perform = jest.fn();
         runtime.jobQueue.shift = jest.fn(() => dummyJob);
       });
@@ -114,6 +126,138 @@ describe("Runtime Tests", () => {
       });
     });
 
-    describe("updateSubscribers function tests", () => {});
+    describe("updateSubscribers function tests", () => {
+      let dummyJob1: Job;
+      let dummyJob2: Job;
+      let dummyJob3: Job;
+      let dummyCallbackSubscriptionContainer1: CallbackSubscriptionContainer;
+      let dummyCallbackFunction1 = () => {};
+      let dummyCallbackSubscriptionContainer2: CallbackSubscriptionContainer;
+      let dummyCallbackFunction2 = () => {};
+      let dummyComponentSubscriptionContainer1: ComponentSubscriptionContainer;
+      let dummyComponent1 = {
+        my: "cool component",
+      };
+      let dummyComponentSubscriptionContainer2: ComponentSubscriptionContainer;
+      let dummyComponent2 = {
+        my: "second cool component",
+      };
+
+      beforeEach(() => {
+        dummyAgile.integrate(testIntegration);
+        dummyJob1 = new Job(dummyObserver1, { key: "dummyJob1" });
+        dummyJob2 = new Job(dummyObserver2, { key: "dummyJob2" });
+        dummyJob3 = new Job(dummyObserver3, { key: "dummyJob3" });
+
+        dummyObserver1.value = "sexy value";
+        dummyObserver2.value = "cool value";
+        dummyObserver3.value = "jeff value";
+
+        dummyCallbackSubscriptionContainer1 = dummyAgile.subController.subscribeWithSubsArray(
+          dummyCallbackFunction1,
+          [dummyObserver1, dummyObserver2, dummyObserver3]
+        ) as CallbackSubscriptionContainer;
+        dummyCallbackSubscriptionContainer1.callback = jest.fn();
+
+        dummyCallbackSubscriptionContainer2 = dummyAgile.subController.subscribeWithSubsArray(
+          dummyCallbackFunction2,
+          [dummyObserver2]
+        ) as CallbackSubscriptionContainer;
+        dummyCallbackSubscriptionContainer2.callback = jest.fn();
+        dummyCallbackSubscriptionContainer2.ready = false;
+
+        dummyComponentSubscriptionContainer1 = dummyAgile.subController.subscribeWithSubsObject(
+          dummyComponent1,
+          {
+            observer1: dummyObserver1,
+            observer2: dummyObserver2,
+            observer3: dummyObserver3,
+          }
+        ).subscriptionContainer as ComponentSubscriptionContainer;
+
+        dummyComponentSubscriptionContainer2 = dummyAgile.subController.subscribeWithSubsObject(
+          dummyComponent2,
+          {
+            observer2: dummyObserver2,
+          }
+        ).subscriptionContainer as ComponentSubscriptionContainer;
+        dummyComponentSubscriptionContainer2.ready = false;
+
+        runtime.jobsToRerender.push(dummyJob1);
+        runtime.notReadyJobsToRerender.add(dummyJob2);
+
+        jest.spyOn(dummyAgile.integrations, "update");
+      });
+
+      it("shouldn't update subscribers if agile has no integration and should reset jobsToRerender", () => {
+        dummyAgile.hasIntegration = jest.fn(() => false);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(dummyAgile.integrations.update).not.toHaveBeenCalled();
+        expect(
+          dummyCallbackSubscriptionContainer1.callback
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyCallbackSubscriptionContainer2.callback
+        ).not.toHaveBeenCalled();
+      });
+
+      it("should update ready subscriptionContainer and add jobs with not ready subscriptionContainer to notReadyJobsToRerender and it should reset jobsToRerender", () => {
+        dummyAgile.hasIntegration = jest.fn(() => true);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(1);
+        expect(runtime.notReadyJobsToRerender.has(dummyJob2)).toBeTruthy();
+
+        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
+          dummyComponent1,
+          {
+            observer1: "sexy value",
+            observer2: "cool value",
+          }
+        );
+        expect(dummyAgile.integrations.update).not.toHaveBeenCalledWith(
+          dummyComponent2,
+          {
+            observer1: "cool value",
+          }
+        );
+        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
+        expect(
+          dummyCallbackSubscriptionContainer2.callback
+        ).not.toHaveBeenCalled();
+
+        expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
+        expect(dummyJob2.subscriptionContainersToUpdate.size).toBe(2);
+        expect(
+          dummyJob2.subscriptionContainersToUpdate.has(
+            dummyComponentSubscriptionContainer2
+          )
+        ).toBeTruthy();
+        expect(
+          dummyJob2.subscriptionContainersToUpdate.has(
+            dummyCallbackSubscriptionContainer2
+          )
+        ).toBeTruthy();
+
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
+          dummyCallbackSubscriptionContainer2
+        );
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
+          dummyComponentSubscriptionContainer2
+        );
+      });
+    });
+
+    describe("handleObjectBasedSubscription function tests", () => {
+      // TODO
+    })
   });
 });
