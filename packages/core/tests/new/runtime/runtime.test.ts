@@ -383,5 +383,37 @@ describe("Runtime Tests", () => {
         ]);
       });
     });
+
+    describe("getObjectBasedProps function tests", () => {
+      let subscriptionContainer: SubscriptionContainer;
+      let dummyFunction = () => {};
+
+      beforeEach(() => {
+        subscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+          dummyFunction,
+          {
+            observer1: dummyObserver1,
+            observer2: dummyObserver2,
+            observer3: dummyObserver3,
+          }
+        ).subscriptionContainer;
+        dummyObserver1.value = "dummyObserverValue1";
+        dummyObserver3.value = "dummyObserverValue3";
+      });
+
+      it("should build Observer Value object out of observerKeysToUpdate and reset it after that", () => {
+        subscriptionContainer.observerKeysToUpdate.push("observer1");
+        subscriptionContainer.observerKeysToUpdate.push("observer2");
+        subscriptionContainer.observerKeysToUpdate.push("observer3");
+
+        const props = runtime.getObjectBasedProps(subscriptionContainer);
+
+        expect(props).toStrictEqual({
+          observer1: "dummyObserverValue1",
+          observer3: "dummyObserverValue3",
+        });
+        expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
+      });
+    });
   });
 });

@@ -214,21 +214,20 @@ export class Runtime {
   public getObjectBasedProps(
     subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
-    const finalObject: { [key: string]: any } = {};
+    const props: { [key: string]: any } = {};
 
-    // Map trough changed Keys and build finalObject
-    subscriptionContainer.observerKeysToUpdate.forEach((changedKey) => {
-      // Check if Observer at changedKey has value property, if so add it to final Object
+    // Map trough observerKeysToUpdate and build object out of Observer value
+    subscriptionContainer.observerKeysToUpdate.forEach((updatedKey) => {
       if (
         subscriptionContainer.subsObject &&
-        subscriptionContainer.subsObject[changedKey]["value"]
+        subscriptionContainer.subsObject[updatedKey]["value"]
       )
-        finalObject[changedKey] =
-          subscriptionContainer.subsObject[changedKey]["value"];
+        props[updatedKey] =
+          subscriptionContainer.subsObject[updatedKey]["value"];
     });
 
     subscriptionContainer.observerKeysToUpdate = [];
-    return finalObject;
+    return props;
   }
 
   //=========================================================================================================
