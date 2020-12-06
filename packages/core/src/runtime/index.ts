@@ -182,7 +182,7 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Finds key of Observer in subsObject and adds it to 'changedObjectKeys'
+   * Finds key of Observer (Job) in subsObject and adds it to 'changedObjectKeys'
    * @param subscriptionContainer - Object based SubscriptionContainer
    * @param job - Job that holds the searched Observer
    */
@@ -208,8 +208,8 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Builds Object from 'changedObjectKeys' with new Values provided by Observers
-   * @param subscriptionContainer - SubscriptionContainer from which the Object gets built
+   * Builds Object out of changedObjectKeys with Observer Value
+   * @param subscriptionContainer - Object based SubscriptionContainer
    */
   public getObjectBasedProps(
     subscriptionContainer: SubscriptionContainer
