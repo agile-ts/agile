@@ -119,7 +119,7 @@ export class Runtime {
     }
     if (this.jobsToRerender.length <= 0) return;
 
-    // Subscriptions that has to be updated/rerendered (Set = For preventing double subscriptions without further checks)
+    // Subscriptions that has to be updated/rerendered
     const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<
       SubscriptionContainer
     >();

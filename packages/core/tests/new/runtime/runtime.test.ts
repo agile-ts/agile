@@ -127,9 +127,11 @@ describe("Runtime Tests", () => {
     });
 
     describe("updateSubscribers function tests", () => {
+      let dummyObserver4: Observer;
       let dummyJob1: Job;
       let dummyJob2: Job;
       let dummyJob3: Job;
+      let dummyJob4: Job;
       let dummyCallbackSubscriptionContainer1: CallbackSubscriptionContainer;
       let dummyCallbackFunction1 = () => {};
       let dummyCallbackSubscriptionContainer2: CallbackSubscriptionContainer;
@@ -145,20 +147,25 @@ describe("Runtime Tests", () => {
 
       beforeEach(() => {
         dummyAgile.integrate(testIntegration);
-        dummyJob1 = new Job(dummyObserver1, { key: "dummyJob1" });
-        dummyJob2 = new Job(dummyObserver2, { key: "dummyJob2" });
-        dummyJob3 = new Job(dummyObserver3, { key: "dummyJob3" });
+        dummyObserver4 = new Observer(dummyAgile, { key: "dummyObserver4" });
+        dummyJob1 = new Job(dummyObserver1, { key: "dummyJob1" }); // Job with ready CallbackSubscription
+        dummyJob2 = new Job(dummyObserver2, { key: "dummyJob2" }); // Job with not ready and ready Callback Subscription
+        dummyJob3 = new Job(dummyObserver3, { key: "dummyJob3" }); // Job with ready Component Subscription
+        dummyJob4 = new Job(dummyObserver4, { key: "dummyJob4" }); // Job with not ready and ready Component Subscription
 
-        dummyObserver1.value = "sexy value";
-        dummyObserver2.value = "cool value";
-        dummyObserver3.value = "jeff value";
+        dummyObserver1.value = "dummyObserverValue1";
+        dummyObserver2.value = "dummyObserverValue2";
+        dummyObserver3.value = "dummyObserverValue3";
+        dummyObserver4.value = "dummyObserverValue4";
 
+        // Ready Callback Subscription
         dummyCallbackSubscriptionContainer1 = dummyAgile.subController.subscribeWithSubsArray(
           dummyCallbackFunction1,
-          [dummyObserver1, dummyObserver2, dummyObserver3]
+          [dummyObserver1, dummyObserver2]
         ) as CallbackSubscriptionContainer;
         dummyCallbackSubscriptionContainer1.callback = jest.fn();
 
+        // Not Ready Callback Subscription
         dummyCallbackSubscriptionContainer2 = dummyAgile.subController.subscribeWithSubsArray(
           dummyCallbackFunction2,
           [dummyObserver2]
@@ -166,31 +173,32 @@ describe("Runtime Tests", () => {
         dummyCallbackSubscriptionContainer2.callback = jest.fn();
         dummyCallbackSubscriptionContainer2.ready = false;
 
+        // Ready Component Subscription
         dummyComponentSubscriptionContainer1 = dummyAgile.subController.subscribeWithSubsObject(
           dummyComponent1,
           {
-            observer1: dummyObserver1,
-            observer2: dummyObserver2,
             observer3: dummyObserver3,
+            observer4: dummyObserver4,
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
 
+        // Not Ready Component Subscription
         dummyComponentSubscriptionContainer2 = dummyAgile.subController.subscribeWithSubsObject(
           dummyComponent2,
           {
-            observer2: dummyObserver2,
+            observer4: dummyObserver4,
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
         dummyComponentSubscriptionContainer2.ready = false;
 
-        runtime.jobsToRerender.push(dummyJob1);
-        runtime.notReadyJobsToRerender.add(dummyJob2);
-
         jest.spyOn(dummyAgile.integrations, "update");
+        jest.spyOn(runtime, "handleObjectBasedSubscription");
       });
 
-      it("shouldn't update subscribers if agile has no integration and should reset jobsToRerender", () => {
+      it("shouldn't update any subscribers if agile has no integration", () => {
         dummyAgile.hasIntegration = jest.fn(() => false);
+        runtime.jobsToRerender.push(dummyJob1);
+        runtime.jobsToRerender.push(dummyJob2);
 
         runtime.updateSubscribers();
 
@@ -205,6 +213,110 @@ describe("Runtime Tests", () => {
         ).not.toHaveBeenCalled();
       });
 
+      it("should update ready component based subscription", () => {
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        runtime.jobsToRerender.push(dummyJob3);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+
+        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
+          dummyComponent1,
+          {
+            observer3: "dummyObserverValue3",
+          }
+        );
+        expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
+          dummyComponentSubscriptionContainer1,
+          dummyJob3
+        );
+        expect(dummyJob3.subscriptionContainersToUpdate.size).toBe(0);
+      });
+
+      it("should update ready callback based subscription", () => {
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        runtime.jobsToRerender.push(dummyJob1);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+
+        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
+        expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
+      });
+
+      it("shouldn't update not ready subscriptions", () => {
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        runtime.jobsToRerender.push(dummyJob2);
+        runtime.jobsToRerender.push(dummyJob4);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(2);
+        expect(runtime.notReadyJobsToRerender.has(dummyJob2)).toBeTruthy();
+        expect(runtime.notReadyJobsToRerender.has(dummyJob4)).toBeTruthy();
+
+        expect(dummyJob2.subscriptionContainersToUpdate.size).toBe(1);
+        expect(
+          dummyJob2.subscriptionContainersToUpdate.has(
+            dummyCallbackSubscriptionContainer2
+          )
+        ).toBeTruthy();
+        expect(dummyJob4.subscriptionContainersToUpdate.size).toBe(1);
+        expect(
+          dummyJob4.subscriptionContainersToUpdate.has(
+            dummyComponentSubscriptionContainer2
+          )
+        ).toBeTruthy();
+
+        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
+        expect(
+          dummyCallbackSubscriptionContainer2.callback
+        ).not.toHaveBeenCalled();
+
+        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
+          dummyComponent1,
+          {
+            observer4: "dummyObserverValue4",
+          }
+        );
+        expect(dummyAgile.integrations.update).not.toHaveBeenCalledWith(
+          dummyComponent2,
+          {
+            observer4: "dummyObserverValue4",
+          }
+        );
+
+        expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
+          dummyComponentSubscriptionContainer1,
+          dummyJob4
+        );
+        expect(runtime.handleObjectBasedSubscription).not.toHaveBeenCalledWith(
+          dummyComponentSubscriptionContainer2,
+          dummyJob4
+        );
+      });
+
+      it("should try to update notReadyJobsToUpdate", () => {
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        runtime.notReadyJobsToRerender.add(dummyJob1);
+
+        runtime.updateSubscribers();
+
+        console.log(runtime.notReadyJobsToRerender);
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+
+        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
+        expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
+      });
+
+      /*
       it("should update ready subscriptionContainer and add jobs with not ready subscriptionContainer to notReadyJobsToRerender and it should reset jobsToRerender", () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
 
@@ -245,6 +357,11 @@ describe("Runtime Tests", () => {
           )
         ).toBeTruthy();
 
+        expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
+          dummyJob1,
+          dummyComponentSubscriptionContainer1
+        );
+
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
           dummyCallbackSubscriptionContainer2
@@ -254,10 +371,11 @@ describe("Runtime Tests", () => {
           dummyComponentSubscriptionContainer2
         );
       });
+       */
     });
 
     describe("handleObjectBasedSubscription function tests", () => {
       // TODO
-    })
+    });
   });
 });
