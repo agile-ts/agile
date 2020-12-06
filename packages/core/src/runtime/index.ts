@@ -20,7 +20,7 @@ export class Runtime {
 
   // Tracking - Used to track computed dependencies
   public trackObservers = false;
-  public foundObservers: Set<Observer> = new Set(); // Observers that got tracked (reset after stop tracking)
+  public trackedObservers: Set<Observer> = new Set();
 
   /**
    * @internal
@@ -237,12 +237,12 @@ export class Runtime {
    * @internal
    * Returns tracked Observers and stops Runtime from tracking anymore Observers
    */
-  public getTrackedObservers(): Set<Observer> {
-    const finalFoundObservers = this.foundObservers;
+  public getTrackedObservers(): Array<Observer> {
+    const finalFoundObservers = Array.from(this.trackedObservers);
 
     // Reset tracking
     this.trackObservers = false;
-    this.foundObservers = new Set();
+    this.trackedObservers = new Set();
 
     return finalFoundObservers;
   }

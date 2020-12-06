@@ -79,7 +79,7 @@ export class State<ValueType = any> {
   public get value(): ValueType {
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
+      this.agileInstance().runtime.trackedObservers.add(this.observer);
 
     return this._value;
   }

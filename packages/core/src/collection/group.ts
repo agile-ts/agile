@@ -50,7 +50,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public get output(): Array<DataType> {
     // Add Group to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
+      this.agileInstance().runtime.trackedObservers.add(this.observer);
 
     return this._output;
   }
@@ -62,7 +62,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public get items(): Array<Item<DataType>> {
     // Add Group to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
+      this.agileInstance().runtime.trackedObservers.add(this.observer);
 
     return this._items.map((item) => item());
   }

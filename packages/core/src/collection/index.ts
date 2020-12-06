@@ -421,7 +421,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(group.observer);
+      this.agileInstance().runtime.trackedObservers.add(group.observer);
 
     return group;
   }
@@ -452,7 +452,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(group.observer);
+      this.agileInstance().runtime.trackedObservers.add(group.observer);
 
     return group;
   }
@@ -502,7 +502,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(selector.observer);
+      this.agileInstance().runtime.trackedObservers.add(selector.observer);
 
     return selector;
   }
@@ -533,7 +533,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(selector.observer);
+      this.agileInstance().runtime.trackedObservers.add(selector.observer);
 
     return selector;
   }
@@ -598,7 +598,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(item.observer);
+      this.agileInstance().runtime.trackedObservers.add(item.observer);
 
     return item;
   }
@@ -625,7 +625,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(item.observer);
+      this.agileInstance().runtime.trackedObservers.add(item.observer);
 
     return item;
   }

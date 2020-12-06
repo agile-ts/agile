@@ -5,7 +5,7 @@ import {
   Observer,
   StorageKey,
   StatePersistentConfigInterface,
-  Event
+  Event,
 } from "../internal";
 
 export class Computed<ComputedValueType = any> extends State<
@@ -58,7 +58,7 @@ export class Computed<ComputedValueType = any> extends State<
 
     // Add State to tracked Observers (for auto tracking used observers in computed function)
     if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
+      this.agileInstance().runtime.trackedObservers.add(this.observer);
 
     return this._value;
   }
@@ -116,9 +116,7 @@ export class Computed<ComputedValueType = any> extends State<
     const computedValue = this.computeFunction();
 
     // Get tracked Observers and disable Tracking Observers
-    let foundDeps = Array.from(
-      this.agileInstance().runtime.getTrackedObservers()
-    );
+    let foundDeps = this.agileInstance().runtime.getTrackedObservers();
 
     // Handle foundDeps and hardCodedDeps
     const newDeps: Array<Observer> = [];
