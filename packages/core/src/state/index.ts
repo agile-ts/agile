@@ -58,12 +58,10 @@ export class State<ValueType = any> {
     this._value = copy(initialValue);
     this.previousStateValue = copy(initialValue);
     this.nextStateValue = copy(initialValue);
-    this.observer = new StateObserver<ValueType>(
-      agileInstance,
-      this,
-      deps,
-      key
-    );
+    this.observer = new StateObserver<ValueType>(agileInstance, this, {
+      key: key,
+      deps: deps,
+    });
   }
 
   /**
