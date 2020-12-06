@@ -21,10 +21,6 @@ export class EventObserver<PayloadType = any> extends Observer {
     event: Event<PayloadType>,
     config: CreateEventObserverConfigInterface = {}
   ) {
-    config = defineConfig(config, {
-      deps: [],
-      subs: [],
-    });
     super(event.agileInstance(), {
       deps: config.deps,
       key: config.key,

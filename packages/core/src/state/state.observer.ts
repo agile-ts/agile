@@ -28,10 +28,6 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
-    config = defineConfig(config, {
-      deps: [],
-      subs: [],
-    });
     super(state.agileInstance(), {
       deps: config.deps,
       value: state.value,
