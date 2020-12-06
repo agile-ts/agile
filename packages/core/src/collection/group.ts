@@ -31,9 +31,11 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   constructor(
     collection: Collection<DataType>,
     initialItems?: Array<ItemKey>,
-    config?: GroupConfigInterface
+    config: GroupConfigInterface = {}
   ) {
-    super(collection.agileInstance(), initialItems || [], config?.key);
+    super(collection.agileInstance(), initialItems || [], {
+      key: config?.key,
+    });
     this.collection = () => collection;
 
     // Add rebuild to sideEffects so that it rebuilds the Group Output if the value changes

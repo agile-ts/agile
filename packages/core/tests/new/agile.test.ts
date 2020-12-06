@@ -152,7 +152,9 @@ describe("Agile Tests", () => {
 
     describe("state function tests", () => {
       it("should create State", () => {
-        const state = agile.State("testValue", "myCoolState");
+        const state = agile.State("testValue", {
+          key: "myCoolState",
+        });
 
         expect(state).toBeInstanceOf(State);
       });
@@ -195,7 +197,9 @@ describe("Agile Tests", () => {
         const computed = agile.Computed(computedFunction, []);
 
         expect(computed).toBeInstanceOf(Computed);
-        expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, []);
+        expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
+          computedDeps: [],
+        });
       });
     });
 

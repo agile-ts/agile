@@ -39,7 +39,7 @@ export class Event<PayloadType = DefaultEventPayload> {
       delay: undefined,
     });
     this._key = config.key;
-    this.observer = new EventObserver(agileInstance, this, { key: config.key });
+    this.observer = new EventObserver(this, { key: config.key });
     this.enabled = config.enabled as any;
     this.config = {
       rerender: config.rerender as any,

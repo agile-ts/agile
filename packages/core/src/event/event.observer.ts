@@ -14,12 +14,10 @@ export class EventObserver<PayloadType = any> extends Observer {
   /**
    * @internal
    * Event Observer - Handles Event dependencies and ingests Event triggers into the Runtime
-   * @param agileInstance - An instance of Agile
    * @param event - Event
    * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     event: Event<PayloadType>,
     config: CreateEventObserverConfigInterface = {}
   ) {
@@ -27,7 +25,7 @@ export class EventObserver<PayloadType = any> extends Observer {
       deps: [],
       subs: [],
     });
-    super(agileInstance, {
+    super(event.agileInstance(), {
       deps: config.deps,
       key: config.key,
       subs: config.subs,

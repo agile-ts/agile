@@ -21,12 +21,10 @@ export class StateObserver<ValueType = any> extends Observer {
   /**
    * @internal
    * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
-   * @param agileInstance - An instance of Agile
    * @param state - State
    * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
@@ -34,7 +32,7 @@ export class StateObserver<ValueType = any> extends Observer {
       deps: [],
       subs: [],
     });
-    super(agileInstance, {
+    super(state.agileInstance(), {
       deps: config.deps,
       value: state.value,
       key: config.key,

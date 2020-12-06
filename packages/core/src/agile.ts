@@ -20,6 +20,7 @@ import {
   defineConfig,
   Logger,
   CreateLoggerConfigInterface,
+  StateConfigInterface,
 } from "./internal";
 
 export class Agile {
@@ -92,10 +93,12 @@ export class Agile {
    * @public
    * State - Class that holds one Value and causes rerender on subscribed Components
    * @param initialValue - Initial Value of the State
-   * @param key - Key/Name of the State
+   * @param config - Config
    */
-  public State = <ValueType>(initialValue: ValueType, key?: string) =>
-    new State<ValueType>(this, initialValue, key);
+  public State = <ValueType>(
+    initialValue: ValueType,
+    config: StateConfigInterface = {}
+  ) => new State<ValueType>(this, initialValue, config);
 
   //=========================================================================================================
   // Collection
@@ -121,7 +124,10 @@ export class Agile {
   public Computed = <ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     deps?: Array<Observer | State | Event>
-  ) => new Computed<ComputedValueType>(this, computeFunction, deps);
+  ) =>
+    new Computed<ComputedValueType>(this, computeFunction, {
+      computedDeps: deps,
+    });
 
   //=========================================================================================================
   // Event

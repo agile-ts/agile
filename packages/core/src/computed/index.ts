@@ -6,6 +6,7 @@ import {
   StorageKey,
   StatePersistentConfigInterface,
   Event,
+  StateConfigInterface,
 } from "../internal";
 
 export class Computed<ComputedValueType = any> extends State<
@@ -22,17 +23,23 @@ export class Computed<ComputedValueType = any> extends State<
    * Computed - Function that recomputes its value if a dependency changes
    * @param agileInstance - An instance of Agile
    * @param computeFunction - Function for computing value
-   * @param deps - Hard coded dependencies of Computed Function
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     computeFunction: () => ComputedValueType,
-    deps: Array<Observer | State | Event> = []
+    config: ComputedConfigInterface = {}
   ) {
-    super(agileInstance, computeFunction());
+    super(agileInstance, computeFunction(), {
+      key: config.key,
+      deps: config.deps,
+    });
+    config = defineConfig(config, {
+      computedDeps: [],
+    });
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
-    this.hardCodedDeps = deps
+    this.hardCodedDeps = (config.computedDeps as any)
       .map((dep) => dep["observer"] || undefined)
       .filter((dep) => dep !== undefined);
 
@@ -153,6 +160,13 @@ export class Computed<ComputedValueType = any> extends State<
     Agile.logger.error("You can't use invert method on Computed Function!");
     return this;
   }
+}
+
+/**
+ * @param computedDeps - Hard coded dependencies of Computed Function
+ */
+export interface ComputedConfigInterface extends StateConfigInterface {
+  computedDeps?: Array<Observer | State | Event>;
 }
 
 /**

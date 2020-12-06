@@ -43,24 +43,25 @@ export class State<ValueType = any> {
    * State - Class that holds one Value and causes rerender on subscribed Components
    * @param agileInstance - An instance of Agile
    * @param initialValue - Initial Value of State
-   * @param key - Key/Name of State
-   * @param deps - Initial deps of State
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     initialValue: ValueType,
-    key?: StateKey,
-    deps: Array<Observer> = []
+    config: StateConfigInterface = {}
   ) {
+    config = defineConfig(config, {
+      deps: [],
+    });
     this.agileInstance = () => agileInstance;
     this.initialStateValue = initialValue;
-    this._key = key;
+    this._key = config.key;
     this._value = copy(initialValue);
     this.previousStateValue = copy(initialValue);
     this.nextStateValue = copy(initialValue);
-    this.observer = new StateObserver<ValueType>(agileInstance, this, {
-      key: key,
-      deps: deps,
+    this.observer = new StateObserver<ValueType>(this, {
+      key: config.key,
+      deps: config.deps,
     });
   }
 
@@ -597,6 +598,15 @@ export class State<ValueType = any> {
 }
 
 export type StateKey = string | number;
+
+/**
+ * @param key - Key/Name of State
+ * @param deps - Initial deps of State
+ */
+export interface StateConfigInterface {
+  key?: StateKey;
+  deps?: Array<Observer>;
+}
 
 /**
  * @param background - If assigning a new value happens in the background (-> not causing any rerender)
