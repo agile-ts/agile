@@ -19,16 +19,18 @@ export class StatusObserver extends Observer {
    * Status Observer - Handles Status changes, dependencies (-> Interface to Runtime)
    * @param agileInstance - An instance of Agile
    * @param status - Status
-   * @param deps - Initial Dependencies of Status Observer
-   * @param key - Key/Name of State Observer
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     status: Status,
-    deps?: Array<Observer>,
-    key?: ObserverKey
+    config: StatusObserverConfigInterface = {}
   ) {
-    super(agileInstance, deps, key, status._value);
+    super(agileInstance, {
+      key: config.key,
+      deps: config.deps,
+      value: status._value,
+    });
     this.status = () => status;
     this.nextValue = copy(status._value);
   }
@@ -54,8 +56,7 @@ export class StatusObserver extends Observer {
     this.nextValue = copy(this.status().nextValue);
 
     // Check if Status changed
-    if (equal(this.status()._value, this.nextValue) && !config.force)
-      return;
+    if (equal(this.status()._value, this.nextValue) && !config.force) return;
 
     this.agileInstance().runtime.ingest(this, config);
   }
@@ -78,4 +79,13 @@ export class StatusObserver extends Observer {
     // Update Observer value
     this.value = copy(this.nextValue);
   }
+}
+
+/**
+ * @param deps - Initial Dependencies of Status Observer
+ * @param key - Key/Name of Status Observer
+ */
+export interface StatusObserverConfigInterface {
+  deps?: Array<Observer>;
+  key?: ObserverKey;
 }

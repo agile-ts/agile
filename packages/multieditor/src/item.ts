@@ -24,7 +24,9 @@ export class Item<DataType = any> extends State<DataType> {
     key: ItemKey,
     config: ItemConfigInterface = {}
   ) {
-    super(editor.agileInstance(), data, key);
+    super(editor.agileInstance(), data, {
+      key: key,
+    });
     config = defineConfig(config, {
       canBeEdited: true,
     });
