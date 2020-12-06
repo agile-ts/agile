@@ -5,6 +5,7 @@ import {
   Job,
   Observer,
   Runtime,
+  SubscriptionContainer,
 } from "../../../src";
 import testIntegration from "../../helper/test.integration";
 
@@ -299,68 +300,6 @@ describe("Runtime Tests", () => {
           dummyComponentSubscriptionContainer2,
           dummyJob4
         );
-      });
-
-      it("should try to update notReadyJobsToUpdate", () => {
-        dummyAgile.hasIntegration = jest.fn(() => true);
-        runtime.notReadyJobsToRerender.add(dummyJob1);
-
-        runtime.updateSubscribers();
-
-        console.log(runtime.notReadyJobsToRerender);
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-
-        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
-        expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
-      });
-
-      /*
-      it("should update ready subscriptionContainer and add jobs with not ready subscriptionContainer to notReadyJobsToRerender and it should reset jobsToRerender", () => {
-        dummyAgile.hasIntegration = jest.fn(() => true);
-
-        runtime.updateSubscribers();
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(1);
-        expect(runtime.notReadyJobsToRerender.has(dummyJob2)).toBeTruthy();
-
-        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
-          dummyComponent1,
-          {
-            observer1: "sexy value",
-            observer2: "cool value",
-          }
-        );
-        expect(dummyAgile.integrations.update).not.toHaveBeenCalledWith(
-          dummyComponent2,
-          {
-            observer1: "cool value",
-          }
-        );
-        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
-        expect(
-          dummyCallbackSubscriptionContainer2.callback
-        ).not.toHaveBeenCalled();
-
-        expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyJob2.subscriptionContainersToUpdate.size).toBe(2);
-        expect(
-          dummyJob2.subscriptionContainersToUpdate.has(
-            dummyComponentSubscriptionContainer2
-          )
-        ).toBeTruthy();
-        expect(
-          dummyJob2.subscriptionContainersToUpdate.has(
-            dummyCallbackSubscriptionContainer2
-          )
-        ).toBeTruthy();
-
-        expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
-          dummyJob1,
-          dummyComponentSubscriptionContainer1
-        );
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
@@ -371,11 +310,78 @@ describe("Runtime Tests", () => {
           dummyComponentSubscriptionContainer2
         );
       });
-       */
+
+      it("should try to update notReadyJobsToUpdate", () => {
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        runtime.notReadyJobsToRerender.add(dummyJob1);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+
+        expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
+        expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
+      });
     });
 
     describe("handleObjectBasedSubscription function tests", () => {
-      // TODO
+      let arraySubscriptionContainer: SubscriptionContainer;
+      let dummyComponent = {
+        my: "cool component",
+      };
+      let objectSubscriptionContainer: SubscriptionContainer;
+      let dummyComponent2 = {
+        my: "second cool component",
+      };
+      let arrayJob: Job;
+      let objectJob1: Job;
+      let objectJob2: Job;
+
+      beforeEach(() => {
+        arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsArray(
+          dummyComponent,
+          [dummyObserver1, dummyObserver2, dummyObserver3]
+        );
+        arrayJob = new Job(dummyObserver1, { key: "dummyArrayJob" });
+        objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+          dummyComponent2,
+          {
+            observer1: dummyObserver1,
+            observer2: dummyObserver2,
+            observer3: dummyObserver3,
+          }
+        ).subscriptionContainer;
+        objectJob1 = new Job(dummyObserver1, { key: "dummyObjectJob1" });
+        objectJob2 = new Job(dummyObserver3, { key: "dummyObjectJob2" });
+      });
+
+      it("should ignore not object based SubscriptionContainer", () => {
+        runtime.handleObjectBasedSubscription(
+          arraySubscriptionContainer,
+          arrayJob
+        );
+
+        expect(arraySubscriptionContainer.observerKeysToUpdate).toStrictEqual(
+          []
+        );
+      });
+
+      it("should add Job Observer to changedObjectKeys in SubscriptionContainer", () => {
+        runtime.handleObjectBasedSubscription(
+          objectSubscriptionContainer,
+          objectJob1
+        );
+        runtime.handleObjectBasedSubscription(
+          objectSubscriptionContainer,
+          objectJob2
+        );
+
+        expect(objectSubscriptionContainer.observerKeysToUpdate).toStrictEqual([
+          "observer1",
+          "observer3",
+        ]);
+      });
     });
   });
 });

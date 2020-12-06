@@ -23,7 +23,7 @@ describe("SubscriptionContainer Tests", () => {
     expect(subscriptionContainer.subs.has(dummyObserver1)).toBeTruthy();
     expect(subscriptionContainer.subs.has(dummyObserver2)).toBeTruthy();
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
-    expect(subscriptionContainer.changedObjectKeys).toStrictEqual([]);
+    expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
     expect(subscriptionContainer.subsObject).toBeUndefined();
   });
 });

@@ -7,8 +7,8 @@ export class SubscriptionContainer {
 
   // For Object based Subscription
   public isObjectBased = false;
-  public changedObjectKeys: Array<string> = []; // Holds temporary changed Object Keys (Runtime)
-  public subsObject?: { [key: string]: Observer }; // Same as subs but in Object form
+  public observerKeysToUpdate: Array<string> = []; // Holds temporary keys of Observers that got updated (Note: keys based on 'subsObject')
+  public subsObject?: { [key: string]: Observer }; // Same as subs but in Object shape
 
   /**
    * @internal

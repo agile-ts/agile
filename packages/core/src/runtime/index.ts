@@ -117,7 +117,11 @@ export class Runtime {
       this.notReadyJobsToRerender = new Set();
       return;
     }
-    if (this.jobsToRerender.length <= 0) return;
+    if (
+      this.jobsToRerender.length <= 0 &&
+      this.notReadyJobsToRerender.size <= 0
+    )
+      return;
 
     // Subscriptions that has to be updated/rerendered
     const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<
@@ -178,25 +182,25 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Finds updated Key of SubscriptionContainer and adds it to 'changedObjectKeys'
+   * Finds key of Observer in subsObject and adds it to 'changedObjectKeys'
    * @param subscriptionContainer - Object based SubscriptionContainer
-   * @param job - Job that holds the SubscriptionContainer
+   * @param job - Job that holds the searched Observer
    */
   public handleObjectBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
     job: Job
   ): void {
-    let localKey: string | null = null;
+    let foundKey: string | null = null;
 
+    // Check if SubscriptionContainer is Object based
     if (!subscriptionContainer.isObjectBased) return;
 
-    // Find localKey of Job Observer in SubscriptionContainer
+    // Find Key of Job Observer in SubscriptionContainer
     for (let key in subscriptionContainer.subsObject)
       if (subscriptionContainer.subsObject[key] === job.observer)
-        localKey = key;
+        foundKey = key;
 
-    // Add localKey to changedObjectKeys
-    if (localKey) subscriptionContainer.changedObjectKeys.push(localKey);
+    if (foundKey) subscriptionContainer.observerKeysToUpdate.push(foundKey);
   }
 
   //=========================================================================================================
@@ -213,7 +217,7 @@ export class Runtime {
     const finalObject: { [key: string]: any } = {};
 
     // Map trough changed Keys and build finalObject
-    subscriptionContainer.changedObjectKeys.forEach((changedKey) => {
+    subscriptionContainer.observerKeysToUpdate.forEach((changedKey) => {
       // Check if Observer at changedKey has value property, if so add it to final Object
       if (
         subscriptionContainer.subsObject &&
@@ -223,7 +227,7 @@ export class Runtime {
           subscriptionContainer.subsObject[changedKey]["value"];
     });
 
-    subscriptionContainer.changedObjectKeys = [];
+    subscriptionContainer.observerKeysToUpdate = [];
     return finalObject;
   }
 
