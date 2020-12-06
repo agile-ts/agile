@@ -194,11 +194,23 @@ export function isJsonString(value: any): boolean {
  * Merges default values/properties into config object
  * @param config - Config object that receives default values
  * @param defaults - Default values object that gets merged into config object
+ * @param overwriteUndefinedProperties - If undefined Properties in config gets overwritten by the default value
  */
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
-  defaults: Object
+  defaults: Object,
+  overwriteUndefinedProperties?: boolean
 ): ConfigInterface {
+  if (overwriteUndefinedProperties === undefined)
+    overwriteUndefinedProperties = true;
+
+  if (overwriteUndefinedProperties) {
+    const finalConfig = { ...defaults, ...config };
+    for (let key in finalConfig)
+      if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
+    return finalConfig;
+  }
+
   return { ...defaults, ...config };
 }
 

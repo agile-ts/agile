@@ -221,7 +221,7 @@ describe("Utils Tests", () => {
   });
 
   describe("defineConfig function tests", () => {
-    it("should merge defaults into config", () => {
+    it("should merge defaults into config and overwrite undefined properties with default config", () => {
       const config = {
         allowLogging: true,
         loops: 10,
@@ -235,6 +235,33 @@ describe("Utils Tests", () => {
           isRobot: false,
           name: "jeff",
         })
+      ).toStrictEqual({
+        allowLogging: true,
+        loops: 10,
+        isHuman: true,
+        isRobot: false,
+        name: "jeff",
+      });
+    });
+
+    it("should merge defaults into config and shouldn't overwrite undefined properties with overwriteUndefinedProperties = false", () => {
+      const config = {
+        allowLogging: true,
+        loops: 10,
+        isHuman: undefined,
+      };
+      expect(
+        defineConfig(
+          config,
+          {
+            allowLogging: false,
+            loops: 15,
+            isHuman: true,
+            isRobot: false,
+            name: "jeff",
+          },
+          false
+        )
       ).toStrictEqual({
         allowLogging: true,
         loops: 10,
