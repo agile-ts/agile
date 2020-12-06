@@ -4,7 +4,6 @@ import {
   State,
   Computed,
   Job,
-  JobConfigInterface,
   copy,
   defineConfig,
   ObserverKey,
@@ -12,6 +11,7 @@ import {
   notEqual,
   isFunction,
   SubscriptionContainer,
+  IngestConfigInterface,
 } from "../internal";
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -52,23 +52,23 @@ export class StateObserver<ValueType = any> extends Observer {
    * Ingests nextStateValue into Runtime and applies it to the State
    * @param config - Config
    */
-  public ingest(config: JobConfigInterface): void;
+  public ingest(config: IngestConfigInterface): void;
   /**
    * @internal
    * Ingests new State Value into Runtime and applies it to the State
    * @param newStateValue - New Value of the State
    * @param config - Config
    */
-  public ingest(newStateValue: ValueType, config: JobConfigInterface): void;
+  public ingest(newStateValue: ValueType, config: IngestConfigInterface): void;
   public ingest(
-    newStateValueOrConfig: ValueType | JobConfigInterface,
-    config: JobConfigInterface = {}
+    newStateValueOrConfig: ValueType | IngestConfigInterface,
+    config: IngestConfigInterface = {}
   ): void {
     const state = this.state();
     let _newStateValue: ValueType;
-    let _config: JobConfigInterface;
+    let _config: IngestConfigInterface;
 
-    if (isStateJobConfigInterface(newStateValueOrConfig)) {
+    if (isStateIngestConfigInterface(newStateValueOrConfig)) {
       _config = newStateValueOrConfig;
       if (state instanceof Computed) _newStateValue = state.computeValue();
       else _newStateValue = state.nextStateValue;
@@ -166,9 +166,9 @@ export class StateObserver<ValueType = any> extends Observer {
 }
 
 // https://stackoverflow.com/questions/40081332/what-does-the-is-keyword-do-in-typescript
-export function isStateJobConfigInterface(
+export function isStateIngestConfigInterface(
   object: any
-): object is JobConfigInterface {
+): object is IngestConfigInterface {
   return (
     object &&
     typeof object === "object" &&
