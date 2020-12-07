@@ -150,7 +150,7 @@ export class State<ValueType = any> {
     if (equal(this.nextStateValue, value) && !config.force) return this;
 
     // Ingest new value into runtime
-    this.observer.ingest(value, config);
+    this.observer.ingestValue(value, config);
 
     return this;
   }

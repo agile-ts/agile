@@ -45,32 +45,31 @@ export class StateObserver<ValueType = any> extends Observer {
    * Ingests nextStateValue into Runtime and applies it to the State
    * @param config - Config
    */
-  public ingest(config: IngestConfigInterface): void;
+  public ingest(config: IngestConfigInterface = {}): void {
+    const state = this.state();
+    let newStateValue: ValueType;
+
+    if (state instanceof Computed) newStateValue = state.computeValue();
+    else newStateValue = state.nextStateValue;
+
+    this.ingestValue(newStateValue, config);
+  }
+
+  //=========================================================================================================
+  // Ingest Value
+  //=========================================================================================================
   /**
    * @internal
    * Ingests new State Value into Runtime and applies it to the State
    * @param newStateValue - New Value of the State
    * @param config - Config
    */
-  public ingest(newStateValue: ValueType, config: IngestConfigInterface): void;
-  public ingest(
-    newStateValueOrConfig: ValueType | IngestConfigInterface,
+  public ingestValue(
+    newStateValue: ValueType,
     config: IngestConfigInterface = {}
   ): void {
     const state = this.state();
-    let _newStateValue: ValueType;
-    let _config: IngestConfigInterface;
-
-    if (isStateIngestConfigInterface(newStateValueOrConfig)) {
-      _config = newStateValueOrConfig;
-      if (state instanceof Computed) _newStateValue = state.computeValue();
-      else _newStateValue = state.nextStateValue;
-    } else {
-      _config = config;
-      _newStateValue = newStateValueOrConfig;
-    }
-
-    _config = defineConfig(_config, {
+    config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: true,
@@ -80,13 +79,13 @@ export class StateObserver<ValueType = any> extends Observer {
 
     // Assign next State Value and compute it if necessary
     this.nextStateValue = state.computeMethod
-      ? copy(state.computeMethod(_newStateValue))
-      : copy(_newStateValue);
+      ? copy(state.computeMethod(newStateValue))
+      : copy(newStateValue);
 
     // Check if State Value and new/next Value are equals
-    if (equal(state.value, this.nextStateValue) && !_config.force) return;
+    if (equal(state.value, this.nextStateValue) && !config.force) return;
 
-    this.agileInstance().runtime.ingest(this, _config);
+    this.agileInstance().runtime.ingest(this, config);
   }
 
   //=========================================================================================================
@@ -156,21 +155,6 @@ export class StateObserver<ValueType = any> extends Observer {
         observer instanceof StateObserver && observer.ingest({ perform: false })
     );
   }
-}
-
-// https://stackoverflow.com/questions/40081332/what-does-the-is-keyword-do-in-typescript
-export function isStateIngestConfigInterface(
-  object: any
-): object is IngestConfigInterface {
-  return (
-    object &&
-    typeof object === "object" &&
-    ("force" in object ||
-      "perform" in object ||
-      "background" in object ||
-      "sideEffects" in object ||
-      "storage" in object)
-  );
 }
 
 /**
