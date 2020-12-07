@@ -154,7 +154,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * Formats Storage Key
    * @param key - Key that gets formatted
    */
-  public formatKey(key?: StorageKey): StorageKey | undefined {
+  public formatKey(key?: PersistentKey): PersistentKey | undefined {
     const state = this.state();
 
     // Get key from State

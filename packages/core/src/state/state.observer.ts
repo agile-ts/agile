@@ -93,7 +93,7 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job from Runtime
+   * Performs Job from Runtime that holds this Observer
    * @param job - Job that gets performed
    */
   public perform(job: Job<this>) {
@@ -103,15 +103,18 @@ export class StateObserver<ValueType = any> extends Observer {
     state.previousStateValue = copy(state.value);
 
     // Set new State Value
-    state._value = copy(this.nextStateValue);
-    state.nextStateValue = copy(this.nextStateValue);
+    state._value = copy(job.observer.nextStateValue);
+    state.nextStateValue = copy(job.observer.nextStateValue);
 
     // Store State changes in Storage
     if (job.config.storage && state.isPersisted)
       state.persistent?.updateValue();
 
     // Set isSet
-    state.isSet = notEqual(this.nextStateValue, state.initialStateValue);
+    state.isSet = notEqual(
+      job.observer.nextStateValue,
+      state.initialStateValue
+    );
 
     // Reset isPlaceholder and set initial/previous Value to nextValue because the placeholder State had no proper value before
     if (state.isPlaceholder) {
@@ -121,7 +124,7 @@ export class StateObserver<ValueType = any> extends Observer {
     }
 
     // Update Observer value
-    this.value = copy(this.nextStateValue);
+    job.observer.value = copy(job.observer.nextStateValue);
 
     // Perform SideEffects of the Perform Function
     this.sideEffects(job);
@@ -135,7 +138,7 @@ export class StateObserver<ValueType = any> extends Observer {
    * SideEffects of Perform Function
    * @param job - Job whose SideEffects gets executed
    */
-  private sideEffects(job: Job<this>) {
+  public sideEffects(job: Job<this>) {
     const state = job.observer.state();
 
     // Call Watchers Functions

@@ -6,7 +6,7 @@ export class Persistent<ValueType = any> {
   public static placeHolderKey = "__THIS_IS_A_PLACEHOLDER__";
 
   public _key: PersistentKey;
-  public ready: boolean = false;
+  public ready = false;
   public isPersisted: boolean = false; // If Value is stored in Agile Storage
   public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
 

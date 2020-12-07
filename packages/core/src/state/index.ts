@@ -20,8 +20,8 @@ export class State<ValueType = any> {
 
   public _key?: StateKey;
   public valueType?: string; // primitive Type of State Value (for JS users)
-  public isSet: boolean = false; // If value is not the same as initialValue
-  public isPlaceholder: boolean = false;
+  public isSet = false; // If value is not the same as initialValue
+  public isPlaceholder = false;
   public initialStateValue: ValueType;
   public _value: ValueType; // Current Value of State
   public previousStateValue: ValueType;
@@ -33,7 +33,7 @@ export class State<ValueType = any> {
   } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
-  public isPersisted: boolean = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
+  public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
   public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
