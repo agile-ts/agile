@@ -9,7 +9,7 @@ describe("Storages Tests", () => {
     dummyAgile = new Agile({ localStorage: false });
   });
 
-  it("should create Storages with default Settings", () => {
+  it("should create Storages with default Config", () => {
     const storages = new Storages(dummyAgile);
 
     expect(storages.defaultStorage).toBeUndefined();
