@@ -22,7 +22,7 @@ describe("Storage Tests", () => {
     expect(storage.methods).toHaveProperty("set");
   });
 
-  it("should create async Storage with config.async = true and config.prefix = 'test' Settings and normal Storage Methods", () => {
+  it("should create async Storage with normal Storage Methods (config.async = true, config.prefix)", () => {
     const storage = new Storage({
       key: "customStorage",
       methods: {

@@ -9,7 +9,7 @@ describe("Storages Tests", () => {
     dummyAgile = new Agile({ localStorage: false });
   });
 
-  it("should create Storages with default Config", () => {
+  it("should create Storages (default config)", () => {
     const storages = new Storages(dummyAgile);
 
     expect(storages.defaultStorage).toBeUndefined();
@@ -17,7 +17,7 @@ describe("Storages Tests", () => {
     expect(storages.persistentInstances.size).toBe(0);
   });
 
-  it("should create Storages with config.localStorage = true and get a warning", () => {
+  it("should create Storages and should get a warning (config.localStorage = true)", () => {
     const storages = new Storages(dummyAgile, { localStorage: true });
 
     expect(console.warn).toHaveBeenCalledWith(
@@ -85,7 +85,7 @@ describe("Storages Tests", () => {
     });
 
     describe("register function tests", () => {
-      it("should register Storage with default config and should assign it as default Storage", () => {
+      it("should register Storage and assign it as default Storage (default config)", () => {
         const success = storages.register(dummyStorage1);
 
         expect(storages.storages).toHaveProperty("storage1");
@@ -98,7 +98,7 @@ describe("Storages Tests", () => {
         expect(success).toBeTruthy();
       });
 
-      it("should register Storage with config.default = false and should assign it as default Storage with a warning", () => {
+      it("should register Storage and should assign it as default Storage with a warning (config.default = false)", () => {
         const success = storages.register(dummyStorage1, { default: false });
 
         expect(console.warn).toHaveBeenCalledWith(
@@ -115,7 +115,7 @@ describe("Storages Tests", () => {
         expect(success).toBeTruthy();
       });
 
-      it("should register second Storage with default config and shouldn't assign it as default Storage", () => {
+      it("should register second Storage and shouldn't assign it as default Storage (default config)", () => {
         const success1 = storages.register(dummyStorage1);
         const success2 = storages.register(dummyStorage2);
 
@@ -133,7 +133,7 @@ describe("Storages Tests", () => {
         expect(success2).toBeTruthy();
       });
 
-      it("should register second Storage with config.default = true and should assign it as default Storage", () => {
+      it("should register second Storage and should assign it as default Storage (config.default = true)", () => {
         const success1 = storages.register(dummyStorage1);
         const success2 = storages.register(dummyStorage2, { default: true });
 

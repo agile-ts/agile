@@ -33,7 +33,7 @@ describe("Persistent Tests", () => {
     );
   });
 
-  it("should create Persistent with config.instantiate = false", () => {
+  it("should create Persistent (config.instantiate = false)", () => {
     const persistent = new Persistent(dummyAgile, { instantiate: false });
 
     expect(persistent).toBeInstanceOf(Persistent);
@@ -51,7 +51,7 @@ describe("Persistent Tests", () => {
     expect(console.error).not.toHaveBeenCalled();
   });
 
-  it("should create Persistent with config.key", () => {
+  it("should create Persistent (config.key)", () => {
     const persistent = new Persistent(dummyAgile, { key: "coolKey" });
 
     expect(persistent).toBeInstanceOf(Persistent);
@@ -71,7 +71,7 @@ describe("Persistent Tests", () => {
     );
   });
 
-  it("should create Persistent with config.storageKeys", () => {
+  it("should create Persistent (config.storageKeys)", () => {
     const persistent = new Persistent(dummyAgile, {
       storageKeys: ["test1", "test2"],
     });
@@ -93,7 +93,7 @@ describe("Persistent Tests", () => {
     );
   });
 
-  it("should create Persistent with config.key and config.storageKeys", () => {
+  it("should create Persistent (config.key, config.storageKeys)", () => {
     const persistent = new Persistent(dummyAgile, {
       key: "coolKey",
       storageKeys: ["test1", "test2"],
@@ -114,7 +114,7 @@ describe("Persistent Tests", () => {
     expect(console.error).not.toHaveBeenCalled();
   });
 
-  it("should create Persistent with config.key, config.storageKeys config.instantiate = false", () => {
+  it("should create Persistent (config.key, config.storageKeys, config.instantiate = false)", () => {
     const persistent = new Persistent(dummyAgile, {
       instantiate: false,
       storageKeys: ["hello", "there"],

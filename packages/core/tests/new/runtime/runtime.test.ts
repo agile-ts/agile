@@ -28,7 +28,7 @@ describe("Runtime Tests", () => {
     expect(runtime.trackedObservers.size).toBe(0);
   });
 
-  describe("Default Runtime Tests", () => {
+  describe("Observer Function Tests", () => {
     let runtime: Runtime;
     let dummyObserver1: Observer;
     let dummyObserver2: Observer;
@@ -50,7 +50,7 @@ describe("Runtime Tests", () => {
         runtime.jobQueue.shift = jest.fn(() => dummyJob);
       });
 
-      it("should create Job and perform it with default Config", () => {
+      it("should create Job and perform it (default config)", () => {
         runtime.ingest(dummyObserver1, { key: "coolJob" });
 
         expect(runtime.jobQueue.length).toBe(1);
@@ -59,7 +59,7 @@ describe("Runtime Tests", () => {
         expect(runtime.perform).toHaveBeenCalledWith(dummyJob); // Dummy Job because of mocking jobQueue.shift
       });
 
-      it("should create Job and not perform it with config.perform = false", () => {
+      it("should create Job and shouldn't perform it (config.perform = false)", () => {
         runtime.ingest(dummyObserver1, { perform: false, key: "coolJob" });
 
         expect(runtime.jobQueue.length).toBe(1);

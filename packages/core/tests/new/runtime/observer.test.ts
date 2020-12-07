@@ -16,7 +16,7 @@ describe("Observer Tests", () => {
     dummySubscription2 = new SubscriptionContainer();
   });
 
-  it("should create Observer with default config", () => {
+  it("should create Observer (default config)", () => {
     const observer = new Observer(dummyAgile);
 
     expect(observer._key).toBeUndefined();

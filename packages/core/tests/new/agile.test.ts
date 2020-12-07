@@ -44,7 +44,7 @@ describe("Agile Tests", () => {
     globalThis["__agile__"] = undefined;
   });
 
-  it("should instantiate Agile with default config", () => {
+  it("should instantiate Agile (default config)", () => {
     const agile = new Agile();
 
     // Check if Agile properties got instantiated properly

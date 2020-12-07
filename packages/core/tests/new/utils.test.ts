@@ -148,7 +148,7 @@ describe("Utils Tests", () => {
       expect(normalizeArray(undefined)).toStrictEqual([]);
     });
 
-    it("should normalize undefined with config.createUndefinedArray = true", () => {
+    it("should normalize undefined (config.createUndefinedArray = true)", () => {
       expect(
         normalizeArray(undefined, { createUndefinedArray: true })
       ).toStrictEqual([undefined]);
@@ -221,7 +221,7 @@ describe("Utils Tests", () => {
   });
 
   describe("defineConfig function tests", () => {
-    it("should merge defaults into config and overwrite undefined properties with default config", () => {
+    it("should merge defaults into config and overwrite undefined properties (default config)", () => {
       const config = {
         allowLogging: true,
         loops: 10,
@@ -310,7 +310,7 @@ describe("Utils Tests", () => {
       });
     });
 
-    it("should add new properties to source with config.addNewProperties = true", () => {
+    it("should add new properties to source Object (config.addNewProperties = true)", () => {
       const source = {
         id: 123,
         name: "jeff",

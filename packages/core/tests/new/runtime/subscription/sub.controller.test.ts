@@ -21,7 +21,7 @@ describe("SubController Tests", () => {
     expect(subController.callbackSubs.size).toBe(0);
   });
 
-  describe("Normal SubController Tests", () => {
+  describe("SubController Function Tests", () => {
     let subController: SubController;
     let dummyObserver1: Observer;
     let dummyObserver2: Observer;
