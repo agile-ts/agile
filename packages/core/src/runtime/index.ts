@@ -51,14 +51,14 @@ export class Runtime {
       sideEffects: config.sideEffects,
       force: config.force,
       background: config.background,
-      key: config.key,
+      key: config.key || observer.key,
     });
     this.jobQueue.push(job);
 
     // Logging
     Agile.logger.if
       .tag(["runtime"])
-      .info(`Created Job(${job.observer.key})`, job);
+      .info(`Created Job '${job.observer.key}'`, job);
 
     // Perform Job
     if (config.perform) {

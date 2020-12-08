@@ -1,4 +1,8 @@
-import { Observer, defineConfig, SubscriptionContainer } from "../internal";
+import {
+  Observer,
+  defineConfig,
+  SubscriptionContainer,
+} from "../internal";
 
 export class Job<ObserverType extends Observer = Observer> {
   public _key?: JobKey;
@@ -33,7 +37,7 @@ export class Job<ObserverType extends Observer = Observer> {
       !config.background &&
       this.observer.agileInstance().integrations.hasIntegration();
     this._key = config.key;
-    this.subscriptionContainersToUpdate = observer.subs;
+    this.subscriptionContainersToUpdate = new Set(observer.subs);
   }
 
   public get key(): JobKey | undefined {
