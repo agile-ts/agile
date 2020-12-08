@@ -72,7 +72,7 @@ export class Selector<DataType = DefaultItem> extends State<
 
     if (oldItem?.key === itemKey && !config.force) {
       Agile.logger.warn(
-        `Agile: Selector has already a selected key '${itemKey}'!`
+        `Selector has already a selected key '${itemKey}'! Use config.force to select a new Key.`
       );
       return this;
     }

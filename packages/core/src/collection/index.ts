@@ -830,7 +830,10 @@ export class Collection<DataType = DefaultItem> {
       if (!selector || selector.itemKey !== oldItemKey) continue;
 
       // Replace old selected ItemKey with new ItemKey
-      selector.select(newItemKey, { background: config?.background });
+      selector.select(newItemKey, {
+        background: config?.background,
+        force: true,
+      });
     }
   }
 

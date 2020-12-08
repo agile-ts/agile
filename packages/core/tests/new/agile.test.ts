@@ -112,7 +112,12 @@ describe("Agile Tests", () => {
       level: Logger.level.DEBUG,
       canUseCustomStyles: true,
     });
-    expect(Agile.logger.allowedTags).toStrictEqual([]);
+    expect(Agile.logger.allowedTags).toStrictEqual([
+      "runtime",
+      "storage",
+      "subscription",
+      "multieditor",
+    ]);
     expect(Agile.logger.isActive).toBeFalsy();
 
     // Check if global Agile Instance got created
