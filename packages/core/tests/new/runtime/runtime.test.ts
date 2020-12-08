@@ -149,10 +149,6 @@ describe("Runtime Tests", () => {
       beforeEach(() => {
         dummyAgile.integrate(testIntegration);
         dummyObserver4 = new Observer(dummyAgile, { key: "dummyObserver4" });
-        dummyJob1 = new Job(dummyObserver1, { key: "dummyJob1" }); // Job with ready CallbackSubscription
-        dummyJob2 = new Job(dummyObserver2, { key: "dummyJob2" }); // Job with not ready and ready Callback Subscription
-        dummyJob3 = new Job(dummyObserver3, { key: "dummyJob3" }); // Job with ready Component Subscription
-        dummyJob4 = new Job(dummyObserver4, { key: "dummyJob4" }); // Job with not ready and ready Component Subscription
 
         dummyObserver1.value = "dummyObserverValue1";
         dummyObserver2.value = "dummyObserverValue2";
@@ -165,6 +161,7 @@ describe("Runtime Tests", () => {
           [dummyObserver1, dummyObserver2]
         ) as CallbackSubscriptionContainer;
         dummyCallbackSubscriptionContainer1.callback = jest.fn();
+        dummyJob1 = new Job(dummyObserver1, { key: "dummyJob1" }); // Job with ready CallbackSubscription
 
         // Not Ready Callback Subscription
         dummyCallbackSubscriptionContainer2 = dummyAgile.subController.subscribeWithSubsArray(
@@ -173,6 +170,7 @@ describe("Runtime Tests", () => {
         ) as CallbackSubscriptionContainer;
         dummyCallbackSubscriptionContainer2.callback = jest.fn();
         dummyCallbackSubscriptionContainer2.ready = false;
+        dummyJob2 = new Job(dummyObserver2, { key: "dummyJob2" }); // Job with not ready and ready Callback Subscription
 
         // Ready Component Subscription
         dummyComponentSubscriptionContainer1 = dummyAgile.subController.subscribeWithSubsObject(
@@ -182,6 +180,7 @@ describe("Runtime Tests", () => {
             observer4: dummyObserver4,
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
+        dummyJob3 = new Job(dummyObserver3, { key: "dummyJob3" }); // Job with ready Component Subscription
 
         // Not Ready Component Subscription
         dummyComponentSubscriptionContainer2 = dummyAgile.subController.subscribeWithSubsObject(
@@ -191,6 +190,7 @@ describe("Runtime Tests", () => {
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
         dummyComponentSubscriptionContainer2.ready = false;
+        dummyJob4 = new Job(dummyObserver4, { key: "dummyJob4" }); // Job with not ready and ready Component Subscription
 
         jest.spyOn(dummyAgile.integrations, "update");
         jest.spyOn(runtime, "handleObjectBasedSubscription");
@@ -234,6 +234,7 @@ describe("Runtime Tests", () => {
           dummyJob3
         );
         expect(dummyJob3.subscriptionContainersToUpdate.size).toBe(0);
+        expect(dummyObserver3.subs.size).toBe(1);
       });
 
       it("should update ready callback based subscription", () => {
@@ -247,6 +248,7 @@ describe("Runtime Tests", () => {
 
         expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
         expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
+        expect(dummyObserver1.subs.size).toBe(1);
       });
 
       it("shouldn't update not ready subscriptions", () => {
@@ -292,6 +294,9 @@ describe("Runtime Tests", () => {
           }
         );
 
+        expect(dummyObserver2.subs.size).toBe(2);
+        expect(dummyObserver4.subs.size).toBe(2);
+
         expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
           dummyComponentSubscriptionContainer1,
           dummyJob4
@@ -322,6 +327,7 @@ describe("Runtime Tests", () => {
 
         expect(dummyCallbackSubscriptionContainer1.callback).toHaveBeenCalled();
         expect(dummyJob1.subscriptionContainersToUpdate.size).toBe(0);
+        expect(dummyObserver1.subs.size).toBe(1);
       });
     });
 
