@@ -8,7 +8,6 @@ import {
   StatePersistent,
   SubscriptionContainer,
 } from "../../../src";
-// jest.mock("../../../src/runtime/observer"); // Can't mock Observer because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe("StateObserver Tests", () => {
   let dummyAgile: Agile;
@@ -24,7 +23,7 @@ describe("StateObserver Tests", () => {
 
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe("dummyValue");
-    /*
+    /* Couldn't figure out how to mock anything in the Constructor
     expect(Observer).toHaveBeenCalledWith(dummyAgile, {
       deps: [],
       value: "dummyValue",
@@ -53,7 +52,7 @@ describe("StateObserver Tests", () => {
 
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe("dummyValue");
-    /*
+    /* Couldn't figure out how to mock anything in the Constructor
     expect(Observer).toHaveBeenCalledWith(dummyAgile, {
       deps: [dummyObserver1, dummyObserver2],
       value: "dummyValue",

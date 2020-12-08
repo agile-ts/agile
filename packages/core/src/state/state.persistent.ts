@@ -27,7 +27,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
       instantiate: true,
     });
     this.state = () => state;
-    this.instantiatePersistent(config);
+    this.instantiatePersistent({
+      key: config.key,
+      storageKeys: config.storageKeys,
+    });
 
     // Load/Store persisted Value/s for the first Time
     if (this.ready && config.instantiate) this.initialLoading();

@@ -9,9 +9,8 @@ describe("Persistent Tests", () => {
     dummyAgile = new Agile({ localStorage: false });
   });
 
-  // Note: Had to test the constructor in detail (not the 'cleanest' way)
-  // because I couldn't figure out how to mock a function (instantiatePersistent) that gets called in the constructor
-  // the with 'x' marked properties changed
+  // Note: Couldn't figure out how to mock anything in the Constructor
+  // with 'x' marked properties changed
 
   it("should create Persistent (default config)", () => {
     const persistent = new Persistent(dummyAgile);
