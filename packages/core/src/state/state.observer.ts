@@ -110,7 +110,6 @@ export class StateObserver<ValueType = any> extends Observer {
     if (job.config.storage && state.isPersisted)
       state.persistent?.updateValue();
 
-    // Set isSet
     state.isSet = notEqual(
       job.observer.nextStateValue,
       state.initialStateValue
@@ -123,10 +122,7 @@ export class StateObserver<ValueType = any> extends Observer {
       state.isPlaceholder = false;
     }
 
-    // Update Observer value
     job.observer.value = copy(job.observer.nextStateValue);
-
-    // Perform SideEffects of the Perform Function
     this.sideEffects(job);
   }
 
@@ -153,7 +149,7 @@ export class StateObserver<ValueType = any> extends Observer {
           state.sideEffects[sideEffectKey](job.config);
 
     // Ingest Dependencies of Observer into Runtime
-    job.observer.deps.forEach(
+    state.observer.deps.forEach(
       (observer) =>
         observer instanceof StateObserver && observer.ingest({ perform: false })
     );

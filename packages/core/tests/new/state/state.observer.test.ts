@@ -1,9 +1,11 @@
 import {
   Agile,
   Computed,
+  Job,
   Observer,
   State,
   StateObserver,
+  StatePersistent,
   SubscriptionContainer,
 } from "../../../src";
 // jest.mock("../../../src/runtime/observer"); // Can't mock Observer because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
@@ -72,23 +74,26 @@ describe("StateObserver Tests", () => {
 
   describe("StateObserver Function Tests", () => {
     let stateObserver: StateObserver;
-    let computedObserver: StateObserver;
-    let dummyComputed: Computed;
 
     beforeEach(() => {
-      dummyComputed = new Computed(dummyAgile, () => {}, {
-        key: "dummyComputed",
-      });
       stateObserver = new StateObserver(dummyState, {
         key: "stateObserverKey",
       });
-      computedObserver = new StateObserver(dummyComputed, {
-        key: "computedObserverKey",
-      });
-      dummyAgile.runtime.ingest = jest.fn();
     });
 
     describe("ingest function tests", () => {
+      let computedObserver: StateObserver;
+      let dummyComputed: Computed;
+
+      beforeEach(() => {
+        dummyComputed = new Computed(dummyAgile, () => {}, {
+          key: "dummyComputed",
+        });
+        computedObserver = new StateObserver(dummyComputed, {
+          key: "computedObserverKey",
+        });
+      });
+
       it("should call ingestValue with nextStateValue (default config)", () => {
         dummyState.nextStateValue = "nextValue";
         stateObserver.ingestValue = jest.fn();
@@ -135,7 +140,11 @@ describe("StateObserver Tests", () => {
     });
 
     describe("ingestValue function tests", () => {
-      it("should ingest State into Runtime if newValue isn't equal to the current State Value (default config)", () => {
+      beforeEach(() => {
+        dummyAgile.runtime.ingest = jest.fn();
+      });
+
+      it("should ingest State into Runtime if newValue isn't equal to current State Value (default config)", () => {
         stateObserver.ingestValue("updatedDummyValue");
 
         expect(stateObserver.nextStateValue).toBe("updatedDummyValue");
@@ -148,7 +157,7 @@ describe("StateObserver Tests", () => {
         });
       });
 
-      it("shouldn't ingest State into Runtime if newValue is equal to the current State Value (default config)", () => {
+      it("shouldn't ingest State into Runtime if newValue is equal to current State Value (default config)", () => {
         dummyState._value = "updatedDummyValue";
         stateObserver.ingestValue("updatedDummyValue");
 
@@ -156,7 +165,7 @@ describe("StateObserver Tests", () => {
         expect(dummyAgile.runtime.ingest).not.toHaveBeenCalled();
       });
 
-      it("should ingest State into Runtime if newValue is equal to the current State Value (config.force = true)", () => {
+      it("should ingest State into Runtime if newValue is equal to current State Value (config.force = true)", () => {
         dummyState._value = "updatedDummyValue";
         stateObserver.ingestValue("updatedDummyValue", { force: true });
 
@@ -188,7 +197,116 @@ describe("StateObserver Tests", () => {
     });
 
     describe("perform function tests", () => {
-      // TODO
+      let dummyJob: Job<StateObserver>;
+
+      beforeEach(() => {
+        dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
+        dummyState.isPersisted = true;
+        dummyState.persistent = new StatePersistent(dummyState);
+        dummyState.persistent.updateValue = jest.fn();
+        stateObserver.sideEffects = jest.fn();
+      });
+
+      it("should perform Job", () => {
+        dummyJob.observer.nextStateValue = "newValue";
+        dummyState._value = "dummyValue";
+
+        stateObserver.perform(dummyJob as any);
+
+        expect(dummyState.previousStateValue).toBe("dummyValue");
+        expect(dummyState._value).toBe("newValue");
+        expect(dummyState.nextStateValue).toBe("newValue");
+        expect(dummyState.isSet).toBeTruthy();
+        expect(stateObserver.value).toBe("newValue");
+
+        expect(dummyState.persistent.updateValue).toHaveBeenCalled();
+        expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
+      });
+
+      it("should perform Job and shouldn't call updateValue on StatePersistent (job.config.storage = false)", () => {
+        dummyJob.observer.nextStateValue = "newValue";
+        dummyJob.config.storage = false;
+
+        stateObserver.perform(dummyJob as any);
+
+        expect(dummyState.persistent.updateValue).not.toHaveBeenCalled();
+      });
+
+      it("should perform Job and shouldn't call updateValue on StatePersistent if state isn't persisted", () => {
+        dummyJob.observer.nextStateValue = "newValue";
+        dummyState.isPersisted = false;
+
+        stateObserver.perform(dummyJob as any);
+
+        expect(dummyState.persistent.updateValue).not.toHaveBeenCalled();
+      });
+
+      it("should perform Job and assign specific values to State if State is a Placeholder", () => {
+        dummyJob.observer.nextStateValue = "newValue";
+        dummyState._value = "dummyValue";
+        dummyState.isPlaceholder = true;
+
+        stateObserver.perform(dummyJob as any);
+
+        expect(dummyState.previousStateValue).toBe("newValue");
+        expect(dummyState.initialStateValue).toBe("newValue");
+        expect(dummyState._value).toBe("newValue");
+        expect(dummyState.nextStateValue).toBe("newValue");
+        expect(dummyState.persistent.updateValue).toHaveBeenCalled();
+        expect(dummyState.isSet).toBeTruthy();
+        expect(stateObserver.value).toBe("newValue");
+
+        expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
+      });
+
+      it("should perform Job and set isSet to false if initialStateValue equals to newStateValue", () => {
+        dummyJob.observer.nextStateValue = "newValue";
+        dummyState.initialStateValue = "newValue";
+        dummyState._value = "dummyValue";
+
+        stateObserver.perform(dummyJob as any);
+
+        expect(dummyState.isSet).toBeFalsy();
+      });
+    });
+
+    describe("sideEffects function tests", () => {
+      let dummyJob: Job<StateObserver>;
+      let dummyStateObserver: StateObserver;
+
+      beforeEach(() => {
+        dummyStateObserver = new StateObserver(new State(dummyAgile, "test"));
+        dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
+        dummyState.watchers["dummyWatcher"] = jest.fn();
+        dummyState.sideEffects["dummySideEffect"] = jest.fn();
+        dummyState.observer.depend(dummyStateObserver);
+        dummyStateObserver.ingest = jest.fn();
+      });
+
+      it("should call watchers, sideEffects and ingest dependencies of State", () => {
+        dummyState._value = "dummyValue";
+        stateObserver.sideEffects(dummyJob);
+
+        expect(dummyState.watchers["dummyWatcher"]).toHaveBeenCalledWith(
+          "dummyValue"
+        );
+        expect(dummyState.sideEffects["dummySideEffect"]).toHaveBeenCalledWith(
+          dummyJob.config
+        );
+        expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
+          perform: false,
+        });
+      });
+
+      it("shouldn't call sideEffects of State(job.config.sideEffects = false)", () => {
+        dummyState._value = "dummyValue";
+        dummyJob.config.sideEffects = false;
+        stateObserver.sideEffects(dummyJob);
+
+        expect(
+          dummyState.sideEffects["dummySideEffect"]
+        ).not.toHaveBeenCalled();
+      });
     });
   });
 });

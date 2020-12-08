@@ -13,7 +13,7 @@ describe("Persistent Tests", () => {
   // because I couldn't figure out how to mock a function (instantiatePersistent) that gets called in the constructor
   // the with 'x' marked properties changed
 
-  it("should create Persistent with default Settings", () => {
+  it("should create Persistent (default config)", () => {
     const persistent = new Persistent(dummyAgile);
 
     expect(persistent).toBeInstanceOf(Persistent);
