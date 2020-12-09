@@ -15,17 +15,20 @@ describe("Storages Tests", () => {
     expect(storages.defaultStorage).toBeUndefined();
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(storages.instantiateLocalStorage).not.toHaveBeenCalled();
+   */
   });
 
   it("should create Storages and should get a warning (config.localStorage = true)", () => {
     const storages = new Storages(dummyAgile, { localStorage: true });
 
-    expect(console.warn).toHaveBeenCalledWith(
-      "Agile Warn: Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
-    );
     expect(storages.defaultStorage).toBeUndefined();
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
+    expect(console.warn).toHaveBeenCalledWith(
+      "Agile Warn: Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
+    );
   });
 
   describe("Storages Function Tests", () => {

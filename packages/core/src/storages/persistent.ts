@@ -28,6 +28,7 @@ export class Persistent<ValueType = any> {
     this._key = Persistent.placeHolderKey;
     config = defineConfig(config, {
       instantiate: true,
+      storageKeys: [],
     });
     this.agileInstance().storages.persistentInstances.add(this);
     if (config.instantiate)

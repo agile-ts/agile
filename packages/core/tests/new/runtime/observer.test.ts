@@ -25,7 +25,7 @@ describe("Observer Tests", () => {
     expect(observer.subs.size).toBe(0);
   });
 
-  it("should create Observer with specific config", () => {
+  it("should create Observer (specific config)", () => {
     const observer = new Observer(dummyAgile, {
       key: "testKey",
       subs: [dummySubscription1, dummySubscription2],

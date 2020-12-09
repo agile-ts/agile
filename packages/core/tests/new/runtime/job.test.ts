@@ -30,7 +30,7 @@ describe("Job Tests", () => {
     expect(job._key).toBeUndefined();
   });
 
-  it("should create Job with specific config and agile that has integrations", () => {
+  it("should create Job with agile that has integrations (specific config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new Job(dummyObserver, {

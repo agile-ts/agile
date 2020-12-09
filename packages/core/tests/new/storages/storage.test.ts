@@ -1,7 +1,7 @@
 import { Storage } from "../../../src";
 
 describe("Storage Tests", () => {
-  it("should create normal Storage with default Settings and normal Storage Methods", () => {
+  it("should create normal Storage with normal Storage Methods (default config)", () => {
     const storage = new Storage({
       key: "customStorage",
       methods: {
@@ -45,7 +45,7 @@ describe("Storage Tests", () => {
     expect(storage.methods).toHaveProperty("set");
   });
 
-  it("should create async Storage with default Settings and async Storage Methods", () => {
+  it("should create async Storage with async Storage Methods (default config)", () => {
     const storage = new Storage({
       key: "customStorage",
       methods: {
@@ -245,6 +245,6 @@ describe("Storage Tests", () => {
         });
       });
     });
-    // Only get tests because the set/remove function stayed the same
+    // Only get tests because the set/remove function stayed more or less the same
   });
 });

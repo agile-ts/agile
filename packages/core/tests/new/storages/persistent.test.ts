@@ -9,23 +9,26 @@ describe("Persistent Tests", () => {
     dummyAgile = new Agile({ localStorage: false });
   });
 
-  // Note: Couldn't figure out how to mock anything in the Constructor
-  // with 'x' marked properties changed
-
   it("should create Persistent (default config)", () => {
     const persistent = new Persistent(dummyAgile);
 
     expect(persistent).toBeInstanceOf(Persistent);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
+      storageKeys: [],
+      key: undefined,
+    });
+     */
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
+
     expect(persistent.key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBe(undefined);
-
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
@@ -36,16 +39,19 @@ describe("Persistent Tests", () => {
     const persistent = new Persistent(dummyAgile, { instantiate: false });
 
     expect(persistent).toBeInstanceOf(Persistent);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
+     */
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
+
     expect(persistent.key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBe(undefined);
-
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
 
     expect(console.error).not.toHaveBeenCalled();
   });
@@ -54,16 +60,22 @@ describe("Persistent Tests", () => {
     const persistent = new Persistent(dummyAgile, { key: "coolKey" });
 
     expect(persistent).toBeInstanceOf(Persistent);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
+      storageKeys: [],
+      key: "coolKey",
+    });
+     */
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
+
     expect(persistent.key).toBe("coolKey"); // x
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBe(undefined);
-
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No persist Storage Key found! Please provide at least one Storage Key."
@@ -76,16 +88,22 @@ describe("Persistent Tests", () => {
     });
 
     expect(persistent).toBeInstanceOf(Persistent);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
+      storageKeys: ["test1", "test2"],
+      key: undefined,
+    });
+     */
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
+
     expect(persistent.key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
     expect(persistent.defaultStorageKey).toBe("test1"); // x
-
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
@@ -99,16 +117,22 @@ describe("Persistent Tests", () => {
     });
 
     expect(persistent).toBeInstanceOf(Persistent);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
+      storageKeys: ["test1", "test2"],
+      key: "coolKey",
+    });
+     */
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
+
     expect(persistent.key).toBe("coolKey"); // x
     expect(persistent.ready).toBeTruthy(); // x
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
     expect(persistent.defaultStorageKey).toBe("test1"); // x
-
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
 
     expect(console.error).not.toHaveBeenCalled();
   });
@@ -121,6 +145,12 @@ describe("Persistent Tests", () => {
     });
 
     expect(persistent).toBeInstanceOf(Persistent);
+    /* Couldn't figure out how to mock anything in the Constructor
+    expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
+     */
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
 
     // Might be weired outputs.. BUT the persistent hasn't got instantiated yet
     expect(persistent.key).toBe(Persistent.placeHolderKey);
@@ -138,6 +168,7 @@ describe("Persistent Tests", () => {
   });
 
   describe("Persistent Function Tests", () => {
+    // Note: InstantiatePersistent function got more or less tested in constructor
     describe("instantiatePersistent function tests", () => {
       let persistent: Persistent;
 
