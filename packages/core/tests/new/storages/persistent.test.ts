@@ -168,10 +168,14 @@ describe("Persistent Tests", () => {
   });
 
   describe("Persistent Function Tests", () => {
+    let persistent: Persistent;
+
+    beforeEach(() => {
+      persistent = new Persistent(dummyAgile);
+    });
+
     // Note: InstantiatePersistent function got more or less tested in constructor
     describe("instantiatePersistent function tests", () => {
-      let persistent: Persistent;
-
       beforeEach(() => {
         persistent = new Persistent(dummyAgile, { instantiate: false });
       });
@@ -201,10 +205,7 @@ describe("Persistent Tests", () => {
     });
 
     describe("validatePersistent function tests", () => {
-      let persistent: Persistent;
-
       beforeEach(() => {
-        persistent = new Persistent(dummyAgile);
         persistent.key = Persistent.placeHolderKey;
         persistent.defaultStorageKey = undefined;
         persistent.storageKeys = [];
@@ -262,12 +263,6 @@ describe("Persistent Tests", () => {
     });
 
     describe("assignStorageKeys function tests", () => {
-      let persistent: Persistent;
-
-      beforeEach(() => {
-        persistent = new Persistent(dummyAgile);
-      });
-
       it("should assign StorageKeys and make first one as default StorageKey", () => {
         persistent.assignStorageKeys(["test1", "test2", "test3"]);
 
@@ -300,11 +295,9 @@ describe("Persistent Tests", () => {
     });
 
     describe("initialLoading function tests", () => {
-      let persistent: Persistent;
       let onLoadSuccess = undefined;
 
       beforeEach(() => {
-        persistent = new Persistent(dummyAgile);
         persistent.onLoad = (success) => {
           onLoadSuccess = success;
         };
@@ -333,12 +326,6 @@ describe("Persistent Tests", () => {
     });
 
     describe("functions that get overwritten tests | because Persistent is no stand alone class", () => {
-      let persistent: Persistent;
-
-      beforeEach(() => {
-        persistent = new Persistent(dummyAgile);
-      });
-
       describe("onLoad function tests", () => {
         it("should print error", () => {
           persistent.loadValue();
