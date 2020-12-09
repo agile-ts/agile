@@ -90,12 +90,14 @@ export class Persistent<ValueType = any> {
    * Validates Persistent and updates its 'ready' property
    */
   public validatePersistent(): boolean {
+    let isValid = true;
+
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
       Agile.logger.error(
         "No valid persist Key found! Please provide a Key or assign one to the parent instance."
       );
-      return false;
+      isValid = false;
     }
 
     // Validate StorageKeys
@@ -103,11 +105,11 @@ export class Persistent<ValueType = any> {
       Agile.logger.error(
         "No persist Storage Key found! Please provide at least one Storage Key."
       );
-      return false;
+      isValid = false;
     }
 
-    this.ready = true;
-    return true;
+    this.ready = isValid;
+    return isValid;
   }
 
   //=========================================================================================================
