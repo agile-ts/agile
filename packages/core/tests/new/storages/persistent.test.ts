@@ -28,7 +28,7 @@ describe("Persistent Tests", () => {
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBe(undefined);
+    expect(persistent.defaultStorageKey).toBeUndefined();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
@@ -51,7 +51,7 @@ describe("Persistent Tests", () => {
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBe(undefined);
+    expect(persistent.defaultStorageKey).toBeUndefined();
 
     expect(console.error).not.toHaveBeenCalled();
   });
@@ -75,7 +75,7 @@ describe("Persistent Tests", () => {
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBe(undefined);
+    expect(persistent.defaultStorageKey).toBeUndefined();
 
     expect(console.error).toHaveBeenCalledWith(
       "Agile Error: No persist Storage Key found! Please provide at least one Storage Key."
@@ -110,7 +110,7 @@ describe("Persistent Tests", () => {
     );
   });
 
-  it("should create Persistent (config.key, config.storageKeys)", () => {
+  it("should create valid Persistent (config.key, config.storageKeys)", () => {
     const persistent = new Persistent(dummyAgile, {
       key: "coolKey",
       storageKeys: ["test1", "test2"],

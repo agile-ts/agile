@@ -25,6 +25,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     });
     config = defineConfig(config, {
       instantiate: true,
+      storageKeys: [],
     });
     this.state = () => state;
     this.instantiatePersistent({
@@ -32,7 +33,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
       storageKeys: config.storageKeys,
     });
 
-    // Load/Store persisted Value/s for the first Time
+    // Load/Store persisted Value for the first Time
     if (this.ready && config.instantiate) this.initialLoading();
   }
 
