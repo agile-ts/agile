@@ -1,3 +1,6 @@
+# TODO get inspiration by https://github.com/formium/formik/blob/master/.github/workflows/release.yml
+# https://www.christopherbiscardi.com/post/shipping-multipackage-repos-with-github-actions-changesets-and-lerna
+
 name: release
 on:
   pull_request:
