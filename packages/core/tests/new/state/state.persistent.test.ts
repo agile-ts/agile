@@ -198,5 +198,39 @@ describe("StatePersistent Tests", () => {
         });
       });
     });
+
+    // Note: Copied Persist initialLoading Tests, since idk how to mock super/extended class
+    describe("initialLoading function tests", () => {
+      let onLoadSuccess = undefined;
+
+      beforeEach(() => {
+        statePersistent.onLoad = (success) => {
+          onLoadSuccess = success;
+        };
+        jest.spyOn(statePersistent, "updateValue");
+      });
+
+      it("shouldn't call updateValue if value got loaded", () => {
+        statePersistent.loadValue = jest.fn(() => Promise.resolve(true));
+
+        statePersistent.initialLoading().then(() => {
+          expect(statePersistent.loadValue).toHaveBeenCalled();
+          expect(statePersistent.updateValue).not.toHaveBeenCalled();
+          expect(onLoadSuccess).toBeTruthy();
+          expect(dummyState.isPersisted).toBeTruthy();
+        });
+      });
+
+      it("should call updateValue if value doesn't got loaded", () => {
+        statePersistent.loadValue = jest.fn(() => Promise.resolve(false));
+
+        statePersistent.initialLoading().then(() => {
+          expect(statePersistent.loadValue).toHaveBeenCalled();
+          expect(statePersistent.updateValue).toHaveBeenCalled();
+          expect(onLoadSuccess).toBeFalsy();
+          expect(dummyState.isPersisted).toBeTruthy();
+        });
+      });
+    });
   });
 });
