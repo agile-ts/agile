@@ -21,7 +21,23 @@ jest.mock("../../src/storages/storage");
 jest.mock("../../src/collection/index");
 jest.mock("../../src/computed/index");
 jest.mock("../../src/event/index");
-// jest.mock("../../src/logger/index"); // Can't get static properties of Logger after mocking it (like the Logger.level property)
+/* Can't mock logger because it can find Logger.level..
+jest.mock("../../src/logger/index", () => {
+  return class {
+    static get level() {
+      return {
+        TRACE: 1,
+        DEBUG: 2,
+        LOG: 5,
+        TABLE: 5,
+        INFO: 10,
+        WARN: 20,
+        ERROR: 50,
+      };
+    }
+  };
+});
+ */
 // jest.mock("../../src/state/index"); // Can't mock State because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe("Agile Tests", () => {
