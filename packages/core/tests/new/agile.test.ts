@@ -21,7 +21,23 @@ jest.mock("../../src/storages/storage");
 jest.mock("../../src/collection/index");
 jest.mock("../../src/computed/index");
 jest.mock("../../src/event/index");
-jest.mock("../../src/logger/index");
+/* Can't mock Logger because I somehow can't overwrite a static get method
+jest.mock("../../src/logger/index", () => {
+  return class {
+    static get level() {
+      return {
+        TRACE: 1,
+        DEBUG: 2,
+        LOG: 5,
+        TABLE: 5,
+        INFO: 10,
+        WARN: 20,
+        ERROR: 50,
+      };
+    }
+  };
+});
+ */
 // jest.mock("../../src/state/index"); // Can't mock State because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe("Agile Tests", () => {
@@ -39,18 +55,6 @@ describe("Agile Tests", () => {
     SubControllerMock.mockClear();
     StoragesMock.mockClear();
     IntegrationsMock.mockClear();
-    // @ts-ignore
-    Logger.level = function () {
-      return {
-        TRACE: 1,
-        DEBUG: 2,
-        LOG: 5,
-        TABLE: 5,
-        INFO: 10,
-        WARN: 20,
-        ERROR: 50,
-      };
-    };
 
     // Reset Global This
     globalThis["__agile__"] = undefined;
