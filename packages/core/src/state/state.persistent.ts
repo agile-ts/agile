@@ -8,7 +8,7 @@ import {
 } from "../internal";
 
 export class StatePersistent<ValueType = any> extends Persistent {
-  private stateSideEffectKey = "rebuildStateStorageValue";
+  public stateSideEffectKey = "rebuildStateStorageValue";
   public state: () => State;
 
   /**
@@ -186,7 +186,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param key - Key/Name of Persistent
    * @param config - Config
    */
-  private rebuildStorageSideEffect(
+  public rebuildStorageSideEffect(
     state: State<ValueType>,
     key: PersistentKey,
     config: any = {}

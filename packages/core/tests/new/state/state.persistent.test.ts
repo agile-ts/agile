@@ -21,15 +21,15 @@ describe("StatePersistent Tests", () => {
 
     expect(statePersistent).toBeInstanceOf(StatePersistent);
     /* Couldn't figure out how to mock anything in the Constructor
-    expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
-      instantiate: false,
-    });
-    expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
-      key: undefined,
-      storageKeys: [],
-    });
-    expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-     */
+        expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
+          instantiate: false,
+        });
+        expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
+          key: undefined,
+          storageKeys: [],
+        });
+        expect(statePersistent.initialLoading).not.toHaveBeenCalled();
+         */
 
     expect(statePersistent.state()).toBe(dummyState);
     expect(statePersistent.key).toBe(Persistent.placeHolderKey);
@@ -57,15 +57,15 @@ describe("StatePersistent Tests", () => {
 
     expect(statePersistent).toBeInstanceOf(StatePersistent);
     /* Couldn't figure out how to mock anything in the Constructor
-    expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
-      instantiate: false,
-    });
-    expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
-      key: "statePersistentKey",
-      storageKeys: ["test1", "test2"],
-    });
-    expect(statePersistent.initialLoading).toHaveBeenCalled();
-     */
+        expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
+          instantiate: false,
+        });
+        expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
+          key: "statePersistentKey",
+          storageKeys: ["test1", "test2"],
+        });
+        expect(statePersistent.initialLoading).toHaveBeenCalled();
+         */
 
     expect(statePersistent.key).toBe("statePersistentKey"); // x
     expect(statePersistent.ready).toBeTruthy(); // x
@@ -91,15 +91,15 @@ describe("StatePersistent Tests", () => {
 
     expect(statePersistent).toBeInstanceOf(StatePersistent);
     /* Couldn't figure out how to mock anything in the Constructor
-    expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
-      instantiate: false,
-    });
-    expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
-      key: "statePersistentKey",
-      storageKeys: ["test1", "test2"],
-    });
-    expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-     */
+        expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
+          instantiate: false,
+        });
+        expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
+          key: "statePersistentKey",
+          storageKeys: ["test1", "test2"],
+        });
+        expect(statePersistent.initialLoading).not.toHaveBeenCalled();
+         */
 
     expect(statePersistent.key).toBe("statePersistentKey");
     expect(statePersistent.ready).toBeTruthy();
@@ -241,13 +241,13 @@ describe("StatePersistent Tests", () => {
       });
     });
 
-    describe("loadValue function tests", () => {
+    describe("loadPersistedValue function tests", () => {
       beforeEach(() => {
         dummyState.set = jest.fn();
         statePersistent.persistValue = jest.fn();
       });
 
-      it("should load value with persistentKey and defaultStorageKey and apply it to the State if loading was successful", async () => {
+      it("should load value with persistentKey and apply it to the State if loading was successful", async () => {
         statePersistent.ready = true;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve("dummyValue" as any)
@@ -268,7 +268,7 @@ describe("StatePersistent Tests", () => {
         );
       });
 
-      it("should load value with persistentKey and defaultStorageKey and shouldn't apply it to the State if loading wasn't successful", async () => {
+      it("should load value with persistentKey and shouldn't apply it to the State if loading wasn't successful", async () => {
         statePersistent.ready = true;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve(undefined as any)
@@ -285,7 +285,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.persistValue).not.toHaveBeenCalled();
       });
 
-      it("should load value with passed key and defaultStorageKey and should set it to the State if loading was successful", async () => {
+      it("should load value with specific Key and apply it to the State if loading was successful", async () => {
         statePersistent.ready = true;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve("dummyValue" as any)
@@ -317,6 +317,149 @@ describe("StatePersistent Tests", () => {
         expect(dummyState.set).not.toHaveBeenCalled();
         expect(statePersistent.persistValue).not.toHaveBeenCalled();
       });
+    });
+
+    describe("persistValue function tests", () => {
+      beforeEach(() => {
+        dummyState.addSideEffect = jest.fn();
+        statePersistent.rebuildStorageSideEffect = jest.fn();
+        statePersistent.isPersisted = false;
+      });
+
+      it("should persist Value with persistentKey and add sideEffect to State that dynamically persists the State Value", async () => {
+        statePersistent.ready = true;
+
+        const response = await statePersistent.persistValue();
+
+        expect(response).toBeTruthy();
+        expect(dummyState.addSideEffect).toHaveBeenCalledWith(
+          statePersistent.stateSideEffectKey,
+          expect.any(Function)
+        );
+        expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
+          dummyState,
+          statePersistent.key
+        );
+        expect(statePersistent.isPersisted).toBeTruthy();
+      });
+
+      it("should persist Value with specific Key and add sideEffect to State that dynamically persists the State Value", async () => {
+        statePersistent.ready = true;
+
+        const response = await statePersistent.persistValue("coolKey");
+
+        expect(response).toBeTruthy();
+        expect(dummyState.addSideEffect).toHaveBeenCalledWith(
+          statePersistent.stateSideEffectKey,
+          expect.any(Function)
+        );
+        expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
+          dummyState,
+          "coolKey"
+        );
+        expect(statePersistent.isPersisted).toBeTruthy();
+      });
+
+      it("shouldn't persist Value if persistent isn't ready", async () => {
+        statePersistent.ready = false;
+
+        const response = await statePersistent.persistValue();
+
+        expect(response).toBeFalsy();
+        expect(dummyState.addSideEffect).not.toHaveBeenCalled();
+        expect(statePersistent.rebuildStorageSideEffect).not.toHaveBeenCalled();
+        expect(statePersistent.isPersisted).toBeFalsy();
+      });
+    });
+
+    describe("removePersistedValue function tests", () => {
+      beforeEach(() => {
+        dummyState.removeSideEffect = jest.fn();
+        dummyAgile.storages.remove = jest.fn();
+        statePersistent.isPersisted = true;
+      });
+
+      it("should remove persisted Value from Storage with persistentKey and remove Storage sideEffect from State", async () => {
+        statePersistent.ready = true;
+
+        const response = await statePersistent.removePersistedValue();
+
+        expect(response).toBeTruthy();
+        expect(dummyState.removeSideEffect).toHaveBeenCalledWith(
+          statePersistent.stateSideEffectKey
+        );
+        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+          statePersistent.key,
+          statePersistent.storageKeys
+        );
+        expect(statePersistent.isPersisted).toBeFalsy();
+      });
+
+      it("should remove persisted Value from Storage with specific Key and remove Storage sideEffect from State", async () => {
+        statePersistent.ready = true;
+
+        const response = await statePersistent.removePersistedValue("coolKey");
+
+        expect(response).toBeTruthy();
+        expect(dummyState.removeSideEffect).toHaveBeenCalledWith(
+          statePersistent.stateSideEffectKey
+        );
+        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+          "coolKey",
+          statePersistent.storageKeys
+        );
+        expect(statePersistent.isPersisted).toBeFalsy();
+      });
+
+      it("shouldn't remove persistedValue if persistent isn't ready", async () => {
+        statePersistent.ready = false;
+
+        const response = await statePersistent.removePersistedValue("coolKey");
+
+        expect(response).toBeFalsy();
+        expect(dummyState.removeSideEffect).not.toHaveBeenCalled();
+        expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+        expect(statePersistent.isPersisted).toBeTruthy();
+      });
+    });
+
+    describe("formatKey function tests", () => {
+      it("should return the key of the state if not key got passed", () => {
+        dummyState._key = "coolKey";
+
+        const response = statePersistent.formatKey();
+
+        expect(response).toBe("coolKey");
+      });
+
+      it("should return passed key", () => {
+        dummyState._key = "coolKey";
+
+        const response = statePersistent.formatKey("awesomeKey");
+
+        expect(response).toBe("awesomeKey");
+      });
+
+      it("should return and apply passed key to state if state has no key yet", () => {
+        dummyState._key = undefined;
+
+        const response = statePersistent.formatKey("awesomeKey");
+
+        expect(response).toBe("awesomeKey");
+        expect(dummyState._key).toBe("awesomeKey");
+      });
+
+      it("should return undefined if no key got passed and the state has no key", () => {
+        dummyState._key = undefined;
+
+        const response = statePersistent.formatKey();
+
+        expect(response).toBeUndefined();
+      });
+    });
+
+    describe("rebuildStorageSiteEffect function tests", () => {
+      // TODO
     });
   });
 });
