@@ -1,7 +1,21 @@
-import { Agile } from "../../../src";
+import { Agile, Item } from "../../../src";
 
-describe("Persist Function Tests", () => {
+describe("Collection Persist Function Tests", () => {
   const myStorage: any = {};
+  const storageMethods = {
+    get: jest.fn((key) => {
+      // console.log(`GET '${key}'`);
+      return myStorage[key];
+    }),
+    set: jest.fn((key, value) => {
+      // console.log(`SET '${key}'`, value);
+      myStorage[key] = value;
+    }),
+    remove: jest.fn((key) => {
+      // console.log(`DELETE '${key}'`);
+      delete myStorage[key];
+    }),
+  };
 
   // Define Agile with Storage
   const App = new Agile();
@@ -9,19 +23,7 @@ describe("Persist Function Tests", () => {
     App.Storage({
       key: "testStorage",
       prefix: "test",
-      methods: {
-        get: (key) => {
-          return myStorage[key];
-        },
-        set: (key, value) => {
-          console.log(`SET '${key}'`, value);
-          myStorage[key] = value;
-        },
-        remove: (key) => {
-          console.log(`DELETE '${key}'`);
-          delete myStorage[key];
-        },
-      },
+      methods: storageMethods,
     })
   );
 
@@ -34,81 +36,188 @@ describe("Persist Function Tests", () => {
     it("Can persist Collection", async () => {
       // Create Collection
       const MY_COLLECTION = App.Collection<User>();
-      MY_COLLECTION.persist("myCollection");
+
+      // Test Collecting Item before Persisting
       MY_COLLECTION.collect({ id: 2, name: "hans" });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(myStorage).toStrictEqual({});
+      expect(storageMethods.set).not.toHaveBeenCalled();
+      expect(storageMethods.get).not.toHaveBeenCalled();
+      expect(storageMethods.remove).not.toHaveBeenCalled();
+
+      // Test Persisting
+      MY_COLLECTION.persist("myCollection");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_default: "[2]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+      });
+      expect(storageMethods.set).toHaveBeenCalledTimes(3);
+      expect(storageMethods.get).toHaveBeenCalledTimes(3);
+      expect(storageMethods.remove).toHaveBeenCalledTimes(0);
+
+      // Test collecting new Item
       MY_COLLECTION.collect({ id: 1, name: "frank" });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_default: "[2,1]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_item_1: '{"id":1,"name":"frank"}',
+      });
+      expect(storageMethods.set).toHaveBeenCalledTimes(5);
+      expect(storageMethods.get).toHaveBeenCalledTimes(4);
+      expect(storageMethods.remove).toHaveBeenCalledTimes(0);
+
+      // Test creating Group
       MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist({
         followCollectionPattern: true,
       });
-
-      // Needs some time to persist value
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_stuipidPeople: "[1,2]",
+        _test__myCollection_group_default: "[2,1]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_item_1: '{"id":1,"name":"frank"}',
+      });
+      expect(storageMethods.set).toHaveBeenCalledTimes(6);
+      expect(storageMethods.get).toHaveBeenCalledTimes(5);
+      expect(storageMethods.remove).toHaveBeenCalledTimes(0);
+
+      // Test collecting new Item
       MY_COLLECTION.collect({ id: 3, name: "günter" });
-
-      // Needs some time to collect value
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_stuipidPeople: "[1,2]",
+        _test__myCollection_group_default: "[2,1,3]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_item_1: '{"id":1,"name":"frank"}',
+        _test__myCollection_item_3: '{"id":3,"name":"günter"}',
+      });
+      expect(storageMethods.set).toHaveBeenCalledTimes(8);
+      expect(storageMethods.get).toHaveBeenCalledTimes(6);
+      expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
+      // Test updating Item
       MY_COLLECTION.update(3, { name: "Benno" });
-
-      // Needs some time to update value
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_stuipidPeople: "[1,2]",
+        _test__myCollection_group_default: "[2,1,3]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_item_1: '{"id":1,"name":"frank"}',
+        _test__myCollection_item_3: '{"id":3,"name":"Benno"}',
+      });
+      expect(storageMethods.set).toHaveBeenCalledTimes(9);
+      expect(storageMethods.get).toHaveBeenCalledTimes(6);
+      expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
+      // Test updating Item with ItemKey
       MY_COLLECTION.update(1, { id: 37, name: "Arne" });
-
-      // Needs some time to update value
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
-      expect(myStorage !== undefined).toBe(true);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_default: "[2,37,3]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
+        _test__myCollection_item_3: '{"id":3,"name":"Benno"}',
+      });
+      expect(storageMethods.set).toHaveBeenCalledTimes(12);
+      expect(storageMethods.get).toHaveBeenCalledTimes(6);
+      expect(storageMethods.remove).toHaveBeenCalledTimes(1);
     });
 
     it("Can load persisted Collection", async () => {
       // Create Collection
       const MY_COLLECTION = App.Collection<User>();
-      MY_COLLECTION.persist("myCollection");
 
-      // Needs some time to persist value
+      // Load persisted Value
+      MY_COLLECTION.persist("myCollection");
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
-      console.log(MY_COLLECTION);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_default: "[2,37,3]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
+        _test__myCollection_item_3: '{"id":3,"name":"Benno"}',
+      });
+      expect(MY_COLLECTION.isPersisted).toBeTruthy();
+      expect(MY_COLLECTION.size).toBe(3);
+      expect(MY_COLLECTION.data["2"]).toBeInstanceOf(Item);
+      expect(MY_COLLECTION.data["37"]).toBeInstanceOf(Item);
+      expect(MY_COLLECTION.data["3"]).toBeInstanceOf(Item);
 
+      // Updating some Collection Stuff
       MY_COLLECTION.update(3, { name: "Angela" });
       MY_COLLECTION.collect({ id: 4, name: "Paul" });
       MY_COLLECTION.collect({ id: 99, name: "Jeff" });
-
-      // Needs some time to collect/update value
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_default: "[2,37,3,4,99]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_item_3: '{"id":3,"name":"Angela"}',
+        _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
+        _test__myCollection_item_4: '{"id":4,"name":"Paul"}',
+        _test__myCollection_item_99: '{"id":99,"name":"Jeff"}',
+      });
 
-      expect(myStorage !== undefined).toBe(true);
+      // Test removing Item
+      MY_COLLECTION.remove(3).everywhere();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_default: "[2,37,4,99]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
+        _test__myCollection_item_4: '{"id":4,"name":"Paul"}',
+        _test__myCollection_item_99: '{"id":99,"name":"Jeff"}',
+      });
     });
 
     it("Can remove persisted Collection", async () => {
       // Create Collection
       const MY_COLLECTION = App.Collection<User>();
+
+      // Load persisted Value
       MY_COLLECTION.persist("myCollection");
-
-      // Needs some time to persist value
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
-      console.log(MY_COLLECTION);
+      expect(myStorage).toStrictEqual({
+        _test_myCollection: "true",
+        _test__myCollection_group_default: "[2,37,4,99]",
+        _test__myCollection_item_2: '{"id":2,"name":"hans"}',
+        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
+        _test__myCollection_item_4: '{"id":4,"name":"Paul"}',
+        _test__myCollection_item_99: '{"id":99,"name":"Jeff"}',
+      });
 
-      MY_COLLECTION.persistent?.removeValue();
-
-      // Needs some time to remove value
+      // Test Removing Persisted Value
+      MY_COLLECTION.persistent?.removePersistedValue();
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      console.log("MyStorage ", myStorage);
-      console.log(MY_COLLECTION);
+      expect(myStorage).toStrictEqual({
+        _test__myCollection_group_stuipidPeople: "[37,2]",
+      });
     });
   });
 });

@@ -146,9 +146,9 @@ export class Persistent<ValueType = any> {
    * Loads/Saves Storage Value for the first Time
    */
   public async initialLoading() {
-    const success = await this.loadValue();
+    const success = await this.loadPersistedValue();
     if (this.onLoad) this.onLoad(success);
-    if (!success) await this.updateValue();
+    if (!success) await this.persistValue();
   }
 
   //=========================================================================================================
@@ -159,9 +159,9 @@ export class Persistent<ValueType = any> {
    * Loads Value from Storage
    * @return Success?
    */
-  public async loadValue(key?: PersistentKey): Promise<boolean> {
+  public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `Load Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+      `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
@@ -174,9 +174,9 @@ export class Persistent<ValueType = any> {
    * Saves/Updates Value in Storage
    * @return Success?
    */
-  public async updateValue(key?: PersistentKey): Promise<boolean> {
+  public async persistValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `Update Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+      `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
@@ -189,9 +189,9 @@ export class Persistent<ValueType = any> {
    * Removes Value form Storage
    * @return Success?
    */
-  public async removeValue(key?: PersistentKey): Promise<boolean> {
+  public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `Remove Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+      `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }

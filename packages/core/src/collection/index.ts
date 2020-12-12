@@ -735,7 +735,7 @@ export class Collection<DataType = DefaultItem> {
     // Remove Items from Storage
     for (let key in this.data) {
       const item = this.getItem(key);
-      item?.persistent?.removeValue();
+      item?.persistent?.removePersistedValue();
     }
 
     // Reset Groups
@@ -898,7 +898,7 @@ export class Collection<DataType = DefaultItem> {
       }
 
       // Remove Item from Storage
-      item.persistent?.removeValue();
+      item.persistent?.removePersistedValue();
 
       // Remove Item from Collection
       delete this.data[itemKey];

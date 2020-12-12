@@ -138,8 +138,8 @@ describe("StatePersistent Tests", () => {
 
     describe("setKey function tests", () => {
       beforeEach(() => {
-        statePersistent.removeValue = jest.fn();
-        statePersistent.updateValue = jest.fn();
+        statePersistent.removePersistedValue = jest.fn();
+        statePersistent.persistValue = jest.fn();
         statePersistent.initialLoading = jest.fn();
         jest.spyOn(statePersistent, "validatePersistent");
       });
@@ -153,8 +153,10 @@ describe("StatePersistent Tests", () => {
           expect(statePersistent.ready).toBeTruthy();
           expect(statePersistent.validatePersistent).toHaveBeenCalled();
           expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-          expect(statePersistent.updateValue).toHaveBeenCalledWith("newKey");
-          expect(statePersistent.removeValue).toHaveBeenCalledWith("dummyKey");
+          expect(statePersistent.persistValue).toHaveBeenCalledWith("newKey");
+          expect(statePersistent.removePersistedValue).toHaveBeenCalledWith(
+            "dummyKey"
+          );
         });
       });
 
@@ -167,8 +169,10 @@ describe("StatePersistent Tests", () => {
           expect(statePersistent.ready).toBeFalsy();
           expect(statePersistent.validatePersistent).toHaveBeenCalled();
           expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-          expect(statePersistent.updateValue).not.toHaveBeenCalled();
-          expect(statePersistent.removeValue).toHaveBeenCalledWith("dummyKey");
+          expect(statePersistent.persistValue).not.toHaveBeenCalled();
+          expect(statePersistent.removePersistedValue).toHaveBeenCalledWith(
+            "dummyKey"
+          );
         });
       });
 
@@ -180,8 +184,8 @@ describe("StatePersistent Tests", () => {
           expect(statePersistent.ready).toBeTruthy();
           expect(statePersistent.validatePersistent).toHaveBeenCalled();
           expect(statePersistent.initialLoading).toHaveBeenCalled();
-          expect(statePersistent.updateValue).not.toHaveBeenCalled();
-          expect(statePersistent.removeValue).not.toHaveBeenCalled();
+          expect(statePersistent.persistValue).not.toHaveBeenCalled();
+          expect(statePersistent.removePersistedValue).not.toHaveBeenCalled();
         });
       });
 
@@ -193,8 +197,8 @@ describe("StatePersistent Tests", () => {
           expect(statePersistent.ready).toBeFalsy();
           expect(statePersistent.validatePersistent).toHaveBeenCalled();
           expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-          expect(statePersistent.updateValue).not.toHaveBeenCalled();
-          expect(statePersistent.removeValue).not.toHaveBeenCalled();
+          expect(statePersistent.persistValue).not.toHaveBeenCalled();
+          expect(statePersistent.removePersistedValue).not.toHaveBeenCalled();
         });
       });
     });
@@ -207,29 +211,111 @@ describe("StatePersistent Tests", () => {
         statePersistent.onLoad = (success) => {
           onLoadSuccess = success;
         };
-        jest.spyOn(statePersistent, "updateValue");
+        jest.spyOn(statePersistent, "persistValue");
       });
 
       it("shouldn't call updateValue if value got loaded", () => {
-        statePersistent.loadValue = jest.fn(() => Promise.resolve(true));
+        statePersistent.loadPersistedValue = jest.fn(() =>
+          Promise.resolve(true)
+        );
 
         statePersistent.initialLoading().then(() => {
-          expect(statePersistent.loadValue).toHaveBeenCalled();
-          expect(statePersistent.updateValue).not.toHaveBeenCalled();
+          expect(statePersistent.loadPersistedValue).toHaveBeenCalled();
+          expect(statePersistent.persistValue).not.toHaveBeenCalled();
           expect(onLoadSuccess).toBeTruthy();
           expect(dummyState.isPersisted).toBeTruthy();
         });
       });
 
       it("should call updateValue if value doesn't got loaded", () => {
-        statePersistent.loadValue = jest.fn(() => Promise.resolve(false));
+        statePersistent.loadPersistedValue = jest.fn(() =>
+          Promise.resolve(false)
+        );
 
         statePersistent.initialLoading().then(() => {
-          expect(statePersistent.loadValue).toHaveBeenCalled();
-          expect(statePersistent.updateValue).toHaveBeenCalled();
+          expect(statePersistent.loadPersistedValue).toHaveBeenCalled();
+          expect(statePersistent.persistValue).toHaveBeenCalled();
           expect(onLoadSuccess).toBeFalsy();
           expect(dummyState.isPersisted).toBeTruthy();
         });
+      });
+    });
+
+    describe("loadValue function tests", () => {
+      beforeEach(() => {
+        dummyState.set = jest.fn();
+        statePersistent.persistValue = jest.fn();
+      });
+
+      it("should load value with persistentKey and defaultStorageKey and apply it to the State if loading was successful", async () => {
+        statePersistent.ready = true;
+        dummyAgile.storages.get = jest.fn(() =>
+          Promise.resolve("dummyValue" as any)
+        );
+
+        const response = await statePersistent.loadPersistedValue();
+
+        expect(response).toBeTruthy();
+        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          statePersistent.key,
+          statePersistent.defaultStorageKey
+        );
+        expect(dummyState.set).toHaveBeenCalledWith("dummyValue", {
+          storage: false,
+        });
+        expect(statePersistent.persistValue).toHaveBeenCalledWith(
+          statePersistent.key
+        );
+      });
+
+      it("should load value with persistentKey and defaultStorageKey and shouldn't apply it to the State if loading wasn't successful", async () => {
+        statePersistent.ready = true;
+        dummyAgile.storages.get = jest.fn(() =>
+          Promise.resolve(undefined as any)
+        );
+
+        const response = await statePersistent.loadPersistedValue();
+
+        expect(response).toBeFalsy();
+        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          statePersistent.key,
+          statePersistent.defaultStorageKey
+        );
+        expect(dummyState.set).not.toHaveBeenCalled();
+        expect(statePersistent.persistValue).not.toHaveBeenCalled();
+      });
+
+      it("should load value with passed key and defaultStorageKey and should set it to the State if loading was successful", async () => {
+        statePersistent.ready = true;
+        dummyAgile.storages.get = jest.fn(() =>
+          Promise.resolve("dummyValue" as any)
+        );
+
+        const response = await statePersistent.loadPersistedValue("coolKey");
+
+        expect(response).toBeTruthy();
+        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          "coolKey",
+          statePersistent.defaultStorageKey
+        );
+        expect(dummyState.set).toHaveBeenCalledWith("dummyValue", {
+          storage: false,
+        });
+        expect(statePersistent.persistValue).toHaveBeenCalledWith("coolKey");
+      });
+
+      it("shouldn't load value if persistent isn't ready", async () => {
+        statePersistent.ready = false;
+        dummyAgile.storages.get = jest.fn(() =>
+          Promise.resolve(undefined as any)
+        );
+
+        const response = await statePersistent.loadPersistedValue();
+
+        expect(response).toBeFalsy();
+        expect(dummyAgile.storages.get).not.toHaveBeenCalled();
+        expect(dummyState.set).not.toHaveBeenCalled();
+        expect(statePersistent.persistValue).not.toHaveBeenCalled();
       });
     });
   });

@@ -104,7 +104,7 @@ export class Storages {
 
       // Add Value to newly registered StorageKey
       if (persistent.storageKeys.includes(storage.key))
-        persistent.updateValue();
+        persistent.persistValue();
     });
 
     return true;

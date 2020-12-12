@@ -106,10 +106,6 @@ export class StateObserver<ValueType = any> extends Observer {
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
 
-    // Store State changes in Storage
-    if (job.config.storage && state.isPersisted)
-      state.persistent?.updateValue();
-
     state.isSet = notEqual(
       job.observer.nextStateValue,
       state.initialStateValue

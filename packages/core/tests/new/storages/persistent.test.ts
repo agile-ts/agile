@@ -301,25 +301,25 @@ describe("Persistent Tests", () => {
         persistent.onLoad = (success) => {
           onLoadSuccess = success;
         };
-        jest.spyOn(persistent, "updateValue");
+        jest.spyOn(persistent, "persistValue");
       });
 
       it("shouldn't call updateValue if value got loaded", () => {
-        persistent.loadValue = jest.fn(() => Promise.resolve(true));
+        persistent.loadPersistedValue = jest.fn(() => Promise.resolve(true));
 
         persistent.initialLoading().then(() => {
-          expect(persistent.loadValue).toHaveBeenCalled();
-          expect(persistent.updateValue).not.toHaveBeenCalled();
+          expect(persistent.loadPersistedValue).toHaveBeenCalled();
+          expect(persistent.persistValue).not.toHaveBeenCalled();
           expect(onLoadSuccess).toBeTruthy();
         });
       });
 
       it("should call updateValue if value doesn't got loaded", () => {
-        persistent.loadValue = jest.fn(() => Promise.resolve(false));
+        persistent.loadPersistedValue = jest.fn(() => Promise.resolve(false));
 
         persistent.initialLoading().then(() => {
-          expect(persistent.loadValue).toHaveBeenCalled();
-          expect(persistent.updateValue).toHaveBeenCalled();
+          expect(persistent.loadPersistedValue).toHaveBeenCalled();
+          expect(persistent.persistValue).toHaveBeenCalled();
           expect(onLoadSuccess).toBeFalsy();
         });
       });
@@ -328,30 +328,30 @@ describe("Persistent Tests", () => {
     describe("functions that get overwritten tests | because Persistent is no stand alone class", () => {
       describe("onLoad function tests", () => {
         it("should print error", () => {
-          persistent.loadValue();
+          persistent.loadPersistedValue();
 
           expect(console.error).toHaveBeenCalledWith(
-            "Agile Error: Load Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
+            "Agile Error: 'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
           );
         });
       });
 
-      describe("updateValue function tests", () => {
+      describe("persistValue function tests", () => {
         it("should print error", () => {
-          persistent.updateValue();
+          persistent.persistValue();
 
           expect(console.error).toHaveBeenCalledWith(
-            "Agile Error: Update Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
+            "Agile Error: 'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
           );
         });
       });
 
-      describe("removeValue function tests", () => {
+      describe("removePersistedValue function tests", () => {
         it("should print error", () => {
-          persistent.removeValue();
+          persistent.removePersistedValue();
 
           expect(console.error).toHaveBeenCalledWith(
-            "Agile Error: Remove Value function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
+            "Agile Error: 'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
           );
         });
       });

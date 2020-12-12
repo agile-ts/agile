@@ -104,7 +104,7 @@ describe("Persist Function Tests", () => {
       console.log("MyStorage ", myStorage);
       console.log(MY_COLLECTION);
 
-      MY_COLLECTION.persistent?.removeValue();
+      MY_COLLECTION.persistent?.removePersistedValue();
 
       // Needs some time to remove value
       await new Promise((resolve) => setTimeout(resolve, 100));

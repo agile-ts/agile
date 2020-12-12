@@ -171,11 +171,11 @@ describe("Storages Tests", () => {
           key: "persistent1",
           storageKeys: ["storage1"],
         });
-        jest.spyOn(persistent, "updateValue");
+        jest.spyOn(persistent, "persistValue");
 
         const success = storages.register(dummyStorage1);
 
-        expect(persistent.updateValue).toHaveBeenCalled();
+        expect(persistent.persistValue).toHaveBeenCalled();
         expect(success).toBeTruthy();
       });
 

@@ -202,7 +202,6 @@ describe("StateObserver Tests", () => {
         dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
         dummyState.isPersisted = true;
         dummyState.persistent = new StatePersistent(dummyState);
-        dummyState.persistent.updateValue = jest.fn();
         stateObserver.sideEffects = jest.fn();
       });
 
@@ -218,26 +217,7 @@ describe("StateObserver Tests", () => {
         expect(dummyState.isSet).toBeTruthy();
         expect(stateObserver.value).toBe("newValue");
 
-        expect(dummyState.persistent.updateValue).toHaveBeenCalled();
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
-      });
-
-      it("should perform Job and shouldn't call updateValue on StatePersistent (job.config.storage = false)", () => {
-        dummyJob.observer.nextStateValue = "newValue";
-        dummyJob.config.storage = false;
-
-        stateObserver.perform(dummyJob as any);
-
-        expect(dummyState.persistent.updateValue).not.toHaveBeenCalled();
-      });
-
-      it("should perform Job and shouldn't call updateValue on StatePersistent if state isn't persisted", () => {
-        dummyJob.observer.nextStateValue = "newValue";
-        dummyState.isPersisted = false;
-
-        stateObserver.perform(dummyJob as any);
-
-        expect(dummyState.persistent.updateValue).not.toHaveBeenCalled();
       });
 
       it("should perform Job and assign specific values to State if State is a Placeholder", () => {
@@ -251,7 +231,6 @@ describe("StateObserver Tests", () => {
         expect(dummyState.initialStateValue).toBe("newValue");
         expect(dummyState._value).toBe("newValue");
         expect(dummyState.nextStateValue).toBe("newValue");
-        expect(dummyState.persistent.updateValue).toHaveBeenCalled();
         expect(dummyState.isSet).toBeTruthy();
         expect(stateObserver.value).toBe("newValue");
 
