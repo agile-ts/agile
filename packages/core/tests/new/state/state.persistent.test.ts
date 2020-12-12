@@ -458,8 +458,28 @@ describe("StatePersistent Tests", () => {
       });
     });
 
-    describe("rebuildStorageSiteEffect function tests", () => {
-      // TODO
+    describe("rebuildStorageSideEffect function tests", () => {
+      beforeEach(() => {
+        dummyAgile.storages.set = jest.fn();
+      });
+
+      it("should save State value in Storage (default config)", () => {
+        statePersistent.rebuildStorageSideEffect(dummyState, "coolKey");
+
+        expect(dummyAgile.storages.set).toHaveBeenCalledWith(
+          "coolKey",
+          dummyState.getPersistableValue(),
+          statePersistent.storageKeys
+        );
+      });
+
+      it("shouldn't save State value in Storage (config.storage = false)", () => {
+        statePersistent.rebuildStorageSideEffect(dummyState, "coolKey", {
+          storage: false,
+        });
+
+        expect(dummyAgile.storages.set).not.toHaveBeenCalled();
+      });
     });
   });
 });
