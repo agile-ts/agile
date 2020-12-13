@@ -219,7 +219,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as GroupPersistConfigInterface;
-      key = undefined;
+      key = this.key;
     } else {
       _config = config || {};
       key = keyOrConfig as PersistentKey;
@@ -228,6 +228,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     _config = defineConfig(_config, {
       instantiate: true,
       followCollectionPattern: false,
+      storageKeys: [],
     });
 
     if (_config.followCollectionPersistKeyPattern) {

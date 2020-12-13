@@ -398,7 +398,7 @@ export class State<ValueType = any> {
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as StatePersistentConfigInterface;
-      key = undefined;
+      key = this.key;
     } else {
       _config = config || {};
       key = keyOrConfig as PersistentKey;
@@ -406,13 +406,13 @@ export class State<ValueType = any> {
 
     _config = defineConfig(_config, {
       instantiate: true,
+      storageKeys: [],
     });
 
-    if (this.persistent) {
+    if (this.persistent)
       Agile.logger.warn(
         "By persisting a State twice you overwrite the old Persistent Instance!"
       );
-    }
 
     // Create persistent -> Persist Value
     this.persistent = new StatePersistent<ValueType>(this, {

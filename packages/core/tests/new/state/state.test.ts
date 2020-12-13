@@ -1,10 +1,18 @@
-import { State, Agile, StateObserver, Observer } from "../../../src";
+import {
+  State,
+  Agile,
+  StateObserver,
+  Observer,
+  StatePersistent,
+} from "../../../src";
 import * as Utils from "../../../src/utils";
+jest.mock("../../../src/state/state.persistent");
 
 describe("State Tests", () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     dummyAgile = new Agile({ localStorage: false });
     console.error = jest.fn();
     console.warn = jest.fn();
@@ -84,7 +92,7 @@ describe("State Tests", () => {
       });
 
       it("should update existing Key in all instances", () => {
-        numberState.persistent._key = "numberStateKey";
+        numberState.persistent.key = "numberStateKey";
 
         numberState.setKey("newKey");
 
@@ -94,7 +102,7 @@ describe("State Tests", () => {
       });
 
       it("should update existing Key but shouldn't update Key in persistent if their Keys weren't equal before", () => {
-        numberState.persistent._key = "randomKey";
+        numberState.persistent.key = "randomKey";
 
         numberState.setKey("newKey");
 
@@ -562,6 +570,77 @@ describe("State Tests", () => {
     });
 
     describe("persist function tests", () => {
+      it("should create persistent with StateKey (default config)", () => {
+        numberState.persist();
+
+        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
+          instantiate: true,
+          storageKeys: [],
+          key: numberState._key,
+        });
+      });
+
+      it("should create persistent with StateKey (specific config)", () => {
+        numberState.persist({
+          storageKeys: ["test1", "test2"],
+          instantiate: false,
+        });
+
+        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
+          instantiate: false,
+          storageKeys: ["test1", "test2"],
+          key: numberState._key,
+        });
+      });
+
+      it("should create persistent with passed Key (default config)", () => {
+        numberState.persist("passedKey");
+
+        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
+          instantiate: true,
+          storageKeys: [],
+          key: "passedKey",
+        });
+      });
+
+      it("should create persistent with passed Key (specific config)", () => {
+        numberState.persist("passedKey", {
+          storageKeys: ["test1", "test2"],
+          instantiate: false,
+        });
+
+        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
+          instantiate: false,
+          storageKeys: ["test1", "test2"],
+          key: "passedKey",
+        });
+      });
+
+      it("should overwrite existing persistent with a warning", () => {
+        numberState.persistent = new StatePersistent(numberState);
+
+        numberState.persist({
+          instantiate: false,
+          storageKeys: ["test1", "test2"],
+        });
+
+        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
+          instantiate: false,
+          storageKeys: ["test1", "test2"],
+          key: numberState._key,
+        });
+        expect(console.warn).toBeCalledWith(
+          "Agile Warn: By persisting a State twice you overwrite the old Persistent Instance!"
+        );
+      });
+    });
+
+    describe("onLoad function tests", () => {
       // TODO
     });
   });
