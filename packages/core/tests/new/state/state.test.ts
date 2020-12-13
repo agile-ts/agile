@@ -6,6 +6,7 @@ import {
   StatePersistent,
 } from "../../../src";
 import * as Utils from "../../../src/utils";
+
 jest.mock("../../../src/state/state.persistent");
 
 describe("State Tests", () => {
@@ -68,6 +69,7 @@ describe("State Tests", () => {
     let numberState: State<number>;
     let objectState: State<{ name: string; age: number }>;
     let arrayState: State<string[]>;
+    let booleanState: State<boolean>;
 
     beforeEach(() => {
       numberState = new State<number>(dummyAgile, 10, {
@@ -82,6 +84,53 @@ describe("State Tests", () => {
       );
       arrayState = new State<string[]>(dummyAgile, ["jeff"], {
         key: "arrayStateKey",
+      });
+      booleanState = new State<boolean>(dummyAgile, false, {
+        key: "booleanStateKey",
+      });
+    });
+
+    describe("value set function tests", () => {
+      it("should call set function with passed value", () => {
+        numberState.set = jest.fn();
+
+        numberState.value = 20;
+
+        expect(numberState.set).toHaveBeenCalledWith(20);
+      });
+    });
+
+    describe("value get function tests", () => {
+      it("should return current value", () => {
+        expect(numberState.value).toBe(10);
+      });
+
+      it("should return current value and add StateObserver to trackedObserver if runtime is tracking observers", () => {
+        dummyAgile.runtime.trackedObservers.add = jest.fn();
+        dummyAgile.runtime.trackObservers = true;
+
+        const value = numberState.value;
+
+        expect(value).toBe(10);
+        expect(dummyAgile.runtime.trackedObservers.add).toHaveBeenCalledWith(
+          numberState.observer
+        );
+      });
+    });
+
+    describe("key set function tests", () => {
+      it("should call setKey with passed value", () => {
+        numberState.setKey = jest.fn();
+
+        numberState.key = "newKey";
+
+        expect(numberState.setKey).toHaveBeenCalledWith("newKey");
+      });
+    });
+
+    describe("key get function tests", () => {
+      it("should return current State Key", () => {
+        expect(numberState.key).toBe("numberStateKey");
       });
     });
 
@@ -526,7 +575,7 @@ describe("State Tests", () => {
     });
 
     describe("onInaugurated function tests", () => {
-      let dummyCallbackFunction = jest.fn();
+      const dummyCallbackFunction = jest.fn();
 
       beforeEach(() => {
         jest.spyOn(numberState, "watch");
@@ -641,7 +690,126 @@ describe("State Tests", () => {
     });
 
     describe("onLoad function tests", () => {
-      // TODO
+      const dummyCallbackFunction = jest.fn();
+
+      it("should set onLoad function if State is persisted and shouldn't call it initially if isPersisted = false", () => {
+        numberState.persistent = new StatePersistent(numberState);
+        numberState.isPersisted = false;
+
+        numberState.onLoad(dummyCallbackFunction);
+
+        expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
+        expect(dummyCallbackFunction).not.toHaveBeenCalled();
+      });
+
+      it("should set onLoad function if State is persisted and should call it initially if isPersisted = true", () => {
+        numberState.persistent = new StatePersistent(numberState);
+        numberState.isPersisted = true;
+
+        numberState.onLoad(dummyCallbackFunction);
+
+        expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
+        expect(dummyCallbackFunction).toBeCalledWith(true);
+      });
+
+      it("shouldn't set onLoad function if State isn't persisted and should drop a warning ", () => {
+        numberState.onLoad(dummyCallbackFunction);
+
+        expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: Please make sure you persist the State 'numberStateKey' before using onLoad!"
+        );
+      });
+    });
+
+    describe("copy function tests", () => {
+      it("should return a reference free copy of the current State Value", () => {
+        jest.spyOn(Utils, "copy");
+        const value = numberState.copy();
+
+        expect(value).toBe(10);
+        expect(Utils.copy).toHaveBeenCalledWith(10);
+      });
+    });
+
+    describe("exists get function tests", () => {
+      it("should return true if value isn't undefined and State is no placeholder", () => {
+        expect(numberState.exists).toBeTruthy();
+      });
+
+      it("should return false if value is undefined and State is no placeholder", () => {
+        numberState._value = undefined;
+
+        expect(numberState.exists).toBeFalsy();
+      });
+
+      it("should return false if value isn't undefined and State is placeholder", () => {
+        numberState.isPlaceholder = true;
+
+        expect(numberState.exists).toBeFalsy();
+      });
+    });
+
+    describe("is function tests", () => {
+      beforeEach(() => {
+        jest.spyOn(Utils, "equal");
+      });
+
+      it("should return true if passed value is equal to the current StateValue", () => {
+        const response = numberState.is(10);
+
+        expect(response).toBeTruthy();
+        expect(Utils.equal).toHaveBeenCalledWith(10, numberState._value);
+      });
+
+      it("should return false if passed value is not equal to the current StateValue", () => {
+        const response = numberState.is(20);
+
+        expect(response).toBeFalsy();
+        expect(Utils.equal).toHaveBeenCalledWith(20, numberState._value);
+      });
+    });
+
+    describe("isNot function tests", () => {
+      beforeEach(() => {
+        jest.spyOn(Utils, "notEqual");
+      });
+
+      it("should return false if passed value is equal to the current StateValue", () => {
+        const response = numberState.isNot(10);
+
+        expect(response).toBeFalsy();
+        expect(Utils.notEqual).toHaveBeenCalledWith(10, numberState._value);
+      });
+
+      it("should return true if passed value is not equal to the current StateValue", () => {
+        const response = numberState.isNot(20);
+
+        expect(response).toBeTruthy();
+        expect(Utils.notEqual).toHaveBeenCalledWith(20, numberState._value);
+      });
+    });
+
+    describe("invert function tests", () => {
+      beforeEach(() => {
+        numberState.set = jest.fn();
+        booleanState.set = jest.fn();
+      });
+
+      it("should invert current value of a boolean based State", () => {
+        booleanState.invert();
+
+        expect(booleanState.set).toHaveBeenCalledWith(true);
+      });
+
+      it("shouldn't invert current value if no boolean based State and should get a error", () => {
+        numberState.invert();
+
+        expect(numberState.set).not.toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: You can only invert boolean based States!"
+        );
+      });
     });
   });
 });

@@ -429,7 +429,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Callback Function gets called if persisted Value gets loaded into the State for the first Time
+   * Callback Function that gets called if the persisted Value gets loaded into the State for the first Time
    * Note: Only useful for persisted States!
    * @param callback - Callback Function
    */
@@ -440,7 +440,7 @@ export class State<ValueType = any> {
       // If State isPersisted the loading was successful -> callback can be called
       if (this.isPersisted) callback(true);
     } else {
-      Agile.logger.warn(
+      Agile.logger.error(
         `Please make sure you persist the State '${this.key}' before using onLoad!`
       );
     }
@@ -466,7 +466,7 @@ export class State<ValueType = any> {
    * Checks if State exists
    */
   public get exists(): boolean {
-    return this.getPublicValue() !== undefined && !this.isPlaceholder;
+    return this._value !== undefined && !this.isPlaceholder;
   }
 
   //=========================================================================================================
@@ -502,11 +502,11 @@ export class State<ValueType = any> {
    * Note: Only useful with boolean based States
    */
   public invert(): this {
-    if (typeof this._value !== "boolean") {
+    if (typeof this._value === "boolean") {
+      this.set(!this._value as any);
+    } else {
       Agile.logger.error("You can only invert boolean based States!");
-      return this;
     }
-    this.set(this._value);
     return this;
   }
 
@@ -606,7 +606,7 @@ export class State<ValueType = any> {
    * Returns Value that gets written into the Agile Storage
    */
   public getPersistableValue(): any {
-    return this.value;
+    return this._value;
   }
 }
 
