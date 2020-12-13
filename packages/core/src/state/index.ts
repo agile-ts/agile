@@ -110,7 +110,7 @@ export class State<ValueType = any> {
    * https://github.com/microsoft/TypeScript/issues/338
    * @param value - New Key/Name of State
    */
-  public setKey(value: StateKey | undefined) {
+  public setKey(value: StateKey | undefined): this {
     const oldKey = this._key;
 
     // Update State Key
@@ -121,6 +121,8 @@ export class State<ValueType = any> {
 
     // Update Key in PersistManager (only if the Keys are the same -> otherwise the PersistKey got formatted and will be set where other)
     if (this.persistent?.key === oldKey) this.persistent?.setKey(value);
+
+    return this;
   }
 
   //=========================================================================================================
@@ -141,9 +143,13 @@ export class State<ValueType = any> {
     });
 
     // Check value has correct Type (js)
-    if (this.valueType && !this.hasCorrectType(value)) {
-      Agile.logger.error(`Incorrect type (${typeof value}) was provided.`);
-      return this;
+    if (!this.hasCorrectType(value)) {
+      const message = `Incorrect type (${typeof value}) was provided.`;
+      if (!config.force) {
+        Agile.logger.error(message);
+        return this;
+      }
+      Agile.logger.warn(message);
     }
 
     // Check if value has changed
@@ -203,9 +209,11 @@ export class State<ValueType = any> {
   /**
    * @public
    * Undoes latest State Value change
+   * @param config - Config
    */
-  public undo() {
-    this.set(this.previousStateValue);
+  public undo(config: SetConfigInterface = {}): this {
+    this.set(this.previousStateValue, config);
+    return this;
   }
 
   //=========================================================================================================
@@ -218,7 +226,6 @@ export class State<ValueType = any> {
    */
   public reset(config: SetConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
-    this.persistent?.removePersistedValue(); // Remove State Value from Storage (since its the initial Value)
     return this;
   }
 
@@ -239,17 +246,18 @@ export class State<ValueType = any> {
     config = defineConfig(config, {
       addNewProperties: true,
       background: false,
+      force: false,
     });
 
     if (!isValidObject(this.nextStateValue)) {
       Agile.logger.error(
-        "You can't use the patch method on a non object States!"
+        "You can't use the patch method on a non object based States!"
       );
       return this;
     }
 
     if (!isValidObject(targetWithChanges)) {
-      Agile.logger.error("TargetWithChanges has to be an object!");
+      Agile.logger.error("TargetWithChanges has to be an Object!");
       return this;
     }
 
@@ -261,10 +269,10 @@ export class State<ValueType = any> {
     );
 
     // Check if value has been changed
-    if (equal(this.value, this.nextStateValue)) return this;
+    if (equal(this.value, this.nextStateValue) && !config.force) return this;
 
     // Ingest updated nextStateValue into Runtime
-    this.ingest({ background: config.background });
+    this.ingest({ background: config.background, force: config.force });
 
     return this;
   }
@@ -564,9 +572,11 @@ export class State<ValueType = any> {
   /**
    * @internal
    * Checks if Value has correct valueType (js)
+   * Note: If no valueType set it returns true
    * @param value - Value that gets checked for its correct Type
    */
   private hasCorrectType(value: any): boolean {
+    if (!this.valueType) return true;
     let type: string = typeof value;
     return type === this.valueType;
   }
@@ -624,10 +634,12 @@ export interface SetConfigInterface {
 /**
  * @param background - If assigning new value happens in the background (-> not causing any rerender)
  * @param addNewProperties - If new Properties gets added to the State Value
+ * @param force - Force patching Value into State
  */
 export interface PatchConfigInterface {
   addNewProperties?: boolean;
   background?: boolean;
+  force?: boolean;
 }
 
 /**

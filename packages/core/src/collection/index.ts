@@ -732,12 +732,6 @@ export class Collection<DataType = DefaultItem> {
    * Resets this Collection
    */
   public reset() {
-    // Remove Items from Storage
-    for (let key in this.data) {
-      const item = this.getItem(key);
-      item?.persistent?.removePersistedValue();
-    }
-
     // Reset Groups
     for (let key in this.groups) this.getGroup(key)?.reset();
 
