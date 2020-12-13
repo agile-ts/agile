@@ -116,7 +116,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       // Persist Default Group and load its Value manually to be 100% sure it got loaded
       defaultGroup.persist({
         instantiate: false,
-        followCollectionPattern: true,
+        followCollectionPersistKeyPattern: true,
       });
       if (defaultGroup.persistent?.ready) {
         await defaultGroup.persistent?.initialLoading();
@@ -171,7 +171,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (!defaultGroup) return false;
 
     // Persist default Group
-    defaultGroup.persist({ followCollectionPattern: true });
+    defaultGroup.persist({ followCollectionPersistKeyPattern: true });
 
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     defaultGroup.addSideEffect(this.defaultGroupSideEffectKey, () =>

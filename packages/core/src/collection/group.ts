@@ -7,11 +7,11 @@ import {
   defineConfig,
   normalizeArray,
   Item,
-  StorageKey,
   copy,
   CollectionPersistent,
-  isValidObject,
   StatePersistentConfigInterface,
+  StorageKey,
+  isValidObject,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -227,7 +227,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       followCollectionPattern: false,
     });
 
-    if (_config.followCollectionPattern) {
+    if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this.key,
         this.collection().key
@@ -311,5 +311,5 @@ export interface GroupConfigInterface {
  */
 export interface GroupPersistConfigInterface
   extends StatePersistentConfigInterface {
-  followCollectionPattern?: boolean;
+  followCollectionPersistKeyPattern?: boolean;
 }

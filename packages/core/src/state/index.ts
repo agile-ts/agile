@@ -291,7 +291,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Watches State and detects State changes
-   * @param key - Key of Watcher Function
+   * @param key - Key/Name of Watcher Function
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public watch(key: string, callback: StateWatcherCallback<ValueType>): this;
@@ -311,16 +311,18 @@ export class State<ValueType = any> {
       _callback = callback as StateWatcherCallback<ValueType>;
     }
 
-    // Check if Callback is a Function
+    // Check if Callback is a valid Function
     if (!isFunction(_callback)) {
-      Agile.logger.error("A Watcher Callback Function has to be an function!");
+      Agile.logger.error(
+        "A Watcher Callback Function has to be typeof Function!"
+      );
       return this;
     }
 
-    // Check if Callback Function already exists
+    // Check if watcherKey is already occupied
     if (this.watchers[key]) {
       Agile.logger.error(
-        `Watcher Callback Function with the key/name ${key} already exists!`
+        `Watcher Callback Function with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -348,9 +350,9 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public onInaugurated(callback: StateWatcherCallback<ValueType>) {
-    const watcherKey = "InauguratedWatcher";
-    this.watch(watcherKey, () => {
-      callback(this.getPublicValue());
+    const watcherKey = "InauguratedWatcherKey";
+    this.watch(watcherKey, (value) => {
+      callback(value);
       this.removeWatcher(watcherKey);
     });
   }
@@ -361,7 +363,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Checks if watcher at given Key exists
-   * @param key - Key of Watcher
+   * @param key - Key/Name of Watcher
    */
   public hasWatcher(key: string): boolean {
     return !!this.watchers[key];

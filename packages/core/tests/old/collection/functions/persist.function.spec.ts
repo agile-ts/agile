@@ -40,7 +40,7 @@ describe("Persist Function Tests", () => {
       MY_COLLECTION.collect({ id: 2, name: "hans" });
       MY_COLLECTION.collect({ id: 1, name: "frank" });
       MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist({
-        followCollectionPattern: true,
+        followCollectionPersistKeyPattern: true,
       });
 
       // Needs some time to persist value
