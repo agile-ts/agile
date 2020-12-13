@@ -516,7 +516,7 @@ describe("State Tests", () => {
       const dummyCallbackFunction1 = () => {};
       const dummyCallbackFunction2 = () => {};
 
-      it("should add watcherFunction to State at passed key", () => {
+      it("should add passed watcherFunction to watchers at passed key", () => {
         const response = numberState.watch("dummyKey", dummyCallbackFunction1);
 
         expect(response).toBe(numberState);
@@ -524,7 +524,7 @@ describe("State Tests", () => {
         expect(numberState.watchers["dummyKey"]).toBe(dummyCallbackFunction1);
       });
 
-      it("should add watcherFunction to State at random key if no key passed and return that generated key", () => {
+      it("should add passed watcherFunction to watchers at random key if no key passed and return that generated key", () => {
         jest.spyOn(Utils, "generateId").mockReturnValue("randomKey");
 
         const response = numberState.watch(dummyCallbackFunction1);
@@ -535,7 +535,7 @@ describe("State Tests", () => {
         expect(Utils.generateId).toHaveBeenCalled();
       });
 
-      it("shouldn't add watcherFunction to State at passed key if callback function is no function", () => {
+      it("shouldn't add passed invalid watcherFunction to watchers at passed key", () => {
         const response = numberState.watch(
           "dummyKey",
           "noFunction hehe" as any
@@ -548,7 +548,7 @@ describe("State Tests", () => {
         );
       });
 
-      it("shouldn't add watcherFunction to State at passed key if passed key is already occupied", () => {
+      it("shouldn't add passed watcherFunction to watchers at passed key if passed key is already occupied", () => {
         numberState.watchers["dummyKey"] = dummyCallbackFunction2;
 
         const response = numberState.watch("dummyKey", dummyCallbackFunction1);
@@ -802,13 +802,108 @@ describe("State Tests", () => {
         expect(booleanState.set).toHaveBeenCalledWith(true);
       });
 
-      it("shouldn't invert current value if no boolean based State and should get a error", () => {
+      it("shouldn't invert current value if not boolean based State and should print a error", () => {
         numberState.invert();
 
         expect(numberState.set).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: You can only invert boolean based States!"
         );
+      });
+    });
+
+    describe("compute function tests", () => {
+      it("should assign passed function to computeMethod", () => {
+        const computeMethod = () => 10;
+
+        numberState.compute(computeMethod);
+
+        expect(numberState.computeMethod).toBe(computeMethod);
+      });
+
+      it("shouldn't assign passed invalid function to computeMethod", () => {
+        numberState.compute(10 as any);
+
+        expect(numberState.computeMethod).toBeUndefined();
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: A computeMethod has to be a function!"
+        );
+      });
+    });
+
+    describe("addSideEffect function tests", () => {
+      const sideEffectFunction = () => {};
+
+      it("should add passed function to sideEffects at passed key", () => {
+        numberState.addSideEffect("dummyKey", sideEffectFunction);
+
+        expect(numberState.sideEffects).toHaveProperty("dummyKey");
+        expect(numberState.sideEffects["dummyKey"]).toBe(sideEffectFunction);
+      });
+
+      it("shouldn't add passed invalid function to sideEffects at passed key", () => {
+        numberState.addSideEffect("dummyKey", 10 as any);
+
+        expect(numberState.sideEffects).not.toHaveProperty("dummyKey");
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: A sideEffect function has to be a function!"
+        );
+      });
+    });
+
+    describe("removeSideEffect function tests", () => {
+      beforeEach(() => {
+        numberState.sideEffects["dummyKey"] = () => {};
+      });
+
+      it("should remove sideEffect at key from State", () => {
+        numberState.removeSideEffect("dummyKey");
+
+        expect(numberState.sideEffects).not.toHaveProperty("dummyKey");
+      });
+    });
+
+    describe("hasSideEffect function tests", () => {
+      beforeEach(() => {
+        numberState.sideEffects["dummyKey"] = () => {};
+      });
+
+      it("should return true if SideEffect at given Key exists", () => {
+        expect(numberState.hasSideEffect("dummyKey")).toBeTruthy();
+      });
+
+      it("should return false if SideEffect at given Key doesn't exists", () => {
+        expect(numberState.hasSideEffect("notExistingDummyKey")).toBeFalsy();
+      });
+    });
+
+    describe("hasCorrectType function tests", () => {
+      it("should return true if State Type matches passed type", () => {
+        numberState.type(Number);
+
+        expect(numberState.hasCorrectType(10)).toBeTruthy();
+      });
+
+      it("should return false if State Type doesn't matches passed type", () => {
+        numberState.type(Number);
+
+        expect(numberState.hasCorrectType("stringValue")).toBeFalsy();
+      });
+
+      it("should return true if State has no defined Type", () => {
+        expect(numberState.hasCorrectType("stringValue")).toBeTruthy();
+      });
+    });
+
+    describe("getPublicValue function tests", () => {
+      it("should return value of State", () => {
+        expect(numberState.getPublicValue()).toBe(10);
+      });
+
+      it("should return output of State", () => {
+        numberState["output"] = 99;
+
+        expect(numberState.getPublicValue()).toBe(99);
       });
     });
   });

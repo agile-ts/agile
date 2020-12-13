@@ -312,7 +312,7 @@ export class State<ValueType = any> {
       _callback = callback as StateWatcherCallback<ValueType>;
     }
 
-    // Check if Callback is a valid Function
+    // Check if Callback is valid Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
         "A Watcher Callback Function has to be typeof Function!"
@@ -515,10 +515,14 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Compute Value if it changes
-   * @param method - Method that will be used to compute the new Value
+   * Function that recomputes State Value if it changes
+   * @param method - Computed Function
    */
   public compute(method: ComputeMethod<ValueType>): this {
+    if (!isFunction(method)) {
+      Agile.logger.error("A computeMethod has to be a function!");
+      return this;
+    }
     this.computeMethod = method;
     return this;
   }
@@ -529,7 +533,7 @@ export class State<ValueType = any> {
   /**
    * @internal
    * Adds SideEffect to State
-   * @param key - Key of SideEffect
+   * @param key - Key/Name of SideEffect
    * @param sideEffect - Callback Function that gets called on every State Value change
    */
   public addSideEffect(
@@ -537,7 +541,7 @@ export class State<ValueType = any> {
     sideEffect: (properties?: { [key: string]: any }) => void
   ): this {
     if (!isFunction(sideEffect)) {
-      Agile.logger.error("A sideEffect function has to be an function!");
+      Agile.logger.error("A sideEffect function has to be a function!");
       return this;
     }
     this.sideEffects[key] = sideEffect;
@@ -575,10 +579,10 @@ export class State<ValueType = any> {
   /**
    * @internal
    * Checks if Value has correct valueType (js)
-   * Note: If no valueType set it returns true
+   * Note: If no valueType set, it returns true
    * @param value - Value that gets checked for its correct Type
    */
-  private hasCorrectType(value: any): boolean {
+  public hasCorrectType(value: any): boolean {
     if (!this.valueType) return true;
     let type: string = typeof value;
     return type === this.valueType;
