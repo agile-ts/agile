@@ -13,6 +13,7 @@ import {
   notEqual,
   generateId,
   JobConfigInterface,
+  PersistentKey,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -381,26 +382,26 @@ export class State<ValueType = any> {
   /**
    * @public
    * Stores State Value into Agile Storage permanently
-   * @param key - Storage Key (Note: not needed if State has key/name)
+   * @param key - Key/Name of created Persistent (Note: Key required if State has no set Key!)
    * @param config - Config
    */
   public persist(
-    key?: StorageKey,
+    key?: PersistentKey,
     config?: StatePersistentConfigInterface
   ): this;
   public persist(
-    keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
+    keyOrConfig: PersistentKey | StatePersistentConfigInterface = {},
     config: StatePersistentConfigInterface = {}
   ): this {
     let _config: StatePersistentConfigInterface;
-    let key: StorageKey | undefined;
+    let key: PersistentKey | undefined;
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as StatePersistentConfigInterface;
       key = undefined;
     } else {
       _config = config || {};
-      key = keyOrConfig as StorageKey;
+      key = keyOrConfig as PersistentKey;
     }
 
     _config = defineConfig(_config, {

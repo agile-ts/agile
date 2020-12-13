@@ -10,8 +10,8 @@ import {
   copy,
   CollectionPersistent,
   StatePersistentConfigInterface,
-  StorageKey,
   isValidObject,
+  PersistentKey,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -203,23 +203,26 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   /**
    * @public
    * Stores Group Value into Agile Storage permanently
-   * @param key - Storage Key (Note: not needed if Group has key/name)
+   * @param key - Key/Name of created Persistent (Note: Key required if Group has no set Key!)
    * @param config - Config
    */
-  public persist(key?: StorageKey, config?: GroupPersistConfigInterface): this;
   public persist(
-    keyOrConfig: StorageKey | GroupPersistConfigInterface = {},
+    key?: PersistentKey,
+    config?: GroupPersistConfigInterface
+  ): this;
+  public persist(
+    keyOrConfig: PersistentKey | GroupPersistConfigInterface = {},
     config: GroupPersistConfigInterface = {}
   ): this {
     let _config: GroupPersistConfigInterface;
-    let key: StorageKey | undefined;
+    let key: PersistentKey | undefined;
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as GroupPersistConfigInterface;
       key = undefined;
     } else {
       _config = config || {};
-      key = keyOrConfig as StorageKey;
+      key = keyOrConfig as PersistentKey;
     }
 
     _config = defineConfig(_config, {
