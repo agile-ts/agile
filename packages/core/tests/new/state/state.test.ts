@@ -454,5 +454,115 @@ describe("State Tests", () => {
         });
       });
     });
+
+    describe("watch function tests", () => {
+      const dummyCallbackFunction1 = () => {};
+      const dummyCallbackFunction2 = () => {};
+
+      it("should add watcherFunction to State at passed key", () => {
+        const response = numberState.watch("dummyKey", dummyCallbackFunction1);
+
+        expect(response).toBe(numberState);
+        expect(numberState.watchers).toHaveProperty("dummyKey");
+        expect(numberState.watchers["dummyKey"]).toBe(dummyCallbackFunction1);
+      });
+
+      it("should add watcherFunction to State at random key if no key passed and return that generated key", () => {
+        jest.spyOn(Utils, "generateId").mockReturnValue("randomKey");
+
+        const response = numberState.watch(dummyCallbackFunction1);
+
+        expect(response).toBe("randomKey");
+        expect(numberState.watchers).toHaveProperty("randomKey");
+        expect(numberState.watchers["randomKey"]).toBe(dummyCallbackFunction1);
+        expect(Utils.generateId).toHaveBeenCalled();
+      });
+
+      it("shouldn't add watcherFunction to State at passed key if callback function is no function", () => {
+        const response = numberState.watch(
+          "dummyKey",
+          "noFunction hehe" as any
+        );
+
+        expect(response).toBe(numberState);
+        expect(numberState.watchers).not.toHaveProperty("dummyKey");
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: A Watcher Callback Function has to be typeof Function!"
+        );
+      });
+
+      it("shouldn't add watcherFunction to State at passed key if passed key is already occupied", () => {
+        numberState.watchers["dummyKey"] = dummyCallbackFunction2;
+
+        const response = numberState.watch("dummyKey", dummyCallbackFunction1);
+
+        expect(response).toBe(numberState);
+        expect(numberState.watchers).toHaveProperty("dummyKey");
+        expect(numberState.watchers["dummyKey"]).toBe(dummyCallbackFunction2);
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: Watcher Callback Function with the key/name 'dummyKey' already exists!"
+        );
+      });
+    });
+
+    describe("removeWatcher function tests", () => {
+      beforeEach(() => {
+        numberState.watchers["dummyKey"] = () => {};
+      });
+
+      it("should remove watcher at key from State", () => {
+        numberState.removeWatcher("dummyKey");
+
+        expect(numberState.watchers).not.toHaveProperty("dummyKey");
+      });
+    });
+
+    describe("onInaugurated function tests", () => {
+      let dummyCallbackFunction = jest.fn();
+
+      beforeEach(() => {
+        jest.spyOn(numberState, "watch");
+      });
+
+      it("should add watcher called InauguratedWatcherKey to State that destroys it self after it got called", () => {
+        numberState.onInaugurated(dummyCallbackFunction);
+
+        expect(numberState.watch).toHaveBeenCalledWith(
+          "InauguratedWatcherKey",
+          expect.any(Function)
+        );
+        expect(numberState.watchers).toHaveProperty("InauguratedWatcherKey");
+      });
+
+      it("should remove itself after getting called", () => {
+        numberState.onInaugurated(dummyCallbackFunction);
+
+        // Call Inaugurated Watcher
+        numberState.watchers["InauguratedWatcherKey"](10);
+
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(10);
+        expect(numberState.watchers).not.toHaveProperty(
+          "InauguratedWatcherKey"
+        );
+      });
+    });
+
+    describe("hasWatcher function tests", () => {
+      beforeEach(() => {
+        numberState.watchers["dummyKey"] = () => {};
+      });
+
+      it("should return true if Watcher at given Key exists", () => {
+        expect(numberState.hasWatcher("dummyKey")).toBeTruthy();
+      });
+
+      it("should return false if Watcher at given Key doesn't exists", () => {
+        expect(numberState.hasWatcher("notExistingDummyKey")).toBeFalsy();
+      });
+    });
+
+    describe("persist function tests", () => {
+      // TODO
+    });
   });
 });

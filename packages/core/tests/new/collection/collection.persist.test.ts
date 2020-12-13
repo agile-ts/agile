@@ -75,7 +75,7 @@ describe("Collection Persist Function Tests", () => {
 
       // Test creating Group
       MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist({
-        followCollectionPattern: true,
+        followCollectionPersistKeyPattern: true,
       });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
