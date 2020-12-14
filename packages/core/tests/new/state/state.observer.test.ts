@@ -23,16 +23,16 @@ describe("StateObserver Tests", () => {
 
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe("dummyValue");
+    expect(stateObserver.state()).toBe(dummyState);
     /* Couldn't figure out how to mock anything in the Constructor
-    expect(Observer).toHaveBeenCalledWith(dummyAgile, {
-      deps: [],
-      value: "dummyValue",
-      key: undefined,
-      subs: [],
-    });
+        expect(Observer).toHaveBeenCalledWith(dummyAgile, {
+          deps: [],
+          value: "dummyValue",
+          key: undefined,
+          subs: [],
+        });
      */
     expect(stateObserver.value).toBe("dummyValue");
-    expect(stateObserver.state()).toBe(dummyState);
     expect(stateObserver._key).toBeUndefined();
     expect(stateObserver.deps.size).toBe(0);
     expect(stateObserver.subs.size).toBe(0);
@@ -52,16 +52,16 @@ describe("StateObserver Tests", () => {
 
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe("dummyValue");
+    expect(stateObserver.state()).toBe(dummyState);
     /* Couldn't figure out how to mock anything in the Constructor
-    expect(Observer).toHaveBeenCalledWith(dummyAgile, {
-      deps: [dummyObserver1, dummyObserver2],
-      value: "dummyValue",
-      key: "testKey",
-      subs: [dummySubscription1, dummySubscription2],
-    });
+        expect(Observer).toHaveBeenCalledWith(dummyAgile, {
+          deps: [dummyObserver1, dummyObserver2],
+          value: "dummyValue",
+          key: "testKey",
+          subs: [dummySubscription1, dummySubscription2],
+        });
      */
     expect(stateObserver.value).toBe("dummyValue");
-    expect(stateObserver.state()).toBe(dummyState);
     expect(stateObserver._key).toBe("testKey");
     expect(stateObserver.deps.size).toBe(2);
     expect(stateObserver.deps.has(dummyObserver2)).toBeTruthy();

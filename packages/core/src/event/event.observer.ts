@@ -4,6 +4,7 @@ import {
   ObserverKey,
   Event,
   SubscriptionContainer,
+  IngestConfigInterface,
 } from "../internal";
 
 export class EventObserver<PayloadType = any> extends Observer {
@@ -33,9 +34,10 @@ export class EventObserver<PayloadType = any> extends Observer {
   /**
    * @internal
    * Ingests Event into Runtime and causes Rerender on Components that got subscribed by the Event (Observer)
+   * @param config - Config
    */
-  public trigger(): void {
-    this.agileInstance().runtime.ingest(this, {});
+  public trigger(config: IngestConfigInterface = {}): void {
+    this.agileInstance().runtime.ingest(this, config);
   }
 
   //=========================================================================================================

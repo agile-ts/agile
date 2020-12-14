@@ -20,6 +20,7 @@ describe("StatePersistent Tests", () => {
     const statePersistent = new StatePersistent(dummyState);
 
     expect(statePersistent).toBeInstanceOf(StatePersistent);
+    expect(statePersistent.state()).toBe(dummyState);
     /* Couldn't figure out how to mock anything in the Constructor
         expect(Persistent).toHaveBeenCalledWith(dummyAgile, {
           instantiate: false,
@@ -29,9 +30,7 @@ describe("StatePersistent Tests", () => {
           storageKeys: [],
         });
         expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-         */
-
-    expect(statePersistent.state()).toBe(dummyState);
+    */
     expect(statePersistent.key).toBe(Persistent.placeHolderKey);
     expect(statePersistent.ready).toBeFalsy();
     expect(statePersistent.isPersisted).toBeFalsy();
