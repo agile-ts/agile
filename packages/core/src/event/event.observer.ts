@@ -1,11 +1,9 @@
 import {
-  Agile,
   Observer,
   Job,
   ObserverKey,
   Event,
   SubscriptionContainer,
-  defineConfig,
 } from "../internal";
 
 export class EventObserver<PayloadType = any> extends Observer {

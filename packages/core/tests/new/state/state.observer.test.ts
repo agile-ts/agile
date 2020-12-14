@@ -38,7 +38,7 @@ describe("StateObserver Tests", () => {
     expect(stateObserver.subs.size).toBe(0);
   });
 
-  it("should create StateObserver with specific config", () => {
+  it("should create StateObserver (specific config)", () => {
     const dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
     const dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
     const dummySubscription1 = new SubscriptionContainer();
