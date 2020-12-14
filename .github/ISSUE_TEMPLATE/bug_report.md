@@ -1,38 +1,45 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report to help us improve AgileTs
 title: ''
-labels: ''
+labels: 'Type: Bug'
 assignees: ''
 
 ---
 
-## Describe the bug
-A clear and concise description of what the bug is.
+## Bug report
 
-## To Reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+### Current Behavior
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+<!-- Explain your problem (with screenshots, videos, text) in detail -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+### Expected behavior
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+<!-- A clear and concise description of what you expected to happen. -->
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+### Reproducible example
 
-**Additional context**
-Add any other context about the problem here.
+<!-- Create a simple example in Codebox -->
+
+### Suggested solution(s)
+
+<!-- How could we solve this bug? What changes would need to made to AgileTs? -->
+
+### Additional notes
+
+<!-- Add any other context about the problem here.  -->
+
+### Your environment
+
+<!-- PLEASE FILL THIS OUT -->
+
+| Software              | Version(s) |
+| ----------------------| ---------- |
+| TypeScript            |
+| npm/Yarn              |
+| NodeJs                |
+| @agile-ts/core        |
+| @agile-ts/react       |
+| @agile-ts/api         |
+| @agile-ts/multieditor |
+<!-- Any additional important Version Notes? -->
