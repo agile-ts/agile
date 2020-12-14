@@ -1,5 +1,5 @@
 ---
-name: Bug report
+name: 🐛 Bug report
 about: Create a report to help us improve AgileTs
 title: ''
 labels: 'Type: Bug'
@@ -7,29 +7,29 @@ assignees: ''
 
 ---
 
-## Bug report
+## 🐛 Bug report
 
-### Current Behavior
+### 🤖 Current Behavior
 
 <!-- Explain your problem (with screenshots, videos, text) in detail -->
 
-### Expected behavior
+### 🎯 Expected behavior
 
 <!-- A clear and concise description of what you expected to happen. -->
 
-### Reproducible example
+### 📄 Reproducible example
 
 <!-- Create a simple example in Codebox -->
 
-### Suggested solution(s)
+### 💡 Suggested solution(s)
 
 <!-- How could we solve this bug? What changes would need to made to AgileTs? -->
 
-### Additional notes
+### ➕ Additional notes
 
 <!-- Add any other context about the problem here.  -->
 
-### Your environment
+### 💻 Your environment
 
 <!-- PLEASE FILL THIS OUT -->
 
