@@ -144,7 +144,7 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @public
-   * Triggers all or specific Events
+   * Triggers Events
    * @param payload - Payload that gets passed into the Callback Functions
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
@@ -190,7 +190,10 @@ export class Event<PayloadType = DefaultEventPayload> {
   public reset() {
     this.enabled = this.initialConfig.enabled as any;
     this.uses = 0;
-    if (this.currentTimeout) clearTimeout(this.currentTimeout);
+    if (this.currentTimeout) {
+      clearTimeout(this.currentTimeout);
+      this.currentTimeout = undefined;
+    }
     return this;
   }
 
@@ -212,11 +215,11 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @internal
-   * Triggers Event
+   * Triggers normal Event
    * @param payload - Payload that gets passed into the Callback Functions
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
-  private normalTrigger(payload: PayloadType, keys?: string[]) {
+  public normalTrigger(payload: PayloadType, keys?: string[]) {
     // Call wished Callback Functions
     if (!keys) {
       for (let key in this.callbacks) this.callbacks[key](payload);
@@ -238,12 +241,12 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @internal
-   * Triggers Event with some delay
+   * Triggers async Event (Events with a delay)
    * @param payload - Payload that gets passed into the Callback Functions
    * @param delay - Delay until Events get triggered
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
-  private delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
+  public delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
     // Check if a Timeout is currently active if so add payload to queue
     if (this.currentTimeout !== undefined) {
       if (payload) this.queue.push(new EventJob<PayloadType>(payload));

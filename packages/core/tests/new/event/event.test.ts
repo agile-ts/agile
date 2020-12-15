@@ -60,10 +60,10 @@ describe("Event Tests", () => {
   });
 
   describe("Event Function Tests", () => {
-    let event: Event;
+    let event: Event<string>;
 
     beforeEach(() => {
-      event = new Event(dummyAgile, {
+      event = new Event<string>(dummyAgile, {
         key: "eventKey",
       });
     });
@@ -141,7 +141,92 @@ describe("Event Tests", () => {
     });
 
     describe("trigger function tests", () => {
-      // TODO
-    })
+      beforeEach(() => {
+        event.delayedTrigger = jest.fn();
+        event.normalTrigger = jest.fn();
+      });
+
+      it("should call normalTrigger if Event is enabled (config.delay = false)", () => {
+        event.enabled = true;
+        event.config.delay = undefined;
+
+        event.trigger("myPayload", ["specificKey"]);
+
+        expect(event.normalTrigger).toHaveBeenCalledWith("myPayload", [
+          "specificKey",
+        ]);
+        expect(event.delayedTrigger).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't call normalTrigger if Event isn't enabled (config.delay = false)", () => {
+        event.enabled = false;
+        event.config.delay = undefined;
+
+        event.trigger("myPayload", ["specificKey"]);
+
+        expect(event.normalTrigger).not.toHaveBeenCalled();
+        expect(event.delayedTrigger).not.toHaveBeenCalled();
+      });
+
+      it("should call normalTrigger if Event is enabled (config.delay = false)", () => {
+        event.enabled = true;
+        event.config.delay = 10;
+
+        event.trigger("myPayload", ["specificKey"]);
+
+        expect(event.delayedTrigger).toHaveBeenCalledWith("myPayload", 10, [
+          "specificKey",
+        ]);
+        expect(event.normalTrigger).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't call normalTrigger if Event isn't enabled (config.delay = false)", () => {
+        event.enabled = false;
+        event.config.delay = 10;
+
+        event.trigger("myPayload", ["specificKey"]);
+
+        expect(event.delayedTrigger).not.toHaveBeenCalled();
+        expect(event.normalTrigger).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("disable function tests", () => {
+      it("should disable Event", () => {
+        event.enabled = undefined;
+
+        event.disable();
+
+        expect(event.enabled).toBeFalsy();
+      });
+    });
+
+    describe("enable function tests", () => {
+      it("should enable Event", () => {
+        event.enabled = undefined;
+
+        event.enable();
+
+        expect(event.enabled).toBeTruthy();
+      });
+    });
+
+    describe("reset function tests", () => {
+      it("should reset enabled, uses and the currentTimeout", () => {
+        const timeout = setTimeout(() => {}, 1000);
+        // @ts-ignore
+        clearTimeout = jest.fn();
+        event.enabled = undefined;
+        event.uses = 100;
+        event.currentTimeout = timeout;
+
+        event.reset();
+
+        expect(event.enabled).toBeTruthy();
+        expect(event.uses).toBe(0);
+        expect(event.currentTimeout).toBeUndefined();
+        expect(clearTimeout).toHaveBeenCalledWith(timeout);
+      });
+    });
   });
 });
