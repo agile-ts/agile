@@ -4,6 +4,7 @@ import {
   EventJob,
   generateId,
   isFunction,
+  Observer,
 } from "../internal";
 import { EventObserver } from "./event.observer";
 
@@ -14,12 +15,13 @@ export class Event<PayloadType = DefaultEventPayload> {
   private initialConfig: CreateEventConfigInterface;
 
   public _key?: EventKey;
-  public uses: number = 0;
+  public uses = 0;
   public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
-  private currentTimeout: any; // Timeout that is active right now (delayed Event)
-  private queue: Array<EventJob> = []; // Queue of delayed Events
-  public enabled: boolean = true;
+  public enabled = true;
   public observer: EventObserver;
+
+  public currentTimeout: any; // Timeout that is active right now (delayed Event)
+  public queue: Array<EventJob> = []; // Queue of delayed Events
 
   // @ts-ignore
   public payload: PayloadType; // Holds type of Payload so that it can be read external (never defined)
@@ -37,9 +39,13 @@ export class Event<PayloadType = DefaultEventPayload> {
       rerender: false,
       maxUses: undefined,
       delay: undefined,
+      deps: [],
     });
     this._key = config.key;
-    this.observer = new EventObserver(this, { key: config.key });
+    this.observer = new EventObserver(this, {
+      key: config.key,
+      deps: config.deps,
+    });
     this.enabled = config.enabled as any;
     this.config = {
       rerender: config.rerender as any,
@@ -54,8 +60,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * Set Key/Name of Event
    */
   public set key(value: EventKey | undefined) {
-    this._key = value;
-    this.observer.key = value;
+    this.setKey(value);
   }
 
   /**
@@ -64,6 +69,20 @@ export class Event<PayloadType = DefaultEventPayload> {
    */
   public get key(): EventKey | undefined {
     return this._key;
+  }
+
+  //=========================================================================================================
+  // Set Key
+  //=========================================================================================================
+  /**
+   * @internal
+   * Set Key/Name of Event
+   * @param value - New Key/Name of Event
+   */
+  public setKey(value: EventKey | undefined): this {
+    this._key = value;
+    this.observer.key = value;
+    return this;
   }
 
   //=========================================================================================================
@@ -102,14 +121,16 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
-      Agile.logger.error("A Event Callback Function has to be an function!");
+      Agile.logger.error(
+        "A Event Callback Function has to be typeof Function!"
+      );
       return this;
     }
 
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
       Agile.logger.error(
-        `Event Callback Function with the key/name ${key} already exists!`
+        `Event Callback Function with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -258,6 +279,7 @@ export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
  * @param maxUses - How often the Event can be used/triggered
  * @param delay - Delayed call of Event Callback Functions in milliseconds
  * @param rerender - If triggering an Event should cause a rerender
+ * @param deps - Initial deps of State
  */
 export interface CreateEventConfigInterface {
   key?: EventKey;
@@ -265,6 +287,7 @@ export interface CreateEventConfigInterface {
   maxUses?: number;
   delay?: number;
   rerender?: boolean;
+  deps?: Array<Observer>;
 }
 
 /**

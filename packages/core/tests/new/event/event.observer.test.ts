@@ -66,7 +66,7 @@ describe("EventObserver Tests", () => {
     expect(eventObserver.subs.has(dummySubscription2)).toBeTruthy();
   });
 
-  describe("EventObserver function tests", () => {
+  describe("EventObserver Function Tests", () => {
     let eventObserver: EventObserver;
 
     beforeEach(() => {
