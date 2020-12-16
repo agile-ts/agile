@@ -40,7 +40,7 @@ export class Computed<ComputedValueType = any> extends State<
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
 
-    // Format hardCodedDeps 
+    // Format hardCodedDeps
     for (let dep of config.computedDeps as any) {
       if (dep instanceof Observer) {
         this.hardCodedDeps.push(dep);
