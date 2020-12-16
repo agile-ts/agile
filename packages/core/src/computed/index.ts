@@ -95,7 +95,10 @@ export class Computed<ComputedValueType = any> extends State<
     this.computeFunction = computeFunction;
 
     // Recompute for setting initial Computed Function Value and adding missing Dependencies
-    this.recompute(config);
+    this.recompute({
+      background: config.background,
+      sideEffects: config.sideEffects,
+    });
   }
 
   //=========================================================================================================
