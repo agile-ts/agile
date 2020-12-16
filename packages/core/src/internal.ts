@@ -34,6 +34,7 @@ export * from "./state/state.persistent";
 
 // Computed
 export * from "./computed";
+export * from "./computed/computed.tracker";
 
 // Collection
 export * from "./collection";

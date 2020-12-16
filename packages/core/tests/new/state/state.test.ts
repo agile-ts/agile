@@ -4,6 +4,7 @@ import {
   StateObserver,
   Observer,
   StatePersistent,
+  ComputedTracker,
 } from "../../../src";
 import * as Utils from "../../../src/utils";
 
@@ -105,16 +106,14 @@ describe("State Tests", () => {
     describe("value get function tests", () => {
       it("should return current value", () => {
         expect(numberState.value).toBe(10);
+        ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return current value and add StateObserver to trackedObserver if runtime is tracking observers", () => {
-        dummyAgile.runtime.trackedObservers.add = jest.fn();
-        dummyAgile.runtime.trackObservers = true;
-
+      it("should return current value", () => {
         const value = numberState.value;
 
         expect(value).toBe(10);
-        expect(dummyAgile.runtime.trackedObservers.add).toHaveBeenCalledWith(
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
           numberState.observer
         );
       });

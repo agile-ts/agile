@@ -7,6 +7,7 @@ import {
   StatePersistentConfigInterface,
   Event,
   StateConfigInterface,
+  ComputedTracker,
 } from "../internal";
 
 export class Computed<ComputedValueType = any> extends State<
@@ -109,16 +110,14 @@ export class Computed<ComputedValueType = any> extends State<
    * Computes Value and adds missing Dependencies to Computed
    */
   public computeValue(): ComputedValueType {
-    this.agileInstance().runtime.trackObservers = true;
+    // Auto track Observers the computeFunction might depend on
+    ComputedTracker.track();
     const computedValue = this.computeFunction();
-
-    // Get tracked Observers and disable Tracking Observers
-    let foundDeps = this.agileInstance().runtime.getTrackedObservers();
+    let foundDeps = ComputedTracker.getTrackedObservers();
 
     // Handle foundDeps and hardCodedDeps
     const newDeps: Array<Observer> = [];
     this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
-      if (!observer) return;
       newDeps.push(observer);
 
       // Make this Observer depending on Observer -> If value of Observer changes it will ingest this Observer into the Runtime

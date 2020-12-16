@@ -14,6 +14,7 @@ import {
   copy,
   CollectionPersistent,
   GroupAddConfig,
+  ComputedTracker,
 } from "../internal";
 
 export class Collection<DataType = DefaultItem> {
@@ -419,10 +420,7 @@ export class Collection<DataType = DefaultItem> {
     if (!group || (!config.notExisting && group.isPlaceholder))
       return undefined;
 
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(group.observer);
-
+    ComputedTracker.tracked(group.observer);
     return group;
   }
 
@@ -450,10 +448,7 @@ export class Collection<DataType = DefaultItem> {
       return dummyGroup;
     }
 
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(group.observer);
-
+    ComputedTracker.tracked(group.observer);
     return group;
   }
 
@@ -500,10 +495,7 @@ export class Collection<DataType = DefaultItem> {
     if (!selector || (!config.notExisting && selector.isPlaceholder))
       return undefined;
 
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(selector.observer);
-
+    ComputedTracker.tracked(selector.observer);
     return selector;
   }
 
@@ -531,10 +523,7 @@ export class Collection<DataType = DefaultItem> {
       return dummySelector;
     }
 
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(selector.observer);
-
+    ComputedTracker.tracked(selector.observer);
     return selector;
   }
 
@@ -596,10 +585,7 @@ export class Collection<DataType = DefaultItem> {
     // Check if Item exists
     if (!item || (!config.notExisting && !item.exists)) return undefined;
 
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(item.observer);
-
+    ComputedTracker.tracked(item.observer);
     return item;
   }
 
@@ -623,10 +609,7 @@ export class Collection<DataType = DefaultItem> {
       return dummyItem;
     }
 
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(item.observer);
-
+    ComputedTracker.tracked(item.observer);
     return item;
   }
 

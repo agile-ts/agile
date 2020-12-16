@@ -18,10 +18,6 @@ export class Runtime {
   public notReadyJobsToRerender: Set<Job> = new Set(); // Jobs that got performed but aren't ready to get rerendered (wait for mount)
   public jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
 
-  // Tracking - Used to track computed dependencies
-  public trackObservers = false;
-  public trackedObservers: Set<Observer> = new Set();
-
   /**
    * @internal
    * Runtime - Performs ingested Observers
@@ -228,23 +224,6 @@ export class Runtime {
 
     subscriptionContainer.observerKeysToUpdate = [];
     return props;
-  }
-
-  //=========================================================================================================
-  // Get Tracked Observers
-  //=========================================================================================================
-  /**
-   * @internal
-   * Returns tracked Observers and stops Runtime from tracking anymore Observers
-   */
-  public getTrackedObservers(): Array<Observer> {
-    const finalFoundObservers = Array.from(this.trackedObservers);
-
-    // Reset tracking
-    this.trackObservers = false;
-    this.trackedObservers = new Set();
-
-    return finalFoundObservers;
   }
 }
 

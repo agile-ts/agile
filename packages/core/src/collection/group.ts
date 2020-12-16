@@ -12,6 +12,7 @@ import {
   StatePersistentConfigInterface,
   isValidObject,
   PersistentKey,
+  ComputedTracker,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -50,10 +51,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * Get Item Values of Group
    */
   public get output(): Array<DataType> {
-    // Add Group to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(this.observer);
-
+    ComputedTracker.tracked(this.observer);
     return this._output;
   }
 
@@ -62,10 +60,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * Get Items of Group
    */
   public get items(): Array<Item<DataType>> {
-    // Add Group to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(this.observer);
-
+    ComputedTracker.tracked(this.observer);
     return this._items.map((item) => item());
   }
 

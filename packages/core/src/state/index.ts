@@ -14,6 +14,7 @@ import {
   generateId,
   JobConfigInterface,
   PersistentKey,
+  ComputedTracker,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -79,10 +80,7 @@ export class State<ValueType = any> {
    * Get Value of State
    */
   public get value(): ValueType {
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(this.observer);
-
+    ComputedTracker.tracked(this.observer);
     return this._value;
   }
 

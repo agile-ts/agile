@@ -24,8 +24,6 @@ describe("Runtime Tests", () => {
     expect(runtime.jobQueue).toStrictEqual([]);
     expect(runtime.notReadyJobsToRerender.size).toBe(0);
     expect(runtime.jobsToRerender).toStrictEqual([]);
-    expect(runtime.trackObservers).toBeFalsy();
-    expect(runtime.trackedObservers.size).toBe(0);
   });
 
   describe("Runtime Function Tests", () => {
@@ -419,25 +417,6 @@ describe("Runtime Tests", () => {
           observer3: "dummyObserverValue3",
         });
         expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
-      });
-    });
-
-    describe("getTrackedObservers function tests", () => {
-      beforeEach(() => {
-        runtime.trackObservers = true;
-        runtime.trackedObservers.add(dummyObserver1);
-        runtime.trackedObservers.add(dummyObserver2);
-      });
-
-      it("should return tracked observers and reset tracking Observers", () => {
-        const trackedObservers = runtime.getTrackedObservers();
-
-        expect(trackedObservers).toStrictEqual([
-          dummyObserver1,
-          dummyObserver2,
-        ]);
-        expect(runtime.trackObservers).toBeFalsy();
-        expect(runtime.trackedObservers.size).toBe(0);
       });
     });
   });
