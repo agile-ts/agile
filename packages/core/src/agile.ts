@@ -73,7 +73,10 @@ export class Agile {
     Agile.logger = new Logger(config.logConfig);
 
     // Create global instance of Agile
-    globalBind("__agile__", this);
+    if (!globalBind("__agile__", this))
+      Agile.logger.warn(
+        "Be careful with multiple Agile Instances in one Application!"
+      );
   }
 
   //=========================================================================================================
