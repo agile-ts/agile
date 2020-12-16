@@ -41,14 +41,7 @@ export class Computed<ComputedValueType = any> extends State<
     this.computeFunction = computeFunction;
 
     // Format hardCodedDeps
-    for (let dep of config.computedDeps as any) {
-      if (dep instanceof Observer) {
-        this.hardCodedDeps.push(dep);
-        continue;
-      }
-      if (dep !== undefined && dep["observer"] !== undefined)
-        this.hardCodedDeps.push(dep["observer"]);
-    }
+    this.hardCodedDeps = this.formatDeps(config.computedDeps as any);
     this.deps = this.hardCodedDeps;
 
     // Recompute for setting initial value and adding missing dependencies
@@ -84,12 +77,22 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<Observer | State | Event> = [],
-    config?: RecomputeConfigInterface
+    config: UpdateComputeFunctionInterface = {}
   ) {
+    config = defineConfig(config, {
+      background: false,
+      sideEffects: true,
+      overwriteDeps: true,
+    });
+
+    // Update deps
+    const newDeps = this.formatDeps(deps as any);
+    if (config.overwriteDeps) this.hardCodedDeps = newDeps;
+    else this.hardCodedDeps = this.hardCodedDeps.concat(newDeps);
+    this.deps = this.hardCodedDeps;
+
+    // Update computeFunction
     this.computeFunction = computeFunction;
-    this.hardCodedDeps = deps
-      .map((dep) => dep["observer"] || undefined)
-      .filter((dep) => dep !== undefined);
 
     // Recompute for setting initial Computed Function Value and adding missing Dependencies
     this.recompute(config);
@@ -121,6 +124,31 @@ export class Computed<ComputedValueType = any> extends State<
 
     this.deps = newDeps;
     return computedValue;
+  }
+
+  //=========================================================================================================
+  // Format Deps
+  //=========================================================================================================
+  /**
+   * @internal
+   * Gets Observer out of passed Dependencies
+   * @param deps - Dependencies that holds an Observer
+   */
+  public formatDeps(deps: Array<any>): Array<Observer> {
+    const finalDeps: Array<Observer> = [];
+    for (let dep of deps) {
+      if (dep instanceof Observer) {
+        finalDeps.push(dep);
+        continue;
+      }
+      if (
+        dep !== undefined &&
+        dep["observer"] !== undefined &&
+        dep["observer"] instanceof Observer
+      )
+        finalDeps.push(dep["observer"]);
+    }
+    return finalDeps;
   }
 
   //=========================================================================================================
@@ -160,4 +188,12 @@ export interface ComputedConfigInterface extends StateConfigInterface {
 export interface RecomputeConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
+}
+
+/**
+ * @param overwriteDeps - If old hardCoded deps get overwritten
+ */
+export interface UpdateComputeFunctionInterface
+  extends RecomputeConfigInterface {
+  overwriteDeps?: boolean;
 }
