@@ -120,7 +120,7 @@ export class Computed<ComputedValueType = any> extends State<
     this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
       newDeps.push(observer);
 
-      // Make this Observer depending on Observer -> If value of Observer changes it will ingest this Observer into the Runtime
+      // Make this Observer depending on foundDep Observer
       observer.depend(this.observer);
     });
 
@@ -133,24 +133,24 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
   /**
    * @internal
-   * Gets Observer out of passed Dependencies
-   * @param deps - Dependencies that holds an Observer
+   * Gets Observer out of passed Instances
+   * @param instances - Instances that hold an Observer
    */
-  public formatDeps(deps: Array<any>): Array<Observer> {
-    const finalDeps: Array<Observer> = [];
-    for (let dep of deps) {
-      if (dep instanceof Observer) {
-        finalDeps.push(dep);
+  public formatDeps(instances: Array<any>): Array<Observer> {
+    const finalInstances: Array<Observer> = [];
+    for (let instance of instances) {
+      if (instance instanceof Observer) {
+        finalInstances.push(instance);
         continue;
       }
       if (
-        dep !== undefined &&
-        dep["observer"] !== undefined &&
-        dep["observer"] instanceof Observer
+        instance !== undefined &&
+        instance["observer"] !== undefined &&
+        instance["observer"] instanceof Observer
       )
-        finalDeps.push(dep["observer"]);
+        finalInstances.push(instance["observer"]);
     }
-    return finalDeps;
+    return finalInstances;
   }
 
   //=========================================================================================================
@@ -158,7 +158,7 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
 
   public patch() {
-    Agile.logger.error("You can't use patch method on Computed Function!");
+    Agile.logger.error("You can't use patch method on ComputedState!");
     return this;
   }
 
@@ -166,12 +166,12 @@ export class Computed<ComputedValueType = any> extends State<
     keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
     config: StatePersistentConfigInterface = {}
   ): this {
-    Agile.logger.error("You can't use persist method on Computed Function!");
+    Agile.logger.error("You can't use persist method on ComputedState!");
     return this;
   }
 
   public invert(): this {
-    Agile.logger.error("You can't use invert method on Computed Function!");
+    Agile.logger.error("You can't use invert method on ComputedState!");
     return this;
   }
 }
