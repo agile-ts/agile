@@ -64,7 +64,7 @@ describe("StatePersistent Tests", () => {
           storageKeys: ["test1", "test2"],
         });
         expect(statePersistent.initialLoading).toHaveBeenCalled();
-         */
+    */
 
     expect(statePersistent.key).toBe("statePersistentKey"); // x
     expect(statePersistent.ready).toBeTruthy(); // x
@@ -98,7 +98,7 @@ describe("StatePersistent Tests", () => {
           storageKeys: ["test1", "test2"],
         });
         expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-         */
+    */
 
     expect(statePersistent.key).toBe("statePersistentKey");
     expect(statePersistent.ready).toBeTruthy();

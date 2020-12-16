@@ -28,7 +28,7 @@ describe("Runtime Tests", () => {
     expect(runtime.trackedObservers.size).toBe(0);
   });
 
-  describe("Observer Function Tests", () => {
+  describe("Runtime Function Tests", () => {
     let runtime: Runtime;
     let dummyObserver1: Observer;
     let dummyObserver2: Observer;
