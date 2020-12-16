@@ -39,6 +39,7 @@ export class Event<PayloadType = DefaultEventPayload> {
       rerender: false,
       maxUses: undefined,
       delay: undefined,
+      overlap: false,
       deps: [],
     });
     this._key = config.key;
@@ -51,6 +52,7 @@ export class Event<PayloadType = DefaultEventPayload> {
       rerender: config.rerender as any,
       delay: config.delay,
       maxUses: config.maxUses,
+      overlap: config.overlap,
     };
     this.initialConfig = config;
   }
@@ -247,25 +249,35 @@ export class Event<PayloadType = DefaultEventPayload> {
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
   public delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
-    // Check if a Timeout is currently active if so add payload to queue
-    if (this.currentTimeout !== undefined) {
-      if (payload) this.queue.push(new EventJob<PayloadType>(payload));
+    const eventJob = new EventJob<PayloadType>(payload, keys);
+
+    // Execute Event no matter if another event is currently active
+    if (this.config.overlap) {
+      setTimeout(() => {
+        this.normalTrigger(eventJob.payload, eventJob.keys);
+      }, delay);
       return;
     }
 
-    // Triggers Callback Functions and calls itself again if queue isn't empty
-    const looper = (payload: PayloadType) => {
+    // Check if a Event(Timeout) is currently active if so add EventJob to queue
+    if (this.currentTimeout !== undefined) {
+      if (payload) this.queue.push(eventJob);
+      return;
+    }
+
+    // Executes EventJob and calls itself again if queue isn't empty to execute the next EventJob
+    const looper = (eventJob: EventJob<PayloadType>) => {
       this.currentTimeout = setTimeout(() => {
         this.currentTimeout = undefined;
-        this.normalTrigger(payload, keys);
+        this.normalTrigger(eventJob.payload, eventJob.keys);
         if (this.queue.length > 0) {
           const nextEventJob = this.queue.shift();
-          if (nextEventJob) looper(nextEventJob.payload);
+          if (nextEventJob) looper(nextEventJob);
         }
       }, delay);
     };
 
-    looper(payload);
+    looper(eventJob);
     return;
   }
 }
@@ -281,6 +293,7 @@ export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
  * @param enabled - If Event can be triggered
  * @param maxUses - How often the Event can be used/triggered
  * @param delay - Delayed call of Event Callback Functions in milliseconds
+ * @param overlap - If Events can overlap
  * @param rerender - If triggering an Event should cause a rerender
  * @param deps - Initial deps of State
  */
@@ -289,6 +302,7 @@ export interface CreateEventConfigInterface {
   enabled?: boolean;
   maxUses?: number;
   delay?: number;
+  overlap?: boolean;
   rerender?: boolean;
   deps?: Array<Observer>;
 }
@@ -296,10 +310,12 @@ export interface CreateEventConfigInterface {
 /**
  * @param maxUses - How often the Event can be used/triggered
  * @param delay - Delayed call of Event Callback Functions in seconds
+ * @param overlap - If Events can overlap
  * @param rerender - If triggering an Event should cause a rerender
  */
 export interface EventConfigInterface {
   maxUses?: number;
   delay?: number;
+  overlap?: boolean;
   rerender: boolean;
 }
