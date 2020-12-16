@@ -326,14 +326,28 @@ export function clone<T = any>(instance: T): T {
  * https://blog.logrocket.com/what-is-globalthis-why-use-it/
  * @param key - Key of Instance
  * @param instance - Instance which becomes globally accessible (globalThis.key)
+ * @param overwrite - If already existing instance gets overwritten
  */
-export function globalBind(key: string, instance: any) {
+export function globalBind(
+  key: string,
+  instance: any,
+  overwrite = false
+): boolean {
   try {
-    if (!globalThis[key]) globalThis[key] = instance;
+    if (overwrite) {
+      globalThis[key] = instance;
+      return true;
+    }
+
+    if (!globalThis[key]) {
+      globalThis[key] = instance;
+      return true;
+    }
   } catch (e) {
     Agile.logger.error(
       `Failed to create global Instance called '${name}'`,
       instance
     );
   }
+  return false;
 }
