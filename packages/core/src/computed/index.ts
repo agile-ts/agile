@@ -15,8 +15,8 @@ export class Computed<ComputedValueType = any> extends State<
   public agileInstance: () => Agile;
 
   public computeFunction: () => ComputedValueType;
-  public deps: Array<Observer> = []; // All Dependencies of Computed
-  public hardCodedDeps: Array<Observer> = [];
+  public deps: Array<Observer> = []; // All Dependencies of Computed (hardCoded and autoDetected)
+  public hardCodedDeps: Array<Observer> = []; // HardCoded Dependencies of Computed
 
   /**
    * @public
@@ -39,35 +39,20 @@ export class Computed<ComputedValueType = any> extends State<
     });
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
-    this.hardCodedDeps = (config.computedDeps as any)
-      .map((dep) => dep["observer"] || undefined)
-      .filter((dep) => dep !== undefined);
+
+    // Format hardCodedDeps 
+    for (let dep of config.computedDeps as any) {
+      if (dep instanceof Observer) {
+        this.hardCodedDeps.push(dep);
+        continue;
+      }
+      if (dep !== undefined && dep["observer"] !== undefined)
+        this.hardCodedDeps.push(dep["observer"]);
+    }
+    this.deps = this.hardCodedDeps;
 
     // Recompute for setting initial value and adding missing dependencies
     this.recompute();
-  }
-
-  /**
-   * @public
-   * Set Value of Computed
-   */
-  public set value(value: ComputedValueType) {
-    Agile.logger.error("You can't mutate Computed value!");
-  }
-
-  /**
-   * @public
-   * Get Value of Computed
-   */
-  public get value(): ComputedValueType {
-    // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
-    // Can't remove this getter function.. since the setter function is set in this class -> Error if not setter and getter function set
-
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.trackedObservers.add(this.observer);
-
-    return this._value;
   }
 
   //=========================================================================================================
@@ -75,11 +60,10 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
   /**
    * @public
-   * Recomputes Function Value
-   * -> Calls ComputeFunction and updates Dependencies of it
+   * Recomputes Value of Computed
    * @param config - Config
    */
-  public recompute(config?: RecomputeConfigInterface) {
+  public recompute(config: RecomputeConfigInterface = {}) {
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
@@ -140,7 +124,7 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   //=========================================================================================================
-  // Overwriting some functions which can't be used in Computed
+  // Overwriting some functions which aren't allowed to use in Computed
   //=========================================================================================================
 
   public patch() {
