@@ -15,6 +15,7 @@ describe("Event Tests", () => {
     expect(event.config).toStrictEqual({
       maxUses: undefined,
       delay: undefined,
+      overlap: false,
       rerender: false,
     });
     expect(event._key).toBeUndefined();
@@ -44,6 +45,7 @@ describe("Event Tests", () => {
     expect(event.config).toStrictEqual({
       maxUses: 40,
       delay: 20,
+      overlap: false,
       rerender: true,
     });
     expect(event._key).toBe("coolEvent");
@@ -312,6 +314,74 @@ describe("Event Tests", () => {
         expect(event.observer.trigger).not.toHaveBeenCalled();
         expect(event.disable).toHaveBeenCalled();
         expect(event.uses).toBe(2);
+      });
+    });
+
+    describe("delayedTrigger function tests", () => {
+      const dummyPayload1 = "123";
+      const dummyPayload2 = "321";
+
+      beforeEach(() => {
+        event.normalTrigger = jest.fn();
+      });
+
+      it("should execute one Event after the other", async () => {
+        event.config.overlap = false;
+
+        event.delayedTrigger(dummyPayload1, 500, ["callback1", "callback3"]);
+        event.delayedTrigger(dummyPayload2, 500, ["callback2"]);
+
+        expect(event.currentTimeout).not.toBeUndefined();
+        expect(event.queue.length).toBe(1);
+        expect(event.queue[0].payload).toBe(dummyPayload2);
+        expect(event.queue[0].keys).toStrictEqual(["callback2"]);
+        expect(event.normalTrigger).not.toHaveBeenCalled();
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // After executing first Event
+        expect(event.currentTimeout).not.toBeUndefined();
+        expect(event.queue.length).toBe(0);
+        expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload1, [
+          "callback1",
+          "callback3",
+        ]);
+        expect(event.normalTrigger).not.toHaveBeenCalledWith(dummyPayload2, [
+          "callback2",
+        ]);
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // After executing second Event
+        expect(event.currentTimeout).toBeUndefined();
+        expect(event.queue.length).toBe(0);
+        expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload2, [
+          "callback2",
+        ]);
+      });
+
+      it("should execute Events at the same time (config.overlap = true)", async () => {
+        event.config.overlap = true;
+
+        event.delayedTrigger(dummyPayload1, 500, ["callback1", "callback3"]);
+        event.delayedTrigger(dummyPayload2, 500, ["callback2"]);
+
+        expect(event.currentTimeout).toBeUndefined();
+        expect(event.queue.length).toBe(0);
+        expect(event.normalTrigger).not.toHaveBeenCalled();
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // After executing both Events at the same time
+        expect(event.currentTimeout).toBeUndefined();
+        expect(event.queue.length).toBe(0);
+        expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload1, [
+          "callback1",
+          "callback3",
+        ]);
+        expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload2, [
+          "callback2",
+        ]);
       });
     });
   });
