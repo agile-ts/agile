@@ -228,5 +228,91 @@ describe("Event Tests", () => {
         expect(clearTimeout).toHaveBeenCalledWith(timeout);
       });
     });
+
+    describe("removeCallback function tests", () => {
+      beforeEach(() => {
+        event.callbacks["dummyKey"] = () => {};
+      });
+
+      it("should remove callback at key from Event", () => {
+        event.removeCallback("dummyKey");
+
+        expect(event.callbacks).not.toHaveProperty("dummyKey");
+      });
+    });
+
+    describe("normalTrigger function tests", () => {
+      const dummyPayload = "123";
+      const dummyCallbackFunction1 = jest.fn();
+      const dummyCallbackFunction2 = jest.fn();
+      const dummyCallbackFunction3 = jest.fn();
+
+      beforeEach(() => {
+        event.observer.trigger = jest.fn();
+        event.disable = jest.fn();
+
+        event.callbacks["callback1"] = dummyCallbackFunction1;
+        event.callbacks["callback2"] = dummyCallbackFunction2;
+        event.callbacks["callback3"] = dummyCallbackFunction3;
+      });
+
+      it("should call callback functions at passed keys with passed payload", () => {
+        event.config.rerender = false;
+        event.uses = 0;
+
+        event.normalTrigger(dummyPayload, ["callback1", "callback3"]);
+
+        expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction2).not.toHaveBeenCalled();
+        expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
+        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.disable).not.toHaveBeenCalled();
+        expect(event.uses).toBe(1);
+      });
+
+      it("should call all callback functions with passed payload", () => {
+        event.config.rerender = false;
+        event.uses = 0;
+
+        event.normalTrigger(dummyPayload);
+
+        expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
+        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.disable).not.toHaveBeenCalled();
+        expect(event.uses).toBe(1);
+      });
+
+      it("should call all callback functions and trigger a rerender (config.rerender)", () => {
+        event.config.rerender = true;
+        event.uses = 0;
+
+        event.normalTrigger(dummyPayload);
+
+        expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
+        expect(event.observer.trigger).toHaveBeenCalled();
+        expect(event.disable).not.toHaveBeenCalled();
+        expect(event.uses).toBe(1);
+      });
+
+      it("should call all callback functions and disable event if maxUses got reached (config.maxUses)", () => {
+        event.config.maxUses = 2;
+        event.config.rerender = false;
+        event.uses = 0;
+
+        event.normalTrigger(dummyPayload);
+        event.normalTrigger(dummyPayload);
+
+        expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
+        expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
+        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.disable).toHaveBeenCalled();
+        expect(event.uses).toBe(2);
+      });
+    });
   });
 });
