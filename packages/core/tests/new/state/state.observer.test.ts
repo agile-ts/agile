@@ -126,7 +126,7 @@ describe("StateObserver Tests", () => {
       });
 
       it("should call ingestValue with computedValue if observer belongs to a ComputedState (default config)", () => {
-        dummyComputed.computeFunction = () => "computedValue";
+        dummyComputed.computeValue = jest.fn(() => "computedValue");
         computedObserver.ingestValue = jest.fn();
 
         computedObserver.ingest();
@@ -135,6 +135,7 @@ describe("StateObserver Tests", () => {
           "computedValue",
           {}
         );
+        expect(dummyComputed.computeValue).toHaveBeenCalled();
       });
     });
 
