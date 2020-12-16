@@ -20,7 +20,8 @@ export class ComputedTracker {
   //=========================================================================================================
   /**
    * @internal
-   * Adds tracked Observer to trackedObservers
+   * Adds passed Observer to tracked Observers, if ComputedTracker is currently tracking
+   * @param observer - Observer
    */
   static tracked(observer: Observer) {
     if (this.isTracking) this.trackedObservers.add(observer);
@@ -34,12 +35,12 @@ export class ComputedTracker {
    * Returns tracked Observers and stops tracking anymore Observers
    */
   static getTrackedObservers(): Array<Observer> {
-    const finalFoundObservers = Array.from(this.trackedObservers);
+    const trackedObservers = Array.from(this.trackedObservers);
 
     // Reset tracking
     this.isTracking = false;
     this.trackedObservers = new Set();
 
-    return finalFoundObservers;
+    return trackedObservers;
   }
 }
