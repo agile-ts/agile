@@ -29,6 +29,15 @@ export class Storage {
       async: config.async,
     };
     this.ready = this.validate();
+    if (!this.ready) return;
+
+    // Check if Storage is async
+    if (
+      isAsyncFunction(this.methods.get) ||
+      isAsyncFunction(this.methods.set) ||
+      isAsyncFunction(this.methods.remove)
+    )
+      this.config.async = true;
   }
 
   //=========================================================================================================
@@ -36,10 +45,9 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Validates this Storage
+   * Validates Storage Methods
    */
   public validate(): boolean {
-    // Validate Functions
     if (!isFunction(this.methods?.get)) {
       Agile.logger.error("Your GET StorageMethod isn't valid!");
       return false;
@@ -52,15 +60,6 @@ export class Storage {
       Agile.logger.error("Your REMOVE StorageMethod isn't valid!");
       return false;
     }
-
-    // Check if Storage is async
-    if (
-      isAsyncFunction(this.methods.get) ||
-      isAsyncFunction(this.methods.set) ||
-      isAsyncFunction(this.methods.remove)
-    )
-      this.config.async = true;
-
     return true;
   }
 
@@ -148,7 +147,7 @@ export class Storage {
    * Creates Storage Key from provided key
    * @param key - Key that gets converted into a Storage Key
    */
-  private getStorageKey(key: StorageItemKey): string {
+  public getStorageKey(key: StorageItemKey): string {
     return this.config.prefix
       ? `_${this.config.prefix}_${key}`
       : key.toString();
