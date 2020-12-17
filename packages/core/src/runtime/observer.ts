@@ -19,6 +19,7 @@ export class Observer<ValueType = any> {
   /**
    * @internal
    * Observer - Handles subscriptions and dependencies of an Agile Class and is like an instance to the Runtime
+   * Note: No stand alone class!!
    * @param agileInstance - An instance of Agile
    * @param config - Config
    */
