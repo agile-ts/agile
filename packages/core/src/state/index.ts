@@ -105,8 +105,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Set Key/Name of State
-   * https://github.com/microsoft/TypeScript/issues/338
+   * Updates Key/Name of State
    * @param value - New Key/Name of State
    */
   public setKey(value: StateKey | undefined): this {

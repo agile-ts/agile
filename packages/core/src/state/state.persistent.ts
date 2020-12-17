@@ -43,7 +43,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Sets Key/Name of Persistent
+   * Updates Key/Name of Persistent
    * @param value - New Key/Name of Persistent
    */
   public async setKey(value?: StorageKey): Promise<void> {
@@ -56,7 +56,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     const isValid = this.validatePersistent();
 
-    // Try to Initial Load Value if persistent wasn't ready
+    // Try to Initial Load Value if persistent wasn't ready and return
     if (!wasReady) {
       if (isValid) this.initialLoading();
       return;
@@ -87,8 +87,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Loads State from the Storage
-   * @return Value got loaded
+   * Loads State Value from the Storage
+   * @return Success?
    */
   public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
@@ -115,7 +115,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Sets everything up so that the State gets saved in the Storage
+   * Sets everything up so that the State gets saved in the Storage on every Value change
    * @return Success?
    */
   public async persistValue(key?: PersistentKey): Promise<boolean> {
@@ -137,7 +137,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Removes Value form Storage
+   * Removes State Value form the Storage
    * @return Success?
    */
   public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
@@ -181,8 +181,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Rebuilds Storage depending on State Value
-   * @param state - State that value gets updated
+   * Rebuilds Storage depending on the State Value (Saves current State Value into the Storage)
+   * @param state - State that holds the new Value
    * @param key - Key/Name of Persistent
    * @param config - Config
    */
