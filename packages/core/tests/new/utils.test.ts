@@ -14,10 +14,23 @@ import {
   normalizeArray,
   notEqual,
   globalBind,
+  getAgileInstance,
+  Agile,
+  State,
+  Event,
+  Observer,
+  Collection,
 } from "../../src";
 
 describe("Utils Tests", () => {
+  let dummyAgile: Agile;
+
   beforeEach(() => {
+    dummyAgile = new Agile({ localStorage: false });
+
+    // @ts-ignore | Reset globalThis
+    globalThis = {};
+
     console.error = jest.fn();
   });
 
@@ -157,6 +170,53 @@ describe("Utils Tests", () => {
       expect(
         normalizeArray(undefined, { createUndefinedArray: true })
       ).toStrictEqual([undefined]);
+    });
+  });
+
+  describe("getAgileInstance function tests", () => {
+    beforeEach(() => {
+      globalThis["__agile__"] = dummyAgile;
+    });
+
+    it("should get agileInstance from State", () => {
+      const dummyState = new State(dummyAgile, "dummyValue");
+
+      expect(getAgileInstance(dummyState)).toBe(dummyAgile);
+    });
+
+    it("should get agileInstance from Event", () => {
+      const dummyEvent = new Event(dummyAgile);
+
+      expect(getAgileInstance(dummyEvent)).toBe(dummyAgile);
+    });
+
+    it("should get agileInstance from Collection", () => {
+      const dummyCollection = new Collection(dummyAgile);
+
+      expect(getAgileInstance(dummyCollection)).toBe(dummyAgile);
+    });
+
+    it("should get agileInstance from Observer", () => {
+      const dummyObserver = new Observer(dummyAgile);
+
+      expect(getAgileInstance(dummyObserver)).toBe(dummyAgile);
+    });
+
+    it("should get agileInstance from globalThis if passed instance holds no agileInstance", () => {
+      expect(getAgileInstance("weiredInstance")).toBe(dummyAgile);
+    });
+
+    it("should print error if something went wrong", () => {
+      // @ts-ignore | Destroy globalThis
+      globalThis = undefined;
+
+      const response = getAgileInstance("weiredInstance");
+
+      expect(response).toBeUndefined();
+      expect(console.error).toHaveBeenCalledWith(
+        "Agile Error: Failed to get Agile Instance from ",
+        "weiredInstance"
+      );
     });
   });
 

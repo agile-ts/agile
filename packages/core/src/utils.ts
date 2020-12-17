@@ -93,27 +93,26 @@ export function normalizeArray<DataType = any>(
 //=========================================================================================================
 /**
  * @internal
- * Tries to get an AgileInstance from provided instance
- * If no agileInstance found it returns the global AgileInstance
- * @param instance - Instance that might hold an AgileInstance
+ * Tries to get an Instance of Agile from provided Instance
+ * If no agileInstance found it returns the global bound Agile Instance
+ * @param instance - Instance that might hold an Agile Instance
  */
 export function getAgileInstance(instance: any): Agile | undefined {
   try {
-    // Try to find agileInstance in Instance
+    // Try to get agileInstance from passed Instance
     if (instance) {
-      if (instance instanceof State) return instance.agileInstance();
-      if (instance instanceof Event) return instance.agileInstance();
-      if (instance instanceof Collection) return instance.agileInstance();
-      if (instance instanceof Observer) return instance.agileInstance();
-      const _agileInstance = instance["agileInstance"];
-      if (_agileInstance) return instance;
+      const _agileInstance = isFunction(instance["agileInstance"])
+        ? instance["agileInstance"]()
+        : instance["agileInstance"];
+      if (_agileInstance) return _agileInstance;
     }
 
-    // Return global bound agileInstance (set in first instantiation of Agile)
+    // Return global bound agileInstance
     return globalThis["__agile__"];
   } catch (e) {
-    Agile.logger.error("Failed to get Agile Instance", e);
+    Agile.logger.error("Failed to get Agile Instance from ", instance);
   }
+
   return undefined;
 }
 
