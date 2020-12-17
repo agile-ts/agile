@@ -13,9 +13,14 @@ import {
   isValidUrl,
   normalizeArray,
   notEqual,
+  globalBind,
 } from "../../src";
 
 describe("Utils Tests", () => {
+  beforeEach(() => {
+    console.error = jest.fn();
+  });
+
   describe("copy function tests", () => {
     it("should copy Array without any reference", () => {
       const myArray = [1, 2, 3, 4, 5];
@@ -96,14 +101,14 @@ describe("Utils Tests", () => {
     //   expect(isValidObject(HTMLElement)).toBe(false);
     // });
 
-    it("should return false if passing not valid Object", () => {
+    it("should return false if passed instance is  invalid Object", () => {
       expect(isValidObject(null)).toBe(false);
       expect(isValidObject("Hello")).toBe(false);
       expect(isValidObject([1, 2])).toBe(false);
       expect(isValidObject(123)).toBe(false);
     });
 
-    it("should return true if passing valid Object", () => {
+    it("should return true if passed instance is valid Object", () => {
       expect(isValidObject({ hello: "jeff" })).toBe(true);
       expect(isValidObject({ hello: "jeff", deep: { hello: "franz" } })).toBe(
         true
@@ -111,7 +116,7 @@ describe("Utils Tests", () => {
     });
   });
 
-  describe("includesArray", () => {
+  describe("includesArray function tests", () => {
     it("should return false if Array1 doesn't include Array2", () => {
       expect(includesArray([1, 2], [5, 6])).toBe(false);
     });
@@ -129,8 +134,8 @@ describe("Utils Tests", () => {
     });
   });
 
-  describe("normalizeArray", () => {
-    it("should normalize Array", () => {
+  describe("normalizeArray function tests", () => {
+    it("should normalize Array (default config)", () => {
       expect(normalizeArray([1, 2, undefined, 3, "hi"])).toStrictEqual([
         1,
         2,
@@ -140,11 +145,11 @@ describe("Utils Tests", () => {
       ]);
     });
 
-    it("should normalize single Item", () => {
+    it("should normalize single Item (default config)", () => {
       expect(normalizeArray(1)).toStrictEqual([1]);
     });
 
-    it("shouldn't normalize undefined and return empty array", () => {
+    it("shouldn't normalize undefined (default config)", () => {
       expect(normalizeArray(undefined)).toStrictEqual([]);
     });
 
@@ -156,11 +161,11 @@ describe("Utils Tests", () => {
   });
 
   describe("isFunction function tests", () => {
-    it("should return true if passing valid Function", () => {
+    it("should return true if passed instance is valid Function", () => {
       expect(isFunction(() => {})).toBe(true);
     });
 
-    it("should return false if not passing valid Function", () => {
+    it("should return false if passed instance is invalid Function", () => {
       expect(isFunction("hello")).toBe(false);
       expect(isFunction(1)).toBe(false);
       expect(isFunction([1, 2, 3])).toBe(false);
@@ -169,12 +174,12 @@ describe("Utils Tests", () => {
   });
 
   describe("isAsyncFunction function tests", () => {
-    it("should return true if passing valid async Function", () => {
+    it("should return true if passed instance is valid async Function", () => {
       expect(isAsyncFunction(async () => {})).toBe(true);
       expect(isAsyncFunction(async function () {})).toBe(true);
     });
 
-    it("should return false if not passing a async Function", () => {
+    it("should return false if passed instance is invalid async Function", () => {
       expect(isAsyncFunction("hello")).toBe(false);
       expect(isAsyncFunction(1)).toBe(false);
       expect(isAsyncFunction([1, 2, 3])).toBe(false);
@@ -184,8 +189,9 @@ describe("Utils Tests", () => {
     });
   });
 
+  // Note: isValidUrl Function doesn't work to 100% yet!!
   describe("isValidUrl function tests", () => {
-    it("should return true if passing valid Url", () => {
+    it("should return true if passed instance is valid url", () => {
       expect(isValidUrl("https://www.google.com/")).toBe(true);
       expect(isValidUrl("www.google.com")).toBe(true);
       expect(isValidUrl("google.com")).toBe(true);
@@ -194,7 +200,7 @@ describe("Utils Tests", () => {
       // );
     });
 
-    it("should return false if not passing valid Url", () => {
+    it("should return false if passed instance is invalid url", () => {
       expect(isValidUrl("hello")).toBe(false);
       expect(isValidUrl("https://sdfasd")).toBe(false);
       expect(isValidUrl("https://")).toBe(false);
@@ -204,13 +210,13 @@ describe("Utils Tests", () => {
   });
 
   describe("isJsonString function tests", () => {
-    it("should return true if passing valid Json String", () => {
+    it("should return true if passed instance is valid Json String", () => {
       expect(isJsonString('{"name":"John", "age":31, "city":"New York"}')).toBe(
         true
       );
     });
 
-    it("should return false if passing invalid Json String", () => {
+    it("should return false if passed instance is invalid Json String", () => {
       expect(isJsonString("frank")).toBe(false);
       expect(isJsonString('{name":"John", "age":31, "city":"New York"}')).toBe(
         false
@@ -244,7 +250,7 @@ describe("Utils Tests", () => {
       });
     });
 
-    it("should merge defaults into config and shouldn't overwrite undefined properties with overwriteUndefinedProperties = false", () => {
+    it("should merge defaults into config and shouldn't overwrite undefined properties (overwriteUndefinedProperties = false)", () => {
       const config = {
         allowLogging: true,
         loops: 10,
@@ -273,7 +279,7 @@ describe("Utils Tests", () => {
   });
 
   describe("flatMerge function tests", () => {
-    it("should merge changes into source", () => {
+    it("should merge Changes Object into Source Object", () => {
       const source = {
         id: 123,
         name: "jeff",
@@ -291,7 +297,7 @@ describe("Utils Tests", () => {
       });
     });
 
-    it("shouldn't add new properties to source", () => {
+    it("shouldn't add new properties to Source Object", () => {
       const source = {
         id: 123,
         name: "jeff",
@@ -334,7 +340,7 @@ describe("Utils Tests", () => {
       });
     });
 
-    it("can't deep merge changes", () => {
+    it("shouldn't deep merge Changes Object into Source Object", () => {
       const source = {
         id: 123,
         name: "jeff",
@@ -369,7 +375,7 @@ describe("Utils Tests", () => {
       expect(equal("hi", "hi")).toBe(true);
     });
 
-    it("should return false if value1 and value2 are not equal", () => {
+    it("should return false if value1 and value2 aren't equal", () => {
       expect(equal({ id: 123, name: "jeff" }, { id: 123, name: "hans" })).toBe(
         false
       );
@@ -389,7 +395,7 @@ describe("Utils Tests", () => {
       expect(equal("hi", "bye")).toBe(false);
     });
 
-    it("should return true if value1 and value2 are not equal", () => {
+    it("should return true if value1 and value2 aren't equal", () => {
       expect(
         notEqual({ id: 123, name: "jeff" }, { id: 123, name: "hans" })
       ).toBe(true);
@@ -400,11 +406,11 @@ describe("Utils Tests", () => {
   });
 
   describe("generateId function tests", () => {
-    it("should returned generated Id that matches the wished regex", () => {
+    it("should returned generated Id that matches regex", () => {
       expect(generateId()).toMatch(/^[a-zA-Z0-9]*$/);
     });
 
-    it("should returned generated Id with right length if passing length", () => {
+    it("should returned generated Id with correct length (length = x)", () => {
       expect(generateId(10)).toMatch(/^[a-zA-Z0-9]*$/);
       expect(generateId(10).length).toEqual(10);
       expect(generateId(5).length).toEqual(5);
@@ -457,6 +463,47 @@ describe("Utils Tests", () => {
         country: "USA",
         state: "California",
       });
+    });
+  });
+
+  describe("globalBind function tests", () => {
+    const dummyKey = "myDummyKey";
+
+    beforeEach(() => {
+      globalThis[dummyKey] = undefined;
+    });
+
+    it("should bind instance at key globally (default config)", () => {
+      globalBind(dummyKey, "dummyInstance");
+
+      expect(globalThis[dummyKey]).toBe("dummyInstance");
+    });
+
+    it("shouldn't overwrite already existing instance at key (default config)", () => {
+      globalBind(dummyKey, "I am first!");
+
+      globalBind(dummyKey, "dummyInstance");
+
+      expect(globalThis[dummyKey]).toBe("I am first!");
+    });
+
+    it("should overwrite already existing instance at key (overwrite = true)", () => {
+      globalBind(dummyKey, "I am first!");
+
+      globalBind(dummyKey, "dummyInstance", true);
+
+      expect(globalThis[dummyKey]).toBe("dummyInstance");
+    });
+
+    it("should print error if something went wrong during the bind process", () => {
+      // @ts-ignore | Destroy globalThis
+      globalThis = undefined;
+
+      globalBind(dummyKey, "dummyInstance");
+
+      expect(console.error).toHaveBeenCalledWith(
+        `Agile Error: Failed to create global Instance called '${dummyKey}'`
+      );
     });
   });
 });

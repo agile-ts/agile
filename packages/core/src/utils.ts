@@ -344,10 +344,7 @@ export function globalBind(
       return true;
     }
   } catch (e) {
-    Agile.logger.error(
-      `Failed to create global Instance called '${name}'`,
-      instance
-    );
+    Agile.logger.error(`Failed to create global Instance called '${key}'`);
   }
   return false;
 }
