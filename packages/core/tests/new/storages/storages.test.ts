@@ -4,10 +4,11 @@ describe("Storages Tests", () => {
   let dummyAgile;
 
   beforeEach(() => {
+    dummyAgile = new Agile({ localStorage: false });
+
+    jest.spyOn(Storages.prototype, "instantiateLocalStorage");
     console.error = jest.fn();
     console.warn = jest.fn();
-    dummyAgile = new Agile({ localStorage: false });
-    jest.spyOn(Storages.prototype, "instantiateLocalStorage");
   });
 
   it("should create Storages (default config)", () => {
@@ -234,11 +235,11 @@ describe("Storages Tests", () => {
 
     describe("get function tests", () => {
       beforeEach(() => {
-        dummyStorage1.get = jest.fn(() => "dummyStorage1Response" as any);
-        dummyStorage2.get = jest.fn(() => "dummyStorage2Response" as any);
-
         storages.register(dummyStorage1);
         storages.register(dummyStorage2);
+
+        dummyStorage1.get = jest.fn(() => "dummyStorage1Response" as any);
+        dummyStorage2.get = jest.fn(() => "dummyStorage2Response" as any);
       });
 
       it("should call get method in default Storage", async () => {
@@ -281,13 +282,13 @@ describe("Storages Tests", () => {
 
     describe("set function tests", () => {
       beforeEach(() => {
-        dummyStorage1.set = jest.fn();
-        dummyStorage2.set = jest.fn();
-        dummyStorage3.set = jest.fn();
-
         storages.register(dummyStorage1);
         storages.register(dummyStorage2);
         storages.register(dummyStorage3);
+
+        dummyStorage1.set = jest.fn();
+        dummyStorage2.set = jest.fn();
+        dummyStorage3.set = jest.fn();
       });
 
       it("should call set method in default Storage", () => {
@@ -320,13 +321,13 @@ describe("Storages Tests", () => {
 
     describe("remove function tests", () => {
       beforeEach(() => {
-        dummyStorage1.remove = jest.fn();
-        dummyStorage2.remove = jest.fn();
-        dummyStorage3.remove = jest.fn();
-
         storages.register(dummyStorage1);
         storages.register(dummyStorage2);
         storages.register(dummyStorage3);
+
+        dummyStorage1.remove = jest.fn();
+        dummyStorage2.remove = jest.fn();
+        dummyStorage3.remove = jest.fn();
       });
 
       it("should call remove method in default Storage", () => {

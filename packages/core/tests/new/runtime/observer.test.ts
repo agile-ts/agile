@@ -8,12 +8,13 @@ describe("Observer Tests", () => {
   let dummySubscription2: SubscriptionContainer;
 
   beforeEach(() => {
-    console.warn = jest.fn();
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
     dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
     dummySubscription1 = new SubscriptionContainer();
     dummySubscription2 = new SubscriptionContainer();
+
+    console.warn = jest.fn();
   });
 
   it("should create Observer (default config)", () => {

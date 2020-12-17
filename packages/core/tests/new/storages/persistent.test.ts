@@ -5,9 +5,11 @@ describe("Persistent Tests", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    console.error = jest.fn();
+
     dummyAgile = new Agile({ localStorage: false });
+
     jest.spyOn(Persistent.prototype, "instantiatePersistent");
+    console.error = jest.fn();
   });
 
   it("should create Persistent (default config)", () => {

@@ -42,7 +42,7 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests nextStateValue into Runtime and applies it to the State
+   * Ingests nextStateValue or computedValue into Runtime and applies it to the State
    * @param config - Config
    */
   public ingest(config: IngestConfigInterface = {}): void {

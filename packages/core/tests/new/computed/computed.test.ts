@@ -12,8 +12,9 @@ describe("Computed Tests", () => {
 
   beforeEach(() => {
     dummyAgile = new Agile({ localStorage: false });
-    console.error = jest.fn();
+
     jest.spyOn(Computed.prototype, "recompute");
+    console.error = jest.fn();
   });
 
   it("should create Computed (default config)", () => {
@@ -206,11 +207,13 @@ describe("Computed Tests", () => {
         dummyObserver1 = new Observer(dummyAgile);
         dummyObserver2 = new Observer(dummyAgile);
         dummyObserver3 = new Observer(dummyAgile);
+
+        computed.hardCodedDeps = [dummyObserver3];
+
         dummyObserver1.depend = jest.fn();
         dummyObserver2.depend = jest.fn();
         dummyObserver3.depend = jest.fn();
         ComputedTracker.track = jest.fn();
-        computed.hardCodedDeps = [dummyObserver3];
       });
 
       it("should call computeFunction and track dependencies the computeFunction depends on", () => {
@@ -247,6 +250,7 @@ describe("Computed Tests", () => {
         dummyObserver = new Observer(dummyAgile);
         dummyState = new State(dummyAgile, undefined);
         dummyStateObserver = new StateObserver(dummyState);
+
         dummyState.observer = dummyStateObserver;
       });
 

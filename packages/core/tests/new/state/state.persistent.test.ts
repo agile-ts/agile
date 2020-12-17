@@ -12,11 +12,13 @@ describe("StatePersistent Tests", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    console.error = jest.fn();
+
     dummyAgile = new Agile({ localStorage: false });
     dummyState = new State(dummyAgile, "dummyValue");
+
     jest.spyOn(StatePersistent.prototype, "instantiatePersistent");
     jest.spyOn(StatePersistent.prototype, "initialLoading");
+    console.error = jest.fn();
   });
 
   it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {
@@ -295,6 +297,7 @@ describe("StatePersistent Tests", () => {
       beforeEach(() => {
         dummyState.addSideEffect = jest.fn();
         statePersistent.rebuildStorageSideEffect = jest.fn();
+
         statePersistent.isPersisted = false;
       });
 
@@ -348,6 +351,7 @@ describe("StatePersistent Tests", () => {
       beforeEach(() => {
         dummyState.removeSideEffect = jest.fn();
         dummyAgile.storages.remove = jest.fn();
+
         statePersistent.isPersisted = true;
       });
 

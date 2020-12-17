@@ -13,8 +13,9 @@ describe("Runtime Tests", () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    console.warn = jest.fn();
     dummyAgile = new Agile({ localStorage: false });
+
+    console.warn = jest.fn();
   });
 
   it("should create Runtime", () => {
@@ -44,6 +45,7 @@ describe("Runtime Tests", () => {
 
       beforeEach(() => {
         dummyJob = new Job(dummyObserver1);
+
         runtime.perform = jest.fn();
         runtime.jobQueue.shift = jest.fn(() => dummyJob);
       });
@@ -79,6 +81,7 @@ describe("Runtime Tests", () => {
         dummyJob1.rerender = true;
         dummyJob2.rerender = true;
         dummyJob3.rerender = false;
+
         runtime.updateSubscribers = jest.fn();
         jest.spyOn(dummyObserver1, "perform");
         jest.spyOn(dummyObserver2, "perform");

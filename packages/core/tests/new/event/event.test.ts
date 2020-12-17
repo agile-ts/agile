@@ -6,6 +6,7 @@ describe("Event Tests", () => {
 
   beforeEach(() => {
     dummyAgile = new Agile({ localStorage: false });
+
     console.error = jest.fn();
   });
 
@@ -250,12 +251,12 @@ describe("Event Tests", () => {
       const dummyCallbackFunction3 = jest.fn();
 
       beforeEach(() => {
-        event.observer.trigger = jest.fn();
-        event.disable = jest.fn();
-
         event.callbacks["callback1"] = dummyCallbackFunction1;
         event.callbacks["callback2"] = dummyCallbackFunction2;
         event.callbacks["callback3"] = dummyCallbackFunction3;
+
+        event.observer.trigger = jest.fn();
+        event.disable = jest.fn();
       });
 
       it("should call callback functions at passed keys with passed payload", () => {

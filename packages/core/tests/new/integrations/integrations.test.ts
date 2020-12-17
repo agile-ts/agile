@@ -4,10 +4,11 @@ describe("Integrations Tests", () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    console.error = jest.fn();
-    console.warn = jest.fn();
     dummyAgile = new Agile({ localStorage: false });
     Agile.initialIntegrations = [];
+
+    console.error = jest.fn();
+    console.warn = jest.fn();
   });
 
   it("should create Integrations", () => {

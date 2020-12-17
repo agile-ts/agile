@@ -15,7 +15,9 @@ describe("State Tests", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
     dummyAgile = new Agile({ localStorage: false });
+
     console.error = jest.fn();
     console.warn = jest.fn();
   });
@@ -138,6 +140,7 @@ describe("State Tests", () => {
     describe("setKey function tests", () => {
       beforeEach(() => {
         numberState.persist();
+
         numberState.persistent.setKey = jest.fn();
       });
 
@@ -576,10 +579,11 @@ describe("State Tests", () => {
     });
 
     describe("onInaugurated function tests", () => {
-      const dummyCallbackFunction = jest.fn();
+      let dummyCallbackFunction;
 
       beforeEach(() => {
         jest.spyOn(numberState, "watch");
+        dummyCallbackFunction = jest.fn();
       });
 
       it("should add watcher called InauguratedWatcherKey to State that destroys it self after it got called", () => {
@@ -854,7 +858,7 @@ describe("State Tests", () => {
 
     describe("removeSideEffect function tests", () => {
       beforeEach(() => {
-        numberState.sideEffects["dummyKey"] = () => {};
+        numberState.sideEffects["dummyKey"] = jest.fn();
       });
 
       it("should remove sideEffect at key from State", () => {
@@ -866,7 +870,7 @@ describe("State Tests", () => {
 
     describe("hasSideEffect function tests", () => {
       beforeEach(() => {
-        numberState.sideEffects["dummyKey"] = () => {};
+        numberState.sideEffects["dummyKey"] = jest.fn();
       });
 
       it("should return true if SideEffect at given Key exists", () => {

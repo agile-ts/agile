@@ -24,14 +24,6 @@ describe("StateObserver Tests", () => {
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe("dummyValue");
     expect(stateObserver.state()).toBe(dummyState);
-    /* Couldn't figure out how to mock anything in the Constructor
-        expect(Observer).toHaveBeenCalledWith(dummyAgile, {
-          deps: [],
-          value: "dummyValue",
-          key: undefined,
-          subs: [],
-        });
-     */
     expect(stateObserver.value).toBe("dummyValue");
     expect(stateObserver._key).toBeUndefined();
     expect(stateObserver.deps.size).toBe(0);
@@ -53,14 +45,6 @@ describe("StateObserver Tests", () => {
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe("dummyValue");
     expect(stateObserver.state()).toBe(dummyState);
-    /* Couldn't figure out how to mock anything in the Constructor
-        expect(Observer).toHaveBeenCalledWith(dummyAgile, {
-          deps: [dummyObserver1, dummyObserver2],
-          value: "dummyValue",
-          key: "testKey",
-          subs: [dummySubscription1, dummySubscription2],
-        });
-     */
     expect(stateObserver.value).toBe("dummyValue");
     expect(stateObserver._key).toBe("testKey");
     expect(stateObserver.deps.size).toBe(2);
@@ -91,11 +75,13 @@ describe("StateObserver Tests", () => {
         computedObserver = new StateObserver(dummyComputed, {
           key: "computedObserverKey",
         });
+
+        stateObserver.ingestValue = jest.fn();
+        computedObserver.ingestValue = jest.fn();
       });
 
       it("should call ingestValue with nextStateValue (default config)", () => {
         dummyState.nextStateValue = "nextValue";
-        stateObserver.ingestValue = jest.fn();
 
         stateObserver.ingest();
 
@@ -104,7 +90,6 @@ describe("StateObserver Tests", () => {
 
       it("should call ingestValue with nextStateValue (specific config)", () => {
         dummyState.nextStateValue = "nextValue";
-        stateObserver.ingestValue = jest.fn();
 
         stateObserver.ingest({
           force: true,
@@ -127,7 +112,6 @@ describe("StateObserver Tests", () => {
 
       it("should call ingestValue with computedValue if observer belongs to a ComputedState (default config)", () => {
         dummyComputed.computeValue = jest.fn(() => "computedValue");
-        computedObserver.ingestValue = jest.fn();
 
         computedObserver.ingest();
 
@@ -144,7 +128,7 @@ describe("StateObserver Tests", () => {
         dummyAgile.runtime.ingest = jest.fn();
       });
 
-      it("should ingest State into Runtime if newValue isn't equal to current State Value (default config)", () => {
+      it("should ingest State into Runtime if newValue isn't equal to currentValue (default config)", () => {
         stateObserver.ingestValue("updatedDummyValue");
 
         expect(stateObserver.nextStateValue).toBe("updatedDummyValue");
@@ -157,15 +141,16 @@ describe("StateObserver Tests", () => {
         });
       });
 
-      it("shouldn't ingest State into Runtime if newValue is equal to current State Value (default config)", () => {
+      it("shouldn't ingest State into Runtime if newValue is equal to currentValue (default config)", () => {
         dummyState._value = "updatedDummyValue";
+
         stateObserver.ingestValue("updatedDummyValue");
 
         expect(stateObserver.nextStateValue).toBe("updatedDummyValue");
         expect(dummyAgile.runtime.ingest).not.toHaveBeenCalled();
       });
 
-      it("should ingest State into Runtime if newValue is equal to current State Value (config.force = true)", () => {
+      it("should ingest State into Runtime if newValue is equal to currentValue (config.force = true)", () => {
         dummyState._value = "updatedDummyValue";
         stateObserver.ingestValue("updatedDummyValue", { force: true });
 
@@ -201,28 +186,31 @@ describe("StateObserver Tests", () => {
 
       beforeEach(() => {
         dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
-        dummyState.isPersisted = true;
         dummyState.persistent = new StatePersistent(dummyState);
+        dummyState.isPersisted = true;
+
         stateObserver.sideEffects = jest.fn();
       });
 
       it("should perform Job", () => {
         dummyJob.observer.nextStateValue = "newValue";
+        dummyState.initialStateValue = "initialValue";
         dummyState._value = "dummyValue";
 
         stateObserver.perform(dummyJob as any);
 
         expect(dummyState.previousStateValue).toBe("dummyValue");
+        expect(dummyState.initialStateValue).toBe("initialValue");
         expect(dummyState._value).toBe("newValue");
         expect(dummyState.nextStateValue).toBe("newValue");
         expect(dummyState.isSet).toBeTruthy();
         expect(stateObserver.value).toBe("newValue");
-
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
       it("should perform Job and assign specific values to State if State is a Placeholder", () => {
         dummyJob.observer.nextStateValue = "newValue";
+        dummyState.initialStateValue = "overwriteValue";
         dummyState._value = "dummyValue";
         dummyState.isPlaceholder = true;
 
@@ -234,7 +222,6 @@ describe("StateObserver Tests", () => {
         expect(dummyState.nextStateValue).toBe("newValue");
         expect(dummyState.isSet).toBeTruthy();
         expect(stateObserver.value).toBe("newValue");
-
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -245,7 +232,13 @@ describe("StateObserver Tests", () => {
 
         stateObserver.perform(dummyJob as any);
 
+        expect(dummyState.previousStateValue).toBe("dummyValue");
+        expect(dummyState.initialStateValue).toBe("newValue");
+        expect(dummyState._value).toBe("newValue");
+        expect(dummyState.nextStateValue).toBe("newValue");
         expect(dummyState.isSet).toBeFalsy();
+        expect(stateObserver.value).toBe("newValue");
+        expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
     });
 
@@ -256,9 +249,11 @@ describe("StateObserver Tests", () => {
       beforeEach(() => {
         dummyStateObserver = new StateObserver(new State(dummyAgile, "test"));
         dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
+
+        dummyState.observer.deps.add(dummyStateObserver);
+
         dummyState.watchers["dummyWatcher"] = jest.fn();
         dummyState.sideEffects["dummySideEffect"] = jest.fn();
-        dummyState.observer.depend(dummyStateObserver);
         dummyStateObserver.ingest = jest.fn();
       });
 
@@ -282,9 +277,15 @@ describe("StateObserver Tests", () => {
         dummyJob.config.sideEffects = false;
         stateObserver.sideEffects(dummyJob);
 
+        expect(dummyState.watchers["dummyWatcher"]).toHaveBeenCalledWith(
+          "dummyValue"
+        );
         expect(
           dummyState.sideEffects["dummySideEffect"]
         ).not.toHaveBeenCalled();
+        expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
+          perform: false,
+        });
       });
     });
   });
