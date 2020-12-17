@@ -321,12 +321,12 @@ export function clone<T = any>(instance: T): T {
 //=========================================================================================================
 /**
  * @internal
- * Binds Instance Global
+ * Binds passed Instance globally at passed Key
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
  * https://blog.logrocket.com/what-is-globalthis-why-use-it/
- * @param key - Key of Instance
- * @param instance - Instance which becomes globally accessible (globalThis.key)
- * @param overwrite - If already existing instance gets overwritten
+ * @param key - Key/Name of Instance
+ * @param instance - Instance
+ * @param overwrite - If already existing instance at passed Key gets overwritten
  */
 export function globalBind(
   key: string,
