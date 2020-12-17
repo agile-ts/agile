@@ -1,170 +1,88 @@
 import { Agile, Persistent, Storage } from "../../../src";
-// jest.mock("../../../src/storages/persistent"); // // Can't mock Persistent because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe("Persistent Tests", () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     console.error = jest.fn();
     dummyAgile = new Agile({ localStorage: false });
+    jest.spyOn(Persistent.prototype, "instantiatePersistent");
   });
 
   it("should create Persistent (default config)", () => {
+    // Overwrite persistent once to not call it
+    jest
+      .spyOn(Persistent.prototype, "instantiatePersistent")
+      .mockReturnValueOnce(undefined);
+
     const persistent = new Persistent(dummyAgile);
 
     expect(persistent).toBeInstanceOf(Persistent);
-    /* Couldn't figure out how to mock anything in the Constructor
     expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
       storageKeys: [],
       key: undefined,
     });
-     */
     expect(
       dummyAgile.storages.persistentInstances.has(persistent)
     ).toBeTruthy();
 
-    expect(persistent.key).toBe(Persistent.placeHolderKey);
+    expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBeUndefined();
+  });
 
-    expect(console.error).toHaveBeenCalledWith(
-      "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
-    );
+  it("should create Persistent (specific config)", () => {
+    // Overwrite instantiatePersistent once to not call it
+    jest
+      .spyOn(Persistent.prototype, "instantiatePersistent")
+      .mockReturnValueOnce(undefined);
+
+    const persistent = new Persistent(dummyAgile, {
+      storageKeys: ["test1", "test2"],
+      key: "persistentKey",
+    });
+
+    expect(persistent).toBeInstanceOf(Persistent);
+    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
+      storageKeys: ["test1", "test2"],
+      key: "persistentKey",
+    });
+    expect(
+      dummyAgile.storages.persistentInstances.has(persistent)
+    ).toBeTruthy();
+
+    expect(persistent._key).toBe(Persistent.placeHolderKey);
+    expect(persistent.ready).toBeFalsy();
+    expect(persistent.isPersisted).toBeFalsy();
+    expect(persistent.onLoad).toBeUndefined();
+    expect(persistent.storageKeys).toStrictEqual([]);
+    expect(persistent.defaultStorageKey).toBeUndefined();
   });
 
   it("should create Persistent (config.instantiate = false)", () => {
+    // Overwrite instantiatePersistent once to not call it
+    jest
+      .spyOn(Persistent.prototype, "instantiatePersistent")
+      .mockReturnValueOnce(undefined);
+
     const persistent = new Persistent(dummyAgile, { instantiate: false });
 
     expect(persistent).toBeInstanceOf(Persistent);
-    /* Couldn't figure out how to mock anything in the Constructor
     expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
-     */
     expect(
       dummyAgile.storages.persistentInstances.has(persistent)
     ).toBeTruthy();
 
-    expect(persistent.key).toBe(Persistent.placeHolderKey);
+    expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
     expect(persistent.defaultStorageKey).toBeUndefined();
-
-    expect(console.error).not.toHaveBeenCalled();
-  });
-
-  it("should create Persistent (config.key)", () => {
-    const persistent = new Persistent(dummyAgile, { key: "coolKey" });
-
-    expect(persistent).toBeInstanceOf(Persistent);
-    /* Couldn't figure out how to mock anything in the Constructor
-    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
-      storageKeys: [],
-      key: "coolKey",
-    });
-     */
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
-
-    expect(persistent.key).toBe("coolKey"); // x
-    expect(persistent.ready).toBeFalsy();
-    expect(persistent.isPersisted).toBeFalsy();
-    expect(persistent.onLoad).toBeUndefined();
-    expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBeUndefined();
-
-    expect(console.error).toHaveBeenCalledWith(
-      "Agile Error: No persist Storage Key found! Please provide at least one Storage Key."
-    );
-  });
-
-  it("should create Persistent (config.storageKeys)", () => {
-    const persistent = new Persistent(dummyAgile, {
-      storageKeys: ["test1", "test2"],
-    });
-
-    expect(persistent).toBeInstanceOf(Persistent);
-    /* Couldn't figure out how to mock anything in the Constructor
-    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
-      storageKeys: ["test1", "test2"],
-      key: undefined,
-    });
-     */
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
-
-    expect(persistent.key).toBe(Persistent.placeHolderKey);
-    expect(persistent.ready).toBeFalsy();
-    expect(persistent.isPersisted).toBeFalsy();
-    expect(persistent.onLoad).toBeUndefined();
-    expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
-    expect(persistent.defaultStorageKey).toBe("test1"); // x
-
-    expect(console.error).toHaveBeenCalledWith(
-      "Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance."
-    );
-  });
-
-  it("should create valid Persistent (config.key, config.storageKeys)", () => {
-    const persistent = new Persistent(dummyAgile, {
-      key: "coolKey",
-      storageKeys: ["test1", "test2"],
-    });
-
-    expect(persistent).toBeInstanceOf(Persistent);
-    /* Couldn't figure out how to mock anything in the Constructor
-    expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
-      storageKeys: ["test1", "test2"],
-      key: "coolKey",
-    });
-     */
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
-
-    expect(persistent.key).toBe("coolKey"); // x
-    expect(persistent.ready).toBeTruthy(); // x
-    expect(persistent.isPersisted).toBeFalsy();
-    expect(persistent.onLoad).toBeUndefined();
-    expect(persistent.storageKeys).toStrictEqual(["test1", "test2"]); // x
-    expect(persistent.defaultStorageKey).toBe("test1"); // x
-
-    expect(console.error).not.toHaveBeenCalled();
-  });
-
-  it("should create Persistent (config.key, config.storageKeys, config.instantiate = false)", () => {
-    const persistent = new Persistent(dummyAgile, {
-      instantiate: false,
-      storageKeys: ["hello", "there"],
-      key: "coolKey",
-    });
-
-    expect(persistent).toBeInstanceOf(Persistent);
-    /* Couldn't figure out how to mock anything in the Constructor
-    expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
-     */
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
-
-    // Might be weired outputs.. BUT the persistent hasn't got instantiated yet
-    expect(persistent.key).toBe(Persistent.placeHolderKey);
-    expect(persistent.ready).toBeFalsy();
-    expect(persistent.isPersisted).toBeFalsy();
-    expect(persistent.onLoad).toBeUndefined();
-    expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBeUndefined();
-
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
-
-    expect(console.error).not.toHaveBeenCalled();
   });
 
   describe("Persistent Function Tests", () => {
@@ -174,33 +92,43 @@ describe("Persistent Tests", () => {
       persistent = new Persistent(dummyAgile);
     });
 
-    // Note: InstantiatePersistent function got more or less tested in constructor
-    describe("instantiatePersistent function tests", () => {
-      beforeEach(() => {
-        persistent = new Persistent(dummyAgile, { instantiate: false });
-      });
+    describe("key set function tests", () => {
+      it("should call setKey with passed value", () => {
+        persistent.setKey = jest.fn();
 
-      it("should be possible to instantiate Persistent after the 'real' instantiation", () => {
-        const persistent = new Persistent(dummyAgile, {
-          instantiate: false,
-        });
+        persistent.key = "dummyKey";
+
+        expect(persistent.setKey).toHaveBeenCalledWith("dummyKey");
+      });
+    });
+
+    describe("ket get function tests", () => {
+      it("should get key property of Persistent", () => {
+        persistent._key = "dummyKey";
+
+        expect(persistent.key).toBe("dummyKey");
+      });
+    });
+
+    describe("instantiatePersistent function tests", () => {
+      it("should call assign key to formatKey and call assignStorageKeys, validatePersistent", () => {
+        jest.spyOn(persistent, "formatKey");
+        jest.spyOn(persistent, "assignStorageKeys");
+        jest.spyOn(persistent, "validatePersistent");
 
         persistent.instantiatePersistent({
-          key: "myCoolPersistent",
+          key: "persistentKey",
           storageKeys: ["myName", "is", "jeff"],
         });
 
-        expect(persistent).toBeInstanceOf(Persistent);
-        expect(persistent.key).toBe("myCoolPersistent");
-        expect(persistent.ready).toBeTruthy();
-        expect(persistent.isPersisted).toBeFalsy();
-        expect(persistent.onLoad).toBeUndefined();
-        expect(persistent.storageKeys).toStrictEqual(["myName", "is", "jeff"]);
-        expect(persistent.defaultStorageKey).toBe("myName");
-
-        expect(
-          dummyAgile.storages.persistentInstances.has(persistent)
-        ).toBeTruthy();
+        expect(persistent._key).toBe("persistentKey");
+        expect(persistent.formatKey).toHaveBeenCalledWith("persistentKey");
+        expect(persistent.assignStorageKeys).toHaveBeenCalledWith([
+          "myName",
+          "is",
+          "jeff",
+        ]);
+        expect(persistent.validatePersistent).toHaveBeenCalled();
       });
     });
 
@@ -212,7 +140,7 @@ describe("Persistent Tests", () => {
         persistent.ready = undefined;
       });
 
-      it("should return false if no set key and no set StorageKeys", () => {
+      it("should return false and print error if no set key and no set StorageKeys", () => {
         const isValid = persistent.validatePersistent();
 
         expect(isValid).toBeFalsy();
@@ -223,8 +151,8 @@ describe("Persistent Tests", () => {
         );
       });
 
-      it("should return false if set key and no set StorageKeys", () => {
-        persistent.key = "test";
+      it("should return false and print error if set key and no set StorageKeys", () => {
+        persistent._key = "persistentKey";
 
         const isValid = persistent.validatePersistent();
 
@@ -251,7 +179,7 @@ describe("Persistent Tests", () => {
       });
 
       it("should return true if set key and set StorageKeys", () => {
-        persistent.key = "test";
+        persistent._key = "persistentKey";
         persistent.defaultStorageKey = "test";
         persistent.storageKeys = ["test"];
 
@@ -263,7 +191,7 @@ describe("Persistent Tests", () => {
     });
 
     describe("assignStorageKeys function tests", () => {
-      it("should assign StorageKeys and make first one as default StorageKey", () => {
+      it("should assign passed StorageKeys and set first one as default StorageKey", () => {
         persistent.assignStorageKeys(["test1", "test2", "test3"]);
 
         expect(persistent.storageKeys).toStrictEqual([
@@ -274,7 +202,7 @@ describe("Persistent Tests", () => {
         expect(persistent.defaultStorageKey).toBe("test1");
       });
 
-      it("should try to get default StorageKey if no StorageKeys passed", () => {
+      it("should try to get default StorageKey from Agile if no StorageKeys passed", () => {
         dummyAgile.storages.register(
           new Storage({
             key: "storage1",
@@ -287,7 +215,7 @@ describe("Persistent Tests", () => {
           { default: true }
         );
 
-        persistent.assignStorageKeys([]);
+        persistent.assignStorageKeys();
 
         expect(persistent.storageKeys).toStrictEqual(["storage1"]);
         expect(persistent.defaultStorageKey).toBe("storage1");
@@ -295,69 +223,64 @@ describe("Persistent Tests", () => {
     });
 
     describe("initialLoading function tests", () => {
-      let onLoadSuccess = undefined;
-
       beforeEach(() => {
-        persistent.onLoad = (success) => {
-          onLoadSuccess = success;
-        };
-        jest.spyOn(persistent, "persistValue");
+        persistent.onLoad = jest.fn();
+        persistent.loadPersistedValue = jest.fn();
+        persistent.persistValue = jest.fn();
       });
 
-      it("shouldn't call updateValue if value got loaded", () => {
+      it("shouldn't call persistValue if value got successful loaded", async () => {
         persistent.loadPersistedValue = jest.fn(() => Promise.resolve(true));
 
-        persistent.initialLoading().then(() => {
-          expect(persistent.loadPersistedValue).toHaveBeenCalled();
-          expect(persistent.persistValue).not.toHaveBeenCalled();
-          expect(onLoadSuccess).toBeTruthy();
-        });
+        await persistent.initialLoading();
+
+        expect(persistent.loadPersistedValue).toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.onLoad).toHaveBeenCalledWith(true);
       });
 
-      it("should call updateValue if value doesn't got loaded", () => {
+      it("should call persistValue if value doesn't got successful loaded", async () => {
         persistent.loadPersistedValue = jest.fn(() => Promise.resolve(false));
 
-        persistent.initialLoading().then(() => {
-          expect(persistent.loadPersistedValue).toHaveBeenCalled();
-          expect(persistent.persistValue).toHaveBeenCalled();
-          expect(onLoadSuccess).toBeFalsy();
-        });
+        await persistent.initialLoading();
+
+        expect(persistent.loadPersistedValue).toHaveBeenCalled();
+        expect(persistent.persistValue).toHaveBeenCalled();
+        expect(persistent.onLoad).toHaveBeenCalledWith(false);
       });
     });
 
-    describe("functions that get overwritten tests | because Persistent is no stand alone class", () => {
-      describe("onLoad function tests", () => {
-        it("should print error", () => {
-          persistent.loadPersistedValue();
+    describe("loadPersistedValue function tests", () => {
+      it("should print error", () => {
+        persistent.loadPersistedValue();
 
-          expect(console.error).toHaveBeenCalledWith(
-            "Agile Error: 'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
-          );
-        });
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: 'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
+        );
       });
+    });
 
-      describe("persistValue function tests", () => {
-        it("should print error", () => {
-          persistent.persistValue();
+    describe("persistValue function tests", () => {
+      it("should print error", () => {
+        persistent.persistValue();
 
-          expect(console.error).toHaveBeenCalledWith(
-            "Agile Error: 'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
-          );
-        });
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: 'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
+        );
       });
+    });
 
-      describe("removePersistedValue function tests", () => {
-        it("should print error", () => {
-          persistent.removePersistedValue();
+    describe("removePersistedValue function tests", () => {
+      it("should print error", () => {
+        persistent.removePersistedValue();
 
-          expect(console.error).toHaveBeenCalledWith(
-            "Agile Error: 'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
-          );
-        });
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: 'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
+        );
       });
 
       describe("formatKey function tests", () => {
-        it("shouldn't formatKey", () => {
+        it("should return passed key", () => {
           expect(persistent.formatKey("test")).toBe("test");
         });
       });
