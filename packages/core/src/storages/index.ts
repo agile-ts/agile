@@ -36,7 +36,7 @@ export class Storages {
    * @internal
    * Instantiates Local Storage
    */
-  private instantiateLocalStorage(): boolean {
+  public instantiateLocalStorage(): boolean {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
       Agile.logger.warn(
@@ -95,14 +95,14 @@ export class Storages {
 
     this.persistentInstances.forEach((persistent) => {
       // If Persistent isn't ready and has no default StorageKey.. reassignStorageKeys and try to load it
-      if (!persistent.ready && !persistent.defaultStorageKey) {
+      if (!persistent.defaultStorageKey) {
         persistent.assignStorageKeys();
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
         return;
       }
 
-      // Add Value to newly registered StorageKey
+      // Add Value of Persistent to newly registered Storage
       if (persistent.storageKeys.includes(storage.key))
         persistent.persistValue();
     });
@@ -150,7 +150,9 @@ export class Storages {
     storageKey?: StorageKey
   ): Promise<GetType | undefined> {
     if (!this.hasStorage()) {
-      Agile.logger.error("No Storage found!");
+      Agile.logger.error(
+        "No Storage found! Please provide at least one Storage."
+      );
       return Promise.resolve(undefined);
     }
 
@@ -171,7 +173,7 @@ export class Storages {
    * @internal
    * Saves/Updates value at provided Key
    * @param key - Key of Storage property
-   * @param value - new Value that gets set
+   * @param value - new Value that gets set at provided Key
    * @param storageKeys - Key/Name of Storages where the Value gets set (if not provided default Storage will be used)
    */
   public set(
@@ -180,7 +182,9 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      Agile.logger.error("No Storage found!");
+      Agile.logger.error(
+        "No Storage found! Please provide at least one Storage."
+      );
       return;
     }
 
@@ -206,7 +210,9 @@ export class Storages {
    */
   public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
     if (!this.hasStorage()) {
-      Agile.logger.error("No Storage found!");
+      Agile.logger.error(
+        "No Storage found! Please provide at least one Storage."
+      );
       return;
     }
 
