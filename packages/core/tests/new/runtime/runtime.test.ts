@@ -140,15 +140,15 @@ describe("Runtime Tests", () => {
       let rComponentSubJob: Job;
       let nrArComponentSubJob: Job;
       let rCallbackSubContainer: CallbackSubscriptionContainer;
-      let dummyCallbackFunction1 = () => {};
+      let rCallbackSubContainerCallbackFunction = () => {};
       let nrCallbackSubContainer: CallbackSubscriptionContainer;
-      let dummyCallbackFunction2 = () => {};
+      let nrCallbackSubContainerCallbackFunction = () => {};
       let rComponentSubContainer: ComponentSubscriptionContainer;
-      let dummyComponent1 = {
+      let rComponentSubContainerComponent = {
         my: "cool component",
       };
       let nrComponentSubContainer: ComponentSubscriptionContainer;
-      let dummyComponent2 = {
+      let nrComponentSubContainerComponent = {
         my: "second cool component",
       };
 
@@ -163,14 +163,14 @@ describe("Runtime Tests", () => {
 
         // Create Ready Callback Subscription
         rCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
-          dummyCallbackFunction1,
+          rCallbackSubContainerCallbackFunction,
           [dummyObserver1, dummyObserver2]
         ) as CallbackSubscriptionContainer;
         rCallbackSubContainer.callback = jest.fn();
 
         // Create Not Ready Callback Subscription
         nrCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
-          dummyCallbackFunction2,
+          nrCallbackSubContainerCallbackFunction,
           [dummyObserver2]
         ) as CallbackSubscriptionContainer;
         nrCallbackSubContainer.callback = jest.fn();
@@ -178,7 +178,7 @@ describe("Runtime Tests", () => {
 
         // Create Ready Component Subscription
         rComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
-          dummyComponent1,
+          rComponentSubContainerComponent,
           {
             observer3: dummyObserver3,
             observer4: dummyObserver4,
@@ -187,7 +187,7 @@ describe("Runtime Tests", () => {
 
         // Create Not Ready Component Subscription
         nrComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
-          dummyComponent2,
+          nrComponentSubContainerComponent,
           {
             observer4: dummyObserver4,
           }
@@ -239,7 +239,7 @@ describe("Runtime Tests", () => {
 
         expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
         expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
-          dummyComponent1,
+          rComponentSubContainerComponent,
           {
             observer3: "dummyObserverValue3",
           }
@@ -300,13 +300,13 @@ describe("Runtime Tests", () => {
 
         expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
         expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
-          dummyComponent1,
+          rComponentSubContainerComponent,
           {
             observer4: "dummyObserverValue4",
           }
         );
         expect(dummyAgile.integrations.update).not.toHaveBeenCalledWith(
-          dummyComponent2,
+          nrComponentSubContainerComponent,
           {
             observer4: "dummyObserverValue4",
           }
