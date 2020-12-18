@@ -6,7 +6,7 @@ export class Job<ObserverType extends Observer = Observer> {
   public config: JobConfigInterface;
   public rerender: boolean; // If Job will cause rerender on subscriptionContainer in Observer
   public performed = false; // If Job has been performed by Runtime
-  public subscriptionContainersToUpdate: Set<SubscriptionContainer> = new Set(); // SubscriptionContainer that have to be updated/rerendered
+  public subscriptionContainersToUpdate = new Set<SubscriptionContainer>(); // SubscriptionContainer that have to be updated/rerendered
 
   /**
    * @internal
