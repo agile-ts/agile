@@ -7,6 +7,7 @@ export class EventJob<PayloadType = any> {
    * @public
    * Event Job - Holds Payload and gets executed/performed by the Event
    * @param payload - Payload that is represented by this Job
+   * @param keys - Keys of EventCallbacks that get executed with the passed payload
    */
   constructor(payload: PayloadType, keys?: string[]) {
     this.payload = payload;
