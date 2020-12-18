@@ -29,12 +29,12 @@ export class StateObserver<ValueType = any> extends Observer {
   ) {
     super(state.agileInstance(), {
       deps: config.deps,
-      value: state.value,
+      value: state._value,
       key: config.key,
       subs: config.subs,
     });
     this.state = () => state;
-    this.nextStateValue = copy(state.value);
+    this.nextStateValue = copy(state._value);
   }
 
   //=========================================================================================================
