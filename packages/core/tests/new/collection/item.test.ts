@@ -53,18 +53,20 @@ describe("Item Tests", () => {
     });
 
     describe("setKey function tests", () => {
-      it("should call State setKey and update sideEffect", () => {
+      it("should call State setKey and add sideEffect to it", () => {
         item.setKey("myNewKey");
 
         expect(State.prototype.setKey).toHaveBeenCalledWith("myNewKey");
-        expect(item.removeSideEffect).toHaveBeenCalledWith("rebuildGroup");
+        expect(item.removeSideEffect).toHaveBeenCalledWith(
+          Item.updateGroupSideEffectKey
+        );
         expect(item.addSideEffect).toHaveBeenCalledWith(
-          "rebuildGroup",
+          Item.updateGroupSideEffectKey,
           expect.any(Function)
         );
       });
 
-      describe("test added sideEffect called 'rebuildGroup'", () => {
+      describe("test added sideEffect called Item.updateGroupSideEffectKey", () => {
         beforeEach(() => {
           dummyCollection.rebuildGroupsThatIncludeItemKey = jest.fn();
         });
@@ -72,7 +74,9 @@ describe("Item Tests", () => {
         it("should call rebuildGroupThatIncludeItemKey", () => {
           item.setKey("myNewKey");
 
-          item.sideEffects["rebuildGroup"]({ dummy: "property" });
+          item.sideEffects[Item.updateGroupSideEffectKey]({
+            dummy: "property",
+          });
 
           expect(
             dummyCollection.rebuildGroupsThatIncludeItemKey

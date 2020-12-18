@@ -1,6 +1,7 @@
 import { State, Collection, DefaultItem, StateKey } from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
+  static updateGroupSideEffectKey = "rebuildGroup";
   public collection: () => Collection<DataType>;
 
   /**
@@ -31,9 +32,9 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     if (!value) return this;
 
     // Update rebuildGroupThatIncludePrimaryKey SideEffect
-    this.removeSideEffect("rebuildGroup");
-    this.addSideEffect("rebuildGroup", (properties: any) =>
-      this.collection().rebuildGroupsThatIncludeItemKey(value, properties)
+    this.removeSideEffect(Item.updateGroupSideEffectKey);
+    this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
+      this.collection().rebuildGroupsThatIncludeItemKey(value, config)
     );
     return this;
   }
