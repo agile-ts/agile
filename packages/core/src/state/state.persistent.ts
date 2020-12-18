@@ -8,7 +8,7 @@ import {
 } from "../internal";
 
 export class StatePersistent<ValueType = any> extends Persistent {
-  public stateSideEffectKey = "rebuildStateStorageValue";
+  static storeValueSideEffectKey = "rebuildStateStorageValue";
   public state: () => State;
 
   /**
@@ -123,9 +123,12 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const _key = key || this.key;
 
     // Add sideEffect to State that updates the Storage Value depending on the State Value
-    this.state().addSideEffect(this.stateSideEffectKey, (config) => {
-      this.rebuildStorageSideEffect(this.state(), _key, config);
-    });
+    this.state().addSideEffect(
+      StatePersistent.storeValueSideEffectKey,
+      (config) => {
+        this.rebuildStorageSideEffect(this.state(), _key, config);
+      }
+    );
     this.rebuildStorageSideEffect(this.state(), _key);
 
     this.isPersisted = true;
@@ -145,7 +148,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const _key = key || this.key;
 
     // Remove SideEffect
-    this.state().removeSideEffect(this.stateSideEffectKey);
+    this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
 
     // Remove Value from Storage
     this.agileInstance().storages.remove(_key, this.storageKeys);
