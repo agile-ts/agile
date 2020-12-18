@@ -107,23 +107,22 @@ export class Runtime {
    * @internal
    * Updates/Rerenders all Subscribed Components of the Job (Observer)
    */
-  public updateSubscribers(): void {
+  public updateSubscribers(): boolean {
     if (!this.agileInstance().hasIntegration()) {
       this.jobsToRerender = [];
       this.notReadyJobsToRerender = new Set();
-      return;
+      return false;
     }
     if (
       this.jobsToRerender.length <= 0 &&
       this.notReadyJobsToRerender.size <= 0
     )
-      return;
+      return false;
 
     // Subscriptions that has to be updated/rerendered
-    const subscriptionsToUpdate: Set<SubscriptionContainer> = new Set<
-      SubscriptionContainer
-    >();
+    const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
+    // Build final jobsToRerender and reset jobsToRerender Instances
     const jobsToRerender = this.jobsToRerender.concat(
       Array.from(this.notReadyJobsToRerender)
     );
@@ -153,7 +152,6 @@ export class Runtime {
       });
     });
 
-    // Update Subscriptions that has to be updated/rerendered
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
@@ -171,6 +169,8 @@ export class Runtime {
     Agile.logger.if
       .tag(["runtime"])
       .info("Updated/Rerendered Subscriptions", subscriptionsToUpdate);
+
+    return true;
   }
 
   //=========================================================================================================
