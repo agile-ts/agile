@@ -4,6 +4,7 @@ import {
   copy,
   DefaultItem,
   defineConfig,
+  IngestConfigInterface,
   Item,
   ItemKey,
   State,
@@ -12,6 +13,7 @@ import {
 export class Selector<DataType = DefaultItem> extends State<
   DataType | undefined
 > {
+  static rebuildSelectorSideEffectKey = "rebuildSelector";
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
   public _itemKey: ItemKey; // Key of Item the Selector represents
@@ -28,14 +30,14 @@ export class Selector<DataType = DefaultItem> extends State<
     itemKey: ItemKey,
     config?: SelectorConfigInterface
   ) {
-    super(collection.agileInstance(), collection.getItemValue(itemKey));
+    super(collection.agileInstance(), undefined);
     this.collection = () => collection;
     this.item = undefined;
     this._itemKey = itemKey;
-    this.key = config?.key;
+    this._key = config?.key;
 
     // Initial Select
-    this.select(itemKey);
+    this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -56,43 +58,56 @@ export class Selector<DataType = DefaultItem> extends State<
 
   /**
    * @public
-   * Select new ItemKey that the Selector will represents
+   * Select new ItemKey
    * @param itemKey - New ItemKey
    * @param config - Config
    */
   public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
     const oldItem = this.item;
     let newItem = this.collection().getItemWithReference(itemKey);
-    const rebuildSelectorSideEffectKey = "rebuildSelector";
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
       force: false,
+      overwrite: oldItem?.isPlaceholder,
     });
 
-    if (oldItem?.key === itemKey && !config.force) {
+    if (oldItem?._key === itemKey && !config.force) {
       Agile.logger.warn(
-        `Selector has already a selected key '${itemKey}'! Use config.force to select a new Key.`
+        `Selector has already selected the same Key '${itemKey}'!`
       );
       return this;
     }
 
+    // Overwrite old Item Values with new Item Value
+    if (config.overwrite) {
+      this._value = newItem._value;
+      this.nextStateValue = newItem._value;
+      this.previousStateValue = newItem._value;
+      this.initialStateValue = newItem._value;
+      this.isSet = false;
+    }
+
     // Remove old Item from Collection if it is an Placeholder
-    if (oldItem?.isPlaceholder) delete this.collection().data[this.itemKey];
+    if (oldItem?.isPlaceholder) delete this.collection().data[this._itemKey];
 
     // Remove Selector sideEffect from old Item
-    oldItem?.removeSideEffect(rebuildSelectorSideEffectKey);
+    oldItem?.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
 
     this._itemKey = itemKey;
     this.item = newItem;
 
-    // Add Selector sideEffect to Item
-    newItem.addSideEffect(rebuildSelectorSideEffectKey, () =>
+    // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
+    newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, () =>
       this.rebuildSelector(config)
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
-    this.rebuildSelector(config);
+    this.rebuildSelector({
+      background: config.background,
+      sideEffects: config.sideEffects,
+      force: config.force,
+    });
 
     return this;
   }
@@ -105,7 +120,7 @@ export class Selector<DataType = DefaultItem> extends State<
    * Rebuilds Selector
    * @param config - Config
    */
-  public rebuildSelector(config: SelectConfigInterface = {}) {
+  public rebuildSelector(config: IngestConfigInterface = {}) {
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
@@ -117,7 +132,7 @@ export class Selector<DataType = DefaultItem> extends State<
       return;
     }
 
-    // Assign ItemValue to Selector
+    // Assign new ItemValue to Selector
     this.nextStateValue = copy(this.item?.value);
 
     // Ingest nextStateValue into Runtime
@@ -138,9 +153,11 @@ export interface SelectorConfigInterface {
  * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
  * @param sideEffects - If Side Effects of Selector get executed
  * @param force - Force to select ItemKey
+ * @param overwrite - If the Selector gets overwritten with the new selected Item (initialStateValue, ..)
  */
 export interface SelectConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
   force?: boolean;
+  overwrite?: boolean;
 }

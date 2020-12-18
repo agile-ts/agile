@@ -868,7 +868,7 @@ export class Collection<DataType = DefaultItem> {
         if (group && group.has(itemKey)) group.remove(itemKey);
       }
 
-      // Remove Selectors that represents this Item
+      // Remove Selectors that represented this Item
       for (let selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey);
         if (selector?.itemKey === itemKey) this.removeSelector(selectorKey);

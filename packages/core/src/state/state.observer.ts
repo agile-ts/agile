@@ -113,8 +113,8 @@ export class StateObserver<ValueType = any> extends Observer {
 
     // Reset isPlaceholder and set initial/previous Value to nextValue because the placeholder State had no proper value before
     if (state.isPlaceholder) {
-      state.initialStateValue = copy(state.value);
-      state.previousStateValue = copy(state.value);
+      state.initialStateValue = copy(state._value);
+      state.previousStateValue = copy(state._value);
       state.isPlaceholder = false;
     }
 

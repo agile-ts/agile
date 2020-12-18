@@ -122,13 +122,15 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _key = key || this.key;
 
-    // Add sideEffect to State that updates the Storage Value depending on the State Value
+    // Add SideEffect to State, that updates the saved State Value depending on the current State Value
     this.state().addSideEffect(
       StatePersistent.storeValueSideEffectKey,
       (config) => {
         this.rebuildStorageSideEffect(this.state(), _key, config);
       }
     );
+
+    // Rebuild Storage for saving State Value in the Storage
     this.rebuildStorageSideEffect(this.state(), _key);
 
     this.isPersisted = true;
