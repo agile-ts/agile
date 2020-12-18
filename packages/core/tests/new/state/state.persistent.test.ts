@@ -352,7 +352,7 @@ describe("StatePersistent Tests", () => {
         });
 
         it("should call rebuildStorageSideEffect", () => {
-          statePersistent.persistValue("myCoolKey");
+          statePersistent.persistValue();
 
           dummyState.sideEffects[StatePersistent.storeValueSideEffectKey]({
             dummy: "property",
@@ -360,7 +360,7 @@ describe("StatePersistent Tests", () => {
 
           expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
             dummyState,
-            "myCoolKey",
+            statePersistent._key,
             {
               dummy: "property",
             }
