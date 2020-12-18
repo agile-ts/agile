@@ -231,14 +231,14 @@ describe("StatePersistent Tests", () => {
 
         expect(response).toBeTruthy();
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
-          statePersistent.key,
+          statePersistent._key,
           statePersistent.defaultStorageKey
         );
         expect(dummyState.set).toHaveBeenCalledWith("dummyValue", {
           storage: false,
         });
         expect(statePersistent.persistValue).toHaveBeenCalledWith(
-          statePersistent.key
+          statePersistent._key
         );
       });
 
@@ -252,7 +252,7 @@ describe("StatePersistent Tests", () => {
 
         expect(response).toBeFalsy();
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
-          statePersistent.key,
+          statePersistent._key,
           statePersistent.defaultStorageKey
         );
         expect(dummyState.set).not.toHaveBeenCalled();
@@ -301,31 +301,31 @@ describe("StatePersistent Tests", () => {
         statePersistent.isPersisted = false;
       });
 
-      it("should persist Value with persistentKey and add sideEffect to State that dynamically persists the State Value", async () => {
+      it("should persist Value with persistentKey and add sideEffect to State", async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.persistValue();
 
         expect(response).toBeTruthy();
         expect(dummyState.addSideEffect).toHaveBeenCalledWith(
-          statePersistent.stateSideEffectKey,
+          StatePersistent.storeValueSideEffectKey,
           expect.any(Function)
         );
         expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
           dummyState,
-          statePersistent.key
+          statePersistent._key
         );
         expect(statePersistent.isPersisted).toBeTruthy();
       });
 
-      it("should persist Value with specific Key and add sideEffect to State that dynamically persists the State Value", async () => {
+      it("should persist Value with specific Key and add sideEffect to State", async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.persistValue("coolKey");
 
         expect(response).toBeTruthy();
         expect(dummyState.addSideEffect).toHaveBeenCalledWith(
-          statePersistent.stateSideEffectKey,
+          StatePersistent.storeValueSideEffectKey,
           expect.any(Function)
         );
         expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
@@ -345,6 +345,28 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.rebuildStorageSideEffect).not.toHaveBeenCalled();
         expect(statePersistent.isPersisted).toBeFalsy();
       });
+
+      describe("test added sideEffect called Item.storeValueSideEffectKey", () => {
+        beforeEach(() => {
+          statePersistent.rebuildStorageSideEffect = jest.fn();
+        });
+
+        it("should call rebuildStorageSideEffect", () => {
+          statePersistent.persistValue("myCoolKey");
+
+          dummyState.sideEffects[StatePersistent.storeValueSideEffectKey]({
+            dummy: "property",
+          });
+
+          expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
+            dummyState,
+            "myCoolKey",
+            {
+              dummy: "property",
+            }
+          );
+        });
+      });
     });
 
     describe("removePersistedValue function tests", () => {
@@ -362,10 +384,10 @@ describe("StatePersistent Tests", () => {
 
         expect(response).toBeTruthy();
         expect(dummyState.removeSideEffect).toHaveBeenCalledWith(
-          statePersistent.stateSideEffectKey
+          StatePersistent.storeValueSideEffectKey
         );
         expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
-          statePersistent.key,
+          statePersistent._key,
           statePersistent.storageKeys
         );
         expect(statePersistent.isPersisted).toBeFalsy();
@@ -378,7 +400,7 @@ describe("StatePersistent Tests", () => {
 
         expect(response).toBeTruthy();
         expect(dummyState.removeSideEffect).toHaveBeenCalledWith(
-          statePersistent.stateSideEffectKey
+          StatePersistent.storeValueSideEffectKey
         );
         expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
           "coolKey",
