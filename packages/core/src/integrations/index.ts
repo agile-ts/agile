@@ -24,13 +24,16 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Integrates Framework (Integration) into Agile
+   * Integrates Framework(Integration) into Agile
    * @param integration - Integration/Framework that gets integrated
    */
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
-    if (!integration.key) {
-      Agile.logger.error("Failed to integrate framework!");
+    if (!integration._key) {
+      Agile.logger.error(
+        "Failed to integrate framework! Invalid Integration!",
+        integration._key
+      );
       return false;
     }
 
@@ -44,7 +47,7 @@ export class Integrations {
     integration.integrated = true;
 
     // Logging
-    Agile.logger.info(`Successfully integrated '${integration.key}'`);
+    Agile.logger.info(`Successfully integrated '${integration._key}'`);
 
     return true;
   }
@@ -54,10 +57,10 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Updates Integrations
-   * -> calls 'updateMethod' in all registered Integrations
+   * Updates registered and ready Integrations
+   * -> calls 'updateMethod' in all registered and ready Integrations
    * @param componentInstance - Component that gets updated
-   * @param updatedData - Updated Properties
+   * @param updatedData - Properties that differ from the last Value
    */
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
