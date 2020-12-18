@@ -60,13 +60,10 @@ export class SubController {
     subscriptionContainer.isObjectBased = true;
     subscriptionContainer.subsObject = subs;
 
-    // Register subs
+    // Register subs and build props object
     for (let key in subs) {
       const observer = subs[key];
-
       observer.subscribe(subscriptionContainer);
-
-      // Add Observer Value to props
       if (observer.value) props[key] = observer.value;
     }
 
