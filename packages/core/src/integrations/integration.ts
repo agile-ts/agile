@@ -21,10 +21,18 @@ export class Integration<F = any, C = any> {
     };
   }
 
+  /**
+   * @public
+   * Set Value of Integration
+   */
   public set key(key: IntegrationKey) {
     this._key = key;
   }
 
+  /**
+   * @public
+   * Get Value of Integration
+   */
   public get key(): IntegrationKey {
     return this._key;
   }
@@ -32,7 +40,7 @@ export class Integration<F = any, C = any> {
 
 /**
  * @param key - Key/Name of Integration
- * @param frameworkInstance - An Instance of the Framework that this Integration represents  (for instance React)
+ * @param frameworkInstance - An Instance of the Framework that this Integration represents (for instance React)
  */
 export interface CreateIntegrationConfig<F = any, C = any>
   extends IntegrationMethods<C> {
