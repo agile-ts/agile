@@ -13,7 +13,7 @@ describe("Persistent Tests", () => {
   });
 
   it("should create Persistent (default config)", () => {
-    // Overwrite persistent once to not call it
+    // Overwrite instantiatePersistent once to not call it
     jest
       .spyOn(Persistent.prototype, "instantiatePersistent")
       .mockReturnValueOnce(undefined);
