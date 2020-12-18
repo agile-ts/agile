@@ -20,14 +20,6 @@ describe("EventObserver Tests", () => {
 
     expect(eventObserver).toBeInstanceOf(EventObserver);
     expect(eventObserver.event()).toBe(dummyEvent);
-    /* Couldn't figure out how to mock anything in the Constructor
-        expect(Observer).toHaveBeenCalledWith(dummyAgile, {
-          deps: [],
-          value: "dummyValue",
-          key: undefined,
-          subs: [],
-        });
-    */
     expect(eventObserver.value).toBeUndefined();
     expect(eventObserver._key).toBeUndefined();
     expect(eventObserver.deps.size).toBe(0);
@@ -48,14 +40,6 @@ describe("EventObserver Tests", () => {
 
     expect(eventObserver).toBeInstanceOf(EventObserver);
     expect(eventObserver.event()).toBe(dummyEvent);
-    /* Couldn't figure out how to mock anything in the Constructor
-        expect(Observer).toHaveBeenCalledWith(dummyAgile, {
-          deps: [dummyObserver1, dummyObserver2],
-          value: "dummyValue",
-          key: "testKey",
-          subs: [dummySubscription1, dummySubscription2],
-        });
-    */
     expect(eventObserver.value).toBeUndefined();
     expect(eventObserver._key).toBe("testKey");
     expect(eventObserver.deps.size).toBe(2);
@@ -104,7 +88,7 @@ describe("EventObserver Tests", () => {
       });
     });
 
-    describe("perfom function tests", () => {
+    describe("perform function tests", () => {
       // No tests necessary
     });
   });
