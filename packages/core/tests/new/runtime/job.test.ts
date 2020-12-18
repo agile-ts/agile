@@ -6,18 +6,19 @@ describe("Job Tests", () => {
   let dummyObserver: Observer;
 
   beforeEach(() => {
-    dummyAgile = new Agile();
+    dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({
       key: "myIntegration",
     });
     dummyObserver = new Observer(dummyAgile);
   });
 
-  it("should create Job with agile that has integrations (default config)", () => {
+  it("should create Job with Agile that has integrations (default config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new Job(dummyObserver);
 
+    expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
@@ -27,10 +28,10 @@ describe("Job Tests", () => {
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
-    expect(job._key).toBeUndefined();
+    expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create Job with agile that has integrations (specific config)", () => {
+  it("should create Job with Agile that has integrations (specific config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new Job(dummyObserver, {
@@ -40,6 +41,7 @@ describe("Job Tests", () => {
       storage: false,
     });
 
+    expect(job._key).toBe("dummyJob");
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
@@ -49,20 +51,32 @@ describe("Job Tests", () => {
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
-    expect(job._key).toBe("dummyJob");
+    expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create Job with agile that has no integrations (default config)", () => {
+  it("should create Job with Agile that has no integrations (default config)", () => {
     const job = new Job(dummyObserver);
 
+    expect(job._key).toBeUndefined();
+    expect(job.observer).toBe(dummyObserver);
+    expect(job.config).toStrictEqual({
+      background: false,
+      sideEffects: true,
+      force: false,
+      storage: true,
+    });
     expect(job.rerender).toBeFalsy();
+    expect(job.performed).toBeFalsy();
+    expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create Job and agile that has integrations (config.background = true)", () => {
+  it("should create Job and Agile that has integrations (config.background = true)", () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new Job(dummyObserver, { background: true });
 
+    expect(job._key).toBeUndefined();
+    expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: true,
       sideEffects: true,
@@ -70,5 +84,31 @@ describe("Job Tests", () => {
       storage: true,
     });
     expect(job.rerender).toBeFalsy();
+    expect(job.performed).toBeFalsy();
+    expect(job.subscriptionContainersToUpdate.size).toBe(0);
+  });
+
+  describe("Job Function Tests", () => {
+    let job: Job;
+
+    beforeEach(() => {
+      job = new Job(dummyObserver);
+    });
+
+    describe("key get function tests", () => {
+      it("should return key of Job", () => {
+        job._key = "myCoolKey";
+
+        expect(job.key).toBe("myCoolKey");
+      });
+    });
+
+    describe("key set function tests", () => {
+      it("should update key in Job", () => {
+        job.key = "myCoolKey";
+
+        expect(job._key).toBe("myCoolKey");
+      });
+    });
   });
 });
