@@ -56,6 +56,10 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     return this._output;
   }
 
+  /**
+   * @public
+   * Set Item Values of Group
+   */
   public set output(value: DataType[]) {
     this._output = value;
   }
@@ -67,6 +71,14 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public get items(): Array<Item<DataType>> {
     ComputedTracker.tracked(this.observer);
     return this._items.map((item) => item());
+  }
+
+  /**
+   * @public
+   * Set Items of Group
+   */
+  public set items(value: Array<Item<DataType>>) {
+    this._items = value.map((item) => () => item);
   }
 
   //=========================================================================================================
