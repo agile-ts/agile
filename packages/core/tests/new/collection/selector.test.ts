@@ -1,12 +1,16 @@
 import { Selector, Agile, Collection, StateObserver, Item } from "../../../src";
 
 describe("Selector Tests", () => {
+  interface ItemInterface {
+    id: string;
+    name: string;
+  }
   let dummyAgile: Agile;
-  let dummyCollection: Collection;
+  let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
     dummyAgile = new Agile({ localStorage: false });
-    dummyCollection = new Collection(dummyAgile);
+    dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Selector.prototype, "select");
     console.warn = jest.fn();
@@ -35,7 +39,7 @@ describe("Selector Tests", () => {
     expect(selector.nextStateValue).toBeUndefined();
     expect(selector.observer).toBeInstanceOf(StateObserver);
     expect(selector.observer.deps.size).toBe(0);
-    expect(selector.observer.key).toBeUndefined();
+    expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeMethod).toBeUndefined();
     expect(selector.isPersisted).toBeFalsy();
@@ -68,7 +72,7 @@ describe("Selector Tests", () => {
     expect(selector.nextStateValue).toBeUndefined();
     expect(selector.observer).toBeInstanceOf(StateObserver);
     expect(selector.observer.deps.size).toBe(0);
-    expect(selector.observer.key).toBeUndefined();
+    expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeMethod).toBeUndefined();
     expect(selector.isPersisted).toBeFalsy();
@@ -77,9 +81,9 @@ describe("Selector Tests", () => {
   });
 
   describe("Selector Function Tests", () => {
-    let selector: Selector;
-    let dummyItem1: Item;
-    let dummyItem2: Item;
+    let selector: Selector<ItemInterface>;
+    let dummyItem1: Item<ItemInterface>;
+    let dummyItem2: Item<ItemInterface>;
 
     beforeEach(() => {
       dummyCollection.collect({ id: "dummyItem1Key", name: "coolName" });
@@ -87,7 +91,7 @@ describe("Selector Tests", () => {
       dummyItem1 = dummyCollection.getItem("dummyItem1Key");
       dummyItem2 = dummyCollection.getItem("dummyItem2Key");
 
-      selector = new Selector(dummyCollection, "dummyItem1Key");
+      selector = new Selector<ItemInterface>(dummyCollection, "dummyItem1Key");
     });
 
     describe("itemKey set function tests", () => {

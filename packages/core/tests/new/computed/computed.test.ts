@@ -35,7 +35,7 @@ describe("Computed Tests", () => {
     expect(computed.nextStateValue).toBe("computedValue");
     expect(computed.observer).toBeInstanceOf(StateObserver);
     expect(computed.observer.deps.size).toBe(0);
-    expect(computed.observer.key).toBeUndefined();
+    expect(computed.observer._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeMethod).toBeUndefined();
     expect(computed.isPersisted).toBeFalsy();
@@ -76,7 +76,7 @@ describe("Computed Tests", () => {
     expect(computed.observer).toBeInstanceOf(StateObserver);
     expect(computed.observer.deps.size).toBe(1); // x
     expect(computed.observer.deps.has(dummyObserver1)).toBeTruthy(); // x
-    expect(computed.observer.key).toBe("coolComputed"); // x
+    expect(computed.observer._key).toBe("coolComputed"); // x
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeMethod).toBeUndefined();
     expect(computed.isPersisted).toBeFalsy();

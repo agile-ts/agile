@@ -35,7 +35,7 @@ describe("State Tests", () => {
     expect(state.nextStateValue).toBe("coolValue");
     expect(state.observer).toBeInstanceOf(StateObserver);
     expect(state.observer.deps.size).toBe(0);
-    expect(state.observer.key).toBeUndefined();
+    expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
     expect(state.isPersisted).toBeFalsy();
@@ -62,7 +62,7 @@ describe("State Tests", () => {
     expect(state.observer).toBeInstanceOf(StateObserver);
     expect(state.observer.deps.size).toBe(1); // x
     expect(state.observer.deps.has(dummyObserver)).toBeTruthy(); // x
-    expect(state.observer.key).toBe("coolState"); // x
+    expect(state.observer._key).toBe("coolState"); // x
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
     expect(state.isPersisted).toBeFalsy();
@@ -150,7 +150,7 @@ describe("State Tests", () => {
         numberState.setKey("newKey");
 
         expect(numberState.key).toBe("newKey");
-        expect(numberState.observer.key).toBe("newKey");
+        expect(numberState.observer._key).toBe("newKey");
         expect(numberState.persistent.setKey).toHaveBeenCalledWith("newKey");
       });
 
@@ -160,7 +160,7 @@ describe("State Tests", () => {
         numberState.setKey("newKey");
 
         expect(numberState.key).toBe("newKey");
-        expect(numberState.observer.key).toBe("newKey");
+        expect(numberState.observer._key).toBe("newKey");
         expect(numberState.persistent.setKey).not.toHaveBeenCalled();
       });
     });

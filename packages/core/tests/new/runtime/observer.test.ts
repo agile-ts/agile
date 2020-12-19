@@ -57,7 +57,7 @@ describe("Observer Tests", () => {
 
     describe("key set function tests", () => {
       it("should update key in Observer", () => {
-        observer.key = "myNewDummyKey";
+        observer._key = "myNewDummyKey";
 
         expect(observer._key).toBe("myNewDummyKey");
       });
@@ -67,7 +67,7 @@ describe("Observer Tests", () => {
       it("should return current key of Observer", () => {
         observer._key = "myDummyKey";
 
-        expect(observer.key).toBe("myDummyKey");
+        expect(observer._key).toBe("myDummyKey");
       });
     });
 
