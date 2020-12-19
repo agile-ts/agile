@@ -1,12 +1,11 @@
 import {
   Agile,
   Collection,
-  copy,
   DefaultItem,
   defineConfig,
-  IngestConfigInterface,
   Item,
   ItemKey,
+  SetConfigInterface,
   State,
 } from "../internal";
 
@@ -73,9 +72,7 @@ export class Selector<DataType = DefaultItem> extends State<
     });
 
     if (oldItem?._key === itemKey && !config.force) {
-      Agile.logger.warn(
-        `Selector has already selected the same Key '${itemKey}'!`
-      );
+      Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
     }
 
@@ -120,23 +117,22 @@ export class Selector<DataType = DefaultItem> extends State<
    * Rebuilds Selector
    * @param config - Config
    */
-  public rebuildSelector(config: IngestConfigInterface = {}) {
+  public rebuildSelector(config: SetConfigInterface = {}) {
     config = defineConfig(config, {
-      background: false,
       sideEffects: true,
+      background: false,
+      force: false,
+      storage: true,
     });
 
     // Set Selector Value to undefined if Item doesn't exist
     if (!this.item || this.item.isPlaceholder) {
-      this._value = undefined;
+      this.set(undefined, config);
       return;
     }
 
-    // Assign new ItemValue to Selector
-    this.nextStateValue = copy(this.item?.value);
-
-    // Ingest nextStateValue into Runtime
-    this.ingest(config);
+    // Set Selector Value to updated Item Value
+    this.set(this.item._value, config);
   }
 }
 
