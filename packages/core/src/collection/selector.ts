@@ -68,7 +68,7 @@ export class Selector<DataType = DefaultItem> extends State<
       background: false,
       sideEffects: true,
       force: false,
-      overwrite: oldItem?.isPlaceholder,
+      overwrite: oldItem?.isPlaceholder || false,
     });
 
     if (oldItem?._key === itemKey && !config.force) {
