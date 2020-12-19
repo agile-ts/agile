@@ -16,6 +16,7 @@ import {
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
+  static rebuildGroupSideEffectKey = "rebuildGroup";
   collection: () => Collection<DataType>;
 
   _output: Array<DataType> = []; // Output of Group
@@ -39,8 +40,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
     this.collection = () => collection;
 
-    // Add rebuild to sideEffects so that it rebuilds the Group Output if the value changes
-    this.addSideEffect("buildGroup", () => this.rebuild());
+    // Add rebuild to sideEffects to rebuild Group on Value Change
+    this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
     // Initial Build
     this.rebuild();
@@ -53,6 +54,10 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public get output(): Array<DataType> {
     ComputedTracker.tracked(this.observer);
     return this._output;
+  }
+
+  public set output(value: DataType[]) {
+    this._output = value;
   }
 
   /**
