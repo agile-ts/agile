@@ -9,6 +9,7 @@ describe("Selector Tests", () => {
     dummyCollection = new Collection(dummyAgile);
 
     jest.spyOn(Selector.prototype, "select");
+    console.warn = jest.fn();
   });
 
   it("should create Selector (default config)", () => {
@@ -111,6 +112,7 @@ describe("Selector Tests", () => {
       beforeEach(() => {
         jest.spyOn(selector, "rebuildSelector");
         dummyItem1.removeSideEffect = jest.fn();
+        dummyItem1.addSideEffect = jest.fn();
         dummyItem2.addSideEffect = jest.fn();
       });
 
@@ -149,31 +151,81 @@ describe("Selector Tests", () => {
         expect(selector.isSet).toBeTruthy();
       });
 
-      it("should remove old selected placeholder Item and select new Item (default config)", async () => {
+      it("should unselect old selected Item and select new Item (specific config)", () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
-        dummyItem1.isPlaceholder = true;
 
-        selector.select("dummyItem2Key");
+        selector.select("dummyItem2Key", {
+          force: true,
+          sideEffects: false,
+          background: true,
+        });
 
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        expect(selector.rebuildSelector).toHaveBeenCalledWith({
+          background: true,
+          sideEffects: false,
+          force: true,
+        });
+      });
+
+      it("should unselect old selected Item and select new Item with overwriting Selector (config.overwrite = true)", () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
+
+        selector.select("dummyItem2Key", { overwrite: true });
+
+        expect(selector._value).toStrictEqual(dummyItem2._value);
+        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.isSet).toBeFalsy();
+      });
+
+      it("should print warning if trying to select the selected Item again (default config)", () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem1);
+
+        selector.select("dummyItem1Key");
+
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Selector has already selected 'dummyItem1Key'!"
+        );
 
         expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
-          "dummyItem2Key"
+          "dummyItem1Key"
         );
-        expect(selector._itemKey).toBe("dummyItem2Key");
-        expect(selector.item).toBe(dummyItem2);
+        expect(dummyItem1.removeSideEffect).not.toHaveBeenCalled();
+        expect(dummyItem2.addSideEffect).not.toHaveBeenCalled();
+        expect(selector.rebuildSelector).not.toHaveBeenCalled();
+      });
+
+      it("should be able to select the selected Item again (config.force = true)", () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem1);
+
+        selector.select("dummyItem1Key", { force: true });
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+          "dummyItem1Key"
+        );
         expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey
         );
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+        expect(dummyItem1.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function)
         );
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,
-          force: false,
+          force: true,
         });
+      });
+
+      it("should remove old selected placeholder Item and select new Item with overwriting Selector (default config)", async () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
+        dummyItem1.isPlaceholder = true;
+
+        selector.select("dummyItem2Key");
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
@@ -184,6 +236,74 @@ describe("Selector Tests", () => {
         expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.isSet).toBeFalsy();
+      });
+
+      it("should remove old selected placeholder Item and select new Item without overwriting Selector (config.overwrite = false)", async () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
+        dummyItem1.isPlaceholder = true;
+
+        selector.select("dummyItem2Key", { overwrite: false });
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
+        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
+        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
+
+        expect(selector._value).toStrictEqual(dummyItem2._value);
+        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isSet).toBeTruthy();
+      });
+    });
+
+    describe("rebuildSelector function tests", () => {
+      beforeEach(() => {
+        selector.set = jest.fn();
+      });
+
+      it("should set selector value to item value (default config)", () => {
+        selector.item = dummyItem1;
+
+        selector.rebuildSelector();
+
+        expect(selector.set).toHaveBeenCalledWith(selector.item._value, {
+          sideEffects: true,
+          background: false,
+          force: false,
+          storage: true,
+        });
+      });
+
+      it("should set selector value to item value (specific config)", () => {
+        selector.item = dummyItem1;
+
+        selector.rebuildSelector({
+          sideEffects: false,
+          background: true,
+          force: true,
+        });
+
+        expect(selector.set).toHaveBeenCalledWith(selector.item._value, {
+          sideEffects: false,
+          background: true,
+          force: true,
+          storage: true,
+        });
+      });
+
+      it("should set selector value to undefined if Item is undefined (default config)", () => {
+        selector.item = undefined;
+
+        selector.rebuildSelector();
+
+        expect(selector.set).toHaveBeenCalledWith(undefined, {
+          sideEffects: true,
+          background: false,
+          force: false,
+          storage: true,
+        });
       });
     });
   });
