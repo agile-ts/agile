@@ -34,9 +34,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     });
     config = defineConfig(config, {
       instantiate: true,
+      storageKeys: [],
     });
     this.collection = () => collection;
-    this.instantiatePersistent(config);
+    this.instantiatePersistent({
+      key: config.key,
+      storageKeys: config.storageKeys,
+    });
 
     // Load/Store persisted Value/s for the first Time
     if (this.ready && config.instantiate) this.initialLoading();
