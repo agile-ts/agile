@@ -206,16 +206,14 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    */
   public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this.key;
-
-    // Set Collection to not Persisted
-    this.agileInstance().storages.remove(_key, this.storageKeys);
-
-    // Get default Group
+    const _key = key || this._key;
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
+
+    // Set Collection to not Persisted
+    this.agileInstance().storages.remove(_key, this.storageKeys);
 
     // Remove default Group from Storage
     defaultGroup.persistent?.removePersistedValue();
@@ -226,13 +224,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     );
 
     // Remove Collection Items from Storage
-    for (let itemKey of defaultGroup.value) {
+    for (let itemKey of defaultGroup._value) {
       const item = this.collection().getItem(itemKey);
       item?.persistent?.removePersistedValue();
     }
 
     this.isPersisted = false;
-    return false;
+    return true;
   }
 
   //=========================================================================================================
@@ -283,7 +281,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       const item = collection.getItem(itemKey);
       if (!item?.isPersisted)
         item?.persist(
-          CollectionPersistent.getItemStorageKey(itemKey, collection.key)
+          CollectionPersistent.getItemStorageKey(itemKey, collection._key)
         );
     });
 
