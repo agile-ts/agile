@@ -497,21 +497,30 @@ describe("CollectionPersist Tests", () => {
 
     describe("persistValue function tests", () => {
       let dummyDefaultGroup: Group;
-      let dummyItem1: Item;
-      let dummyItem3: Item;
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem3: Item<ItemInterface>;
 
       beforeEach(() => {
         collectionPersistent.storageKeys = ["test1", "test2"];
+        collectionPersistent.isPersisted = undefined;
+
+        dummyItem1 = new Item<ItemInterface>(dummyCollection, {
+          id: "1",
+          name: "frank",
+        });
+        dummyItem3 = new Item<ItemInterface>(dummyCollection, {
+          id: "3",
+          name: "hans",
+        });
 
         dummyDefaultGroup = new Group(dummyCollection, ["1", "2", "3"]);
-
-        dummyCollection.collect({ id: "1", name: "frank" });
-        dummyCollection.collect({ id: "3", name: "hans" });
-        dummyItem1 = dummyCollection.data["1"];
-        dummyItem3 = dummyCollection.data["3"];
+        dummyCollection.data = {
+          ["1"]: dummyItem1,
+          ["3"]: dummyItem3,
+        };
 
         dummyDefaultGroup.persist = jest.fn();
-        dummyDefaultGroup.addSideEffect = jest.fn();
+        jest.spyOn(dummyDefaultGroup, "addSideEffect");
 
         dummyItem1.persist = jest.fn();
         dummyItem3.persist = jest.fn();
@@ -538,7 +547,6 @@ describe("CollectionPersist Tests", () => {
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
           dummyCollection.config.defaultGroupKey
         );
-
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
           followCollectionPersistKeyPattern: true,
         });
@@ -580,7 +588,6 @@ describe("CollectionPersist Tests", () => {
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
           dummyCollection.config.defaultGroupKey
         );
-
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
           followCollectionPersistKeyPattern: true,
         });
@@ -606,11 +613,10 @@ describe("CollectionPersist Tests", () => {
         const response = await collectionPersistent.persistValue("dummyKey");
 
         expect(response).toBeFalsy();
-        // TODO set function got already called twice before calling persistValue
+
         expect(dummyAgile.storages.set).not.toHaveBeenCalled();
 
         expect(dummyCollection.getGroup).not.toHaveBeenCalled();
-
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.addSideEffect).not.toHaveBeenCalled();
 
@@ -620,10 +626,49 @@ describe("CollectionPersist Tests", () => {
         expect(collectionPersistent.isPersisted).toBeFalsy();
       });
 
-      it("shouldn't persist defaultGroup and its Items if Collection has no defaultGroup", async () => {});
+      it("shouldn't persist defaultGroup and its Items if Collection has no defaultGroup", async () => {
+        collectionPersistent.ready = true;
+        dummyCollection.getGroup = jest.fn(() => undefined as any);
+
+        const response = await collectionPersistent.persistValue();
+
+        expect(response).toBeFalsy();
+
+        expect(dummyAgile.storages.set).not.toHaveBeenCalled();
+
+        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
+          dummyCollection.config.defaultGroupKey
+        );
+        expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
+        expect(dummyDefaultGroup.addSideEffect).not.toHaveBeenCalled();
+
+        expect(dummyItem1.persist).not.toHaveBeenCalled();
+        expect(dummyItem3.persist).not.toHaveBeenCalled();
+
+        expect(collectionPersistent.isPersisted).toBeFalsy();
+      });
 
       describe("test added sideEffect called CollectionPersistent.defaultGroupSideEffectKey", () => {
-        it("should call rebuildStorageSideEffect", () => {});
+        beforeEach(() => {
+          collectionPersistent.rebuildStorageSideEffect = jest.fn();
+        });
+
+        it("should call rebuildStorageSideEffect", async () => {
+          collectionPersistent.ready = true;
+          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+
+          await collectionPersistent.persistValue();
+
+          dummyDefaultGroup.sideEffects[
+            CollectionPersistent.defaultGroupSideEffectKey
+          ]({
+            dummy: "property",
+          });
+
+          expect(
+            collectionPersistent.rebuildStorageSideEffect
+          ).toHaveBeenCalledWith(dummyDefaultGroup);
+        });
       });
     });
   });

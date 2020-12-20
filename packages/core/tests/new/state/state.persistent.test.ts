@@ -339,8 +339,8 @@ describe("StatePersistent Tests", () => {
           statePersistent.rebuildStorageSideEffect = jest.fn();
         });
 
-        it("should call rebuildStorageSideEffect", () => {
-          statePersistent.persistValue();
+        it("should call rebuildStorageSideEffect", async () => {
+          await statePersistent.persistValue();
 
           dummyState.sideEffects[StatePersistent.storeValueSideEffectKey]({
             dummy: "property",

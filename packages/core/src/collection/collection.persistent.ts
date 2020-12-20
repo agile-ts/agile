@@ -265,7 +265,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    * Rebuilds Storage depending on Group
    * @param group - Group
    */
-  private rebuildStorageSideEffect(group: Group<DataType>) {
+  public rebuildStorageSideEffect(group: Group<DataType>) {
     const collection = group.collection();
 
     // Return if only one ItemKey got updated, because the Group value hasn't changed
