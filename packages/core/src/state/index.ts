@@ -408,7 +408,7 @@ export class State<ValueType = any> {
 
     if (this.persistent)
       Agile.logger.warn(
-        "By persisting a State twice you overwrite the old Persistent Instance!"
+        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`
       );
 
     // Create persistent -> Persist Value

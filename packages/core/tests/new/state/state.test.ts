@@ -689,7 +689,7 @@ describe("State Tests", () => {
           key: numberState._key,
         });
         expect(console.warn).toBeCalledWith(
-          "Agile Warn: By persisting a State twice you overwrite the old Persistent Instance!"
+          `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`
         );
       });
     });

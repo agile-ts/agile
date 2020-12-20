@@ -209,7 +209,7 @@ describe("StatePersistent Tests", () => {
         statePersistent.persistValue = jest.fn();
       });
 
-      it("should load value with persistentKey and apply it to the State if loading was successful", async () => {
+      it("should load State Value with persistentKey and apply it to the State if loading was successful", async () => {
         statePersistent.ready = true;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve("dummyValue" as any)
@@ -230,7 +230,7 @@ describe("StatePersistent Tests", () => {
         );
       });
 
-      it("should load value with persistentKey and shouldn't apply it to the State if loading wasn't successful", async () => {
+      it("should load State Value with persistentKey and shouldn't apply it to the State if loading wasn't successful", async () => {
         statePersistent.ready = true;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve(undefined as any)
@@ -247,7 +247,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.persistValue).not.toHaveBeenCalled();
       });
 
-      it("should load value with specific Key and apply it to the State if loading was successful", async () => {
+      it("should load State Value with specific Key and apply it to the State if loading was successful", async () => {
         statePersistent.ready = true;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve("dummyValue" as any)
@@ -266,7 +266,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.persistValue).toHaveBeenCalledWith("coolKey");
       });
 
-      it("shouldn't load value if Persistent isn't ready", async () => {
+      it("shouldn't load State Value if Persistent isn't ready", async () => {
         statePersistent.ready = false;
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve(undefined as any)
@@ -289,7 +289,7 @@ describe("StatePersistent Tests", () => {
         statePersistent.isPersisted = false;
       });
 
-      it("should persist Value with persistentKey and add sideEffect to State", async () => {
+      it("should persist State with persistentKey", async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.persistValue();
@@ -306,7 +306,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.isPersisted).toBeTruthy();
       });
 
-      it("should persist Value with specific Key and add sideEffect to State", async () => {
+      it("should persist State with specific Key", async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.persistValue("coolKey");
@@ -323,7 +323,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.isPersisted).toBeTruthy();
       });
 
-      it("shouldn't persist Value if Persistent isn't ready", async () => {
+      it("shouldn't persist State if Persistent isn't ready", async () => {
         statePersistent.ready = false;
 
         const response = await statePersistent.persistValue();
@@ -334,7 +334,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.isPersisted).toBeFalsy();
       });
 
-      describe("test added sideEffect called Item.storeValueSideEffectKey", () => {
+      describe("test added sideEffect called StatePersistent.storeValueSideEffectKey", () => {
         beforeEach(() => {
           statePersistent.rebuildStorageSideEffect = jest.fn();
         });
