@@ -395,7 +395,7 @@ export class State<ValueType = any> {
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as StatePersistentConfigInterface;
-      key = this.key;
+      key = this._key;
     } else {
       _config = config || {};
       key = keyOrConfig as PersistentKey;
