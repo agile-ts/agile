@@ -195,7 +195,7 @@ describe("StatePersistent Tests", () => {
         jest.spyOn(Persistent.prototype, "initialLoading");
       });
 
-      it("shouldn't call updateValue if value got loaded", async () => {
+      it("should initialLoad and set isPersisted in State to true", async () => {
         await statePersistent.initialLoading();
 
         expect(Persistent.prototype.initialLoading).toHaveBeenCalled();
