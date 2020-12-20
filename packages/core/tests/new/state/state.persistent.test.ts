@@ -47,19 +47,6 @@ describe("StatePersistent Tests", () => {
     expect(statePersistent.defaultStorageKey).toBeUndefined();
   });
 
-  it("should create StatePersistent and should call initialLoading if Persistent is ready (default config)", () => {
-    // Overwrite instantiatePersistent once to not call it
-    jest
-      .spyOn(StatePersistent.prototype, "instantiatePersistent")
-      .mockImplementationOnce(function () {
-        this.ready = true;
-      });
-
-    const statePersistent = new StatePersistent(dummyState);
-
-    expect(statePersistent.initialLoading).toHaveBeenCalled();
-  });
-
   it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (specific config)", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
@@ -88,6 +75,19 @@ describe("StatePersistent Tests", () => {
     expect(statePersistent.defaultStorageKey).toBeUndefined();
   });
 
+  it("should create StatePersistent and should call initialLoading if Persistent is ready (default config)", () => {
+    // Overwrite instantiatePersistent once to not call it
+    jest
+      .spyOn(StatePersistent.prototype, "instantiatePersistent")
+      .mockImplementationOnce(function () {
+        this.ready = true;
+      });
+
+    const statePersistent = new StatePersistent(dummyState);
+
+    expect(statePersistent.initialLoading).toHaveBeenCalled();
+  });
+
   it("should create StatePersistent and shouldn't call initialLoading if Persistent is ready (config.instantiate = false)", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
@@ -100,19 +100,7 @@ describe("StatePersistent Tests", () => {
       instantiate: false,
     });
 
-    expect(statePersistent).toBeInstanceOf(StatePersistent);
-    expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
-      key: undefined,
-      storageKeys: [],
-    });
     expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-
-    expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
-    expect(statePersistent.ready).toBeTruthy();
-    expect(statePersistent.isPersisted).toBeFalsy();
-    expect(statePersistent.onLoad).toBeUndefined();
-    expect(statePersistent.storageKeys).toStrictEqual([]);
-    expect(statePersistent.defaultStorageKey).toBeUndefined();
   });
 
   describe("StatePersistent Function Tests", () => {
