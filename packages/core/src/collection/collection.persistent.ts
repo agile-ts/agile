@@ -50,23 +50,23 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   // Set Key
   //=========================================================================================================
   /**
-   * @public
-   * Sets Key/Name of Persistent
+   * @internal
+   * Updates Key/Name of Persistent
    * @param value - New Key/Name of Persistent
    */
-  public async setKey(value: StorageKey) {
+  public async setKey(value?: StorageKey): Promise<void> {
     const oldKey = this._key;
     const wasReady = this.ready;
 
     // Assign Key
     if (value === this._key) return;
-    this._key = value;
+    this._key = value || Persistent.placeHolderKey;
 
     const isValid = this.validatePersistent();
 
     // Try to Initial Load Value if persistent wasn't ready
-    if (!wasReady && isValid) {
-      this.initialLoading();
+    if (!wasReady) {
+      if (isValid) this.initialLoading();
       return;
     }
 
