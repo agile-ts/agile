@@ -1,3 +1,6 @@
+// Note: This is no optimized Test!
+//       It was manly used to see if the collection persistent works during the development
+
 import { Agile, Item } from "../../../src";
 
 describe("Collection Persist Function Tests", () => {
