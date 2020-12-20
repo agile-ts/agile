@@ -821,6 +821,41 @@ describe("CollectionPersist Tests", () => {
           expect(collectionPersistent.isPersisted).toBeUndefined();
         });
       });
+
+      describe("formatKey function tests", () => {
+        it("should return key of Collection if no key got passed", () => {
+          dummyCollection._key = "coolKey";
+
+          const response = collectionPersistent.formatKey();
+
+          expect(response).toBe("coolKey");
+        });
+
+        it("should return passed key", () => {
+          dummyCollection._key = "coolKey";
+
+          const response = collectionPersistent.formatKey("awesomeKey");
+
+          expect(response).toBe("awesomeKey");
+        });
+
+        it("should return and apply passed key to Collection if Collection had no own key before", () => {
+          dummyCollection._key = undefined;
+
+          const response = collectionPersistent.formatKey("awesomeKey");
+
+          expect(response).toBe("awesomeKey");
+          expect(dummyCollection._key).toBe("awesomeKey");
+        });
+
+        it("should return undefined if no key got passed and Collection has no key", () => {
+          dummyCollection._key = undefined;
+
+          const response = collectionPersistent.formatKey();
+
+          expect(response).toBeUndefined();
+        });
+      });
     });
   });
 });

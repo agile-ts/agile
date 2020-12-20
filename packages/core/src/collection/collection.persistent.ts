@@ -245,12 +245,12 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     const collection = this.collection();
 
     // Get key from Collection
-    if (!key && collection.key) return collection.key;
+    if (!key && collection._key) return collection._key;
 
     if (!key) return;
 
     // Set Storage Key to Collection Key if Collection has no key
-    if (!collection.key) collection.key = key;
+    if (!collection._key) collection._key = key;
 
     return key;
   }

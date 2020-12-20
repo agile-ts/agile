@@ -426,7 +426,7 @@ describe("StatePersistent Tests", () => {
         expect(response).toBe("awesomeKey");
       });
 
-      it("should return and apply passed key to State if state has no key yet", () => {
+      it("should return and apply passed key to State if State had no own key before", () => {
         dummyState._key = undefined;
 
         const response = statePersistent.formatKey("awesomeKey");

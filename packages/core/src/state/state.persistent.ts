@@ -171,12 +171,12 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const state = this.state();
 
     // Get key from State
-    if (!key && state.key) return state.key;
+    if (!key && state._key) return state._key;
 
     if (!key) return;
 
     // Set State Key to Storage Key if State has no key
-    if (!state.key) state.key = key;
+    if (!state._key) state._key = key;
 
     return key;
   }
