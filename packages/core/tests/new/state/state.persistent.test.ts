@@ -365,7 +365,7 @@ describe("StatePersistent Tests", () => {
         statePersistent.isPersisted = true;
       });
 
-      it("should remove persisted Value from Storage with persistentKey and remove Storage sideEffect from State", async () => {
+      it("should remove persisted State from Storage with persistentKey", async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.removePersistedValue();
@@ -381,7 +381,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.isPersisted).toBeFalsy();
       });
 
-      it("should remove persisted Value from Storage with specific Key and remove Storage sideEffect from State", async () => {
+      it("should remove persisted State from Storage with specific Key", async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.removePersistedValue("coolKey");
@@ -397,7 +397,7 @@ describe("StatePersistent Tests", () => {
         expect(statePersistent.isPersisted).toBeFalsy();
       });
 
-      it("shouldn't remove persistedValue if Persistent isn't ready", async () => {
+      it("shouldn't remove State from Storage if Persistent isn't ready", async () => {
         statePersistent.ready = false;
 
         const response = await statePersistent.removePersistedValue("coolKey");
