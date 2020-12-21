@@ -1064,5 +1064,57 @@ describe("CollectionPersist Tests", () => {
         );
       });
     });
+
+    describe("getGroupStorageKey function tests", () => {
+      beforeEach(() => {
+        console.warn = jest.fn();
+      });
+
+      it("should build GroupStorageKey out of groupKey and collectionKey", () => {
+        const response = CollectionPersistent.getGroupStorageKey(
+          "groupKey",
+          "collectionKey"
+        );
+
+        expect(response).toBe("_collectionKey_group_groupKey");
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      it("should build GroupStorageKey out of collectionKey with warning", () => {
+        const response = CollectionPersistent.getGroupStorageKey(
+          undefined,
+          "collectionKey"
+        );
+
+        expect(response).toBe("_collectionKey_group_unknown");
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Failed to build unique Group StorageKey!"
+        );
+      });
+
+      it("should build GroupStorageKey out of groupKey with warning", () => {
+        const response = CollectionPersistent.getGroupStorageKey(
+          "groupKey",
+          undefined
+        );
+
+        expect(response).toBe("_unknown_group_groupKey");
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Failed to build unique Group StorageKey!"
+        );
+      });
+
+      it("should build GroupStorageKey out of nothing with warning", () => {
+        const response = CollectionPersistent.getGroupStorageKey(
+          undefined,
+          undefined
+        );
+
+        expect(response).toBe("_unknown_group_unknown");
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Failed to build unique Group StorageKey!"
+        );
+      });
+    });
   });
 });
