@@ -653,7 +653,7 @@ describe("CollectionPersist Tests", () => {
           collectionPersistent.rebuildStorageSideEffect = jest.fn();
         });
 
-        it("should call rebuildStorageSideEffect", async () => {
+        it("should call rebuildStorageSideEffect with persistentKey", async () => {
           collectionPersistent.ready = true;
           dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
@@ -661,13 +661,26 @@ describe("CollectionPersist Tests", () => {
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey
-          ]({
-            dummy: "property",
-          });
+          ]();
 
           expect(
             collectionPersistent.rebuildStorageSideEffect
-          ).toHaveBeenCalledWith(dummyDefaultGroup);
+          ).toHaveBeenCalledWith(dummyDefaultGroup, collectionPersistent._key);
+        });
+
+        it("should call rebuildStorageSideEffect with specific Key", async () => {
+          collectionPersistent.ready = true;
+          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+
+          await collectionPersistent.persistValue("dummyKey");
+
+          dummyDefaultGroup.sideEffects[
+            CollectionPersistent.defaultGroupSideEffectKey
+          ]();
+
+          expect(
+            collectionPersistent.rebuildStorageSideEffect
+          ).toHaveBeenCalledWith(dummyDefaultGroup, "dummyKey");
         });
       });
 
@@ -896,6 +909,7 @@ describe("CollectionPersist Tests", () => {
           ["3"]: dummyItem3,
           ["4"]: dummyItem4,
         };
+        dummyCollection.persistent = collectionPersistent;
 
         dummyItem1.persist = jest.fn();
         dummyItem2.persist = jest.fn();
@@ -912,6 +926,7 @@ describe("CollectionPersist Tests", () => {
       });
 
       it("should return if no Item got added or removed", () => {
+        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1", "2", "3"];
         dummyGroup._value = ["1", "2", "3"];
 
@@ -938,6 +953,7 @@ describe("CollectionPersist Tests", () => {
       });
 
       it("should call removePersistedValue on Items that got removed from Group", () => {
+        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1", "2", "3"];
         dummyGroup._value = ["2"];
 
@@ -948,22 +964,23 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem3.persist).not.toHaveBeenCalled();
         expect(dummyItem4.persist).not.toHaveBeenCalled();
 
-        expect(
-          dummyItem1.persistent.removePersistedValue
-        ).not.toHaveBeenCalled();
+        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalledWith(
+          collectionPersistent._key
+        );
         expect(
           dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
-        expect(
-          dummyItem3.persistent.removePersistedValue
-        ).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalledWith(
+          collectionPersistent._key
+        );
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem2.persistent.persistValue).toHaveBeenCalled();
-        expect(dummyItem3.persistent.persistValue).toHaveBeenCalled();
+        expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
       });
 
       it("should call persistValue on Items that have a persistent and got added to Group", () => {
+        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1"];
         dummyGroup._value = ["1", "2", "3"];
 
@@ -985,11 +1002,16 @@ describe("CollectionPersist Tests", () => {
         ).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem2.persistent.persistValue).toHaveBeenCalled();
-        expect(dummyItem3.persistent.persistValue).toHaveBeenCalled();
+        expect(dummyItem2.persistent.persistValue).toHaveBeenCalledWith(
+          collectionPersistent._key
+        );
+        expect(dummyItem3.persistent.persistValue).toHaveBeenCalledWith(
+          collectionPersistent._key
+        );
       });
 
       it("should call persist on Items that have no persistent and got added to Group", () => {
+        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1"];
         dummyGroup._value = ["1", "4"];
 
@@ -999,8 +1021,7 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
         expect(dummyItem4.persist).toHaveBeenCalledWith(
-          "4",
-          collectionPersistent._key
+          CollectionPersistent.getItemStorageKey("4", collectionPersistent._key)
         );
 
         expect(
@@ -1017,6 +1038,10 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
         expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
       });
+    });
+
+    describe("getItemStorageKey function tests", () => {
+      // TODO
     });
   });
 });

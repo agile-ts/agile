@@ -96,6 +96,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Loads Collection from Storage
+   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
   public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
@@ -159,6 +160,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Sets everything up so that the Collection gets saved in the Storage
+   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
   public async persistValue(key?: PersistentKey): Promise<boolean> {
@@ -179,7 +181,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     defaultGroup.addSideEffect(
       CollectionPersistent.defaultGroupSideEffectKey,
-      () => this.rebuildStorageSideEffect(defaultGroup)
+      () => this.rebuildStorageSideEffect(defaultGroup, _key)
     );
 
     // Persist Collection Items
@@ -202,6 +204,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Removes Collection from the Storage
+   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
   public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
@@ -262,9 +265,11 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    * @internal
    * Rebuilds Storage depending on Group
    * @param group - Group
+   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
    */
-  public rebuildStorageSideEffect(group: Group<DataType>) {
+  public rebuildStorageSideEffect(group: Group<DataType>, key?: PersistentKey) {
     const collection = group.collection();
+    const _key = key || collection.persistent?._key;
 
     // Return if only a ItemKey got updated
     if (group.previousStateValue.length === group._value.length) return;
@@ -281,20 +286,15 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       const item = collection.getItem(itemKey);
       if (!item) return;
       if (!item.isPersisted)
-        item.persist(
-          CollectionPersistent.getItemStorageKey(
-            itemKey,
-            collection.persistent?._key
-          )
-        );
-      else item.persistent?.persistValue();
+        item.persist(CollectionPersistent.getItemStorageKey(itemKey, _key));
+      else item.persistent?.persistValue(_key);
     });
 
     // Unpersist removed Keys
     removedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
       if (!item) return;
-      if (item.isPersisted) item.persistent?.removePersistedValue();
+      if (item.isPersisted) item.persistent?.removePersistedValue(_key);
     });
   }
 
