@@ -95,7 +95,7 @@ export class Selector<DataType = DefaultItem> extends State<
     this.item = newItem;
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
-    newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, () =>
+    newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, (config) =>
       this.rebuildSelector(config)
     );
 

@@ -365,6 +365,24 @@ describe("Selector Tests", () => {
         expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
         expect(selector.isSet).toBeTruthy();
       });
+
+      describe("test added sideEffect called Selector.rebuildSelectorSideEffectKey", () => {
+        beforeEach(() => {
+          selector.rebuildSelector = jest.fn();
+        });
+
+        it("should call rebuildSelector", () => {
+          selector.select("dummyItem1Key");
+
+          dummyItem1.sideEffects[Selector.rebuildSelectorSideEffectKey]({
+            dummy: "property",
+          });
+
+          expect(selector.rebuildSelector).toHaveBeenCalledWith({
+            dummy: "property",
+          });
+        });
+      });
     });
 
     describe("rebuildSelector function tests", () => {
