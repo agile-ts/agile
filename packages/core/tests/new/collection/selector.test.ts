@@ -164,17 +164,63 @@ describe("Selector Tests", () => {
           background: true,
         });
 
+        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+          "dummyItem2Key"
+        );
+        expect(selector._itemKey).toBe("dummyItem2Key");
+        expect(selector.item).toBe(dummyItem2);
+        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey
+        );
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey,
+          expect.any(Function)
+        );
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: true,
           sideEffects: false,
           force: true,
         });
+
+        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
+        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
+        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
+        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
+
+        expect(selector._value).toStrictEqual(dummyItem2._value);
+        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isSet).toBeTruthy();
       });
 
       it("should unselect old selected Item and select new Item with overwriting Selector (config.overwrite = true)", () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
 
         selector.select("dummyItem2Key", { overwrite: true });
+
+        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+          "dummyItem2Key"
+        );
+        expect(selector._itemKey).toBe("dummyItem2Key");
+        expect(selector.item).toBe(dummyItem2);
+        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey
+        );
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey,
+          expect.any(Function)
+        );
+        expect(selector.rebuildSelector).toHaveBeenCalledWith({
+          background: false,
+          sideEffects: true,
+          force: false,
+        });
+
+        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
+        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
+        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
+        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
 
         expect(selector._value).toStrictEqual(dummyItem2._value);
         expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
@@ -195,9 +241,22 @@ describe("Selector Tests", () => {
         expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
           "dummyItem1Key"
         );
+        expect(selector._itemKey).toBe("dummyItem1Key");
+        expect(selector.item).toBe(dummyItem1);
         expect(dummyItem1.removeSideEffect).not.toHaveBeenCalled();
         expect(dummyItem2.addSideEffect).not.toHaveBeenCalled();
         expect(selector.rebuildSelector).not.toHaveBeenCalled();
+
+        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
+        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
+        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
+        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
+
+        expect(selector._value).toStrictEqual(dummyItem1._value);
+        expect(selector.nextStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isSet).toBeFalsy();
       });
 
       it("should be able to select the selected Item again (config.force = true)", () => {
@@ -206,9 +265,12 @@ describe("Selector Tests", () => {
         selector.select("dummyItem1Key", { force: true });
 
         expect(console.warn).not.toHaveBeenCalled();
+
         expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
           "dummyItem1Key"
         );
+        expect(selector._itemKey).toBe("dummyItem1Key");
+        expect(selector.item).toBe(dummyItem1);
         expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey
         );
@@ -221,6 +283,17 @@ describe("Selector Tests", () => {
           sideEffects: true,
           force: true,
         });
+
+        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
+        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
+        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
+        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
+
+        expect(selector._value).toStrictEqual(dummyItem1._value);
+        expect(selector.nextStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isSet).toBeFalsy();
       });
 
       it("should remove old selected placeholder Item and select new Item with overwriting Selector (default config)", async () => {
@@ -229,7 +302,23 @@ describe("Selector Tests", () => {
 
         selector.select("dummyItem2Key");
 
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+          "dummyItem2Key"
+        );
+        expect(selector._itemKey).toBe("dummyItem2Key");
+        expect(selector.item).toBe(dummyItem2);
+        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey
+        );
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey,
+          expect.any(Function)
+        );
+        expect(selector.rebuildSelector).toHaveBeenCalledWith({
+          background: false,
+          sideEffects: true,
+          force: false,
+        });
 
         expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
@@ -248,7 +337,23 @@ describe("Selector Tests", () => {
 
         selector.select("dummyItem2Key", { overwrite: false });
 
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+          "dummyItem2Key"
+        );
+        expect(selector._itemKey).toBe("dummyItem2Key");
+        expect(selector.item).toBe(dummyItem2);
+        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey
+        );
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey,
+          expect.any(Function)
+        );
+        expect(selector.rebuildSelector).toHaveBeenCalledWith({
+          background: false,
+          sideEffects: true,
+          force: false,
+        });
 
         expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
