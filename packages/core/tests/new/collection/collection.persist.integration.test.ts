@@ -77,14 +77,14 @@ describe("Collection Persist Function Tests", () => {
       expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
       // Test creating Group
-      MY_COLLECTION.createGroup("stuipidPeople", [1, 2]).persist({
+      MY_COLLECTION.createGroup("stupidPeople", [1, 2]).persist({
         followCollectionPersistKeyPattern: true,
       });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
         _test_myCollection: "true",
-        _test__myCollection_group_stuipidPeople: "[1,2]",
+        _test__myCollection_group_stupidPeople: "[1,2]",
         _test__myCollection_group_default: "[2,1]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
         _test__myCollection_item_1: '{"id":1,"name":"frank"}',
@@ -99,7 +99,7 @@ describe("Collection Persist Function Tests", () => {
 
       expect(myStorage).toStrictEqual({
         _test_myCollection: "true",
-        _test__myCollection_group_stuipidPeople: "[1,2]",
+        _test__myCollection_group_stupidPeople: "[1,2]",
         _test__myCollection_group_default: "[2,1,3]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
         _test__myCollection_item_1: '{"id":1,"name":"frank"}',
@@ -115,7 +115,7 @@ describe("Collection Persist Function Tests", () => {
 
       expect(myStorage).toStrictEqual({
         _test_myCollection: "true",
-        _test__myCollection_group_stuipidPeople: "[1,2]",
+        _test__myCollection_group_stupidPeople: "[1,2]",
         _test__myCollection_group_default: "[2,1,3]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
         _test__myCollection_item_1: '{"id":1,"name":"frank"}',
@@ -131,7 +131,7 @@ describe("Collection Persist Function Tests", () => {
 
       expect(myStorage).toStrictEqual({
         _test_myCollection: "true",
-        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_stupidPeople: "[37,2]",
         _test__myCollection_group_default: "[2,37,3]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
         _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
@@ -152,7 +152,7 @@ describe("Collection Persist Function Tests", () => {
 
       expect(myStorage).toStrictEqual({
         _test_myCollection: "true",
-        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_stupidPeople: "[37,2]",
         _test__myCollection_group_default: "[2,37,3]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
         _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
@@ -174,7 +174,7 @@ describe("Collection Persist Function Tests", () => {
         _test_myCollection: "true",
         _test__myCollection_group_default: "[2,37,3,4,99]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
-        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_stupidPeople: "[37,2]",
         _test__myCollection_item_3: '{"id":3,"name":"Angela"}',
         _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
         _test__myCollection_item_4: '{"id":4,"name":"Paul"}',
@@ -189,7 +189,7 @@ describe("Collection Persist Function Tests", () => {
         _test_myCollection: "true",
         _test__myCollection_group_default: "[2,37,4,99]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
-        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_stupidPeople: "[37,2]",
         _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
         _test__myCollection_item_4: '{"id":4,"name":"Paul"}',
         _test__myCollection_item_99: '{"id":99,"name":"Jeff"}',
@@ -208,7 +208,7 @@ describe("Collection Persist Function Tests", () => {
         _test_myCollection: "true",
         _test__myCollection_group_default: "[2,37,4,99]",
         _test__myCollection_item_2: '{"id":2,"name":"hans"}',
-        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_stupidPeople: "[37,2]",
         _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
         _test__myCollection_item_4: '{"id":4,"name":"Paul"}',
         _test__myCollection_item_99: '{"id":99,"name":"Jeff"}',
@@ -219,7 +219,7 @@ describe("Collection Persist Function Tests", () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
-        _test__myCollection_group_stuipidPeople: "[37,2]",
+        _test__myCollection_group_stupidPeople: "[37,2]",
       });
     });
   });

@@ -284,17 +284,21 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Persist Added Keys
     addedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
+      const _itemKey =  CollectionPersistent.getItemStorageKey(itemKey, _key);
       if (!item) return;
       if (!item.isPersisted)
-        item.persist(CollectionPersistent.getItemStorageKey(itemKey, _key));
-      else item.persistent?.persistValue(_key);
+        item.persist(_itemKey);
+      else
+        item.persistent?.persistValue(_itemKey);
     });
 
     // Unpersist removed Keys
     removedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
+      const _itemKey =  CollectionPersistent.getItemStorageKey(itemKey, _key);
       if (!item) return;
-      if (item.isPersisted) item.persistent?.removePersistedValue(_key);
+      if (item.isPersisted)
+        item.persistent?.removePersistedValue(_itemKey);
     });
   }
 

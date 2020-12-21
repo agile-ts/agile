@@ -940,13 +940,13 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalledWith(
-          collectionPersistent._key
+          CollectionPersistent.getItemStorageKey("1", collectionPersistent._key)
         );
         expect(
           dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalledWith(
-          collectionPersistent._key
+          CollectionPersistent.getItemStorageKey("3", collectionPersistent._key)
         );
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
@@ -977,10 +977,10 @@ describe("CollectionPersist Tests", () => {
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
         expect(dummyItem2.persistent.persistValue).toHaveBeenCalledWith(
-          collectionPersistent._key
+          CollectionPersistent.getItemStorageKey("2", collectionPersistent._key)
         );
         expect(dummyItem3.persistent.persistValue).toHaveBeenCalledWith(
-          collectionPersistent._key
+          CollectionPersistent.getItemStorageKey("3", collectionPersistent._key)
         );
       });
 
