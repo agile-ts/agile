@@ -14,6 +14,7 @@ describe("CollectionPersist Tests", () => {
     id: string;
     name: string;
   }
+
   let dummyAgile: Agile;
   let dummyCollection: Collection<ItemInterface>;
 
@@ -28,6 +29,7 @@ describe("CollectionPersist Tests", () => {
     jest.spyOn(CollectionPersistent.prototype, "instantiatePersistent");
     jest.spyOn(CollectionPersistent.prototype, "initialLoading");
     console.error = jest.fn();
+    console.warn = jest.fn();
   });
 
   it("should create CollectionPersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {
@@ -114,6 +116,10 @@ describe("CollectionPersist Tests", () => {
 
   describe("CollectionPersistent Function Tests", () => {
     let collectionPersistent: CollectionPersistent;
+    let dummyItem1: Item<ItemInterface>;
+    let dummyItem2: Item<ItemInterface>;
+    let dummyItem3: Item<ItemInterface>;
+    let dummyItem4WithoutPersistent: Item<ItemInterface>;
 
     beforeEach(() => {
       collectionPersistent = new CollectionPersistent(dummyCollection, {
@@ -130,6 +136,28 @@ describe("CollectionPersist Tests", () => {
           },
         })
       );
+      dummyItem1 = new Item<ItemInterface>(dummyCollection, {
+        id: "1",
+        name: "frank",
+      });
+      dummyItem1.persistent = new StatePersistent(dummyItem1);
+
+      dummyItem2 = new Item<ItemInterface>(dummyCollection, {
+        id: "2",
+        name: "dieter",
+      });
+      dummyItem2.persistent = new StatePersistent(dummyItem2);
+
+      dummyItem3 = new Item<ItemInterface>(dummyCollection, {
+        id: "3",
+        name: "hans",
+      });
+      dummyItem3.persistent = new StatePersistent(dummyItem3);
+
+      dummyItem4WithoutPersistent = new Item<ItemInterface>(dummyCollection, {
+        id: "4",
+        name: "jeff",
+      });
     });
 
     describe("setKey function tests", () => {
@@ -497,21 +525,10 @@ describe("CollectionPersist Tests", () => {
 
     describe("persistValue function tests", () => {
       let dummyDefaultGroup: Group;
-      let dummyItem1: Item<ItemInterface>;
-      let dummyItem3: Item<ItemInterface>;
 
       beforeEach(() => {
         collectionPersistent.storageKeys = ["test1", "test2"];
         collectionPersistent.isPersisted = undefined;
-
-        dummyItem1 = new Item<ItemInterface>(dummyCollection, {
-          id: "1",
-          name: "frank",
-        });
-        dummyItem3 = new Item<ItemInterface>(dummyCollection, {
-          id: "3",
-          name: "hans",
-        });
 
         dummyDefaultGroup = new Group(dummyCollection, ["1", "2", "3"]);
         dummyCollection.data = {
@@ -683,238 +700,198 @@ describe("CollectionPersist Tests", () => {
           ).toHaveBeenCalledWith(dummyDefaultGroup, "dummyKey");
         });
       });
+    });
 
-      describe("removePersistedValue function tests", () => {
-        let dummyDefaultGroup: Group;
-        let dummyItem1: Item<ItemInterface>;
-        let dummyItem3: Item<ItemInterface>;
+    describe("removePersistedValue function tests", () => {
+      let dummyDefaultGroup: Group;
 
-        beforeEach(() => {
-          collectionPersistent.storageKeys = ["test1", "test2"];
-          collectionPersistent.isPersisted = undefined;
+      beforeEach(() => {
+        collectionPersistent.storageKeys = ["test1", "test2"];
+        collectionPersistent.isPersisted = undefined;
 
-          dummyItem1 = new Item<ItemInterface>(dummyCollection, {
-            id: "1",
-            name: "frank",
-          });
-          dummyItem1.persistent = new StatePersistent(dummyItem1);
-          dummyItem3 = new Item<ItemInterface>(dummyCollection, {
-            id: "3",
-            name: "hans",
-          });
-          dummyItem3.persistent = new StatePersistent(dummyItem3);
+        dummyDefaultGroup = new Group(dummyCollection, ["1", "2", "3"]);
+        dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
+        dummyCollection.data = {
+          ["1"]: dummyItem1,
+          ["3"]: dummyItem3,
+        };
 
-          dummyDefaultGroup = new Group(dummyCollection, ["1", "2", "3"]);
-          dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
-          dummyCollection.data = {
-            ["1"]: dummyItem1,
-            ["3"]: dummyItem3,
-          };
+        dummyDefaultGroup.persistent.removePersistedValue = jest.fn();
+        dummyDefaultGroup.removeSideEffect = jest.fn();
 
-          dummyDefaultGroup.persistent.removePersistedValue = jest.fn();
-          dummyDefaultGroup.removeSideEffect = jest.fn();
+        dummyItem1.persistent.removePersistedValue = jest.fn();
+        dummyItem3.persistent.removePersistedValue = jest.fn();
 
-          dummyItem1.persistent.removePersistedValue = jest.fn();
-          dummyItem3.persistent.removePersistedValue = jest.fn();
-
-          dummyAgile.storages.remove = jest.fn();
-        });
-
-        it("should remove persisted defaultGroup and its Items from Storage with persistentKey", async () => {
-          collectionPersistent.ready = true;
-          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
-
-          const response = await collectionPersistent.removePersistedValue();
-
-          expect(response).toBeTruthy();
-
-          expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
-            collectionPersistent._key,
-            collectionPersistent.storageKeys
-          );
-
-          expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-            dummyCollection.config.defaultGroupKey
-          );
-          expect(
-            dummyDefaultGroup.persistent.removePersistedValue
-          ).toHaveBeenCalled();
-          expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
-            CollectionPersistent.defaultGroupSideEffectKey
-          );
-
-          expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
-          expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalled();
-
-          expect(collectionPersistent.isPersisted).toBeFalsy();
-        });
-
-        it("should remove persisted defaultGroup and its Items from Storage with specific Key", async () => {
-          collectionPersistent.ready = true;
-          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
-
-          const response = await collectionPersistent.removePersistedValue(
-            "dummyKey"
-          );
-
-          expect(response).toBeTruthy();
-
-          expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
-            "dummyKey",
-            collectionPersistent.storageKeys
-          );
-
-          expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-            dummyCollection.config.defaultGroupKey
-          );
-          expect(
-            dummyDefaultGroup.persistent.removePersistedValue
-          ).toHaveBeenCalled();
-          expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
-            CollectionPersistent.defaultGroupSideEffectKey
-          );
-
-          expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
-          expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalled();
-
-          expect(collectionPersistent.isPersisted).toBeFalsy();
-        });
-
-        it("shouldn't remove persisted defaultGroup and its Items from Storage if Persistent isn't ready", async () => {
-          collectionPersistent.ready = false;
-          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
-
-          const response = await collectionPersistent.removePersistedValue();
-
-          expect(response).toBeFalsy();
-
-          expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
-
-          expect(dummyCollection.getGroup).not.toHaveBeenCalled();
-          expect(
-            dummyDefaultGroup.persistent.removePersistedValue
-          ).not.toHaveBeenCalled();
-          expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
-
-          expect(
-            dummyItem1.persistent.removePersistedValue
-          ).not.toHaveBeenCalled();
-          expect(
-            dummyItem3.persistent.removePersistedValue
-          ).not.toHaveBeenCalled();
-
-          expect(collectionPersistent.isPersisted).toBeUndefined();
-        });
-
-        it("shouldn't remove persisted defaultGroup and its Items from Storage if Collection has no default Group", async () => {
-          collectionPersistent.ready = true;
-          dummyCollection.getGroup = jest.fn(() => undefined as any);
-
-          const response = await collectionPersistent.removePersistedValue();
-
-          expect(response).toBeFalsy();
-
-          expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
-
-          expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-            dummyCollection.config.defaultGroupKey
-          );
-          expect(
-            dummyDefaultGroup.persistent.removePersistedValue
-          ).not.toHaveBeenCalled();
-          expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
-
-          expect(
-            dummyItem1.persistent.removePersistedValue
-          ).not.toHaveBeenCalled();
-          expect(
-            dummyItem3.persistent.removePersistedValue
-          ).not.toHaveBeenCalled();
-
-          expect(collectionPersistent.isPersisted).toBeUndefined();
-        });
+        dummyAgile.storages.remove = jest.fn();
       });
 
-      describe("formatKey function tests", () => {
-        it("should return key of Collection if no key got passed", () => {
-          dummyCollection._key = "coolKey";
+      it("should remove persisted defaultGroup and its Items from Storage with persistentKey", async () => {
+        collectionPersistent.ready = true;
+        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
-          const response = collectionPersistent.formatKey();
+        const response = await collectionPersistent.removePersistedValue();
 
-          expect(response).toBe("coolKey");
-        });
+        expect(response).toBeTruthy();
 
-        it("should return passed key", () => {
-          dummyCollection._key = "coolKey";
+        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+          collectionPersistent._key,
+          collectionPersistent.storageKeys
+        );
 
-          const response = collectionPersistent.formatKey("awesomeKey");
+        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
+          dummyCollection.config.defaultGroupKey
+        );
+        expect(
+          dummyDefaultGroup.persistent.removePersistedValue
+        ).toHaveBeenCalled();
+        expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
+          CollectionPersistent.defaultGroupSideEffectKey
+        );
 
-          expect(response).toBe("awesomeKey");
-        });
+        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalled();
 
-        it("should return and apply passed key to Collection if Collection had no own key before", () => {
-          dummyCollection._key = undefined;
+        expect(collectionPersistent.isPersisted).toBeFalsy();
+      });
 
-          const response = collectionPersistent.formatKey("awesomeKey");
+      it("should remove persisted defaultGroup and its Items from Storage with specific Key", async () => {
+        collectionPersistent.ready = true;
+        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
-          expect(response).toBe("awesomeKey");
-          expect(dummyCollection._key).toBe("awesomeKey");
-        });
+        const response = await collectionPersistent.removePersistedValue(
+          "dummyKey"
+        );
 
-        it("should return undefined if no key got passed and Collection has no key", () => {
-          dummyCollection._key = undefined;
+        expect(response).toBeTruthy();
 
-          const response = collectionPersistent.formatKey();
+        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+          "dummyKey",
+          collectionPersistent.storageKeys
+        );
 
-          expect(response).toBeUndefined();
-        });
+        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
+          dummyCollection.config.defaultGroupKey
+        );
+        expect(
+          dummyDefaultGroup.persistent.removePersistedValue
+        ).toHaveBeenCalled();
+        expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
+          CollectionPersistent.defaultGroupSideEffectKey
+        );
+
+        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalled();
+
+        expect(collectionPersistent.isPersisted).toBeFalsy();
+      });
+
+      it("shouldn't remove persisted defaultGroup and its Items from Storage if Persistent isn't ready", async () => {
+        collectionPersistent.ready = false;
+        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+
+        const response = await collectionPersistent.removePersistedValue();
+
+        expect(response).toBeFalsy();
+
+        expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+
+        expect(dummyCollection.getGroup).not.toHaveBeenCalled();
+        expect(
+          dummyDefaultGroup.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
+
+        expect(
+          dummyItem1.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem3.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(collectionPersistent.isPersisted).toBeUndefined();
+      });
+
+      it("shouldn't remove persisted defaultGroup and its Items from Storage if Collection has no default Group", async () => {
+        collectionPersistent.ready = true;
+        dummyCollection.getGroup = jest.fn(() => undefined as any);
+
+        const response = await collectionPersistent.removePersistedValue();
+
+        expect(response).toBeFalsy();
+
+        expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+
+        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
+          dummyCollection.config.defaultGroupKey
+        );
+        expect(
+          dummyDefaultGroup.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
+
+        expect(
+          dummyItem1.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem3.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(collectionPersistent.isPersisted).toBeUndefined();
+      });
+    });
+
+    describe("formatKey function tests", () => {
+      it("should return key of Collection if no key got passed", () => {
+        dummyCollection._key = "coolKey";
+
+        const response = collectionPersistent.formatKey();
+
+        expect(response).toBe("coolKey");
+      });
+
+      it("should return passed key", () => {
+        dummyCollection._key = "coolKey";
+
+        const response = collectionPersistent.formatKey("awesomeKey");
+
+        expect(response).toBe("awesomeKey");
+      });
+
+      it("should return and apply passed key to Collection if Collection had no own key before", () => {
+        dummyCollection._key = undefined;
+
+        const response = collectionPersistent.formatKey("awesomeKey");
+
+        expect(response).toBe("awesomeKey");
+        expect(dummyCollection._key).toBe("awesomeKey");
+      });
+
+      it("should return undefined if no key got passed and Collection has no key", () => {
+        dummyCollection._key = undefined;
+
+        const response = collectionPersistent.formatKey();
+
+        expect(response).toBeUndefined();
       });
     });
 
     describe("rebuildStorageSideEffects function tests", () => {
       let dummyGroup: Group;
-      let dummyItem1: Item<ItemInterface>;
-      let dummyItem2: Item<ItemInterface>;
-      let dummyItem3: Item<ItemInterface>;
-      let dummyItem4: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item<ItemInterface>(dummyCollection, {
-          id: "1",
-          name: "frank",
-        });
-        dummyItem1.persistent = new StatePersistent(dummyItem1);
-
-        dummyItem2 = new Item<ItemInterface>(dummyCollection, {
-          id: "2",
-          name: "dieter",
-        });
-        dummyItem2.persistent = new StatePersistent(dummyItem2);
-
-        dummyItem3 = new Item<ItemInterface>(dummyCollection, {
-          id: "3",
-          name: "hans",
-        });
-        dummyItem3.persistent = new StatePersistent(dummyItem3);
-
-        dummyItem4 = new Item<ItemInterface>(dummyCollection, {
-          id: "4",
-          name: "jeff",
-        });
-
         dummyGroup = new Group(dummyCollection);
         dummyCollection.data = {
           ["1"]: dummyItem1,
           ["2"]: dummyItem2,
           ["3"]: dummyItem3,
-          ["4"]: dummyItem4,
+          ["4"]: dummyItem4WithoutPersistent,
         };
         dummyCollection.persistent = collectionPersistent;
 
         dummyItem1.persist = jest.fn();
         dummyItem2.persist = jest.fn();
         dummyItem3.persist = jest.fn();
-        dummyItem4.persist = jest.fn();
+        dummyItem4WithoutPersistent.persist = jest.fn();
 
         dummyItem1.persistent.removePersistedValue = jest.fn();
         dummyItem2.persistent.removePersistedValue = jest.fn();
@@ -926,7 +903,6 @@ describe("CollectionPersist Tests", () => {
       });
 
       it("should return if no Item got added or removed", () => {
-        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1", "2", "3"];
         dummyGroup._value = ["1", "2", "3"];
 
@@ -935,7 +911,7 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem1.persist).not.toHaveBeenCalled();
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
-        expect(dummyItem4.persist).not.toHaveBeenCalled();
+        expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(
           dummyItem1.persistent.removePersistedValue
@@ -953,7 +929,6 @@ describe("CollectionPersist Tests", () => {
       });
 
       it("should call removePersistedValue on Items that got removed from Group", () => {
-        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1", "2", "3"];
         dummyGroup._value = ["2"];
 
@@ -962,7 +937,7 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem1.persist).not.toHaveBeenCalled();
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
-        expect(dummyItem4.persist).not.toHaveBeenCalled();
+        expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalledWith(
           collectionPersistent._key
@@ -980,7 +955,6 @@ describe("CollectionPersist Tests", () => {
       });
 
       it("should call persistValue on Items that have a persistent and got added to Group", () => {
-        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1"];
         dummyGroup._value = ["1", "2", "3"];
 
@@ -989,7 +963,7 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem1.persist).not.toHaveBeenCalled();
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
-        expect(dummyItem4.persist).not.toHaveBeenCalled();
+        expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(
           dummyItem1.persistent.removePersistedValue
@@ -1011,7 +985,6 @@ describe("CollectionPersist Tests", () => {
       });
 
       it("should call persist on Items that have no persistent and got added to Group", () => {
-        jest.clearAllMocks(); // Because of weired mock bug
         dummyGroup.previousStateValue = ["1"];
         dummyGroup._value = ["1", "4"];
 
@@ -1020,7 +993,7 @@ describe("CollectionPersist Tests", () => {
         expect(dummyItem1.persist).not.toHaveBeenCalled();
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
-        expect(dummyItem4.persist).toHaveBeenCalledWith(
+        expect(dummyItem4WithoutPersistent.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey("4", collectionPersistent._key)
         );
 
@@ -1041,7 +1014,55 @@ describe("CollectionPersist Tests", () => {
     });
 
     describe("getItemStorageKey function tests", () => {
-      // TODO
+      beforeEach(() => {
+        console.warn = jest.fn();
+      });
+
+      it("should build ItemStorageKey out of itemKey and collectionKey", () => {
+        const response = CollectionPersistent.getItemStorageKey(
+          "itemKey",
+          "collectionKey"
+        );
+
+        expect(response).toBe("_collectionKey_item_itemKey");
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      it("should build ItemStorageKey out of collectionKey with warning", () => {
+        const response = CollectionPersistent.getItemStorageKey(
+          undefined,
+          "collectionKey"
+        );
+
+        expect(response).toBe("_collectionKey_item_unknown");
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Failed to build unique Item StorageKey!"
+        );
+      });
+
+      it("should build ItemStorageKey out of itemKey with warning", () => {
+        const response = CollectionPersistent.getItemStorageKey(
+          "itemKey",
+          undefined
+        );
+
+        expect(response).toBe("_unknown_item_itemKey");
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Failed to build unique Item StorageKey!"
+        );
+      });
+
+      it("should build ItemStorageKey out of nothing with warning", () => {
+        const response = CollectionPersistent.getItemStorageKey(
+          undefined,
+          undefined
+        );
+
+        expect(response).toBe("_unknown_item_unknown");
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Failed to build unique Item StorageKey!"
+        );
+      });
     });
   });
 });
