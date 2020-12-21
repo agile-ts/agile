@@ -311,14 +311,10 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     itemKey?: ItemKey,
     collectionKey?: CollectionKey
   ): string {
-    if (!itemKey) {
-      Agile.logger.error("Failed to build Item StorageKey");
-      itemKey = "unknown";
-    }
-    if (!collectionKey) {
-      Agile.logger.error("Failed to build Item StorageKey");
-      collectionKey = "unknown";
-    }
+    if (!itemKey || !collectionKey)
+      Agile.logger.warn("Failed to build unique Item StorageKey!");
+    if (!itemKey) itemKey = "unknown";
+    if (!collectionKey) collectionKey = "unknown";
     return this.storageItemKeyPattern
       .replace("${collectionKey}", collectionKey.toString())
       .replace("${itemKey}", itemKey.toString());
@@ -337,14 +333,11 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     groupKey?: GroupKey,
     collectionKey?: CollectionKey
   ): string {
-    if (!groupKey) {
-      Agile.logger.error("Failed to build Group StorageKey");
-      groupKey = "unknown";
-    }
-    if (!collectionKey) {
-      Agile.logger.error("Failed to build Group StorageKey");
-      collectionKey = "unknown";
-    }
+    if (!groupKey || !collectionKey)
+      Agile.logger.warn("Failed to build unique Group StorageKey!");
+    if (!groupKey) groupKey = "unknown";
+    if (!collectionKey) collectionKey = "unknown";
+
     return this.storageGroupKeyPattern
       .replace("${collectionKey}", collectionKey.toString())
       .replace("${groupKey}", groupKey.toString());
