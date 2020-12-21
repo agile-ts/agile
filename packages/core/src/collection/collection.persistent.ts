@@ -266,29 +266,35 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   public rebuildStorageSideEffect(group: Group<DataType>) {
     const collection = group.collection();
 
-    // Return if only one ItemKey got updated, because the Group value hasn't changed
-    if (group.previousStateValue.length === group.value.length) return;
+    // Return if only a ItemKey got updated
+    if (group.previousStateValue.length === group._value.length) return;
 
-    const addedKeys = group.value.filter(
+    const addedKeys = group._value.filter(
       (key) => !group.previousStateValue.includes(key)
     );
     const removedKeys = group.previousStateValue.filter(
-      (key) => !group.value.includes(key)
+      (key) => !group._value.includes(key)
     );
 
     // Persist Added Keys
     addedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
-      if (!item?.isPersisted)
-        item?.persist(
-          CollectionPersistent.getItemStorageKey(itemKey, collection._key)
+      if (!item) return;
+      if (!item.isPersisted)
+        item.persist(
+          CollectionPersistent.getItemStorageKey(
+            itemKey,
+            collection.persistent?._key
+          )
         );
+      else item.persistent?.persistValue();
     });
 
     // Unpersist removed Keys
     removedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
-      if (item?.isPersisted) item?.persistent?.removePersistedValue();
+      if (!item) return;
+      if (item.isPersisted) item.persistent?.removePersistedValue();
     });
   }
 
