@@ -689,7 +689,7 @@ describe("CollectionPersist Tests", () => {
             id: "3",
             name: "hans",
           });
-          dummyItem3.persistent = new StatePersistent(dummyItem1);
+          dummyItem3.persistent = new StatePersistent(dummyItem3);
 
           dummyDefaultGroup = new Group(dummyCollection, ["1", "2", "3"]);
           dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
@@ -855,6 +855,167 @@ describe("CollectionPersist Tests", () => {
 
           expect(response).toBeUndefined();
         });
+      });
+    });
+
+    describe("rebuildStorageSideEffects function tests", () => {
+      let dummyGroup: Group;
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+      let dummyItem3: Item<ItemInterface>;
+      let dummyItem4: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem1 = new Item<ItemInterface>(dummyCollection, {
+          id: "1",
+          name: "frank",
+        });
+        dummyItem1.persistent = new StatePersistent(dummyItem1);
+
+        dummyItem2 = new Item<ItemInterface>(dummyCollection, {
+          id: "2",
+          name: "dieter",
+        });
+        dummyItem2.persistent = new StatePersistent(dummyItem2);
+
+        dummyItem3 = new Item<ItemInterface>(dummyCollection, {
+          id: "3",
+          name: "hans",
+        });
+        dummyItem3.persistent = new StatePersistent(dummyItem3);
+
+        dummyItem4 = new Item<ItemInterface>(dummyCollection, {
+          id: "4",
+          name: "jeff",
+        });
+
+        dummyGroup = new Group(dummyCollection);
+        dummyCollection.data = {
+          ["1"]: dummyItem1,
+          ["2"]: dummyItem2,
+          ["3"]: dummyItem3,
+          ["4"]: dummyItem4,
+        };
+
+        dummyItem1.persist = jest.fn();
+        dummyItem2.persist = jest.fn();
+        dummyItem3.persist = jest.fn();
+        dummyItem4.persist = jest.fn();
+
+        dummyItem1.persistent.removePersistedValue = jest.fn();
+        dummyItem2.persistent.removePersistedValue = jest.fn();
+        dummyItem3.persistent.removePersistedValue = jest.fn();
+
+        dummyItem1.persistent.persistValue = jest.fn();
+        dummyItem2.persistent.persistValue = jest.fn();
+        dummyItem3.persistent.persistValue = jest.fn();
+      });
+
+      it("should return if no Item got added or removed", () => {
+        dummyGroup.previousStateValue = ["1", "2", "3"];
+        dummyGroup._value = ["1", "2", "3"];
+
+        collectionPersistent.rebuildStorageSideEffect(dummyGroup);
+
+        expect(dummyItem1.persist).not.toHaveBeenCalled();
+        expect(dummyItem2.persist).not.toHaveBeenCalled();
+        expect(dummyItem3.persist).not.toHaveBeenCalled();
+        expect(dummyItem4.persist).not.toHaveBeenCalled();
+
+        expect(
+          dummyItem1.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem2.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem3.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
+      });
+
+      it("should call removePersistedValue on Items that got removed from Group", () => {
+        dummyGroup.previousStateValue = ["1", "2", "3"];
+        dummyGroup._value = ["2"];
+
+        collectionPersistent.rebuildStorageSideEffect(dummyGroup);
+
+        expect(dummyItem1.persist).not.toHaveBeenCalled();
+        expect(dummyItem2.persist).not.toHaveBeenCalled();
+        expect(dummyItem3.persist).not.toHaveBeenCalled();
+        expect(dummyItem4.persist).not.toHaveBeenCalled();
+
+        expect(
+          dummyItem1.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem2.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem3.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent.persistValue).toHaveBeenCalled();
+        expect(dummyItem3.persistent.persistValue).toHaveBeenCalled();
+      });
+
+      it("should call persistValue on Items that have a persistent and got added to Group", () => {
+        dummyGroup.previousStateValue = ["1"];
+        dummyGroup._value = ["1", "2", "3"];
+
+        collectionPersistent.rebuildStorageSideEffect(dummyGroup);
+
+        expect(dummyItem1.persist).not.toHaveBeenCalled();
+        expect(dummyItem2.persist).not.toHaveBeenCalled();
+        expect(dummyItem3.persist).not.toHaveBeenCalled();
+        expect(dummyItem4.persist).not.toHaveBeenCalled();
+
+        expect(
+          dummyItem1.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem2.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem3.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent.persistValue).toHaveBeenCalled();
+        expect(dummyItem3.persistent.persistValue).toHaveBeenCalled();
+      });
+
+      it("should call persist on Items that have no persistent and got added to Group", () => {
+        dummyGroup.previousStateValue = ["1"];
+        dummyGroup._value = ["1", "4"];
+
+        collectionPersistent.rebuildStorageSideEffect(dummyGroup);
+
+        expect(dummyItem1.persist).not.toHaveBeenCalled();
+        expect(dummyItem2.persist).not.toHaveBeenCalled();
+        expect(dummyItem3.persist).not.toHaveBeenCalled();
+        expect(dummyItem4.persist).toHaveBeenCalledWith(
+          "4",
+          collectionPersistent._key
+        );
+
+        expect(
+          dummyItem1.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem2.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyItem3.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
       });
     });
   });
