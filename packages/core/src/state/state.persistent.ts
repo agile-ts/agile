@@ -92,7 +92,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this.key;
+    const _key = key || this._key;
 
     // Load Value from default Storage
     const loadedValue = await this.agileInstance().storages.get<ValueType>(
@@ -120,7 +120,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async persistValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this.key;
+    const _key = key || this._key;
 
     // Add SideEffect to State, that updates the saved State Value depending on the current State Value
     this.state().addSideEffect(
@@ -147,7 +147,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this.key;
+    const _key = key || this._key;
 
     // Remove SideEffect
     this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
