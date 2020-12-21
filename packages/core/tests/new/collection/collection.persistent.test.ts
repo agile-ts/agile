@@ -9,7 +9,7 @@ import {
   Item,
 } from "../../../src";
 
-describe("CollectionPersist Tests", () => {
+describe("CollectionPersistent Tests", () => {
   interface ItemInterface {
     id: string;
     name: string;
