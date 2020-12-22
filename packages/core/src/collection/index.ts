@@ -23,10 +23,10 @@ export class Collection<DataType = DefaultItem> {
   public config: CollectionConfigInterface;
   private initialConfig: CreateCollectionConfigInterface;
 
-  public size: number = 0; // Amount of Items stored in Collection
+  public size = 0; // Amount of Items stored in Collection
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
-  public isPersisted: boolean = false; // If Collection can be stored in Agile Storage (-> successfully integrated persistent)
+  public isPersisted = false; // If Collection can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: CollectionPersistent | undefined; // Manages storing Collection Value into Storage
 
   public groups: { [key: string]: Group<any> } = {};
@@ -93,16 +93,14 @@ export class Collection<DataType = DefaultItem> {
   public setKey(value: CollectionKey | undefined) {
     const oldKey = this._key;
 
-    // Update Collection Key
+    // Update State Key
     this._key = value;
 
-    // Update Key in PersistManager
-    if (
-      value !== undefined &&
-      this.persistent &&
-      this.persistent.key === oldKey
-    )
-      this.persistent.key = value;
+    // Update Key in Persistent (only if oldKey equal to persistentKey -> otherwise the PersistentKey got formatted and will be set where other)
+    if (value && this.persistent?._key === oldKey)
+      this.persistent?.setKey(value);
+
+    return this;
   }
 
   //=========================================================================================================
@@ -144,7 +142,7 @@ export class Collection<DataType = DefaultItem> {
    * @internal
    * Instantiates Groups
    */
-  private initGroups(groups: { [key: string]: Group<any> } | string[]) {
+  public initGroups(groups: { [key: string]: Group<any> } | string[]) {
     if (!groups) return;
     let groupsObject: { [key: string]: Group<DataType> } = {};
 
@@ -176,9 +174,7 @@ export class Collection<DataType = DefaultItem> {
    * @internal
    * Instantiates Selectors
    */
-  private initSelectors(
-    selectors: { [key: string]: Selector<any> } | string[]
-  ) {
+  public initSelectors(selectors: { [key: string]: Selector<any> } | string[]) {
     if (!selectors) return;
     let selectorsObject: { [key: string]: Selector<DataType> } = {};
 
@@ -316,16 +312,16 @@ export class Collection<DataType = DefaultItem> {
 
     const oldItemKey = item.value[primaryKey];
     const newItemKey = newItemValue[primaryKey];
-    const updateItemKey = oldItemKey !== newItemKey;
+    const updatedItemKey = oldItemKey !== newItemKey;
 
     // Apply changes to Item
     item.set(newItemValue, {
       background: config.background,
-      storage: !updateItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
+      storage: !updatedItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
     });
 
     // Update ItemKey of Item
-    if (updateItemKey)
+    if (updatedItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
@@ -766,7 +762,7 @@ export class Collection<DataType = DefaultItem> {
    * @param newItemKey - New ItemKey
    * @param config - Config
    */
-  private updateItemKey(
+  public updateItemKey(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
     config?: UpdateItemKeyConfigInterface
