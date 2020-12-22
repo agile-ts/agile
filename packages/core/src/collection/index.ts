@@ -146,7 +146,7 @@ export class Collection<DataType = DefaultItem> {
     if (!groups) return;
     let groupsObject: { [key: string]: Group<DataType> } = {};
 
-    // If groups is Array of SelectorNames transform it to Selector Object
+    // If groups is Array of GroupNames transform it to Group Object
     if (Array.isArray(groups)) {
       groups.forEach((groupKey) => {
         groupsObject[groupKey] = new Group<DataType>(this, [], {
@@ -162,7 +162,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Set Key/Name of Group to property Name
     for (let key in groupsObject)
-      if (!groupsObject[key].key) groupsObject[key].key = key;
+      if (!groupsObject[key]._key) groupsObject[key]._key = key;
 
     this.groups = groupsObject;
   }
@@ -193,7 +193,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Set Key/Name of Selector to property Name
     for (let key in selectorsObject)
-      if (!selectorsObject[key].key) selectorsObject[key].key = key;
+      if (!selectorsObject[key]._key) selectorsObject[key]._key = key;
 
     this.selectors = selectorsObject;
   }
