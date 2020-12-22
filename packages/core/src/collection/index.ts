@@ -204,17 +204,17 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @public
    * Collect Item/s
-   * @param items - Item/s that get collected and added to this Collection
-   * @param groups - Add collected Item/s to certain Groups
+   * @param data - Data that gets added to Collection
+   * @param groupKeys - Add collected Item/s to certain Groups
    * @param config - Config
    */
   public collect(
-    items: DataType | Array<DataType>,
-    groups?: GroupKey | Array<GroupKey>,
+    data: DataType | Array<DataType>,
+    groupKeys?: GroupKey | Array<GroupKey>,
     config: CollectConfigInterface<DataType> = {}
   ): this {
-    const _items = normalizeArray<DataType>(items);
-    const groupKeys = normalizeArray<GroupKey>(groups);
+    const _data = normalizeArray<DataType>(data);
+    const _groupKeys = normalizeArray<GroupKey>(groupKeys);
     const defaultGroupKey = this.config.defaultGroupKey;
     const primaryKey = this.config.primaryKey;
     config = defineConfig<CollectConfigInterface>(config, {
@@ -225,14 +225,12 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Add default GroupKey, because Items get always added to default Group
-    if (!groupKeys.includes(defaultGroupKey)) groupKeys.push(defaultGroupKey);
+    if (!_groupKeys.includes(defaultGroupKey)) _groupKeys.push(defaultGroupKey);
 
     // Create not existing Groups
-    groupKeys.forEach(
-      (groupName) => !this.groups[groupName] && this.createGroup(groupName)
-    );
+    _groupKeys.forEach((key) => !this.groups[key] && this.createGroup(key));
 
-    _items.forEach((data, index) => {
+    _data.forEach((data, index) => {
       const itemKey = data[primaryKey];
 
       // Add Item to Collection
@@ -243,7 +241,7 @@ export class Collection<DataType = DefaultItem> {
       if (!success) return this;
 
       // Add ItemKey to provided Groups
-      groupKeys.forEach((groupKey) => {
+      _groupKeys.forEach((groupKey) => {
         this.getGroup(groupKey)?.add(itemKey, {
           method: config.method,
           background: config.background,

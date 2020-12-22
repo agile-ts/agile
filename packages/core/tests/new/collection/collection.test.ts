@@ -328,5 +328,255 @@ describe("Collection Tests", () => {
         );
       });
     });
+
+    describe("collect function tests", () => {
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+      let defaultGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup1 = new Group(collection);
+        dummyGroup2 = new Group(collection);
+        defaultGroup = new Group(collection);
+
+        collection.groups = {
+          [collection.config.defaultGroupKey]: defaultGroup,
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+        };
+
+        collection.setData = jest.fn();
+        collection.createSelector = jest.fn();
+        collection.createGroup = jest.fn();
+
+        dummyGroup1.add = jest.fn();
+        dummyGroup2.add = jest.fn();
+        defaultGroup.add = jest.fn();
+      });
+
+      it("should add Data to Collection and to default Group (default config)", () => {
+        collection.setData = jest.fn(() => true);
+
+        collection.collect({ id: "1", name: "frank" });
+
+        expect(collection.setData).toHaveBeenCalledWith(
+          {
+            id: "1",
+            name: "frank",
+          },
+          {
+            patch: false,
+            background: false,
+          }
+        );
+        expect(collection.createGroup).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.add).not.toHaveBeenCalled();
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
+          method: "push",
+          background: false,
+        });
+
+        expect(collection.createSelector).not.toHaveBeenCalled();
+      });
+
+      it("should add Data to Collection and to default Group (specific config)", () => {
+        collection.setData = jest.fn(() => true);
+
+        collection.collect({ id: "1", name: "frank" }, [], {
+          background: true,
+          method: "unshift",
+          patch: true,
+        });
+
+        expect(collection.setData).toHaveBeenCalledWith(
+          {
+            id: "1",
+            name: "frank",
+          },
+          {
+            patch: true,
+            background: true,
+          }
+        );
+        expect(collection.createGroup).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.add).not.toHaveBeenCalled();
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
+          method: "unshift",
+          background: true,
+        });
+
+        expect(collection.createSelector).not.toHaveBeenCalled();
+      });
+
+      it("should add Data to Collection and to passed Groups + default Group (default config)", () => {
+        collection.setData = jest.fn(() => true);
+
+        collection.collect(
+          [
+            { id: "1", name: "frank" },
+            { id: "2", name: "hans" },
+          ],
+          ["dummyGroup1", "dummyGroup2"]
+        );
+
+        expect(collection.setData).toHaveBeenCalledWith(
+          {
+            id: "1",
+            name: "frank",
+          },
+          {
+            patch: false,
+            background: false,
+          }
+        );
+        expect(collection.setData).toHaveBeenCalledWith(
+          {
+            id: "2",
+            name: "hans",
+          },
+          {
+            patch: false,
+            background: false,
+          }
+        );
+        expect(collection.createGroup).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.add).toHaveBeenCalledWith("1", {
+          method: "push",
+          background: false,
+        });
+        expect(dummyGroup1.add).toHaveBeenCalledWith("2", {
+          method: "push",
+          background: false,
+        });
+        expect(dummyGroup2.add).toHaveBeenCalledWith("1", {
+          method: "push",
+          background: false,
+        });
+        expect(dummyGroup2.add).toHaveBeenCalledWith("2", {
+          method: "push",
+          background: false,
+        });
+        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
+          method: "push",
+          background: false,
+        });
+        expect(defaultGroup.add).toHaveBeenCalledWith("2", {
+          method: "push",
+          background: false,
+        });
+
+        expect(collection.createSelector).not.toHaveBeenCalled();
+      });
+
+      it("should call setData and shouldn't add Items to passed Groups if setData failed (default config)", () => {
+        collection.setData = jest.fn(() => false);
+
+        collection.collect({ id: "1", name: "frank" }, [
+          "dummyGroup1",
+          "dummyGroup2",
+        ]);
+
+        expect(collection.setData).toHaveBeenCalledWith(
+          {
+            id: "1",
+            name: "frank",
+          },
+          {
+            patch: false,
+            background: false,
+          }
+        );
+        expect(collection.createGroup).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.add).not.toHaveBeenCalled();
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+        expect(defaultGroup.add).not.toHaveBeenCalled();
+
+        expect(collection.createSelector).not.toHaveBeenCalled();
+      });
+
+      it("should add Data to Collection and create Groups that doesn't exist yet (default config)", () => {
+        const notExistingGroup = new Group(collection);
+        notExistingGroup.add = jest.fn();
+        collection.setData = jest.fn(() => true);
+        collection.createGroup = jest.fn(function (groupKey) {
+          this.groups[groupKey] = notExistingGroup;
+          return notExistingGroup as any;
+        });
+
+        collection.collect({ id: "1", name: "frank" }, "notExistingGroup");
+
+        expect(collection.setData).toHaveBeenCalledWith(
+          {
+            id: "1",
+            name: "frank",
+          },
+          {
+            patch: false,
+            background: false,
+          }
+        );
+        expect(collection.createGroup).toHaveBeenCalledWith("notExistingGroup");
+
+        expect(dummyGroup1.add).not.toHaveBeenCalled();
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+        expect(notExistingGroup.add).toHaveBeenCalledWith("1", {
+          method: "push",
+          background: false,
+        });
+        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
+          method: "push",
+          background: false,
+        });
+
+        expect(collection.createSelector).not.toHaveBeenCalled();
+      });
+
+      it("should create Selector for each Item (config.select)", () => {
+        collection.setData = jest.fn(() => true);
+
+        collection.collect(
+          [
+            { id: "1", name: "frank" },
+            { id: "2", name: "hans" },
+          ],
+          [],
+          { select: true }
+        );
+
+        expect(collection.createSelector).toHaveBeenCalledWith("1", "1");
+        expect(collection.createSelector).toHaveBeenCalledWith("2", "2");
+      });
+
+      it("should call 'forEachItem' for each Item (default config)", () => {
+        collection.setData = jest.fn(() => true);
+        const forEachItemMock = jest.fn();
+
+        collection.collect(
+          [
+            { id: "1", name: "frank" },
+            { id: "2", name: "hans" },
+          ],
+          [],
+          { forEachItem: forEachItemMock }
+        );
+
+        expect(forEachItemMock).toHaveBeenCalledWith(
+          { id: "1", name: "frank" },
+          "1",
+          0
+        );
+        expect(forEachItemMock).toHaveBeenCalledWith(
+          { id: "2", name: "hans" },
+          "2",
+          1
+        );
+      });
+    });
   });
 });
