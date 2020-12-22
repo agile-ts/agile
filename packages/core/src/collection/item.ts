@@ -14,7 +14,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     super(collection.agileInstance(), data);
     this.collection = () => collection;
 
-    // Setting primaryKey of Data to Key/Name of Item
+    // Set Key/Name of Item to primaryKey of Data
     this.setKey(data[collection.config.primaryKey]);
   }
 
@@ -28,14 +28,19 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    */
   public setKey(value: StateKey | undefined): this {
     super.setKey(value);
-
     if (!value) return this;
 
-    // Update rebuildGroupThatIncludePrimaryKey SideEffect
+    // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);
+
+    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it changes
     this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
       this.collection().rebuildGroupsThatIncludeItemKey(value, config)
     );
+
+    // Initial Rebuild
+    this.collection().rebuildGroupsThatIncludeItemKey(value);
+
     return this;
   }
 }

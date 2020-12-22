@@ -43,7 +43,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     // Add rebuild to sideEffects to rebuild Group on Value Change
     this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
-    // Initial Build
+    // Initial Rebuild
     this.rebuild();
   }
 
@@ -283,8 +283,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
 
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
-      let data = this.collection().data[itemKey];
-      if (data) groupItems.push(data);
+      const item = this.collection().getItem(itemKey);
+      if (item) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
@@ -294,11 +294,14 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Logging
-    if (notFoundItemKeys.length > 0)
+    if (notFoundItemKeys.length > 0) {
       Agile.logger.warn(
-        `Couldn't find some Items in Collection '${this.collection()._key}'`,
+        `Couldn't find some Items in Collection '${this.collection()._key}' (${
+          this._key
+        })`,
         notFoundItemKeys
       );
+    }
 
     this.items = groupItems;
     this._output = groupOutput;

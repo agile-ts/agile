@@ -47,14 +47,12 @@ export class Runtime {
       sideEffects: config.sideEffects,
       force: config.force,
       background: config.background,
-      key: config.key || observer.key,
+      key: config.key || observer._key,
     });
     this.jobQueue.push(job);
 
     // Logging
-    Agile.logger.if
-      .tag(["runtime"])
-      .info(`Created Job '${job.observer.key}'`, job);
+    Agile.logger.if.tag(["runtime"]).info(`Created Job '${job._key}'`, job);
 
     // Perform Job
     if (config.perform) {
@@ -82,9 +80,7 @@ export class Runtime {
     this.currentJob = null;
 
     // Logging
-    Agile.logger.if
-      .tag(["runtime"])
-      .info(`Completed Job '${job.observer.key}'`, job);
+    Agile.logger.if.tag(["runtime"]).info(`Completed Job '${job._key}'`, job);
 
     // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
     if (this.jobQueue.length > 0) {

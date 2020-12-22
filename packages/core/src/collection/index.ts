@@ -34,7 +34,7 @@ export class Collection<DataType = DefaultItem> {
 
   /**
    * @public
-   * Class that holds a List of Objects with key and causes rerender on subscribed Components
+   * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param agileInstance - An instance of Agile
    * @param config - Config
    */
@@ -221,6 +221,7 @@ export class Collection<DataType = DefaultItem> {
       method: "push",
       background: false,
       patch: false,
+      select: false,
     });
 
     // Add default GroupKey, because Items get always added to default Group
@@ -231,10 +232,8 @@ export class Collection<DataType = DefaultItem> {
       (groupName) => !this.groups[groupName] && this.createGroup(groupName)
     );
 
-    // Instantiate Items
     _items.forEach((data, index) => {
       const itemKey = data[primaryKey];
-      const itemExistsInCollection = !!this.data[itemKey];
 
       // Add Item to Collection
       const success = this.setData(data, {
@@ -243,28 +242,15 @@ export class Collection<DataType = DefaultItem> {
       });
       if (!success) return this;
 
-      // Ingest Groups that include the ItemKey into Runtime, which than rebuilds the Group (because output of group changed)
-      if (!itemExistsInCollection) {
-        for (let groupKey in this.groups) {
-          const group = this.getGroup(groupKey);
-          if (group && group.value.includes(itemKey)) {
-            group.ingest({
-              force: true,
-              background: config.background,
-              storage: false,
-            });
-          }
-        }
-      }
-
       // Add ItemKey to provided Groups
       groupKeys.forEach((groupKey) => {
-        this.groups[groupKey].add(itemKey, {
+        this.getGroup(groupKey)?.add(itemKey, {
           method: config.method,
           background: config.background,
         });
       });
 
+      if (config.select) this.createSelector(itemKey, itemKey);
       if (config.forEachItem) config.forEachItem(data, itemKey, index);
     });
 
@@ -779,33 +765,32 @@ export class Collection<DataType = DefaultItem> {
     this.data[newItemKey] = item;
 
     // Update Key/Name of Item
-    item.key = newItemKey;
+    item.setKey(newItemKey);
 
-    // Update persist Key of Item (Doesn't get changed by setting new item key because PersistKey is not ItemKey)
+    // Update persist Key of Item (Doesn't get updated by updating key of Item because PersistKey is special formatted)
     item.persistent?.setKey(
-      CollectionPersistent.getItemStorageKey(newItemKey, this.key)
+      CollectionPersistent.getItemStorageKey(newItemKey, this._key)
     );
 
     // Update Groups
-    for (let groupName in this.groups) {
-      const group = this.getGroup(groupName);
+    for (let groupKey in this.groups) {
+      const group = this.getGroup(groupKey);
       if (!group || group.isPlaceholder || !group.has(oldItemKey)) continue;
 
       // Replace old ItemKey with new ItemKey
-      const newGroupValue = copy(group.value);
+      const newGroupValue = copy(group._value);
       newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
       group.set(newGroupValue, { background: config?.background });
     }
 
     // Update Selectors
-    for (let selectorName in this.selectors) {
-      const selector = this.getSelector(selectorName);
+    for (let selectorKey in this.selectors) {
+      const selector = this.getSelector(selectorKey);
       if (!selector || selector.itemKey !== oldItemKey) continue;
 
       // Replace old selected ItemKey with new ItemKey
       selector.select(newItemKey, {
         background: config?.background,
-        force: true,
       });
     }
   }
@@ -914,19 +899,23 @@ export class Collection<DataType = DefaultItem> {
 
     const itemKey = _data[primaryKey];
     let item: Item<DataType> | undefined = this.data[itemKey];
+    const createItem = !item;
 
     // Create or update Item
-    if (item && config.patch)
+    if (!createItem && config.patch)
       item.patch(_data, { background: config.background });
-    if (item && !config.patch)
+    if (!createItem && !config.patch)
       item.set(_data, { background: config.background });
-    if (!item) {
+    if (createItem) {
       item = new Item<DataType>(this, _data);
       this.size++;
     }
 
     // Set new Item at itemKey
     this.data[itemKey] = item;
+
+    // Group might contain updated itemKey and now a fitting Item for that might exist -> rebuild Group Output BUT after setting it in the Collection
+    if (createItem) this.rebuildGroupsThatIncludeItemKey(itemKey);
 
     return true;
   }
@@ -952,9 +941,9 @@ export class Collection<DataType = DefaultItem> {
     // Rebuild Groups that include ItemKey
     for (let groupKey in this.groups) {
       const group = this.getGroup(groupKey);
-      if (group && group.has(itemKey)) {
+      if (group?.has(itemKey)) {
         // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
-        group.ingest({
+        group?.ingest({
           background: config?.background,
           force: true, // because Group value doesn't change only the output changes
           sideEffects: config?.sideEffects,
@@ -998,12 +987,14 @@ export interface CollectionConfigInterface {
  * @param method - Way of adding Item to Collection (push, unshift)
  * @param forEachItem - Gets called for each Item that got collected
  * @param background - If collecting an Item happens in the background (-> not causing any rerender)
+ * @param select - If collected Items get selected with a Selector
  */
 export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
   method?: "push" | "unshift";
   forEachItem?: (data: DataType, key: ItemKey, index: number) => void;
   background?: boolean;
+  select?: boolean;
 }
 
 /**

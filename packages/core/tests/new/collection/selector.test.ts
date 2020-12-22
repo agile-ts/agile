@@ -24,7 +24,7 @@ describe("Selector Tests", () => {
 
     expect(selector.collection()).toBe(dummyCollection);
     expect(selector.item).toBeUndefined();
-    expect(selector._itemKey).toBe("dummyItemKey");
+    expect(selector._itemKey).toBe("unknown");
     expect(selector.select).toHaveBeenCalledWith("dummyItemKey", {
       overwrite: true,
     });
@@ -57,7 +57,7 @@ describe("Selector Tests", () => {
 
     expect(selector.collection()).toBe(dummyCollection);
     expect(selector.item).toBeUndefined();
-    expect(selector._itemKey).toBe("dummyItemKey");
+    expect(selector._itemKey).toBe("unknown");
     expect(selector.select).toHaveBeenCalledWith("dummyItemKey", {
       overwrite: true,
     });

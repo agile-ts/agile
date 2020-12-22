@@ -468,7 +468,7 @@ describe("Group Tests", () => {
         expect(
           console.warn
         ).toHaveBeenCalledWith(
-          `Agile Warn: Couldn't find some Items in Collection '${dummyCollection._key}'`,
+          `Agile Warn: Couldn't find some Items in Collection '${dummyCollection._key}' (${group._key})`,
           ["dummyItem3Key"]
         );
         expect(group.notFoundItemKeys).toStrictEqual(["dummyItem3Key"]);

@@ -58,7 +58,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
     // Try to Initial Load Value if persistent wasn't ready and return
     if (!wasReady) {
-      if (isValid) this.initialLoading();
+      if (isValid) await this.initialLoading();
       return;
     }
 

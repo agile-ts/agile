@@ -48,12 +48,13 @@ describe("Item Tests", () => {
     beforeEach(() => {
       item = new Item(dummyCollection, { id: "dummyId", name: "dummyName" });
 
-      jest.spyOn(item, "removeSideEffect");
+      item.removeSideEffect = jest.fn();
       jest.spyOn(item, "addSideEffect");
+      dummyCollection.rebuildGroupsThatIncludeItemKey = jest.fn();
     });
 
     describe("setKey function tests", () => {
-      it("should call State setKey and add sideEffect to it", () => {
+      it("should call State setKey and add rebuildGroupsThatIncludeItemKey sideEffect to it", () => {
         item.setKey("myNewKey");
 
         expect(State.prototype.setKey).toHaveBeenCalledWith("myNewKey");
@@ -64,6 +65,10 @@ describe("Item Tests", () => {
           Item.updateGroupSideEffectKey,
           expect.any(Function)
         );
+
+        expect(
+          dummyCollection.rebuildGroupsThatIncludeItemKey
+        ).toHaveBeenCalledWith("myNewKey");
       });
 
       describe("test added sideEffect called Item.updateGroupSideEffectKey", () => {

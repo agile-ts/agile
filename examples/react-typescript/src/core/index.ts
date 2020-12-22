@@ -1,5 +1,4 @@
-import { Agile, Logger } from "@agile-ts/core";
-import { MultiEditor, Validator } from "@agile-ts/multieditor";
+import { Agile, clone, Logger } from "@agile-ts/core";
 
 export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG },
@@ -43,7 +42,7 @@ MY_COLLECTION.getGroup("myGroup")?.persist({
   followCollectionPersistKeyPattern: true,
 });
 
-console.log("Initial: myCollection ", MY_COLLECTION);
+console.log("Initial: myCollection ", clone(MY_COLLECTION));
 
 export const MY_EVENT = App.Event<{ name: string }>({
   delay: 3000,
@@ -56,51 +55,6 @@ MY_EVENT.on(() => {
 MY_EVENT.on("Test", () => {
   console.log("Triggered Event (Test)");
 });
-
-// MULTIEDITOR TEST
-
-const emailValidator = new Validator().string().email().required();
-
-export const multiEditor = new MultiEditor<string | undefined, boolean>(
-  (editor) => ({
-    data: {
-      id: "myId",
-      email: undefined,
-      name: undefined,
-    },
-    onSubmit: async (data) => {
-      console.log("Submitted MultiEditor", data);
-      return Promise.resolve(true);
-    },
-    fixedProperties: ["id"],
-    validateMethods: {
-      email: emailValidator,
-      name: editor
-        .Validator()
-        .required()
-        .string()
-        .max(10)
-        .min(2)
-        .addValidationMethod("testFuck", (key, value, editor) => {
-          const isValid = value !== "Fuck";
-
-          if (!isValid) {
-            editor.setStatus(key, "error", "Fuck is no valid Name!");
-          }
-
-          return Promise.resolve(isValid);
-        }),
-    },
-    computeMethods: {
-      name: (value) => {
-        return value ? value?.charAt(0).toUpperCase() + value?.slice(1) : value;
-      },
-    },
-    editableProperties: ["email", "name"],
-    reValidateMode: "onChange",
-    validate: "all",
-  })
-);
 
 // LOGGER tests
 

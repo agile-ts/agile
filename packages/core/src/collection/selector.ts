@@ -32,7 +32,7 @@ export class Selector<DataType = DefaultItem> extends State<
     super(collection.agileInstance(), undefined);
     this.collection = () => collection;
     this.item = undefined;
-    this._itemKey = itemKey;
+    this._itemKey = "unknown";
     this._key = config?.key;
 
     // Initial Select
@@ -71,7 +71,7 @@ export class Selector<DataType = DefaultItem> extends State<
       overwrite: oldItem?.isPlaceholder || false,
     });
 
-    if (oldItem?._key === itemKey && !config.force) {
+    if (this._itemKey === itemKey && !config.force) {
       Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
     }
