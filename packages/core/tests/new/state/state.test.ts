@@ -139,28 +139,38 @@ describe("State Tests", () => {
 
     describe("setKey function tests", () => {
       beforeEach(() => {
-        numberState.persist();
+        numberState.persistent = new StatePersistent(numberState);
 
         numberState.persistent.setKey = jest.fn();
       });
 
       it("should update existing Key in all instances", () => {
-        numberState.persistent.key = "numberStateKey";
+        numberState.persistent._key = "numberStateKey";
 
         numberState.setKey("newKey");
 
-        expect(numberState.key).toBe("newKey");
+        expect(numberState._key).toBe("newKey");
         expect(numberState.observer._key).toBe("newKey");
         expect(numberState.persistent.setKey).toHaveBeenCalledWith("newKey");
       });
 
-      it("should update existing Key but shouldn't update Key in persistent if their Keys weren't equal before", () => {
-        numberState.persistent.key = "randomKey";
+      it("should update existing Key in all instances except persistent if the StateKey and PersistKey aren't equal", () => {
+        numberState.persistent._key = "randomKey";
 
         numberState.setKey("newKey");
 
-        expect(numberState.key).toBe("newKey");
+        expect(numberState._key).toBe("newKey");
         expect(numberState.observer._key).toBe("newKey");
+        expect(numberState.persistent.setKey).not.toHaveBeenCalled();
+      });
+
+      it("should update existing Key in all instances except persistent if new StateKey is undefined", () => {
+        numberState.persistent._key = "numberStateKey";
+
+        numberState.setKey(undefined);
+
+        expect(numberState._key).toBeUndefined();
+        expect(numberState.observer._key).toBeUndefined();
         expect(numberState.persistent.setKey).not.toHaveBeenCalled();
       });
     });

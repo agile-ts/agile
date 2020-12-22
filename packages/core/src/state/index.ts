@@ -115,10 +115,11 @@ export class State<ValueType = any> {
     this._key = value;
 
     // Update Key in Observer
-    this.observer.key = value;
+    this.observer._key = value;
 
-    // Update Key in PersistManager (only if the Keys are the same -> otherwise the PersistKey got formatted and will be set where other)
-    if (this.persistent?.key === oldKey) this.persistent?.setKey(value);
+    // Update Key in Persistent (only if oldKey equal to persistentKey -> otherwise the PersistentKey got formatted and will be set where other)
+    if (value && this.persistent?._key === oldKey)
+      this.persistent?.setKey(value);
 
     return this;
   }
