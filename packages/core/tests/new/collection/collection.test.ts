@@ -6,6 +6,7 @@ import {
   Item,
   CollectionPersistent,
 } from "../../../src";
+import * as Utils from "../../../src/utils";
 
 describe("Collection Tests", () => {
   interface ItemInterface {
@@ -20,6 +21,7 @@ describe("Collection Tests", () => {
 
     jest.spyOn(Collection.prototype, "initSelectors");
     jest.spyOn(Collection.prototype, "initGroups");
+    console.error = jest.fn();
   });
 
   it("should create Collection (default config)", () => {
@@ -575,6 +577,139 @@ describe("Collection Tests", () => {
           { id: "2", name: "hans" },
           "2",
           1
+        );
+      });
+    });
+
+    describe("update function tests", () => {
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
+
+        dummyItem.set = jest.fn();
+        collection.updateItemKey = jest.fn();
+        jest.spyOn(Utils, "flatMerge");
+      });
+
+      it("should update existing Item with valid changes Object (default config)", () => {
+        const response = collection.update("dummyItem", { name: "hans" });
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          {
+            id: "dummyItem",
+            name: "hans",
+          },
+          {
+            background: false,
+            storage: true,
+          }
+        );
+        expect(Utils.flatMerge).toHaveBeenCalledWith(
+          { id: "dummyItem", name: "frank" },
+          { name: "hans" },
+          {
+            addNewProperties: false,
+          }
+        );
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it("should update existing Item with valid changes Object (specific config)", () => {
+        const response = collection.update(
+          "dummyItem",
+          { name: "hans" },
+          {
+            addNewProperties: true,
+            background: true,
+          }
+        );
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          {
+            id: "dummyItem",
+            name: "hans",
+          },
+          {
+            background: true,
+            storage: true,
+          }
+        );
+        expect(Utils.flatMerge).toHaveBeenCalledWith(
+          { id: "dummyItem", name: "frank" },
+          { name: "hans" },
+          {
+            addNewProperties: true,
+          }
+        );
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't update not existing Item and should print error", () => {
+        const response = collection.update("notExisting", { name: "hans" });
+
+        expect(response).toBeUndefined();
+        expect(console.error).toHaveBeenCalledWith(
+          `Agile Error: ItemKey 'notExisting' doesn't exist in Collection '${collection._key}'!`
+        );
+        expect(dummyItem.set).not.toHaveBeenCalled();
+        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't update existing Item with invalid changes Object and should print error", () => {
+        const response = collection.update(
+          "dummyItem",
+          "notValidChanges" as any
+        );
+
+        expect(response).toBeUndefined();
+        expect(console.error).toHaveBeenCalledWith(
+          `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`
+        );
+        expect(dummyItem.set).not.toHaveBeenCalled();
+        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it("should update existing Item and its ItemKey with valid changes Object if ItemKey has changed (default config)", () => {
+        const response = collection.update("dummyItem", {
+          id: "newDummyItemKey",
+          name: "hans",
+        });
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          {
+            id: "newDummyItemKey",
+            name: "hans",
+          },
+          {
+            background: false,
+            storage: false,
+          }
+        );
+        expect(Utils.flatMerge).toHaveBeenCalledWith(
+          { id: "dummyItem", name: "frank" },
+          { id: "newDummyItemKey", name: "hans" },
+          {
+            addNewProperties: false,
+          }
+        );
+        expect(collection.updateItemKey).toHaveBeenCalledWith(
+          "dummyItem",
+          "newDummyItemKey",
+          {
+            background: false,
+          }
         );
       });
     });

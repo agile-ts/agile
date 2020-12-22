@@ -270,31 +270,32 @@ export class Collection<DataType = DefaultItem> {
     changes: DefaultItem | DataType,
     config: UpdateConfigInterface = {}
   ): Item<DataType> | undefined {
-    if (!this.data.hasOwnProperty(itemKey)) {
-      console.error(
-        `Agile: ItemKey '${itemKey}' doesn't exist in Collection!`,
-        this
+    const item = this.getItem(itemKey);
+    const primaryKey = this.config.primaryKey;
+    config = defineConfig(config, {
+      addNewProperties: false,
+      background: false,
+    });
+
+    if (!item) {
+      Agile.logger.error(
+        `ItemKey '${itemKey}' doesn't exist in Collection '${this._key}'!`
       );
       return undefined;
     }
     if (!isValidObject(changes)) {
-      console.error(`Agile: Changes have to be an Object!`, this);
+      Agile.logger.error(
+        `You have to pass an valid Changes Object to update '${itemKey}' in '${this._key}'!`
+      );
       return undefined;
     }
 
-    const item = this.data[itemKey];
-    const primaryKey = this.config.primaryKey;
-    config = defineConfig(config, {
-      addNewProperties: true,
-      background: false,
-    });
-
-    // Merge changes into ItemValue
+    // Merge changes into current ItemValue
     const newItemValue = flatMerge(copy(item.nextStateValue), changes, {
       addNewProperties: config.addNewProperties,
     });
 
-    const oldItemKey = item.value[primaryKey];
+    const oldItemKey = item._value[primaryKey];
     const newItemKey = newItemValue[primaryKey];
     const updatedItemKey = oldItemKey !== newItemKey;
 
@@ -310,7 +311,7 @@ export class Collection<DataType = DefaultItem> {
         background: config.background,
       });
 
-    return this.data[newItemValue[primaryKey]];
+    return item;
   }
 
   //=========================================================================================================
