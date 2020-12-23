@@ -582,9 +582,16 @@ export class Collection<DataType = DefaultItem> {
 
     // Create Placeholder Item to hold reference
     if (!item) {
-      const dummyItem = new Item<DataType>(this, "unknown" as any, {
-        isPlaceholder: true,
-      });
+      const dummyItem = new Item<DataType>(
+        this,
+        {
+          [this.config.primaryKey]: itemKey, // Setting ItemKey to assign key to Item
+          dummy: "item",
+        } as any,
+        {
+          isPlaceholder: true,
+        }
+      );
       this.data[itemKey] = dummyItem;
       return dummyItem;
     }
