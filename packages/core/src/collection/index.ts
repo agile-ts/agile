@@ -270,7 +270,7 @@ export class Collection<DataType = DefaultItem> {
     changes: DefaultItem | DataType,
     config: UpdateConfigInterface = {}
   ): Item<DataType> | undefined {
-    const item = this.getItem(itemKey);
+    const item = this.getItem(itemKey, { notExisting: true });
     const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
       addNewProperties: false,
@@ -327,7 +327,7 @@ export class Collection<DataType = DefaultItem> {
     groupKey: GroupKey,
     initialItems?: Array<ItemKey>
   ): Group<DataType> {
-    let group = this.getGroup(groupKey);
+    let group = this.getGroup(groupKey, { notExisting: true });
 
     // Check if Group already exists
     if (group) {
@@ -359,7 +359,7 @@ export class Collection<DataType = DefaultItem> {
     selectorKey: SelectorKey,
     itemKey: ItemKey
   ): Selector<DataType> {
-    let selector = this.getSelector(selectorKey);
+    let selector = this.getSelector(selectorKey, { notExisting: true });
 
     // Check if Selector already exists
     if (selector) {
@@ -418,7 +418,7 @@ export class Collection<DataType = DefaultItem> {
    * @param groupKey - Name/Key of Group
    */
   public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
-    let group = this.getGroup(groupKey);
+    let group = this.getGroup(groupKey, { notExisting: true });
 
     // Create dummy Group to hold reference
     if (!group) {
@@ -493,7 +493,7 @@ export class Collection<DataType = DefaultItem> {
   public getSelectorWithReference(
     selectorKey: SelectorKey
   ): Selector<DataType> {
-    let selector = this.getSelector(selectorKey);
+    let selector = this.getSelector(selectorKey, { notExisting: true });
 
     // Create dummy Selector to hold reference
     if (!selector) {
@@ -578,7 +578,7 @@ export class Collection<DataType = DefaultItem> {
    * @param itemKey - Name/Key of Item
    */
   public getItemWithReference(itemKey: ItemKey): Item<DataType> {
-    let item = this.getItem(itemKey);
+    let item = this.getItem(itemKey, { notExisting: true });
 
     // Create Placeholder Item to hold reference
     if (!item) {
@@ -607,9 +607,13 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Get Value of Item by Key/Name
    * @param itemKey - ItemKey of Item that holds the Value
+   * @param config - Config
    */
-  public getItemValue(itemKey: ItemKey | undefined): DataType | undefined {
-    let item = this.getItem(itemKey);
+  public getItemValue(
+    itemKey: ItemKey | undefined,
+    config: GetItemConfigInterface = {}
+  ): DataType | undefined {
+    let item = this.getItem(itemKey, config);
     if (!item) return undefined;
     return item.value;
   }
@@ -756,9 +760,9 @@ export class Collection<DataType = DefaultItem> {
   public updateItemKey(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
-    config?: UpdateItemKeyConfigInterface
+    config: UpdateItemKeyConfigInterface = {}
   ): void {
-    const item = this.getItem(oldItemKey);
+    const item = this.getItem(oldItemKey, { notExisting: true });
     config = defineConfig(config, {
       background: false,
     });
@@ -779,7 +783,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Update Groups
     for (let groupKey in this.groups) {
-      const group = this.getGroup(groupKey);
+      const group = this.getGroup(groupKey, { notExisting: true });
       if (!group || group.isPlaceholder || !group.has(oldItemKey)) continue;
 
       // Replace old ItemKey with new ItemKey
@@ -790,7 +794,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Update Selectors
     for (let selectorKey in this.selectors) {
-      const selector = this.getSelector(selectorKey);
+      const selector = this.getSelector(selectorKey, { notExisting: true });
       if (!selector || selector.itemKey !== oldItemKey) continue;
 
       // Replace old selected ItemKey with new ItemKey
@@ -821,7 +825,7 @@ export class Collection<DataType = DefaultItem> {
 
       // Remove ItemKey from Groups
       _groupKeys.forEach((groupKey) => {
-        const group = this.getGroup(groupKey);
+        const group = this.getGroup(groupKey, { notExisting: true });
         if (!group) return;
         group.remove(itemKey);
         removedFromGroupsCount++;
@@ -845,19 +849,19 @@ export class Collection<DataType = DefaultItem> {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
     _itemKeys.forEach((itemKey) => {
-      const item = this.getItem(itemKey);
+      const item = this.getItem(itemKey, { notExisting: true });
       if (!item) return;
 
       // Remove Item from Groups
       for (let groupKey in this.groups) {
-        const group = this.getGroup(groupKey);
+        const group = this.getGroup(groupKey, { notExisting: true });
         if (group && group.has(itemKey)) group.remove(itemKey);
       }
 
       // Remove Selectors that represented this Item
       for (let selectorKey in this.selectors) {
-        const selector = this.getSelector(selectorKey);
-        if (selector?.itemKey === itemKey) this.removeSelector(selectorKey);
+        const selector = this.getSelector(selectorKey, { notExisting: true });
+        if (selector?._itemKey === itemKey) this.removeSelector(selectorKey);
       }
 
       // Remove Item from Storage
@@ -903,7 +907,7 @@ export class Collection<DataType = DefaultItem> {
     }
 
     const itemKey = _data[primaryKey];
-    let item = this.getItem(itemKey);
+    let item = this.getItem(itemKey, { notExisting: true });
     const wasPlaceholder = item?.isPlaceholder || false;
     const createItem = !item;
 
