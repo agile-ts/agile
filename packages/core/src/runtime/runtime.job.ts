@@ -10,8 +10,8 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
 
   /**
    * @internal
-   * Job - Holds Observer and gets executed/performed by the Runtime
-   * @param observer - Observer that is represented by this Job and gets performed
+   * Job - Represents Observer that gets performed by the Runtime
+   * @param observer - Observer
    * @param config - Config
    */
   constructor(
@@ -28,7 +28,6 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       force: config.force,
       sideEffects: config.sideEffects,
     };
-
     this.observer = observer;
     this.rerender =
       !config.background &&

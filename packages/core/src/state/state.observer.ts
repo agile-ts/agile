@@ -28,12 +28,7 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
-    super(state.agileInstance(), {
-      deps: config.deps,
-      value: state._value,
-      key: config.key,
-      subs: config.subs,
-    });
+    super(state.agileInstance(), { ...config, ...{ value: state._value } });
     this.state = () => state;
     this.nextStateValue = copy(state._value);
   }
@@ -76,8 +71,14 @@ export class StateObserver<ValueType = any> extends Observer {
       sideEffects: true,
       force: false,
       storage: true,
-      overwrite: state.isPlaceholder,
+      overwrite: false,
     });
+
+    // Force overwriting State because if setting Value the State shouldn't be a placeholder anymore
+    if (state.isPlaceholder) {
+      config.force = true;
+      config.overwrite = true;
+    }
 
     // Assign next State Value and compute it if necessary
     this.nextStateValue = state.computeMethod
@@ -126,10 +127,7 @@ export class StateObserver<ValueType = any> extends Observer {
       state.isPlaceholder = false;
     }
 
-    state.isSet = notEqual(
-      state._value,
-      state.initialStateValue
-    );
+    state.isSet = notEqual(state._value, state.initialStateValue);
 
     this.sideEffects(job);
   }

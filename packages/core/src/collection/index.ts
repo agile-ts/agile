@@ -162,7 +162,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Set Key/Name of Group to property Name
     for (let key in groupsObject)
-      if (!groupsObject[key]._key) groupsObject[key]._key = key;
+      if (!groupsObject[key]._key) groupsObject[key].setKey(key);
 
     this.groups = groupsObject;
   }
@@ -193,7 +193,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Set Key/Name of Selector to property Name
     for (let key in selectorsObject)
-      if (!selectorsObject[key]._key) selectorsObject[key]._key = key;
+      if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
 
     this.selectors = selectorsObject;
   }

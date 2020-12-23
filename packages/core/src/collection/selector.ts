@@ -1,13 +1,12 @@
 import {
   Agile,
   Collection,
-  copy,
   DefaultItem,
   defineConfig,
   Item,
   ItemKey,
-  SetConfigInterface,
   State,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class Selector<DataType = DefaultItem> extends State<
@@ -67,7 +66,10 @@ export class Selector<DataType = DefaultItem> extends State<
    * @param itemKey - New ItemKey
    * @param config - Config
    */
-  public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
+  public select(
+    itemKey: ItemKey,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
     const oldItem = this.item;
     let newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
@@ -75,6 +77,7 @@ export class Selector<DataType = DefaultItem> extends State<
       sideEffects: true,
       force: false,
       overwrite: oldItem?.isPlaceholder || false,
+      storage: true,
     });
 
     if (this._itemKey === itemKey && !config.force) {
@@ -115,15 +118,7 @@ export class Selector<DataType = DefaultItem> extends State<
    * Rebuilds Selector
    * @param config - Config
    */
-  public rebuildSelector(config: SetConfigInterface = {}) {
-    config = defineConfig(config, {
-      sideEffects: true,
-      background: false,
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-
+  public rebuildSelector(config: StateRuntimeJobConfigInterface = {}) {
     // Set Selector Value to undefined if Item doesn't exist
     if (!this.item || this.item.isPlaceholder) {
       this.set(undefined, config);
@@ -144,17 +139,4 @@ export type SelectorKey = string | number;
 export interface SelectorConfigInterface {
   key?: SelectorKey;
   isPlaceholder?: boolean;
-}
-
-/**
- * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of Selector get executed
- * @param force - Force to select ItemKey
- * @param overwrite - If the Selector gets overwritten with the new selected Item (initialStateValue, ..)
- */
-export interface SelectConfigInterface {
-  background?: boolean;
-  sideEffects?: boolean;
-  force?: boolean;
-  overwrite?: boolean;
 }

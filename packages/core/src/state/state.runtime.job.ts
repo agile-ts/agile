@@ -14,7 +14,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
     config: CreateStateRuntimeJobConfigInterface = {}
   ) {
     super(observer, config);
-    config = defineConfig<RuntimeJobConfigInterface>(config, {
+    config = defineConfig(config, {
       background: false,
       sideEffects: true,
       force: false,
@@ -41,8 +41,8 @@ export interface CreateStateRuntimeJobConfigInterface
 }
 
 /**
- * @param overwrite - If State gets overwritten with value
- * @param storage - If Job value gets saved in Storage
+ * @param overwrite - If whole State Value gets overwritten with Job Value
+ * @param storage - If Job Value can be saved in Storage
  */
 export interface StateRuntimeJobConfigInterface
   extends RuntimeJobConfigInterface {
