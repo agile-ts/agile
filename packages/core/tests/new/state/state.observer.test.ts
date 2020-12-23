@@ -1,7 +1,7 @@
 import {
   Agile,
   Computed,
-  Job,
+  RuntimeJob,
   Observer,
   State,
   StateObserver,
@@ -182,10 +182,12 @@ describe("StateObserver Tests", () => {
     });
 
     describe("perform function tests", () => {
-      let dummyJob: Job<StateObserver>;
+      let dummyJob: RuntimeJob<StateObserver>;
 
       beforeEach(() => {
-        dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
+        dummyJob = new RuntimeJob<StateObserver>(stateObserver, {
+          key: "dummyJob",
+        });
         dummyState.persistent = new StatePersistent(dummyState);
         dummyState.isPersisted = true;
 
@@ -243,12 +245,14 @@ describe("StateObserver Tests", () => {
     });
 
     describe("sideEffects function tests", () => {
-      let dummyJob: Job<StateObserver>;
+      let dummyJob: RuntimeJob<StateObserver>;
       let dummyStateObserver: StateObserver;
 
       beforeEach(() => {
         dummyStateObserver = new StateObserver(new State(dummyAgile, "test"));
-        dummyJob = new Job<StateObserver>(stateObserver, { key: "dummyJob" });
+        dummyJob = new RuntimeJob<StateObserver>(stateObserver, {
+          key: "dummyJob",
+        });
 
         dummyState.observer.deps.add(dummyStateObserver);
 

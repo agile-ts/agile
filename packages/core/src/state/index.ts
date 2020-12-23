@@ -12,9 +12,9 @@ import {
   isFunction,
   notEqual,
   generateId,
-  JobConfigInterface,
   PersistentKey,
   ComputedTracker,
+  StateIngestConfigInterface,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -157,24 +157,13 @@ export class State<ValueType = any> {
       Agile.logger.warn(message);
     }
 
-    // Overwrite old Item Values with new Item Value
-    if (config.overwrite) {
-      this._value = copy(value);
-      this.nextStateValue = copy(value);
-      this.previousStateValue = copy(value);
-      this.initialStateValue = copy(value);
-      this.isSet = false;
-      this.isPlaceholder = false;
-
-      config.force = true;
-    }
-
     // Ingest new value into Runtime
     this.observer.ingestValue(value, {
       storage: config.storage,
       background: config.background,
       force: config.force,
       sideEffects: config.sideEffects,
+      overwrite: config.overwrite,
     });
 
     return this;
@@ -188,7 +177,7 @@ export class State<ValueType = any> {
    * Ingests nextStateValue, computedValue into Runtime
    * @param config - Config
    */
-  public ingest(config: JobConfigInterface = {}): this {
+  public ingest(config: StateIngestConfigInterface = {}): this {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,

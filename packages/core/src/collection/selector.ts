@@ -82,18 +82,6 @@ export class Selector<DataType = DefaultItem> extends State<
       return this;
     }
 
-    // Overwrite old Item Values with new Item Value
-    if (config.overwrite) {
-      this._value = copy(newItem._value);
-      this.nextStateValue = copy(newItem._value);
-      this.previousStateValue = copy(newItem._value);
-      this.initialStateValue = copy(newItem._value);
-      this.isSet = false;
-      this.isPlaceholder = false;
-
-      config.force = true;
-    }
-
     // Remove old Item from Collection if it is an Placeholder
     if (oldItem?.isPlaceholder) delete this.collection().data[this._itemKey];
 
@@ -113,6 +101,7 @@ export class Selector<DataType = DefaultItem> extends State<
       background: config.background,
       sideEffects: config.sideEffects,
       force: config.force,
+      overwrite: config.overwrite,
     });
 
     return this;
@@ -132,6 +121,7 @@ export class Selector<DataType = DefaultItem> extends State<
       background: false,
       force: false,
       storage: true,
+      overwrite: false,
     });
 
     // Set Selector Value to undefined if Item doesn't exist

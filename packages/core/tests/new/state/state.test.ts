@@ -372,7 +372,6 @@ describe("State Tests", () => {
       it("should update values of State and shouldn't overwrite it if State is placeholder (config.overwrite = false)", () => {
         numberState.isPlaceholder = true;
 
-        // TODO somehow State got called 5 times before here..
         numberState.set(20, { overwrite: false });
 
         expect(console.warn).not.toHaveBeenCalled();

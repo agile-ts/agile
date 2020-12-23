@@ -713,5 +713,27 @@ describe("Collection Tests", () => {
         );
       });
     });
+
+    describe("createGroup function tests", () => {
+      let dummyGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+
+        collection.groups = {
+          dummyGroup: dummyGroup,
+        };
+
+        dummyGroup.set = jest.fn();
+      });
+
+      it("should create Group if it doesn't exist", () => {
+        const response = collection.createGroup("newGroup", ["test1"]);
+
+        expect(response._key).toBe("newGroup");
+        expect(response.isPlaceholder).toBeFalsy();
+        expect(response._value).toStrictEqual(["test1"]);
+      });
+    });
   });
 });

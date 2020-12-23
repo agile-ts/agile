@@ -1,4 +1,4 @@
-import { Agile, Integration, Job, Observer } from "../../../src";
+import { Agile, Integration, RuntimeJob, Observer } from "../../../src";
 
 describe("Job Tests", () => {
   let dummyAgile: Agile;
@@ -16,7 +16,7 @@ describe("Job Tests", () => {
   it("should create Job with Agile that has integrations (default config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new Job(dummyObserver);
+    const job = new RuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
@@ -34,7 +34,7 @@ describe("Job Tests", () => {
   it("should create Job with Agile that has integrations (specific config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new Job(dummyObserver, {
+    const job = new RuntimeJob(dummyObserver, {
       key: "dummyJob",
       sideEffects: false,
       force: true,
@@ -55,7 +55,7 @@ describe("Job Tests", () => {
   });
 
   it("should create Job with Agile that has no integrations (default config)", () => {
-    const job = new Job(dummyObserver);
+    const job = new RuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
@@ -73,7 +73,7 @@ describe("Job Tests", () => {
   it("should create Job and Agile that has integrations (config.background = true)", () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new Job(dummyObserver, { background: true });
+    const job = new RuntimeJob(dummyObserver, { background: true });
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
@@ -89,10 +89,10 @@ describe("Job Tests", () => {
   });
 
   describe("Job Function Tests", () => {
-    let job: Job;
+    let job: RuntimeJob;
 
     beforeEach(() => {
-      job = new Job(dummyObserver);
+      job = new RuntimeJob(dummyObserver);
     });
 
     describe("key get function tests", () => {

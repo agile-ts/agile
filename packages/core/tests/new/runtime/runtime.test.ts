@@ -2,7 +2,7 @@ import {
   Agile,
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
-  Job,
+  RuntimeJob,
   Observer,
   Runtime,
   SubscriptionContainer,
@@ -41,10 +41,10 @@ describe("Runtime Tests", () => {
     });
 
     describe("ingest function tests", () => {
-      let dummyJob: Job;
+      let dummyJob: RuntimeJob;
 
       beforeEach(() => {
-        dummyJob = new Job(dummyObserver1);
+        dummyJob = new RuntimeJob(dummyObserver1);
 
         runtime.perform = jest.fn();
         runtime.jobQueue.shift = jest.fn(() => dummyJob);
@@ -70,14 +70,14 @@ describe("Runtime Tests", () => {
     });
 
     describe("perform function tests", () => {
-      let dummyJob1: Job;
-      let dummyJob2: Job;
-      let dummyJob3: Job;
+      let dummyJob1: RuntimeJob;
+      let dummyJob2: RuntimeJob;
+      let dummyJob3: RuntimeJob;
 
       beforeEach(() => {
-        dummyJob1 = new Job(dummyObserver1, { key: "dummyJob1" });
-        dummyJob2 = new Job(dummyObserver2, { key: "dummyJob2" });
-        dummyJob3 = new Job(dummyObserver1, { key: "dummyJob3" });
+        dummyJob1 = new RuntimeJob(dummyObserver1, { key: "dummyJob1" });
+        dummyJob2 = new RuntimeJob(dummyObserver2, { key: "dummyJob2" });
+        dummyJob3 = new RuntimeJob(dummyObserver1, { key: "dummyJob3" });
         dummyJob1.rerender = true;
         dummyJob2.rerender = true;
         dummyJob3.rerender = false;
@@ -135,10 +135,10 @@ describe("Runtime Tests", () => {
 
     describe("updateSubscribers function tests", () => {
       let dummyObserver4: Observer;
-      let rCallbackSubJob: Job;
-      let nrArCallbackSubJob: Job;
-      let rComponentSubJob: Job;
-      let nrArComponentSubJob: Job;
+      let rCallbackSubJob: RuntimeJob;
+      let nrArCallbackSubJob: RuntimeJob;
+      let rComponentSubJob: RuntimeJob;
+      let nrArComponentSubJob: RuntimeJob;
       let rCallbackSubContainer: CallbackSubscriptionContainer;
       let rCallbackSubContainerCallbackFunction = () => {};
       let nrCallbackSubContainer: CallbackSubscriptionContainer;
@@ -194,10 +194,14 @@ describe("Runtime Tests", () => {
         ).subscriptionContainer as ComponentSubscriptionContainer;
         nrComponentSubContainer.ready = false;
 
-        rComponentSubJob = new Job(dummyObserver3, { key: "dummyJob3" }); // Job with ready Component Subscription
-        rCallbackSubJob = new Job(dummyObserver1, { key: "dummyJob1" }); // Job with ready CallbackSubscription
-        nrArComponentSubJob = new Job(dummyObserver4, { key: "dummyJob4" }); // Job with not ready and ready Component Subscription
-        nrArCallbackSubJob = new Job(dummyObserver2, { key: "dummyJob2" }); // Job with not ready and ready Callback Subscription
+        rComponentSubJob = new RuntimeJob(dummyObserver3, { key: "dummyJob3" }); // Job with ready Component Subscription
+        rCallbackSubJob = new RuntimeJob(dummyObserver1, { key: "dummyJob1" }); // Job with ready CallbackSubscription
+        nrArComponentSubJob = new RuntimeJob(dummyObserver4, {
+          key: "dummyJob4",
+        }); // Job with not ready and ready Component Subscription
+        nrArCallbackSubJob = new RuntimeJob(dummyObserver2, {
+          key: "dummyJob2",
+        }); // Job with not ready and ready Callback Subscription
 
         jest.spyOn(dummyAgile.integrations, "update");
         jest.spyOn(runtime, "handleObjectBasedSubscription");
@@ -358,16 +362,16 @@ describe("Runtime Tests", () => {
       let dummyComponent2 = {
         my: "second cool component",
       };
-      let arrayJob: Job;
-      let objectJob1: Job;
-      let objectJob2: Job;
+      let arrayJob: RuntimeJob;
+      let objectJob1: RuntimeJob;
+      let objectJob2: RuntimeJob;
 
       beforeEach(() => {
         arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsArray(
           dummyComponent,
           [dummyObserver1, dummyObserver2, dummyObserver3]
         );
-        arrayJob = new Job(dummyObserver1, { key: "dummyArrayJob" });
+        arrayJob = new RuntimeJob(dummyObserver1, { key: "dummyArrayJob" });
 
         objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
           dummyComponent2,
@@ -377,8 +381,8 @@ describe("Runtime Tests", () => {
             observer3: dummyObserver3,
           }
         ).subscriptionContainer;
-        objectJob1 = new Job(dummyObserver1, { key: "dummyObjectJob1" });
-        objectJob2 = new Job(dummyObserver3, { key: "dummyObjectJob2" });
+        objectJob1 = new RuntimeJob(dummyObserver1, { key: "dummyObjectJob1" });
+        objectJob2 = new RuntimeJob(dummyObserver3, { key: "dummyObjectJob2" });
       });
 
       it("should ignore not object based SubscriptionContainer", () => {

@@ -1,11 +1,9 @@
 import {
   Agile,
   SubscriptionContainer,
-  Observer,
-  Job,
+  RuntimeJob,
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
-  CreateJobConfigInterface,
   defineConfig,
 } from "../internal";
 
@@ -13,10 +11,10 @@ export class Runtime {
   public agileInstance: () => Agile;
 
   // Queue system
-  public currentJob: Job | null = null;
-  public jobQueue: Array<Job> = [];
-  public notReadyJobsToRerender: Set<Job> = new Set(); // Jobs that got performed but aren't ready to get rerendered (wait for mount)
-  public jobsToRerender: Array<Job> = []; // Jobs that are performed and will be rendered
+  public currentJob: RuntimeJob | null = null;
+  public jobQueue: Array<RuntimeJob> = [];
+  public notReadyJobsToRerender: Set<RuntimeJob> = new Set(); // Jobs that got performed but aren't ready to get rerendered (wait for mount)
+  public jobsToRerender: Array<RuntimeJob> = []; // Jobs that are performed and will be rendered
 
   /**
    * @internal
@@ -32,23 +30,15 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Ingests Observer into Runtime
-   * -> Creates Job which will be performed by the Runtime
-   * @param observer - Observer that gets performed by the Runtime
+   * Ingests Job into Runtime that gets performed
+   * @param job - Job
    * @param config - Config
    */
-  public ingest(observer: Observer, config: IngestConfigInterface = {}): void {
+  public ingest(job: RuntimeJob, config: IngestConfigInterface = {}): void {
     config = defineConfig(config, {
       perform: true,
     });
 
-    const job = new Job(observer, {
-      storage: config.storage,
-      sideEffects: config.sideEffects,
-      force: config.force,
-      background: config.background,
-      key: config.key || observer._key,
-    });
     this.jobQueue.push(job);
 
     // Logging
@@ -69,7 +59,7 @@ export class Runtime {
    * Performs Job and adds it to the rerender queue if necessary
    * @param job - Job that gets performed
    */
-  public perform(job: Job): void {
+  public perform(job: RuntimeJob): void {
     this.currentJob = job;
 
     // Perform Job
@@ -180,7 +170,7 @@ export class Runtime {
    */
   public handleObjectBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
-    job: Job
+    job: RuntimeJob
   ): void {
     let foundKey: string | null = null;
 
@@ -226,6 +216,6 @@ export class Runtime {
 /**
  * @param perform - If Job gets performed immediately
  */
-export interface IngestConfigInterface extends CreateJobConfigInterface {
+export interface IngestConfigInterface {
   perform?: boolean;
 }
