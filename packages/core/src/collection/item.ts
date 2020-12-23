@@ -1,4 +1,10 @@
-import { State, Collection, DefaultItem, StateKey } from "../internal";
+import {
+  State,
+  Collection,
+  DefaultItem,
+  StateKey,
+  StateConfigInterface,
+} from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
   static updateGroupSideEffectKey = "rebuildGroup";
@@ -9,9 +15,14 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    * Item of Collection
    * @param collection - Collection to which the Item belongs
    * @param data - Data that the Item holds
+   * @param config - Config
    */
-  constructor(collection: Collection<DataType>, data: DataType) {
-    super(collection.agileInstance(), data);
+  constructor(
+    collection: Collection<DataType>,
+    data: DataType,
+    config: StateConfigInterface = {}
+  ) {
+    super(collection.agileInstance(), data, config);
     this.collection = () => collection;
 
     // Set Key/Name of Item to primaryKey of Data

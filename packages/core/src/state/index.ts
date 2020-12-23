@@ -54,17 +54,22 @@ export class State<ValueType = any> {
   ) {
     config = defineConfig(config, {
       deps: [],
+      isPlaceholder: false,
     });
     this.agileInstance = () => agileInstance;
-    this.initialStateValue = initialValue;
     this._key = config.key;
-    this._value = copy(initialValue);
-    this.previousStateValue = copy(initialValue);
-    this.nextStateValue = copy(initialValue);
     this.observer = new StateObserver<ValueType>(this, {
       key: config.key,
       deps: config.deps,
     });
+    this.initialStateValue = copy(initialValue);
+    this._value = copy(initialValue);
+    this.previousStateValue = copy(initialValue);
+    this.nextStateValue = copy(initialValue);
+    this.isPlaceholder = true;
+
+    // Initial Set
+    if (!config.isPlaceholder) this.set(initialValue, { overwrite: true });
   }
 
   /**
@@ -139,6 +144,7 @@ export class State<ValueType = any> {
       background: false,
       force: false,
       storage: true,
+      overwrite: this.isPlaceholder,
     });
 
     // Check value has correct Type (js)
@@ -151,11 +157,25 @@ export class State<ValueType = any> {
       Agile.logger.warn(message);
     }
 
-    // Check if value has changed
-    if (equal(this.nextStateValue, value) && !config.force) return this;
+    // Overwrite old Item Values with new Item Value
+    if (config.overwrite) {
+      this._value = copy(value);
+      this.nextStateValue = copy(value);
+      this.previousStateValue = copy(value);
+      this.initialStateValue = copy(value);
+      this.isSet = false;
+      this.isPlaceholder = false;
 
-    // Ingest new value into runtime
-    this.observer.ingestValue(value, config);
+      config.force = true;
+    }
+
+    // Ingest new value into Runtime
+    this.observer.ingestValue(value, {
+      storage: config.storage,
+      background: config.background,
+      force: config.force,
+      sideEffects: config.sideEffects,
+    });
 
     return this;
   }
@@ -617,10 +637,12 @@ export type StateKey = string | number;
 /**
  * @param key - Key/Name of State
  * @param deps - Initial deps of State
+ * @param isPlaceholder - If State is initially a Placeholder
  */
 export interface StateConfigInterface {
   key?: StateKey;
   deps?: Array<Observer>;
+  isPlaceholder?: boolean;
 }
 
 /**
@@ -628,12 +650,14 @@ export interface StateConfigInterface {
  * @param sideEffects - If Side Effects of State get executed
  * @param storage - If State value gets saved in Agile Storage (only useful if State is persisted)
  * @param force -  Force creating and performing Job
+ * @param overwrite - If the State gets overwritten with the new Value (initialStateValue, ..)
  */
 export interface SetConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
   storage?: boolean;
   force?: boolean;
+  overwrite?: boolean;
 }
 
 /**

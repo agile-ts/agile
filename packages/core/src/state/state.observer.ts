@@ -83,7 +83,7 @@ export class StateObserver<ValueType = any> extends Observer {
       : copy(newStateValue);
 
     // Check if State Value and new/next Value are equals
-    if (equal(state.value, this.nextStateValue) && !config.force) return;
+    if (equal(state._value, this.nextStateValue) && !config.force) return;
 
     this.agileInstance().runtime.ingest(this, config);
   }
@@ -100,7 +100,7 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = job.observer.state();
 
     // Set Previous State
-    state.previousStateValue = copy(state.value);
+    state.previousStateValue = copy(state._value);
 
     // Set new State Value
     state._value = copy(job.observer.nextStateValue);

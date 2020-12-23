@@ -35,9 +35,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     initialItems?: Array<ItemKey>,
     config: GroupConfigInterface = {}
   ) {
-    super(collection.agileInstance(), initialItems || [], {
-      key: config?.key,
-    });
+    super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
 
     // Add rebuild to sideEffects to rebuild Group on Value Change
@@ -331,9 +329,11 @@ export interface GroupRemoveConfig {
 
 /**
  * @param key - Key/Name of Group
+ * @param isPlaceholder - If Group is initially a Placeholder
  */
 export interface GroupConfigInterface {
   key?: GroupKey;
+  isPlaceholder?: boolean;
 }
 
 /**

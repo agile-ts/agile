@@ -329,20 +329,19 @@ export class Collection<DataType = DefaultItem> {
   ): Group<DataType> {
     let group = this.getGroup(groupKey);
 
-    // Create or update Group
+    // Check if Group already exists
     if (group) {
-      if (!group.isPlaceholder) return group;
-      group.set(initialItems || []);
-      group.isPlaceholder = false;
-    } else {
-      group = new Group<DataType>(this, initialItems, { key: groupKey });
-      this.groups[groupKey] = group;
+      if (!group.isPlaceholder) {
+        console.warn(`Group with the name '${groupKey}' already exists!`);
+        return group;
+      }
+      group.set(initialItems || [], { overwrite: true });
+      return group;
     }
 
-    if (this.groups.hasOwnProperty(groupKey)) {
-      console.warn(`Agile: Group with the name '${groupKey}' already exists!`);
-      return this.groups[groupKey];
-    }
+    // Create Group
+    group = new Group<DataType>(this, initialItems, { key: groupKey });
+    this.groups[groupKey] = group;
 
     return group;
   }
@@ -362,17 +361,21 @@ export class Collection<DataType = DefaultItem> {
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey);
 
-    // Create or update Selector
+    // Check if Selector already exists
     if (selector) {
-      if (!selector.isPlaceholder) return selector;
-      selector.select(itemKey);
-      selector.isPlaceholder = false;
-    } else {
-      selector = new Selector<DataType>(this, itemKey, {
-        key: selectorKey,
-      });
-      this.selectors[selectorKey] = selector;
+      if (!selector.isPlaceholder) {
+        console.warn(`Selector with the name '${selectorKey}' already exists!`);
+        return selector;
+      }
+      selector.select(itemKey, { overwrite: true });
+      return selector;
     }
+
+    // Create Selector
+    selector = new Selector<DataType>(this, itemKey, {
+      key: selectorKey,
+    });
+    this.selectors[selectorKey] = selector;
 
     return selector;
   }
@@ -414,18 +417,16 @@ export class Collection<DataType = DefaultItem> {
    * If Group doesn't exist, it returns a reference of the Group that will be filled with the real data later
    * @param groupKey - Name/Key of Group
    */
-  public getGroupWithReference(
-    groupKey: GroupKey | undefined
-  ): Group<DataType> {
-    let group = groupKey ? this.groups[groupKey] : undefined;
+  public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
+    let group = this.getGroup(groupKey);
 
     // Create dummy Group to hold reference
     if (!group) {
       const dummyGroup = new Group<DataType>(this, [], {
         key: groupKey,
+        isPlaceholder: true,
       });
-      dummyGroup.isPlaceholder = true;
-      this.groups[groupKey || "unknown"] = dummyGroup;
+      this.groups[groupKey] = dummyGroup;
       return dummyGroup;
     }
 
@@ -490,17 +491,17 @@ export class Collection<DataType = DefaultItem> {
    * @param selectorKey - Name/Key of Selector
    */
   public getSelectorWithReference(
-    selectorKey: SelectorKey | undefined
+    selectorKey: SelectorKey
   ): Selector<DataType> {
-    let selector = selectorKey ? this.selectors[selectorKey] : undefined;
+    let selector = this.getSelector(selectorKey);
 
-    // Create dummy Group to hold reference
+    // Create dummy Selector to hold reference
     if (!selector) {
       const dummySelector = new Selector<DataType>(this, "unknown", {
         key: selectorKey,
+        isPlaceholder: true,
       });
-      dummySelector.isPlaceholder = true;
-      this.selectors[selectorKey || "unknown"] = dummySelector;
+      this.selectors[selectorKey] = dummySelector;
       return dummySelector;
     }
 
@@ -576,17 +577,15 @@ export class Collection<DataType = DefaultItem> {
    * If Item doesn't exist, it returns a reference of the Item that will be filled with the real data later
    * @param itemKey - Name/Key of Item
    */
-  public getItemWithReference(itemKey: ItemKey | undefined): Item<DataType> {
-    let item = itemKey ? this.data[itemKey] : undefined;
+  public getItemWithReference(itemKey: ItemKey): Item<DataType> {
+    let item = this.getItem(itemKey);
 
-    // Create dummy Item to hold reference
+    // Create Placeholder Item to hold reference
     if (!item) {
-      const dummyItem = new Item<DataType>(this, {
-        [this.config.primaryKey]: itemKey,
-        dummy: true,
-      } as any);
-      dummyItem.isPlaceholder = true;
-      this.data[itemKey || "unknown"] = dummyItem;
+      const dummyItem = new Item<DataType>(this, "unknown" as any, {
+        isPlaceholder: true,
+      });
+      this.data[itemKey] = dummyItem;
       return dummyItem;
     }
 
@@ -703,10 +702,10 @@ export class Collection<DataType = DefaultItem> {
     this.data = {};
     this.size = 0;
 
-    // Reselect Items
+    // Reselect Items -> force ingest to rebuild Selector
     for (let key in this.selectors) {
       const selector = this.getSelector(key);
-      selector?.select(selector?.itemKey, { force: true });
+      selector?.ingest({ force: true });
     }
   }
 
@@ -897,24 +896,25 @@ export class Collection<DataType = DefaultItem> {
     }
 
     const itemKey = _data[primaryKey];
-    let item: Item<DataType> | undefined = this.data[itemKey];
+    let item = this.getItem(itemKey);
+    const wasPlaceholder = item?.isPlaceholder || false;
     const createItem = !item;
 
     // Create or update Item
     if (!createItem && config.patch)
-      item.patch(_data, { background: config.background });
+      item?.patch(_data, { background: config.background });
     if (!createItem && !config.patch)
-      item.set(_data, { background: config.background });
-    if (createItem) {
-      item = new Item<DataType>(this, _data);
-      this.size++;
-    }
+      item?.set(_data, { background: config.background });
+    if (createItem) item = new Item<DataType>(this, _data);
 
     // Set new Item at itemKey
-    this.data[itemKey] = item;
+    this.data[itemKey] = item as any;
 
     // Group might contain updated itemKey and now a fitting Item for that might exist -> rebuild Group Output BUT after setting it in the Collection
     if (createItem) this.rebuildGroupsThatIncludeItemKey(itemKey);
+
+    // Increase size of Collection
+    if (createItem || wasPlaceholder) this.size++;
 
     return true;
   }

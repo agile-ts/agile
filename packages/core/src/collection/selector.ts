@@ -1,6 +1,7 @@
 import {
   Agile,
   Collection,
+  copy,
   DefaultItem,
   defineConfig,
   Item,
@@ -27,16 +28,21 @@ export class Selector<DataType = DefaultItem> extends State<
   constructor(
     collection: Collection<DataType>,
     itemKey: ItemKey,
-    config?: SelectorConfigInterface
+    config: SelectorConfigInterface = {}
   ) {
-    super(collection.agileInstance(), undefined);
+    super(collection.agileInstance(), undefined, config);
+    config = defineConfig(config, {
+      isPlaceholder: false,
+    });
+
     this.collection = () => collection;
     this.item = undefined;
     this._itemKey = "unknown";
     this._key = config?.key;
+    this.isPlaceholder = true;
 
     // Initial Select
-    this.select(itemKey, { overwrite: true });
+    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -71,18 +77,21 @@ export class Selector<DataType = DefaultItem> extends State<
       overwrite: oldItem?.isPlaceholder || false,
     });
 
-    if (this._itemKey === itemKey && !config.force) {
+    if (this._itemKey === itemKey) {
       Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
     }
 
     // Overwrite old Item Values with new Item Value
     if (config.overwrite) {
-      this._value = newItem._value;
-      this.nextStateValue = newItem._value;
-      this.previousStateValue = newItem._value;
-      this.initialStateValue = newItem._value;
+      this._value = copy(newItem._value);
+      this.nextStateValue = copy(newItem._value);
+      this.previousStateValue = copy(newItem._value);
+      this.initialStateValue = copy(newItem._value);
       this.isSet = false;
+      this.isPlaceholder = false;
+
+      config.force = true;
     }
 
     // Remove old Item from Collection if it is an Placeholder
@@ -140,9 +149,11 @@ export type SelectorKey = string | number;
 
 /**
  * @param key - Key/Name of Selector
+ * @param isPlaceholder - If Selector is initially a Placeholder
  */
 export interface SelectorConfigInterface {
   key?: SelectorKey;
+  isPlaceholder?: boolean;
 }
 
 /**
