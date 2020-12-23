@@ -9,6 +9,7 @@ describe("Selector Tests", () => {
   let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
@@ -16,7 +17,7 @@ describe("Selector Tests", () => {
     console.warn = jest.fn();
   });
 
-  it("should create Selector (default config)", () => {
+  it("should create Selector and call initial select (default config)", () => {
     // Overwrite select once to not call it
     jest.spyOn(Selector.prototype, "select").mockReturnValueOnce(undefined);
 
@@ -32,7 +33,7 @@ describe("Selector Tests", () => {
     expect(selector._key).toBeUndefined();
     expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
-    expect(selector.isPlaceholder).toBeFalsy();
+    expect(selector.isPlaceholder).toBeTruthy();
     expect(selector.initialStateValue).toBeUndefined();
     expect(selector._value).toBeUndefined();
     expect(selector.previousStateValue).toBeUndefined();
@@ -47,7 +48,7 @@ describe("Selector Tests", () => {
     expect(selector.watchers).toStrictEqual({});
   });
 
-  it("should create Selector (specific config)", () => {
+  it("should create Selector and call initial select (specific config)", () => {
     // Overwrite select once to not call it
     jest.spyOn(Selector.prototype, "select").mockReturnValueOnce(undefined);
 
@@ -65,7 +66,38 @@ describe("Selector Tests", () => {
     expect(selector._key).toBe("dummyKey");
     expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
-    expect(selector.isPlaceholder).toBeFalsy();
+    expect(selector.isPlaceholder).toBeTruthy();
+    expect(selector.initialStateValue).toBeUndefined();
+    expect(selector._value).toBeUndefined();
+    expect(selector.previousStateValue).toBeUndefined();
+    expect(selector.nextStateValue).toBeUndefined();
+    expect(selector.observer).toBeInstanceOf(StateObserver);
+    expect(selector.observer.deps.size).toBe(0);
+    expect(selector.observer._key).toBe("dummyKey");
+    expect(selector.sideEffects).toStrictEqual({});
+    expect(selector.computeMethod).toBeUndefined();
+    expect(selector.isPersisted).toBeFalsy();
+    expect(selector.persistent).toBeUndefined();
+    expect(selector.watchers).toStrictEqual({});
+  });
+
+  it("should create Selector and shouldn't call initial select (config.isPlaceholder = true)", () => {
+    // Overwrite select once to not call it
+    jest.spyOn(Selector.prototype, "select").mockReturnValueOnce(undefined);
+
+    const selector = new Selector(dummyCollection, "dummyItemKey", {
+      isPlaceholder: true,
+    });
+
+    expect(selector.collection()).toBe(dummyCollection);
+    expect(selector.item).toBeUndefined();
+    expect(selector._itemKey).toBe("unknown");
+    expect(selector.select).not.toHaveBeenCalled();
+
+    expect(selector._key).toBeUndefined();
+    expect(selector.valueType).toBeUndefined();
+    expect(selector.isSet).toBeFalsy();
+    expect(selector.isPlaceholder).toBeTruthy();
     expect(selector.initialStateValue).toBeUndefined();
     expect(selector._value).toBeUndefined();
     expect(selector.previousStateValue).toBeUndefined();
@@ -152,6 +184,7 @@ describe("Selector Tests", () => {
         expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
         expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isPlaceholder).toBeFalsy();
         expect(selector.isSet).toBeTruthy();
       });
 
@@ -191,45 +224,11 @@ describe("Selector Tests", () => {
         expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
         expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isPlaceholder).toBeFalsy();
         expect(selector.isSet).toBeTruthy();
       });
 
-      it("should unselect old selected Item and select new Item with overwriting Selector (config.overwrite = true)", () => {
-        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
-
-        selector.select("dummyItem2Key", { overwrite: true });
-
-        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
-          "dummyItem2Key"
-        );
-        expect(selector._itemKey).toBe("dummyItem2Key");
-        expect(selector.item).toBe(dummyItem2);
-        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
-          Selector.rebuildSelectorSideEffectKey
-        );
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
-          Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
-        );
-        expect(selector.rebuildSelector).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: true,
-          force: false,
-        });
-
-        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
-        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
-        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
-        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem2._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.isSet).toBeFalsy();
-      });
-
-      it("should print warning if trying to select the selected Item again (default config)", () => {
+      it("should print warning if trying to select selected Item again (default config)", () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem1);
 
         selector.select("dummyItem1Key");
@@ -256,10 +255,11 @@ describe("Selector Tests", () => {
         expect(selector.nextStateValue).toStrictEqual(dummyItem1._value);
         expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
         expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isPlaceholder).toBeFalsy();
         expect(selector.isSet).toBeFalsy();
       });
 
-      it("should be able to select the selected Item again (config.force = true)", () => {
+      it("should be able to select selected Item again (config.force = true)", () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem1);
 
         selector.select("dummyItem1Key", { force: true });
@@ -296,7 +296,43 @@ describe("Selector Tests", () => {
         expect(selector.isSet).toBeFalsy();
       });
 
-      it("should remove old selected placeholder Item and select new Item with overwriting Selector (default config)", async () => {
+      it("should unselect old selected Item and select new Item with overwriting Selector (config.overwrite = true)", () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
+
+        selector.select("dummyItem2Key", { overwrite: true });
+
+        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+          "dummyItem2Key"
+        );
+        expect(selector._itemKey).toBe("dummyItem2Key");
+        expect(selector.item).toBe(dummyItem2);
+        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey
+        );
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+          Selector.rebuildSelectorSideEffectKey,
+          expect.any(Function)
+        );
+        expect(selector.rebuildSelector).toHaveBeenCalledWith({
+          background: false,
+          sideEffects: true,
+          force: true,
+        });
+
+        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
+        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
+        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
+        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
+
+        expect(selector._value).toStrictEqual(dummyItem2._value);
+        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.isPlaceholder).toBeFalsy();
+        expect(selector.isSet).toBeFalsy();
+      });
+
+      it("should remove old selected Item, select new Item and overwrite Selector if old Item is placeholder (default config)", async () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
         dummyItem1.isPlaceholder = true;
 
@@ -317,7 +353,7 @@ describe("Selector Tests", () => {
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,
-          force: false,
+          force: true,
         });
 
         expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
@@ -328,10 +364,11 @@ describe("Selector Tests", () => {
         expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
+        expect(selector.isPlaceholder).toBeFalsy();
         expect(selector.isSet).toBeFalsy();
       });
 
-      it("should remove old selected placeholder Item and select new Item without overwriting Selector (config.overwrite = false)", async () => {
+      it("should remove old selected Item, select new Item and shouldn't overwrite Selector if old Item is placeholder (config.overwrite = false)", async () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
         dummyItem1.isPlaceholder = true;
 
@@ -363,6 +400,7 @@ describe("Selector Tests", () => {
         expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
         expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
         expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
+        expect(selector.isPlaceholder).toBeFalsy();
         expect(selector.isSet).toBeTruthy();
       });
 

@@ -68,6 +68,7 @@ describe("Group Tests", () => {
 
     const group = new Group(dummyCollection, [], {
       key: "dummyKey",
+      isPlaceholder: true,
     });
 
     expect(group.collection()).toBe(dummyCollection);
@@ -78,7 +79,7 @@ describe("Group Tests", () => {
     expect(group._key).toBe("dummyKey");
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
-    expect(group.isPlaceholder).toBeFalsy();
+    expect(group.isPlaceholder).toBeTruthy();
     expect(group.initialStateValue).toStrictEqual([]);
     expect(group._value).toStrictEqual([]);
     expect(group.previousStateValue).toStrictEqual([]);

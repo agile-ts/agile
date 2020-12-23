@@ -3,7 +3,6 @@ import {
   Collection,
   DefaultItem,
   StateKey,
-  StateConfigInterface,
 } from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
@@ -20,7 +19,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
   constructor(
     collection: Collection<DataType>,
     data: DataType,
-    config: StateConfigInterface = {}
+    config: ItemConfigInterface = {}
   ) {
     super(collection.agileInstance(), data, config);
     this.collection = () => collection;
@@ -54,4 +53,11 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
 
     return this;
   }
+}
+
+/**
+ * @param isPlaceholder - If Item is initially a Placeholder
+ */
+export interface ItemConfigInterface {
+  isPlaceholder?: boolean;
 }

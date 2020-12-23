@@ -77,7 +77,7 @@ export class Selector<DataType = DefaultItem> extends State<
       overwrite: oldItem?.isPlaceholder || false,
     });
 
-    if (this._itemKey === itemKey) {
+    if (this._itemKey === itemKey && !config.force) {
       Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
     }

@@ -12,7 +12,7 @@ describe("Item Tests", () => {
     jest.spyOn(Item.prototype, "setKey");
   });
 
-  it("should create Item", () => {
+  it("should create Item (default config)", () => {
     // Overwrite setKey once to not call it
     jest.spyOn(Item.prototype, "setKey").mockReturnValueOnce(undefined);
 
@@ -28,6 +28,38 @@ describe("Item Tests", () => {
     expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeFalsy();
+    expect(item.initialStateValue).toStrictEqual(dummyData);
+    expect(item._value).toStrictEqual(dummyData);
+    expect(item.previousStateValue).toStrictEqual(dummyData);
+    expect(item.nextStateValue).toStrictEqual(dummyData);
+    expect(item.observer).toBeInstanceOf(StateObserver);
+    expect(item.observer.deps.size).toBe(0);
+    expect(item.observer._key).toBeUndefined();
+    expect(item.sideEffects).toStrictEqual({});
+    expect(item.computeMethod).toBeUndefined();
+    expect(item.isPersisted).toBeFalsy();
+    expect(item.persistent).toBeUndefined();
+    expect(item.watchers).toStrictEqual({});
+  });
+
+  it("should create Item (specific config)", () => {
+    // Overwrite setKey once to not call it
+    jest.spyOn(Item.prototype, "setKey").mockReturnValueOnce(undefined);
+
+    const dummyData = { id: "dummyId", name: "dummyName" };
+    const item = new Item(dummyCollection, dummyData, {
+      isPlaceholder: true,
+    });
+
+    expect(item.collection()).toBe(dummyCollection);
+    expect(item.setKey).toHaveBeenCalledWith(
+      dummyData[dummyCollection.config.primaryKey]
+    );
+
+    expect(item._key).toBeUndefined();
+    expect(item.valueType).toBeUndefined();
+    expect(item.isSet).toBeFalsy();
+    expect(item.isPlaceholder).toBeTruthy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
     expect(item._value).toStrictEqual(dummyData);
     expect(item.previousStateValue).toStrictEqual(dummyData);

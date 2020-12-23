@@ -18,17 +18,22 @@ describe("State Tests", () => {
 
     dummyAgile = new Agile({ localStorage: false });
 
+    jest.spyOn(State.prototype, "set");
     console.error = jest.fn();
     console.warn = jest.fn();
   });
 
-  it("should create State (default config)", () => {
+  it("should create State and should call initial set (default config)", () => {
+    // Overwrite select once to not call it
+    jest.spyOn(State.prototype, "set").mockReturnValueOnce(undefined);
+
     const state = new State(dummyAgile, "coolValue");
 
+    expect(state.set).toHaveBeenCalledWith("coolValue", { overwrite: true });
     expect(state._key).toBeUndefined();
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
-    expect(state.isPlaceholder).toBeFalsy();
+    expect(state.isPlaceholder).toBeTruthy();
     expect(state.initialStateValue).toBe("coolValue");
     expect(state._value).toBe("coolValue");
     expect(state.previousStateValue).toBe("coolValue");
@@ -43,7 +48,10 @@ describe("State Tests", () => {
     expect(state.watchers).toStrictEqual({});
   });
 
-  it("should create State (specific config)", () => {
+  it("should create State and should call initial set (specific config)", () => {
+    // Overwrite select once to not call it
+    jest.spyOn(State.prototype, "set").mockReturnValueOnce(undefined);
+
     const dummyObserver = new Observer(dummyAgile);
 
     const state = new State(dummyAgile, "coolValue", {
@@ -51,18 +59,44 @@ describe("State Tests", () => {
       deps: [dummyObserver],
     });
 
-    expect(state._key).toBe("coolState"); // x
+    expect(state.set).toHaveBeenCalledWith("coolValue", { overwrite: true });
+    expect(state._key).toBe("coolState");
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
-    expect(state.isPlaceholder).toBeFalsy();
+    expect(state.isPlaceholder).toBeTruthy();
     expect(state.initialStateValue).toBe("coolValue");
     expect(state._value).toBe("coolValue");
     expect(state.previousStateValue).toBe("coolValue");
     expect(state.nextStateValue).toBe("coolValue");
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(1); // x
-    expect(state.observer.deps.has(dummyObserver)).toBeTruthy(); // x
-    expect(state.observer._key).toBe("coolState"); // x
+    expect(state.observer.deps.size).toBe(1);
+    expect(state.observer.deps.has(dummyObserver)).toBeTruthy();
+    expect(state.observer._key).toBe("coolState");
+    expect(state.sideEffects).toStrictEqual({});
+    expect(state.computeMethod).toBeUndefined();
+    expect(state.isPersisted).toBeFalsy();
+    expect(state.persistent).toBeUndefined();
+    expect(state.watchers).toStrictEqual({});
+  });
+
+  it("should create State and shouldn't call initial set (config.isPlaceholder = true)", () => {
+    // Overwrite select once to not call it
+    jest.spyOn(State.prototype, "set").mockReturnValueOnce(undefined);
+
+    const state = new State(dummyAgile, "coolValue", { isPlaceholder: true });
+
+    expect(state.set).not.toHaveBeenCalled();
+    expect(state._key).toBeUndefined();
+    expect(state.valueType).toBeUndefined();
+    expect(state.isSet).toBeFalsy();
+    expect(state.isPlaceholder).toBeTruthy();
+    expect(state.initialStateValue).toBe("coolValue");
+    expect(state._value).toBe("coolValue");
+    expect(state.previousStateValue).toBe("coolValue");
+    expect(state.nextStateValue).toBe("coolValue");
+    expect(state.observer).toBeInstanceOf(StateObserver);
+    expect(state.observer.deps.size).toBe(0);
+    expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
     expect(state.isPersisted).toBeFalsy();
@@ -180,97 +214,80 @@ describe("State Tests", () => {
         jest.spyOn(numberState.observer, "ingestValue");
       });
 
-      it("should set value if currentValue isn't equal to newValue and has the correct type (default config)", () => {
+      it("should update value of State if value has correct type (default config)", () => {
         numberState.set(20);
 
-        expect(numberState._value).toBe(20);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe(20);
-
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
           sideEffects: true,
           background: false,
           force: false,
           storage: true,
         });
+
+        expect(numberState._value).toBe(20);
+        expect(numberState.nextStateValue).toBe(20);
+        expect(numberState.previousStateValue).toBe(10);
+        expect(numberState.initialStateValue).toBe(10);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeTruthy();
       });
 
-      it("should set value if currentValue isn't equal to newValue and has the correct type (specific config)", () => {
+      it("should update value of State if value has correct type (specific config)", () => {
         numberState.set(20, {
           sideEffects: false,
           background: true,
           storage: false,
         });
 
-        expect(numberState._value).toBe(20);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe(20);
-
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
           sideEffects: false,
           background: true,
           force: false,
           storage: false,
         });
-      });
 
-      it("shouldn't set value if currentValue is equal to newValue and has the correct type (default config)", () => {
-        numberState.set(10);
-
-        expect(numberState._value).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
+        expect(numberState._value).toBe(20);
+        expect(numberState.nextStateValue).toBe(20);
         expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe(10);
-
-        expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
-      });
-
-      it("should set value if currentValue is equal to newValue and has the correct type (config.force = true)", () => {
-        numberState.set(10, { force: true });
-
-        expect(numberState._value).toBe(10);
         expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe(10);
-
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(10, {
-          sideEffects: true,
-          background: false,
-          force: true,
-          storage: true,
-        });
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeTruthy();
       });
 
-      it("shouldn't set value if currentValue isn't equal to newValue and has wrong type (default config)", () => {
+      it("shouldn't update value of State if value hasn't correct type (default config)", () => {
         numberState.type(Number);
 
-        numberState.set("coolString" as any);
+        numberState.set("coolValue" as any);
 
-        expect(numberState._value).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe(10);
-
-        expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: Incorrect type (string) was provided."
         );
+        expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
+
+        expect(numberState._value).toBe(10);
+        expect(numberState.nextStateValue).toBe(10);
+        expect(numberState.previousStateValue).toBe(10);
+        expect(numberState.initialStateValue).toBe(10);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeFalsy();
       });
 
-      it("should set value if currentValue isn't equal to newValue and has wrong type (config.force = true)", () => {
+      it("should update value of State if value hasn't correct type (config.force = true)", () => {
         numberState.type(Number);
 
-        numberState.set("coolString" as any, { force: true });
+        numberState.set("coolValue" as any, { force: true });
 
-        expect(numberState._value).toBe("coolString");
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe("coolString");
-
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Incorrect type (string) was provided."
+        );
+        expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
-          "coolString",
+          "coolValue",
           {
             sideEffects: true,
             background: false,
@@ -278,21 +295,22 @@ describe("State Tests", () => {
             storage: true,
           }
         );
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Incorrect type (string) was provided."
-        );
+
+        expect(numberState._value).toBe("coolValue");
+        expect(numberState.nextStateValue).toBe("coolValue");
+        expect(numberState.previousStateValue).toBe(10);
+        expect(numberState.initialStateValue).toBe(10);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeTruthy();
       });
 
-      it("should set value if currentValue isn't equal to newValue and has wrong type and type is not explicit defined (default config)", () => {
-        numberState.set("coolString" as any);
+      it("should update value of State if value hasn't correct type but the type isn't explicit defined (default config)", () => {
+        numberState.set("coolValue" as any);
 
-        expect(numberState._value).toBe("coolString");
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.nextStateValue).toBe("coolString");
-
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
-          "coolString",
+          "coolValue",
           {
             sideEffects: true,
             background: false,
@@ -300,6 +318,78 @@ describe("State Tests", () => {
             storage: true,
           }
         );
+
+        expect(numberState._value).toBe("coolValue");
+        expect(numberState.nextStateValue).toBe("coolValue");
+        expect(numberState.previousStateValue).toBe(10);
+        expect(numberState.initialStateValue).toBe(10);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeTruthy();
+      });
+
+      it("should update values of State and overwrite it (config.overwrite = true)", () => {
+        numberState.set(20, { overwrite: true });
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
+        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
+          sideEffects: true,
+          background: false,
+          force: true,
+          storage: true,
+        });
+
+        expect(numberState._value).toBe(20);
+        expect(numberState.nextStateValue).toBe(20);
+        expect(numberState.previousStateValue).toBe(20);
+        expect(numberState.initialStateValue).toBe(20);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeFalsy();
+      });
+
+      it("should update values of State and overwrite it if State is placeholder (default config)", () => {
+        numberState.isPlaceholder = true;
+
+        numberState.set(20);
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
+        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
+          sideEffects: true,
+          background: false,
+          force: true,
+          storage: true,
+        });
+
+        expect(numberState._value).toBe(20);
+        expect(numberState.nextStateValue).toBe(20);
+        expect(numberState.previousStateValue).toBe(20);
+        expect(numberState.initialStateValue).toBe(20);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeFalsy();
+      });
+
+      it("should update values of State and shouldn't overwrite it if State is placeholder (config.overwrite = false)", () => {
+        numberState.isPlaceholder = true;
+
+        // TODO somehow State got called 5 times before here..
+        numberState.set(20, { overwrite: false });
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
+        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
+          sideEffects: true,
+          background: false,
+          force: false,
+          storage: true,
+        });
+
+        expect(numberState._value).toBe(20);
+        expect(numberState.nextStateValue).toBe(20);
+        expect(numberState.previousStateValue).toBe(10);
+        expect(numberState.initialStateValue).toBe(10);
+        expect(numberState.isPlaceholder).toBeFalsy();
+        expect(numberState.isSet).toBeTruthy();
       });
     });
 
