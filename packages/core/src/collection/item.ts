@@ -22,7 +22,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     });
     this.collection = () => collection;
 
-    // Set Key to assign sideEffects
+    // Reassign Key to assign sideEffects
     this.setKey(data[collection.config.primaryKey]);
   }
 

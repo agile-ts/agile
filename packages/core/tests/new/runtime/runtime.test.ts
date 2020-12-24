@@ -47,24 +47,20 @@ describe("Runtime Tests", () => {
         dummyJob = new RuntimeJob(dummyObserver1);
 
         runtime.perform = jest.fn();
-        runtime.jobQueue.shift = jest.fn(() => dummyJob);
       });
 
       it("should create Job and perform it (default config)", () => {
-        runtime.ingest(dummyObserver1, { key: "coolJob" });
+        runtime.ingest(dummyJob);
 
-        expect(runtime.jobQueue.length).toBe(1);
-        expect(runtime.jobQueue[0]._key).toBe("coolJob");
-        expect(runtime.jobQueue.shift).toHaveBeenCalled();
-        expect(runtime.perform).toHaveBeenCalledWith(dummyJob); // Dummy Job because of mocking jobQueue.shift
+        expect(runtime.jobQueue.length).toBe(0);
+        expect(runtime.perform).toHaveBeenCalledWith(dummyJob);
       });
 
       it("should create Job and shouldn't perform it (config.perform = false)", () => {
-        runtime.ingest(dummyObserver1, { perform: false, key: "coolJob" });
+        runtime.ingest(dummyJob, { perform: false });
 
         expect(runtime.jobQueue.length).toBe(1);
-        expect(runtime.jobQueue[0]._key).toBe("coolJob");
-        expect(runtime.jobQueue.shift).not.toHaveBeenCalled();
+        expect(runtime.jobQueue[0]).toBe(dummyJob);
         expect(runtime.perform).not.toHaveBeenCalled();
       });
     });

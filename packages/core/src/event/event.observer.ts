@@ -7,6 +7,7 @@ import {
   IngestConfigInterface,
   RuntimeJobConfigInterface,
   defineConfig,
+  RuntimeJobKey,
 } from "../internal";
 
 export class EventObserver<PayloadType = any> extends Observer {
@@ -51,7 +52,7 @@ export class EventObserver<PayloadType = any> extends Observer {
       force: config.force,
       sideEffects: config.sideEffects,
       background: config.background,
-      key: this._key,
+      key: config.key || this._key,
     });
 
     this.agileInstance().runtime.ingest(job, {
@@ -83,6 +84,11 @@ export interface CreateEventObserverConfigInterface {
   key?: ObserverKey;
 }
 
+/**
+ * @param key - Key/Name of Job that gets created
+ */
 export interface EventIngestConfigInterface
   extends RuntimeJobConfigInterface,
-    IngestConfigInterface {}
+    IngestConfigInterface {
+  key?: RuntimeJobKey;
+}

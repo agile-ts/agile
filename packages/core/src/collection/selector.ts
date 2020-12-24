@@ -100,12 +100,7 @@ export class Selector<DataType = DefaultItem> extends State<
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
-    this.rebuildSelector({
-      background: config.background,
-      sideEffects: config.sideEffects,
-      force: config.force,
-      overwrite: config.overwrite,
-    });
+    this.rebuildSelector(config);
 
     return this;
   }

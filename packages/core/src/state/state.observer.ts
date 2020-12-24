@@ -12,6 +12,7 @@ import {
   IngestConfigInterface,
   StateRuntimeJob,
   StateRuntimeJobConfigInterface,
+  RuntimeJobKey,
 } from "../internal";
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -74,7 +75,7 @@ export class StateObserver<ValueType = any> extends Observer {
       overwrite: false,
     });
 
-    // Force overwriting State because if setting Value the State shouldn't be a placeholder anymore
+    // Force overwriting State because if assigning Value to State, the State shouldn't be a placeholder anymore
     if (state.isPlaceholder) {
       config.force = true;
       config.overwrite = true;
@@ -95,7 +96,7 @@ export class StateObserver<ValueType = any> extends Observer {
       force: config.force,
       background: config.background,
       overwrite: config.overwrite,
-      key: this._key,
+      key: config.key || this._key,
     });
 
     this.agileInstance().runtime.ingest(job, {
@@ -173,6 +174,11 @@ export interface CreateStateObserverConfigInterface {
   key?: ObserverKey;
 }
 
+/**
+ * @param key - Key/Name of Job that gets created
+ */
 export interface StateIngestConfigInterface
   extends StateRuntimeJobConfigInterface,
-    IngestConfigInterface {}
+    IngestConfigInterface {
+  key?: RuntimeJobKey;
+}
