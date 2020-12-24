@@ -5,7 +5,9 @@ export const App = new Agile({
 });
 
 export const MY_STATE = App.State<string>("MyState", { key: "my-state" }); //.persist();
-export const MY_STATE_2 = App.State<string>("MyState2").persist("my-state2");
+export const MY_STATE_2 = App.State<string>("MyState2", {
+  key: "my-state2",
+}).persist();
 MY_STATE_2.onLoad(() => {
   console.log("On Load");
 });
@@ -17,7 +19,7 @@ MY_STATE.watch("test", (value: any) => {
 
 export const MY_COMPUTED = App.Computed<string>(() => {
   return "test" + MY_STATE.value + "_computed_" + MY_STATE_2.value;
-});
+}, []);
 
 interface collectionValueInterface {
   id: string;
@@ -46,6 +48,7 @@ console.log("Initial: myCollection ", clone(MY_COLLECTION));
 
 export const MY_EVENT = App.Event<{ name: string }>({
   delay: 3000,
+  key: "myEvent",
 });
 
 MY_EVENT.on(() => {

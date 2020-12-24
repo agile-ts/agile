@@ -652,6 +652,33 @@ describe("Collection Tests", () => {
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
+      it("should update existing placeholder Item with valid changes Object (default config)", () => {
+        dummyItem.isPlaceholder = true;
+
+        const response = collection.update("dummyItem", { name: "hans" });
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          {
+            id: "dummyItem",
+            name: "hans",
+          },
+          {
+            background: false,
+            storage: true,
+          }
+        );
+        expect(Utils.flatMerge).toHaveBeenCalledWith(
+          { id: "dummyItem", name: "frank" },
+          { name: "hans" },
+          {
+            addNewProperties: false,
+          }
+        );
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
       it("shouldn't update not existing Item and should print error", () => {
         const response = collection.update("notExisting", { name: "hans" });
 
