@@ -1,6 +1,6 @@
-import { Agile, Integration, Job, Observer } from "../../../src";
+import { Agile, Integration, RuntimeJob, Observer } from "../../../src";
 
-describe("Job Tests", () => {
+describe("RuntimeJob Tests", () => {
   let dummyAgile: Agile;
   let dummyIntegration: Integration;
   let dummyObserver: Observer;
@@ -13,10 +13,10 @@ describe("Job Tests", () => {
     dummyObserver = new Observer(dummyAgile);
   });
 
-  it("should create Job with Agile that has integrations (default config)", () => {
+  it("should create RuntimeJob with Agile that has integrations (default config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new Job(dummyObserver);
+    const job = new RuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
@@ -24,21 +24,19 @@ describe("Job Tests", () => {
       background: false,
       sideEffects: true,
       force: false,
-      storage: true,
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create Job with Agile that has integrations (specific config)", () => {
+  it("should create RuntimeJob with Agile that has integrations (specific config)", () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new Job(dummyObserver, {
+    const job = new RuntimeJob(dummyObserver, {
       key: "dummyJob",
       sideEffects: false,
       force: true,
-      storage: false,
     });
 
     expect(job._key).toBe("dummyJob");
@@ -47,15 +45,14 @@ describe("Job Tests", () => {
       background: false,
       sideEffects: false,
       force: true,
-      storage: false,
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create Job with Agile that has no integrations (default config)", () => {
-    const job = new Job(dummyObserver);
+  it("should create RuntimeJob with Agile that has no integrations (default config)", () => {
+    const job = new RuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
@@ -63,17 +60,16 @@ describe("Job Tests", () => {
       background: false,
       sideEffects: true,
       force: false,
-      storage: true,
     });
     expect(job.rerender).toBeFalsy();
     expect(job.performed).toBeFalsy();
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create Job and Agile that has integrations (config.background = true)", () => {
+  it("should create RuntimeJob and Agile that has integrations (config.background = true)", () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new Job(dummyObserver, { background: true });
+    const job = new RuntimeJob(dummyObserver, { background: true });
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);
@@ -81,22 +77,21 @@ describe("Job Tests", () => {
       background: true,
       sideEffects: true,
       force: false,
-      storage: true,
     });
     expect(job.rerender).toBeFalsy();
     expect(job.performed).toBeFalsy();
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  describe("Job Function Tests", () => {
-    let job: Job;
+  describe("RuntimeJob Function Tests", () => {
+    let job: RuntimeJob;
 
     beforeEach(() => {
-      job = new Job(dummyObserver);
+      job = new RuntimeJob(dummyObserver);
     });
 
     describe("key get function tests", () => {
-      it("should return key of Job", () => {
+      it("should return key of RuntimeJob", () => {
         job._key = "myCoolKey";
 
         expect(job.key).toBe("myCoolKey");
@@ -104,7 +99,7 @@ describe("Job Tests", () => {
     });
 
     describe("key set function tests", () => {
-      it("should update key in Job", () => {
+      it("should update key in RuntimeJob", () => {
         job.key = "myCoolKey";
 
         expect(job._key).toBe("myCoolKey");

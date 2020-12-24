@@ -1,7 +1,7 @@
 import {
   Agile,
   StateKey,
-  Job,
+  RuntimeJob,
   SubscriptionContainer,
   defineConfig,
 } from "../internal";
@@ -64,7 +64,7 @@ export class Observer<ValueType = any> {
    * Performs Job of Runtime
    * @param job - Job that gets performed
    */
-  public perform(job: Job) {
+  public perform(job: RuntimeJob) {
     Agile.logger.warn(
       "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
     );

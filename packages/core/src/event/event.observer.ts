@@ -1,10 +1,13 @@
 import {
   Observer,
-  Job,
+  RuntimeJob,
   ObserverKey,
   Event,
   SubscriptionContainer,
   IngestConfigInterface,
+  RuntimeJobConfigInterface,
+  defineConfig,
+  RuntimeJobKey,
 } from "../internal";
 
 export class EventObserver<PayloadType = any> extends Observer {
@@ -36,8 +39,25 @@ export class EventObserver<PayloadType = any> extends Observer {
    * Ingests Event into Runtime and causes Rerender on Components that got subscribed by the Event (Observer)
    * @param config - Config
    */
-  public trigger(config: IngestConfigInterface = {}): void {
-    this.agileInstance().runtime.ingest(this, config);
+  public trigger(config: EventIngestConfigInterface = {}): void {
+    config = defineConfig(config, {
+      perform: true,
+      background: false,
+      sideEffects: true,
+      force: false,
+    });
+
+    // Create Job
+    const job = new RuntimeJob(this, {
+      force: config.force,
+      sideEffects: config.sideEffects,
+      background: config.background,
+      key: config.key || this._key,
+    });
+
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
   }
 
   //=========================================================================================================
@@ -48,7 +68,7 @@ export class EventObserver<PayloadType = any> extends Observer {
    * Performs Job from Runtime
    * @param job - Job that gets performed
    */
-  public perform(job: Job<this>) {
+  public perform(job: RuntimeJob<this>) {
     // Noting to perform
   }
 }
@@ -62,4 +82,13 @@ export interface CreateEventObserverConfigInterface {
   deps?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
+}
+
+/**
+ * @param key - Key/Name of Job that gets created
+ */
+export interface EventIngestConfigInterface
+  extends RuntimeJobConfigInterface,
+    IngestConfigInterface {
+  key?: RuntimeJobKey;
 }

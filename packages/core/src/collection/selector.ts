@@ -1,13 +1,12 @@
 import {
   Agile,
   Collection,
-  copy,
   DefaultItem,
   defineConfig,
   Item,
   ItemKey,
-  SetConfigInterface,
   State,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class Selector<DataType = DefaultItem> extends State<
@@ -67,7 +66,10 @@ export class Selector<DataType = DefaultItem> extends State<
    * @param itemKey - New ItemKey
    * @param config - Config
    */
-  public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
+  public select(
+    itemKey: ItemKey,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
     const oldItem = this.item;
     let newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
@@ -75,23 +77,12 @@ export class Selector<DataType = DefaultItem> extends State<
       sideEffects: true,
       force: false,
       overwrite: oldItem?.isPlaceholder || false,
+      storage: true,
     });
 
     if (this._itemKey === itemKey && !config.force) {
       Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
-    }
-
-    // Overwrite old Item Values with new Item Value
-    if (config.overwrite) {
-      this._value = copy(newItem._value);
-      this.nextStateValue = copy(newItem._value);
-      this.previousStateValue = copy(newItem._value);
-      this.initialStateValue = copy(newItem._value);
-      this.isSet = false;
-      this.isPlaceholder = false;
-
-      config.force = true;
     }
 
     // Remove old Item from Collection if it is an Placeholder
@@ -109,11 +100,7 @@ export class Selector<DataType = DefaultItem> extends State<
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
-    this.rebuildSelector({
-      background: config.background,
-      sideEffects: config.sideEffects,
-      force: config.force,
-    });
+    this.rebuildSelector(config);
 
     return this;
   }
@@ -126,14 +113,7 @@ export class Selector<DataType = DefaultItem> extends State<
    * Rebuilds Selector
    * @param config - Config
    */
-  public rebuildSelector(config: SetConfigInterface = {}) {
-    config = defineConfig(config, {
-      sideEffects: true,
-      background: false,
-      force: false,
-      storage: true,
-    });
-
+  public rebuildSelector(config: StateRuntimeJobConfigInterface = {}) {
     // Set Selector Value to undefined if Item doesn't exist
     if (!this.item || this.item.isPlaceholder) {
       this.set(undefined, config);
@@ -154,17 +134,4 @@ export type SelectorKey = string | number;
 export interface SelectorConfigInterface {
   key?: SelectorKey;
   isPlaceholder?: boolean;
-}
-
-/**
- * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of Selector get executed
- * @param force - Force to select ItemKey
- * @param overwrite - If the Selector gets overwritten with the new selected Item (initialStateValue, ..)
- */
-export interface SelectConfigInterface {
-  background?: boolean;
-  sideEffects?: boolean;
-  force?: boolean;
-  overwrite?: boolean;
 }

@@ -2,7 +2,6 @@ import {
   Observer,
   State,
   Computed,
-  Job,
   copy,
   defineConfig,
   ObserverKey,
@@ -11,6 +10,9 @@ import {
   isFunction,
   SubscriptionContainer,
   IngestConfigInterface,
+  StateRuntimeJob,
+  StateRuntimeJobConfigInterface,
+  RuntimeJobKey,
 } from "../internal";
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -27,12 +29,7 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
-    super(state.agileInstance(), {
-      deps: config.deps,
-      value: state._value,
-      key: config.key,
-      subs: config.subs,
-    });
+    super(state.agileInstance(), { ...config, ...{ value: state._value } });
     this.state = () => state;
     this.nextStateValue = copy(state._value);
   }
@@ -45,7 +42,7 @@ export class StateObserver<ValueType = any> extends Observer {
    * Ingests nextStateValue or computedValue into Runtime and applies it to the State
    * @param config - Config
    */
-  public ingest(config: IngestConfigInterface = {}): void {
+  public ingest(config: StateIngestConfigInterface = {}): void {
     const state = this.state();
     let newStateValue: ValueType;
 
@@ -66,7 +63,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public ingestValue(
     newStateValue: ValueType,
-    config: IngestConfigInterface = {}
+    config: StateIngestConfigInterface = {}
   ): void {
     const state = this.state();
     config = defineConfig(config, {
@@ -75,7 +72,14 @@ export class StateObserver<ValueType = any> extends Observer {
       sideEffects: true,
       force: false,
       storage: true,
+      overwrite: false,
     });
+
+    // Force overwriting State because if assigning Value to State, the State shouldn't be a placeholder anymore
+    if (state.isPlaceholder) {
+      config.force = true;
+      config.overwrite = true;
+    }
 
     // Assign next State Value and compute it if necessary
     this.nextStateValue = state.computeMethod
@@ -85,7 +89,19 @@ export class StateObserver<ValueType = any> extends Observer {
     // Check if State Value and new/next Value are equals
     if (equal(state._value, this.nextStateValue) && !config.force) return;
 
-    this.agileInstance().runtime.ingest(this, config);
+    // Create Job
+    const job = new StateRuntimeJob(this, {
+      storage: config.storage,
+      sideEffects: config.sideEffects,
+      force: config.force,
+      background: config.background,
+      overwrite: config.overwrite,
+      key: config.key || this._key,
+    });
+
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
   }
 
   //=========================================================================================================
@@ -93,32 +109,27 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job from Runtime that holds this Observer
-   * @param job - Job that gets performed
+   * Performs Job that holds this Observer
+   * @param job - Job
    */
-  public perform(job: Job<this>) {
+  public perform(job: StateRuntimeJob) {
     const state = job.observer.state();
 
-    // Set Previous State
+    // Assign new State Values
     state.previousStateValue = copy(state._value);
-
-    // Set new State Value
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
+    job.observer.value = copy(job.observer.nextStateValue);
 
-    state.isSet = notEqual(
-      job.observer.nextStateValue,
-      state.initialStateValue
-    );
-
-    // Reset isPlaceholder and set initial/previous Value to nextValue because the placeholder State had no proper value before
-    if (state.isPlaceholder) {
+    // Overwrite old State Values
+    if (job.config.overwrite) {
       state.initialStateValue = copy(state._value);
       state.previousStateValue = copy(state._value);
       state.isPlaceholder = false;
     }
 
-    job.observer.value = copy(job.observer.nextStateValue);
+    state.isSet = notEqual(state._value, state.initialStateValue);
+
     this.sideEffects(job);
   }
 
@@ -127,10 +138,10 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * SideEffects of Perform Function
-   * @param job - Job whose SideEffects gets executed
+   * SideEffects of Job
+   * @param job - Job
    */
-  public sideEffects(job: Job<this>) {
+  public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
 
     // Call Watchers Functions
@@ -161,4 +172,13 @@ export interface CreateStateObserverConfigInterface {
   deps?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
+}
+
+/**
+ * @param key - Key/Name of Job that gets created
+ */
+export interface StateIngestConfigInterface
+  extends StateRuntimeJobConfigInterface,
+    IngestConfigInterface {
+  key?: RuntimeJobKey;
 }

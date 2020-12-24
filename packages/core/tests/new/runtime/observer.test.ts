@@ -1,4 +1,9 @@
-import { Observer, Agile, SubscriptionContainer, Job } from "../../../src";
+import {
+  Observer,
+  Agile,
+  SubscriptionContainer,
+  RuntimeJob,
+} from "../../../src";
 
 describe("Observer Tests", () => {
   let dummyAgile: Agile;
@@ -73,7 +78,7 @@ describe("Observer Tests", () => {
 
     describe("perform function tests", () => {
       it("should print warning", () => {
-        const dummyJob = new Job(observer);
+        const dummyJob = new RuntimeJob(observer);
 
         observer.perform(dummyJob);
 

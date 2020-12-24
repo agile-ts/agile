@@ -1,33 +1,33 @@
 import { Observer, defineConfig, SubscriptionContainer } from "../internal";
 
-export class Job<ObserverType extends Observer = Observer> {
-  public _key?: JobKey;
+export class RuntimeJob<ObserverType extends Observer = Observer> {
+  public _key?: RuntimeJobKey;
   public observer: ObserverType;
-  public config: JobConfigInterface;
+  public config: RuntimeJobConfigInterface;
   public rerender: boolean; // If Job will cause rerender on subscriptionContainer in Observer
   public performed = false; // If Job has been performed by Runtime
   public subscriptionContainersToUpdate = new Set<SubscriptionContainer>(); // SubscriptionContainer that have to be updated/rerendered
 
   /**
    * @internal
-   * Job - Holds Observer and gets executed/performed by the Runtime
-   * @param observer - Observer that is represented by this Job and gets performed
+   * Job - Represents Observer that gets performed by the Runtime
+   * @param observer - Observer
    * @param config - Config
    */
-  constructor(observer: ObserverType, config: CreateJobConfigInterface = {}) {
-    config = defineConfig<JobConfigInterface>(config, {
+  constructor(
+    observer: ObserverType,
+    config: CreateRuntimeJobConfigInterface = {}
+  ) {
+    config = defineConfig<RuntimeJobConfigInterface>(config, {
       background: false,
       sideEffects: true,
       force: false,
-      storage: true,
     });
     this.config = {
       background: config.background,
       force: config.force,
       sideEffects: config.sideEffects,
-      storage: config.storage,
     };
-
     this.observer = observer;
     this.rerender =
       !config.background &&
@@ -36,33 +36,32 @@ export class Job<ObserverType extends Observer = Observer> {
     this.subscriptionContainersToUpdate = new Set(observer.subs);
   }
 
-  public get key(): JobKey | undefined {
+  public get key(): RuntimeJobKey | undefined {
     return this._key;
   }
 
-  public set key(value: JobKey | undefined) {
+  public set key(value: RuntimeJobKey | undefined) {
     this._key = value;
   }
 }
 
-export type JobKey = string | number;
+export type RuntimeJobKey = string | number;
 
 /**
- * @param key - Key/Name of Job
+ * @param key - Key/Name of RuntimeJob
  */
-export interface CreateJobConfigInterface extends JobConfigInterface {
-  key?: JobKey;
+export interface CreateRuntimeJobConfigInterface
+  extends RuntimeJobConfigInterface {
+  key?: RuntimeJobKey;
 }
 
 /**
  * @param background - If Job gets executed in the background -> not causing any rerender
- * @param sideEffects - If SideEffects gets executed
- * @param storage - If Job value gets saved in Storage
+ * @param sideEffects - If SideEffects get executed
  * @param force - Force performing Job
  */
-export interface JobConfigInterface {
+export interface RuntimeJobConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
-  storage?: boolean;
   force?: boolean;
 }

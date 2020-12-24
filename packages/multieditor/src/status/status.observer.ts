@@ -4,10 +4,11 @@ import {
   copy,
   defineConfig,
   equal,
-  Job,
-  JobConfigInterface,
+  IngestConfigInterface,
   Observer,
   ObserverKey,
+  RuntimeJob,
+  RuntimeJobConfigInterface,
 } from "@agile-ts/core";
 
 export class StatusObserver extends Observer {
@@ -43,13 +44,12 @@ export class StatusObserver extends Observer {
    * Assigns next Status Value to current Status Value
    * @param config - Config
    */
-  public assign(config: JobConfigInterface = {}): void {
+  public assign(config: StatusIngestConfigInterface = {}): void {
     config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: true,
       force: false,
-      storage: true,
     });
 
     // Set Next Status Value
@@ -58,7 +58,17 @@ export class StatusObserver extends Observer {
     // Check if Status changed
     if (equal(this.status()._value, this.nextValue) && !config.force) return;
 
-    this.agileInstance().runtime.ingest(this, config);
+    // Create Job
+    const job = new RuntimeJob(this, {
+      sideEffects: config.sideEffects,
+      force: config.force,
+      background: config.background,
+      key: this._key,
+    });
+
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
   }
 
   //=========================================================================================================
@@ -69,7 +79,7 @@ export class StatusObserver extends Observer {
    * Performs Job from Runtime
    * @param job - Job that gets performed
    */
-  public perform(job: Job<this>) {
+  public perform(job: RuntimeJob<this>) {
     const status = job.observer.status();
 
     // Set new State Value
@@ -89,3 +99,7 @@ export interface StatusObserverConfigInterface {
   deps?: Array<Observer>;
   key?: ObserverKey;
 }
+
+export interface StatusIngestConfigInterface
+  extends RuntimeJobConfigInterface,
+    IngestConfigInterface {}

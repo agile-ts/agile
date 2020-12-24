@@ -12,9 +12,10 @@ import {
   isFunction,
   notEqual,
   generateId,
-  JobConfigInterface,
   PersistentKey,
   ComputedTracker,
+  StateIngestConfigInterface,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -138,13 +139,16 @@ export class State<ValueType = any> {
    * @param value - new State Value
    * @param config - Config
    */
-  public set(value: ValueType, config: SetConfigInterface = {}): this {
+  public set(
+    value: ValueType,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,
       force: false,
       storage: true,
-      overwrite: this.isPlaceholder,
+      overwrite: false,
     });
 
     // Check value has correct Type (js)
@@ -157,25 +161,8 @@ export class State<ValueType = any> {
       Agile.logger.warn(message);
     }
 
-    // Overwrite old Item Values with new Item Value
-    if (config.overwrite) {
-      this._value = copy(value);
-      this.nextStateValue = copy(value);
-      this.previousStateValue = copy(value);
-      this.initialStateValue = copy(value);
-      this.isSet = false;
-      this.isPlaceholder = false;
-
-      config.force = true;
-    }
-
     // Ingest new value into Runtime
-    this.observer.ingestValue(value, {
-      storage: config.storage,
-      background: config.background,
-      force: config.force,
-      sideEffects: config.sideEffects,
-    });
+    this.observer.ingestValue(value, config);
 
     return this;
   }
@@ -188,12 +175,7 @@ export class State<ValueType = any> {
    * Ingests nextStateValue, computedValue into Runtime
    * @param config - Config
    */
-  public ingest(config: JobConfigInterface = {}): this {
-    config = defineConfig(config, {
-      sideEffects: true,
-      background: false,
-      force: false,
-    });
+  public ingest(config: StateIngestConfigInterface = {}): this {
     this.observer.ingest(config);
     return this;
   }
@@ -230,7 +212,7 @@ export class State<ValueType = any> {
    * Undoes latest State Value change
    * @param config - Config
    */
-  public undo(config: SetConfigInterface = {}): this {
+  public undo(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.previousStateValue, config);
     return this;
   }
@@ -243,7 +225,7 @@ export class State<ValueType = any> {
    * Resets State to its initial Value
    * @param config - Config
    */
-  public reset(config: SetConfigInterface = {}): this {
+  public reset(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
     return this;
   }
@@ -264,8 +246,11 @@ export class State<ValueType = any> {
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
+      sideEffects: true,
       background: false,
       force: false,
+      storage: true,
+      overwrite: false,
     });
 
     if (!isValidObject(this.nextStateValue)) {
@@ -282,23 +267,25 @@ export class State<ValueType = any> {
 
     // Merge targetWithChanges into nextStateValue
     this.nextStateValue = flatMerge<ValueType>(
-      this.nextStateValue,
+      copy(this.nextStateValue),
       targetWithChanges,
       { addNewProperties: config.addNewProperties }
     );
 
-    // Check if value has been changed
-    if (equal(this.value, this.nextStateValue) && !config.force) return this;
-
     // Ingest updated nextStateValue into Runtime
-    this.ingest({ background: config.background, force: config.force });
+    this.ingest({
+      background: config.background,
+      force: config.force,
+      overwrite: config.overwrite,
+      sideEffects: config.sideEffects,
+      storage: config.storage,
+    });
 
     return this;
   }
 
   //=========================================================================================================
   // Watch
-  // https://stackoverflow.com/questions/12688275/is-there-a-way-to-do-method-overloading-in-typescript/12689054#12689054
   //=========================================================================================================
   /**
    * @public
@@ -646,29 +633,10 @@ export interface StateConfigInterface {
 }
 
 /**
- * @param background - If assigning a new value happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of State get executed
- * @param storage - If State value gets saved in Agile Storage (only useful if State is persisted)
- * @param force -  Force creating and performing Job
- * @param overwrite - If the State gets overwritten with the new Value (initialStateValue, ..)
- */
-export interface SetConfigInterface {
-  background?: boolean;
-  sideEffects?: boolean;
-  storage?: boolean;
-  force?: boolean;
-  overwrite?: boolean;
-}
-
-/**
- * @param background - If assigning new value happens in the background (-> not causing any rerender)
  * @param addNewProperties - If new Properties gets added to the State Value
- * @param force - Force patching Value into State
  */
-export interface PatchConfigInterface {
+export interface PatchConfigInterface extends StateRuntimeJobConfigInterface {
   addNewProperties?: boolean;
-  background?: boolean;
-  force?: boolean;
 }
 
 /**

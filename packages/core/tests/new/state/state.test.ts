@@ -214,7 +214,7 @@ describe("State Tests", () => {
         jest.spyOn(numberState.observer, "ingestValue");
       });
 
-      it("should update value of State if value has correct type (default config)", () => {
+      it("should ingestValue if value has correct type (default config)", () => {
         numberState.set(20);
 
         expect(console.warn).not.toHaveBeenCalled();
@@ -224,17 +224,11 @@ describe("State Tests", () => {
           background: false,
           force: false,
           storage: true,
+          overwrite: false,
         });
-
-        expect(numberState._value).toBe(20);
-        expect(numberState.nextStateValue).toBe(20);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeTruthy();
       });
 
-      it("should update value of State if value has correct type (specific config)", () => {
+      it("should ingestValue if value has correct type (specific config)", () => {
         numberState.set(20, {
           sideEffects: false,
           background: true,
@@ -248,17 +242,11 @@ describe("State Tests", () => {
           background: true,
           force: false,
           storage: false,
+          overwrite: false,
         });
-
-        expect(numberState._value).toBe(20);
-        expect(numberState.nextStateValue).toBe(20);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeTruthy();
       });
 
-      it("shouldn't update value of State if value hasn't correct type (default config)", () => {
+      it("shouldn't ingestValue if value hasn't correct type (default config)", () => {
         numberState.type(Number);
 
         numberState.set("coolValue" as any);
@@ -268,16 +256,9 @@ describe("State Tests", () => {
           "Agile Error: Incorrect type (string) was provided."
         );
         expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
-
-        expect(numberState._value).toBe(10);
-        expect(numberState.nextStateValue).toBe(10);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeFalsy();
       });
 
-      it("should update value of State if value hasn't correct type (config.force = true)", () => {
+      it("should ingestValue if value hasn't correct type (config.force = true)", () => {
         numberState.type(Number);
 
         numberState.set("coolValue" as any, { force: true });
@@ -293,18 +274,12 @@ describe("State Tests", () => {
             background: false,
             force: true,
             storage: true,
+            overwrite: false,
           }
         );
-
-        expect(numberState._value).toBe("coolValue");
-        expect(numberState.nextStateValue).toBe("coolValue");
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeTruthy();
       });
 
-      it("should update value of State if value hasn't correct type but the type isn't explicit defined (default config)", () => {
+      it("should ingestValue if value hasn't correct type but the type isn't explicit defined (default config)", () => {
         numberState.set("coolValue" as any);
 
         expect(console.warn).not.toHaveBeenCalled();
@@ -316,80 +291,9 @@ describe("State Tests", () => {
             background: false,
             force: false,
             storage: true,
+            overwrite: false,
           }
         );
-
-        expect(numberState._value).toBe("coolValue");
-        expect(numberState.nextStateValue).toBe("coolValue");
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeTruthy();
-      });
-
-      it("should update values of State and overwrite it (config.overwrite = true)", () => {
-        numberState.set(20, { overwrite: true });
-
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: true,
-          background: false,
-          force: true,
-          storage: true,
-        });
-
-        expect(numberState._value).toBe(20);
-        expect(numberState.nextStateValue).toBe(20);
-        expect(numberState.previousStateValue).toBe(20);
-        expect(numberState.initialStateValue).toBe(20);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeFalsy();
-      });
-
-      it("should update values of State and overwrite it if State is placeholder (default config)", () => {
-        numberState.isPlaceholder = true;
-
-        numberState.set(20);
-
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: true,
-          background: false,
-          force: true,
-          storage: true,
-        });
-
-        expect(numberState._value).toBe(20);
-        expect(numberState.nextStateValue).toBe(20);
-        expect(numberState.previousStateValue).toBe(20);
-        expect(numberState.initialStateValue).toBe(20);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeFalsy();
-      });
-
-      it("should update values of State and shouldn't overwrite it if State is placeholder (config.overwrite = false)", () => {
-        numberState.isPlaceholder = true;
-
-        // TODO somehow State got called 5 times before here..
-        numberState.set(20, { overwrite: false });
-
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: true,
-          background: false,
-          force: false,
-          storage: true,
-        });
-
-        expect(numberState._value).toBe(20);
-        expect(numberState.nextStateValue).toBe(20);
-        expect(numberState.previousStateValue).toBe(10);
-        expect(numberState.initialStateValue).toBe(10);
-        expect(numberState.isPlaceholder).toBeFalsy();
-        expect(numberState.isSet).toBeTruthy();
       });
     });
 
@@ -398,24 +302,19 @@ describe("State Tests", () => {
         numberState.observer.ingest = jest.fn();
       });
 
-      it("should call ingest function in the observer (default config)", () => {
+      it("should call ingest function in Observer (default config)", () => {
         numberState.ingest();
 
-        expect(numberState.observer.ingest).toHaveBeenCalledWith({
-          sideEffects: true,
-          background: false,
-          force: false,
-        });
+        expect(numberState.observer.ingest).toHaveBeenCalledWith({});
       });
 
-      it("should call ingest function in the observer (specific config)", () => {
+      it("should call ingest function in Observer (specific config)", () => {
         numberState.ingest({
           force: true,
           background: true,
         });
 
         expect(numberState.observer.ingest).toHaveBeenCalledWith({
-          sideEffects: true,
           background: true,
           force: true,
         });
@@ -549,6 +448,9 @@ describe("State Tests", () => {
         expect(objectState.ingest).toHaveBeenCalledWith({
           background: false,
           force: false,
+          overwrite: false,
+          sideEffects: true,
+          storage: true,
         });
       });
 
@@ -558,6 +460,9 @@ describe("State Tests", () => {
           {
             addNewProperties: false,
             background: true,
+            force: true,
+            overwrite: true,
+            sideEffects: false,
           }
         );
 
@@ -574,44 +479,10 @@ describe("State Tests", () => {
         });
         expect(objectState.ingest).toHaveBeenCalledWith({
           background: true,
-          force: false,
-        });
-      });
-
-      it("should patch and shouldn't ingest passed object based value into a object based State if patch result is equal to currentValue (default config)", () => {
-        objectState.patch({ name: "jeff" });
-
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { age: 10, name: "jeff" },
-          { name: "jeff" },
-          {
-            addNewProperties: true,
-          }
-        );
-        expect(objectState.nextStateValue).toStrictEqual({
-          age: 10,
-          name: "jeff",
-        });
-        expect(objectState.ingest).not.toHaveBeenCalled();
-      });
-
-      it("should patch and ingest passed object based value into a object based State if patch result is equal to currentValue (config.force = true)", () => {
-        objectState.patch({ name: "jeff" }, { force: true });
-
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { age: 10, name: "jeff" },
-          { name: "jeff" },
-          {
-            addNewProperties: true,
-          }
-        );
-        expect(objectState.nextStateValue).toStrictEqual({
-          age: 10,
-          name: "jeff",
-        });
-        expect(objectState.ingest).toHaveBeenCalledWith({
-          background: false,
           force: true,
+          overwrite: true,
+          sideEffects: false,
+          storage: true,
         });
       });
     });

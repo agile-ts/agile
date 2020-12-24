@@ -24,7 +24,7 @@ describe("Item Tests", () => {
       dummyData[dummyCollection.config.primaryKey]
     );
 
-    expect(item._key).toBeUndefined();
+    expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
     expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeFalsy();
@@ -34,7 +34,9 @@ describe("Item Tests", () => {
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observer).toBeInstanceOf(StateObserver);
     expect(item.observer.deps.size).toBe(0);
-    expect(item.observer._key).toBeUndefined();
+    expect(item.observer._key).toBe(
+      dummyData[dummyCollection.config.primaryKey]
+    );
     expect(item.sideEffects).toStrictEqual({});
     expect(item.computeMethod).toBeUndefined();
     expect(item.isPersisted).toBeFalsy();
@@ -56,7 +58,7 @@ describe("Item Tests", () => {
       dummyData[dummyCollection.config.primaryKey]
     );
 
-    expect(item._key).toBeUndefined();
+    expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
     expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeTruthy();
@@ -66,7 +68,9 @@ describe("Item Tests", () => {
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observer).toBeInstanceOf(StateObserver);
     expect(item.observer.deps.size).toBe(0);
-    expect(item.observer._key).toBeUndefined();
+    expect(item.observer._key).toBe(
+      dummyData[dummyCollection.config.primaryKey]
+    );
     expect(item.sideEffects).toStrictEqual({});
     expect(item.computeMethod).toBeUndefined();
     expect(item.isPersisted).toBeFalsy();

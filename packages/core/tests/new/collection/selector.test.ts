@@ -173,19 +173,14 @@ describe("Selector Tests", () => {
           background: false,
           sideEffects: true,
           force: false,
+          overwrite: false,
+          storage: true,
         });
 
         expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
         expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem2._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.isPlaceholder).toBeFalsy();
-        expect(selector.isSet).toBeTruthy();
       });
 
       it("should unselect old selected Item and select new Item (specific config)", () => {
@@ -195,6 +190,7 @@ describe("Selector Tests", () => {
           force: true,
           sideEffects: false,
           background: true,
+          overwrite: true,
         });
 
         expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
@@ -213,19 +209,14 @@ describe("Selector Tests", () => {
           background: true,
           sideEffects: false,
           force: true,
+          overwrite: true,
+          storage: true,
         });
 
         expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
         expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem2._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.isPlaceholder).toBeFalsy();
-        expect(selector.isSet).toBeTruthy();
       });
 
       it("should print warning if trying to select selected Item again (default config)", () => {
@@ -250,13 +241,6 @@ describe("Selector Tests", () => {
         expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
         expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem1._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.isPlaceholder).toBeFalsy();
-        expect(selector.isSet).toBeFalsy();
       });
 
       it("should be able to select selected Item again (config.force = true)", () => {
@@ -282,54 +266,14 @@ describe("Selector Tests", () => {
           background: false,
           sideEffects: true,
           force: true,
+          overwrite: false,
+          storage: true,
         });
 
         expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
         expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem1._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.isSet).toBeFalsy();
-      });
-
-      it("should unselect old selected Item and select new Item with overwriting Selector (config.overwrite = true)", () => {
-        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
-
-        selector.select("dummyItem2Key", { overwrite: true });
-
-        expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
-          "dummyItem2Key"
-        );
-        expect(selector._itemKey).toBe("dummyItem2Key");
-        expect(selector.item).toBe(dummyItem2);
-        expect(dummyItem1.removeSideEffect).toHaveBeenCalledWith(
-          Selector.rebuildSelectorSideEffectKey
-        );
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
-          Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
-        );
-        expect(selector.rebuildSelector).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: true,
-          force: true,
-        });
-
-        expect(dummyCollection.data).toHaveProperty("dummyItem1Key");
-        expect(dummyCollection.data["dummyItem1Key"]).toBe(dummyItem1);
-        expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
-        expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem2._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.isPlaceholder).toBeFalsy();
-        expect(selector.isSet).toBeFalsy();
       });
 
       it("should remove old selected Item, select new Item and overwrite Selector if old Item is placeholder (default config)", async () => {
@@ -353,19 +297,14 @@ describe("Selector Tests", () => {
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,
-          force: true,
+          force: false,
+          overwrite: true,
+          storage: true,
         });
 
         expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
         expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem2._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.isPlaceholder).toBeFalsy();
-        expect(selector.isSet).toBeFalsy();
       });
 
       it("should remove old selected Item, select new Item and shouldn't overwrite Selector if old Item is placeholder (config.overwrite = false)", async () => {
@@ -390,18 +329,13 @@ describe("Selector Tests", () => {
           background: false,
           sideEffects: true,
           force: false,
+          overwrite: false,
+          storage: true,
         });
 
         expect(dummyCollection.data).not.toHaveProperty("dummyItem1Key");
         expect(dummyCollection.data).toHaveProperty("dummyItem2Key");
         expect(dummyCollection.data["dummyItem2Key"]).toBe(dummyItem2);
-
-        expect(selector._value).toStrictEqual(dummyItem2._value);
-        expect(selector.nextStateValue).toStrictEqual(dummyItem2._value);
-        expect(selector.previousStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.initialStateValue).toStrictEqual(dummyItem1._value);
-        expect(selector.isPlaceholder).toBeFalsy();
-        expect(selector.isSet).toBeTruthy();
       });
 
       describe("test added sideEffect called Selector.rebuildSelectorSideEffectKey", () => {
@@ -433,12 +367,7 @@ describe("Selector Tests", () => {
 
         selector.rebuildSelector();
 
-        expect(selector.set).toHaveBeenCalledWith(selector.item._value, {
-          sideEffects: true,
-          background: false,
-          force: false,
-          storage: true,
-        });
+        expect(selector.set).toHaveBeenCalledWith(selector.item._value, {});
       });
 
       it("should set selector value to item value (specific config)", () => {
@@ -454,7 +383,6 @@ describe("Selector Tests", () => {
           sideEffects: false,
           background: true,
           force: true,
-          storage: true,
         });
       });
 
@@ -463,12 +391,7 @@ describe("Selector Tests", () => {
 
         selector.rebuildSelector();
 
-        expect(selector.set).toHaveBeenCalledWith(undefined, {
-          sideEffects: true,
-          background: false,
-          force: false,
-          storage: true,
-        });
+        expect(selector.set).toHaveBeenCalledWith(undefined, {});
       });
     });
   });
