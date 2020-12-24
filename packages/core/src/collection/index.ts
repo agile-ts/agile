@@ -325,17 +325,17 @@ export class Collection<DataType = DefaultItem> {
    */
   public createGroup(
     groupKey: GroupKey,
-    initialItems?: Array<ItemKey>
+    initialItems: Array<ItemKey> = []
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
     // Check if Group already exists
     if (group) {
       if (!group.isPlaceholder) {
-        console.warn(`Group with the name '${groupKey}' already exists!`);
+        Agile.logger.warn(`Group with the name '${groupKey}' already exists!`);
         return group;
       }
-      group.set(initialItems || [], { overwrite: true });
+      group.set(initialItems, { overwrite: true });
       return group;
     }
 
@@ -344,40 +344,6 @@ export class Collection<DataType = DefaultItem> {
     this.groups[groupKey] = group;
 
     return group;
-  }
-
-  //=========================================================================================================
-  // Create Selector
-  //=========================================================================================================
-  /**
-   * @public
-   * Creates new Selector that represents an Item of the Collection
-   * @param selectorKey - Name/Key of Selector
-   * @param itemKey - Key of Item which the Selector represents
-   */
-  public createSelector(
-    selectorKey: SelectorKey,
-    itemKey: ItemKey
-  ): Selector<DataType> {
-    let selector = this.getSelector(selectorKey, { notExisting: true });
-
-    // Check if Selector already exists
-    if (selector) {
-      if (!selector.isPlaceholder) {
-        console.warn(`Selector with the name '${selectorKey}' already exists!`);
-        return selector;
-      }
-      selector.select(itemKey, { overwrite: true });
-      return selector;
-    }
-
-    // Create Selector
-    selector = new Selector<DataType>(this, itemKey, {
-      key: selectorKey,
-    });
-    this.selectors[selectorKey] = selector;
-
-    return selector;
   }
 
   //=========================================================================================================
@@ -413,8 +379,7 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Get Group by Key/Name or a Reference to it if it doesn't exist
-   * If Group doesn't exist, it returns a reference of the Group that will be filled with the real data later
+   * Get Group by Key/Name or a Reference to it if it doesn't exist yet
    * @param groupKey - Name/Key of Group
    */
   public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
@@ -422,12 +387,11 @@ export class Collection<DataType = DefaultItem> {
 
     // Create dummy Group to hold reference
     if (!group) {
-      const dummyGroup = new Group<DataType>(this, [], {
+      group = new Group<DataType>(this, [], {
         key: groupKey,
         isPlaceholder: true,
       });
-      this.groups[groupKey] = dummyGroup;
-      return dummyGroup;
+      this.groups[groupKey] = group;
     }
 
     ComputedTracker.tracked(group.observer);
@@ -444,13 +408,47 @@ export class Collection<DataType = DefaultItem> {
    */
   public removeGroup(groupKey: GroupKey): this {
     if (!this.groups[groupKey]) {
-      console.warn(
-        `Agile: Group with the key/name '${groupKey}' doesn't exist!`
-      );
+      Agile.logger.warn(`Group with the key/name '${groupKey}' doesn't exist!`);
       return this;
     }
     delete this.groups[groupKey];
     return this;
+  }
+
+  //=========================================================================================================
+  // Create Selector
+  //=========================================================================================================
+  /**
+   * @public
+   * Creates new Selector that represents an Item of the Collection
+   * @param selectorKey - Name/Key of Selector
+   * @param itemKey - Key of Item which the Selector represents
+   */
+  public createSelector(
+    selectorKey: SelectorKey,
+    itemKey: ItemKey
+  ): Selector<DataType> {
+    let selector = this.getSelector(selectorKey, { notExisting: true });
+
+    // Check if Selector already exists
+    if (selector) {
+      if (!selector.isPlaceholder) {
+        Agile.logger.warn(
+          `Selector with the name '${selectorKey}' already exists!`
+        );
+        return selector;
+      }
+      selector.select(itemKey, { overwrite: true });
+      return selector;
+    }
+
+    // Create Selector
+    selector = new Selector<DataType>(this, itemKey, {
+      key: selectorKey,
+    });
+    this.selectors[selectorKey] = selector;
+
+    return selector;
   }
 
   //=========================================================================================================
@@ -486,8 +484,7 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Get Selector by Key/Name or a Reference to it if it doesn't exist
-   * If Selector doesn't exist, it returns a reference of the Selector that will be filled with the real data later
+   * Get Selector by Key/Name or a Reference to it if it doesn't exist yet
    * @param selectorKey - Name/Key of Selector
    */
   public getSelectorWithReference(
@@ -497,12 +494,11 @@ export class Collection<DataType = DefaultItem> {
 
     // Create dummy Selector to hold reference
     if (!selector) {
-      const dummySelector = new Selector<DataType>(this, "unknown", {
+      selector = new Selector<DataType>(this, "unknown", {
         key: selectorKey,
         isPlaceholder: true,
       });
-      this.selectors[selectorKey] = dummySelector;
-      return dummySelector;
+      this.selectors[selectorKey] = selector;
     }
 
     ComputedTracker.tracked(selector.observer);
@@ -519,8 +515,8 @@ export class Collection<DataType = DefaultItem> {
    */
   public removeSelector(selectorKey: SelectorKey): this {
     if (!this.selectors[selectorKey]) {
-      console.warn(
-        `Agile: Selector with the key/name '${selectorKey}' doesn't exist!`
+      Agile.logger.warn(
+        `Selector with the key/name '${selectorKey}' doesn't exist!`
       );
       return this;
     }

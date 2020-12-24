@@ -5,6 +5,7 @@ import {
   Selector,
   Item,
   CollectionPersistent,
+  ComputedTracker,
 } from "../../../src";
 import * as Utils from "../../../src/utils";
 
@@ -22,6 +23,7 @@ describe("Collection Tests", () => {
     jest.spyOn(Collection.prototype, "initSelectors");
     jest.spyOn(Collection.prototype, "initGroups");
     console.error = jest.fn();
+    console.warn = jest.fn();
   });
 
   it("should create Collection (default config)", () => {
@@ -743,10 +745,15 @@ describe("Collection Tests", () => {
 
     describe("createGroup function tests", () => {
       let dummyGroup: Group;
+      let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
 
+        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -754,12 +761,345 @@ describe("Collection Tests", () => {
         dummyGroup.set = jest.fn();
       });
 
-      it("should create Group if it doesn't exist", () => {
-        const response = collection.createGroup("newGroup", ["test1"]);
+      it("should create and add not existing Group to Collection", () => {
+        const response = collection.createGroup("newGroup", ["dummyItem"]);
 
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(response).toBeInstanceOf(Group);
         expect(response._key).toBe("newGroup");
         expect(response.isPlaceholder).toBeFalsy();
-        expect(response._value).toStrictEqual(["test1"]);
+        expect(response._value).toStrictEqual(["dummyItem"]);
+        expect(collection.groups["newGroup"]).toBe(response);
+      });
+
+      it("shouldn't create and add existing Group to Collection", () => {
+        const response = collection.createGroup("dummyGroup", ["dummyItem"]);
+
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Group with the name 'dummyGroup' already exists!"
+        );
+        expect(response).toBe(dummyGroup);
+        expect(collection.groups["dummyGroup"]).toBe(dummyGroup);
+        expect(dummyGroup.set).not.toHaveBeenCalled();
+      });
+
+      it("should update existing placeholder Group of Collection", () => {
+        dummyGroup.isPlaceholder = true;
+
+        const response = collection.createGroup("dummyGroup", ["dummyItem"]);
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(response).toBe(dummyGroup);
+        expect(collection.groups["dummyGroup"]).toBe(dummyGroup);
+        expect(dummyGroup.set).toHaveBeenCalledWith(["dummyItem"], {
+          overwrite: true,
+        });
+      });
+    });
+
+    describe("getGroup function tests", () => {
+      let dummyGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        collection.groups = {
+          dummyGroup: dummyGroup,
+        };
+
+        ComputedTracker.tracked = jest.fn();
+      });
+
+      it("should return and track existing Group (default config)", () => {
+        const response = collection.getGroup("dummyGroup");
+
+        expect(response).toBe(dummyGroup);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummyGroup.observer
+        );
+      });
+
+      it("shouldn't return and track not existing Group (default config)", () => {
+        const response = collection.getGroup("notExistingGroup");
+
+        expect(response).toBeUndefined();
+        expect(ComputedTracker.tracked).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't return and track existing placeholder Group (default config)", () => {
+        dummyGroup.isPlaceholder = true;
+
+        const response = collection.getGroup("dummyGroup");
+
+        expect(response).toBeUndefined();
+        expect(ComputedTracker.tracked).not.toHaveBeenCalled();
+      });
+
+      it("should return and track  existing placeholder Group (config.notExisting = true)", () => {
+        dummyGroup.isPlaceholder = true;
+
+        const response = collection.getGroup("dummyGroup", {
+          notExisting: true,
+        });
+
+        expect(response).toBe(dummyGroup);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummyGroup.observer
+        );
+      });
+    });
+
+    describe("getGroupWithReference function tests", () => {
+      let dummyGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        collection.groups = {
+          dummyGroup: dummyGroup,
+        };
+
+        ComputedTracker.tracked = jest.fn();
+      });
+
+      it("should return and track existing Group", () => {
+        const response = collection.getGroupWithReference("dummyGroup");
+
+        expect(response).toBe(dummyGroup);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummyGroup.observer
+        );
+      });
+
+      it("should return and track created reference Group if Group doesn't exist yet", () => {
+        const response = collection.getGroupWithReference("notExistingGroup");
+
+        expect(response).toBeInstanceOf(Group);
+        expect(response.isPlaceholder).toBeTruthy();
+        expect(response._key).toBe("notExistingGroup");
+        expect(collection.groups["notExistingGroup"]).toBe(response);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
+      });
+    });
+
+    describe("removeGroup function tests", () => {
+      let dummyGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        collection.groups = {
+          dummyGroup: dummyGroup,
+        };
+      });
+
+      it("should remove existing Group", () => {
+        collection.removeGroup("dummyGroup");
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(collection.groups["dummyGroup"]).toBeUndefined();
+      });
+
+      it("shouldn't remove not existing Group and print warning", () => {
+        collection.removeGroup("notExistingGroup");
+
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Group with the key/name 'notExistingGroup' doesn't exist!"
+        );
+      });
+    });
+
+    describe("createSelector function tests", () => {
+      let dummySelector: Selector;
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
+
+        dummySelector = new Selector(collection, "dummyItem", {
+          key: "dummySelector",
+        });
+        collection.selectors = {
+          dummySelector: dummySelector,
+        };
+
+        dummySelector.select = jest.fn();
+      });
+
+      it("should create and add not existing Selector to Collection", () => {
+        const response = collection.createSelector("newSelector", "dummyItem");
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(response).toBeInstanceOf(Selector);
+        expect(response._key).toBe("newSelector");
+        expect(response.isPlaceholder).toBeFalsy();
+        expect(response._itemKey).toStrictEqual("dummyItem");
+        expect(collection.selectors["newSelector"]).toBe(response);
+      });
+
+      it("shouldn't create and add existing Selector to Collection", () => {
+        const response = collection.createSelector(
+          "dummySelector",
+          "dummyItem"
+        );
+
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Selector with the name 'dummySelector' already exists!"
+        );
+        expect(response).toBe(dummySelector);
+        expect(collection.selectors["dummySelector"]).toBe(dummySelector);
+        expect(dummySelector.select).not.toHaveBeenCalled();
+      });
+
+      it("should update existing placeholder Selector of Collection", () => {
+        dummySelector.isPlaceholder = true;
+
+        const response = collection.createSelector(
+          "dummySelector",
+          "dummyItem"
+        );
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(response).toBe(dummySelector);
+        expect(collection.selectors["dummySelector"]).toBe(dummySelector);
+        expect(dummySelector.select).toHaveBeenCalledWith("dummyItem", {
+          overwrite: true,
+        });
+      });
+    });
+
+    describe("getSelector function tests", () => {
+      let dummySelector: Selector;
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
+
+        dummySelector = new Selector(collection, "dummyItem", {
+          key: "dummySelector",
+        });
+        collection.selectors = {
+          dummySelector: dummySelector,
+        };
+
+        ComputedTracker.tracked = jest.fn();
+      });
+
+      it("should return and track existing Selector (default config)", () => {
+        const response = collection.getSelector("dummySelector");
+
+        expect(response).toBe(dummySelector);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummySelector.observer
+        );
+      });
+
+      it("shouldn't return and track not existing Selector (default config)", () => {
+        const response = collection.getSelector("notExistingSelector");
+
+        expect(response).toBeUndefined();
+        expect(ComputedTracker.tracked).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't return and track existing placeholder Selector (default config)", () => {
+        dummySelector.isPlaceholder = true;
+
+        const response = collection.getSelector("dummySelector");
+
+        expect(response).toBeUndefined();
+        expect(ComputedTracker.tracked).not.toHaveBeenCalled();
+      });
+
+      it("should return and track existing placeholder Selector (config.notExisting = true)", () => {
+        dummySelector.isPlaceholder = true;
+
+        const response = collection.getSelector("dummySelector", {
+          notExisting: true,
+        });
+
+        expect(response).toBe(dummySelector);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummySelector.observer
+        );
+      });
+    });
+
+    describe("getSelectorWithReference function tests", () => {
+      let dummySelector: Selector;
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
+
+        dummySelector = new Selector(collection, "dummyItem", {
+          key: "dummySelector",
+        });
+        collection.selectors = {
+          dummySelector: dummySelector,
+        };
+
+        ComputedTracker.tracked = jest.fn();
+      });
+
+      it("should return and track existing Selector", () => {
+        const response = collection.getSelectorWithReference("dummySelector");
+
+        expect(response).toBe(dummySelector);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummySelector.observer
+        );
+      });
+
+      it("should return and track created reference Selector if Selector doesn't exist yet", () => {
+        const response = collection.getSelectorWithReference(
+          "notExistingSelector"
+        );
+
+        expect(response).toBeInstanceOf(Selector);
+        expect(response.isPlaceholder).toBeTruthy();
+        expect(response._key).toBe("notExistingSelector");
+        expect(collection.selectors["notExistingSelector"]).toBe(response);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
+      });
+    });
+
+    describe("removeSelector function tests", () => {
+      let dummySelector: Selector;
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
+
+        dummySelector = new Selector(collection, "dummyItem", {
+          key: "dummySelector",
+        });
+        collection.selectors = {
+          dummySelector: dummySelector,
+        };
+      });
+
+      it("should remove existing Selector", () => {
+        collection.removeSelector("dummySelector");
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(collection.selectors["dummySelector"]).toBeUndefined();
+      });
+
+      it("shouldn't remove not existing Selector and print warning", () => {
+        collection.removeSelector("notExistingSelector");
+
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Selector with the key/name 'notExistingSelector' doesn't exist!"
+        );
       });
     });
   });
