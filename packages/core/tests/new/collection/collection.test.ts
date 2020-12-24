@@ -970,14 +970,8 @@ describe("Collection Tests", () => {
 
     describe("getSelector function tests", () => {
       let dummySelector: Selector;
-      let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
-        collection.data = {
-          dummyItem: dummyItem,
-        };
-
         dummySelector = new Selector(collection, "dummyItem", {
           key: "dummySelector",
         });
@@ -1029,14 +1023,8 @@ describe("Collection Tests", () => {
 
     describe("getSelectorWithReference function tests", () => {
       let dummySelector: Selector;
-      let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
-        collection.data = {
-          dummyItem: dummyItem,
-        };
-
         dummySelector = new Selector(collection, "dummyItem", {
           key: "dummySelector",
         });
@@ -1071,14 +1059,8 @@ describe("Collection Tests", () => {
 
     describe("removeSelector function tests", () => {
       let dummySelector: Selector;
-      let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
-        collection.data = {
-          dummyItem: dummyItem,
-        };
-
         dummySelector = new Selector(collection, "dummyItem", {
           key: "dummySelector",
         });
