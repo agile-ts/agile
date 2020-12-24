@@ -216,7 +216,7 @@ describe("StateObserver Tests", () => {
         );
       });
 
-      it("should ingest placeholder State into Runtime if newValue isn't equal to currentValue (default config)", () => {
+      it("should ingest placeholder State into Runtime (default config)", () => {
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
           expect(job._key).toBe(stateObserver._key);
           expect(job.observer).toBe(stateObserver);
@@ -242,17 +242,6 @@ describe("StateObserver Tests", () => {
       });
 
       it("should ingest State into Runtime and compute newStateValue if State compute Function is set (default config)", () => {
-        dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(stateObserver._key);
-          expect(job.observer).toBe(stateObserver);
-          expect(job.config).toStrictEqual({
-            background: false,
-            sideEffects: true,
-            force: false,
-            storage: true,
-            overwrite: false,
-          });
-        });
         dummyState.computeMethod = (value) => `cool value '${value}'`;
 
         stateObserver.ingestValue("updatedDummyValue");

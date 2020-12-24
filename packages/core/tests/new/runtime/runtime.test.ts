@@ -49,14 +49,14 @@ describe("Runtime Tests", () => {
         runtime.perform = jest.fn();
       });
 
-      it("should create Job and perform it (default config)", () => {
+      it("should perform passed Job (default config)", () => {
         runtime.ingest(dummyJob);
 
         expect(runtime.jobQueue.length).toBe(0);
         expect(runtime.perform).toHaveBeenCalledWith(dummyJob);
       });
 
-      it("should create Job and shouldn't perform it (config.perform = false)", () => {
+      it("shouldn't perform passed Job (config.perform = false)", () => {
         runtime.ingest(dummyJob, { perform: false });
 
         expect(runtime.jobQueue.length).toBe(1);
