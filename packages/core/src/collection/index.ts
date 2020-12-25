@@ -525,22 +525,6 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
-  // Remove
-  //=========================================================================================================
-  /**
-   * @public
-   * Remove Items from Group or from everywhere
-   * @param itemKeys - ItemKey/s that get removed
-   */
-  public remove(itemKeys: ItemKey | Array<ItemKey>) {
-    return {
-      fromGroups: (groups: Array<ItemKey> | ItemKey) =>
-        this.removeFromGroups(itemKeys, groups),
-      everywhere: () => this.removeItems(itemKeys),
-    };
-  }
-
-  //=========================================================================================================
   // Get Item by Id
   //=========================================================================================================
   /**
@@ -798,6 +782,22 @@ export class Collection<DataType = DefaultItem> {
         background: config?.background,
       });
     }
+  }
+
+  //=========================================================================================================
+  // Remove
+  //=========================================================================================================
+  /**
+   * @public
+   * Remove Items from Collection
+   * @param itemKeys - ItemKey/s that get removed
+   */
+  public remove(itemKeys: ItemKey | Array<ItemKey>) {
+    return {
+      fromGroups: (groups: Array<ItemKey> | ItemKey) =>
+        this.removeFromGroups(itemKeys, groups),
+      everywhere: () => this.removeItems(itemKeys),
+    };
   }
 
   //=========================================================================================================

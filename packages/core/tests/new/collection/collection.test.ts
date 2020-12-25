@@ -1084,5 +1084,31 @@ describe("Collection Tests", () => {
         );
       });
     });
+
+    describe("remove function tests", () => {
+      beforeEach(() => {
+        collection.removeFromGroups = jest.fn();
+        collection.removeItems = jest.fn();
+      });
+
+      it("should remove Items from Group", () => {
+        collection
+          .remove(["test1", "test2"])
+          .fromGroups(["testGroup1", "testGroup2"]);
+
+        expect(collection.removeFromGroups).toHaveBeenCalledWith(
+          ["test1", "test2"],
+          ["testGroup1", "testGroup2"]
+        );
+        expect(collection.removeItems).not.toHaveBeenCalled();
+      });
+
+      it("should remove Items from everywhere", () => {
+        collection.remove(["test1", "test2"]).everywhere();
+
+        expect(collection.removeFromGroups).not.toHaveBeenCalled();
+        expect(collection.removeItems).toHaveBeenCalledWith(["test1", "test2"]);
+      });
+    });
   });
 });
