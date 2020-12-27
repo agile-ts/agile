@@ -9,6 +9,8 @@ import {
 } from "../../../src";
 import * as Utils from "../../../src/utils";
 
+jest.mock("../../../src/collection/collection.persistent");
+
 describe("Collection Tests", () => {
   interface ItemInterface {
     id: string;
@@ -1214,6 +1216,75 @@ describe("Collection Tests", () => {
         expect(collection.getItem).toHaveBeenCalledWith("1", {
           notExisting: true,
         });
+      });
+    });
+
+    describe("persist function tests", () => {
+      it("should create persistent with CollectionKey (default config)", () => {
+        collection.persist();
+
+        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
+        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
+          instantiate: true,
+          storageKeys: [],
+          key: collection._key,
+        });
+      });
+
+      it("should create persistent with CollectionKey (specific config)", () => {
+        collection.persist({
+          storageKeys: ["test1", "test2"],
+          instantiate: false,
+        });
+
+        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
+        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
+          instantiate: false,
+          storageKeys: ["test1", "test2"],
+          key: collection._key,
+        });
+      });
+
+      it("should create persistent with passed Key (default config)", () => {
+        collection.persist("passedKey");
+
+        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
+        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
+          instantiate: true,
+          storageKeys: [],
+          key: "passedKey",
+        });
+      });
+
+      it("should create persistent with passed Key (specific config)", () => {
+        collection.persist("passedKey", {
+          storageKeys: ["test1", "test2"],
+          instantiate: false,
+        });
+
+        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
+        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
+          instantiate: false,
+          storageKeys: ["test1", "test2"],
+          key: "passedKey",
+        });
+      });
+
+      it("should overwrite existing persistent with a warning", () => {
+        collection.persistent = new CollectionPersistent(collection);
+
+        collection.persist("newPersistentKey");
+
+        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
+        // expect(collection.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
+        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
+          instantiate: true,
+          storageKeys: [],
+          key: "newPersistentKey",
+        });
+        expect(console.warn).toBeCalledWith(
+          `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`
+        );
       });
     });
 

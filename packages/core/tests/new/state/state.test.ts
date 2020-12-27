@@ -648,16 +648,14 @@ describe("State Tests", () => {
       it("should overwrite existing persistent with a warning", () => {
         numberState.persistent = new StatePersistent(numberState);
 
-        numberState.persist({
-          instantiate: false,
-          storageKeys: ["test1", "test2"],
-        });
+        numberState.persist("newPersistentKey");
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        // expect(numberState.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: false,
-          storageKeys: ["test1", "test2"],
-          key: numberState._key,
+          instantiate: true,
+          storageKeys: [],
+          key: "newPersistentKey",
         });
         expect(console.warn).toBeCalledWith(
           `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`

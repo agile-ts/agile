@@ -608,7 +608,7 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @public
    * Stores Collection Value into Agile Storage permanently
-   * @param key - Storage Key (Note: not needed if Collection has key/name)
+   * @param key - Key/Name of created Persistent (Note: Key required if Collection has no set Key!)
    * @param config - Config
    */
   public persist(
@@ -624,7 +624,7 @@ export class Collection<DataType = DefaultItem> {
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as CollectionPersistentConfigInterface;
-      key = undefined;
+      key = this._key;
     } else {
       _config = config || {};
       key = keyOrConfig as StorageKey;
@@ -632,13 +632,13 @@ export class Collection<DataType = DefaultItem> {
 
     _config = defineConfig(_config, {
       instantiate: true,
+      storageKeys: [],
     });
 
-    if (this.persistent) {
+    if (this.persistent)
       Agile.logger.warn(
-        "By persisting a Collection twice you overwrite the old Persistent Instance!"
+        `By persisting the Collection '${this._key}' twice you overwrite the old Persistent Instance!`
       );
-    }
 
     // Create persistent -> Persist Value
     this.persistent = new CollectionPersistent<DataType>(this, {
