@@ -738,10 +738,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Add ItemKeys to Groups
     _groupKeys.forEach((groupKey) => {
-      const group = this.getGroup(groupKey);
-      _itemKeys.forEach((itemKey) => {
-        group?.add(itemKey, config);
-      });
+      this.getGroup(groupKey)?.add(_itemKeys, config);
     });
   }
 

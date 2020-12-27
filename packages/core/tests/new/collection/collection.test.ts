@@ -1384,6 +1384,50 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("put function tests", () => {
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+
+      beforeEach(() => {
+        dummyGroup1 = new Group(collection, [], { key: "dummyGroup1" });
+        dummyGroup2 = new Group(collection, [], { key: "dummyGroup2" });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+        };
+
+        dummyGroup1.add = jest.fn();
+        dummyGroup2.add = jest.fn();
+      });
+
+      it("should add passed itemKey to passed Group (default config)", () => {
+        collection.put("1", "dummyGroup1");
+
+        expect(dummyGroup1.add).toHaveBeenCalledWith(["1"], {});
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+      });
+
+      it("should add passed itemKey to passed Group (specific config)", () => {
+        collection.put("1", "dummyGroup1", {
+          overwrite: true,
+          method: "push",
+        });
+
+        expect(dummyGroup1.add).toHaveBeenCalledWith(["1"], {
+          overwrite: true,
+          method: "push",
+        });
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+      });
+
+      it("should add passed itemKeys to passed Groups (default config)", () => {
+        collection.put(["1", "2", "3"], ["dummyGroup1", "notExistingGroup", "dummyGroup2"]);
+
+        expect(dummyGroup1.add).toHaveBeenCalledWith(["1", "2", "3"], {});
+        expect(dummyGroup2.add).toHaveBeenCalledWith(["1", "2", "3"], {});
+      });
+    });
+
     describe("remove function tests", () => {
       beforeEach(() => {
         collection.removeFromGroups = jest.fn();
