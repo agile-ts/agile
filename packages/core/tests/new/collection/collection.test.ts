@@ -1321,6 +1321,34 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("getGroupCount function tests", () => {
+      beforeEach(() => {
+        collection.groups = {
+          1: "x" as any,
+          2: "y" as any,
+          10: "z" as any,
+        };
+      });
+
+      it("should return count of registered Groups", () => {
+        expect(collection.getGroupCount()).toBe(3);
+      });
+    });
+
+    describe("getSelectorCount function tests", () => {
+      beforeEach(() => {
+        collection.selectors = {
+          1: "x" as any,
+          2: "y" as any,
+          10: "z" as any,
+        };
+      });
+
+      it("should return count of registered Selectors", () => {
+        expect(collection.getSelectorCount()).toBe(3);
+      });
+    });
+
     describe("remove function tests", () => {
       beforeEach(() => {
         collection.removeFromGroups = jest.fn();
