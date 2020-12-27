@@ -651,6 +651,29 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // On Load
+  //=========================================================================================================
+  /**
+   * @public
+   * Callback Function that gets called if the persisted Value gets loaded into the Collection for the first Time
+   * Note: Only useful for persisted Collections!
+   * @param callback - Callback Function
+   */
+  public onLoad(callback: (success: boolean) => void): this {
+    if (this.persistent) {
+      this.persistent.onLoad = callback;
+
+      // If Collection is already 'isPersisted' the loading was successful -> callback can be called
+      if (this.isPersisted) callback(true);
+    } else {
+      Agile.logger.error(
+        `Please make sure you persist the Collection '${this._key}' before using the 'onLoad' function!`
+      );
+    }
+    return this;
+  }
+
+  //=========================================================================================================
   // Group Size
   //=========================================================================================================
   /**

@@ -1288,6 +1288,39 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("onLoad function tests", () => {
+      const dummyCallbackFunction = jest.fn();
+
+      it("should set onLoad function if Collection is persisted and shouldn't call it initially (collection.isPersisted = false)", () => {
+        collection.persistent = new CollectionPersistent(collection);
+        collection.isPersisted = false;
+
+        collection.onLoad(dummyCallbackFunction);
+
+        expect(collection.persistent.onLoad).toBe(dummyCallbackFunction);
+        expect(dummyCallbackFunction).not.toHaveBeenCalled();
+      });
+
+      it("should set onLoad function if Collection is persisted and should call it initially (collection.isPersisted = true)", () => {
+        collection.persistent = new CollectionPersistent(collection);
+        collection.isPersisted = true;
+
+        collection.onLoad(dummyCallbackFunction);
+
+        expect(collection.persistent.onLoad).toBe(dummyCallbackFunction);
+        expect(dummyCallbackFunction).toBeCalledWith(true);
+      });
+
+      it("shouldn't set onLoad function if Collection isn't persisted and should drop a error", () => {
+        collection.onLoad(dummyCallbackFunction);
+
+        expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: Please make sure you persist the Collection 'collectionKey' before using the 'onLoad' function!"
+        );
+      });
+    });
+
     describe("remove function tests", () => {
       beforeEach(() => {
         collection.removeFromGroups = jest.fn();

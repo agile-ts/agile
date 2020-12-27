@@ -666,7 +666,7 @@ describe("State Tests", () => {
     describe("onLoad function tests", () => {
       const dummyCallbackFunction = jest.fn();
 
-      it("should set onLoad function if State is persisted and shouldn't call it initially if isPersisted = false", () => {
+      it("should set onLoad function if State is persisted and shouldn't call it initially (state.isPersisted = false)", () => {
         numberState.persistent = new StatePersistent(numberState);
         numberState.isPersisted = false;
 
@@ -676,7 +676,7 @@ describe("State Tests", () => {
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
       });
 
-      it("should set onLoad function if State is persisted and should call it initially if isPersisted = true", () => {
+      it("should set onLoad function if State is persisted and should call it initially (state.isPersisted = true)", () => {
         numberState.persistent = new StatePersistent(numberState);
         numberState.isPersisted = true;
 
@@ -686,12 +686,12 @@ describe("State Tests", () => {
         expect(dummyCallbackFunction).toBeCalledWith(true);
       });
 
-      it("shouldn't set onLoad function if State isn't persisted and should drop a warning ", () => {
+      it("shouldn't set onLoad function if State isn't persisted and should drop a error", () => {
         numberState.onLoad(dummyCallbackFunction);
 
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Please make sure you persist the State 'numberStateKey' before using onLoad!"
+          "Agile Error: Please make sure you persist the State 'numberStateKey' before using the 'onLoad' function!"
         );
       });
     });
