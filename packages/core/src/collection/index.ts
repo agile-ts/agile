@@ -352,7 +352,7 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @public
    * Get Group by Key/Name
-   * @param groupKey - Name/Key of Group
+   * @param groupKey - Key/Name of Group
    * @param config - Config
    */
   public getGroup(
@@ -457,7 +457,7 @@ export class Collection<DataType = DefaultItem> {
   /**
    * @public
    * Get Selector by Key/Name
-   * @param selectorKey - Name/Key of Selector
+   * @param selectorKey - Key/Name of Selector
    * @param config - Config
    */
   public getSelector(
@@ -553,27 +553,25 @@ export class Collection<DataType = DefaultItem> {
 
   /**
    * @public
-   * Get Item by Key/Name or a Reference to it if it doesn't exist
-   * If Item doesn't exist, it returns a reference of the Item that will be filled with the real data later
-   * @param itemKey - Name/Key of Item
+   * Get Item by Key/Name or a Reference to it if it doesn't exist yet
+   * @param itemKey - Key/Name of Item
    */
   public getItemWithReference(itemKey: ItemKey): Item<DataType> {
     let item = this.getItem(itemKey, { notExisting: true });
 
-    // Create Placeholder Item to hold reference
+    // Create dummy Item to hold reference
     if (!item) {
-      const dummyItem = new Item<DataType>(
+      item = new Item<DataType>(
         this,
         {
-          [this.config.primaryKey]: itemKey, // Setting ItemKey to assign key to Item
+          [this.config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
           dummy: "item",
         } as any,
         {
           isPlaceholder: true,
         }
       );
-      this.data[itemKey] = dummyItem;
-      return dummyItem;
+      this.data[itemKey] = item;
     }
 
     ComputedTracker.tracked(item.observer);

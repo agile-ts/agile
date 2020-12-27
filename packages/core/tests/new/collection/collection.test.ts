@@ -1085,6 +1085,138 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("getItem function tests", () => {
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+        collection.data = {
+          ["1"]: dummyItem,
+        };
+
+        ComputedTracker.tracked = jest.fn();
+      });
+
+      it("should return and track existing Item (default config)", () => {
+        const response = collection.getItem("1");
+
+        expect(response).toBe(dummyItem);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummyItem.observer
+        );
+      });
+
+      it("shouldn't return and track not existing Item (default config)", () => {
+        const response = collection.getItem("notExistingItem");
+
+        expect(response).toBeUndefined();
+        expect(ComputedTracker.tracked).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't return and track existing placeholder Item (default config)", () => {
+        dummyItem.isPlaceholder = true;
+
+        const response = collection.getItem("1");
+
+        expect(response).toBeUndefined();
+        expect(ComputedTracker.tracked).not.toHaveBeenCalled();
+      });
+
+      it("should return and track existing placeholder Item (config.notExisting = true)", () => {
+        dummyItem.isPlaceholder = true;
+
+        const response = collection.getItem("1", {
+          notExisting: true,
+        });
+
+        expect(response).toBe(dummyItem);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummyItem.observer
+        );
+      });
+    });
+
+    describe("getItemWithReference function tests", () => {
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+        collection.data = {
+          ["1"]: dummyItem,
+        };
+
+        ComputedTracker.tracked = jest.fn();
+      });
+
+      it("should return and track existing Item", () => {
+        const response = collection.getItemWithReference("1");
+
+        expect(response).toBe(dummyItem);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          dummyItem.observer
+        );
+      });
+
+      it("should return and track created reference Item if Item doesn't exist yet", () => {
+        const response = collection.getItemWithReference("notExistingItem");
+
+        expect(response).toBeInstanceOf(Item);
+        expect(response.isPlaceholder).toBeTruthy();
+        expect(response._key).toBe("notExistingItem");
+        expect(collection.data["notExistingItem"]).toBe(response);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
+      });
+    });
+
+    describe("getItemValue function tests", () => {
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+        collection.data = {
+          ["1"]: dummyItem,
+        };
+
+        jest.spyOn(collection, "getItem");
+      });
+
+      it("should return existing Item Value (default config)", () => {
+        const response = collection.getItemValue("1");
+
+        expect(response).toBe(dummyItem._value);
+        expect(collection.getItem).toHaveBeenCalledWith("1", {});
+      });
+
+      it("shouldn't return not existing Item Value (default config)", () => {
+        const response = collection.getItemValue("notExistingItem");
+
+        expect(response).toBeUndefined();
+        expect(collection.getItem).toHaveBeenCalledWith("notExistingItem", {});
+      });
+
+      it("shouldn't return existing placeholder Item Value (default config)", () => {
+        dummyItem.isPlaceholder = true;
+
+        const response = collection.getItemValue("1");
+
+        expect(response).toBeUndefined();
+        expect(collection.getItem).toHaveBeenCalledWith("1", {});
+      });
+
+      it("should return existing placeholder Item Value (config.notExisting = true)", () => {
+        dummyItem.isPlaceholder = true;
+
+        const response = collection.getItemValue("1", {
+          notExisting: true,
+        });
+
+        expect(response).toBe(dummyItem._value);
+        expect(collection.getItem).toHaveBeenCalledWith("1", {
+          notExisting: true,
+        });
+      });
+    });
+
     describe("remove function tests", () => {
       beforeEach(() => {
         collection.removeFromGroups = jest.fn();
