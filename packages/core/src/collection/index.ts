@@ -707,18 +707,15 @@ export class Collection<DataType = DefaultItem> {
    * Resets this Collection
    */
   public reset() {
-    // Reset Groups
-    for (let key in this.groups) this.getGroup(key)?.reset();
-
     // Reset Data
     this.data = {};
     this.size = 0;
 
-    // Reselect Items -> force ingest to rebuild Selector
-    for (let key in this.selectors) {
-      const selector = this.getSelector(key);
-      selector?.ingest({ force: true });
-    }
+    // Reset Groups
+    for (let key in this.groups) this.getGroup(key)?.reset();
+
+    // Reset Selectors
+    for (let key in this.selectors) this.getSelector(key)?.reset();
   }
 
   //=========================================================================================================

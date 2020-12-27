@@ -1282,7 +1282,7 @@ describe("Collection Tests", () => {
           storageKeys: [],
           key: "newPersistentKey",
         });
-        expect(console.warn).toBeCalledWith(
+        expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`
         );
       });
@@ -1308,7 +1308,7 @@ describe("Collection Tests", () => {
         collection.onLoad(dummyCallbackFunction);
 
         expect(collection.persistent.onLoad).toBe(dummyCallbackFunction);
-        expect(dummyCallbackFunction).toBeCalledWith(true);
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(true);
       });
 
       it("shouldn't set onLoad function if Collection isn't persisted and should drop a error", () => {
@@ -1346,6 +1346,41 @@ describe("Collection Tests", () => {
 
       it("should return count of registered Selectors", () => {
         expect(collection.getSelectorCount()).toBe(3);
+      });
+    });
+
+    describe("reset function tests", () => {
+      let dummyGroup: Group;
+      let dummySelector: Selector;
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        collection.data = {
+          dummyItem: dummyItem,
+        };
+        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        collection.groups = {
+          dummyGroup: dummyGroup,
+        };
+        dummySelector = new Selector(collection, "dummyItem", {
+          key: "dummySelector",
+        });
+        collection.selectors = {
+          dummySelector: dummySelector,
+        };
+
+        dummyGroup.reset = jest.fn();
+        dummySelector.reset = jest.fn();
+      });
+
+      it("should reset Collection and its Selectors and Groups", () => {
+        collection.reset();
+
+        expect(collection.data).toStrictEqual({});
+        expect(collection.size).toBe(0);
+        expect(dummySelector.reset).toHaveBeenCalled();
+        expect(dummyGroup.reset).toHaveBeenCalled();
       });
     });
 

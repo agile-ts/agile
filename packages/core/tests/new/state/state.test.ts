@@ -657,7 +657,7 @@ describe("State Tests", () => {
           storageKeys: [],
           key: "newPersistentKey",
         });
-        expect(console.warn).toBeCalledWith(
+        expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`
         );
       });
@@ -683,7 +683,7 @@ describe("State Tests", () => {
         numberState.onLoad(dummyCallbackFunction);
 
         expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
-        expect(dummyCallbackFunction).toBeCalledWith(true);
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(true);
       });
 
       it("shouldn't set onLoad function if State isn't persisted and should drop a error", () => {
