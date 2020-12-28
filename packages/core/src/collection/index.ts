@@ -786,7 +786,7 @@ export class Collection<DataType = DefaultItem> {
     // Update ItemKey in Selectors
     for (let selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
-      if (!selector || selector._itemKey !== oldItemKey) continue;
+      if (!selector || !selector.hasSelected(oldItemKey)) continue;
       selector.select(newItemKey, {
         background: config?.background,
       });
@@ -882,13 +882,7 @@ export class Collection<DataType = DefaultItem> {
       // Remove Item from Groups
       for (let groupKey in this.groups) {
         const group = this.getGroup(groupKey, { notExisting: true });
-        if (group && group.has(itemKey)) group.remove(itemKey);
-      }
-
-      // Remove Selectors that represented this Item
-      for (let selectorKey in this.selectors) {
-        const selector = this.getSelector(selectorKey, { notExisting: true });
-        if (selector?._itemKey === itemKey) this.removeSelector(selectorKey);
+        if (group?.has(itemKey)) group?.remove(itemKey);
       }
 
       // Remove Item from Storage
@@ -896,6 +890,12 @@ export class Collection<DataType = DefaultItem> {
 
       // Remove Item from Collection
       delete this.data[itemKey];
+
+      // Reselect Item -> creates placeholder Item
+      for (let selectorKey in this.selectors) {
+        const selector = this.getSelector(selectorKey, { notExisting: true });
+        if (selector?.hasSelected(itemKey)) selector?.select(itemKey);
+      }
 
       this.size--;
     });

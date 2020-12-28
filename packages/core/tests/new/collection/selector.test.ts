@@ -357,6 +357,20 @@ describe("Selector Tests", () => {
       });
     });
 
+    describe("hasSelected function tests", () => {
+      beforeEach(() => {
+        selector._itemKey = "dummyItemKey";
+      });
+
+      it("should return true if Selector has selected ItemKey", () => {
+        expect(selector.hasSelected("dummyItemKey")).toBeTruthy();
+      });
+
+      it("should return false if Selector hasn't selected ItemKey", () => {
+        expect(selector.hasSelected("notSelectedItemKey")).toBeFalsy();
+      });
+    });
+
     describe("rebuildSelector function tests", () => {
       beforeEach(() => {
         selector.set = jest.fn();

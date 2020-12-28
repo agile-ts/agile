@@ -60,6 +60,9 @@ export class Selector<DataType = DefaultItem> extends State<
     return this._itemKey;
   }
 
+  //=========================================================================================================
+  // Select
+  //=========================================================================================================
   /**
    * @public
    * Select new ItemKey
@@ -80,7 +83,7 @@ export class Selector<DataType = DefaultItem> extends State<
       storage: true,
     });
 
-    if (this._itemKey === itemKey && !config.force) {
+    if (this.hasSelected(itemKey) && !config.force) {
       Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
     }
@@ -103,6 +106,17 @@ export class Selector<DataType = DefaultItem> extends State<
     this.rebuildSelector(config);
 
     return this;
+  }
+
+  //=========================================================================================================
+  // Has Selected
+  //=========================================================================================================
+  /**
+   * Checks if Selector has selected passed ItemKey
+   * @param itemKey
+   */
+  public hasSelected(itemKey: ItemKey): boolean {
+    return this._itemKey === itemKey;
   }
 
   //=========================================================================================================
