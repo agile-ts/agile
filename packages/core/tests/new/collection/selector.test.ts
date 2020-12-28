@@ -415,11 +415,27 @@ describe("Selector Tests", () => {
         selector._itemKey = "dummyItemKey";
       });
 
-      it("should return true if Selector has selected ItemKey", () => {
+      it("should return true if Selector has selected ItemKey and Item isSelected", () => {
+        selector.item.isSelected = true;
+
         expect(selector.hasSelected("dummyItemKey")).toBeTruthy();
       });
 
-      it("should return false if Selector hasn't selected ItemKey", () => {
+      it("should return false if Selector hasn't selected ItemKey and Item isSelected", () => {
+        selector.item.isSelected = true;
+
+        expect(selector.hasSelected("notSelectedItemKey")).toBeFalsy();
+      });
+
+      it("should return false if Selector has selected ItemKey and Item isn't isSelected", () => {
+        selector.item.isSelected = false;
+
+        expect(selector.hasSelected("dummyItemKey")).toBeFalsy();
+      });
+
+      it("should return false if Selector hasn't selected ItemKey and Item isn't isSelected", () => {
+        selector.item.isSelected = false;
+
         expect(selector.hasSelected("notSelectedItemKey")).toBeFalsy();
       });
     });

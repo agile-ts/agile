@@ -143,6 +143,7 @@ export class Selector<DataType = DefaultItem> extends State<
   public hasSelected(itemKey: ItemKey): boolean {
     const isSelected = this._itemKey === itemKey;
     if (!this.item) return isSelected;
+    // Checking isSelected since Item might not be the same.. -> have the same ItemKeys but maybe not the same value
     return isSelected && this.item.isSelected;
   }
 
