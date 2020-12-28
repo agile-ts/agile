@@ -779,12 +779,10 @@ export class Collection<DataType = DefaultItem> {
     // Update Groups
     for (let groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
-      if (!group || group.isPlaceholder || !group.has(oldItemKey)) continue;
+      if (!group || !group.has(oldItemKey)) continue;
 
       // Replace old ItemKey with new ItemKey
-      const newGroupValue = copy(group._value);
-      newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
-      group.set(newGroupValue, { background: config?.background });
+      group.replace(oldItemKey, newItemKey, { background: config?.background });
     }
 
     // Update Selectors
@@ -792,7 +790,7 @@ export class Collection<DataType = DefaultItem> {
       const selector = this.getSelector(selectorKey, { notExisting: true });
       if (!selector || selector.itemKey !== oldItemKey) continue;
 
-      // Replace old selected ItemKey with new ItemKey
+      // Select new ItemKey
       selector.select(newItemKey, {
         background: config?.background,
       });

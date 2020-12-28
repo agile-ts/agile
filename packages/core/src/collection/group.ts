@@ -13,6 +13,7 @@ import {
   isValidObject,
   PersistentKey,
   ComputedTracker,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -209,6 +210,27 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
 
     this.set(newGroupValue, { background: config.background });
 
+    return this;
+  }
+
+  //=========================================================================================================
+  // Replace
+  //=========================================================================================================
+  /**
+   * @public
+   * Replaces oldItemKey with newItemKey
+   * @param oldItemKey - Old ItemKey
+   * @param newItemKey - New ItemKey
+   * @param config - Config
+   */
+  public replace(
+    oldItemKey: ItemKey,
+    newItemKey: ItemKey,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
+    let newGroupValue = copy(this._value);
+    newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
+    this.set(newGroupValue, config);
     return this;
   }
 

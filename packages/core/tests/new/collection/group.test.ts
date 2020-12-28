@@ -383,6 +383,32 @@ describe("Group Tests", () => {
       });
     });
 
+    describe("replace function tests", () => {
+      beforeEach(() => {
+        group._value = [1, 2, 3, 4, 5, 6];
+
+        group.set = jest.fn();
+      });
+
+      it("should replace oldItemKey with new ItemKey (default config)", () => {
+        group.replace(4, 20);
+
+        expect(group.set).toHaveBeenCalledWith([1, 2, 3, 20, 5, 6], {});
+      });
+
+      it("should replace oldItemKey with new ItemKey (specific config)", () => {
+        group.replace(2, 20, {
+          storage: true,
+          sideEffects: false,
+        });
+
+        expect(group.set).toHaveBeenCalledWith([1, 20, 3, 4, 5, 6], {
+          storage: true,
+          sideEffects: false,
+        });
+      });
+    });
+
     describe("persist function tests", () => {
       beforeEach(() => {
         jest.spyOn(State.prototype, "persist");
