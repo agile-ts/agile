@@ -747,7 +747,7 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @internal
-   * Updates ItemKey of Item
+   * Updates Key/Name of Item in all Instances (Group, Selector, ..)
    * @param oldItemKey - Old ItemKey
    * @param newItemKey - New ItemKey
    * @param config - Config
@@ -756,13 +756,13 @@ export class Collection<DataType = DefaultItem> {
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
     config: UpdateItemKeyConfigInterface = {}
-  ): void {
+  ): boolean {
     const item = this.getItem(oldItemKey, { notExisting: true });
     config = defineConfig(config, {
       background: false,
     });
 
-    if (!item || oldItemKey === newItemKey) return;
+    if (!item || oldItemKey === newItemKey) return false;
 
     // Remove Item from old ItemKey and add Item to new ItemKey
     delete this.data[oldItemKey];
@@ -776,25 +776,23 @@ export class Collection<DataType = DefaultItem> {
       CollectionPersistent.getItemStorageKey(newItemKey, this._key)
     );
 
-    // Update Groups
+    // Update ItemKey in Groups
     for (let groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (!group || !group.has(oldItemKey)) continue;
-
-      // Replace old ItemKey with new ItemKey
       group.replace(oldItemKey, newItemKey, { background: config?.background });
     }
 
-    // Update Selectors
+    // Update ItemKey in Selectors
     for (let selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
-      if (!selector || selector.itemKey !== oldItemKey) continue;
-
-      // Select new ItemKey
+      if (!selector || selector._itemKey !== oldItemKey) continue;
       selector.select(newItemKey, {
         background: config?.background,
       });
     }
+
+    return true;
   }
 
   //=========================================================================================================

@@ -6,6 +6,7 @@ import {
   Item,
   CollectionPersistent,
   ComputedTracker,
+  StatePersistent,
 } from "../../../src";
 import * as Utils from "../../../src/utils";
 
@@ -1421,10 +1422,172 @@ describe("Collection Tests", () => {
       });
 
       it("should add passed itemKeys to passed Groups (default config)", () => {
-        collection.put(["1", "2", "3"], ["dummyGroup1", "notExistingGroup", "dummyGroup2"]);
+        collection.put(
+          ["1", "2", "3"],
+          ["dummyGroup1", "notExistingGroup", "dummyGroup2"]
+        );
 
         expect(dummyGroup1.add).toHaveBeenCalledWith(["1", "2", "3"], {});
         expect(dummyGroup2.add).toHaveBeenCalledWith(["1", "2", "3"], {});
+      });
+    });
+
+    describe("updateItemKey function tests", () => {
+      let dummySelector1: Selector;
+      let dummySelector2: Selector;
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem1 = new Item(collection, { id: "dummyItem1", name: "Jeff" });
+        dummyItem1.persistent = new StatePersistent(dummyItem1);
+        dummyItem2 = new Item(collection, { id: "dummyItem2", name: "Hans" });
+        dummyItem2.persistent = new StatePersistent(dummyItem2);
+        collection.data = {
+          dummyItem1: dummyItem1,
+          dummyItem2: dummyItem2,
+        };
+
+        dummyGroup1 = new Group(collection, ["dummyItem1", "dummyItem2"], {
+          key: "dummyGroup1",
+        });
+        dummyGroup2 = new Group(collection, ["dummyItem2"], {
+          key: "dummyGroup2",
+        });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+        };
+
+        dummySelector1 = new Selector(collection, "dummyItem1", {
+          key: "dummySelector1",
+        });
+        dummySelector2 = new Selector(collection, "dummyItem2", {
+          key: "dummySelector2",
+        });
+        collection.selectors = {
+          dummySelector1: dummySelector1,
+          dummySelector2: dummySelector2,
+        };
+
+        dummyItem1.setKey = jest.fn();
+        dummyItem2.setKey = jest.fn();
+        dummyItem1.persistent.setKey = jest.fn();
+        dummyItem2.persistent.setKey = jest.fn();
+
+        dummyGroup1.replace = jest.fn();
+        dummyGroup2.replace = jest.fn();
+
+        dummySelector1.select = jest.fn();
+        dummySelector2.select = jest.fn();
+      });
+
+      it("should update ItemKey in Collection, Selectors and Groups (default config)", () => {
+        const response = collection.updateItemKey("dummyItem1", "newDummyItem");
+
+        expect(response).toBeTruthy();
+
+        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem2.setKey).not.toHaveBeenCalled();
+        expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            "newDummyItem",
+            collection._key
+          )
+        );
+        expect(dummyItem2.persistent.setKey).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.replace).toHaveBeenCalledWith(
+          "dummyItem1",
+          "newDummyItem",
+          {
+            background: false,
+          }
+        );
+        expect(dummyGroup2.replace).not.toHaveBeenCalled();
+
+        expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+          background: false,
+        });
+        expect(dummySelector2.select).not.toHaveBeenCalled();
+      });
+
+      it("should update ItemKey in Collection, Selectors and Groups (specific config)", () => {
+        const response = collection.updateItemKey(
+          "dummyItem1",
+          "newDummyItem",
+          {
+            background: true,
+          }
+        );
+
+        expect(response).toBeTruthy();
+
+        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            "newDummyItem",
+            collection._key
+          )
+        );
+
+        expect(dummyGroup1.replace).toHaveBeenCalledWith(
+          "dummyItem1",
+          "newDummyItem",
+          {
+            background: true,
+          }
+        );
+
+        expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+          background: true,
+        });
+      });
+
+      it("should update ItemKey in Collection, dummy Selectors and dummy Groups (default config)", () => {
+        dummyGroup1.isPlaceholder = true;
+        dummySelector1.isPlaceholder = true;
+
+        const response = collection.updateItemKey("dummyItem1", "newDummyItem");
+
+        expect(response).toBeTruthy();
+
+        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            "newDummyItem",
+            collection._key
+          )
+        );
+
+        expect(dummyGroup1.replace).toHaveBeenCalledWith(
+          "dummyItem1",
+          "newDummyItem",
+          {
+            background: false,
+          }
+        );
+
+        expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+          background: false,
+        });
+      });
+
+      it("shouldn't update ItemKey of Item that doesn't exist (default config)", () => {
+        const response = collection.updateItemKey(
+          "notExistingItem",
+          "newDummyItem"
+        );
+
+        expect(response).toBeFalsy();
+      });
+
+      it("shouldn't update ItemKey if it stayed the same (default config)", () => {
+        const response = collection.updateItemKey("dummyItem1", "dummyItem1");
+
+        expect(response).toBeFalsy();
       });
     });
 
