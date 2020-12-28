@@ -12,6 +12,7 @@ import {
 export class Selector<DataType = DefaultItem> extends State<
   DataType | undefined
 > {
+  static dummyItemKey = "unknown";
   static rebuildSelectorSideEffectKey = "rebuildSelector";
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
@@ -36,7 +37,7 @@ export class Selector<DataType = DefaultItem> extends State<
 
     this.collection = () => collection;
     this.item = undefined;
-    this._itemKey = "unknown";
+    this._itemKey = Selector.dummyItemKey;
     this._key = config?.key;
     this.isPlaceholder = true;
 
@@ -88,14 +89,12 @@ export class Selector<DataType = DefaultItem> extends State<
       return this;
     }
 
-    // Remove old Item from Collection if it is an Placeholder
-    if (oldItem?.isPlaceholder) delete this.collection().data[this._itemKey];
-
-    // Remove Selector sideEffect from old Item
-    oldItem?.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
+    // Unselect old Item
+    this.unselect({ background: true });
 
     this._itemKey = itemKey;
     this.item = newItem;
+    newItem.isSelected = true;
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, (config) =>
@@ -109,6 +108,32 @@ export class Selector<DataType = DefaultItem> extends State<
   }
 
   //=========================================================================================================
+  // Unselect
+  //=========================================================================================================
+  /**
+   * @public
+   * Unselects current selected Item
+   * @param config - Config
+   */
+  public unselect(config: StateRuntimeJobConfigInterface = {}): this {
+    // Unselect Item
+    if (this.item) {
+      this.item.isSelected = false;
+      this.item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
+      if (this.item.isPlaceholder) delete this.collection().data[this._itemKey];
+    }
+
+    // Reset and rebuild Selector
+    this.item = undefined;
+    this._itemKey = Selector.dummyItemKey;
+    this.rebuildSelector(config);
+
+    this.isPlaceholder = true;
+
+    return this;
+  }
+
+  //=========================================================================================================
   // Has Selected
   //=========================================================================================================
   /**
@@ -116,7 +141,9 @@ export class Selector<DataType = DefaultItem> extends State<
    * @param itemKey
    */
   public hasSelected(itemKey: ItemKey): boolean {
-    return this._itemKey === itemKey;
+    const isSelected = this._itemKey === itemKey;
+    if (!this.item) return isSelected;
+    return isSelected && this.item.isSelected;
   }
 
   //=========================================================================================================

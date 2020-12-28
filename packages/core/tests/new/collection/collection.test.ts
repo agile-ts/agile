@@ -1070,13 +1070,16 @@ describe("Collection Tests", () => {
         collection.selectors = {
           dummySelector: dummySelector,
         };
+
+        dummySelector.unselect = jest.fn();
       });
 
       it("should remove existing Selector", () => {
         collection.removeSelector("dummySelector");
 
         expect(console.warn).not.toHaveBeenCalled();
-        expect(collection.selectors["dummySelector"]).toBeUndefined();
+        expect(collection.selectors).not.toHaveProperty("dummySelector");
+        expect(dummySelector.unselect).toHaveBeenCalled();
       });
 
       it("shouldn't remove not existing Selector and print warning", () => {
@@ -1085,6 +1088,8 @@ describe("Collection Tests", () => {
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: Selector with the key/name 'notExistingSelector' doesn't exist!"
         );
+        expect(collection.selectors).toHaveProperty("dummySelector");
+        expect(dummySelector.unselect).not.toHaveBeenCalled();
       });
     });
 
@@ -1727,6 +1732,10 @@ describe("Collection Tests", () => {
         expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
         expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
       });
+    });
+
+    describe("removeItems function test", () => {
+      // TODO
     });
   });
 });

@@ -2,6 +2,7 @@ import { State, Collection, DefaultItem, StateKey } from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
   static updateGroupSideEffectKey = "rebuildGroup";
+  public isSelected = false;
   public collection: () => Collection<DataType>;
 
   /**

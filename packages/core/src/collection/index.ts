@@ -520,6 +520,7 @@ export class Collection<DataType = DefaultItem> {
       );
       return this;
     }
+    this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
     delete this.selectors[selectorKey];
     return this;
   }
@@ -891,7 +892,7 @@ export class Collection<DataType = DefaultItem> {
       // Remove Item from Collection
       delete this.data[itemKey];
 
-      // Reselect Item -> creates placeholder Item
+      // Reselect Item
       for (let selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
         if (selector?.hasSelected(itemKey)) selector?.select(itemKey);

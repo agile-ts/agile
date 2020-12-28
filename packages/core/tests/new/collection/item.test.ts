@@ -42,6 +42,7 @@ describe("Item Tests", () => {
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
     expect(item.watchers).toStrictEqual({});
+    expect(item.isSelected).toBeFalsy();
   });
 
   it("should create Item (specific config)", () => {
@@ -76,6 +77,7 @@ describe("Item Tests", () => {
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
     expect(item.watchers).toStrictEqual({});
+    expect(item.isSelected).toBeFalsy();
   });
 
   describe("Item Function Tests", () => {
