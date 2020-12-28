@@ -796,6 +796,23 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Get GroupKeys That Have ItemKey
+  //=========================================================================================================
+  /**
+   * @public
+   * Gets GroupKeys that contain the passed ItemKey
+   * @param itemKey - ItemKey
+   */
+  public getGroupKeysThatHaveItemKey(itemKey: ItemKey): Array<GroupKey> {
+    const groupKeys: Array<GroupKey> = [];
+    for (let groupKey in this.groups) {
+      const group = this.getGroup(groupKey, { notExisting: true });
+      if (group?.has(itemKey)) groupKeys.push(groupKey);
+    }
+    return groupKeys;
+  }
+
+  //=========================================================================================================
   // Remove
   //=========================================================================================================
   /**
@@ -833,13 +850,16 @@ export class Collection<DataType = DefaultItem> {
       // Remove ItemKey from Groups
       _groupKeys.forEach((groupKey) => {
         const group = this.getGroup(groupKey, { notExisting: true });
-        if (!group) return;
+        if (!group || !group.has(itemKey)) return;
         group.remove(itemKey);
         removedFromGroupsCount++;
       });
 
-      // If Item got removed from every Groups in Collection, remove it completely
-      if (removedFromGroupsCount >= this.getGroupCount())
+      // If Item got removed from every Groups the Item was in, remove it completely
+      if (
+        removedFromGroupsCount >=
+        this.getGroupKeysThatHaveItemKey(itemKey).length
+      )
         this.removeItems(itemKey);
     });
   }

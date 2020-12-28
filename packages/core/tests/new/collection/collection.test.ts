@@ -1591,6 +1591,48 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("getGroupKeysThatHaveItemKey function tests", () => {
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+      let dummyGroup3: Group;
+
+      beforeEach(() => {
+        dummyGroup1 = new Group(
+          collection,
+          ["dummyItem1", "dummyItem2", "dummyItem3"],
+          {
+            key: "dummyGroup1",
+          }
+        );
+        dummyGroup2 = new Group(collection, ["dummyItem2", "dummyItem3"], {
+          key: "dummyGroup2",
+        });
+        dummyGroup3 = new Group(collection, ["dummyItem3"], {
+          key: "dummyGroup3",
+        });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+          dummyGroup3: dummyGroup3,
+        };
+      });
+
+      it("should return groupKeys that contain ItemKey", () => {
+        expect(
+          collection.getGroupKeysThatHaveItemKey("unknownItem")
+        ).toStrictEqual([]);
+        expect(
+          collection.getGroupKeysThatHaveItemKey("dummyItem1")
+        ).toStrictEqual(["dummyGroup1"]);
+        expect(
+          collection.getGroupKeysThatHaveItemKey("dummyItem2")
+        ).toStrictEqual(["dummyGroup1", "dummyGroup2"]);
+        expect(
+          collection.getGroupKeysThatHaveItemKey("dummyItem3")
+        ).toStrictEqual(["dummyGroup1", "dummyGroup2", "dummyGroup3"]);
+      });
+    });
+
     describe("remove function tests", () => {
       beforeEach(() => {
         collection.removeFromGroups = jest.fn();
@@ -1614,6 +1656,76 @@ describe("Collection Tests", () => {
 
         expect(collection.removeFromGroups).not.toHaveBeenCalled();
         expect(collection.removeItems).toHaveBeenCalledWith(["test1", "test2"]);
+      });
+    });
+
+    describe("removeFromGroups function tests", () => {
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+      let dummyGroup3: Group;
+
+      beforeEach(() => {
+        dummyGroup1 = new Group(
+          collection,
+          ["dummyItem1", "dummyItem2", "dummyItem3", "unknownItem"],
+          {
+            key: "dummyGroup1",
+          }
+        );
+        dummyGroup2 = new Group(
+          collection,
+          ["dummyItem2", "dummyItem3", "unknownItem"],
+          {
+            key: "dummyGroup2",
+          }
+        );
+        dummyGroup3 = new Group(collection, ["dummyItem3", "unknownItem"], {
+          key: "dummyGroup3",
+        });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+          dummyGroup3: dummyGroup3,
+        };
+
+        collection.removeItems = jest.fn();
+        dummyGroup1.remove = jest.fn();
+        dummyGroup2.remove = jest.fn();
+        dummyGroup3.remove = jest.fn();
+      });
+
+      it("should remove ItemKey from Group", () => {
+        collection.removeFromGroups("dummyItem2", "dummyGroup1");
+
+        expect(collection.removeItems).not.toHaveBeenCalled();
+        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup2.remove).not.toHaveBeenCalled();
+        expect(dummyGroup3.remove).not.toHaveBeenCalled();
+      });
+
+      it("should remove ItemKeys from Groups", () => {
+        collection.removeFromGroups(
+          ["dummyItem2", "dummyItem3"],
+          ["dummyGroup2", "dummyGroup3"]
+        );
+
+        expect(collection.removeItems).not.toHaveBeenCalled();
+        expect(dummyGroup1.remove).not.toHaveBeenCalled();
+        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem3");
+        expect(dummyGroup3.remove).not.toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup3.remove).toHaveBeenCalledWith("dummyItem3");
+      });
+
+      it("should remove Item from Collection if it got removed from all Groups in which it was in", () => {
+        collection.removeFromGroups("dummyItem2", [
+          "dummyGroup2",
+          "dummyGroup1",
+        ]);
+
+        expect(collection.removeItems).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
       });
     });
   });
