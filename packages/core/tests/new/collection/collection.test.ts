@@ -1753,7 +1753,99 @@ describe("Collection Tests", () => {
     });
 
     describe("removeItems function test", () => {
-      // TODO
+      let dummySelector1: Selector;
+      let dummySelector2: Selector;
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem1 = new Item(collection, { id: "dummyItem1", name: "Jeff" });
+        dummyItem1.persistent = new StatePersistent(dummyItem1);
+        dummyItem2 = new Item(collection, { id: "dummyItem2", name: "Hans" });
+        dummyItem2.persistent = new StatePersistent(dummyItem2);
+        collection.data = {
+          dummyItem1: dummyItem1,
+          dummyItem2: dummyItem2,
+        };
+        collection.size = 2;
+
+        dummyGroup1 = new Group(collection, ["dummyItem1", "dummyItem2"], {
+          key: "dummyGroup1",
+        });
+        dummyGroup2 = new Group(collection, ["dummyItem2"], {
+          key: "dummyGroup2",
+        });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+        };
+
+        dummySelector1 = new Selector(collection, "dummyItem1", {
+          key: "dummySelector1",
+        });
+        dummySelector2 = new Selector(collection, "dummyItem2", {
+          key: "dummySelector2",
+        });
+        collection.selectors = {
+          dummySelector1: dummySelector1,
+          dummySelector2: dummySelector2,
+        };
+
+        dummyItem1.persistent.removePersistedValue = jest.fn();
+        dummyItem2.persistent.removePersistedValue = jest.fn();
+
+        dummyGroup1.remove = jest.fn();
+        dummyGroup2.remove = jest.fn();
+
+        dummySelector1.select = jest.fn();
+        dummySelector2.select = jest.fn();
+      });
+
+      it("should remove Item from Collection, Groups and Selectors", () => {
+        collection.removeItems("dummyItem1");
+
+        expect(collection.data).not.toHaveProperty("dummyItem1");
+        expect(collection.data).toHaveProperty("dummyItem2");
+        expect(collection.size).toBe(1);
+
+        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
+        expect(
+          dummyItem2.persistent.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem1");
+        expect(dummyGroup2.remove).not.toHaveBeenCalled();
+
+        expect(dummySelector1.select).toHaveBeenCalledWith("dummyItem1", {
+          force: true,
+        });
+        expect(dummySelector2.select).not.toHaveBeenCalled();
+      });
+
+      it("should remove Items from Collection, Groups and Selectors", () => {
+        collection.removeItems(["dummyItem1", "dummyItem2", "notExistingItem"]);
+
+        expect(collection.data).not.toHaveProperty("dummyItem1");
+        expect(collection.data).not.toHaveProperty("dummyItem2");
+        expect(collection.size).toBe(0);
+
+        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem2.persistent.removePersistedValue).toHaveBeenCalled();
+
+        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem1");
+        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup2.remove).not.toHaveBeenCalledWith("dummyItem1");
+        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
+
+        expect(dummySelector1.select).toHaveBeenCalledWith("dummyItem1", {
+          force: true,
+        });
+        expect(dummySelector2.select).toHaveBeenCalledWith("dummyItem2", {
+          force: true,
+        });
+      });
     });
   });
 });

@@ -881,8 +881,8 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Removes Item/s from Group/s
-   * @param itemKeys - ItemKey/s of Item/s that get removed from Collection
+   * Removes Item completely from Collection
+   * @param itemKeys - ItemKey/s of Item/s
    */
   public removeItems(itemKeys: ItemKey | Array<ItemKey>): void {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
@@ -903,7 +903,7 @@ export class Collection<DataType = DefaultItem> {
       // Remove Item from Collection
       delete this.data[itemKey];
 
-      // Reselect Item in Selectors
+      // Reselect Item in Selectors (to create new dummyItem that holds reference)
       for (let selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
         if (selector?.hasSelected(itemKey))
