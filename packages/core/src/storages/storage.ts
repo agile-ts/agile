@@ -8,7 +8,7 @@ import {
 
 export class Storage {
   public key: StorageKey;
-  public ready: boolean = false;
+  public ready = false;
   public methods: StorageMethodsInterface;
   public config: StorageConfigInterface;
 
@@ -29,6 +29,15 @@ export class Storage {
       async: config.async,
     };
     this.ready = this.validate();
+    if (!this.ready) return;
+
+    // Check if Storage is async
+    if (
+      isAsyncFunction(this.methods.get) ||
+      isAsyncFunction(this.methods.set) ||
+      isAsyncFunction(this.methods.remove)
+    )
+      this.config.async = true;
   }
 
   //=========================================================================================================
@@ -36,10 +45,9 @@ export class Storage {
   //=========================================================================================================
   /**
    * @public
-   * Validates this Storage
+   * Validates Storage Methods
    */
   public validate(): boolean {
-    // Validate Functions
     if (!isFunction(this.methods?.get)) {
       Agile.logger.error("Your GET StorageMethod isn't valid!");
       return false;
@@ -52,35 +60,26 @@ export class Storage {
       Agile.logger.error("Your REMOVE StorageMethod isn't valid!");
       return false;
     }
-
-    // Check if Storage is async
-    if (
-      isAsyncFunction(this.methods.get) ||
-      isAsyncFunction(this.methods.set) ||
-      isAsyncFunction(this.methods.remove)
-    )
-      this.config.async = true;
-
     return true;
   }
 
   //=========================================================================================================
-  // Get
+  // Normal Get
   //=========================================================================================================
   /**
-   * @public
-   * Gets value at provided Key
+   * @internal
+   * Gets value at provided Key (normal)
+   * Note: Only use this if you are 100% sure this Storage doesn't work async
    * @param key - Key of Storage property
    */
-  public get<GetType = any>(
-    key: StorageItemKey
-  ): GetType | Promise<GetType> | undefined {
+  public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
     if (!this.ready || !this.methods.get) return;
+    if (isAsyncFunction(this.methods.get))
+      Agile.logger.warn(
+        "Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
+      );
 
-    // Async Get
-    if (this.config.async) return this.asyncGet<GetType>(key);
-
-    // Normal Get
+    // Get Value
     const res = this.methods.get(this.getStorageKey(key));
     if (isJsonString(res)) return JSON.parse(res);
     return res;
@@ -94,12 +93,19 @@ export class Storage {
    * Gets value at provided Key (async)
    * @param key - Key of Storage property
    */
-  private asyncGet<GetTpe = any>(key: StorageItemKey): Promise<GetTpe> {
+  public get<GetTpe = any>(key: StorageItemKey): Promise<GetTpe | undefined> {
+    if (!this.ready || !this.methods.get) return Promise.resolve(undefined);
+
+    // Get Value in 'dummy' promise if get method isn't async
+    if (!isAsyncFunction(this.methods.get))
+      return Promise.resolve(this.normalGet(key));
+
+    // Get Value (async)
     return new Promise((resolve, reject) => {
       this.methods
         ?.get(this.getStorageKey(key))
         .then((res: any) => {
-          if (isJsonString(res)) return resolve(JSON.parse(res));
+          if (isJsonString(res)) resolve(JSON.parse(res));
           resolve(res);
         })
         .catch(reject);
@@ -141,8 +147,10 @@ export class Storage {
    * Creates Storage Key from provided key
    * @param key - Key that gets converted into a Storage Key
    */
-  private getStorageKey(key: StorageItemKey): string {
-    return `_${this.config.prefix}_${key}`;
+  public getStorageKey(key: StorageItemKey): string {
+    return this.config.prefix
+      ? `_${this.config.prefix}_${key}`
+      : key.toString();
   }
 }
 

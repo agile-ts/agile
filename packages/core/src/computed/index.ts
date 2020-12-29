@@ -5,6 +5,9 @@ import {
   Observer,
   StorageKey,
   StatePersistentConfigInterface,
+  Event,
+  StateConfigInterface,
+  ComputedTracker,
 } from "../internal";
 
 export class Computed<ComputedValueType = any> extends State<
@@ -13,53 +16,37 @@ export class Computed<ComputedValueType = any> extends State<
   public agileInstance: () => Agile;
 
   public computeFunction: () => ComputedValueType;
-  public deps: Array<Observer> = []; // All Dependencies of Computed
-  public hardCodedDeps: Array<Observer> = [];
+  public deps: Array<Observer> = []; // All Dependencies of Computed (hardCoded and autoDetected)
+  public hardCodedDeps: Array<Observer> = []; // HardCoded Dependencies of Computed
 
   /**
    * @public
    * Computed - Function that recomputes its value if a dependency changes
    * @param agileInstance - An instance of Agile
    * @param computeFunction - Function for computing value
-   * @param deps - Hard coded dependencies of Computed Function
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     computeFunction: () => ComputedValueType,
-    deps: Array<Observer | State | Event> = []
+    config: ComputedConfigInterface = {}
   ) {
-    super(agileInstance, computeFunction());
+    super(agileInstance, computeFunction(), {
+      key: config.key,
+      deps: config.deps,
+    });
+    config = defineConfig(config, {
+      computedDeps: [],
+    });
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
-    this.hardCodedDeps = deps
-      .map((dep) => dep["observer"] || undefined)
-      .filter((dep) => dep !== undefined);
+
+    // Format hardCodedDeps
+    this.hardCodedDeps = this.formatDeps(config.computedDeps as any);
+    this.deps = this.hardCodedDeps;
 
     // Recompute for setting initial value and adding missing dependencies
     this.recompute();
-  }
-
-  /**
-   * @public
-   * Set Value of Computed
-   */
-  public set value(value: ComputedValueType) {
-    Agile.logger.error("You can't mutate Computed value!");
-  }
-
-  /**
-   * @public
-   * Get Value of Computed
-   */
-  public get value(): ComputedValueType {
-    // Note can't use 'super.value' because of 'https://github.com/Microsoft/TypeScript/issues/338'
-    // Can't remove this getter function.. since the setter function is set in this class -> Error if not setter and getter function set
-
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
-
-    return this._value;
   }
 
   //=========================================================================================================
@@ -67,11 +54,10 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
   /**
    * @public
-   * Recomputes Function Value
-   * -> Calls ComputeFunction and updates Dependencies of it
+   * Recomputes Value of Computed
    * @param config - Config
    */
-  public recompute(config?: RecomputeConfigInterface) {
+  public recompute(config: RecomputeConfigInterface = {}) {
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
@@ -92,15 +78,28 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<Observer | State | Event> = [],
-    config?: RecomputeConfigInterface
+    config: UpdateComputeFunctionInterface = {}
   ) {
+    config = defineConfig(config, {
+      background: false,
+      sideEffects: true,
+      overwriteDeps: true,
+    });
+
+    // Update deps
+    const newDeps = this.formatDeps(deps as any);
+    if (config.overwriteDeps) this.hardCodedDeps = newDeps;
+    else this.hardCodedDeps = this.hardCodedDeps.concat(newDeps);
+    this.deps = this.hardCodedDeps;
+
+    // Update computeFunction
     this.computeFunction = computeFunction;
-    this.hardCodedDeps = deps
-      .map((dep) => dep["observer"] || undefined)
-      .filter((dep) => dep !== undefined);
 
     // Recompute for setting initial Computed Function Value and adding missing Dependencies
-    this.recompute(config);
+    this.recompute({
+      background: config.background,
+      sideEffects: config.sideEffects,
+    });
   }
 
   //=========================================================================================================
@@ -111,21 +110,17 @@ export class Computed<ComputedValueType = any> extends State<
    * Computes Value and adds missing Dependencies to Computed
    */
   public computeValue(): ComputedValueType {
-    this.agileInstance().runtime.trackObservers = true;
+    // Auto track Observers the computeFunction might depend on
+    ComputedTracker.track();
     const computedValue = this.computeFunction();
-
-    // Get tracked Observers and disable Tracking Observers
-    let foundDeps = Array.from(
-      this.agileInstance().runtime.getTrackedObservers()
-    );
+    let foundDeps = ComputedTracker.getTrackedObservers();
 
     // Handle foundDeps and hardCodedDeps
     const newDeps: Array<Observer> = [];
     this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
-      if (!observer) return;
       newDeps.push(observer);
 
-      // Make this Observer depending on Observer -> If value of Observer changes it will ingest this Observer into the Runtime
+      // Make this Observer depending on foundDep Observer
       observer.depend(this.observer);
     });
 
@@ -134,11 +129,36 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   //=========================================================================================================
-  // Overwriting some functions which can't be used in Computed
+  // Format Deps
+  //=========================================================================================================
+  /**
+   * @internal
+   * Gets Observer out of passed Instances
+   * @param instances - Instances that hold an Observer
+   */
+  public formatDeps(instances: Array<any>): Array<Observer> {
+    const finalInstances: Array<Observer> = [];
+    for (let instance of instances) {
+      if (instance instanceof Observer) {
+        finalInstances.push(instance);
+        continue;
+      }
+      if (
+        instance !== undefined &&
+        instance["observer"] !== undefined &&
+        instance["observer"] instanceof Observer
+      )
+        finalInstances.push(instance["observer"]);
+    }
+    return finalInstances;
+  }
+
+  //=========================================================================================================
+  // Overwriting some functions which aren't allowed to use in Computed
   //=========================================================================================================
 
   public patch() {
-    Agile.logger.error("You can't use patch method on Computed Function!");
+    Agile.logger.error("You can't use patch method on ComputedState!");
     return this;
   }
 
@@ -146,14 +166,21 @@ export class Computed<ComputedValueType = any> extends State<
     keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
     config: StatePersistentConfigInterface = {}
   ): this {
-    Agile.logger.error("You can't use persist method on Computed Function!");
+    Agile.logger.error("You can't use persist method on ComputedState!");
     return this;
   }
 
   public invert(): this {
-    Agile.logger.error("You can't use invert method on Computed Function!");
+    Agile.logger.error("You can't use invert method on ComputedState!");
     return this;
   }
+}
+
+/**
+ * @param computedDeps - Hard coded dependencies of Computed Function
+ */
+export interface ComputedConfigInterface extends StateConfigInterface {
+  computedDeps?: Array<Observer | State | Event>;
 }
 
 /**
@@ -163,4 +190,12 @@ export class Computed<ComputedValueType = any> extends State<
 export interface RecomputeConfigInterface {
   background?: boolean;
   sideEffects?: boolean;
+}
+
+/**
+ * @param overwriteDeps - If old hardCoded deps get overwritten
+ */
+export interface UpdateComputeFunctionInterface
+  extends RecomputeConfigInterface {
+  overwriteDeps?: boolean;
 }

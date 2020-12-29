@@ -16,7 +16,7 @@ export class ComponentSubscriptionContainer extends SubscriptionContainer {
    */
   constructor(
     component: any,
-    subs?: Set<Observer>,
+    subs: Array<Observer> = [],
     key?: SubscriptionContainerKeyType
   ) {
     super(subs, key);

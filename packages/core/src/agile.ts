@@ -20,62 +20,63 @@ import {
   defineConfig,
   Logger,
   CreateLoggerConfigInterface,
+  StateConfigInterface,
 } from "./internal";
 
 export class Agile {
   public config: AgileConfigInterface;
 
-  public runtime: Runtime;
+  public runtime: Runtime; // Handles assigning Values to Agile Instances
   public subController: SubController; // Handles subscriptions to Components
   public storages: Storages; // Handles permanent saving
 
   // Integrations
   public integrations: Integrations; // Integrated frameworks
-  static initialIntegrations: Integration[] = []; // External added Integrations
+  static initialIntegrations: Integration[] = []; // External added initial Integrations
 
-  static logger = new Logger();
+  // Static Logger with default config -> will be overwritten by config of last created Agile Instance
+  static logger = new Logger({
+    prefix: "Agile",
+    active: true,
+    level: Logger.level.WARN,
+  });
 
   /**
    * @public
    * Agile - Global state and logic framework for reactive Typescript & Javascript applications
    * @param config - Config
    */
-  constructor(config: AgileConfigInterface = {}) {
-    this.config = defineConfig(config, {
+  constructor(config: CreateAgileConfigInterface = {}) {
+    config = defineConfig(config, {
       localStorage: true,
       waitForMount: false,
+      logConfig: {},
     });
-    this.config.logConfig = defineConfig(config.logConfig, {
+    config.logConfig = defineConfig(config.logConfig, {
       prefix: "Agile",
-      active: false,
-      level: 0,
+      active: true,
+      level: Logger.level.WARN,
       canUseCustomStyles: true,
       allowedTags: ["runtime", "storage", "subscription", "multieditor"],
     });
+    this.config = {
+      waitForMount: config.waitForMount as any,
+    };
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
     this.storages = new Storages(this, {
-      localStorage: this.config.localStorage,
+      localStorage: config.localStorage,
     });
 
-    Agile.logger = new Logger(this.config.logConfig);
+    // Assign customized config to Logger
+    Agile.logger = new Logger(config.logConfig);
 
     // Create global instance of Agile
-    globalBind("__agile__", this);
-  }
-
-  //=========================================================================================================
-  // Use
-  //=========================================================================================================
-  /**
-   * @public
-   * Integrates framework into Agile
-   * @param integration - Integration that gets registered/integrated
-   */
-  public use(integration: Integration) {
-    this.integrations.integrate(integration);
-    return this;
+    if (!globalBind("__agile__", this))
+      Agile.logger.warn(
+        "Be careful with multiple Agile Instances in one Application!"
+      );
   }
 
   //=========================================================================================================
@@ -96,10 +97,12 @@ export class Agile {
    * @public
    * State - Class that holds one Value and causes rerender on subscribed Components
    * @param initialValue - Initial Value of the State
-   * @param key - Key/Name of the State
+   * @param config - Config
    */
-  public State = <ValueType>(initialValue: ValueType, key?: string) =>
-    new State<ValueType>(this, initialValue, key);
+  public State = <ValueType>(
+    initialValue: ValueType,
+    config: StateConfigInterface = {}
+  ) => new State<ValueType>(this, initialValue, config);
 
   //=========================================================================================================
   // Collection
@@ -125,8 +128,10 @@ export class Agile {
   public Computed = <ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     deps?: Array<Observer | State | Event>
-    // @ts-ignore
-  ) => new Computed<ComputedValueType>(this, computeFunction, deps);
+  ) =>
+    new Computed<ComputedValueType>(this, computeFunction, {
+      computedDeps: deps,
+    });
 
   //=========================================================================================================
   // Event
@@ -141,6 +146,19 @@ export class Agile {
   ) => new Event<PayloadType>(this, config);
 
   //=========================================================================================================
+  // Integrate
+  //=========================================================================================================
+  /**
+   * @public
+   * Integrates framework into Agile
+   * @param integration - Integration that gets registered/integrated
+   */
+  public integrate(integration: Integration) {
+    this.integrations.integrate(integration);
+    return this;
+  }
+
+  //=========================================================================================================
   // Register Storage
   //=========================================================================================================
   /**
@@ -152,8 +170,9 @@ export class Agile {
   public registerStorage(
     storage: Storage,
     config: RegisterConfigInterface = {}
-  ): boolean {
-    return this.storages.register(storage, config);
+  ): this {
+    this.storages.register(storage, config);
+    return this;
   }
 
   //=========================================================================================================
@@ -166,6 +185,17 @@ export class Agile {
   public hasIntegration(): boolean {
     return this.integrations.hasIntegration();
   }
+
+  //=========================================================================================================
+  // Has Storage
+  //=========================================================================================================
+  /**
+   * @public
+   * Checks if Agile has any registered Storage
+   */
+  public hasStorage(): boolean {
+    return this.storages.hasStorage();
+  }
 }
 
 /**
@@ -173,8 +203,15 @@ export class Agile {
  * @param waitForMount - If Agile should wait until the component mounts
  * @param storageConfig - To configure Agile Storage
  */
-export interface AgileConfigInterface {
+export interface CreateAgileConfigInterface {
   logConfig?: CreateLoggerConfigInterface;
   waitForMount?: boolean;
   localStorage?: boolean;
+}
+
+/**
+ * @param waitForMount - If Agile should wait until the component mounts
+ */
+export interface AgileConfigInterface {
+  waitForMount: boolean;
 }

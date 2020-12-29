@@ -12,8 +12,10 @@ import {
   isFunction,
   notEqual,
   generateId,
-  StatePersistentConfigInterface,
-  JobConfigInterface,
+  PersistentKey,
+  ComputedTracker,
+  StateIngestConfigInterface,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class State<ValueType = any> {
@@ -21,8 +23,8 @@ export class State<ValueType = any> {
 
   public _key?: StateKey;
   public valueType?: string; // primitive Type of State Value (for JS users)
-  public isSet: boolean = false; // If value is not the same as initialValue
-  public isPlaceholder: boolean = false;
+  public isSet = false; // If value is not the same as initialValue
+  public isPlaceholder = false;
   public initialStateValue: ValueType;
   public _value: ValueType; // Current Value of State
   public previousStateValue: ValueType;
@@ -34,7 +36,7 @@ export class State<ValueType = any> {
   } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
-  public isPersisted: boolean = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
+  public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
   public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
@@ -44,27 +46,31 @@ export class State<ValueType = any> {
    * State - Class that holds one Value and causes rerender on subscribed Components
    * @param agileInstance - An instance of Agile
    * @param initialValue - Initial Value of State
-   * @param key - Key/Name of State
-   * @param deps - Initial deps of State
+   * @param config - Config
    */
   constructor(
     agileInstance: Agile,
     initialValue: ValueType,
-    key?: StateKey,
-    deps: Array<Observer> = []
+    config: StateConfigInterface = {}
   ) {
+    config = defineConfig(config, {
+      deps: [],
+      isPlaceholder: false,
+    });
     this.agileInstance = () => agileInstance;
-    this.initialStateValue = initialValue;
-    this._key = key;
+    this._key = config.key;
+    this.observer = new StateObserver<ValueType>(this, {
+      key: config.key,
+      deps: config.deps,
+    });
+    this.initialStateValue = copy(initialValue);
     this._value = copy(initialValue);
     this.previousStateValue = copy(initialValue);
     this.nextStateValue = copy(initialValue);
-    this.observer = new StateObserver<ValueType>(
-      agileInstance,
-      this,
-      deps,
-      key
-    );
+    this.isPlaceholder = true;
+
+    // Initial Set
+    if (!config.isPlaceholder) this.set(initialValue, { overwrite: true });
   }
 
   /**
@@ -80,10 +86,7 @@ export class State<ValueType = any> {
    * Get Value of State
    */
   public get value(): ValueType {
-    // Add State to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
-
+    ComputedTracker.tracked(this.observer);
     return this._value;
   }
 
@@ -108,26 +111,23 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Set Key/Name of State
-   * https://github.com/microsoft/TypeScript/issues/338
+   * Updates Key/Name of State
    * @param value - New Key/Name of State
    */
-  public setKey(value: StateKey | undefined) {
+  public setKey(value: StateKey | undefined): this {
     const oldKey = this._key;
 
     // Update State Key
     this._key = value;
 
     // Update Key in Observer
-    this.observer.key = value;
+    this.observer._key = value;
 
-    // Update Key in PersistManager
-    if (
-      value !== undefined &&
-      this.persistent &&
-      this.persistent.key === oldKey
-    )
-      this.persistent.key = value;
+    // Update Key in Persistent (only if oldKey equal to persistentKey -> otherwise the PersistentKey got formatted and will be set where other)
+    if (value && this.persistent?._key === oldKey)
+      this.persistent?.setKey(value);
+
+    return this;
   }
 
   //=========================================================================================================
@@ -139,25 +139,30 @@ export class State<ValueType = any> {
    * @param value - new State Value
    * @param config - Config
    */
-  public set(value: ValueType, config: SetConfigInterface = {}): this {
+  public set(
+    value: ValueType,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,
       force: false,
       storage: true,
+      overwrite: false,
     });
 
     // Check value has correct Type (js)
-    if (this.valueType && !this.hasCorrectType(value)) {
-      Agile.logger.error(`Incorrect type (${typeof value}) was provided.`);
-      return this;
+    if (!this.hasCorrectType(value)) {
+      const message = `Incorrect type (${typeof value}) was provided.`;
+      if (!config.force) {
+        Agile.logger.error(message);
+        return this;
+      }
+      Agile.logger.warn(message);
     }
 
-    // Check if value has changed
-    if (equal(this.nextStateValue, value) && !config.force) return this;
-
-    // Ingest new value into runtime
-    this.observer.ingest(value, config);
+    // Ingest new value into Runtime
+    this.observer.ingestValue(value, config);
 
     return this;
   }
@@ -170,12 +175,7 @@ export class State<ValueType = any> {
    * Ingests nextStateValue, computedValue into Runtime
    * @param config - Config
    */
-  public ingest(config: JobConfigInterface = {}): this {
-    config = defineConfig(config, {
-      sideEffects: true,
-      background: false,
-      force: false,
-    });
+  public ingest(config: StateIngestConfigInterface = {}): this {
     this.observer.ingest(config);
     return this;
   }
@@ -210,9 +210,11 @@ export class State<ValueType = any> {
   /**
    * @public
    * Undoes latest State Value change
+   * @param config - Config
    */
-  public undo() {
-    this.set(this.previousStateValue);
+  public undo(config: StateRuntimeJobConfigInterface = {}): this {
+    this.set(this.previousStateValue, config);
+    return this;
   }
 
   //=========================================================================================================
@@ -223,9 +225,8 @@ export class State<ValueType = any> {
    * Resets State to its initial Value
    * @param config - Config
    */
-  public reset(config: SetConfigInterface = {}): this {
+  public reset(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
-    this.persistent?.removeValue(); // Remove State Value from Storage (since its the initial Value)
     return this;
   }
 
@@ -245,40 +246,46 @@ export class State<ValueType = any> {
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
+      sideEffects: true,
       background: false,
+      force: false,
+      storage: true,
+      overwrite: false,
     });
 
     if (!isValidObject(this.nextStateValue)) {
       Agile.logger.error(
-        "You can't use the patch method on a non object States!"
+        "You can't use the patch method on a non object based States!"
       );
       return this;
     }
 
     if (!isValidObject(targetWithChanges)) {
-      Agile.logger.error("TargetWithChanges has to be an object!");
+      Agile.logger.error("TargetWithChanges has to be an Object!");
       return this;
     }
 
     // Merge targetWithChanges into nextStateValue
     this.nextStateValue = flatMerge<ValueType>(
-      this.nextStateValue,
+      copy(this.nextStateValue),
       targetWithChanges,
       { addNewProperties: config.addNewProperties }
     );
 
-    // Check if value has been changed
-    if (equal(this.value, this.nextStateValue)) return this;
-
     // Ingest updated nextStateValue into Runtime
-    this.ingest({ background: config.background });
+    this.ingest({
+      background: config.background,
+      force: config.force,
+      overwrite: config.overwrite,
+      sideEffects: config.sideEffects,
+      storage: config.storage,
+    });
 
     return this;
   }
 
   //=========================================================================================================
   // Watch
-  // https://stackoverflow.com/questions/12688275/is-there-a-way-to-do-method-overloading-in-typescript/12689054#12689054
   //=========================================================================================================
   /**
    * @public
@@ -290,7 +297,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Watches State and detects State changes
-   * @param key - Key of Watcher Function
+   * @param key - Key/Name of Watcher Function
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public watch(key: string, callback: StateWatcherCallback<ValueType>): this;
@@ -310,16 +317,18 @@ export class State<ValueType = any> {
       _callback = callback as StateWatcherCallback<ValueType>;
     }
 
-    // Check if Callback is a Function
+    // Check if Callback is valid Function
     if (!isFunction(_callback)) {
-      Agile.logger.error("A Watcher Callback Function has to be an function!");
+      Agile.logger.error(
+        "A Watcher Callback Function has to be typeof Function!"
+      );
       return this;
     }
 
-    // Check if Callback Function already exists
+    // Check if watcherKey is already occupied
     if (this.watchers[key]) {
       Agile.logger.error(
-        `Watcher Callback Function with the key/name ${key} already exists!`
+        `Watcher Callback Function with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -347,9 +356,9 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public onInaugurated(callback: StateWatcherCallback<ValueType>) {
-    const watcherKey = "InauguratedWatcher";
-    this.watch(watcherKey, () => {
-      callback(this.getPublicValue());
+    const watcherKey = "InauguratedWatcherKey";
+    this.watch(watcherKey, (value) => {
+      callback(value);
       this.removeWatcher(watcherKey);
     });
   }
@@ -360,7 +369,7 @@ export class State<ValueType = any> {
   /**
    * @public
    * Checks if watcher at given Key exists
-   * @param key - Key of Watcher
+   * @param key - Key/Name of Watcher
    */
   public hasWatcher(key: string): boolean {
     return !!this.watchers[key];
@@ -378,44 +387,43 @@ export class State<ValueType = any> {
   /**
    * @public
    * Stores State Value into Agile Storage permanently
-   * @param key - Storage Key (Note: not needed if State has key/name)
+   * @param key - Key/Name of created Persistent (Note: Key required if State has no set Key!)
    * @param config - Config
    */
   public persist(
-    key?: StorageKey,
+    key?: PersistentKey,
     config?: StatePersistentConfigInterface
   ): this;
   public persist(
-    keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
+    keyOrConfig: PersistentKey | StatePersistentConfigInterface = {},
     config: StatePersistentConfigInterface = {}
   ): this {
     let _config: StatePersistentConfigInterface;
-    let key: StorageKey | undefined;
+    let key: PersistentKey | undefined;
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as StatePersistentConfigInterface;
-      key = undefined;
+      key = this._key;
     } else {
       _config = config || {};
-      key = keyOrConfig as StorageKey;
+      key = keyOrConfig as PersistentKey;
     }
 
     _config = defineConfig(_config, {
       instantiate: true,
-      storageKeys: undefined,
+      storageKeys: [],
     });
 
-    // Update Persistent Key
-    if (this.persistent) {
-      this.persistent.storageKeys = config.storageKeys;
-      if (key) this.persistent.setKey(key);
-      return this;
-    }
+    if (this.persistent)
+      Agile.logger.warn(
+        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`
+      );
 
     // Create persistent -> Persist Value
-    this.persistent = new StatePersistent<ValueType>(this, key, {
+    this.persistent = new StatePersistent<ValueType>(this, {
       instantiate: _config.instantiate,
       storageKeys: _config.storageKeys,
+      key: key,
     });
 
     return this;
@@ -426,7 +434,7 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Callback Function gets called if persisted Value gets loaded into the State for the first Time
+   * Callback Function that gets called if the persisted Value gets loaded into the State for the first Time
    * Note: Only useful for persisted States!
    * @param callback - Callback Function
    */
@@ -434,11 +442,11 @@ export class State<ValueType = any> {
     if (this.persistent) {
       this.persistent.onLoad = callback;
 
-      // If State isPersisted the loading was successful -> callback can be called
+      // If State is already 'isPersisted' the loading was successful -> callback can be called
       if (this.isPersisted) callback(true);
     } else {
-      Agile.logger.warn(
-        `Please make sure you persist the State '${this.key}' before using onLoad!`
+      Agile.logger.error(
+        `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`
       );
     }
     return this;
@@ -463,7 +471,7 @@ export class State<ValueType = any> {
    * Checks if State exists
    */
   public get exists(): boolean {
-    return this.getPublicValue() !== undefined && !this.isPlaceholder;
+    return this._value !== undefined && !this.isPlaceholder;
   }
 
   //=========================================================================================================
@@ -499,11 +507,11 @@ export class State<ValueType = any> {
    * Note: Only useful with boolean based States
    */
   public invert(): this {
-    if (typeof this._value !== "boolean") {
+    if (typeof this._value === "boolean") {
+      this.set(!this._value as any);
+    } else {
       Agile.logger.error("You can only invert boolean based States!");
-      return this;
     }
-    this.set(this._value);
     return this;
   }
 
@@ -512,10 +520,14 @@ export class State<ValueType = any> {
   //=========================================================================================================
   /**
    * @public
-   * Compute Value if it changes
-   * @param method - Method that will be used to compute the new Value
+   * Function that recomputes State Value if it changes
+   * @param method - Computed Function
    */
   public compute(method: ComputeMethod<ValueType>): this {
+    if (!isFunction(method)) {
+      Agile.logger.error("A computeMethod has to be a function!");
+      return this;
+    }
     this.computeMethod = method;
     return this;
   }
@@ -526,7 +538,7 @@ export class State<ValueType = any> {
   /**
    * @internal
    * Adds SideEffect to State
-   * @param key - Key of SideEffect
+   * @param key - Key/Name of SideEffect
    * @param sideEffect - Callback Function that gets called on every State Value change
    */
   public addSideEffect(
@@ -534,7 +546,7 @@ export class State<ValueType = any> {
     sideEffect: (properties?: { [key: string]: any }) => void
   ): this {
     if (!isFunction(sideEffect)) {
-      Agile.logger.error("A sideEffect function has to be an function!");
+      Agile.logger.error("A sideEffect function has to be a function!");
       return this;
     }
     this.sideEffects[key] = sideEffect;
@@ -572,9 +584,11 @@ export class State<ValueType = any> {
   /**
    * @internal
    * Checks if Value has correct valueType (js)
+   * Note: If no valueType set, it returns true
    * @param value - Value that gets checked for its correct Type
    */
-  private hasCorrectType(value: any): boolean {
+  public hasCorrectType(value: any): boolean {
+    if (!this.valueType) return true;
     let type: string = typeof value;
     return type === this.valueType;
   }
@@ -601,32 +615,37 @@ export class State<ValueType = any> {
    * Returns Value that gets written into the Agile Storage
    */
   public getPersistableValue(): any {
-    return this.value;
+    return this._value;
   }
 }
 
 export type StateKey = string | number;
 
 /**
- * @param background - If assigning a new value happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of State get executed
- * @param storage - If State value gets saved in Agile Storage (only useful if State is persisted)
- * @param force -  Force creating and performing Job
+ * @param key - Key/Name of State
+ * @param deps - Initial deps of State
+ * @param isPlaceholder - If State is initially a Placeholder
  */
-export interface SetConfigInterface {
-  background?: boolean;
-  sideEffects?: boolean;
-  storage?: boolean;
-  force?: boolean;
+export interface StateConfigInterface {
+  key?: StateKey;
+  deps?: Array<Observer>;
+  isPlaceholder?: boolean;
 }
 
 /**
- * @param background - If assigning new value happens in the background (-> not causing any rerender)
  * @param addNewProperties - If new Properties gets added to the State Value
  */
-export interface PatchConfigInterface {
+export interface PatchConfigInterface extends StateRuntimeJobConfigInterface {
   addNewProperties?: boolean;
-  background?: boolean;
+}
+
+/**
+ * @param instantiate - If Persistent gets instantiated
+ * @param storageKeys - Key/Name of Storages which gets used to persist the State Value (NOTE: If not passed the default Storage will be used)
+ */
+export interface StatePersistentConfigInterface {
+  instantiate?: boolean;
+  storageKeys?: StorageKey[];
 }
 
 export type StateWatcherCallback<T = any> = (value: T) => void;

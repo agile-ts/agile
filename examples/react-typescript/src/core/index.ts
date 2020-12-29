@@ -1,12 +1,13 @@
-import { Agile } from "@agile-ts/core";
-import { MultiEditor, Validator } from "@agile-ts/multieditor";
+import { Agile, clone, Logger } from "@agile-ts/core";
 
 export const App = new Agile({
-  logConfig: { active: true },
+  logConfig: { level: Logger.level.DEBUG },
 });
 
-export const MY_STATE = App.State<string>("MyState", "my-state"); //.persist();
-export const MY_STATE_2 = App.State<string>("MyState2").persist("my-state2");
+export const MY_STATE = App.State<string>("MyState", { key: "my-state" }); //.persist();
+export const MY_STATE_2 = App.State<string>("MyState2", {
+  key: "my-state2",
+}).persist();
 MY_STATE_2.onLoad(() => {
   console.log("On Load");
 });
@@ -18,7 +19,7 @@ MY_STATE.watch("test", (value: any) => {
 
 export const MY_COMPUTED = App.Computed<string>(() => {
   return "test" + MY_STATE.value + "_computed_" + MY_STATE_2.value;
-});
+}, []);
 
 interface collectionValueInterface {
   id: string;
@@ -39,12 +40,15 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(
 MY_COLLECTION.collect({ id: "id1", name: "test" });
 MY_COLLECTION.collect({ id: "id2", name: "test2" }, "myGroup");
 MY_COLLECTION.update("id1", { id: "id1Updated", name: "testUpdated" });
-MY_COLLECTION.getGroup("myGroup")?.persist({ followCollectionPattern: true });
+MY_COLLECTION.getGroup("myGroup")?.persist({
+  followCollectionPersistKeyPattern: true,
+});
 
-console.log("Initial: myCollection ", MY_COLLECTION);
+console.log("Initial: myCollection ", clone(MY_COLLECTION));
 
 export const MY_EVENT = App.Event<{ name: string }>({
   delay: 3000,
+  key: "myEvent",
 });
 
 MY_EVENT.on(() => {
@@ -54,51 +58,6 @@ MY_EVENT.on(() => {
 MY_EVENT.on("Test", () => {
   console.log("Triggered Event (Test)");
 });
-
-// MULTIEDITOR TEST
-
-const emailValidator = new Validator().string().email().required();
-
-export const multiEditor = new MultiEditor<string | undefined, boolean>(
-  (editor) => ({
-    data: {
-      id: "myId",
-      email: undefined,
-      name: undefined,
-    },
-    onSubmit: async (data) => {
-      console.log("Submitted MultiEditor", data);
-      return Promise.resolve(true);
-    },
-    fixedProperties: ["id"],
-    validateMethods: {
-      email: emailValidator,
-      name: editor
-        .Validator()
-        .required()
-        .string()
-        .max(10)
-        .min(2)
-        .addValidationMethod("testFuck", (key, value, editor) => {
-          const isValid = value !== "Fuck";
-
-          if (!isValid) {
-            editor.setStatus(key, "error", "Fuck is no valid Name!");
-          }
-
-          return Promise.resolve(isValid);
-        }),
-    },
-    computeMethods: {
-      name: (value) => {
-        return value ? value?.charAt(0).toUpperCase() + value?.slice(1) : value;
-      },
-    },
-    editableProperties: ["email", "name"],
-    reValidateMode: "onChange",
-    validate: "all",
-  })
-);
 
 // LOGGER tests
 

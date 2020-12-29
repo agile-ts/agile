@@ -1,4 +1,8 @@
-import { defineConfig, SetConfigInterface, State } from "@agile-ts/core";
+import {
+  defineConfig,
+  State,
+  StateRuntimeJobConfigInterface,
+} from "@agile-ts/core";
 import { MultiEditor, Validator, Status, ItemKey } from "./internal";
 
 export class Item<DataType = any> extends State<DataType> {
@@ -24,7 +28,9 @@ export class Item<DataType = any> extends State<DataType> {
     key: ItemKey,
     config: ItemConfigInterface = {}
   ) {
-    super(editor.agileInstance(), data, key);
+    super(editor.agileInstance(), data, {
+      key: key,
+    });
     config = defineConfig(config, {
       canBeEdited: true,
     });
@@ -70,7 +76,7 @@ export class Item<DataType = any> extends State<DataType> {
    * Resets State to its initial Value
    * @param config - Config
    */
-  public reset(config: SetConfigInterface = {}): this {
+  public reset(config: StateRuntimeJobConfigInterface = {}): this {
     super.reset(config);
     this.status.display = false;
     return this;

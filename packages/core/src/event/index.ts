@@ -4,6 +4,7 @@ import {
   EventJob,
   generateId,
   isFunction,
+  Observer,
 } from "../internal";
 import { EventObserver } from "./event.observer";
 
@@ -14,12 +15,13 @@ export class Event<PayloadType = DefaultEventPayload> {
   private initialConfig: CreateEventConfigInterface;
 
   public _key?: EventKey;
-  public uses: number = 0;
+  public uses = 0;
   public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
-  private currentTimeout: any; // Timeout that is active right now (delayed Event)
-  private queue: Array<EventJob> = []; // Queue of delayed Events
-  public enabled: boolean = true;
+  public enabled = true;
   public observer: EventObserver;
+
+  public currentTimeout: any; // Timeout that is active right now (delayed Event)
+  public queue: Array<EventJob> = []; // Queue of delayed Events
 
   // @ts-ignore
   public payload: PayloadType; // Holds type of Payload so that it can be read external (never defined)
@@ -37,14 +39,20 @@ export class Event<PayloadType = DefaultEventPayload> {
       rerender: false,
       maxUses: undefined,
       delay: undefined,
+      overlap: false,
+      deps: [],
     });
     this._key = config.key;
-    this.observer = new EventObserver(agileInstance, this, [], config.key);
+    this.observer = new EventObserver(this, {
+      key: config.key,
+      deps: config.deps,
+    });
     this.enabled = config.enabled as any;
     this.config = {
       rerender: config.rerender as any,
       delay: config.delay,
       maxUses: config.maxUses,
+      overlap: config.overlap,
     };
     this.initialConfig = config;
   }
@@ -54,8 +62,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * Set Key/Name of Event
    */
   public set key(value: EventKey | undefined) {
-    this._key = value;
-    this.observer.key = value;
+    this.setKey(value);
   }
 
   /**
@@ -64,6 +71,20 @@ export class Event<PayloadType = DefaultEventPayload> {
    */
   public get key(): EventKey | undefined {
     return this._key;
+  }
+
+  //=========================================================================================================
+  // Set Key
+  //=========================================================================================================
+  /**
+   * @internal
+   * Set Key/Name of Event
+   * @param value - New Key/Name of Event
+   */
+  public setKey(value: EventKey | undefined): this {
+    this._key = value;
+    this.observer._key = value;
+    return this;
   }
 
   //=========================================================================================================
@@ -102,14 +123,16 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
-      Agile.logger.error("A Event Callback Function has to be an function!");
+      Agile.logger.error(
+        "A Event Callback Function has to be typeof Function!"
+      );
       return this;
     }
 
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
       Agile.logger.error(
-        `Event Callback Function with the key/name ${key} already exists!`
+        `Event Callback Function with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -123,7 +146,7 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @public
-   * Triggers all or specific Events
+   * Triggers Events
    * @param payload - Payload that gets passed into the Callback Functions
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
@@ -169,7 +192,10 @@ export class Event<PayloadType = DefaultEventPayload> {
   public reset() {
     this.enabled = this.initialConfig.enabled as any;
     this.uses = 0;
-    if (this.currentTimeout) clearTimeout(this.currentTimeout);
+    if (this.currentTimeout) {
+      clearTimeout(this.currentTimeout);
+      this.currentTimeout = undefined;
+    }
     return this;
   }
 
@@ -191,11 +217,11 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @internal
-   * Triggers Event
+   * Triggers normal Event
    * @param payload - Payload that gets passed into the Callback Functions
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
-  private normalTrigger(payload: PayloadType, keys?: string[]) {
+  public normalTrigger(payload: PayloadType, keys?: string[]) {
     // Call wished Callback Functions
     if (!keys) {
       for (let key in this.callbacks) this.callbacks[key](payload);
@@ -217,31 +243,41 @@ export class Event<PayloadType = DefaultEventPayload> {
   //=========================================================================================================
   /**
    * @internal
-   * Triggers Event with some delay
+   * Triggers async Event (Events with a delay)
    * @param payload - Payload that gets passed into the Callback Functions
    * @param delay - Delay until Events get triggered
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
-  private delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
-    // Check if a Timeout is currently active if so add payload to queue
-    if (this.currentTimeout !== undefined) {
-      if (payload) this.queue.push(new EventJob<PayloadType>(payload));
+  public delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
+    const eventJob = new EventJob<PayloadType>(payload, keys);
+
+    // Execute Event no matter if another event is currently active
+    if (this.config.overlap) {
+      setTimeout(() => {
+        this.normalTrigger(eventJob.payload, eventJob.keys);
+      }, delay);
       return;
     }
 
-    // Triggers Callback Functions and calls itself again if queue isn't empty
-    const looper = (payload: PayloadType) => {
+    // Check if a Event(Timeout) is currently active if so add EventJob to queue
+    if (this.currentTimeout !== undefined) {
+      if (payload) this.queue.push(eventJob);
+      return;
+    }
+
+    // Executes EventJob and calls itself again if queue isn't empty to execute the next EventJob
+    const looper = (eventJob: EventJob<PayloadType>) => {
       this.currentTimeout = setTimeout(() => {
         this.currentTimeout = undefined;
-        this.normalTrigger(payload, keys);
+        this.normalTrigger(eventJob.payload, eventJob.keys);
         if (this.queue.length > 0) {
           const nextEventJob = this.queue.shift();
-          if (nextEventJob) looper(nextEventJob.payload);
+          if (nextEventJob) looper(nextEventJob);
         }
       }, delay);
     };
 
-    looper(payload);
+    looper(eventJob);
     return;
   }
 }
@@ -257,23 +293,29 @@ export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
  * @param enabled - If Event can be triggered
  * @param maxUses - How often the Event can be used/triggered
  * @param delay - Delayed call of Event Callback Functions in milliseconds
+ * @param overlap - If Events can overlap
  * @param rerender - If triggering an Event should cause a rerender
+ * @param deps - Initial deps of State
  */
 export interface CreateEventConfigInterface {
   key?: EventKey;
   enabled?: boolean;
   maxUses?: number;
   delay?: number;
+  overlap?: boolean;
   rerender?: boolean;
+  deps?: Array<Observer>;
 }
 
 /**
  * @param maxUses - How often the Event can be used/triggered
  * @param delay - Delayed call of Event Callback Functions in seconds
+ * @param overlap - If Events can overlap
  * @param rerender - If triggering an Event should cause a rerender
  */
 export interface EventConfigInterface {
   maxUses?: number;
   delay?: number;
+  overlap?: boolean;
   rerender: boolean;
 }
