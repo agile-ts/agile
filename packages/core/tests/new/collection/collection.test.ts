@@ -1440,6 +1440,7 @@ describe("Collection Tests", () => {
     describe("updateItemKey function tests", () => {
       let dummySelector1: Selector;
       let dummySelector2: Selector;
+      let dummySelector3: Selector;
       let dummyGroup1: Group;
       let dummyGroup2: Group;
       let dummyItem1: Item<ItemInterface>;
@@ -1472,9 +1473,13 @@ describe("Collection Tests", () => {
         dummySelector2 = new Selector(collection, "dummyItem2", {
           key: "dummySelector2",
         });
+        dummySelector3 = new Selector(collection, "newDummyItem", {
+          key: "dummySelector3",
+        });
         collection.selectors = {
           dummySelector1: dummySelector1,
           dummySelector2: dummySelector2,
+          dummySelector3: dummySelector3,
         };
 
         dummyItem1.setKey = jest.fn();
@@ -1487,6 +1492,7 @@ describe("Collection Tests", () => {
 
         dummySelector1.select = jest.fn();
         dummySelector2.select = jest.fn();
+        dummySelector3.select = jest.fn();
       });
 
       it("should update ItemKey in Collection, Selectors and Groups (default config)", () => {
@@ -1517,6 +1523,10 @@ describe("Collection Tests", () => {
           background: false,
         });
         expect(dummySelector2.select).not.toHaveBeenCalled();
+        expect(dummySelector3.select).toHaveBeenCalledWith("newDummyItem", {
+          force: true,
+          background: false,
+        });
       });
 
       it("should update ItemKey in Collection, Selectors and Groups (specific config)", () => {
@@ -1549,6 +1559,10 @@ describe("Collection Tests", () => {
         expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
           background: true,
         });
+        expect(dummySelector3.select).toHaveBeenCalledWith("newDummyItem", {
+          force: true,
+          background: true,
+        });
       });
 
       it("should update ItemKey in Collection, dummy Selectors and dummy Groups (default config)", () => {
@@ -1576,6 +1590,10 @@ describe("Collection Tests", () => {
         );
 
         expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+          background: false,
+        });
+        expect(dummySelector3.select).toHaveBeenCalledWith("newDummyItem", {
+          force: true,
           background: false,
         });
       });

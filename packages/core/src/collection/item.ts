@@ -2,7 +2,7 @@ import { State, Collection, DefaultItem, StateKey } from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
   static updateGroupSideEffectKey = "rebuildGroup";
-  public isSelected = false;
+  public isSelected = false; // If Item is selected by a Selector
   public collection: () => Collection<DataType>;
 
   /**

@@ -787,10 +787,21 @@ export class Collection<DataType = DefaultItem> {
     // Update ItemKey in Selectors
     for (let selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
-      if (!selector || !selector.hasSelected(oldItemKey)) continue;
-      selector.select(newItemKey, {
-        background: config?.background,
-      });
+      if (!selector) continue;
+
+      // Reselect Item in existing Selector which has selected the newItemKey
+      if (selector.hasSelected(newItemKey)) {
+        selector.select(newItemKey, {
+          force: true, // Because ItemKeys are the same
+          background: config?.background,
+        });
+      }
+
+      // Select newItemKey in existing Selector which has selected the oldItemKey
+      if (selector.hasSelected(oldItemKey))
+        selector.select(newItemKey, {
+          background: config?.background,
+        });
     }
 
     return true;
@@ -892,10 +903,11 @@ export class Collection<DataType = DefaultItem> {
       // Remove Item from Collection
       delete this.data[itemKey];
 
-      // Reselect Item
+      // Reselect Item in Selectors
       for (let selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
-        if (selector?.hasSelected(itemKey)) selector?.select(itemKey);
+        if (selector?.hasSelected(itemKey))
+          selector?.select(itemKey, { force: true });
       }
 
       this.size--;

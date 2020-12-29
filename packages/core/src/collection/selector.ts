@@ -74,7 +74,9 @@ export class Selector<DataType = DefaultItem> extends State<
     itemKey: ItemKey,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
-    const oldItem = this.item;
+    const oldItem = this.collection().getItem(this._itemKey, {
+      notExisting: true,
+    }); // Because this.item might be outdated
     let newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
@@ -116,11 +118,16 @@ export class Selector<DataType = DefaultItem> extends State<
    * @param config - Config
    */
   public unselect(config: StateRuntimeJobConfigInterface = {}): this {
+    // Because this.item might be outdated
+    const item = this.collection().getItem(this._itemKey, {
+      notExisting: true,
+    });
+
     // Unselect Item
-    if (this.item) {
-      this.item.isSelected = false;
-      this.item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
-      if (this.item.isPlaceholder) delete this.collection().data[this._itemKey];
+    if (item) {
+      item.isSelected = false;
+      item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
+      if (item.isPlaceholder) delete this.collection().data[this._itemKey];
     }
 
     // Reset and rebuild Selector
@@ -143,7 +150,6 @@ export class Selector<DataType = DefaultItem> extends State<
   public hasSelected(itemKey: ItemKey): boolean {
     const isSelected = this._itemKey === itemKey;
     if (!this.item) return isSelected;
-    // Checking isSelected since Item might not be the same.. -> have the same ItemKeys but maybe not the same value
     return isSelected && this.item.isSelected;
   }
 
