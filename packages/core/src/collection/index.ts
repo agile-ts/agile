@@ -919,15 +919,12 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @internal
-   * Creates/Updates Item from provided Data and adds it to the Collection
-   * @param data - Data from which the Item gets created/updated
+   * Updates existing or creates Item from provided Data
+   * @param data - Data
    * @param config - Config
    */
-  public setData(
-    data: DataType,
-    config: { patch?: boolean; background?: boolean } = {}
-  ): boolean {
-    const _data = data as any; // Transformed Data to any because of unknown Object (DataType)
+  public setData(data: DataType, config: SetDataConfigInterface = {}): boolean {
+    const _data = copy(data as any); // Transformed Data to any because of unknown Object (DataType)
     const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
       patch: false,
@@ -935,13 +932,15 @@ export class Collection<DataType = DefaultItem> {
     });
 
     if (!isValidObject(_data)) {
-      console.error("Agile: Collections items has to be an object!");
+      Agile.logger.error(
+        `Item Data of Collection '${this._key}' has to be an valid Object!`
+      );
       return false;
     }
 
     if (!_data.hasOwnProperty(primaryKey)) {
-      console.error(
-        `Agile: Collection Item needs a primary Key property called '${this.config.primaryKey}'!`
+      Agile.logger.error(
+        `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`
       );
       return false;
     }
@@ -956,13 +955,10 @@ export class Collection<DataType = DefaultItem> {
       item?.patch(_data, { background: config.background });
     if (!createItem && !config.patch)
       item?.set(_data, { background: config.background });
-    if (createItem) item = new Item<DataType>(this, _data);
-
-    // Set new Item at itemKey
-    this.data[itemKey] = item as any;
-
-    // Group might contain updated itemKey and now a fitting Item for that might exist -> rebuild Group Output BUT after setting it in the Collection
-    if (createItem) this.rebuildGroupsThatIncludeItemKey(itemKey);
+    if (createItem) {
+      item = new Item<DataType>(this, _data);
+      this.data[itemKey] = item;
+    }
 
     // Increase size of Collection
     if (createItem || wasPlaceholder) this.size++;
@@ -1102,6 +1098,15 @@ export interface GetSelectorConfigInterface {
 export interface CollectionPersistentConfigInterface {
   instantiate?: boolean;
   storageKeys?: StorageKey[];
+}
+
+/**
+ * @param patch - If Data gets patched into existing Item
+ * @param background - If assigning Data happens in background
+ */
+export interface SetDataConfigInterface {
+  patch?: boolean;
+  background?: boolean;
 }
 
 export type CollectionConfig<DataType = DefaultItem> =

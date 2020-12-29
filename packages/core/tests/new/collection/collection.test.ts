@@ -1847,5 +1847,187 @@ describe("Collection Tests", () => {
         });
       });
     });
+
+    describe("setData function tests", () => {
+      let dummyItem1: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem1 = new Item(collection, { id: "dummyItem1", name: "Jeff" });
+        collection.data = {
+          dummyItem1: dummyItem1,
+        };
+        collection.size = 1;
+
+        collection.rebuildGroupsThatIncludeItemKey = jest.fn();
+        dummyItem1.patch = jest.fn();
+        dummyItem1.set = jest.fn();
+      });
+
+      it("should create new Item out of valid Data, rebuild Groups and increase size (default config)", () => {
+        const response = collection.setData({ id: "dummyItem2", name: "Hans" });
+
+        expect(response).toBeTruthy();
+        expect(collection.data).toHaveProperty("dummyItem1");
+        expect(collection.data).toHaveProperty("dummyItem2");
+        expect(collection.data["dummyItem2"]).toBeInstanceOf(Item);
+        expect(collection.data["dummyItem2"]._value).toStrictEqual({
+          id: "dummyItem2",
+          name: "Hans",
+        });
+        expect(collection.size).toBe(2);
+        expect(collection.rebuildGroupsThatIncludeItemKey).toHaveBeenCalledWith(
+          "dummyItem2"
+        );
+      });
+
+      it("shouldn't create new Item if passed Data is no valid Object", () => {
+        const response = collection.setData("noObject" as any);
+
+        expect(console.error).toHaveBeenCalledWith(
+          `Agile Error: Item Data of Collection '${collection._key}' has to be an valid Object!`
+        );
+
+        expect(response).toBeFalsy();
+        expect(collection.size).toBe(1);
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't create new Item if passed Data has no primaryKey", () => {
+        const response = collection.setData({ name: "Frank" } as any);
+
+        expect(console.error).toHaveBeenCalledWith(
+          `Agile Error: Collection '${collection._key}' Item Data has to contain a primaryKey property called '${collection.config.primaryKey}'!`
+        );
+
+        expect(response).toBeFalsy();
+        expect(collection.size).toBe(1);
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+      });
+
+      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (default config)", () => {
+        const response = collection.setData({
+          id: "dummyItem1",
+          name: "Dieter",
+        });
+
+        expect(response).toBeTruthy();
+
+        expect(collection.data).toHaveProperty("dummyItem1");
+        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.size).toBe(1);
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.set).toHaveBeenCalledWith(
+          { id: "dummyItem1", name: "Dieter" },
+          { background: false }
+        );
+        expect(dummyItem1.patch).not.toHaveBeenCalled();
+      });
+
+      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (specific config)", () => {
+        const response = collection.setData(
+          {
+            id: "dummyItem1",
+            name: "Dieter",
+          },
+          { background: true }
+        );
+
+        expect(response).toBeTruthy();
+
+        expect(collection.data).toHaveProperty("dummyItem1");
+        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.size).toBe(1);
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.set).toHaveBeenCalledWith(
+          { id: "dummyItem1", name: "Dieter" },
+          { background: true }
+        );
+        expect(dummyItem1.patch).not.toHaveBeenCalled();
+      });
+
+      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true)", () => {
+        const response = collection.setData(
+          {
+            id: "dummyItem1",
+            name: "Dieter",
+          },
+          { patch: true }
+        );
+
+        expect(response).toBeTruthy();
+
+        expect(collection.data).toHaveProperty("dummyItem1");
+        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.size).toBe(1);
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.set).not.toHaveBeenCalled();
+        expect(dummyItem1.patch).toHaveBeenCalledWith(
+          { id: "dummyItem1", name: "Dieter" },
+          { background: false }
+        );
+      });
+
+      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true, config.background = true)", () => {
+        const response = collection.setData(
+            {
+              id: "dummyItem1",
+              name: "Dieter",
+            },
+            { patch: true, background: true }
+        );
+
+        expect(response).toBeTruthy();
+
+        expect(collection.data).toHaveProperty("dummyItem1");
+        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.size).toBe(1);
+        expect(
+            collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.set).not.toHaveBeenCalled();
+        expect(dummyItem1.patch).toHaveBeenCalledWith(
+            { id: "dummyItem1", name: "Dieter" },
+            { background: true }
+        );
+      });
+
+      it("should update placeholder Item with valid Data, shouldn't rebuild Groups and should increase size (default config)", () => {
+        dummyItem1.isPlaceholder = true;
+        collection.size = 0;
+
+        const response = collection.setData({
+          id: "dummyItem1",
+          name: "Dieter",
+        });
+
+        expect(response).toBeTruthy();
+
+        expect(collection.data).toHaveProperty("dummyItem1");
+        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.size).toBe(1);
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+
+        expect(dummyItem1.set).toHaveBeenCalledWith(
+          { id: "dummyItem1", name: "Dieter" },
+          { background: false }
+        );
+      });
+    });
   });
 });
