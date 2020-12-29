@@ -1002,7 +1002,7 @@ export class Collection<DataType = DefaultItem> {
 
 export type DefaultItem = { [key: string]: any };
 export type CollectionKey = string | number;
-export type ItemKey = string | number; // Key Interface of Item in Collection
+export type ItemKey = string | number;
 
 /**
  * @param key - Key/Name of Collection

@@ -1930,7 +1930,7 @@ describe("Collection Tests", () => {
         expect(dummyItem1.patch).not.toHaveBeenCalled();
       });
 
-      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (specific config)", () => {
+      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.background = true)", () => {
         const response = collection.setData(
           {
             id: "dummyItem1",
@@ -1955,13 +1955,13 @@ describe("Collection Tests", () => {
         expect(dummyItem1.patch).not.toHaveBeenCalled();
       });
 
-      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true)", () => {
+      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true, background: true)", () => {
         const response = collection.setData(
           {
             id: "dummyItem1",
             name: "Dieter",
           },
-          { patch: true }
+          { patch: true, background: true }
         );
 
         expect(response).toBeTruthy();
@@ -1976,32 +1976,7 @@ describe("Collection Tests", () => {
         expect(dummyItem1.set).not.toHaveBeenCalled();
         expect(dummyItem1.patch).toHaveBeenCalledWith(
           { id: "dummyItem1", name: "Dieter" },
-          { background: false }
-        );
-      });
-
-      it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true, config.background = true)", () => {
-        const response = collection.setData(
-            {
-              id: "dummyItem1",
-              name: "Dieter",
-            },
-            { patch: true, background: true }
-        );
-
-        expect(response).toBeTruthy();
-
-        expect(collection.data).toHaveProperty("dummyItem1");
-        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
-        expect(collection.size).toBe(1);
-        expect(
-            collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
-
-        expect(dummyItem1.set).not.toHaveBeenCalled();
-        expect(dummyItem1.patch).toHaveBeenCalledWith(
-            { id: "dummyItem1", name: "Dieter" },
-            { background: true }
+          { background: true }
         );
       });
 
@@ -2027,6 +2002,59 @@ describe("Collection Tests", () => {
           { id: "dummyItem1", name: "Dieter" },
           { background: false }
         );
+      });
+    });
+
+    describe("rebuildGroupsThatIncludeItemKey function tests", () => {
+      let dummyGroup1: Group;
+      let dummyGroup2: Group;
+
+      beforeEach(() => {
+        dummyGroup1 = new Group(collection, ["dummyItem1", "dummyItem2"], {
+          key: "dummyGroup1",
+        });
+        dummyGroup2 = new Group(collection, ["dummyItem2"], {
+          key: "dummyGroup2",
+        });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+        };
+
+        dummyGroup1.ingest = jest.fn();
+        dummyGroup2.ingest = jest.fn();
+      });
+
+      it("should call ingest on each Group that includes the passed ItemKey (default config)", () => {
+        collection.rebuildGroupsThatIncludeItemKey("dummyItem1");
+
+        expect(dummyGroup1.ingest).toHaveBeenCalledWith({
+          background: false,
+          force: true,
+          sideEffects: true,
+          storage: false,
+        });
+        expect(dummyGroup2.ingest).not.toHaveBeenCalled();
+      });
+
+      it("should call ingest on each Group that includes the passed ItemKey (specific config)", () => {
+        collection.rebuildGroupsThatIncludeItemKey("dummyItem2", {
+          background: true,
+          sideEffects: false,
+        });
+
+        expect(dummyGroup1.ingest).toHaveBeenCalledWith({
+          background: true,
+          force: true,
+          sideEffects: false,
+          storage: false,
+        });
+        expect(dummyGroup2.ingest).toHaveBeenCalledWith({
+          background: true,
+          force: true,
+          sideEffects: false,
+          storage: false,
+        });
       });
     });
   });
