@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { useAgile, useEvent, useWatcher } from "@agile-ts/react";
 import {
-  multiEditor,
   MY_COLLECTION,
   MY_COMPUTED,
   MY_EVENT,
@@ -48,8 +47,6 @@ const App = (props: any) => {
   useWatcher(MY_STATE, () => {
     console.log("MY_STATE changes");
   });
-
-  useAgile(multiEditor.deps);
 
   // Create global Instance of Core (for better debugging)
   useEffect(() => {
@@ -120,43 +117,8 @@ const App = (props: any) => {
         <button onClick={() => MY_COLLECTION.removeSelector("mySelector")}>
           Remove mySelector
         </button>
-      </header>
-
-      <form>
-        <label>Name</label>
-        <input
-          name={"name"}
-          onChange={(e) => {
-            multiEditor.setValue("name", e.target.value, { background: false });
-          }}
-          value={multiEditor.getValueById("name")}
-        />
-        {multiEditor.getStatus("name")?.type === "error" && (
-          <p style={{ color: "red" }}>
-            {multiEditor.getStatus("name")?.message}
-          </p>
-        )}
-
-        <label>Email</label>
-        <input
-          name={"email"}
-          onChange={(e) => multiEditor.setValue("email", e.target.value)}
-        />
-        {multiEditor.getStatus("email")?.type === "error" && (
-          <p style={{ color: "red" }}>
-            {multiEditor.getStatus("email")?.message}
-          </p>
-        )}
-
         <p>{rerenderCount}</p>
-      </form>
-      <button
-        onClick={() => {
-          multiEditor.submit();
-        }}
-      >
-        Submit
-      </button>
+      </header>
     </div>
   );
 };

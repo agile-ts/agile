@@ -7,14 +7,17 @@ import {
   defineConfig,
   normalizeArray,
   Item,
-  StorageKey,
   copy,
-  StatePersistentConfigInterface,
   CollectionPersistent,
+  StatePersistentConfigInterface,
   isValidObject,
+  PersistentKey,
+  ComputedTracker,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
+  static rebuildGroupSideEffectKey = "rebuildGroup";
   collection: () => Collection<DataType>;
 
   _output: Array<DataType> = []; // Output of Group
@@ -31,15 +34,15 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   constructor(
     collection: Collection<DataType>,
     initialItems?: Array<ItemKey>,
-    config?: GroupConfigInterface
+    config: GroupConfigInterface = {}
   ) {
-    super(collection.agileInstance(), initialItems || [], config?.key);
+    super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
 
-    // Add rebuild to sideEffects so that it rebuilds the Group Output if the value changes
-    this.addSideEffect("buildGroup", () => this.rebuild());
+    // Add rebuild to sideEffects to rebuild Group on Value Change
+    this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
-    // Initial Build
+    // Initial Rebuild
     this.rebuild();
   }
 
@@ -48,11 +51,16 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * Get Item Values of Group
    */
   public get output(): Array<DataType> {
-    // Add Group to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
-
+    ComputedTracker.tracked(this.observer);
     return this._output;
+  }
+
+  /**
+   * @public
+   * Set Item Values of Group
+   */
+  public set output(value: DataType[]) {
+    this._output = value;
   }
 
   /**
@@ -60,11 +68,16 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * Get Items of Group
    */
   public get items(): Array<Item<DataType>> {
-    // Add Group to tracked Observers (for auto tracking used observers in computed function)
-    if (this.agileInstance().runtime.trackObservers)
-      this.agileInstance().runtime.foundObservers.add(this.observer);
-
+    ComputedTracker.tracked(this.observer);
     return this._items.map((item) => item());
+  }
+
+  /**
+   * @public
+   * Set Items of Group
+   */
+  public set items(value: Array<Item<DataType>>) {
+    this._items = value.map((item) => () => item);
   }
 
   //=========================================================================================================
@@ -104,8 +117,9 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     config: GroupRemoveConfig = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
+    const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const notExistingItemKeys: Array<ItemKey> = [];
-    let newGroupValue = copy(this.nextStateValue); // Copying nextStateValue because somehow a reference exists between nextStateValue and value
+    let newGroupValue = copy(this.nextStateValue);
     config = defineConfig(config, {
       background: false,
     });
@@ -115,27 +129,29 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
         Agile.logger.error(
-          `Couldn't find itemKey '${itemKey}' in Group!`,
-          this
+          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`
         );
+        notExistingItemKeys.push(itemKey);
+        notExistingItemKeysInCollection.push(itemKey);
         return;
       }
 
       // Check if ItemKey exists in Collection
       if (!this.collection().getItem(itemKey))
-        notExistingItemKeys.push(itemKey);
+        notExistingItemKeysInCollection.push(itemKey);
 
       // Remove ItemKey from Group
       newGroupValue = newGroupValue.filter((key) => key !== itemKey);
     });
-    this.nextStateValue = newGroupValue;
+
+    // Return if passed ItemKeys doesn't exist
+    if (notExistingItemKeys.length >= _itemKeys.length) return this;
 
     // If all removed ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
-    if (notExistingItemKeys.length >= _itemKeys.length)
+    if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    // Ingest nextStateValue into Runtime
-    this.ingest({ background: config.background });
+    this.set(newGroupValue, { background: config.background });
 
     return this;
   }
@@ -151,8 +167,9 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public add(itemKeys: ItemKey | ItemKey[], config: GroupAddConfig = {}): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
-    const notExistingItemKeys: Array<ItemKey> = []; // ItemKeys that don't exist in Collection
-    let newGroupValue = copy(this.nextStateValue); // Copying nextStateValue because somehow a reference exists between nextStateValue and value
+    const notExistingItemKeysInCollection: Array<ItemKey> = [];
+    const existingItemKeys: Array<ItemKey> = [];
+    let newGroupValue = copy(this.nextStateValue);
     config = defineConfig<GroupAddConfig>(config, {
       method: "push",
       overwrite: false,
@@ -165,27 +182,55 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
 
       // Check if ItemKey exists in Collection
       if (!this.collection().getItem(itemKey))
-        notExistingItemKeys.push(itemKey);
+        notExistingItemKeysInCollection.push(itemKey);
 
-      // Remove ItemKey from Group if it should get overwritten and exists
+      // Remove ItemKey from Group if it should get overwritten and already exists
       if (existsInGroup) {
-        if (config.overwrite)
+        if (config.overwrite) {
           newGroupValue = newGroupValue.filter((key) => key !== itemKey);
-        else return;
+        } else {
+          existingItemKeys.push(itemKey);
+          return;
+        }
       }
 
       // Add new ItemKey to Group
       newGroupValue[config.method || "push"](itemKey);
     });
-    this.nextStateValue = newGroupValue;
 
-    // If all added ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
-    if (notExistingItemKeys.length >= _itemKeys.length)
+    // Return if passed ItemKeys already exist
+    if (existingItemKeys.length >= _itemKeys.length) return this;
+
+    // If all added ItemKeys doesn't exist in Collection or already exist -> no rerender necessary since output doesn't change
+    if (
+      notExistingItemKeysInCollection.concat(existingItemKeys).length >=
+      _itemKeys.length
+    )
       config.background = true;
 
-    // Ingest nextStateValue into Runtime
-    this.ingest({ background: config.background });
+    this.set(newGroupValue, { background: config.background });
 
+    return this;
+  }
+
+  //=========================================================================================================
+  // Replace
+  //=========================================================================================================
+  /**
+   * @public
+   * Replaces oldItemKey with newItemKey
+   * @param oldItemKey - Old ItemKey
+   * @param newItemKey - New ItemKey
+   * @param config - Config
+   */
+  public replace(
+    oldItemKey: ItemKey,
+    newItemKey: ItemKey,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
+    let newGroupValue = copy(this._value);
+    newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
+    this.set(newGroupValue, config);
     return this;
   }
 
@@ -201,38 +246,46 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   /**
    * @public
    * Stores Group Value into Agile Storage permanently
-   * @param key - Storage Key (Note: not needed if Group has key/name)
+   * @param key - Key/Name of created Persistent (Note: Key required if Group has no set Key!)
    * @param config - Config
    */
-  public persist(key?: StorageKey, config?: GroupPersistConfigInterface): this;
   public persist(
-    keyOrConfig: StorageKey | GroupPersistConfigInterface = {},
+    key?: PersistentKey,
+    config?: GroupPersistConfigInterface
+  ): this;
+  public persist(
+    keyOrConfig: PersistentKey | GroupPersistConfigInterface = {},
     config: GroupPersistConfigInterface = {}
   ): this {
     let _config: GroupPersistConfigInterface;
-    let key: StorageKey | undefined;
+    let key: PersistentKey | undefined;
 
     if (isValidObject(keyOrConfig)) {
       _config = keyOrConfig as GroupPersistConfigInterface;
-      key = undefined;
+      key = this._key;
     } else {
       _config = config || {};
-      key = keyOrConfig as StorageKey;
+      key = keyOrConfig as PersistentKey;
     }
 
     _config = defineConfig(_config, {
       instantiate: true,
       followCollectionPattern: false,
+      storageKeys: [],
     });
 
-    if (_config.followCollectionPattern) {
+    if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
-        key || this.key,
-        this.collection().key
+        key || this._key,
+        this.collection()._key
       );
     }
 
-    super.persist(key, { instantiate: _config.instantiate });
+    super.persist(key, {
+      instantiate: _config.instantiate,
+      storageKeys: _config.storageKeys,
+    });
+
     return this;
   }
 
@@ -250,8 +303,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
 
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
-      let data = this.collection().data[itemKey];
-      if (data) groupItems.push(data);
+      const item = this.collection().getItem(itemKey);
+      if (item) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
@@ -261,13 +314,16 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Logging
-    if (notFoundItemKeys.length > 0)
+    if (notFoundItemKeys.length > 0) {
       Agile.logger.warn(
-        `Couldn't find some Items in Collection '${this.key}'`,
+        `Couldn't find some Items in Collection '${this.collection()._key}' (${
+          this._key
+        })`,
         notFoundItemKeys
       );
+    }
 
-    this._items = groupItems.map((item) => () => item);
+    this.items = groupItems;
     this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
   }
@@ -295,9 +351,11 @@ export interface GroupRemoveConfig {
 
 /**
  * @param key - Key/Name of Group
+ * @param isPlaceholder - If Group is initially a Placeholder
  */
 export interface GroupConfigInterface {
   key?: GroupKey;
+  isPlaceholder?: boolean;
 }
 
 /**
@@ -305,5 +363,5 @@ export interface GroupConfigInterface {
  */
 export interface GroupPersistConfigInterface
   extends StatePersistentConfigInterface {
-  followCollectionPattern?: boolean;
+  followCollectionPersistKeyPattern?: boolean;
 }

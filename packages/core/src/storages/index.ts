@@ -22,10 +22,10 @@ export class Storages {
    * @param config - Config
    */
   constructor(agileInstance: Agile, config: StoragesConfigInterface = {}) {
-    config = defineConfig(config, {
-      localStorage: true,
-    });
     this.agileInstance = () => agileInstance;
+    config = defineConfig(config, {
+      localStorage: false,
+    });
     if (config.localStorage) this.instantiateLocalStorage();
   }
 
@@ -36,13 +36,13 @@ export class Storages {
    * @internal
    * Instantiates Local Storage
    */
-  private instantiateLocalStorage() {
+  public instantiateLocalStorage(): boolean {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
       Agile.logger.warn(
         "Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
       );
-      return;
+      return false;
     }
 
     // Create and register Local Storage
@@ -55,7 +55,7 @@ export class Storages {
         remove: localStorage.removeItem.bind(localStorage),
       },
     });
-    this.register(_localStorage, { default: true });
+    return this.register(_localStorage, { default: true });
   }
 
   //=========================================================================================================
@@ -71,32 +71,40 @@ export class Storages {
     storage: Storage,
     config: RegisterConfigInterface = {}
   ): boolean {
-    const hasRegisteredStorage = notEqual(this.storages, {});
+    const hasRegisteredAnyStorage = notEqual(this.storages, {});
 
     // Check if Storage already exists
     if (this.storages.hasOwnProperty(storage.key)) {
       Agile.logger.error(
-        `Storage with the key/name ${storage.key} already exists`
+        `Storage with the key/name '${storage.key}' already exists`
       );
       return false;
     }
 
-    // Set first added Storage to default (if it isn't set)
-    if (!hasRegisteredStorage && config.default === undefined)
-      config.default = true;
+    // Set first added Storage as default Storage
+    if (!hasRegisteredAnyStorage && config.default === false) {
+      Agile.logger.warn(
+        "Be aware that Agile has to assign the first added Storage as default Storage!"
+      );
+    }
+    if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
     this.storages[storage.key] = storage;
-    storage.ready = true;
     if (config.default) this.defaultStorage = storage;
 
-    // Transfer already saved Items into new Storage
     this.persistentInstances.forEach((persistent) => {
-      if (
-        persistent.storageKeys &&
-        persistent.storageKeys.includes(storage.key)
-      )
-        persistent.initialLoading(persistent.key);
+      // If Persistent isn't ready and has no default StorageKey.. reassignStorageKeys and try to load it
+      if (!persistent.defaultStorageKey) {
+        persistent.assignStorageKeys();
+        const isValid = persistent.validatePersistent();
+        if (isValid) persistent.initialLoading();
+        return;
+      }
+
+      // Add Value of Persistent to newly registered Storage
+      if (persistent.storageKeys.includes(storage.key))
+        persistent.persistValue();
     });
 
     return true;
@@ -140,9 +148,22 @@ export class Storages {
   public get<GetType = any>(
     key: StorageItemKey,
     storageKey?: StorageKey
-  ): GetType | Promise<GetType> | undefined {
-    if (storageKey) return this.getStorage(storageKey)?.get(key);
-    return this.defaultStorage?.get(key);
+  ): Promise<GetType | undefined> {
+    if (!this.hasStorage()) {
+      Agile.logger.error(
+        "No Storage found! Please provide at least one Storage."
+      );
+      return Promise.resolve(undefined);
+    }
+
+    // Call get Method in specific Storage
+    if (storageKey) {
+      const storage = this.getStorage(storageKey);
+      if (storage) return storage.get<GetType>(key);
+    }
+
+    // Call get Method in default Storage
+    return this.defaultStorage?.get<GetType>(key) || Promise.resolve(undefined);
   }
 
   //=========================================================================================================
@@ -152,7 +173,7 @@ export class Storages {
    * @internal
    * Saves/Updates value at provided Key
    * @param key - Key of Storage property
-   * @param value - new Value that gets set
+   * @param value - new Value that gets set at provided Key
    * @param storageKeys - Key/Name of Storages where the Value gets set (if not provided default Storage will be used)
    */
   public set(
@@ -160,11 +181,21 @@ export class Storages {
     value: any,
     storageKeys?: StorageKey[]
   ): void {
+    if (!this.hasStorage()) {
+      Agile.logger.error(
+        "No Storage found! Please provide at least one Storage."
+      );
+      return;
+    }
+
+    // Call set Method in specific Storages
     if (storageKeys) {
       for (let storageKey of storageKeys)
         this.getStorage(storageKey)?.set(key, value);
       return;
     }
+
+    // Call set Method in default Storage
     this.defaultStorage?.set(key, value);
   }
 
@@ -178,12 +209,33 @@ export class Storages {
    * @param storageKeys - Key/Name of Storages where the Value gets removed (if not provided default Storage will be used)
    */
   public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
+    if (!this.hasStorage()) {
+      Agile.logger.error(
+        "No Storage found! Please provide at least one Storage."
+      );
+      return;
+    }
+
+    // Call remove Method in specific Storages
     if (storageKeys) {
       for (let storageKey of storageKeys)
         this.getStorage(storageKey)?.remove(key);
       return;
     }
+
+    // Call remove Method in default Storage
     this.defaultStorage?.remove(key);
+  }
+
+  //=========================================================================================================
+  // Has Storage
+  //=========================================================================================================
+  /**
+   * @internal
+   * Check if at least one Storage got registered
+   */
+  public hasStorage(): boolean {
+    return notEqual(this.storages, {});
   }
 
   //=========================================================================================================

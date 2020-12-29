@@ -93,27 +93,26 @@ export function normalizeArray<DataType = any>(
 //=========================================================================================================
 /**
  * @internal
- * Tries to get an AgileInstance from provided instance
- * If no agileInstance found it returns the global AgileInstance
- * @param instance - Instance that might hold an AgileInstance
+ * Tries to get an Instance of Agile from provided Instance
+ * If no agileInstance found it returns the global bound Agile Instance
+ * @param instance - Instance that might hold an Agile Instance
  */
 export function getAgileInstance(instance: any): Agile | undefined {
   try {
-    // Try to find agileInstance in Instance
+    // Try to get agileInstance from passed Instance
     if (instance) {
-      if (instance instanceof State) return instance.agileInstance();
-      if (instance instanceof Event) return instance.agileInstance();
-      if (instance instanceof Collection) return instance.agileInstance();
-      if (instance instanceof Observer) return instance.agileInstance();
-      const _agileInstance = instance["agileInstance"];
-      if (_agileInstance) return instance;
+      const _agileInstance = isFunction(instance["agileInstance"])
+        ? instance["agileInstance"]()
+        : instance["agileInstance"];
+      if (_agileInstance) return _agileInstance;
     }
 
-    // Return global bound agileInstance (set in first instantiation of Agile)
+    // Return global bound agileInstance
     return globalThis["__agile__"];
   } catch (e) {
-    Agile.logger.error("Failed to get Agile Instance", e);
+    Agile.logger.error("Failed to get Agile Instance from ", instance);
   }
+
   return undefined;
 }
 
@@ -138,7 +137,12 @@ export function isFunction(value: any): boolean {
  * @param value - Value that gets tested if its an async function
  */
 export function isAsyncFunction(value: any): boolean {
-  return isFunction(value) && value.constructor.name === "AsyncFunction";
+  const valueString = value.toString();
+  return (
+    isFunction(value) &&
+    (value.constructor.name === "AsyncFunction" ||
+      valueString.includes("__awaiter"))
+  );
 }
 
 //=========================================================================================================
@@ -172,6 +176,7 @@ export function isValidUrl(url: string): boolean {
  * @param value - Value that gets checked
  */
 export function isJsonString(value: any): boolean {
+  if (typeof value !== "string") return false;
   try {
     JSON.parse(value);
   } catch (e) {
@@ -188,11 +193,23 @@ export function isJsonString(value: any): boolean {
  * Merges default values/properties into config object
  * @param config - Config object that receives default values
  * @param defaults - Default values object that gets merged into config object
+ * @param overwriteUndefinedProperties - If undefined Properties in config gets overwritten by the default value
  */
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
-  defaults: Object
+  defaults: Object,
+  overwriteUndefinedProperties?: boolean
 ): ConfigInterface {
+  if (overwriteUndefinedProperties === undefined)
+    overwriteUndefinedProperties = true;
+
+  if (overwriteUndefinedProperties) {
+    const finalConfig = { ...defaults, ...config };
+    for (let key in finalConfig)
+      if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
+    return finalConfig;
+  }
+
   return { ...defaults, ...config };
 }
 
@@ -267,7 +284,7 @@ export function notEqual(value1: any, value2: any): boolean {
  * Generates random Id
  * @param length - Length of generated Id
  */
-export function generateId(length?: number) {
+export function generateId(length?: number): string {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
@@ -288,8 +305,14 @@ export function generateId(length?: number) {
  * @param instance - Instance of Class you want to clone
  */
 export function clone<T = any>(instance: T): T {
-  const copy: T = Object.create(Object.getPrototypeOf(instance));
-  return Object.assign(copy, instance);
+  // Clone Class
+  const objectCopy: T = Object.create(Object.getPrototypeOf(instance));
+  const objectClone = Object.assign(objectCopy, instance);
+
+  // Copy Properties of Class
+  for (let key in objectClone) objectClone[key] = copy(objectClone[key]);
+
+  return objectClone;
 }
 
 //=========================================================================================================
@@ -297,19 +320,30 @@ export function clone<T = any>(instance: T): T {
 //=========================================================================================================
 /**
  * @internal
- * Binds Instance Global
+ * Binds passed Instance globally at passed Key
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
  * https://blog.logrocket.com/what-is-globalthis-why-use-it/
- * @param key - Key of Instance
- * @param instance - Instance which becomes globally accessible (globalThis.key)
+ * @param key - Key/Name of Instance
+ * @param instance - Instance
+ * @param overwrite - If already existing instance at passed Key gets overwritten
  */
-export function globalBind(key: string, instance: any) {
+export function globalBind(
+  key: string,
+  instance: any,
+  overwrite = false
+): boolean {
   try {
-    if (!globalThis[key]) globalThis[key] = instance;
+    if (overwrite) {
+      globalThis[key] = instance;
+      return true;
+    }
+
+    if (!globalThis[key]) {
+      globalThis[key] = instance;
+      return true;
+    }
   } catch (e) {
-    Agile.logger.error(
-      `Failed to create global Instance called '${name}'`,
-      instance
-    );
+    Agile.logger.error(`Failed to create global Instance called '${key}'`);
   }
+  return false;
 }

@@ -1,46 +1,62 @@
 import { State, Collection, DefaultItem, StateKey } from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
-  private collection: () => Collection<DataType>;
+  static updateGroupSideEffectKey = "rebuildGroup";
+  public isSelected = false; // If Item is selected by a Selector
+  public collection: () => Collection<DataType>;
 
   /**
    * @public
    * Item of Collection
    * @param collection - Collection to which the Item belongs
    * @param data - Data that the Item holds
+   * @param config - Config
    */
-  constructor(collection: Collection<DataType>, data: DataType) {
-    super(collection.agileInstance(), data);
+  constructor(
+    collection: Collection<DataType>,
+    data: DataType,
+    config: ItemConfigInterface = {}
+  ) {
+    super(collection.agileInstance(), data, {
+      isPlaceholder: config.isPlaceholder,
+      key: data[collection.config.primaryKey], // Set Key/Name of Item to primaryKey of Data
+    });
     this.collection = () => collection;
 
-    // Setting primaryKey of Data to Key/Name of Item
-    this.key = data[collection.config.primaryKey];
+    // Reassign Key to assign sideEffects
+    this.setKey(data[collection.config.primaryKey]);
   }
 
+  //=========================================================================================================
+  // Set Key
+  //=========================================================================================================
   /**
-   * @public
-   * Set Key/Name of Item
+   * @internal
+   * Updates Key/Name of State
+   * @param value - New Key/Name of State
    */
-  public set key(value: StateKey | undefined) {
-    // Note can't use 'super.key' because of 'https://github.com/Microsoft/TypeScript/issues/338'
-    this.setKey(value);
-    if (!value) return;
+  public setKey(value: StateKey | undefined): this {
+    super.setKey(value);
+    if (!value) return this;
 
-    // Update rebuildGroupThatIncludePrimaryKey SideEffect
-    this.removeSideEffect("rebuildGroup");
-    this.addSideEffect("rebuildGroup", (properties: any) =>
-      this.collection().rebuildGroupsThatIncludeItemKey(value, properties)
+    // Remove old rebuildGroupsThatIncludeItemKey sideEffect
+    this.removeSideEffect(Item.updateGroupSideEffectKey);
+
+    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it changes
+    this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
+      this.collection().rebuildGroupsThatIncludeItemKey(value, config)
     );
-  }
 
-  /**
-   * @public
-   * Get Key/Name of Item
-   */
-  public get key(): StateKey | undefined {
-    // Note can't use 'super.key' because of 'https://github.com/Microsoft/TypeScript/issues/338'
-    // Can't remove this getter function.. because the setter function is set in this class -> Error if not setter and getter function set
+    // Initial Rebuild
+    this.collection().rebuildGroupsThatIncludeItemKey(value);
 
-    return this._key;
+    return this;
   }
+}
+
+/**
+ * @param isPlaceholder - If Item is initially a Placeholder
+ */
+export interface ItemConfigInterface {
+  isPlaceholder?: boolean;
 }
