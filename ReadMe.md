@@ -1,4 +1,5 @@
  <img src="https://agile-ts.org/img/header_background.svg" alt="Banner">
+ 
  > Spacy State Management Framework for reactive Applications
 
  <br />
@@ -17,25 +18,49 @@
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
   
- ### Why Agile?
- 
- TODO
+## ❓ Why Agile?
 
-### Get started with React
+#### 🚅 Straightforward
+Write minimalistic, boilerplate free code with a moderate lerning curve.
 
-**1. Install Core** <br />
+**For Instance**  <br />
+
+Store State in Storage
+```
+const MY_STATE = App.State("Hello there").persist("persist-key");
+```
+
+Create an Collection of States
+```
+const MY_COLLECTION = App.Collection();
+MY_COLLECTION.collect({id: "1", name: "Jeff"});
+MY_COLLECTION.collect({id: "2", name: "Hans"});
+```
+
+#### 🎯 Easy to Use
+Learn the powerfull tools of Agile in a short amount of time.
+
+#### 🤸‍ Flexible
+Use any UI-Layer and the workflow that suits you the best.
+
+#### ⛳️ Centralize
+Manage your Application Logic central outside of any UI-Framework.
+
+## 🚀 Get Started (React)
+
+**1. ⬇️ Install Core** <br />
 _Brain of AgileTs that handles your States, Collections, Events, .._
 ```
 npm install @agile-ts/core
 ```
 
-**2. Install React Integration** <br />
+**2. ⬇️ Install React Integration** <br />
 _Integration for React that helps you subscribing your States in your Components_
 ```
 npm install @agile-ts/react
 ```
 
-**3. Simple Example** <br />
+**3. 🎲 Simple Example** <br />
 _If you can't believe the simplicity, convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
 ```ts
 // Create an Instance of Agile that holds and handles your States
@@ -64,9 +89,10 @@ const RandomComponent = () => {
     );
 }
 ```
+If you want to find out more checkout the [documentation](https://agile-ts.org/docs/)
 
-### Packages of Agile
 
+## 🗂 Packages of Agile
 | Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | Brain of Agile                            |
@@ -74,5 +100,9 @@ const RandomComponent = () => {
 | [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Simple Api                                |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
 
-### Inspiration
-- Syntax of Agile Core is Inspired by [PulseJs](https://github.com/pulse-framework/pulse)
+## 📄 Documentation
+The Agile Docs are located [here](https://agile-ts.org/docs/)
+
+
+## 😎 Inspiration
+- Syntax of Agile is Inspired by [PulseJs](https://github.com/pulse-framework/pulse)
