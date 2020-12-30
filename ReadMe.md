@@ -1,6 +1,6 @@
 # AgileTs
 
-_**Agile Typescript** is a spacy State Management Framework, supporting Frameworks like React, .._
+> Spacy State Management Framework for reactive Applications
 
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/npm/v/@agile-ts/core.svg" alt="npm version"></a>
@@ -20,10 +20,55 @@ _**Agile Typescript** is a spacy State Management Framework, supporting Framewor
   <img src="https://img.shields.io/github/languages/code-size/agile-ts/agile.svg" alt="GitHub Code Size"></a>
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
+  
+ ### Why Agile?
+ 
+ TODO
 
-### Quick Start
+### Get started with React
 
-````
+** 1. Install Core of AgileTs ** |
+_Brain of AgileTs that handles your States, Collections, Events, .._
+```
+npm install @agile-ts/core
+```
+
+** 2. Install React Integration ** |
+_Integration for React to cause rerenders on your components_
+```
+npm install @agile-ts/react
+```
+
+** 3. Simple Example **
+```ts
+// Create an Instance of Agile that holds and handles all your States
+const App = new Agile();
+
+// Create State that has the Value "Hello Stranger"
+const MY_STATE = App.State("Hello Stranger");
+
+let helloWorldCount = 0;
+
+// Our React Component
+const RandomComponent = () => {
+    // Subscribe State and get current Value of It
+    const myFirstState = useAgile(MY_FIRST_STATE);
+
+    return (
+        <div>
+            <p>{myFirstState}</p>
+            <button
+                onClick={() => {
+                    // Update State Value
+                    MY_FIRST_STATE.set(`Hello World ${++helloWorldCount}`)
+                }}
+            >
+                Update State
+            </button>
+        </div>
+    );
+}
+```
 
 | Name                                                                     |                                                                               Latest Version                                                                                |
 | ------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
