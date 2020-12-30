@@ -2,9 +2,6 @@
  
  > Spacy State Management Framework for reactive Applications
 
- <br />
- <br />
- 
  <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
 <a href="https://npm.im/@agile-ts/core">
@@ -18,7 +15,7 @@
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
   
-## ❓ Why Agile?
+## ❓ Why Agile
 
 #### 🚅 Straightforward
 Write minimalistic, boilerplate free code with a moderate lerning curve.
