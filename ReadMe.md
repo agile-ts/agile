@@ -1,6 +1,8 @@
  <img src="https://agile-ts.org/img/header_background.svg" alt="Banner">
  
  > Spacy State Management Framework for reactive Applications
+ 
+ <br />
 
  <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
@@ -34,7 +36,7 @@ Write minimalistic, boilerplate free code with a moderate lerning curve.
   MY_COLLECTION.collect({id: "2", name: "Hans"});
   ```
   
-- Create State that computes its return Value depending on used Dependencies
+- Create State that computes its return Value depending on used Agile Instances (State, ..)
   ```
   const MY_COMPUTED = App.Computed(() => {
     return ´${MY_STATE.value}_${MY_STATE2.value}´
