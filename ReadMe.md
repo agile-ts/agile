@@ -27,40 +27,38 @@
 
 ### Get started with React
 
-** 1. Install Core of AgileTs ** |
+**1. Install Core of AgileTs** <br />
 _Brain of AgileTs that handles your States, Collections, Events, .._
 ```
 npm install @agile-ts/core
 ```
 
-** 2. Install React Integration ** |
-_Integration for React to cause rerenders on your components_
+**2. Install React Integration** <br />
+_Integration for React that helps you subscribing a State in a Component_
 ```
 npm install @agile-ts/react
 ```
 
 ** 3. Simple Example **
 ```ts
-// Create an Instance of Agile that holds and handles all your States
+// Create an Instance of Agile that holds and handles your States
 const App = new Agile();
 
-// Create State that has the Value "Hello Stranger"
-const MY_STATE = App.State("Hello Stranger");
-
-let helloWorldCount = 0;
+// Create State that has the initial Value "Hello Stranger!"
+const MY_STATE = App.State("Hello Stranger!");
 
 // Our React Component
 const RandomComponent = () => {
-    // Subscribe State and get current Value of It
-    const myFirstState = useAgile(MY_FIRST_STATE);
-
-    return (
-        <div>
-            <p>{myFirstState}</p>
-            <button
-                onClick={() => {
-                    // Update State Value
-                    MY_FIRST_STATE.set(`Hello World ${++helloWorldCount}`)
+    // Subscribe State to Component and get current Value from It
+    const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
+                                                              //       A
+    return (                                                  //       |
+        <div>                                                 //       |  Now the State Value gets changed to
+            <p>{myFirstState}</p>                             //       |  "Hello Friend!" and causes a rerender 
+            <button                                           //       |  on this Component.
+                onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend"
+                    // Update State Value to "Hello Friend!"  //       |
+                    MY_FIRST_STATE.set("Hello Friend!") // -------------
                 }}
             >
                 Update State
