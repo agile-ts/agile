@@ -1,6 +1,6 @@
-# Agile Framework `v0.0.5`
+# AgileTs
 
-_Agile is a global state and logic framework for reactive Typescript & Javascript applications. Supporting frameworks like React and React Native._
+_**Agile Typescript** is a spacy State Management Framework, supporting Frameworks like React, .._
 
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/npm/v/@agile-ts/core.svg" alt="npm version"></a>
@@ -21,20 +21,15 @@ _Agile is a global state and logic framework for reactive Typescript & Javascrip
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
+### Quick Start
 
-### Agile is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
-Agile has a similar syntax as [PulseJs](https://pulsejs.org/) and works slightly different under the hood. 
-Maybe a little more sophisticated and extensible
-**BUT** I would recommend to use PulseJS right away as it is supported by a cool community and has nearly all features AgileTs offers.
+````
 
 | Name                                                                     |                                                                               Latest Version                                                                                |
 | ------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [@agile-ts/core](/packages/core)                                         |                 [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                 |
+| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   |
 | [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 |
-| [@agile-ts/api](/packages/api)                                           |              [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                      |
-     
-<div align="center">
-  <img src="https://i.pinimg.com/originals/66/70/fd/6670fd61b91760bf8f04ca0479a2e0d1.gif">
-</div>
+| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     |
+| [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     |            
 
-
+#### Agile is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
