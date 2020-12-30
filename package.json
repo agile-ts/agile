@@ -12,7 +12,7 @@
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec npm install",
-    "bump-version": "changeset",
+    "version-bump": "changeset",
     "release": "lerna run build && changeset publish"
   },
   "repository": {
