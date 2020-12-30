@@ -67,7 +67,6 @@ npm install @agile-ts/react
 ```
 
 **3. 🎲 Simple Example** <br />
-_If you can't believe the simplicity, convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
 ```ts
 // Create an Instance of Agile that holds and handles your States
 const App = new Agile();
@@ -95,7 +94,7 @@ const RandomComponent = () => {
     );
 }
 ```
-If you want to find out more checkout the [documentation](https://agile-ts.org/docs/)
+_If you can't believe the simplicity, convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
 
 
 ## 🗂 Packages of Agile
