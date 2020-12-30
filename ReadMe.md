@@ -22,17 +22,24 @@ Write minimalistic, boilerplate free code with a moderate lerning curve.
 
 **For Instance**  <br />
 
-Store State in Storage
-```
-const MY_STATE = App.State("Hello there").persist("persist-key");
-```
+- Store State in Storage
+  ```
+  const MY_STATE = App.State("Hello there").persist("persist-key");
+  ```
 
-Create an Collection of States
-```
-const MY_COLLECTION = App.Collection();
-MY_COLLECTION.collect({id: "1", name: "Jeff"});
-MY_COLLECTION.collect({id: "2", name: "Hans"});
-```
+- Create an Collection of States
+  ```
+  const MY_COLLECTION = App.Collection();
+  MY_COLLECTION.collect({id: "1", name: "Jeff"});
+  MY_COLLECTION.collect({id: "2", name: "Hans"});
+  ```
+  
+- Create State that computes its return Value depending on used Dependencies
+  ```
+  const MY_COMPUTED = App.Computed(() => {
+    return ´${MY_STATE.value}_${MY_STATE2.value}´
+  });
+  ```
 
 #### 🎯 Easy to Use
 Learn the powerfull tools of Agile in a short amount of time.
