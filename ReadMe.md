@@ -1,21 +1,16 @@
-# AgileTs
+ <img src="https://agile-ts.org/img/header_background.svg" alt="Banner">
+ > Spacy State Management Framework for reactive Applications
 
-> Spacy State Management Framework for reactive Applications
-
-<a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/v/@agile-ts/core.svg" alt="npm version"></a>
+ <br />
+ 
+ <a href="https://github.com/agile-ts/agile">
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg" alt="npm monthly downloads"></a>
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg" alt="npm total downloads"></a>
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"></a>
-  
-  
-<br />
-
-<a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/languages/code-size/agile-ts/agile.svg" alt="GitHub Code Size"></a>
 <a href="https://github.com/agile-ts/agile">
@@ -27,7 +22,7 @@
 
 ### Get started with React
 
-**1. Install Core of AgileTs** <br />
+**1. Install Core** <br />
 _Brain of AgileTs that handles your States, Collections, Events, .._
 ```
 npm install @agile-ts/core
@@ -40,15 +35,15 @@ npm install @agile-ts/react
 ```
 
 **3. Simple Example** <br />
-_If you can't believe the simplicity test it [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
+_If you can't believe the simplicity, convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
 ```ts
 // Create an Instance of Agile that holds and handles your States
 const App = new Agile();
 
-// Create State that has the initial Value "Hello Stranger!"
+// Create State that has a initial Value of "Hello Stranger!"
 const MY_FIRST_STATE = App.State("Hello Stranger!");
 
-// Our React Component
+// Your React Component
 const RandomComponent = () => {
     // Subscribe State to Component and get current Value from It
     const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
@@ -69,11 +64,14 @@ const RandomComponent = () => {
 }
 ```
 
-| Name                                                                     |                                                                               Latest Version                                                                                |
-| ------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   |
-| [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 |
-| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     |
-| [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     |            
+### Packages of Agile
 
-#### Agile is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
+| Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | Brain of Agile                            |
+| [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                         |
+| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Simple Api                                |
+| [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
+
+### Inspiration
+- Syntax of Agile Core is Inspired by [PulseJs](https://github.com/pulse-framework/pulse)
