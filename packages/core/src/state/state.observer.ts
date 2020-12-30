@@ -1,20 +1,19 @@
 import {
-  Agile,
   Observer,
   State,
   Computed,
-  Job,
-  JobConfigInterface,
   copy,
   defineConfig,
   ObserverKey,
   equal,
   notEqual,
   isFunction,
+  SubscriptionContainer,
+  IngestConfigInterface,
+  StateRuntimeJob,
+  StateRuntimeJobConfigInterface,
+  RuntimeJobKey,
 } from "../internal";
-
-export const internalIngestKey =
-  "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
 
 export class StateObserver<ValueType = any> extends Observer {
   public state: () => State<ValueType>;
@@ -23,20 +22,16 @@ export class StateObserver<ValueType = any> extends Observer {
   /**
    * @internal
    * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
-   * @param agileInstance - An instance of Agile
    * @param state - State
-   * @param deps - Initial Dependencies of State Observer
-   * @param key - Key/Name of State Observer
+   * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     state: State<ValueType>,
-    deps?: Array<Observer>,
-    key?: ObserverKey
+    config: CreateStateObserverConfigInterface = {}
   ) {
-    super(agileInstance, deps, key, state.value);
+    super(state.agileInstance(), { ...config, ...{ value: state._value } });
     this.state = () => state;
-    this.nextStateValue = state.value;
+    this.nextStateValue = copy(state._value);
   }
 
   //=========================================================================================================
@@ -44,42 +39,69 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
+   * Ingests nextStateValue or computedValue into Runtime and applies it to the State
+   * @param config - Config
+   */
+  public ingest(config: StateIngestConfigInterface = {}): void {
+    const state = this.state();
+    let newStateValue: ValueType;
+
+    if (state instanceof Computed) newStateValue = state.computeValue();
+    else newStateValue = state.nextStateValue;
+
+    this.ingestValue(newStateValue, config);
+  }
+
+  //=========================================================================================================
+  // Ingest Value
+  //=========================================================================================================
+  /**
+   * @internal
    * Ingests new State Value into Runtime and applies it to the State
    * @param newStateValue - New Value of the State
    * @param config - Config
    */
-  public ingest(
-    newStateValue: ValueType | InternalIngestKeyType = internalIngestKey,
-    config: StateJobConfigInterface = {}
+  public ingestValue(
+    newStateValue: ValueType,
+    config: StateIngestConfigInterface = {}
   ): void {
     const state = this.state();
-    config = defineConfig<JobConfigInterface>(config, {
+    config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: true,
-      forceRerender: false,
+      force: false,
       storage: true,
+      overwrite: false,
     });
 
-    // If forceRerender, set background config to false since forceRerender is 'stronger' than background
-    if (config.forceRerender && config.background) config.background = false;
-
-    // Grab nextState or compute State if internalIngestKey got passed
-    if (newStateValue === internalIngestKey) {
-      if (state instanceof Computed) this.nextStateValue = state.computeValue();
-      else this.nextStateValue = state.nextStateValue;
-    } else this.nextStateValue = newStateValue;
-
-    // Check if State Value and the new Value are equals (Note: Not checking state.nextStateValue because of the internalIngestKey)
-    if (equal(state.value, this.nextStateValue) && !config.forceRerender) {
-      if (this.agileInstance().config.logJobs)
-        console.warn(
-          "Agile: Doesn't created job because state values are the same! "
-        );
-      return;
+    // Force overwriting State because if assigning Value to State, the State shouldn't be a placeholder anymore
+    if (state.isPlaceholder) {
+      config.force = true;
+      config.overwrite = true;
     }
 
-    this.agileInstance().runtime.ingest(this, config);
+    // Assign next State Value and compute it if necessary
+    this.nextStateValue = state.computeMethod
+      ? copy(state.computeMethod(newStateValue))
+      : copy(newStateValue);
+
+    // Check if State Value and new/next Value are equals
+    if (equal(state._value, this.nextStateValue) && !config.force) return;
+
+    // Create Job
+    const job = new StateRuntimeJob(this, {
+      storage: config.storage,
+      sideEffects: config.sideEffects,
+      force: config.force,
+      background: config.background,
+      overwrite: config.overwrite,
+      key: config.key || this._key,
+    });
+
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
   }
 
   //=========================================================================================================
@@ -87,32 +109,27 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * Performs Job from Runtime
-   * @param job - Job that gets performed
+   * Performs Job that holds this Observer
+   * @param job - Job
    */
-  public perform(job: Job<this>) {
+  public perform(job: StateRuntimeJob) {
     const state = job.observer.state();
 
-    // Set Previous State
-    state.previousStateValue = copy(state.value);
+    // Assign new State Values
+    state.previousStateValue = copy(state._value);
+    state._value = copy(job.observer.nextStateValue);
+    state.nextStateValue = copy(job.observer.nextStateValue);
+    job.observer.value = copy(job.observer.nextStateValue);
 
-    // Set new State Value
-    state._value = copy(this.nextStateValue);
-    state.nextStateValue = copy(this.nextStateValue);
+    // Overwrite old State Values
+    if (job.config.overwrite) {
+      state.initialStateValue = copy(state._value);
+      state.previousStateValue = copy(state._value);
+      state.isPlaceholder = false;
+    }
 
-    // Store State changes in Storage
-    if (job.config.storage) state.persistent?.updateValue();
+    state.isSet = notEqual(state._value, state.initialStateValue);
 
-    // Set isSet
-    state.isSet = notEqual(this.nextStateValue, state.initialStateValue);
-
-    // Reset isPlaceholder since it got an value
-    if (state.isPlaceholder) state.isPlaceholder = false;
-
-    // Update Observer value
-    this.value = copy(this.nextStateValue);
-
-    // Perform SideEffects of the Perform Function
     this.sideEffects(job);
   }
 
@@ -121,10 +138,10 @@ export class StateObserver<ValueType = any> extends Observer {
   //=========================================================================================================
   /**
    * @internal
-   * SideEffects of Perform Function
-   * @param job - Job whose SideEffects gets executed
+   * SideEffects of Job
+   * @param job - Job
    */
-  private sideEffects(job: Job<this>) {
+  public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
 
     // Call Watchers Functions
@@ -139,19 +156,29 @@ export class StateObserver<ValueType = any> extends Observer {
           state.sideEffects[sideEffectKey](job.config);
 
     // Ingest Dependencies of Observer into Runtime
-    job.observer.deps.forEach(
+    state.observer.deps.forEach(
       (observer) =>
-        observer instanceof StateObserver &&
-        observer.ingest(internalIngestKey, { perform: false })
+        observer instanceof StateObserver && observer.ingest({ perform: false })
     );
   }
 }
 
-export type InternalIngestKeyType = "THIS_IS_AN_INTERNAL_KEY_FOR_INGESTING_INTERNAL_STUFF";
+/**
+ * @param deps - Initial Dependencies of State Observer
+ * @param subs - Initial Subscriptions of State Observer
+ * @param key - Key/Name of State Observer
+ */
+export interface CreateStateObserverConfigInterface {
+  deps?: Array<Observer>;
+  subs?: Array<SubscriptionContainer>;
+  key?: ObserverKey;
+}
 
 /**
- * @param forceRerender - Force rerender no matter what happens
+ * @param key - Key/Name of Job that gets created
  */
-export interface StateJobConfigInterface extends JobConfigInterface {
-  forceRerender?: boolean;
+export interface StateIngestConfigInterface
+  extends StateRuntimeJobConfigInterface,
+    IngestConfigInterface {
+  key?: RuntimeJobKey;
 }

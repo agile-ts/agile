@@ -24,27 +24,32 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Integrates Framework (Integration) into Agile
-   * @param integration - Integration that gets registered/integrated
+   * Integrates Framework(Integration) into Agile
+   * @param integration - Integration/Framework that gets integrated
    */
-  public async integrate(integration: Integration) {
-    // Check if integration is valid
-    if (!integration.config.name) {
-      console.error("Agile: Failed to integrate framework!");
-      return;
+  public async integrate(integration: Integration): Promise<boolean> {
+    // Check if Integration is valid
+    if (!integration._key) {
+      Agile.logger.error(
+        "Failed to integrate framework! Invalid Integration!",
+        integration._key
+      );
+      return false;
     }
 
-    // Integrate Integration/Framework
-    this.integrations.add(integration);
-    if (integration.config.bind)
-      integration.ready = await integration.config.bind(this.agileInstance());
+    // Bind Framework to Agile
+    if (integration.methods.bind)
+      integration.ready = await integration.methods.bind(this.agileInstance());
     else integration.ready = true;
 
+    // Integrate Framework
+    this.integrations.add(integration);
+    integration.integrated = true;
+
     // Logging
-    if (this.agileInstance().config.logJobs)
-      console.log(
-        `Agile: Successfully integrated '${integration.config.name}'`
-      );
+    Agile.logger.info(`Successfully integrated '${integration._key}'`);
+
+    return true;
   }
 
   //=========================================================================================================
@@ -52,23 +57,19 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Updates Integrations
-   * -> calls 'updateMethod' in registered Integrations
+   * Updates registered and ready Integrations
+   * -> calls 'updateMethod' in all registered and ready Integrations
    * @param componentInstance - Component that gets updated
-   * @param updatedData - Updated Properties with new Value (Note: properties with no value won't get passed)
+   * @param updatedData - Properties that differ from the last Value
    */
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
-      // Check if integration is ready
       if (!integration.ready) {
-        console.log(
-          `Agile: Integration '${integration.config.name}' isn't ready yet!`
-        );
+        Agile.logger.warn(`Integration '${integration.key}' isn't ready yet!`);
         return;
       }
-
-      if (integration.config.updateMethod)
-        integration.config.updateMethod(componentInstance, updatedData);
+      if (integration.methods.updateMethod)
+        integration.methods.updateMethod(componentInstance, updatedData);
     });
   }
 
@@ -77,7 +78,7 @@ export class Integrations {
   //=========================================================================================================
   /**
    * @internal
-   * Checks if Agile has registered any Integration
+   *  Check if at least one Integration got registered
    */
   public hasIntegration(): boolean {
     return this.integrations.size > 0;

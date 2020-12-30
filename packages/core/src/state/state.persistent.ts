@@ -1,155 +1,207 @@
 import {
-  Agile,
+  CreatePersistentConfigInterface,
   defineConfig,
   Persistent,
+  PersistentKey,
   State,
   StorageKey,
 } from "../internal";
 
 export class StatePersistent<ValueType = any> extends Persistent {
+  static storeValueSideEffectKey = "rebuildStateStorageValue";
   public state: () => State;
 
   /**
    * @internal
    * State Persist Manager - Handles permanent storing of State Value
-   * @param agileInstance - An instance of Agile
    * @param state - State that gets stored
-   * @param key - Key of Storage property
    * @param config - Config
    */
   constructor(
-    agileInstance: Agile,
     state: State<ValueType>,
-    key?: StorageKey,
-    config: StatePersistentConfigInterface = {}
+    config: CreatePersistentConfigInterface = {}
   ) {
-    super(agileInstance);
+    super(state.agileInstance(), {
+      instantiate: false,
+    });
     config = defineConfig(config, {
       instantiate: true,
+      storageKeys: [],
     });
     this.state = () => state;
-    if (config.instantiate)
-      this.instantiatePersistent(key).then((success) => {
-        state.isPersisted = success;
-      });
-  }
+    this.instantiatePersistent({
+      key: config.key,
+      storageKeys: config.storageKeys,
+    });
 
-  public set key(value: StorageKey) {
-    this.setKey(value);
-  }
-
-  public get key(): StorageKey {
-    return this._key;
+    // Load/Store persisted Value for the first Time
+    if (this.ready && config.instantiate) this.initialLoading();
   }
 
   //=========================================================================================================
   // Set Key
   //=========================================================================================================
   /**
-   * @public
-   * Sets Key/Name of Persistent
+   * @internal
+   * Updates Key/Name of Persistent
    * @param value - New Key/Name of Persistent
    */
-  public async setKey(value: StorageKey) {
-    // If persistent isn't ready try to init it with the new Key
-    if (!this.ready) {
-      this.instantiatePersistent(value).then((success) => {
-        this.state().isPersisted = success;
-      });
+  public async setKey(value?: StorageKey): Promise<void> {
+    const oldKey = this._key;
+    const wasReady = this.ready;
+
+    // Assign Key
+    if (value === this._key) return;
+    this._key = value || Persistent.placeHolderKey;
+
+    const isValid = this.validatePersistent();
+
+    // Try to Initial Load Value if persistent wasn't ready and return
+    if (!wasReady) {
+      if (isValid) await this.initialLoading();
       return;
     }
 
-    // Check if key has changed
-    if (value === this._key) return;
+    // Remove value at old Key
+    await this.removePersistedValue(oldKey);
 
-    // Remove value with old Key
-    await this.removeValue();
-
-    // Update Key
-    this._key = value;
-
-    // Set value with new Key
-    await this.updateValue();
+    // Assign Value to new Key
+    if (isValid) await this.persistValue(value);
   }
 
   //=========================================================================================================
-  // Load Value
+  // Initial Loading
   //=========================================================================================================
   /**
    * @internal
-   * Loads Value from Storage
-   * @return Success?
+   * Loads/Saves Storage Value for the first Time
    */
-  public async loadValue(): Promise<boolean> {
-    if (!this.ready) return false;
-    const loadedValue = await this.agileInstance().storage.get(this._key);
-    if (loadedValue) {
-      this.state().set(loadedValue, { storage: false });
-      return true;
-    }
-    return false;
+  public async initialLoading() {
+    super.initialLoading().then(() => {
+      this.state().isPersisted = true;
+    });
   }
 
   //=========================================================================================================
-  // Set Value
+  // Load Persisted Value
   //=========================================================================================================
   /**
    * @internal
-   * Saves/Updates Value in Storage
+   * Loads State Value from the Storage
    * @return Success?
    */
-  public async updateValue(): Promise<boolean> {
+  public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    this.agileInstance().storage.set(
-      this.key,
-      this.state().getPersistableValue()
+    const _key = key || this._key;
+
+    // Load Value from default Storage
+    const loadedValue = await this.agileInstance().storages.get<ValueType>(
+      _key,
+      this.defaultStorageKey
     );
-    this.state().isPersisted = true;
+    if (!loadedValue) return false;
+
+    // Assign loaded Value to State
+    this.state().set(loadedValue, { storage: false });
+
+    // Persist State, so that the Storage Value updates dynamically if the State updates
+    await this.persistValue(_key);
+
     return true;
   }
 
   //=========================================================================================================
-  // Remove Value
+  // Persist Value
   //=========================================================================================================
   /**
    * @internal
-   * Removes Value form Storage
+   * Sets everything up so that the State gets saved in the Storage on every Value change
    * @return Success?
    */
-  public async removeValue(): Promise<boolean> {
+  public async persistValue(key?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    this.agileInstance().storage.remove(this.key);
-    this.state().isPersisted = false;
+    const _key = key || this._key;
+
+    // Add SideEffect to State, that updates the saved State Value depending on the current State Value
+    this.state().addSideEffect(
+      StatePersistent.storeValueSideEffectKey,
+      (config) => {
+        this.rebuildStorageSideEffect(this.state(), _key, config);
+      }
+    );
+
+    // Rebuild Storage for saving State Value in the Storage
+    this.rebuildStorageSideEffect(this.state(), _key);
+
+    this.isPersisted = true;
     return true;
   }
 
   //=========================================================================================================
-  // Validate Key
+  // Remove Persisted Value
   //=========================================================================================================
   /**
    * @internal
-   * Validates Storage Key
-   * @param key - Key that gets validated
+   * Removes State Value form the Storage
+   * @return Success?
    */
-  public validateKey(key?: StorageKey): StorageKey | null {
+  public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
+    if (!this.ready) return false;
+    const _key = key || this._key;
+
+    // Remove SideEffect
+    this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
+
+    // Remove Value from Storage
+    this.agileInstance().storages.remove(_key, this.storageKeys);
+
+    this.isPersisted = false;
+    return true;
+  }
+
+  //=========================================================================================================
+  // Format Key
+  //=========================================================================================================
+  /**
+   * @internal
+   * Formats Storage Key
+   * @param key - Key that gets formatted
+   */
+  public formatKey(key?: PersistentKey): PersistentKey | undefined {
     const state = this.state();
 
     // Get key from State
-    if (!key && state.key) return state.key;
+    if (!key && state._key) return state._key;
 
-    // Return null if no key found
-    if (!key) return null;
+    if (!key) return;
 
     // Set State Key to Storage Key if State has no key
-    if (!state.key) state.key = key;
+    if (!state._key) state._key = key;
 
     return key;
   }
-}
 
-/**
- * @param instantiate - If Persistent gets instantiated
- */
-export interface StatePersistentConfigInterface {
-  instantiate?: boolean;
+  //=========================================================================================================
+  // Rebuild Storage SideEffect
+  //=========================================================================================================
+  /**
+   * @internal
+   * Rebuilds Storage depending on the State Value (Saves current State Value into the Storage)
+   * @param state - State that holds the new Value
+   * @param key - Key/Name of Persistent
+   * @param config - Config
+   */
+  public rebuildStorageSideEffect(
+    state: State<ValueType>,
+    key: PersistentKey,
+    config: any = {}
+  ) {
+    if (config.storage !== undefined && !config.storage) return;
+
+    this.agileInstance().storages.set(
+      key,
+      this.state().getPersistableValue(),
+      this.storageKeys
+    );
+  }
 }

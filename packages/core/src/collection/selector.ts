@@ -1,17 +1,19 @@
 import {
+  Agile,
   Collection,
-  copy,
   DefaultItem,
   defineConfig,
-  equal,
   Item,
   ItemKey,
   State,
+  StateRuntimeJobConfigInterface,
 } from "../internal";
 
 export class Selector<DataType = DefaultItem> extends State<
   DataType | undefined
 > {
+  static dummyItemKey = "unknown";
+  static rebuildSelectorSideEffectKey = "rebuildSelector";
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
   public _itemKey: ItemKey; // Key of Item the Selector represents
@@ -26,16 +28,21 @@ export class Selector<DataType = DefaultItem> extends State<
   constructor(
     collection: Collection<DataType>,
     itemKey: ItemKey,
-    config?: SelectorConfigInterface
+    config: SelectorConfigInterface = {}
   ) {
-    super(collection.agileInstance(), collection.getValueById(itemKey));
+    super(collection.agileInstance(), undefined, config);
+    config = defineConfig(config, {
+      isPlaceholder: false,
+    });
+
     this.collection = () => collection;
     this.item = undefined;
-    this._itemKey = itemKey;
-    this.key = config?.key;
+    this._itemKey = Selector.dummyItemKey;
+    this._key = config?.key;
+    this.isPlaceholder = true;
 
     // Initial Select
-    this.select(itemKey);
+    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -54,44 +61,45 @@ export class Selector<DataType = DefaultItem> extends State<
     return this._itemKey;
   }
 
+  //=========================================================================================================
+  // Select
+  //=========================================================================================================
   /**
    * @public
-   * Select new ItemKey that the Selector will represents
+   * Select new ItemKey
    * @param itemKey - New ItemKey
    * @param config - Config
    */
-  public select(itemKey: ItemKey, config: SelectConfigInterface = {}): this {
-    const oldItem = this.item;
-    let newItem = this.collection().getItemById(itemKey);
+  public select(
+    itemKey: ItemKey,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
+    const oldItem = this.collection().getItem(this._itemKey, {
+      notExisting: true,
+    }); // Because this.item might be outdated
+    let newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
       force: false,
+      overwrite: oldItem?.isPlaceholder || false,
+      storage: true,
     });
 
-    if (oldItem?.key === itemKey && !config.force) {
-      console.warn(`Agile: Selector has already selected key '${itemKey}'!`);
+    if (this.hasSelected(itemKey) && !config.force) {
+      Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
       return this;
     }
 
-    // Remove old Item from Collection if it is an Placeholder
-    if (oldItem?.isPlaceholder) delete this.collection().data[this.itemKey];
-
-    // Create dummy Item to hold reference if Item with ItemKey doesn't exist
-    if (!newItem) {
-      newItem = new Item<DataType>(this.collection(), { id: itemKey } as any);
-      newItem.isPlaceholder = true;
-      this.collection().data[itemKey] = newItem;
-    }
-
-    // Remove Selector sideEffect from old Item
-    oldItem?.removeSideEffect("rebuildSelector");
+    // Unselect old Item
+    this.unselect({ background: true });
 
     this._itemKey = itemKey;
     this.item = newItem;
+    newItem.isSelected = true;
 
-    // Add Selector sideEffect to Item
-    newItem.addSideEffect("rebuildSelector", () =>
+    // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
+    newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, (config) =>
       this.rebuildSelector(config)
     );
 
@@ -102,36 +110,66 @@ export class Selector<DataType = DefaultItem> extends State<
   }
 
   //=========================================================================================================
-  // RebuildSelector
+  // Unselect
+  //=========================================================================================================
+  /**
+   * @public
+   * Unselects current selected Item
+   * @param config - Config
+   */
+  public unselect(config: StateRuntimeJobConfigInterface = {}): this {
+    // Because this.item might be outdated
+    const item = this.collection().getItem(this._itemKey, {
+      notExisting: true,
+    });
+
+    // Unselect Item
+    if (item) {
+      item.isSelected = false;
+      item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
+      if (item.isPlaceholder) delete this.collection().data[this._itemKey];
+    }
+
+    // Reset and rebuild Selector
+    this.item = undefined;
+    this._itemKey = Selector.dummyItemKey;
+    this.rebuildSelector(config);
+
+    this.isPlaceholder = true;
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Has Selected
+  //=========================================================================================================
+  /**
+   * Checks if Selector has selected passed ItemKey
+   * @param itemKey
+   */
+  public hasSelected(itemKey: ItemKey): boolean {
+    const isSelected = this._itemKey === itemKey;
+    if (!this.item) return isSelected;
+    return isSelected && this.item.isSelected;
+  }
+
+  //=========================================================================================================
+  // Rebuild Selector
   //=========================================================================================================
   /**
    * @public
    * Rebuilds Selector
    * @param config - Config
    */
-  public rebuildSelector(config: SelectConfigInterface = {}) {
-    config = defineConfig(config, {
-      background: false,
-      sideEffects: true,
-    });
-
+  public rebuildSelector(config: StateRuntimeJobConfigInterface = {}) {
     // Set Selector Value to undefined if Item doesn't exist
     if (!this.item || this.item.isPlaceholder) {
-      this._value = undefined;
+      this.set(undefined, config);
       return;
     }
 
-    // Assign ItemValue to Selector
-    this.nextStateValue = copy(this.item?.value);
-
-    // Fix initialStateValue and previousStateValue if they are still set from the Placeholder
-    if (equal(this.item.initialStateValue, { id: this.itemKey }))
-      this.item.initialStateValue = copy(this.item?.nextStateValue);
-    if (equal(this.item.previousStateValue, { id: this.itemKey }))
-      this.item.previousStateValue = copy(this.nextStateValue);
-
-    // Ingest nextStateValue into Runtime
-    this.ingest(config);
+    // Set Selector Value to updated Item Value
+    this.set(this.item._value, config);
   }
 }
 
@@ -139,18 +177,9 @@ export type SelectorKey = string | number;
 
 /**
  * @param key - Key/Name of Selector
+ * @param isPlaceholder - If Selector is initially a Placeholder
  */
 export interface SelectorConfigInterface {
   key?: SelectorKey;
-}
-
-/**
- * @param background - If selecting a new Item happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of Selector get executed
- * @param force - Force to select ItemKey
- */
-export interface SelectConfigInterface {
-  background?: boolean;
-  sideEffects?: boolean;
-  force?: boolean;
+  isPlaceholder?: boolean;
 }

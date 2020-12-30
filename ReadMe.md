@@ -22,16 +22,16 @@ _Agile is a global state and logic framework for reactive Typescript & Javascrip
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
 
-##### Agile is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
+### Agile is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
 Agile has a similar syntax as [PulseJs](https://pulsejs.org/) and works slightly different under the hood. 
 Maybe a little more sophisticated and extensible
-**BUT** I would recommend you to use PulfseJS right away as it is supported by a cool community and has nearly all features AgileTs offers.
+**BUT** I would recommend to use PulseJS right away as it is supported by a cool community and has nearly all features AgileTs offers.
 
 | Name                                                                     |                                                                               Latest Version                                                                                |
 | ------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [@agile-ts/core](/packages/core)                                         |                 [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                     |
-| [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                            |
-| [@agile-ts/api](/packages/api)                                           |              [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                              |
+| [@agile-ts/core](/packages/core)                                         |                 [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                 |
+| [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 |
+| [@agile-ts/api](/packages/api)                                           |              [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                      |
      
 <div align="center">
   <img src="https://i.pinimg.com/originals/66/70/fd/6670fd61b91760bf8f04ca0479a2e0d1.gif">

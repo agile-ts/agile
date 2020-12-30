@@ -1,0 +1,34 @@
+name: Release
+on:
+  push:
+    branches: [master]
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout Project
+      - name: 📚 Checkout
+        uses: actions/checkout@v2
+
+        # Setup NodeJS
+      - name: 🟢 Setup Node ${{ matrix.node_version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+        # Install Dependencies
+      - name: ⏳ Install
+        run: yarn install
+
+        # Create Release Pull Request
+      - name: 📤 Create Release Pull Request or Publish to NPM
+        uses: changesets/action@master
+        with:
+          publish: yarn release
+          commit: Version Release
+          title: Next Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

@@ -1,4 +1,4 @@
-import { State, Agile, Event, Collection } from "./internal";
+import { State, Agile, Event, Collection, Observer } from "./internal";
 
 //=========================================================================================================
 // Copy
@@ -6,14 +6,19 @@ import { State, Agile, Event, Collection } from "./internal";
 /**
  * @internal
  * Creates a fresh copy of an Array/Object
+ * https://www.samanthaming.com/tidbits/70-3-ways-to-clone-objects/
  * @param value - Array/Object that gets copied
  */
-export function copy<T = any>(value: T): T;
-export function copy<T extends Array<T>>(value: T): T[];
-export function copy<T = any>(value: T): T | T[] {
-  if (Array.isArray(value)) return [...value];
-  if (isValidObject(value)) return { ...value };
-  return value;
+export function copy<T = any>(value: T): T {
+  // Extra checking '!value' because 'typeof null === object'
+  if (!value || typeof value !== "object") return value;
+  let temp;
+  let newObject: any = Array.isArray(value) ? [] : {};
+  for (let property in value) {
+    temp = value[property];
+    newObject[property] = typeof temp === "object" ? copy(temp) : temp;
+  }
+  return newObject as T;
 }
 
 //=========================================================================================================
@@ -48,17 +53,38 @@ export function isValidObject(value: any): boolean {
 }
 
 //=========================================================================================================
+// Includes Array
+//=========================================================================================================
+/**
+ * @internal
+ * Check if array1 contains all elements of array2
+ * @param array1 - Array 1
+ * @param array2 - Array 2
+ */
+export function includesArray<DataType = any>(
+  array1: Array<DataType>,
+  array2: Array<DataType>
+): boolean {
+  return array2.every((element) => array1.includes(element));
+}
+
+//=========================================================================================================
 // Normalize Array
 //=========================================================================================================
 /**
  * @internal
  * Transforms Item/s to an Item Array
  * @param items - Item/s that gets transformed to an Array
+ * @param config - Config
  */
 export function normalizeArray<DataType = any>(
-  items?: DataType | Array<DataType>
+  items?: DataType | Array<DataType>,
+  config: { createUndefinedArray?: boolean } = {}
 ): Array<DataType> {
-  if (!items) return [];
+  config = defineConfig(config, {
+    createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
+  });
+  if (!items && !config.createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 
@@ -67,24 +93,26 @@ export function normalizeArray<DataType = any>(
 //=========================================================================================================
 /**
  * @internal
- * Tries to get an AgileInstance from provided instance
- * If no agileInstance found it returns the global AgileInstance
- * @param instance - Instance that might hold an AgileInstance
+ * Tries to get an Instance of Agile from provided Instance
+ * If no agileInstance found it returns the global bound Agile Instance
+ * @param instance - Instance that might hold an Agile Instance
  */
 export function getAgileInstance(instance: any): Agile | undefined {
   try {
-    // Try to find agileInstance in Instance
-    if (instance instanceof State) return instance.agileInstance();
-    if (instance instanceof Event) return instance.agileInstance();
-    if (instance instanceof Collection) return instance.agileInstance();
-    const _instance = instance["agileInstance"];
-    if (_instance) return instance;
+    // Try to get agileInstance from passed Instance
+    if (instance) {
+      const _agileInstance = isFunction(instance["agileInstance"])
+        ? instance["agileInstance"]()
+        : instance["agileInstance"];
+      if (_agileInstance) return _agileInstance;
+    }
 
-    // Return global bound agileInstance (set in first instantiation of Agile)
-    return globalThis.__agile__;
+    // Return global bound agileInstance
+    return globalThis["__agile__"];
   } catch (e) {
-    // fail silently
+    Agile.logger.error("Failed to get Agile Instance from ", instance);
   }
+
   return undefined;
 }
 
@@ -109,7 +137,12 @@ export function isFunction(value: any): boolean {
  * @param value - Value that gets tested if its an async function
  */
 export function isAsyncFunction(value: any): boolean {
-  return isFunction(value) && value.constructor.name === "AsyncFunction";
+  const valueString = value.toString();
+  return (
+    isFunction(value) &&
+    (value.constructor.name === "AsyncFunction" ||
+      valueString.includes("__awaiter"))
+  );
 }
 
 //=========================================================================================================
@@ -124,10 +157,10 @@ export function isAsyncFunction(value: any): boolean {
 export function isValidUrl(url: string): boolean {
   const pattern = new RegExp(
     "^(https?:\\/\\/)?" + // protocol
-    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-    "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
       "(\\#[-a-z\\d_]*)?$",
     "i"
   );
@@ -143,6 +176,7 @@ export function isValidUrl(url: string): boolean {
  * @param value - Value that gets checked
  */
 export function isJsonString(value: any): boolean {
+  if (typeof value !== "string") return false;
   try {
     JSON.parse(value);
   } catch (e) {
@@ -159,11 +193,23 @@ export function isJsonString(value: any): boolean {
  * Merges default values/properties into config object
  * @param config - Config object that receives default values
  * @param defaults - Default values object that gets merged into config object
+ * @param overwriteUndefinedProperties - If undefined Properties in config gets overwritten by the default value
  */
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
-  defaults: Object
+  defaults: Object,
+  overwriteUndefinedProperties?: boolean
 ): ConfigInterface {
+  if (overwriteUndefinedProperties === undefined)
+    overwriteUndefinedProperties = true;
+
+  if (overwriteUndefinedProperties) {
+    const finalConfig = { ...defaults, ...config };
+    for (let key in finalConfig)
+      if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
+    return finalConfig;
+  }
+
   return { ...defaults, ...config };
 }
 
@@ -227,7 +273,7 @@ export function equal(value1: any, value2: any): boolean {
  * @param value2 - Second Value
  */
 export function notEqual(value1: any, value2: any): boolean {
-  return value1 !== value2 && JSON.stringify(value1) !== JSON.stringify(value2);
+  return !equal(value1, value2);
 }
 
 //=========================================================================================================
@@ -238,7 +284,7 @@ export function notEqual(value1: any, value2: any): boolean {
  * Generates random Id
  * @param length - Length of generated Id
  */
-export function generateId(length?: number) {
+export function generateId(length?: number): string {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
@@ -258,9 +304,15 @@ export function generateId(length?: number) {
  * Clones a Class
  * @param instance - Instance of Class you want to clone
  */
-export function clone<T>(instance: T): T {
-  const copy: T = Object.create(Object.getPrototypeOf(instance));
-  return Object.assign(copy, instance);
+export function clone<T = any>(instance: T): T {
+  // Clone Class
+  const objectCopy: T = Object.create(Object.getPrototypeOf(instance));
+  const objectClone = Object.assign(objectCopy, instance);
+
+  // Copy Properties of Class
+  for (let key in objectClone) objectClone[key] = copy(objectClone[key]);
+
+  return objectClone;
 }
 
 //=========================================================================================================
@@ -268,18 +320,30 @@ export function clone<T>(instance: T): T {
 //=========================================================================================================
 /**
  * @internal
- * Binds Instance Global
+ * Binds passed Instance globally at passed Key
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
- * @param key - Key of Instance
- * @param instance - Instance which becomes globally accessible (globalThis.key)
+ * https://blog.logrocket.com/what-is-globalthis-why-use-it/
+ * @param key - Key/Name of Instance
+ * @param instance - Instance
+ * @param overwrite - If already existing instance at passed Key gets overwritten
  */
-export function globalBind(key: string, instance: any) {
+export function globalBind(
+  key: string,
+  instance: any,
+  overwrite = false
+): boolean {
   try {
-    if (!globalThis[key]) globalThis[key] = instance;
+    if (overwrite) {
+      globalThis[key] = instance;
+      return true;
+    }
+
+    if (!globalThis[key]) {
+      globalThis[key] = instance;
+      return true;
+    }
   } catch (e) {
-    console.warn(
-      `Agile: Failed to create global Instance called '${name}'`,
-      instance
-    );
+    Agile.logger.error(`Failed to create global Instance called '${key}'`);
   }
+  return false;
 }
