@@ -2,6 +2,7 @@
  > Spacy State Management Framework for reactive Applications
 
  <br />
+ <br />
  
  <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
