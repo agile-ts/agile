@@ -22,62 +22,42 @@
 #### 🚅 Straightforward
 Write minimalistic, boilerplate free code with a moderate lerning curve.
 
-**For Instance**  <br />
-
-- Store State in Storage
-  ```
-  const MY_STATE = App.State("Hello there").persist("persist-key");
-  ```
-
-- Create an Collection of States
-  ```
-  const MY_COLLECTION = App.Collection();
-  MY_COLLECTION.collect({id: "1", name: "Jeff"});
-  MY_COLLECTION.collect({id: "2", name: "Hans"});
-  ```
-  
-- Create State that computes its return Value depending on used Agile Instances (State, ..)
-  ```
-  const MY_COMPUTED = App.Computed(() => {
-    return ´${MY_STATE.value}_${MY_STATE2.value}´
-  });
-  ```
+#### 🤸‍ Flexible
+Use Agile with any UI-Layer and the workflow that suits you the best. <br />
+-> You aren't bound to reducers, actions, dispatches, ..
 
 #### 🎯 Easy to Use
-Learn the powerfull tools of Agile in a short amount of time.
-
-#### 🤸‍ Flexible
-Use any UI-Layer and the workflow that suits you the best.
+Learn the powerful and simple tools of Agile in a short amount of time.
 
 #### ⛳️ Centralize
-Manage your Application Logic central outside of any UI-Framework.
+Manage your Application Logic central, outside of any UI-Framework.
 
 ## 🚀 Get Started (React)
 
 **1. ⬇️ Install Core** <br />
-_Brain of AgileTs that handles your States, Collections, Events, .._
+_The Brain of Agile that handels your States, Collections, .._
 ```
 npm install @agile-ts/core
 ```
 
 **2. ⬇️ Install React Integration** <br />
-_Integration for React that helps you subscribing your States in your Components_
+_Integration to use Agile with React_
 ```
 npm install @agile-ts/react
 ```
 
-**3. 🎲 Simple Example** <br />
-```ts
-// Create an Instance of Agile that holds and handles your States
+**3. 🎲 Let's create your first State** <br />
+```tsx
+// At first we have to create an Instance of Agile
 const App = new Agile();
 
-// Create State that has a initial Value of "Hello Stranger!"
+// Now we can create a State which has a initial Value of "Hello Stranger!"
 const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // Your React Component
 const RandomComponent = () => {
-    // Subscribe State to Component and get current Value from It
-    const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
+    // In our Component we can subscribe the State with the React Integration
+    const myFirstState = useAgile(MY_FIRST_STATE); // returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
         <div>                                                 //       |  Now the State Value gets changed to
