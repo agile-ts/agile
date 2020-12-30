@@ -40,7 +40,7 @@ npm install @agile-ts/react
 ```
 
 **3. Simple Example** <br />
-_If you can't believe the simplicity test it [here](https://agile-ts.org/)_
+_If you can't believe the simplicity test it [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
 ```ts
 // Create an Instance of Agile that holds and handles your States
 const App = new Agile();
