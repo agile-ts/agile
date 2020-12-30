@@ -9,10 +9,11 @@
     "build": "lerna run build",
     "watch": "lerna run watch",
     "test": "jest",
-    "new-version": "lerna version --conventional-commits --yes",
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
-    "package-install": "lerna exec npm install"
+    "package-install": "lerna exec npm install",
+    "bump-version": "changeset",
+    "release": "lerna run build && changeset publish"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,8 @@
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "@changesets/cli": "^2.12.0"
   },
   "workspaces": [
     "packages/*"
