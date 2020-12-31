@@ -2,7 +2,7 @@
   "name": "@agile-ts/api",
   "version": "0.0.6",
   "author": "BennoDev",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://agile-ts.org/",
   "description": "API extension for AgileTs",
   "keywords": [],

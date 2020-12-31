@@ -2,7 +2,7 @@
   "name": "@agile-ts/multieditor",
   "version": "0.0.6",
   "author": "BennoDev",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://agile-ts.org/",
   "description": "Form Editor extension for AgileTS.",
   "keywords": [],
