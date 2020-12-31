@@ -29,6 +29,8 @@
     "url": "https://github.com/agile-ts/agile.git"
   },
   "files": [
-    "dist/**/*"
+    "dist",
+    "LICENSE",
+    "README.md"
   ]
 }

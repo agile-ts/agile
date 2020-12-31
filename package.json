@@ -7,14 +7,13 @@
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
-    "prepublish": "lerna run prepublish",
     "watch": "lerna run watch",
     "test": "jest",
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec npm install",
     "version-bump": "changeset",
-    "release": "lerna run build && changeset publish"
+    "release": "lerna run prepublish && changeset publish"
   },
   "repository": {
     "type": "git",
