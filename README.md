@@ -18,7 +18,8 @@
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
 
-## 🛠 Simple Example with React
+## 🚀 Look how easy it is 
+Blow example is based on React
 ```tsx
 // At first we have to create an Instance of Agile
 const App = new Agile();
@@ -47,17 +48,19 @@ const RandomComponent = () => {
 }
 ```
 _You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
+<br />
+or do you want to find out [more](https://www.agile-ts.org/docs)?
 
 
 ## ❓ Why Agile
 
 #### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. <br />
-Do you want to store a State in the Local Storage? No Problem 
+_Do you want to store a State in the Local Storage?_
 ```ts
 const MY_STORED_STATE = App.State("Jeff").persist("storage-key")
 ```
-or do you need a reactive Collection of States? Nothing easier than that
+_or do you need a reactive Collection of States?_
 ```ts
 const MY_COLLECTION = App.Collection();
 MY_COLLECTION.collect({id: 1, name: "Frank"});
@@ -65,18 +68,20 @@ MY_COLLECTION.collect({id: 2, name: "Dieter"});
 ```
 
 #### 🤸‍ Flexible
-Use Agile with any UI-Layer and a workflow that suits you the best. <br />
--> You are NOT bound to reducers, actions, dispatches, ..
+Agile can be used in nearly every UI-Framework 
+and surly works with the workflow that suits you best, 
+since Agile is not bound to dispatches, reducers, ..
 
 #### 🎯 Easy to Use
 Learn the powerful and simple tools of Agile in a short amount of time.
 
 #### ⛳️ Centralize
-Manage your Application Logic central, outside of any UI-Framework. <br />
-This makes your code decoupled, portable, and above all, easily testable. 
+Manage your Application Logic outside of any UI-Framework in a central place. <br />
+This makes your application logic decoupled, portable, and above all, easily testable. 
 
 #### 🍃 Lightweight
-[52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) and 0 dependencies
+Agile has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
+and 0 dependencies.
 
 
 ## ⬇️ Installation
