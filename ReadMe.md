@@ -27,14 +27,14 @@ const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // Our cool React Component
 const RandomComponent = () => {
-    // In our Component we can subscribe the State with 'useAgile' from the React Integration
+    // With 'useAgile' we can bind the State to this Component
     const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
-        <div>                                                 //       |  Throught the 'set' action the State Value g
-            <p>{myFirstState}</p>                             //       |  ets changed  to "Hello Friend!" 
+        <div>                                                 //       |  Throught the 'set' action the State Value 
+            <p>{myFirstState}</p>                             //       |  gets changed  to "Hello Friend!" 
             <button                                           //       |  and causes a rerender on this Component.
-                onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend"
+                onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend!"
                     // Lets's update the State Value          //       |
                     MY_FIRST_STATE.set("Hello Friend!") // -------------
                 }}
@@ -56,7 +56,7 @@ Do you want to store a State in the Local Storage? No Problem
 ```ts
 const MY_STORED_STATE = App.State("Jeff").persist("storage-key")
 ```
-or do you need a reactive Collection of States. Nothing easier than that
+or do you need a reactive Collection of States? Nothing easier than that
 ```ts
 const MY_COLLECTION = App.Collection();
 MY_COLLECTION.collect(id: 1, name: "Frank");
@@ -87,7 +87,8 @@ npm install @agile-ts/react
 ```
 Now we have to install a fitting integration for the Framework we are using.. in my case React.
 <br />
-And that't it.. if you want to find out more take a look into the [docs](https://agile-ts.org/docs/)
+<br />
+_And that't it.. if you want to find out more take a look into the [docs](https://agile-ts.org/docs/)_
 
 
 ## 🗂 Packages of Agile
@@ -100,6 +101,9 @@ And that't it.. if you want to find out more take a look into the [docs](https:/
 
 ## 📄 Documentation
 The Agile Docs are located [here](https://agile-ts.org/docs/)
+
+## 👨‍💻 Contribute
+Feel free to contribute
 
 
 ## 🌠 Credits
