@@ -18,17 +18,17 @@
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
 
-## 🚀 Look how easy it is (React)
+## 🛠 Simple Example with React
 ```tsx
 // At first we have to create an Instance of Agile
 const App = new Agile();
 
-// Now we can create a State which has a initial Value of "Hello Stranger!"
+// Now we can create a State which has an initial Value of "Hello Stranger!"
 const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // Our cool React Component
 const RandomComponent = () => {
-    // With 'useAgile' we bind the State to this Component
+    // With 'useAgile' we bind the State to the 'RandomComponent'
     const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
@@ -84,12 +84,12 @@ This makes your code decoupled, portable, and above all, easily testable.
 ```
 npm install @agile-ts/core
 ```
-To use Agile we have to install the _core_ package, its the brain and handles your States, Collections, ..
+To use Agile we have to install the _core_ package, it's the brain and handles your States, Collections, ..
 <br />
 ```
 npm install @agile-ts/react
 ```
-In addition we need to install a _fitting integration_ for the Framework we are using.. in my case React.
+In addition, we need to install a _fitting integration_ for the Framework we are using.. in my case React.
 
 
 ## 📄 Documentation

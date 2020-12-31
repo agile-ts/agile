@@ -1,6 +1,6 @@
 # React Integration
 
-> Package for combining Agile with React or React-Native
+> Package to combine Agile with React or React-Native
 
 <a href="https://npm.im/@agile-ts/react">
   <img src="https://img.shields.io/npm/v/@agile-ts/react.svg" alt="npm version"></a>
@@ -13,9 +13,71 @@
 <a href="https://npm.im/@agile-ts/react">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/react.svg" alt="npm minified size"></a>
   
-  ## Fitting Versions
-  | @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
-  | --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
-  | v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
-  | v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
-  _Other Versions aren't supported anymore_
+## ⬇️ Installation
+```
+npm install @agile-ts/react
+```
+_Be aware that this is no standalone package!_
+    
+## Functional Components: `useAgile`
+`useAgile` is a React Hook that helps you to bind a Component to an Agile Instance (State, Collection, ..).
+This is necessary to cause a rerender on this Component if the bound State Value has changed.
+The Hook does return the current `output` of this Instance.
+```ts
+const myCoolState = useAgile(MY_COOL_STATE); 
+```
+If `MY_COOL_STATE` has a value of _"Frank"_ the `useAgile` Hook returns the value _"Frank"_
+and subscribes the Component to cause a rerender if the State value changes.
+<br />
+<br />
+It is also possible to bind more than one Agile Instance to a Component at once
+```ts
+  const [myCoolState1, myCoolStat2] = useAgile([MY_COOL_STATE1, MY_COOL_STATE2]);
+  ```
+
+#### 🛠 [Simple Example](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)
+```tsx
+  const App = new Agile();
+  const MY_FIRST_STATE = App.State("Hello Stranger!");
+  
+  const RandomComponent = () => {
+      // With 'useAgile' we bind the State to the 'RandomComponent'
+      const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
+                                                                //       ^
+      return (                                                  //       |
+          <div>                                                 //       |  Throught the 'set' action the State Value 
+              <p>{myFirstState}</p>                             //       |  gets changed to "Hello Friend!" 
+              <button                                           //       |  and causes a rerender on this Component.
+                  onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend!"
+                      // Lets's update the State Value          //       |
+                      MY_FIRST_STATE.set("Hello Friend!") // -------------
+                  }}
+              >
+                  Update State
+              </button>
+          </div>
+      );
+  }
+```
+
+## Class Component: `AgileHOC`
+`AgileHOC` is a class that gets wrapped around a Component Class to update its props
+ based on the State Value and cause rerender
+```tsx
+class Component extends React.Component {
+  render() {
+    return <h1>Hi {this.props.myCoolState}</h1>;
+  }
+}
+
+export default AgileHOC(Component, [MY_COOL_STATE]);`);
+```
+If `MY_COOL_STATE` has a value of _"Frank"_ `this.props.myCoolState` returns the value _"Frank"_.
+The name `myCoolState` is based on the State Key!
+
+## 🔑 Fitting Versions
+| @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
+| --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
+| v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
+| v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
+_Other Versions aren't supported anymore_
