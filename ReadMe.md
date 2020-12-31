@@ -1,6 +1,6 @@
  <img src="https://agile-ts.org/img/header_background.svg" alt="Banner">
  
- > Spacy State Management Framework for reactive Applications
+ > **Spacy**, **Simple**, **Scalable** State Management Framework
  
  <br />
 
@@ -16,37 +16,8 @@
   <img src="https://img.shields.io/github/languages/code-size/agile-ts/agile.svg" alt="GitHub Code Size"></a>
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
-  
-## ❓ Why Agile
 
-#### 🚅 Straightforward
-Write minimalistic, boilerplate free code with a moderate lerning curve.
-
-#### 🤸‍ Flexible
-Use Agile with any UI-Layer and the workflow that suits you the best. <br />
--> You aren't bound to reducers, actions, dispatches, ..
-
-#### 🎯 Easy to Use
-Learn the powerful and simple tools of Agile in a short amount of time.
-
-#### ⛳️ Centralize
-Manage your Application Logic central, outside of any UI-Framework.
-
-## 🚀 Get Started (React)
-
-**1. ⬇️ Install Core** <br />
-_The Brain of Agile that handels your States, Collections, .._
-```
-npm install @agile-ts/core
-```
-
-**2. ⬇️ Install React Integration** <br />
-_Integration to use Agile with React_
-```
-npm install @agile-ts/react
-```
-
-**3. 🎲 Let's create your first State** <br />
+## 🚀 Look how easy it is (React)
 ```tsx
 // At first we have to create an Instance of Agile
 const App = new Agile();
@@ -54,17 +25,17 @@ const App = new Agile();
 // Now we can create a State which has a initial Value of "Hello Stranger!"
 const MY_FIRST_STATE = App.State("Hello Stranger!");
 
-// Your React Component
+// Our cool React Component
 const RandomComponent = () => {
-    // In our Component we can subscribe the State with the React Integration
-    const myFirstState = useAgile(MY_FIRST_STATE); // returns "Hello Stranger!"
+    // In our Component we can subscribe the State with 'useAgile' from the React Integration
+    const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
-        <div>                                                 //       |  Now the State Value gets changed to
-            <p>{myFirstState}</p>                             //       |  "Hello Friend!" and causes a rerender 
-            <button                                           //       |  on this Component.
+        <div>                                                 //       |  Throught the 'set' action the State Value g
+            <p>{myFirstState}</p>                             //       |  ets changed  to "Hello Friend!" 
+            <button                                           //       |  and causes a rerender on this Component.
                 onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend"
-                    // Update State Value to "Hello Friend!"  //       |
+                    // Lets's update the State Value          //       |
                     MY_FIRST_STATE.set("Hello Friend!") // -------------
                 }}
             >
@@ -74,7 +45,49 @@ const RandomComponent = () => {
     );
 }
 ```
-_If you can't believe the simplicity, convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
+_You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
+
+
+## ❓ Why Agile
+
+#### 🚅 Straightforward
+Write minimalistic, boilerplate free code that captures your intent. <br />
+Do you want to store a State in the Local Storage? No Problem 
+```ts
+const MY_STORED_STATE = App.State("Jeff").persist("storage-key")
+```
+or do you need a reactive Collection of States. Nothing easier than that
+```ts
+const MY_COLLECTION = App.Collection();
+MY_COLLECTION.collect(id: 1, name: "Frank");
+MY_COLLECTION.collect(id: 2, name: "Dieter");
+```
+
+#### 🤸‍ Flexible
+Use Agile with any UI-Layer and a workflow that suits you the best. <br />
+-> You are NOT bound to reducers, actions, dispatches, ..
+
+#### 🎯 Easy to Use
+Learn the powerful and simple tools of Agile in a short amount of time.
+
+#### ⛳️ Centralize
+Manage your Application Logic central, outside of any UI-Framework.
+This makes your code decoupled, portable, and above all, easily testable. 
+
+
+## ⬇️ Installation
+
+```
+npm install @agile-ts/core
+```
+To use Agile we need the 'core', its the Brain of Agile and handles your States, Collections, ..
+
+```
+npm install @agile-ts/react
+```
+Now we have to install a fitting integration for the Framework we are using.. in my case React.
+<br />
+And that't it.. if you want to find out more take a look into the [docs](https://agile-ts.org/docs/)
 
 
 ## 🗂 Packages of Agile
@@ -89,5 +102,5 @@ _If you can't believe the simplicity, convince yourself [here](https://codesandb
 The Agile Docs are located [here](https://agile-ts.org/docs/)
 
 
-## 😎 Inspiration
-- Syntax of Agile is Inspired by [PulseJs](https://github.com/pulse-framework/pulse)
+## 🌠 Credits
+AgileTs is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
