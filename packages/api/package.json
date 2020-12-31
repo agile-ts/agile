@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "BennoDev",
   "license": "ISC",
   "homepage": "https://agile-ts.org/",
@@ -19,7 +19,7 @@
     "@agile-ts/core": "file:../core"
   },
   "peerDependencies": {
-    "@agile-ts/core": "^0.0.4"
+    "@agile-ts/core": "^0.0.6"
   },
   "publishConfig": {
     "access": "public"
