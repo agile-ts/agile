@@ -17,6 +17,7 @@
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
+
 ## 🚀 Look how easy it is (React)
 ```tsx
 // At first we have to create an Instance of Agile
@@ -27,12 +28,12 @@ const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // Our cool React Component
 const RandomComponent = () => {
-    // With 'useAgile' we can bind the State to this Component
+    // With 'useAgile' we bind the State to this Component
     const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
         <div>                                                 //       |  Throught the 'set' action the State Value 
-            <p>{myFirstState}</p>                             //       |  gets changed  to "Hello Friend!" 
+            <p>{myFirstState}</p>                             //       |  gets changed to "Hello Friend!" 
             <button                                           //       |  and causes a rerender on this Component.
                 onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend!"
                     // Lets's update the State Value          //       |
@@ -59,8 +60,8 @@ const MY_STORED_STATE = App.State("Jeff").persist("storage-key")
 or do you need a reactive Collection of States? Nothing easier than that
 ```ts
 const MY_COLLECTION = App.Collection();
-MY_COLLECTION.collect(id: 1, name: "Frank");
-MY_COLLECTION.collect(id: 2, name: "Dieter");
+MY_COLLECTION.collect({id: 1, name: "Frank"});
+MY_COLLECTION.collect({id: 2, name: "Dieter"});
 ```
 
 #### 🤸‍ Flexible
@@ -71,8 +72,11 @@ Use Agile with any UI-Layer and a workflow that suits you the best. <br />
 Learn the powerful and simple tools of Agile in a short amount of time.
 
 #### ⛳️ Centralize
-Manage your Application Logic central, outside of any UI-Framework.
+Manage your Application Logic central, outside of any UI-Framework. <br />
 This makes your code decoupled, portable, and above all, easily testable. 
+
+#### 🍃 Lightweight
+[52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) and 0 dependencies
 
 
 ## ⬇️ Installation
@@ -80,15 +84,16 @@ This makes your code decoupled, portable, and above all, easily testable.
 ```
 npm install @agile-ts/core
 ```
-To use Agile we need the 'core', its the Brain of Agile and handles your States, Collections, ..
-
+To use Agile we have to install the _core_ package, its the brain and handles your States, Collections, ..
+<br />
 ```
 npm install @agile-ts/react
 ```
-Now we have to install a fitting integration for the Framework we are using.. in my case React.
-<br />
-<br />
-_And that't it.. if you want to find out more take a look into the [docs](https://agile-ts.org/docs/)_
+In addition we need to install a _fitting integration_ for the Framework we are using.. in my case React.
+
+
+## 📄 Documentation
+The Agile Docs are located [here](https://agile-ts.org/docs/)
 
 
 ## 🗂 Packages of Agile
@@ -99,8 +104,6 @@ _And that't it.. if you want to find out more take a look into the [docs](https:
 | [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Simple Api                                |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
 
-## 📄 Documentation
-The Agile Docs are located [here](https://agile-ts.org/docs/)
 
 ## 👨‍💻 Contribute
 Feel free to contribute
