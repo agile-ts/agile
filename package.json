@@ -7,6 +7,7 @@
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
+    "prepublish": "lerna run prepublish",
     "watch": "lerna run watch",
     "test": "jest",
     "new-version": "lerna version --conventional-commits --yes",
