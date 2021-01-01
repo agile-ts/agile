@@ -17,18 +17,18 @@
 ```
 npm install @agile-ts/react
 ```
-_Be aware that this is no standalone package!_
+_Be aware that this is no standalone package!_ <br />
+To use Agile with React you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
+To find out more take a look into the [docs](https://www.agile-ts.org/docs).
     
-## Functional Components: `useAgile`
-`useAgile` is a React Hook that helps you to bind a Component to an Agile Instance (State, Collection, ..).
-This is necessary to cause a rerender on this Component if the bound State Value has changed.
-The Hook does return the current `output` of this Instance.
+## 🎚 Functional Components: `useAgile`
+`useAgile` is a React Hook that helps you to bind an Agile Instance (State, Collection, ..) to a React Component.
+This is necessary to cause rerender on the Component if the bound State Value has changed.
+The Hook does return the current `output` of the Agile Instance.
 ```ts
 const myCoolState = useAgile(MY_COOL_STATE); 
 ```
-If `MY_COOL_STATE` has a value of _"Frank"_ the `useAgile` Hook returns the value _"Frank"_
-and subscribes the Component to cause a rerender if the State value changes.
-<br />
+-> If `MY_COOL_STATE` has the Value _"Frank"_ the `useAgile` Hook returns _"Frank"_.
 <br />
 It is also possible to bind more than one Agile Instance to a Component at once
 ```ts
@@ -41,7 +41,7 @@ It is also possible to bind more than one Agile Instance to a Component at once
   const MY_FIRST_STATE = App.State("Hello Stranger!");
   
   const RandomComponent = () => {
-      // With 'useAgile' we bind the State to the 'RandomComponent'
+      // With 'useAgile' we bind our State to the 'RandomComponent'
       const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                                 //       ^
       return (                                                  //       |
@@ -60,9 +60,9 @@ It is also possible to bind more than one Agile Instance to a Component at once
   }
 ```
 
-## Class Component: `AgileHOC`
+## 🗿 Class Component: `AgileHOC`
 `AgileHOC` is a class that gets wrapped around a Component Class to update its props
- based on the State Value and cause rerender
+ based on the Agile Instances (State, Collection, ..) and causes rerender on it.
 ```tsx
 class Component extends React.Component {
   render() {
@@ -70,7 +70,7 @@ class Component extends React.Component {
   }
 }
 
-export default AgileHOC(Component, [MY_COOL_STATE]);`);
+export default AgileHOC(Component, [MY_COOL_STATE]);
 ```
 If `MY_COOL_STATE` has a value of _"Frank"_ `this.props.myCoolState` returns the value _"Frank"_.
 The name `myCoolState` is based on the State Key!
@@ -81,3 +81,6 @@ The name `myCoolState` is based on the State Key!
 | v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
 | v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
 _Other Versions aren't supported anymore_
+
+## 📄 Documentation
+The Agile Docs are located [here](https://agile-ts.org/docs/)

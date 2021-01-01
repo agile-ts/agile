@@ -1,4 +1,4 @@
-# Multi Editor
+# [WIP] Multi Editor
 
 > Simple Form Manager for UI-Frameworks
 
@@ -42,8 +42,8 @@ const multiEditor = new MultiEditor<string, boolean>((editor) => ({
   
   
   ## 🔑 Fitting Versions
-  | @agile-ts/api   | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
-  | --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
-  | v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
-  | v0.0.6          | v0.0.6                  | v6+                      | 16.8+                    | Yes                               | 
+  | @agile-ts/api   | @agile-ts/core          | NPM Version              | 
+  | --------------- | ----------------------- | ------------------------ | 
+  | v0.0.7          | v0.0.7+                 | v6+                      | 
+  | v0.0.6          | v0.0.6                  | v6+                      | 
   _Other Versions aren't supported anymore_

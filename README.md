@@ -19,7 +19,7 @@
 
 
 ## 🚀 Look how easy it is 
-Blow example is based on React
+Below example is based on React
 ```tsx
 // At first we have to create an Instance of Agile
 const App = new Agile();
@@ -29,7 +29,7 @@ const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // Our cool React Component
 const RandomComponent = () => {
-    // With 'useAgile' we bind the State to the 'RandomComponent'
+    // With the Hook 'useAgile' we bind the State to our 'RandomComponent'
     const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
@@ -47,12 +47,12 @@ const RandomComponent = () => {
     );
 }
 ```
-_You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)_
+_You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)._
 <br />
 or do you want to find out [more](https://www.agile-ts.org/docs)?
 
 
-## ❓ Why Agile
+## ❓ Why AgileTs
 
 #### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. <br />
@@ -76,12 +76,12 @@ since Agile is not bound to dispatches, reducers, ..
 Learn the powerful and simple tools of Agile in a short amount of time.
 
 #### ⛳️ Centralize
-Manage your Application Logic outside of any UI-Framework in a central place. <br />
+Manage your Application Logic outside of any UI-Framework in a central place.
 This makes your application logic decoupled, portable, and above all, easily testable. 
 
 #### 🍃 Lightweight
 Agile has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
-and 0 dependencies.
+and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
 
 ## ⬇️ Installation
@@ -94,7 +94,7 @@ To use Agile we have to install the _core_ package, it's the brain and handles y
 ```
 npm install @agile-ts/react
 ```
-In addition, we need to install a _fitting integration_ for the Framework we are using.. in my case React.
+In addition, we need to install a _fitting integration_ for the Framework we are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
 
 
 ## 📄 Documentation
