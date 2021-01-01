@@ -1,6 +1,10 @@
 import { Agile, globalBind } from "@agile-ts/core";
 
-const App = new Agile({ logJobs: true });
+const App = new Agile({
+  logConfig: {
+    active: true,
+  },
+});
 
 export default App;
 
