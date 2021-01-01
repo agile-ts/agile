@@ -30,4 +30,4 @@ jobs:
 
         # Build Packages for Testing
       - name: 🔨 Build Packages
-        run: yarn run build:test
+        run: yarn run build
