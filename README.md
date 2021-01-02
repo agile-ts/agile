@@ -1,4 +1,4 @@
- <img src="https://agile-ts.org/img/header_background.svg" alt="Banner">
+ <img src="./header.svg" alt="Banner">
  
  > **Spacy**, **Simple**, **Scalable** State Management Framework
  
