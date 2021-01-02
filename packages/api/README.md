@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/api.svg" alt="npm minified size"></a>
   
 ## ⏰ Short Example
+
 ```ts
 // Let't create our API
 const api = new API({
@@ -38,9 +39,20 @@ console.log(response);
 */
 ```
 
-## ❓ Why this Api?
+## ❓ Why Agile Api
 
-TODO
+#### 🚅 Straightforward
+Write minimalistic, boilerplate free code that captures your intent. <br />
+**For instance**
+- Automatic transform for JSON data
+- Configurable Timeout
+
+#### 🎯 Easy to Use
+Learn the powerful and simple tools of Agile Api in a short amount of time.
+
+#### 🍃 Lightweight
+Agile Api has an unpacked size of [10.1kB](https://bundlephobia.com/result?p=@agile-ts/api@0.0.6) 
+and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/api).
 
 ## ⬇️ Installation
 ```
@@ -51,9 +63,12 @@ To use Agile with the Api-Package you have to install the [Agile Core](https://w
 To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 
 
-## Fitting Versions
+## 🔑 Fitting Versions
 | @agile-ts/api   | @agile-ts/core          | NPM Version              | 
 | --------------- | ----------------------- | ------------------------ | 
 | v0.0.7          | v0.0.1+                 | v6+                      | 
 | v0.0.6          | v0.0.1+                 | v6+                      | 
 _Other Versions aren't supported anymore_
+
+## 📄 Documentation
+The Agile Api Docs are located [here](https://agile-ts.org/docs/)

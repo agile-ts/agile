@@ -16,7 +16,7 @@
 <br />
 <br />
 
-## ❓ Why a React Integration?
+## ❓ Why a React Integration
 We need this Integration to bind Agile Instances to Components.
 This is necessary because a Component needs to rerender
 if an Agile Instance mutates otherwise the Application wouldn't be reactive.
@@ -94,4 +94,4 @@ If an Agile Instance has no `output` it won't be listed in the props!
 _Other Versions aren't supported anymore_
 
 ## 📄 Documentation
-The Agile Docs are located [here](https://agile-ts.org/docs/)
+The React Integration Docs are located [here](https://agile-ts.org/docs/)
