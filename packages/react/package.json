@@ -2,17 +2,26 @@
   "name": "@agile-ts/react",
   "version": "0.0.6",
   "author": "BennoDev",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "React extension for AgileTs",
-  "keywords": [],
+  "description": "Extension to combine Agile with React or React-Native",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "react-component",
+    "react",
+    "reactjs",
+    "reactive",
+    "react-native"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev-publish": "yalc publish",
     "dev-push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\"",
+    "prepublish": "yarn run build"
   },
   "devDependencies": {
     "@types/react": "^16.9.51",
@@ -31,6 +40,8 @@
     "url": "https://github.com/agile-ts/agile.git"
   },
   "files": [
-    "dist/**/*"
+    "dist",
+    "LICENSE",
+    "README.md"
   ]
 }

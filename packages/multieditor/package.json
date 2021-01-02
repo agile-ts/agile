@@ -2,17 +2,26 @@
   "name": "@agile-ts/multieditor",
   "version": "0.0.6",
   "author": "BennoDev",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Form Editor extension for AgileTS.",
-  "keywords": [],
+  "description": "Simple Form Manager for UI-Frameworks",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "multi-editor",
+    "form",
+    "form-editor",
+    "form-manager",
+    "form-validator"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev-publish": "yalc publish",
     "dev-push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\"",
+    "prepublish": "yarn run build"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core"
@@ -28,6 +37,8 @@
     "url": "https://github.com/agile-ts/agile.git"
   },
   "files": [
-    "dist/**/*"
+    "dist",
+    "LICENSE",
+    "README.md"
   ]
 }

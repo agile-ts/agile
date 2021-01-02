@@ -1,9 +1,18 @@
 {
   "private": true,
-  "description": "Global state and logic framework for reactive Javascript & Typescript applications.",
   "author": "BennoDev",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://agile-ts.org/",
+  "description": "Spacy, Simple, Scalable State Management Framework",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "react-component",
+    "react",
+    "reactjs",
+    "reactive",
+    "simple"
+  ],
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
@@ -13,7 +22,7 @@
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec npm install",
     "version-bump": "changeset",
-    "release": "lerna run build && changeset publish"
+    "release": "lerna run prepublish && changeset publish"
   },
   "repository": {
     "type": "git",
