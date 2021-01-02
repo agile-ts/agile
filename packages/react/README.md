@@ -1,6 +1,6 @@
 # React Integration
 
-> Package to combine Agile with React or React-Native
+> Combines Agile with React or React-Native
 
 <a href="https://npm.im/@agile-ts/react">
   <img src="https://img.shields.io/npm/v/@agile-ts/react.svg" alt="npm version"></a>
@@ -12,16 +12,13 @@
   <img src="https://img.shields.io/npm/dt/@agile-ts/react.svg" alt="npm total downloads"></a>
 <a href="https://npm.im/@agile-ts/react">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/react.svg" alt="npm minified size"></a>
-  
-<br />
-<br />
 
 ## ❓ Why a React Integration
 We need this Integration to bind Agile Instances to Components.
 This is necessary because a Component needs to rerender
 if an Agile Instance mutates otherwise the Application wouldn't be reactive.
-And from outside it isn't possible to find out which Component has been bound to which Agile Instance. 
--> Agile doesn't know which Component has to be rerender when which Agile Instance changes.
+Unfortunately it isn't possible to find out which Agile Instance has been bound to the Component from outside. 
+-> Agile wouldn't know which Component has to be rerender when which Agile Instance changes.
 
   
 ## ⬇️ Installation
@@ -55,7 +52,7 @@ It is also possible to bind more than one Agile Instance to a Component at once.
       const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                                 //       ^
       return (                                                  //       |
-          <div>                                                 //       |  Throught the 'set' action the State Value 
+          <div>                                                 //       |  Through the 'set' action the State Value 
               <p>{myFirstState}</p>                             //       |  gets changed to "Hello Friend!" 
               <button                                           //       |  and causes a rerender on this Component.
                   onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend!"
@@ -71,8 +68,8 @@ It is also possible to bind more than one Agile Instance to a Component at once.
 ```
 
 ## 🗿 Class Component: `AgileHOC`
-`AgileHOC` is a class that gets wrapped around a Component Class, to update the Component props
-based on the Agile Instances Output (State, Collection, ..) and causes rerender on the wrapped Component.
+`AgileHOC` is a class that gets wrapped around a Component Class, to update the props of the Component
+based on the Agile Instances Output (State, Collection, ..) and to cause rerender on it.
 ```tsx
 class Component extends React.Component {
   render() {

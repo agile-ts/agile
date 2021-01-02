@@ -33,7 +33,7 @@ const RandomComponent = () => {
     const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                               //       ^
     return (                                                  //       |
-        <div>                                                 //       |  Throught the 'set' action the State Value 
+        <div>                                                 //       |  Through the 'set' action the State Value 
             <p>{myFirstState}</p>                             //       |  gets changed to "Hello Friend!" 
             <button                                           //       |  and causes a rerender on this Component.
                 onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend!"
@@ -48,8 +48,6 @@ const RandomComponent = () => {
 }
 ```
 _You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz)._
-<br />
-or do you want to find out [more](https://www.agile-ts.org/docs)?
 
 
 ## ❓ Why AgileTs
@@ -91,7 +89,6 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
 
 ## ⬇️ Installation
-
 ```
 npm install @agile-ts/core
 ```

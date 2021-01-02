@@ -77,7 +77,7 @@ and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multiedito
 npm install @agile-ts/multieditor
 ```
 _Be aware that this is no standalone package!_ <br />
-To use Agile with the Api-Package you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
+To use the Agile MultiEditor you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
 To find out more take a look into the [docs](https://www.agile-ts.org/docs).
   
   
@@ -87,3 +87,6 @@ To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 | v0.0.7          | v0.0.7+                 | v6+                      | 
 | v0.0.6          | v0.0.6                  | v6+                      | 
 _Other Versions aren't supported anymore_
+
+## 📄 Documentation
+The Agile Api Docs are located [here](https://agile-ts.org/docs/)

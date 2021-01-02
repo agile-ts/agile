@@ -14,7 +14,6 @@
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/api.svg" alt="npm minified size"></a>
   
 ## ⏰ Short Example
-
 ```ts
 // Let't create our API
 const api = new API({
@@ -57,7 +56,7 @@ and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/api).
 npm install @agile-ts/api
 ```
 _Be aware that this is no standalone package!_ <br />
-To use Agile with the Api-Package you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
+To use the Agile Api you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
 To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 
 
