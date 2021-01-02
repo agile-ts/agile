@@ -25,8 +25,6 @@ const api = new API({
 
 // Now we can create our first Request to 'https://myapp.com/hello'
 const response = await api.get('/hello');
-
-// The Response might look like that
 console.log(response);
 /* 
   {
@@ -51,7 +49,7 @@ Write minimalistic, boilerplate free code that captures your intent. <br />
 Learn the powerful and simple tools of Agile Api in a short amount of time.
 
 #### 🍃 Lightweight
-Agile Api has an unpacked size of [10.1kB](https://bundlephobia.com/result?p=@agile-ts/api@0.0.6) 
+Agile Api has an unpacked size of [2kB](https://bundlephobia.com/result?p=@agile-ts/api@0.0.6) 
 and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/api).
 
 ## ⬇️ Installation

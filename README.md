@@ -47,7 +47,7 @@ const RandomComponent = () => {
     );
 }
 ```
-_You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)._
+_You can't believe the simplicity?! Convince yourself [here](https://codesandbox.io/s/agilets-first-state-f12cz)._
 <br />
 or do you want to find out [more](https://www.agile-ts.org/docs)?
 

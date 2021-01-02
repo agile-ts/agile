@@ -28,24 +28,57 @@ const multiEditor = new MultiEditor(editor => ({
   fixedProperties: ["id"], // Properties that always get passed as data into the onSubmit function
   validateMethods: {
     email: editor.Validator().string().email().required(), // Email is requiered, a string and follows the Email regex
-    name: editor.Validator().string().max(10).min(2).required(), // Name is required, a string, has to be below 10 chars and more than 2 chars
+    name: editor.Validator().string().max(10).min(2).required(), // Name is required, a string, has to be shorter than 10 and longer than 2 chars
   },
   editableProperties: ["email", "name"], // Properties that can be edited
 }));
 
-// Now lets update the Email Property
+// Lets update the requiered properties to validate the Editor
 multiEditor.setValue("email", "test@test.com");
+multiEditor.setValue("name", "Jeff");
+
+// Now we can submit the Editor and see what the onSubmit will log
+multiEditor.submit();
+// Submited {
+//   id: "myId",
+//   name: "Jeff",
+//   email: "test@test.com"
+// }
 ```
-_[here](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js) you can find a live example._
+_Do you want to see it in action? Click [here](https://codesandbox.io/s/multieditor-yxt4x)._
 
 ## ❓ Why Agile MultiEditor
-TODO
+
+#### 🚅 Straightforward
+Write minimalistic, boilerplate free code that captures your intent. <br />
+**For instance**
+- Simple Validation
+  ```ts
+  // Email is requiered, a string and follows the Email regex
+  EDITOR.Validator().string().email().required()
+  ```
+- Compute Value
+  ```ts
+  // Force Name to be lowercase
+  name: (value) => {
+        return value.toLowerCase();
+      }
+  ```
+
+#### 🎯 Easy to Use
+Learn the powerful and simple tools of Agile MultiEditor in a short amount of time.
+
+#### 🍃 Lightweight
+Agile Api has an unpacked size of [14.1kB](https://bundlephobia.com/result?p=@agile-ts/multieditor@0.0.6)
+and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multieditor).
 
 ## ⬇️ Installation
 ```
 npm install @agile-ts/multieditor
 ```
-_Be aware that this is no standalone package!_
+_Be aware that this is no standalone package!_ <br />
+To use Agile with the Api-Package you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
+To find out more take a look into the [docs](https://www.agile-ts.org/docs).
   
   
 ## 🔑 Fitting Versions
