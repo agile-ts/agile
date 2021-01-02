@@ -4,8 +4,16 @@
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "React extension for AgileTs",
-  "keywords": [],
+  "description": "Extension to combine Agile with React or React-Native",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "react-component",
+    "react",
+    "reactjs",
+    "reactive",
+    "react-native"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

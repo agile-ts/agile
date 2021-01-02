@@ -4,8 +4,16 @@
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Form Editor extension for AgileTS.",
-  "keywords": [],
+  "description": "Simple Form Manager for UI-Frameworks",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "multi-editor",
+    "form",
+    "form-editor",
+    "form-manager",
+    "form-validator"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

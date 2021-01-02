@@ -5,7 +5,14 @@
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
   "description": "Spacy, Simple, Scalable State Management Framework",
-  "keywords": [],
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "state-management",
+    "state",
+    "typescript",
+    "reactive"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

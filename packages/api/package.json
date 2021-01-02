@@ -4,8 +4,14 @@
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "API extension for AgileTs",
-  "keywords": [],
+  "description": "Promise based HTTP request API for Node.js",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "api",
+    "promise-api",
+    "http-request"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
