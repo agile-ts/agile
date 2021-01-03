@@ -24,13 +24,13 @@
     "prepublish": "yarn run build"
   },
   "devDependencies": {
-    "@types/react": "^16.9.51",
-    "react": "^16.9.51",
-    "@agile-ts/core": "file:../core"
+    "@agile-ts/core": "file:../core",
+    "@types/react": "^17.0.0",
+    "react": "^17.0.1"
   },
   "peerDependencies": {
-    "react": "^16.13.1",
-    "@agile-ts/core": "^0.0.6"
+    "@agile-ts/core": "^0.0.6",
+    "react": "^16.13.1"
   },
   "publishConfig": {
     "access": "public"
