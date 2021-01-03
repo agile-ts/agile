@@ -2,23 +2,30 @@
   "name": "@agile-ts/api",
   "version": "0.0.6",
   "author": "BennoDev",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "API extension for AgileTs",
-  "keywords": [],
+  "description": "Promise based HTTP request API for Node.js",
+  "keywords": [
+    "agile",
+    "agile-ts",
+    "api",
+    "promise-api",
+    "http-request"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev-publish": "yalc publish",
     "dev-push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"npm run dev-push\""
+    "watch": "tsc-watch --onSuccess \"npm run dev-push\"",
+    "prepublish": "yarn run build"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core"
   },
   "peerDependencies": {
-    "@agile-ts/core": "^0.0.6"
+    "@agile-ts/core": "^0.0.5"
   },
   "publishConfig": {
     "access": "public"
@@ -28,6 +35,8 @@
     "url": "https://github.com/agile-ts/agile.git"
   },
   "files": [
-    "dist/**/*"
+    "dist",
+    "LICENSE",
+    "README.md"
   ]
 }
