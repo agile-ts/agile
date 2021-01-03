@@ -40,7 +40,9 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(
 MY_COLLECTION.collect({ id: "id1", name: "test" });
 MY_COLLECTION.collect({ id: "id2", name: "test2" }, "myGroup");
 MY_COLLECTION.update("id1", { id: "id1Updated", name: "testUpdated" });
-MY_COLLECTION.getGroup("myGroup")?.persist({ followCollectionPattern: true });
+MY_COLLECTION.getGroup("myGroup")?.persist({
+  followCollectionPersistKeyPattern: true,
+});
 
 console.log("Initial: myCollection ", clone(MY_COLLECTION));
 
