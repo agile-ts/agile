@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.7
+
+### Patch Changes
+
+- 7f89382: Updated ReadMe's
+
 ## 0.0.6
 
 ### Patch Changes
