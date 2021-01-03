@@ -19,7 +19,7 @@
     "build": "tsc",
     "dev-publish": "yalc publish",
     "dev-push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"npm run dev-push\"",
+    "watch": "tsc-watch --onSuccess \"yarn run dev-push\"",
     "prepublish": "node ./scripts/prepublish.js && yarn run build"
   },
   "publishConfig": {
