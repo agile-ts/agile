@@ -20,13 +20,13 @@
     "build": "tsc",
     "dev-publish": "yalc publish",
     "dev-push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"npm run dev-push\"",
-    "prepublish": "yarn run build"
+    "watch": "tsc-watch --onSuccess \"yarn run dev-push\"",
+    "release": "yarn run build"
   },
   "devDependencies": {
-    "@types/react": "^16.9.51",
-    "react": "^16.9.51",
-    "@agile-ts/core": "file:../core"
+    "@agile-ts/core": "file:../core",
+    "@types/react": "^17.0.0",
+    "react": "^17.0.1"
   },
   "peerDependencies": {
     "react": "^16.13.1",
