@@ -22,7 +22,7 @@
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec yarn install",
     "version-bump": "changeset",
-    "release": "lerna run prepublish && changeset publish"
+    "release": "lerna run release && changeset publish"
   },
   "repository": {
     "type": "git",
