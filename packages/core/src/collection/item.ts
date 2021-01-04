@@ -1,4 +1,11 @@
-import { State, Collection, DefaultItem, StateKey } from "../internal";
+import {
+  State,
+  Collection,
+  DefaultItem,
+  StateKey,
+  StateRuntimeJobConfigInterface,
+  defineConfig,
+} from "../internal";
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
   static updateGroupSideEffectKey = "rebuildGroup";
@@ -34,10 +41,30 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    * @internal
    * Updates Key/Name of State
    * @param value - New Key/Name of State
+   * @param config - Config
    */
-  public setKey(value: StateKey | undefined): this {
+  public setKey(
+    value: StateKey | undefined,
+    config: StateRuntimeJobConfigInterface = {}
+  ): this {
     super.setKey(value);
+    config = defineConfig(config, {
+      sideEffects: true,
+      background: false,
+      force: false,
+      storage: true,
+      overwrite: false,
+    });
     if (!value) return this;
+
+    // Update ItemKey in ItemValue
+    this.set(
+      {
+        ...{ [this.collection().config.primaryKey]: value },
+        ...this.nextStateValue,
+      },
+      config
+    );
 
     // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);
@@ -48,7 +75,11 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     );
 
     // Initial Rebuild
-    this.collection().rebuildGroupsThatIncludeItemKey(value);
+    this.collection().rebuildGroupsThatIncludeItemKey(value, {
+      background: config.background,
+      force: config.force,
+      sideEffects: config.sideEffects,
+    });
 
     return this;
   }
