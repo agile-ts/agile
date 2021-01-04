@@ -60,10 +60,6 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     });
     if (!value) return this;
 
-    // Update ItemKey in ItemValue
-    if (config.updateItemValuePrimaryKey)
-      this.patch({ [this.collection().config.primaryKey]: value }, config);
-
     // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);
 
@@ -72,12 +68,17 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
       this.collection().rebuildGroupsThatIncludeItemKey(value, config)
     );
 
-    // Initial Rebuild
-    this.collection().rebuildGroupsThatIncludeItemKey(value, {
-      background: config.background,
-      force: config.force,
-      sideEffects: config.sideEffects,
-    });
+    // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
+    if (config.updateItemValuePrimaryKey)
+      this.patch({ [this.collection().config.primaryKey]: value }, config);
+
+    // Initial Rebuild (not necessary if updating primaryKey in ItemValue because a sideEffect of the patch method is to rebuild the Group)
+    if (!config.updateItemValuePrimaryKey)
+      this.collection().rebuildGroupsThatIncludeItemKey(value, {
+        background: config.background,
+        force: config.force,
+        sideEffects: config.sideEffects,
+      });
 
     return this;
   }
