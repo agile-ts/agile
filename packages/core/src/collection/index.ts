@@ -297,21 +297,21 @@ export class Collection<DataType = DefaultItem> {
 
     const oldItemKey = item._value[primaryKey];
     const newItemKey = newItemValue[primaryKey];
-    const updatedItemKey = oldItemKey !== newItemKey;
+    const updateItemKey = oldItemKey !== newItemKey;
 
-    // Update ItemKeK
-    if (updatedItemKey) {
+    // Update ItemKey
+    if (updateItemKey) {
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
-      // Reset ItemKey in newItemValue to prevent updating Key if 'updateItemKey' failed
-      newItemValue[primaryKey] = oldItemKey;
+      // Delete primaryKey because it get applied to the Item in 'updateItemKey'
+      delete newItemValue[primaryKey];
     }
 
     // Apply changes to Item
-    item.set(newItemValue, {
+    item.patch(newItemValue as any, {
       background: config.background,
-      storage: !updatedItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
+      storage: !updateItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
     });
 
     return item;

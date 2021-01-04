@@ -62,13 +62,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
 
     // Update ItemKey in ItemValue
     if (config.updateItemValuePrimaryKey)
-      this.set(
-        {
-          ...{ [this.collection().config.primaryKey]: value },
-          ...this.nextStateValue,
-        },
-        config
-      );
+      this.patch({ [this.collection().config.primaryKey]: value }, config);
 
     // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);
