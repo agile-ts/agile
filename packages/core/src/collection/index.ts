@@ -350,6 +350,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Group
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Group exists in Collection
+   * @param groupKey - Key/Name of Group
+   * @param config - Config
+   */
+  public hasGroup(
+    groupKey: GroupKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getGroup(groupKey, config);
+  }
+
+  //=========================================================================================================
   // Get Group
   //=========================================================================================================
   /**
@@ -455,6 +471,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Selector
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Selector exists in Collection
+   * @param selectorKey - Key/Name of Selector
+   * @param config - Config
+   */
+  public hasSelector(
+    selectorKey: SelectorKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getSelector(selectorKey, config);
+  }
+
+  //=========================================================================================================
   // Get Selector
   //=========================================================================================================
   /**
@@ -533,8 +565,8 @@ export class Collection<DataType = DefaultItem> {
   //=========================================================================================================
   /**
    * @public
-   * Check if Collection has Item at Key/Name
-   * @param itemKey - ItemKey of Item
+   * Check if Item exists in Collection
+   * @param itemKey - Key/Name of Item
    * @param config - Config
    */
   public hasItem(
