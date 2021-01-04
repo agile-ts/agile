@@ -70,7 +70,16 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
 
     // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
     if (config.updateItemValuePrimaryKey)
-      this.patch({ [this.collection().config.primaryKey]: value }, config);
+      this.patch(
+        { [this.collection().config.primaryKey]: value },
+        {
+          sideEffects: config.sideEffects,
+          background: config.background,
+          force: config.force,
+          storage: config.storage,
+          overwrite: config.overwrite,
+        }
+      );
 
     // Initial Rebuild (not necessary if updating primaryKey in ItemValue because a sideEffect of the patch method is to rebuild the Group)
     if (!config.updateItemValuePrimaryKey)

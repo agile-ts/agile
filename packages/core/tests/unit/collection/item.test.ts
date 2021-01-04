@@ -21,7 +21,8 @@ describe("Item Tests", () => {
 
     expect(item.collection()).toBe(dummyCollection);
     expect(item.setKey).toHaveBeenCalledWith(
-      dummyData[dummyCollection.config.primaryKey]
+      dummyData[dummyCollection.config.primaryKey],
+      { updateItemValuePrimaryKey: false }
     );
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
@@ -56,7 +57,8 @@ describe("Item Tests", () => {
 
     expect(item.collection()).toBe(dummyCollection);
     expect(item.setKey).toHaveBeenCalledWith(
-      dummyData[dummyCollection.config.primaryKey]
+      dummyData[dummyCollection.config.primaryKey],
+      { updateItemValuePrimaryKey: false }
     );
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
@@ -87,12 +89,13 @@ describe("Item Tests", () => {
       item = new Item(dummyCollection, { id: "dummyId", name: "dummyName" });
 
       item.removeSideEffect = jest.fn();
+      item.patch = jest.fn();
       jest.spyOn(item, "addSideEffect");
       dummyCollection.rebuildGroupsThatIncludeItemKey = jest.fn();
     });
 
     describe("setKey function tests", () => {
-      it("should call State setKey and add rebuildGroupsThatIncludeItemKey sideEffect to it", () => {
+      it("should call State setKey, add rebuildGroup sideEffect to Item and patch newItemKey into Item (default config)", () => {
         item.setKey("myNewKey");
 
         expect(State.prototype.setKey).toHaveBeenCalledWith("myNewKey");
@@ -103,10 +106,79 @@ describe("Item Tests", () => {
           Item.updateGroupSideEffectKey,
           expect.any(Function)
         );
+        expect(item.patch).toHaveBeenCalledWith(
+          {
+            [dummyCollection.config.primaryKey]: "myNewKey",
+          },
+          {
+            sideEffects: true,
+            background: false,
+            force: false,
+            storage: true,
+            overwrite: false,
+          }
+        );
 
         expect(
           dummyCollection.rebuildGroupsThatIncludeItemKey
-        ).toHaveBeenCalledWith("myNewKey");
+        ).not.toHaveBeenCalled();
+      });
+
+      it("should call State setKey, add rebuildGroup sideEffect to Item and patch newItemKey into Item (specific config)", () => {
+        item.setKey("myNewKey", {
+          sideEffects: false,
+          background: true,
+          force: true,
+        });
+
+        expect(State.prototype.setKey).toHaveBeenCalledWith("myNewKey");
+        expect(item.removeSideEffect).toHaveBeenCalledWith(
+          Item.updateGroupSideEffectKey
+        );
+        expect(item.addSideEffect).toHaveBeenCalledWith(
+          Item.updateGroupSideEffectKey,
+          expect.any(Function)
+        );
+        expect(item.patch).toHaveBeenCalledWith(
+          {
+            [dummyCollection.config.primaryKey]: "myNewKey",
+          },
+          {
+            sideEffects: false,
+            background: true,
+            force: true,
+            storage: true,
+            overwrite: false,
+          }
+        );
+
+        expect(
+          dummyCollection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
+      });
+
+      it("should call State setKey, add rebuildGroup sideEffect to Item and call rebuildGroup once (config.updateItemValuePrimaryKey = false)", () => {
+        item.setKey("myNewKey", {
+          updateItemValuePrimaryKey: false,
+        });
+
+        expect(State.prototype.setKey).toHaveBeenCalledWith("myNewKey");
+        expect(item.removeSideEffect).toHaveBeenCalledWith(
+          Item.updateGroupSideEffectKey
+        );
+        expect(item.addSideEffect).toHaveBeenCalledWith(
+          Item.updateGroupSideEffectKey,
+          expect.any(Function)
+        );
+        expect(item.patch).not.toHaveBeenCalled();
+
+        expect(
+          dummyCollection.rebuildGroupsThatIncludeItemKey
+        ).toHaveBeenCalledWith("myNewKey", {
+          background: false,
+          force: false,
+          sideEffects: true,
+        });
       });
 
       describe("test added sideEffect called Item.updateGroupSideEffectKey", () => {
