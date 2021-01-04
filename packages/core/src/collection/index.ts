@@ -294,19 +294,19 @@ export class Collection<DataType = DefaultItem> {
     const newItemKey = changes[primaryKey] || oldItemKey;
     const updateItemKey = oldItemKey !== newItemKey;
 
+    // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (below)
+    if (changes[primaryKey]) delete changes[primaryKey];
+
     // Update ItemKey
-    if (updateItemKey) {
+    if (updateItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
 
-      // Delete primaryKey from Changes because it gets applied in 'updateItemKey'
-      delete changes[primaryKey];
-    }
-
     // Apply changes to Item
     item.patch(changes as any, {
       background: config.background,
+      addNewProperties: config.addNewProperties,
     });
 
     return item;

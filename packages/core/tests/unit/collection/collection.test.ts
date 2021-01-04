@@ -595,9 +595,8 @@ describe("Collection Tests", () => {
           dummyItem: dummyItem,
         };
 
-        dummyItem.set = jest.fn();
+        dummyItem.patch = jest.fn();
         collection.updateItemKey = jest.fn();
-        jest.spyOn(Utils, "flatMerge");
       });
 
       it("should update existing Item with valid changes Object (default config)", () => {
@@ -605,20 +604,12 @@ describe("Collection Tests", () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "dummyItem",
             name: "hans",
           },
           {
             background: false,
-            storage: true,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { name: "hans" },
-          {
             addNewProperties: false,
           }
         );
@@ -637,20 +628,12 @@ describe("Collection Tests", () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "dummyItem",
             name: "hans",
           },
           {
             background: true,
-            storage: true,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { name: "hans" },
-          {
             addNewProperties: true,
           }
         );
@@ -664,20 +647,12 @@ describe("Collection Tests", () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "dummyItem",
             name: "hans",
           },
           {
             background: false,
-            storage: true,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { name: "hans" },
-          {
             addNewProperties: false,
           }
         );
@@ -689,10 +664,9 @@ describe("Collection Tests", () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: ItemKey 'notExisting' doesn't exist in Collection '${collection._key}'!`
+          `Agile Error: Item with key/name 'notExisting' doesn't exist in Collection '${collection._key}'!`
         );
-        expect(dummyItem.set).not.toHaveBeenCalled();
-        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
@@ -706,8 +680,7 @@ describe("Collection Tests", () => {
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`
         );
-        expect(dummyItem.set).not.toHaveBeenCalled();
-        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
@@ -719,20 +692,12 @@ describe("Collection Tests", () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "newDummyItemKey",
             name: "hans",
           },
           {
             background: false,
-            storage: false,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { id: "newDummyItemKey", name: "hans" },
-          {
             addNewProperties: false,
           }
         );
