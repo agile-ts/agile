@@ -1465,7 +1465,9 @@ describe("Collection Tests", () => {
 
         expect(response).toBeTruthy();
 
-        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem", {
+          background: false,
+        });
         expect(dummyItem2.setKey).not.toHaveBeenCalled();
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
@@ -1505,7 +1507,9 @@ describe("Collection Tests", () => {
 
         expect(response).toBeTruthy();
 
-        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem", {
+          background: true,
+        });
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             "newDummyItem",
@@ -1538,7 +1542,9 @@ describe("Collection Tests", () => {
 
         expect(response).toBeTruthy();
 
-        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem", {
+          background: false,
+        });
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             "newDummyItem",
@@ -1576,6 +1582,15 @@ describe("Collection Tests", () => {
         const response = collection.updateItemKey("dummyItem1", "dummyItem1");
 
         expect(response).toBeFalsy();
+      });
+
+      it("shouldn't update ItemKey if ItemKey called after the newItemKey already exists and should print warning (default config)", () => {
+        const response = collection.updateItemKey("dummyItem1", "dummyItem2");
+
+        expect(response).toBeFalsy();
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Couldn't update ItemKey from 'dummyItem1' to 'dummyItem2' because an Item with the key/name 'dummyItem2' already exists!"
+        );
       });
     });
 
