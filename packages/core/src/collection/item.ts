@@ -31,7 +31,9 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     this.collection = () => collection;
 
     // Reassign Key to assign sideEffects
-    this.setKey(data[collection.config.primaryKey]);
+    this.setKey(data[collection.config.primaryKey], {
+      updateItemValuePrimaryKey: false,
+    });
   }
 
   //=========================================================================================================
@@ -45,7 +47,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    */
   public setKey(
     value: StateKey | undefined,
-    config: StateRuntimeJobConfigInterface = {}
+    config: SetItemKeyConfig = {}
   ): this {
     super.setKey(value);
     config = defineConfig(config, {
@@ -54,17 +56,19 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
       force: false,
       storage: true,
       overwrite: false,
+      updateItemValuePrimaryKey: true,
     });
     if (!value) return this;
 
     // Update ItemKey in ItemValue
-    this.set(
-      {
-        ...{ [this.collection().config.primaryKey]: value },
-        ...this.nextStateValue,
-      },
-      config
-    );
+    if (config.updateItemValuePrimaryKey)
+      this.set(
+        {
+          ...{ [this.collection().config.primaryKey]: value },
+          ...this.nextStateValue,
+        },
+        config
+      );
 
     // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);
@@ -90,4 +94,11 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
  */
 export interface ItemConfigInterface {
   isPlaceholder?: boolean;
+}
+
+/**
+ * @param updateItemValuePrimaryKey - If the primaryKey in ItemValue gets update
+ */
+export interface SetItemKeyConfig extends StateRuntimeJobConfigInterface {
+  updateItemValuePrimaryKey?: boolean;
 }
