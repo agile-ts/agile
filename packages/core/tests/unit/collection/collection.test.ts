@@ -1838,7 +1838,6 @@ describe("Collection Tests", () => {
         };
         collection.size = 1;
 
-        collection.rebuildGroupsThatIncludeItemKey = jest.fn();
         dummyItem1.patch = jest.fn();
         dummyItem1.set = jest.fn();
       });
@@ -1855,9 +1854,6 @@ describe("Collection Tests", () => {
           name: "Hans",
         });
         expect(collection.size).toBe(2);
-        expect(collection.rebuildGroupsThatIncludeItemKey).toHaveBeenCalledWith(
-          "dummyItem2"
-        );
       });
 
       it("shouldn't create new Item if passed Data is no valid Object", () => {
@@ -1869,9 +1865,6 @@ describe("Collection Tests", () => {
 
         expect(response).toBeFalsy();
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
       });
 
       it("shouldn't create new Item if passed Data has no primaryKey", () => {
@@ -1883,9 +1876,6 @@ describe("Collection Tests", () => {
 
         expect(response).toBeFalsy();
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (default config)", () => {
@@ -1899,9 +1889,6 @@ describe("Collection Tests", () => {
         expect(collection.data).toHaveProperty("dummyItem1");
         expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
           { id: "dummyItem1", name: "Dieter" },
@@ -1924,9 +1911,6 @@ describe("Collection Tests", () => {
         expect(collection.data).toHaveProperty("dummyItem1");
         expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
           { id: "dummyItem1", name: "Dieter" },
@@ -1949,9 +1933,6 @@ describe("Collection Tests", () => {
         expect(collection.data).toHaveProperty("dummyItem1");
         expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).not.toHaveBeenCalled();
         expect(dummyItem1.patch).toHaveBeenCalledWith(
@@ -1974,9 +1955,6 @@ describe("Collection Tests", () => {
         expect(collection.data).toHaveProperty("dummyItem1");
         expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
           { id: "dummyItem1", name: "Dieter" },
