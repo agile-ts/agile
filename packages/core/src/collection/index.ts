@@ -299,6 +299,7 @@ export class Collection<DataType = DefaultItem> {
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
+
       // Delete primaryKey from Changes because it gets applied in 'updateItemKey'
       delete changes[primaryKey];
     }
@@ -306,7 +307,6 @@ export class Collection<DataType = DefaultItem> {
     // Apply changes to Item
     item.patch(changes as any, {
       background: config.background,
-      storage: !updateItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
     });
 
     return item;
