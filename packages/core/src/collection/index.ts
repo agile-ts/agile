@@ -290,13 +290,8 @@ export class Collection<DataType = DefaultItem> {
       return undefined;
     }
 
-    // Merge changes into current ItemValue
-    const newItemValue = flatMerge(copy(item.nextStateValue), changes, {
-      addNewProperties: config.addNewProperties,
-    });
-
     const oldItemKey = item._value[primaryKey];
-    const newItemKey = newItemValue[primaryKey];
+    const newItemKey = changes[primaryKey] || oldItemKey;
     const updateItemKey = oldItemKey !== newItemKey;
 
     // Update ItemKey
@@ -304,12 +299,12 @@ export class Collection<DataType = DefaultItem> {
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
-      // Delete primaryKey because it get applied to the Item in 'updateItemKey'
-      delete newItemValue[primaryKey];
+      // Delete primaryKey from Changes because it gets applied in 'updateItemKey'
+      delete changes[primaryKey];
     }
 
     // Apply changes to Item
-    item.patch(newItemValue as any, {
+    item.patch(changes as any, {
       background: config.background,
       storage: !updateItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
     });
