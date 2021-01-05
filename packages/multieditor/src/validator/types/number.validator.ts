@@ -1,5 +1,5 @@
-import { Validator } from "../../internal";
-import { copy } from "@agile-ts/core";
+import {Validator} from '../../internal';
+import {copy} from '@agile-ts/core';
 
 export class NumberValidator<DataType = any> extends Validator<DataType> {
   /**
@@ -9,7 +9,7 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    * @param errorMessage - Error Message
    */
   constructor(validator: Validator<DataType>, errorMessage?: string) {
-    super({ key: validator.key, prefix: "number" });
+    super({key: validator.key, prefix: 'number'});
 
     // Copy ValidationMethods of old Validator into this Validator
     for (let key in validator.validationMethods) {
@@ -18,18 +18,18 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
 
     // Add Number Validation Method
     this.addValidationMethod(
-      this.getValidationMethodKey("isNumber"),
+      this.getValidationMethodKey('isNumber'),
       async (key, value, editor) => {
-        const isValid = typeof value === "number";
+        const isValid = typeof value === 'number';
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
-            errorMessage || `${key} is no valid Number!`
+            'error',
+            errorMessage || `${key} is no valid Number!`,
           );
         }
         return isValid;
-      }
+      },
     );
   }
 
@@ -44,19 +44,19 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    */
   public max(number: number, errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("maxNumber"),
+      this.getValidationMethodKey('maxNumber'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "number") return false;
+        if (!value || typeof value !== 'number') return false;
         const isValid = value <= number;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
-            errorMessage || `${key} has to be smaller than ${number}`
+            'error',
+            errorMessage || `${key} has to be smaller than ${number}`,
           );
         }
         return isValid;
-      }
+      },
     );
     return this;
   }
@@ -72,19 +72,19 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    */
   public min(number: number, errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("minNumber"),
+      this.getValidationMethodKey('minNumber'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "number") return false;
+        if (!value || typeof value !== 'number') return false;
         const isValid = value >= number;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
-            errorMessage || `${key} has to be larger than ${number}`
+            'error',
+            errorMessage || `${key} has to be larger than ${number}`,
           );
         }
         return isValid;
-      }
+      },
     );
     return this;
   }
@@ -99,19 +99,19 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    */
   public positive(errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("positive"),
+      this.getValidationMethodKey('positive'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "number") return false;
+        if (!value || typeof value !== 'number') return false;
         const isValid = value >= 0;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
-            errorMessage || `${key} has to be positive`
+            'error',
+            errorMessage || `${key} has to be positive`,
           );
         }
         return isValid;
-      }
+      },
     );
     return this;
   }
@@ -126,19 +126,19 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    */
   public negative(errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("negative"),
+      this.getValidationMethodKey('negative'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "number") return false;
+        if (!value || typeof value !== 'number') return false;
         const isValid = value < 0;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
-            errorMessage || `${key} has to be negative`
+            'error',
+            errorMessage || `${key} has to be negative`,
           );
         }
         return isValid;
-      }
+      },
     );
     return this;
   }

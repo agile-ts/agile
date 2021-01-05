@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   State,
   Agile,
@@ -6,15 +6,15 @@ import {
   getAgileInstance,
   normalizeArray,
   Observer,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 
 export function AgileHOC(
   ReactComponent: any,
-  deps?: Array<State> | { [key: string]: State } | State,
-  agileInstance?: Agile
+  deps?: Array<State> | {[key: string]: State} | State,
+  agileInstance?: Agile,
 ) {
   let depsArray: Array<Observer>;
-  let depsObject: { [key: string]: Observer } = {};
+  let depsObject: {[key: string]: Observer} = {};
 
   if (deps instanceof State || Array.isArray(deps)) {
     // Normalize Dependencies
@@ -29,7 +29,7 @@ export function AgileHOC(
         Agile.logger.error("Please don't pass an empty array!");
       }
     }
-  } else if (typeof deps === "object") {
+  } else if (typeof deps === 'object') {
     for (let dep in deps) {
       depsObject[dep] = deps[dep].observer;
     }
@@ -45,13 +45,13 @@ export function AgileHOC(
       }
     }
   } else {
-    Agile.logger.error("No Valid AgileHOC properties");
+    Agile.logger.error('No Valid AgileHOC properties');
     return ReactComponent;
   }
 
   // Check if agile Instance exists
   if (!agileInstance) {
-    Agile.logger.error("Failed to get Agile Instance");
+    Agile.logger.error('Failed to get Agile Instance');
     return ReactComponent;
   }
 
@@ -69,14 +69,14 @@ export function AgileHOC(
       if (depsArray)
         this.agileInstance().subController.subscribeWithSubsArray(
           this,
-          depsArray
+          depsArray,
         );
 
       // Create HOC based Subscription with Object
       if (depsObject) {
         const response = this.agileInstance().subController.subscribeWithSubsObject(
           this,
-          depsObject
+          depsObject,
         );
         this.updatedProps = {
           ...props,

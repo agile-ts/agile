@@ -2,7 +2,7 @@ import {
   Observer,
   SubscriptionContainer,
   SubscriptionContainerKeyType,
-} from "../../../internal";
+} from '../../../internal';
 
 export class CallbackSubscriptionContainer extends SubscriptionContainer {
   public callback: Function;
@@ -17,7 +17,7 @@ export class CallbackSubscriptionContainer extends SubscriptionContainer {
   constructor(
     callback: Function,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    key?: SubscriptionContainerKeyType,
   ) {
     super(subs, key);
     this.callback = callback;

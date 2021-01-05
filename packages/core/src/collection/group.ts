@@ -14,10 +14,10 @@ import {
   PersistentKey,
   ComputedTracker,
   StateRuntimeJobConfigInterface,
-} from "../internal";
+} from '../internal';
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
-  static rebuildGroupSideEffectKey = "rebuildGroup";
+  static rebuildGroupSideEffectKey = 'rebuildGroup';
   collection: () => Collection<DataType>;
 
   _output: Array<DataType> = []; // Output of Group
@@ -34,7 +34,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   constructor(
     collection: Collection<DataType>,
     initialItems?: Array<ItemKey>,
-    config: GroupConfigInterface = {}
+    config: GroupConfigInterface = {},
   ) {
     super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
@@ -114,7 +114,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    config: GroupRemoveConfig = {}
+    config: GroupRemoveConfig = {},
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
@@ -129,7 +129,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
         Agile.logger.error(
-          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`
+          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`,
         );
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
@@ -151,7 +151,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    this.set(newGroupValue, { background: config.background });
+    this.set(newGroupValue, {background: config.background});
 
     return this;
   }
@@ -171,7 +171,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     const existingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
     config = defineConfig<GroupAddConfig>(config, {
-      method: "push",
+      method: 'push',
       overwrite: false,
       background: false,
     });
@@ -195,7 +195,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       }
 
       // Add new ItemKey to Group
-      newGroupValue[config.method || "push"](itemKey);
+      newGroupValue[config.method || 'push'](itemKey);
     });
 
     // Return if passed ItemKeys already exist
@@ -208,7 +208,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     )
       config.background = true;
 
-    this.set(newGroupValue, { background: config.background });
+    this.set(newGroupValue, {background: config.background});
 
     return this;
   }
@@ -226,7 +226,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public replace(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
-    config: StateRuntimeJobConfigInterface = {}
+    config: StateRuntimeJobConfigInterface = {},
   ): this {
     let newGroupValue = copy(this._value);
     newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
@@ -251,11 +251,11 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public persist(
     key?: PersistentKey,
-    config?: GroupPersistConfigInterface
+    config?: GroupPersistConfigInterface,
   ): this;
   public persist(
     keyOrConfig: PersistentKey | GroupPersistConfigInterface = {},
-    config: GroupPersistConfigInterface = {}
+    config: GroupPersistConfigInterface = {},
   ): this {
     let _config: GroupPersistConfigInterface;
     let key: PersistentKey | undefined;
@@ -277,7 +277,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this._key,
-        this.collection()._key
+        this.collection()._key,
       );
     }
 
@@ -319,7 +319,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
         `Couldn't find some Items in Collection '${this.collection()._key}' (${
           this._key
         })`,
-        notFoundItemKeys
+        notFoundItemKeys,
       );
     }
 
@@ -337,7 +337,7 @@ export type GroupKey = string | number;
  * @param background - If adding ItemKey happens in the background (-> not causing any rerender)
  */
 export interface GroupAddConfig {
-  method?: "unshift" | "push";
+  method?: 'unshift' | 'push';
   overwrite?: boolean;
   background?: boolean;
 }

@@ -2,7 +2,7 @@ import {
   Observer,
   SubscriptionContainer,
   SubscriptionContainerKeyType,
-} from "../../../internal";
+} from '../../../internal';
 
 export class ComponentSubscriptionContainer extends SubscriptionContainer {
   public component: any;
@@ -17,7 +17,7 @@ export class ComponentSubscriptionContainer extends SubscriptionContainer {
   constructor(
     component: any,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    key?: SubscriptionContainerKeyType,
   ) {
     super(subs, key);
     this.component = component;

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import {useEffect, useLayoutEffect} from 'react';
 
 // React currently throws a warning when using useLayoutEffect on the server.
 // To get around it, we can conditionally useEffect on the server (no-op) and
@@ -10,8 +10,8 @@ import { useEffect, useLayoutEffect } from "react";
 // subscription is created and an inconsistent state may be observed
 
 export const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" &&
-  typeof window.document !== "undefined" &&
-  typeof window.document.createElement !== "undefined"
+  typeof window !== 'undefined' &&
+  typeof window.document !== 'undefined' &&
+  typeof window.document.createElement !== 'undefined'
     ? useLayoutEffect
     : useEffect;

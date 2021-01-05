@@ -8,7 +8,7 @@ import {
   RuntimeJobConfigInterface,
   defineConfig,
   RuntimeJobKey,
-} from "../internal";
+} from '../internal';
 
 export class EventObserver<PayloadType = any> extends Observer {
   public event: () => Event<PayloadType>;
@@ -21,7 +21,7 @@ export class EventObserver<PayloadType = any> extends Observer {
    */
   constructor(
     event: Event<PayloadType>,
-    config: CreateEventObserverConfigInterface = {}
+    config: CreateEventObserverConfigInterface = {},
   ) {
     super(event.agileInstance(), {
       deps: config.deps,

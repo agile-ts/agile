@@ -1,19 +1,19 @@
-import { ComputedTracker, Observer, Agile } from "../../../src";
+import {ComputedTracker, Observer, Agile} from '../../../src';
 
-describe("ComputedTracker Tests", () => {
+describe('ComputedTracker Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile({localStorage: false});
 
     // Reset ComputedTracker (because it works static)
     ComputedTracker.isTracking = false;
     ComputedTracker.trackedObservers = new Set();
   });
 
-  describe("ComputedTracker Function Tests", () => {
-    describe("track function tests", () => {
-      it("should set isTracking to true", () => {
+  describe('ComputedTracker Function Tests', () => {
+    describe('track function tests', () => {
+      it('should set isTracking to true', () => {
         ComputedTracker.isTracking = false;
 
         ComputedTracker.track();
@@ -22,21 +22,21 @@ describe("ComputedTracker Tests", () => {
       });
     });
 
-    describe("tracked function tests", () => {
+    describe('tracked function tests', () => {
       let dummyObserver: Observer;
 
       beforeEach(() => {
         dummyObserver = new Observer(dummyAgile);
       });
 
-      it("should add passed Observer to trackedObservers if ComputedTracker is tracking", () => {
+      it('should add passed Observer to trackedObservers if ComputedTracker is tracking', () => {
         ComputedTracker.isTracking = true;
 
         ComputedTracker.tracked(dummyObserver);
 
         expect(ComputedTracker.trackedObservers.size).toBe(1);
         expect(
-          ComputedTracker.trackedObservers.has(dummyObserver)
+          ComputedTracker.trackedObservers.has(dummyObserver),
         ).toBeTruthy();
       });
 
@@ -49,7 +49,7 @@ describe("ComputedTracker Tests", () => {
       });
     });
 
-    describe("getTrackedObserver function tests", () => {
+    describe('getTrackedObserver function tests', () => {
       let dummyObserver1: Observer;
       let dummyObserver2: Observer;
 
@@ -62,7 +62,7 @@ describe("ComputedTracker Tests", () => {
         ComputedTracker.trackedObservers.add(dummyObserver2);
       });
 
-      it("should return tracked Observers and reset tracking", () => {
+      it('should return tracked Observers and reset tracking', () => {
         const response = ComputedTracker.getTrackedObservers();
 
         expect(response).toStrictEqual([dummyObserver1, dummyObserver2]);

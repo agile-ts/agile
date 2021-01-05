@@ -1,11 +1,6 @@
-import {
-  Observer,
-  Agile,
-  SubscriptionContainer,
-  RuntimeJob,
-} from "../../../src";
+import {Observer, Agile, SubscriptionContainer, RuntimeJob} from '../../../src';
 
-describe("Observer Tests", () => {
+describe('Observer Tests', () => {
   let dummyAgile: Agile;
   let dummyObserver1: Observer;
   let dummyObserver2: Observer;
@@ -14,16 +9,16 @@ describe("Observer Tests", () => {
 
   beforeEach(() => {
     dummyAgile = new Agile();
-    dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
-    dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
+    dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
+    dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
     dummySubscription1 = new SubscriptionContainer();
     dummySubscription2 = new SubscriptionContainer();
 
     console.warn = jest.fn();
-    jest.spyOn(Observer.prototype, "subscribe");
+    jest.spyOn(Observer.prototype, 'subscribe');
   });
 
-  it("should create Observer (default config)", () => {
+  it('should create Observer (default config)', () => {
     const observer = new Observer(dummyAgile);
 
     expect(observer._key).toBeUndefined();
@@ -32,16 +27,16 @@ describe("Observer Tests", () => {
     expect(observer.subs.size).toBe(0);
   });
 
-  it("should create Observer (specific config)", () => {
+  it('should create Observer (specific config)', () => {
     const observer = new Observer(dummyAgile, {
-      key: "testKey",
+      key: 'testKey',
       subs: [dummySubscription1, dummySubscription2],
       deps: [dummyObserver1, dummyObserver2],
-      value: "coolValue",
+      value: 'coolValue',
     });
 
-    expect(observer._key).toBe("testKey");
-    expect(observer.value).toBe("coolValue");
+    expect(observer._key).toBe('testKey');
+    expect(observer.value).toBe('coolValue');
     expect(observer.deps.size).toBe(2);
     expect(observer.deps.has(dummyObserver2)).toBeTruthy();
     expect(observer.deps.has(dummyObserver1)).toBeTruthy();
@@ -53,51 +48,51 @@ describe("Observer Tests", () => {
     expect(observer.subscribe).toHaveBeenCalledWith(dummySubscription2);
   });
 
-  describe("Observer Function Tests", () => {
+  describe('Observer Function Tests', () => {
     let observer: Observer;
 
     beforeEach(() => {
-      observer = new Observer(dummyAgile, { key: "observer" });
+      observer = new Observer(dummyAgile, {key: 'observer'});
     });
 
-    describe("key set function tests", () => {
-      it("should update key in Observer", () => {
-        observer.key = "myNewDummyKey";
+    describe('key set function tests', () => {
+      it('should update key in Observer', () => {
+        observer.key = 'myNewDummyKey';
 
-        expect(observer._key).toBe("myNewDummyKey");
+        expect(observer._key).toBe('myNewDummyKey');
       });
     });
 
-    describe("key get function tests", () => {
-      it("should return current key of Observer", () => {
-        observer._key = "myDummyKey";
+    describe('key get function tests', () => {
+      it('should return current key of Observer', () => {
+        observer._key = 'myDummyKey';
 
-        expect(observer.key).toBe("myDummyKey");
+        expect(observer.key).toBe('myDummyKey');
       });
     });
 
-    describe("perform function tests", () => {
-      it("should print warning", () => {
+    describe('perform function tests', () => {
+      it('should print warning', () => {
         const dummyJob = new RuntimeJob(observer);
 
         observer.perform(dummyJob);
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
+          "Agile Warn: Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!",
         );
       });
     });
 
-    describe("depend function tests", () => {
+    describe('depend function tests', () => {
       let dummyObserver1: Observer;
       let dummyObserver2: Observer;
 
       beforeEach(() => {
-        dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
-        dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
+        dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
+        dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
       });
 
-      it("should add passed Observer to deps", () => {
+      it('should add passed Observer to deps', () => {
         observer.depend(dummyObserver1);
 
         expect(observer.deps.size).toBe(1);
@@ -114,7 +109,7 @@ describe("Observer Tests", () => {
       });
     });
 
-    describe("subscribe function tests", () => {
+    describe('subscribe function tests', () => {
       let dummySubscriptionContainer1: SubscriptionContainer;
       let dummySubscriptionContainer2: SubscriptionContainer;
 
@@ -123,7 +118,7 @@ describe("Observer Tests", () => {
         dummySubscriptionContainer2 = new SubscriptionContainer();
       });
 
-      it("should add subscriptionContainer to subs and this(Observer) to SubscriptionContainer subs", () => {
+      it('should add subscriptionContainer to subs and this(Observer) to SubscriptionContainer subs', () => {
         observer.subscribe(dummySubscriptionContainer1);
 
         expect(observer.subs.size).toBe(1);
@@ -144,7 +139,7 @@ describe("Observer Tests", () => {
       });
     });
 
-    describe("unsubscribe function tests", () => {
+    describe('unsubscribe function tests', () => {
       let dummySubscriptionContainer1: SubscriptionContainer;
       let dummySubscriptionContainer2: SubscriptionContainer;
 
@@ -155,7 +150,7 @@ describe("Observer Tests", () => {
         observer.subscribe(dummySubscriptionContainer2);
       });
 
-      it("should remove subscriptionContainer from subs and this(Observer) from SubscriptionContainer subs", () => {
+      it('should remove subscriptionContainer from subs and this(Observer) from SubscriptionContainer subs', () => {
         observer.unsubscribe(dummySubscriptionContainer1);
 
         expect(observer.subs.size).toBe(1);

@@ -1,5 +1,5 @@
-import { Agile, copy, RuntimeJobConfigInterface } from "@agile-ts/core";
-import { Item, StatusObserver } from "../internal";
+import {Agile, copy, RuntimeJobConfigInterface} from '@agile-ts/core';
+import {Item, StatusObserver} from '../internal';
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
@@ -89,7 +89,7 @@ export class Status<DataType = any> {
   }
 }
 
-export type StatusType = "error" | "success";
+export type StatusType = 'error' | 'success';
 
 /**
  * @param type - Type of Status

@@ -13,7 +13,7 @@ import {
   StateRuntimeJob,
   StateRuntimeJobConfigInterface,
   RuntimeJobKey,
-} from "../internal";
+} from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
   public state: () => State<ValueType>;
@@ -27,9 +27,9 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   constructor(
     state: State<ValueType>,
-    config: CreateStateObserverConfigInterface = {}
+    config: CreateStateObserverConfigInterface = {},
   ) {
-    super(state.agileInstance(), { ...config, ...{ value: state._value } });
+    super(state.agileInstance(), {...config, ...{value: state._value}});
     this.state = () => state;
     this.nextStateValue = copy(state._value);
   }
@@ -63,7 +63,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public ingestValue(
     newStateValue: ValueType,
-    config: StateIngestConfigInterface = {}
+    config: StateIngestConfigInterface = {},
   ): void {
     const state = this.state();
     config = defineConfig(config, {
@@ -158,7 +158,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // Ingest Dependencies of Observer into Runtime
     state.observer.deps.forEach(
       (observer) =>
-        observer instanceof StateObserver && observer.ingest({ perform: false })
+        observer instanceof StateObserver && observer.ingest({perform: false}),
     );
   }
 }

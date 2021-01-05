@@ -5,14 +5,14 @@ import {
   defineConfig,
   getAgileInstance,
   Observer,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 import {
   Item,
   Validator,
   StatusType,
   StatusInterface,
   ValidationMethodInterface,
-} from "./internal";
+} from './internal';
 
 export class MultiEditor<
   DataType = any,
@@ -33,7 +33,7 @@ export class MultiEditor<
   public computeMethods: DataObject<ComputeMethod<DataType>> = {};
   public onSubmit: (
     preparedData: DataObject<DataType>,
-    config?: OnSubmitConfigType
+    config?: OnSubmitConfigType,
   ) => Promise<SubmitReturnType>;
 
   public _key?: EditorKey;
@@ -48,22 +48,22 @@ export class MultiEditor<
    */
   constructor(
     config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
-    agileInstance?: Agile
+    agileInstance?: Agile,
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
       Agile.logger.error(
-        "No Global agileInstance found! Please pass an agileInstance into the MultiEditor!"
+        'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!',
       );
     this.agileInstance = () => agileInstance as any;
-    let _config = typeof config === "function" ? config(this) : config;
+    let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
       fixedProperties: [],
       editableProperties: Object.keys(_config.data),
       validateMethods: {},
       computeMethods: {},
-      reValidateMode: "onSubmit",
-      validate: "editable",
+      reValidateMode: 'onSubmit',
+      validate: 'editable',
     });
     this._key = _config?.key;
     this.onSubmit = _config.onSubmit as any;
@@ -162,7 +162,7 @@ export class MultiEditor<
   public setValue(
     key: ItemKey,
     value: DataType,
-    config: SetValueConfigInterface = {}
+    config: SetValueConfigInterface = {},
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
@@ -189,7 +189,7 @@ export class MultiEditor<
   public updateInitialValue(
     key: ItemKey,
     value: DataType,
-    config: UpdateInitialValueConfigInterface = {}
+    config: UpdateInitialValueConfigInterface = {},
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
@@ -208,7 +208,7 @@ export class MultiEditor<
         background: config.background,
       });
     } else {
-      item.ingest({ force: true, background: config.background });
+      item.ingest({force: true, background: config.background});
     }
 
     return this;
@@ -224,7 +224,7 @@ export class MultiEditor<
    * @return false if MultiEditor is not valid
    */
   public async submit(
-    config: SubmitConfigInterface<OnSubmitConfigType> = {}
+    config: SubmitConfigInterface<OnSubmitConfigType> = {},
   ): Promise<SubmitReturnType | false> {
     const preparedData: DataObject<DataType> = {};
     config = defineConfig(config, {
@@ -248,7 +248,7 @@ export class MultiEditor<
 
     // Logging
     Agile.logger.if
-      .tag(["multieditor"])
+      .tag(['multieditor'])
       .info(`Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
@@ -410,7 +410,7 @@ export class MultiEditor<
         }).addValidationMethod(validation);
       }
     }
-    return new Validator<DataType>({ key: key });
+    return new Validator<DataType>({key: key});
   }
 
   //=========================================================================================================
@@ -438,7 +438,7 @@ export class MultiEditor<
     // Check if Items are Valid
     for (let key in this.data) {
       const item = this.data[key];
-      if (!item.config.canBeEdited && this.config.validate === "editable")
+      if (!item.config.canBeEdited && this.config.validate === 'editable')
         continue;
       isValid = item.isValid && isValid;
     }
@@ -457,11 +457,11 @@ export class MultiEditor<
    */
   public canAssignStatusToItemOnChange(item: Item): boolean {
     return (
-      (this.config.reValidateMode === "onChange" ||
-        (this.config.reValidateMode === "afterFirstSubmit" &&
+      (this.config.reValidateMode === 'onChange' ||
+        (this.config.reValidateMode === 'afterFirstSubmit' &&
           this.submitted)) &&
-      (this.config.validate === "all" ||
-        (this.config.validate === "editable" && item.config.canBeEdited) ||
+      (this.config.validate === 'all' ||
+        (this.config.validate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
@@ -476,18 +476,18 @@ export class MultiEditor<
    */
   public canAssignStatusToItemOnSubmit(item: Item): boolean {
     return (
-      (this.config.reValidateMode === "onSubmit" ||
-        (this.config.reValidateMode === "afterFirstSubmit" &&
+      (this.config.reValidateMode === 'onSubmit' ||
+        (this.config.reValidateMode === 'afterFirstSubmit' &&
           !this.submitted) ||
-        (this.config.reValidateMode === "onChange" && !item.status.display)) &&
-      (this.config.validate === "all" ||
-        (this.config.validate === "editable" && item.config.canBeEdited) ||
+        (this.config.reValidateMode === 'onChange' && !item.status.display)) &&
+      (this.config.validate === 'all' ||
+        (this.config.validate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
 }
 
-export type DataObject<T = any> = { [key: string]: T };
+export type DataObject<T = any> = {[key: string]: T};
 export type EditorKey = string | number;
 export type ItemKey = string | number;
 
@@ -517,7 +517,7 @@ export interface CreateEditorConfigInterface<
   computeMethods?: DataObject<ComputeMethod<DataType>>;
   onSubmit: (
     preparedData: DataObject<DataType>,
-    config?: onSubmitConfig
+    config?: onSubmitConfig,
   ) => Promise<SubmitReturnType>;
   reValidateMode?: RevalidationModeType;
   validate?: ValidateType;
@@ -539,7 +539,7 @@ export type EditorConfig<
 > =
   | CreateEditorConfigInterface<DataType, SubmitReturnType, OnSubmitConfigType>
   | ((
-      editor: MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>
+      editor: MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>,
     ) => CreateEditorConfigInterface<
       DataType,
       SubmitReturnType,
@@ -571,5 +571,5 @@ export interface UpdateInitialValueConfigInterface {
   background?: boolean;
 }
 
-export type RevalidationModeType = "onChange" | "onSubmit" | "afterFirstSubmit";
-export type ValidateType = "all" | "editable";
+export type RevalidationModeType = 'onChange' | 'onSubmit' | 'afterFirstSubmit';
+export type ValidateType = 'all' | 'editable';

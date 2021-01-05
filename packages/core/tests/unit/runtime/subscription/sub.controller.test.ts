@@ -5,61 +5,61 @@ import {
   Observer,
   SubController,
   SubscriptionContainer,
-} from "../../../../src";
+} from '../../../../src';
 
-describe("SubController Tests", () => {
+describe('SubController Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile({localStorage: false});
   });
 
-  it("should create SubController", () => {
+  it('should create SubController', () => {
     const subController = new SubController(dummyAgile);
 
     expect(subController.callbackSubs.size).toBe(0);
     expect(subController.callbackSubs.size).toBe(0);
   });
 
-  describe("SubController Function Tests", () => {
+  describe('SubController Function Tests', () => {
     let subController: SubController;
     let dummyObserver1: Observer;
     let dummyObserver2: Observer;
 
     beforeEach(() => {
-      dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
-      dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
+      dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
+      dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
       subController = new SubController(dummyAgile);
     });
 
-    describe("subscribeWithSubsObject function tests", () => {
-      const dummyIntegration = "myDummyIntegration";
+    describe('subscribeWithSubsObject function tests', () => {
+      const dummyIntegration = 'myDummyIntegration';
       let dummySubscriptionContainer: SubscriptionContainer;
 
       beforeEach(() => {
         dummySubscriptionContainer = new SubscriptionContainer();
-        dummyObserver1.value = "myCoolValue";
+        dummyObserver1.value = 'myCoolValue';
 
         subController.registerSubscription = jest.fn(
-          () => dummySubscriptionContainer
+          () => dummySubscriptionContainer,
         );
-        jest.spyOn(dummyObserver1, "subscribe");
-        jest.spyOn(dummyObserver2, "subscribe");
+        jest.spyOn(dummyObserver1, 'subscribe');
+        jest.spyOn(dummyObserver2, 'subscribe');
       });
 
-      it("should create subscriptionContainer and add in Object shape passed Observers to it", () => {
+      it('should create subscriptionContainer and add in Object shape passed Observers to it', () => {
         const subscribeWithSubsResponse = subController.subscribeWithSubsObject(
           dummyIntegration,
           {
             dummyObserver1: dummyObserver1,
             dummyObserver2: dummyObserver2,
           },
-          "subscribeWithSubsObjectKey"
+          'subscribeWithSubsObjectKey',
         );
 
         expect(subscribeWithSubsResponse).toStrictEqual({
           props: {
-            dummyObserver1: "myCoolValue",
+            dummyObserver1: 'myCoolValue',
           },
           subscriptionContainer: dummySubscriptionContainer,
         });
@@ -67,7 +67,7 @@ describe("SubController Tests", () => {
         expect(subController.registerSubscription).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "subscribeWithSubsObjectKey"
+          'subscribeWithSubsObjectKey',
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeTruthy();
@@ -78,40 +78,40 @@ describe("SubController Tests", () => {
 
         expect(dummySubscriptionContainer.subs.size).toBe(2);
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver1)
+          dummySubscriptionContainer.subs.has(dummyObserver1),
         ).toBeTruthy();
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver2)
+          dummySubscriptionContainer.subs.has(dummyObserver2),
         ).toBeTruthy();
 
         expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
+          dummySubscriptionContainer,
         );
         expect(dummyObserver2.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
+          dummySubscriptionContainer,
         );
       });
     });
 
-    describe("subscribeWithSubsArray function tests", () => {
-      const dummyIntegration = "myDummyIntegration";
+    describe('subscribeWithSubsArray function tests', () => {
+      const dummyIntegration = 'myDummyIntegration';
       let dummySubscriptionContainer: SubscriptionContainer;
 
       beforeEach(() => {
         dummySubscriptionContainer = new SubscriptionContainer();
 
         subController.registerSubscription = jest.fn(
-          () => dummySubscriptionContainer
+          () => dummySubscriptionContainer,
         );
-        jest.spyOn(dummyObserver1, "subscribe");
-        jest.spyOn(dummyObserver2, "subscribe");
+        jest.spyOn(dummyObserver1, 'subscribe');
+        jest.spyOn(dummyObserver2, 'subscribe');
       });
 
-      it("should create subscriptionContainer and add in Array Shape passed Observers to it", () => {
+      it('should create subscriptionContainer and add in Array Shape passed Observers to it', () => {
         const subscribeWithSubsArrayResponse = subController.subscribeWithSubsArray(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "subscribeWithSubsArrayKey"
+          'subscribeWithSubsArrayKey',
         );
 
         expect(subscribeWithSubsArrayResponse).toBe(dummySubscriptionContainer);
@@ -119,7 +119,7 @@ describe("SubController Tests", () => {
         expect(subController.registerSubscription).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "subscribeWithSubsArrayKey"
+          'subscribeWithSubsArrayKey',
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeFalsy();
@@ -127,33 +127,33 @@ describe("SubController Tests", () => {
 
         expect(dummySubscriptionContainer.subs.size).toBe(2);
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver1)
+          dummySubscriptionContainer.subs.has(dummyObserver1),
         ).toBeTruthy();
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver2)
+          dummySubscriptionContainer.subs.has(dummyObserver2),
         ).toBeTruthy();
 
         expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
+          dummySubscriptionContainer,
         );
         expect(dummyObserver2.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
+          dummySubscriptionContainer,
         );
       });
     });
 
-    describe("unsubscribe function tests", () => {
+    describe('unsubscribe function tests', () => {
       beforeEach(() => {
-        jest.spyOn(dummyObserver1, "unsubscribe");
-        jest.spyOn(dummyObserver2, "unsubscribe");
+        jest.spyOn(dummyObserver1, 'unsubscribe');
+        jest.spyOn(dummyObserver2, 'unsubscribe');
       });
 
-      it("should unsubscribe callbackSubscriptionContainer", () => {
+      it('should unsubscribe callbackSubscriptionContainer', () => {
         const dummyIntegration = () => {};
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         subController.unsubscribe(callbackSubscriptionContainer);
@@ -161,21 +161,21 @@ describe("SubController Tests", () => {
         expect(subController.callbackSubs.size).toBe(0);
         expect(callbackSubscriptionContainer.ready).toBeFalsy();
         expect(dummyObserver1.unsubscribe).toHaveBeenCalledWith(
-          callbackSubscriptionContainer
+          callbackSubscriptionContainer,
         );
         expect(dummyObserver2.unsubscribe).toHaveBeenCalledWith(
-          callbackSubscriptionContainer
+          callbackSubscriptionContainer,
         );
       });
 
-      it("should unsubscribe componentSubscriptionContainer", () => {
+      it('should unsubscribe componentSubscriptionContainer', () => {
         const dummyIntegration: any = {
-          dummy: "integration",
+          dummy: 'integration',
         };
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         subController.unsubscribe(componentSubscriptionContainer);
@@ -183,21 +183,21 @@ describe("SubController Tests", () => {
         expect(subController.componentSubs.size).toBe(0);
         expect(componentSubscriptionContainer.ready).toBeFalsy();
         expect(dummyObserver1.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer
+          componentSubscriptionContainer,
         );
         expect(dummyObserver2.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer
+          componentSubscriptionContainer,
         );
       });
 
-      it("should unsubscribe componentSubscriptionContainer in a passed Object that hold an instance of it", () => {
+      it('should unsubscribe componentSubscriptionContainer in a passed Object that hold an instance of it', () => {
         const dummyIntegration: any = {
-          dummy: "integration",
+          dummy: 'integration',
         };
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         subController.unsubscribe(dummyIntegration);
@@ -205,181 +205,181 @@ describe("SubController Tests", () => {
         expect(subController.componentSubs.size).toBe(0);
         expect(componentSubscriptionContainer.ready).toBeFalsy();
         expect(dummyObserver1.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer
+          componentSubscriptionContainer,
         );
         expect(dummyObserver2.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer
+          componentSubscriptionContainer,
         );
       });
     });
 
-    describe("registerSubscription function tests", () => {
+    describe('registerSubscription function tests', () => {
       let dummySubscriptionContainer: SubscriptionContainer;
 
       beforeEach(() => {
         dummySubscriptionContainer = new SubscriptionContainer();
 
         subController.registerCallbackSubscription = jest.fn(
-          () => dummySubscriptionContainer as CallbackSubscriptionContainer
+          () => dummySubscriptionContainer as CallbackSubscriptionContainer,
         );
         subController.registerComponentSubscription = jest.fn(
-          () => dummySubscriptionContainer as ComponentSubscriptionContainer
+          () => dummySubscriptionContainer as ComponentSubscriptionContainer,
         );
       });
 
-      it("should call registerCallbackSubscription if passed integrationInstance is a Function", () => {
+      it('should call registerCallbackSubscription if passed integrationInstance is a Function', () => {
         const dummyIntegration = () => {};
 
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "niceKey"
+          'niceKey',
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
         expect(subController.registerCallbackSubscription).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "niceKey"
+          'niceKey',
         );
         expect(
-          subController.registerComponentSubscription
+          subController.registerComponentSubscription,
         ).not.toHaveBeenCalled();
       });
 
-      it("should call registerComponentSubscription if passed integrationInstance is not a Function", () => {
-        const dummyIntegration = { dummy: "integration" };
+      it('should call registerComponentSubscription if passed integrationInstance is not a Function', () => {
+        const dummyIntegration = {dummy: 'integration'};
 
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "niceKey"
+          'niceKey',
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
         expect(
-          subController.registerComponentSubscription
+          subController.registerComponentSubscription,
         ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "niceKey"
+          'niceKey',
         );
         expect(
-          subController.registerCallbackSubscription
+          subController.registerCallbackSubscription,
         ).not.toHaveBeenCalled();
       });
     });
 
-    describe("registerComponentSubscription function tests", () => {
-      it("should return ready componentSubscriptionContainer and add it to dummyIntegration (agileInstance.config.mount = false)", () => {
-        const dummyIntegration: any = { dummy: "integration" };
+    describe('registerComponentSubscription function tests', () => {
+      it('should return ready componentSubscriptionContainer and add it to dummyIntegration (agileInstance.config.mount = false)', () => {
+        const dummyIntegration: any = {dummy: 'integration'};
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
-          ComponentSubscriptionContainer
+          ComponentSubscriptionContainer,
         );
-        expect(componentSubscriptionContainer.key).toBe("myKey");
+        expect(componentSubscriptionContainer.key).toBe('myKey');
         expect(componentSubscriptionContainer.component).toStrictEqual(
-          dummyIntegration
+          dummyIntegration,
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
 
         expect(componentSubscriptionContainer.subs.size).toBe(2);
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver1)
+          componentSubscriptionContainer.subs.has(dummyObserver1),
         ).toBeTruthy();
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver2)
+          componentSubscriptionContainer.subs.has(dummyObserver2),
         ).toBeTruthy();
 
         expect(subController.componentSubs.size).toBe(1);
         expect(
-          subController.componentSubs.has(componentSubscriptionContainer)
+          subController.componentSubs.has(componentSubscriptionContainer),
         ).toBeTruthy();
 
         expect(dummyIntegration.componentSubscriptionContainer).toBe(
-          componentSubscriptionContainer
+          componentSubscriptionContainer,
         );
       });
 
       it("should return not ready componentSubscriptionContainer if componentInstance isn't mounted (agileInstance.config.mount = true)", () => {
         dummyAgile.config.waitForMount = true;
         const dummyIntegration: any = {
-          dummy: "integration",
+          dummy: 'integration',
         };
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
-          ComponentSubscriptionContainer
+          ComponentSubscriptionContainer,
         );
         expect(componentSubscriptionContainer.ready).toBeFalsy();
       });
 
-      it("should return ready componentSubscriptionContainer if componentInstance is mounted (agileInstance.config.mount = true)", () => {
+      it('should return ready componentSubscriptionContainer if componentInstance is mounted (agileInstance.config.mount = true)', () => {
         dummyAgile.config.waitForMount = true;
         const dummyIntegration: any = {
-          dummy: "integration",
+          dummy: 'integration',
         };
         subController.mount(dummyIntegration);
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
-          ComponentSubscriptionContainer
+          ComponentSubscriptionContainer,
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
       });
     });
 
-    describe("registerCallbackSubscription function tests", () => {
-      it("should return callbackSubscriptionContainer", () => {
+    describe('registerCallbackSubscription function tests', () => {
+      it('should return callbackSubscriptionContainer', () => {
         const dummyIntegration = () => {};
 
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
 
         expect(callbackSubscriptionContainer).toBeInstanceOf(
-          CallbackSubscriptionContainer
+          CallbackSubscriptionContainer,
         );
-        expect(callbackSubscriptionContainer.key).toBe("myKey");
+        expect(callbackSubscriptionContainer.key).toBe('myKey');
         expect(callbackSubscriptionContainer.callback).toBe(dummyIntegration);
         expect(callbackSubscriptionContainer.ready).toBeTruthy();
 
         expect(callbackSubscriptionContainer.subs.size).toBe(2);
         expect(
-          callbackSubscriptionContainer.subs.has(dummyObserver1)
+          callbackSubscriptionContainer.subs.has(dummyObserver1),
         ).toBeTruthy();
         expect(
-          callbackSubscriptionContainer.subs.has(dummyObserver2)
+          callbackSubscriptionContainer.subs.has(dummyObserver2),
         ).toBeTruthy();
 
         expect(subController.callbackSubs.size).toBe(1);
         expect(
-          subController.callbackSubs.has(callbackSubscriptionContainer)
+          subController.callbackSubs.has(callbackSubscriptionContainer),
         ).toBeTruthy();
       });
     });
 
-    describe("mount function tests", () => {
+    describe('mount function tests', () => {
       const dummyIntegration: any = {
-        dummy: "integration",
+        dummy: 'integration',
       };
       let componentSubscriptionContainer: ComponentSubscriptionContainer;
 
@@ -388,24 +388,24 @@ describe("SubController Tests", () => {
         componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
       });
 
-      it("should add componentInstance to mountedComponents and set its subscriptionContainer to ready", () => {
+      it('should add componentInstance to mountedComponents and set its subscriptionContainer to ready', () => {
         subController.mount(dummyIntegration);
 
         expect(componentSubscriptionContainer.ready).toBeTruthy();
         expect(subController.mountedComponents.size).toBe(1);
         expect(
-          subController.mountedComponents.has(dummyIntegration)
+          subController.mountedComponents.has(dummyIntegration),
         ).toBeTruthy();
       });
     });
 
-    describe("unmount function tests", () => {
+    describe('unmount function tests', () => {
       const dummyIntegration: any = {
-        dummy: "integration",
+        dummy: 'integration',
       };
       let componentSubscriptionContainer: ComponentSubscriptionContainer;
 
@@ -414,12 +414,12 @@ describe("SubController Tests", () => {
         componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          "myKey"
+          'myKey',
         );
         subController.mount(dummyIntegration);
       });
 
-      it("should remove componentInstance from mountedComponents and set its subscriptionContainer to not ready", () => {
+      it('should remove componentInstance from mountedComponents and set its subscriptionContainer to not ready', () => {
         subController.unmount(dummyIntegration);
 
         expect(componentSubscriptionContainer.ready).toBeFalsy();

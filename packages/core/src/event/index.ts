@@ -5,8 +5,8 @@ import {
   generateId,
   isFunction,
   Observer,
-} from "../internal";
-import { EventObserver } from "./event.observer";
+} from '../internal';
+import {EventObserver} from './event.observer';
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;
@@ -16,7 +16,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
   public _key?: EventKey;
   public uses = 0;
-  public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
+  public callbacks: {[key: string]: EventCallbackFunction<PayloadType>} = {}; // All 'subscribed' callback function
   public enabled = true;
   public observer: EventObserver;
 
@@ -107,7 +107,7 @@ export class Event<PayloadType = DefaultEventPayload> {
   public on(key: string, callback: EventCallbackFunction<PayloadType>): this;
   public on(
     keyOrCallback: string | EventCallbackFunction<PayloadType>,
-    callback?: EventCallbackFunction<PayloadType>
+    callback?: EventCallbackFunction<PayloadType>,
   ): this | string {
     const generateKey = isFunction(keyOrCallback);
     let _callback: EventCallbackFunction<PayloadType>;
@@ -124,7 +124,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
-        "A Event Callback Function has to be typeof Function!"
+        'A Event Callback Function has to be typeof Function!',
       );
       return this;
     }
@@ -132,7 +132,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
       Agile.logger.error(
-        `Event Callback Function with the key/name '${key}' already exists!`
+        `Event Callback Function with the key/name '${key}' already exists!`,
       );
       return this;
     }
@@ -283,9 +283,9 @@ export class Event<PayloadType = DefaultEventPayload> {
 }
 
 export type EventKey = string | number;
-export type DefaultEventPayload = { [key: string]: any };
+export type DefaultEventPayload = {[key: string]: any};
 export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
-  payload: PayloadType
+  payload: PayloadType,
 ) => void;
 
 /**

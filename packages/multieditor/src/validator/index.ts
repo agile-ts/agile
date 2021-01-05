@@ -4,14 +4,14 @@ import {
   defineConfig,
   generateId,
   isFunction,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 import {
   DataObject,
   MultiEditor,
   ItemKey,
   StringValidator,
   NumberValidator,
-} from "../internal";
+} from '../internal';
 
 export class Validator<DataType = any> {
   public _key?: ValidatorKey;
@@ -25,7 +25,7 @@ export class Validator<DataType = any> {
    */
   constructor(config: ValidatorConfigInterface = {}) {
     this.config = defineConfig(config, {
-      prefix: "default",
+      prefix: 'default',
     });
     this._key = this.config.key;
   }
@@ -59,7 +59,7 @@ export class Validator<DataType = any> {
   public async validate(
     key: ItemKey,
     value: DataType,
-    editor: MultiEditor<DataType>
+    editor: MultiEditor<DataType>,
   ): Promise<boolean> {
     let isValid = true;
     const item = editor.getItemById(key);
@@ -77,7 +77,7 @@ export class Validator<DataType = any> {
         (await this.validationMethods[validationMethodKey](
           key,
           value,
-          editor
+          editor,
         )) && isValid;
 
     // Handle tracked Statuses
@@ -105,11 +105,11 @@ export class Validator<DataType = any> {
    */
   public addValidationMethod(
     key: ItemKey,
-    method: ValidationMethodInterface<DataType>
+    method: ValidationMethodInterface<DataType>,
   ): this;
   public addValidationMethod(
     keyOrMethod: ItemKey | ValidationMethodInterface<DataType>,
-    method?: ValidationMethodInterface<DataType>
+    method?: ValidationMethodInterface<DataType>,
   ): this {
     const generateKey = isFunction(keyOrMethod);
     let _method: ValidationMethodInterface<DataType>;
@@ -125,14 +125,14 @@ export class Validator<DataType = any> {
 
     // Check if Validation Method is a Function
     if (!isFunction(_method)) {
-      Agile.logger.error("A Validation Method has to be a function!");
+      Agile.logger.error('A Validation Method has to be a function!');
       return this;
     }
 
     // Check if Validation Method already exists
     if (this.validationMethods[key]) {
       Agile.logger.error(
-        `Validation Method with the key/name '${key}' already exists!`
+        `Validation Method with the key/name '${key}' already exists!`,
       );
       return this;
     }
@@ -188,18 +188,18 @@ export class Validator<DataType = any> {
    */
   public required(errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("required"),
+      this.getValidationMethodKey('required'),
       async (key: ItemKey, value: DataType, editor) => {
         const isValid = !!value;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
-            errorMessage || `${key} is a required field`
+            'error',
+            errorMessage || `${key} is a required field`,
           );
         }
         return isValid;
-      }
+      },
     );
     return this;
   }
@@ -221,7 +221,7 @@ export type ValidatorKey = string | number;
 export type ValidationMethodInterface<DataType = any> = (
   key: ItemKey,
   value: DataType,
-  editor: MultiEditor<DataType>
+  editor: MultiEditor<DataType>,
 ) => Promise<boolean>;
 
 /**

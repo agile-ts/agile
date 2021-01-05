@@ -7,13 +7,13 @@ import {
   ItemKey,
   State,
   StateRuntimeJobConfigInterface,
-} from "../internal";
+} from '../internal';
 
 export class Selector<DataType = DefaultItem> extends State<
   DataType | undefined
 > {
-  static dummyItemKey = "unknown";
-  static rebuildSelectorSideEffectKey = "rebuildSelector";
+  static dummyItemKey = 'unknown';
+  static rebuildSelectorSideEffectKey = 'rebuildSelector';
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
   public _itemKey: ItemKey; // Key of Item the Selector represents
@@ -28,7 +28,7 @@ export class Selector<DataType = DefaultItem> extends State<
   constructor(
     collection: Collection<DataType>,
     itemKey: ItemKey,
-    config: SelectorConfigInterface = {}
+    config: SelectorConfigInterface = {},
   ) {
     super(collection.agileInstance(), undefined, config);
     config = defineConfig(config, {
@@ -42,7 +42,7 @@ export class Selector<DataType = DefaultItem> extends State<
     this.isPlaceholder = true;
 
     // Initial Select
-    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
+    if (!config.isPlaceholder) this.select(itemKey, {overwrite: true});
   }
 
   /**
@@ -72,7 +72,7 @@ export class Selector<DataType = DefaultItem> extends State<
    */
   public select(
     itemKey: ItemKey,
-    config: StateRuntimeJobConfigInterface = {}
+    config: StateRuntimeJobConfigInterface = {},
   ): this {
     const oldItem = this.collection().getItem(this._itemKey, {
       notExisting: true,
@@ -92,7 +92,7 @@ export class Selector<DataType = DefaultItem> extends State<
     }
 
     // Unselect old Item
-    this.unselect({ background: true });
+    this.unselect({background: true});
 
     this._itemKey = itemKey;
     this.item = newItem;
@@ -100,7 +100,7 @@ export class Selector<DataType = DefaultItem> extends State<
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, (config) =>
-      this.rebuildSelector(config)
+      this.rebuildSelector(config),
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly

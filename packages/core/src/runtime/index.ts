@@ -5,7 +5,7 @@ import {
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
   defineConfig,
-} from "../internal";
+} from '../internal';
 
 export class Runtime {
   public agileInstance: () => Agile;
@@ -42,7 +42,7 @@ export class Runtime {
     this.jobQueue.push(job);
 
     // Logging
-    Agile.logger.if.tag(["runtime"]).info(`Created Job '${job._key}'`, job);
+    Agile.logger.if.tag(['runtime']).info(`Created Job '${job._key}'`, job);
 
     // Perform Job
     if (config.perform) {
@@ -70,7 +70,7 @@ export class Runtime {
     this.currentJob = null;
 
     // Logging
-    Agile.logger.if.tag(["runtime"]).info(`Completed Job '${job._key}'`, job);
+    Agile.logger.if.tag(['runtime']).info(`Completed Job '${job._key}'`, job);
 
     // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
     if (this.jobQueue.length > 0) {
@@ -110,7 +110,7 @@ export class Runtime {
 
     // Build final jobsToRerender and reset jobsToRerender Instances
     const jobsToRerender = this.jobsToRerender.concat(
-      Array.from(this.notReadyJobsToRerender)
+      Array.from(this.notReadyJobsToRerender),
     );
     this.notReadyJobsToRerender = new Set();
     this.jobsToRerender = [];
@@ -124,7 +124,7 @@ export class Runtime {
           // Logging
           Agile.logger.warn(
             "SubscriptionContainer/Component isn't ready to rerender!",
-            subscriptionContainer
+            subscriptionContainer,
           );
           return;
         }
@@ -147,14 +147,14 @@ export class Runtime {
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
-          this.getObjectBasedProps(subscriptionContainer)
+          this.getObjectBasedProps(subscriptionContainer),
         );
     });
 
     // Logging
     Agile.logger.if
-      .tag(["runtime"])
-      .info("Updated/Rerendered Subscriptions", subscriptionsToUpdate);
+      .tag(['runtime'])
+      .info('Updated/Rerendered Subscriptions', subscriptionsToUpdate);
 
     return true;
   }
@@ -170,7 +170,7 @@ export class Runtime {
    */
   public handleObjectBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
-    job: RuntimeJob
+    job: RuntimeJob,
   ): void {
     let foundKey: string | null = null;
 
@@ -194,18 +194,18 @@ export class Runtime {
    * @param subscriptionContainer - Object based SubscriptionContainer
    */
   public getObjectBasedProps(
-    subscriptionContainer: SubscriptionContainer
-  ): { [key: string]: any } {
-    const props: { [key: string]: any } = {};
+    subscriptionContainer: SubscriptionContainer,
+  ): {[key: string]: any} {
+    const props: {[key: string]: any} = {};
 
     // Map trough observerKeysToUpdate and build object out of Observer value
     subscriptionContainer.observerKeysToUpdate.forEach((updatedKey) => {
       if (
         subscriptionContainer.subsObject &&
-        subscriptionContainer.subsObject[updatedKey]["value"]
+        subscriptionContainer.subsObject[updatedKey]['value']
       )
         props[updatedKey] =
-          subscriptionContainer.subsObject[updatedKey]["value"];
+          subscriptionContainer.subsObject[updatedKey]['value'];
     });
 
     subscriptionContainer.observerKeysToUpdate = [];

@@ -5,10 +5,10 @@ import {
   PersistentKey,
   State,
   StorageKey,
-} from "../internal";
+} from '../internal';
 
 export class StatePersistent<ValueType = any> extends Persistent {
-  static storeValueSideEffectKey = "rebuildStateStorageValue";
+  static storeValueSideEffectKey = 'rebuildStateStorageValue';
   public state: () => State;
 
   /**
@@ -19,7 +19,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   constructor(
     state: State<ValueType>,
-    config: CreatePersistentConfigInterface = {}
+    config: CreatePersistentConfigInterface = {},
   ) {
     super(state.agileInstance(), {
       instantiate: false,
@@ -97,12 +97,12 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Load Value from default Storage
     const loadedValue = await this.agileInstance().storages.get<ValueType>(
       _key,
-      this.defaultStorageKey
+      this.defaultStorageKey,
     );
     if (!loadedValue) return false;
 
     // Assign loaded Value to State
-    this.state().set(loadedValue, { storage: false });
+    this.state().set(loadedValue, {storage: false});
 
     // Persist State, so that the Storage Value updates dynamically if the State updates
     await this.persistValue(_key);
@@ -127,7 +127,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
       StatePersistent.storeValueSideEffectKey,
       (config) => {
         this.rebuildStorageSideEffect(this.state(), _key, config);
-      }
+      },
     );
 
     // Rebuild Storage for saving State Value in the Storage
@@ -194,14 +194,14 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public rebuildStorageSideEffect(
     state: State<ValueType>,
     key: PersistentKey,
-    config: any = {}
+    config: any = {},
   ) {
     if (config.storage !== undefined && !config.storage) return;
 
     this.agileInstance().storages.set(
       key,
       this.state().getPersistableValue(),
-      this.storageKeys
+      this.storageKeys,
     );
   }
 }

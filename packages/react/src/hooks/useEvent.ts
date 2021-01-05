@@ -1,18 +1,18 @@
-import React from "react";
+import React from 'react';
 import {
   Agile,
   Event,
   EventCallbackFunction,
   getAgileInstance,
   SubscriptionContainerKeyType,
-} from "@agile-ts/core";
-import { useIsomorphicLayoutEffect } from "../utils/useIsomorphicLayoutEffect";
+} from '@agile-ts/core';
+import {useIsomorphicLayoutEffect} from '../utils/useIsomorphicLayoutEffect';
 
 export function useEvent<E extends Event<any>>(
   event: E,
-  callback: EventCallbackFunction<E["payload"]>,
+  callback: EventCallbackFunction<E['payload']>,
   key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
+  agileInstance?: Agile,
 ) {
   // Trigger State used to force the component to rerender
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
@@ -23,7 +23,7 @@ export function useEvent<E extends Event<any>>(
     // Get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(event);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error("Failed to subscribe Component with deps", event);
+      Agile.logger.error('Failed to subscribe Component with deps', event);
       return;
     }
 
@@ -33,7 +33,7 @@ export function useEvent<E extends Event<any>>(
         forceRender();
       },
       [event.observer],
-      key
+      key,
     );
 
     // Unsubscribe Callback based Subscription and Event on Unmount

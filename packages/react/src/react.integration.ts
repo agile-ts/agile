@@ -1,9 +1,9 @@
-import { Agile, Integration } from "@agile-ts/core";
-import { AgileReactComponent } from "./hooks/AgileHOC";
-import React from "react";
+import {Agile, Integration} from '@agile-ts/core';
+import {AgileReactComponent} from './hooks/AgileHOC';
+import React from 'react';
 
 const reactIntegration = new Integration<typeof React, AgileReactComponent>({
-  key: "react",
+  key: 'react',
   frameworkInstance: React,
   bind(agileInstance: Agile) {
     // Nothing to bind ;D

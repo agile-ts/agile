@@ -2,8 +2,8 @@ import {
   defineConfig,
   State,
   StateRuntimeJobConfigInterface,
-} from "@agile-ts/core";
-import { MultiEditor, Validator, Status, ItemKey } from "./internal";
+} from '@agile-ts/core';
+import {MultiEditor, Validator, Status, ItemKey} from './internal';
 
 export class Item<DataType = any> extends State<DataType> {
   public editor: () => MultiEditor<DataType>;
@@ -26,7 +26,7 @@ export class Item<DataType = any> extends State<DataType> {
     editor: MultiEditor<DataType>,
     data: DataType,
     key: ItemKey,
-    config: ItemConfigInterface = {}
+    config: ItemConfigInterface = {},
   ) {
     super(editor.agileInstance(), data, {
       key: key,
@@ -40,11 +40,11 @@ export class Item<DataType = any> extends State<DataType> {
     this.status = new Status(this);
 
     // Add SideEffect that rebuilds the Status depending of the Item value
-    this.addSideEffect("validateItem", async () => {
+    this.addSideEffect('validateItem', async () => {
       this.isValid = await this.validator.validate(
         key,
         this.value,
-        this.editor()
+        this.editor(),
       );
       if (this.editor().canAssignStatusToItemOnChange(this))
         this.status.display = true;

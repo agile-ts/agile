@@ -4,7 +4,7 @@ import {
   isAsyncFunction,
   isFunction,
   Agile,
-} from "../internal";
+} from '../internal';
 
 export class Storage {
   public key: StorageKey;
@@ -19,7 +19,7 @@ export class Storage {
    */
   constructor(config: CreateStorageConfigInterface) {
     config = defineConfig(config, {
-      prefix: "agile",
+      prefix: 'agile',
       async: false,
     });
     this.key = config.key;
@@ -76,7 +76,7 @@ export class Storage {
     if (!this.ready || !this.methods.get) return;
     if (isAsyncFunction(this.methods.get))
       Agile.logger.warn(
-        "Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
+        "Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!",
       );
 
     // Get Value

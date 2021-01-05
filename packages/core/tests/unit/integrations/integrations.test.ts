@@ -1,29 +1,29 @@
-import { Agile, Integration, Integrations } from "../../../src";
+import {Agile, Integration, Integrations} from '../../../src';
 
-describe("Integrations Tests", () => {
+describe('Integrations Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile({localStorage: false});
     Agile.initialIntegrations = [];
 
     console.error = jest.fn();
     console.warn = jest.fn();
-    jest.spyOn(Integrations.prototype, "integrate");
+    jest.spyOn(Integrations.prototype, 'integrate');
   });
 
-  it("should create Integrations", () => {
+  it('should create Integrations', () => {
     const integrations = new Integrations(dummyAgile);
 
     expect(integrations.integrations.size).toBe(0);
   });
 
-  it("should create Integrations and integrate Agile initialIntegrations", async () => {
+  it('should create Integrations and integrate Agile initialIntegrations', async () => {
     const dummyIntegration1 = new Integration({
-      key: "initialIntegration1",
+      key: 'initialIntegration1',
     });
     const dummyIntegration2 = new Integration({
-      key: "initialIntegration2",
+      key: 'initialIntegration2',
     });
     Agile.initialIntegrations.push(dummyIntegration1);
     Agile.initialIntegrations.push(dummyIntegration2);
@@ -38,7 +38,7 @@ describe("Integrations Tests", () => {
     expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration2);
   });
 
-  describe("Integrations Function Tests", () => {
+  describe('Integrations Function Tests', () => {
     let integrations: Integrations;
     let dummyIntegration1: Integration;
     let dummyIntegration2: Integration;
@@ -46,15 +46,15 @@ describe("Integrations Tests", () => {
     beforeEach(() => {
       integrations = new Integrations(dummyAgile);
       dummyIntegration1 = new Integration({
-        key: "dummyIntegration1",
+        key: 'dummyIntegration1',
       });
       dummyIntegration2 = new Integration({
-        key: "dummyIntegration2",
+        key: 'dummyIntegration2',
       });
     });
 
-    describe("integrate function tests", () => {
-      it("should integrate valid integration with no bind function", async () => {
+    describe('integrate function tests', () => {
+      it('should integrate valid integration with no bind function', async () => {
         const response = await integrations.integrate(dummyIntegration1);
 
         expect(response).toBeTruthy();
@@ -63,7 +63,7 @@ describe("Integrations Tests", () => {
         expect(dummyIntegration1.integrated).toBeTruthy();
       });
 
-      it("should integrate valid integration with bind function that returns true", async () => {
+      it('should integrate valid integration with bind function that returns true', async () => {
         dummyIntegration1.methods.bind = jest.fn(() => Promise.resolve(true));
 
         const response = await integrations.integrate(dummyIntegration1);
@@ -75,7 +75,7 @@ describe("Integrations Tests", () => {
         expect(dummyIntegration1.methods.bind).toHaveBeenCalledWith(dummyAgile);
       });
 
-      it("should integrate valid integration with bind function that returns false", async () => {
+      it('should integrate valid integration with bind function that returns false', async () => {
         dummyIntegration1.methods.bind = jest.fn(() => Promise.resolve(false));
 
         const response = await integrations.integrate(dummyIntegration1);
@@ -98,22 +98,22 @@ describe("Integrations Tests", () => {
         expect(dummyIntegration1.integrated).toBeFalsy();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Failed to integrate framework! Invalid Integration!",
-          dummyIntegration1._key
+          'Agile Error: Failed to integrate framework! Invalid Integration!',
+          dummyIntegration1._key,
         );
       });
     });
 
-    describe("update function tests", () => {
-      const dummyComponentInstance = { my: "component" };
-      const dummyUpdatedData = { my: "updatedData" };
+    describe('update function tests', () => {
+      const dummyComponentInstance = {my: 'component'};
+      const dummyUpdatedData = {my: 'updatedData'};
 
       beforeEach(() => {
         integrations.integrate(dummyIntegration1);
         integrations.integrate(dummyIntegration2);
       });
 
-      it("should call updateMethod on each ready Integration", () => {
+      it('should call updateMethod on each ready Integration', () => {
         dummyIntegration1.ready = false;
         dummyIntegration1.methods.updateMethod = jest.fn();
         dummyIntegration2.methods.updateMethod = jest.fn();
@@ -123,21 +123,21 @@ describe("Integrations Tests", () => {
         expect(dummyIntegration1.methods.updateMethod).not.toHaveBeenCalled();
         expect(dummyIntegration2.methods.updateMethod).toHaveBeenCalledWith(
           dummyComponentInstance,
-          dummyUpdatedData
+          dummyUpdatedData,
         );
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Integration 'dummyIntegration1' isn't ready yet!"
+          "Agile Warn: Integration 'dummyIntegration1' isn't ready yet!",
         );
       });
     });
 
-    describe("hasIntegration function tests", () => {
-      it("should return false if Integrations has no integrated Integration", () => {
+    describe('hasIntegration function tests', () => {
+      it('should return false if Integrations has no integrated Integration', () => {
         expect(integrations.hasIntegration()).toBeFalsy();
       });
 
-      it("should return true if Integrations has at least one integrated Integration", () => {
+      it('should return true if Integrations has at least one integrated Integration', () => {
         integrations.integrate(dummyIntegration1);
 
         expect(integrations.hasIntegration()).toBeTruthy();

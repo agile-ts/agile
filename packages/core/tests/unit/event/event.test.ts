@@ -1,16 +1,16 @@
-import { Event, Agile, Observer, EventObserver } from "../../../src";
-import * as Utils from "../../../src/utils";
+import {Event, Agile, Observer, EventObserver} from '../../../src';
+import * as Utils from '../../../src/utils';
 
-describe("Event Tests", () => {
+describe('Event Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile({localStorage: false});
 
     console.error = jest.fn();
   });
 
-  it("should create Event (default config)", () => {
+  it('should create Event (default config)', () => {
     const event = new Event(dummyAgile);
 
     expect(event.config).toStrictEqual({
@@ -31,11 +31,11 @@ describe("Event Tests", () => {
     expect(event.payload).toBeUndefined();
   });
 
-  it("should create Event (specific config)", () => {
+  it('should create Event (specific config)', () => {
     const dummyObserver = new Observer(dummyAgile);
 
     const event = new Event(dummyAgile, {
-      key: "coolEvent",
+      key: 'coolEvent',
       deps: [dummyObserver],
       delay: 20,
       maxUses: 40,
@@ -49,114 +49,114 @@ describe("Event Tests", () => {
       overlap: false,
       rerender: true,
     });
-    expect(event._key).toBe("coolEvent");
+    expect(event._key).toBe('coolEvent');
     expect(event.uses).toBe(0);
     expect(event.callbacks).toStrictEqual({});
     expect(event.enabled).toBeFalsy();
     expect(event.observer).toBeInstanceOf(EventObserver);
     expect(event.observer.deps.size).toBe(1);
     expect(event.observer.deps.has(dummyObserver)).toBeTruthy();
-    expect(event.observer._key).toBe("coolEvent");
+    expect(event.observer._key).toBe('coolEvent');
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
     expect(event.payload).toBeUndefined();
   });
 
-  describe("Event Function Tests", () => {
+  describe('Event Function Tests', () => {
     let event: Event<string>;
 
     beforeEach(() => {
       event = new Event<string>(dummyAgile, {
-        key: "eventKey",
+        key: 'eventKey',
       });
     });
 
-    describe("key set function tests", () => {
-      it("should call setKey with passed value", () => {
+    describe('key set function tests', () => {
+      it('should call setKey with passed value', () => {
         event.setKey = jest.fn();
 
-        event.key = "newKey";
+        event.key = 'newKey';
 
-        expect(event.setKey).toHaveBeenCalledWith("newKey");
+        expect(event.setKey).toHaveBeenCalledWith('newKey');
       });
     });
 
-    describe("key get function tests", () => {
-      it("should return current State Key", () => {
-        expect(event.key).toBe("eventKey");
+    describe('key get function tests', () => {
+      it('should return current State Key', () => {
+        expect(event.key).toBe('eventKey');
       });
     });
 
-    describe("setKey function tests", () => {
-      it("should update existing Key in all instances", () => {
-        event.setKey("newKey");
+    describe('setKey function tests', () => {
+      it('should update existing Key in all instances', () => {
+        event.setKey('newKey');
 
-        expect(event.key).toBe("newKey");
-        expect(event.observer._key).toBe("newKey");
+        expect(event.key).toBe('newKey');
+        expect(event.observer._key).toBe('newKey');
       });
     });
 
-    describe("on function tests", () => {
+    describe('on function tests', () => {
       const dummyCallbackFunction1 = () => {};
       const dummyCallbackFunction2 = () => {};
 
-      it("should add passed callbackFunction to callbacks at passed key", () => {
-        const response = event.on("dummyKey", dummyCallbackFunction1);
+      it('should add passed callbackFunction to callbacks at passed key', () => {
+        const response = event.on('dummyKey', dummyCallbackFunction1);
 
         expect(response).toBe(event);
-        expect(event.callbacks).toHaveProperty("dummyKey");
-        expect(event.callbacks["dummyKey"]).toBe(dummyCallbackFunction1);
+        expect(event.callbacks).toHaveProperty('dummyKey');
+        expect(event.callbacks['dummyKey']).toBe(dummyCallbackFunction1);
       });
 
-      it("should add passed callbackFunction to callbacks at random key if no key passed and return that generated key", () => {
-        jest.spyOn(Utils, "generateId").mockReturnValue("randomKey");
+      it('should add passed callbackFunction to callbacks at random key if no key passed and return that generated key', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
 
         const response = event.on(dummyCallbackFunction1);
 
-        expect(response).toBe("randomKey");
-        expect(event.callbacks).toHaveProperty("randomKey");
-        expect(event.callbacks["randomKey"]).toBe(dummyCallbackFunction1);
+        expect(response).toBe('randomKey');
+        expect(event.callbacks).toHaveProperty('randomKey');
+        expect(event.callbacks['randomKey']).toBe(dummyCallbackFunction1);
         expect(Utils.generateId).toHaveBeenCalled();
       });
 
       it("shouldn't add passed invalid callbackFunction to callbacks at passed key", () => {
-        const response = event.on("dummyKey", "noFunction hehe" as any);
+        const response = event.on('dummyKey', 'noFunction hehe' as any);
 
         expect(response).toBe(event);
-        expect(event.callbacks).not.toHaveProperty("dummyKey");
+        expect(event.callbacks).not.toHaveProperty('dummyKey');
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: A Event Callback Function has to be typeof Function!"
+          'Agile Error: A Event Callback Function has to be typeof Function!',
         );
       });
 
       it("shouldn't add passed callbackFunction to callbacks at passed key if passed key is already occupied", () => {
-        event.callbacks["dummyKey"] = dummyCallbackFunction2;
+        event.callbacks['dummyKey'] = dummyCallbackFunction2;
 
-        const response = event.on("dummyKey", dummyCallbackFunction1);
+        const response = event.on('dummyKey', dummyCallbackFunction1);
 
         expect(response).toBe(event);
-        expect(event.callbacks).toHaveProperty("dummyKey");
-        expect(event.callbacks["dummyKey"]).toBe(dummyCallbackFunction2);
+        expect(event.callbacks).toHaveProperty('dummyKey');
+        expect(event.callbacks['dummyKey']).toBe(dummyCallbackFunction2);
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Event Callback Function with the key/name 'dummyKey' already exists!"
+          "Agile Error: Event Callback Function with the key/name 'dummyKey' already exists!",
         );
       });
     });
 
-    describe("trigger function tests", () => {
+    describe('trigger function tests', () => {
       beforeEach(() => {
         event.delayedTrigger = jest.fn();
         event.normalTrigger = jest.fn();
       });
 
-      it("should call normalTrigger if Event is enabled (config.delay = false)", () => {
+      it('should call normalTrigger if Event is enabled (config.delay = false)', () => {
         event.enabled = true;
         event.config.delay = undefined;
 
-        event.trigger("myPayload", ["specificKey"]);
+        event.trigger('myPayload', ['specificKey']);
 
-        expect(event.normalTrigger).toHaveBeenCalledWith("myPayload", [
-          "specificKey",
+        expect(event.normalTrigger).toHaveBeenCalledWith('myPayload', [
+          'specificKey',
         ]);
         expect(event.delayedTrigger).not.toHaveBeenCalled();
       });
@@ -165,20 +165,20 @@ describe("Event Tests", () => {
         event.enabled = false;
         event.config.delay = undefined;
 
-        event.trigger("myPayload", ["specificKey"]);
+        event.trigger('myPayload', ['specificKey']);
 
         expect(event.normalTrigger).not.toHaveBeenCalled();
         expect(event.delayedTrigger).not.toHaveBeenCalled();
       });
 
-      it("should call normalTrigger if Event is enabled (config.delay = false)", () => {
+      it('should call normalTrigger if Event is enabled (config.delay = false)', () => {
         event.enabled = true;
         event.config.delay = 10;
 
-        event.trigger("myPayload", ["specificKey"]);
+        event.trigger('myPayload', ['specificKey']);
 
-        expect(event.delayedTrigger).toHaveBeenCalledWith("myPayload", 10, [
-          "specificKey",
+        expect(event.delayedTrigger).toHaveBeenCalledWith('myPayload', 10, [
+          'specificKey',
         ]);
         expect(event.normalTrigger).not.toHaveBeenCalled();
       });
@@ -187,15 +187,15 @@ describe("Event Tests", () => {
         event.enabled = false;
         event.config.delay = 10;
 
-        event.trigger("myPayload", ["specificKey"]);
+        event.trigger('myPayload', ['specificKey']);
 
         expect(event.delayedTrigger).not.toHaveBeenCalled();
         expect(event.normalTrigger).not.toHaveBeenCalled();
       });
     });
 
-    describe("disable function tests", () => {
-      it("should disable Event", () => {
+    describe('disable function tests', () => {
+      it('should disable Event', () => {
         event.enabled = undefined;
 
         event.disable();
@@ -204,8 +204,8 @@ describe("Event Tests", () => {
       });
     });
 
-    describe("enable function tests", () => {
-      it("should enable Event", () => {
+    describe('enable function tests', () => {
+      it('should enable Event', () => {
         event.enabled = undefined;
 
         event.enable();
@@ -214,8 +214,8 @@ describe("Event Tests", () => {
       });
     });
 
-    describe("reset function tests", () => {
-      it("should reset enabled, uses and the currentTimeout", () => {
+    describe('reset function tests', () => {
+      it('should reset enabled, uses and the currentTimeout', () => {
         const timeout = setTimeout(() => {}, 1000);
         // @ts-ignore
         clearTimeout = jest.fn();
@@ -232,38 +232,38 @@ describe("Event Tests", () => {
       });
     });
 
-    describe("removeCallback function tests", () => {
+    describe('removeCallback function tests', () => {
       beforeEach(() => {
-        event.callbacks["dummyKey"] = () => {};
+        event.callbacks['dummyKey'] = () => {};
       });
 
-      it("should remove callback at key from Event", () => {
-        event.removeCallback("dummyKey");
+      it('should remove callback at key from Event', () => {
+        event.removeCallback('dummyKey');
 
-        expect(event.callbacks).not.toHaveProperty("dummyKey");
+        expect(event.callbacks).not.toHaveProperty('dummyKey');
       });
     });
 
-    describe("normalTrigger function tests", () => {
-      const dummyPayload = "123";
+    describe('normalTrigger function tests', () => {
+      const dummyPayload = '123';
       const dummyCallbackFunction1 = jest.fn();
       const dummyCallbackFunction2 = jest.fn();
       const dummyCallbackFunction3 = jest.fn();
 
       beforeEach(() => {
-        event.callbacks["callback1"] = dummyCallbackFunction1;
-        event.callbacks["callback2"] = dummyCallbackFunction2;
-        event.callbacks["callback3"] = dummyCallbackFunction3;
+        event.callbacks['callback1'] = dummyCallbackFunction1;
+        event.callbacks['callback2'] = dummyCallbackFunction2;
+        event.callbacks['callback3'] = dummyCallbackFunction3;
 
         event.observer.trigger = jest.fn();
         event.disable = jest.fn();
       });
 
-      it("should call callback functions at passed keys with passed payload", () => {
+      it('should call callback functions at passed keys with passed payload', () => {
         event.config.rerender = false;
         event.uses = 0;
 
-        event.normalTrigger(dummyPayload, ["callback1", "callback3"]);
+        event.normalTrigger(dummyPayload, ['callback1', 'callback3']);
 
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).not.toHaveBeenCalled();
@@ -273,7 +273,7 @@ describe("Event Tests", () => {
         expect(event.uses).toBe(1);
       });
 
-      it("should call all callback functions with passed payload", () => {
+      it('should call all callback functions with passed payload', () => {
         event.config.rerender = false;
         event.uses = 0;
 
@@ -287,7 +287,7 @@ describe("Event Tests", () => {
         expect(event.uses).toBe(1);
       });
 
-      it("should call all callback functions and trigger a rerender (config.rerender)", () => {
+      it('should call all callback functions and trigger a rerender (config.rerender)', () => {
         event.config.rerender = true;
         event.uses = 0;
 
@@ -301,7 +301,7 @@ describe("Event Tests", () => {
         expect(event.uses).toBe(1);
       });
 
-      it("should call all callback functions and disable event if maxUses got reached (config.maxUses)", () => {
+      it('should call all callback functions and disable event if maxUses got reached (config.maxUses)', () => {
         event.config.maxUses = 2;
         event.config.rerender = false;
         event.uses = 0;
@@ -318,24 +318,24 @@ describe("Event Tests", () => {
       });
     });
 
-    describe("delayedTrigger function tests", () => {
-      const dummyPayload1 = "123";
-      const dummyPayload2 = "321";
+    describe('delayedTrigger function tests', () => {
+      const dummyPayload1 = '123';
+      const dummyPayload2 = '321';
 
       beforeEach(() => {
         event.normalTrigger = jest.fn();
       });
 
-      it("should execute one Event after the other", async () => {
+      it('should execute one Event after the other', async () => {
         event.config.overlap = false;
 
-        event.delayedTrigger(dummyPayload1, 500, ["callback1", "callback3"]);
-        event.delayedTrigger(dummyPayload2, 500, ["callback2"]);
+        event.delayedTrigger(dummyPayload1, 500, ['callback1', 'callback3']);
+        event.delayedTrigger(dummyPayload2, 500, ['callback2']);
 
         expect(event.currentTimeout).not.toBeUndefined();
         expect(event.queue.length).toBe(1);
         expect(event.queue[0].payload).toBe(dummyPayload2);
-        expect(event.queue[0].keys).toStrictEqual(["callback2"]);
+        expect(event.queue[0].keys).toStrictEqual(['callback2']);
         expect(event.normalTrigger).not.toHaveBeenCalled();
 
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -344,11 +344,11 @@ describe("Event Tests", () => {
         expect(event.currentTimeout).not.toBeUndefined();
         expect(event.queue.length).toBe(0);
         expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload1, [
-          "callback1",
-          "callback3",
+          'callback1',
+          'callback3',
         ]);
         expect(event.normalTrigger).not.toHaveBeenCalledWith(dummyPayload2, [
-          "callback2",
+          'callback2',
         ]);
 
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -357,15 +357,15 @@ describe("Event Tests", () => {
         expect(event.currentTimeout).toBeUndefined();
         expect(event.queue.length).toBe(0);
         expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload2, [
-          "callback2",
+          'callback2',
         ]);
       });
 
-      it("should execute Events at the same time (config.overlap = true)", async () => {
+      it('should execute Events at the same time (config.overlap = true)', async () => {
         event.config.overlap = true;
 
-        event.delayedTrigger(dummyPayload1, 500, ["callback1", "callback3"]);
-        event.delayedTrigger(dummyPayload2, 500, ["callback2"]);
+        event.delayedTrigger(dummyPayload1, 500, ['callback1', 'callback3']);
+        event.delayedTrigger(dummyPayload2, 500, ['callback2']);
 
         expect(event.currentTimeout).toBeUndefined();
         expect(event.queue.length).toBe(0);
@@ -377,11 +377,11 @@ describe("Event Tests", () => {
         expect(event.currentTimeout).toBeUndefined();
         expect(event.queue.length).toBe(0);
         expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload1, [
-          "callback1",
-          "callback3",
+          'callback1',
+          'callback3',
         ]);
         expect(event.normalTrigger).toHaveBeenCalledWith(dummyPayload2, [
-          "callback2",
+          'callback2',
         ]);
       });
     });

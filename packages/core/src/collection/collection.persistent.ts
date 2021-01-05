@@ -10,14 +10,14 @@ import {
   Persistent,
   PersistentKey,
   StorageKey,
-} from "../internal";
+} from '../internal';
 
 export class CollectionPersistent<DataType = any> extends Persistent {
   public collection: () => Collection<DataType>;
 
-  static defaultGroupSideEffectKey = "rebuildGroupStorageValue";
-  static storageItemKeyPattern = "_${collectionKey}_item_${itemKey}";
-  static storageGroupKeyPattern = "_${collectionKey}_group_${groupKey}";
+  static defaultGroupSideEffectKey = 'rebuildGroupStorageValue';
+  static storageItemKeyPattern = '_${collectionKey}_item_${itemKey}';
+  static storageGroupKeyPattern = '_${collectionKey}_group_${groupKey}';
 
   /**
    * @internal
@@ -27,7 +27,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    */
   constructor(
     collection: Collection<DataType>,
-    config: CreatePersistentConfigInterface = {}
+    config: CreatePersistentConfigInterface = {},
   ) {
     super(collection.agileInstance(), {
       instantiate: false,
@@ -106,14 +106,14 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Check if Collection is Persisted
     const isPersisted = await this.agileInstance().storages.get<DataType>(
       _key,
-      this.defaultStorageKey
+      this.defaultStorageKey,
     );
     if (!isPersisted) return false;
 
     // Loads Values into Collection
     const loadValuesIntoCollection = async () => {
       const defaultGroup = this.collection().getGroup(
-        this.collection().config.defaultGroupKey
+        this.collection().config.defaultGroupKey,
       );
       if (!defaultGroup) return false;
 
@@ -131,13 +131,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       for (let itemKey of defaultGroup._value) {
         const itemStorageKey = CollectionPersistent.getItemStorageKey(
           itemKey,
-          _key
+          _key,
         );
 
         // Get Storage Value
         const storageValue = await this.agileInstance().storages.get<DataType>(
           itemStorageKey,
-          this.defaultStorageKey
+          this.defaultStorageKey,
         );
         if (!storageValue) continue;
 
@@ -167,7 +167,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (!this.ready) return false;
     const _key = key || this._key;
     const defaultGroup = this.collection().getGroup(
-      this.collection().config.defaultGroupKey
+      this.collection().config.defaultGroupKey,
     );
     if (!defaultGroup) return false;
 
@@ -176,12 +176,12 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Persist default Group
     if (!defaultGroup.isPersisted)
-      defaultGroup.persist({ followCollectionPersistKeyPattern: true });
+      defaultGroup.persist({followCollectionPersistKeyPattern: true});
 
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     defaultGroup.addSideEffect(
       CollectionPersistent.defaultGroupSideEffectKey,
-      () => this.rebuildStorageSideEffect(defaultGroup, _key)
+      () => this.rebuildStorageSideEffect(defaultGroup, _key),
     );
 
     // Persist Collection Items
@@ -189,7 +189,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       const item = this.collection().getItem(itemKey);
       const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
-        _key
+        _key,
       );
       item?.persist(itemStorageKey);
     }
@@ -211,7 +211,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (!this.ready) return false;
     const _key = key || this._key;
     const defaultGroup = this.collection().getGroup(
-      this.collection().config.defaultGroupKey
+      this.collection().config.defaultGroupKey,
     );
     if (!defaultGroup) return false;
 
@@ -223,7 +223,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Remove Rebuild Storage sideEffect from default Group
     defaultGroup.removeSideEffect(
-      CollectionPersistent.defaultGroupSideEffectKey
+      CollectionPersistent.defaultGroupSideEffectKey,
     );
 
     // Remove Collection Items from Storage
@@ -275,10 +275,10 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     if (group.previousStateValue.length === group._value.length) return;
 
     const addedKeys = group._value.filter(
-      (key) => !group.previousStateValue.includes(key)
+      (key) => !group.previousStateValue.includes(key),
     );
     const removedKeys = group.previousStateValue.filter(
-      (key) => !group._value.includes(key)
+      (key) => !group._value.includes(key),
     );
 
     // Persist Added Keys
@@ -310,15 +310,15 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    */
   public static getItemStorageKey(
     itemKey?: ItemKey,
-    collectionKey?: CollectionKey
+    collectionKey?: CollectionKey,
   ): string {
     if (!itemKey || !collectionKey)
-      Agile.logger.warn("Failed to build unique Item StorageKey!");
-    if (!itemKey) itemKey = "unknown";
-    if (!collectionKey) collectionKey = "unknown";
+      Agile.logger.warn('Failed to build unique Item StorageKey!');
+    if (!itemKey) itemKey = 'unknown';
+    if (!collectionKey) collectionKey = 'unknown';
     return this.storageItemKeyPattern
-      .replace("${collectionKey}", collectionKey.toString())
-      .replace("${itemKey}", itemKey.toString());
+      .replace('${collectionKey}', collectionKey.toString())
+      .replace('${itemKey}', itemKey.toString());
   }
 
   //=========================================================================================================
@@ -332,15 +332,15 @@ export class CollectionPersistent<DataType = any> extends Persistent {
    */
   public static getGroupStorageKey(
     groupKey?: GroupKey,
-    collectionKey?: CollectionKey
+    collectionKey?: CollectionKey,
   ): string {
     if (!groupKey || !collectionKey)
-      Agile.logger.warn("Failed to build unique Group StorageKey!");
-    if (!groupKey) groupKey = "unknown";
-    if (!collectionKey) collectionKey = "unknown";
+      Agile.logger.warn('Failed to build unique Group StorageKey!');
+    if (!groupKey) groupKey = 'unknown';
+    if (!collectionKey) collectionKey = 'unknown';
 
     return this.storageGroupKeyPattern
-      .replace("${collectionKey}", collectionKey.toString())
-      .replace("${groupKey}", groupKey.toString());
+      .replace('${collectionKey}', collectionKey.toString())
+      .replace('${groupKey}', groupKey.toString());
   }
 }

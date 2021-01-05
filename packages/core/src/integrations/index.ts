@@ -1,4 +1,4 @@
-import { Agile, Integration } from "../internal";
+import {Agile, Integration} from '../internal';
 
 export class Integrations {
   public agileInstance: () => Agile;
@@ -15,7 +15,7 @@ export class Integrations {
 
     // Integrate initial Integrations which are static and got set external
     Agile.initialIntegrations.forEach((integration) =>
-      this.integrate(integration)
+      this.integrate(integration),
     );
   }
 
@@ -31,8 +31,8 @@ export class Integrations {
     // Check if Integration is valid
     if (!integration._key) {
       Agile.logger.error(
-        "Failed to integrate framework! Invalid Integration!",
-        integration._key
+        'Failed to integrate framework! Invalid Integration!',
+        integration._key,
       );
       return false;
     }

@@ -1,4 +1,4 @@
-import { State, Agile, Event, Collection, Observer } from "./internal";
+import {State, Agile, Event, Collection, Observer} from './internal';
 
 //=========================================================================================================
 // Copy
@@ -11,12 +11,12 @@ import { State, Agile, Event, Collection, Observer } from "./internal";
  */
 export function copy<T = any>(value: T): T {
   // Extra checking '!value' because 'typeof null === object'
-  if (!value || typeof value !== "object") return value;
+  if (!value || typeof value !== 'object') return value;
   let temp;
   let newObject: any = Array.isArray(value) ? [] : {};
   for (let property in value) {
     temp = value[property];
-    newObject[property] = typeof temp === "object" ? copy(temp) : temp;
+    newObject[property] = typeof temp === 'object' ? copy(temp) : temp;
   }
   return newObject as T;
 }
@@ -36,17 +36,17 @@ export function isValidObject(value: any): boolean {
       return obj instanceof HTMLElement;
     } catch (e) {
       return (
-        typeof obj === "object" &&
+        typeof obj === 'object' &&
         obj.nodeType === 1 &&
-        typeof obj.style === "object" &&
-        typeof obj.ownerDocument === "object"
+        typeof obj.style === 'object' &&
+        typeof obj.ownerDocument === 'object'
       );
     }
   }
 
   return (
     value !== null &&
-    typeof value === "object" &&
+    typeof value === 'object' &&
     !isHTMLElement(value) &&
     !Array.isArray(value)
   );
@@ -63,7 +63,7 @@ export function isValidObject(value: any): boolean {
  */
 export function includesArray<DataType = any>(
   array1: Array<DataType>,
-  array2: Array<DataType>
+  array2: Array<DataType>,
 ): boolean {
   return array2.every((element) => array1.includes(element));
 }
@@ -79,7 +79,7 @@ export function includesArray<DataType = any>(
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
-  config: { createUndefinedArray?: boolean } = {}
+  config: {createUndefinedArray?: boolean} = {},
 ): Array<DataType> {
   config = defineConfig(config, {
     createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
@@ -101,16 +101,16 @@ export function getAgileInstance(instance: any): Agile | undefined {
   try {
     // Try to get agileInstance from passed Instance
     if (instance) {
-      const _agileInstance = isFunction(instance["agileInstance"])
-        ? instance["agileInstance"]()
-        : instance["agileInstance"];
+      const _agileInstance = isFunction(instance['agileInstance'])
+        ? instance['agileInstance']()
+        : instance['agileInstance'];
       if (_agileInstance) return _agileInstance;
     }
 
     // Return global bound agileInstance
-    return globalThis["__agile__"];
+    return globalThis['__agile__'];
   } catch (e) {
-    Agile.logger.error("Failed to get Agile Instance from ", instance);
+    Agile.logger.error('Failed to get Agile Instance from ', instance);
   }
 
   return undefined;
@@ -125,7 +125,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
  * @param value - Value that gets tested if its a function
  */
 export function isFunction(value: any): boolean {
-  return typeof value === "function";
+  return typeof value === 'function';
 }
 
 //=========================================================================================================
@@ -140,8 +140,8 @@ export function isAsyncFunction(value: any): boolean {
   const valueString = value.toString();
   return (
     isFunction(value) &&
-    (value.constructor.name === "AsyncFunction" ||
-      valueString.includes("__awaiter"))
+    (value.constructor.name === 'AsyncFunction' ||
+      valueString.includes('__awaiter'))
   );
 }
 
@@ -156,13 +156,13 @@ export function isAsyncFunction(value: any): boolean {
  */
 export function isValidUrl(url: string): boolean {
   const pattern = new RegExp(
-    "^(https?:\\/\\/)?" + // protocol
-      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-      "(\\#[-a-z\\d_]*)?$",
-    "i"
+    '^(https?:\\/\\/)?' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i',
   );
   return pattern.test(url);
 }
@@ -176,7 +176,7 @@ export function isValidUrl(url: string): boolean {
  * @param value - Value that gets checked
  */
 export function isJsonString(value: any): boolean {
-  if (typeof value !== "string") return false;
+  if (typeof value !== 'string') return false;
   try {
     JSON.parse(value);
   } catch (e) {
@@ -198,19 +198,19 @@ export function isJsonString(value: any): boolean {
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
   defaults: Object,
-  overwriteUndefinedProperties?: boolean
+  overwriteUndefinedProperties?: boolean,
 ): ConfigInterface {
   if (overwriteUndefinedProperties === undefined)
     overwriteUndefinedProperties = true;
 
   if (overwriteUndefinedProperties) {
-    const finalConfig = { ...defaults, ...config };
+    const finalConfig = {...defaults, ...config};
     for (let key in finalConfig)
       if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
     return finalConfig;
   }
 
-  return { ...defaults, ...config };
+  return {...defaults, ...config};
 }
 
 //=========================================================================================================
@@ -234,7 +234,7 @@ export interface FlatMergeConfigInterface {
 export function flatMerge<DataType = Object>(
   source: DataType,
   changes: Object,
-  config: FlatMergeConfigInterface = {}
+  config: FlatMergeConfigInterface = {},
 ): DataType {
   // Copy Source to avoid references
   const _source = copy<DataType>(source);
@@ -286,9 +286,9 @@ export function notEqual(value1: any, value2: any): boolean {
  */
 export function generateId(length?: number): string {
   const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
-  let result = "";
+  let result = '';
   if (!length) length = 5;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -330,7 +330,7 @@ export function clone<T = any>(instance: T): T {
 export function globalBind(
   key: string,
   instance: any,
-  overwrite = false
+  overwrite = false,
 ): boolean {
   try {
     if (overwrite) {

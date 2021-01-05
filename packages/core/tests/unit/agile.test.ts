@@ -10,17 +10,17 @@ import {
   Collection,
   Logger,
   Storages,
-} from "../../src";
-import testIntegration from "../helper/test.integration";
+} from '../../src';
+import testIntegration from '../helper/test.integration';
 
-jest.mock("../../src/runtime/index");
-jest.mock("../../src/runtime/subscription/sub.controller");
-jest.mock("../../src/storages/index");
-jest.mock("../../src/integrations/index");
-jest.mock("../../src/storages/storage");
-jest.mock("../../src/collection/index");
-jest.mock("../../src/computed/index");
-jest.mock("../../src/event/index");
+jest.mock('../../src/runtime/index');
+jest.mock('../../src/runtime/subscription/sub.controller');
+jest.mock('../../src/storages/index');
+jest.mock('../../src/integrations/index');
+jest.mock('../../src/storages/storage');
+jest.mock('../../src/collection/index');
+jest.mock('../../src/computed/index');
+jest.mock('../../src/event/index');
 /* Can't mock Logger because I somehow can't overwrite a static get method
 jest.mock("../../src/logger/index", () => {
   return class {
@@ -40,7 +40,7 @@ jest.mock("../../src/logger/index", () => {
  */
 // jest.mock("../../src/state/index"); // Can't mock State because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
-describe("Agile Tests", () => {
+describe('Agile Tests', () => {
   const RuntimeMock = Runtime as jest.MockedClass<typeof Runtime>;
   const SubControllerMock = SubController as jest.MockedClass<
     typeof SubController
@@ -57,10 +57,10 @@ describe("Agile Tests", () => {
     IntegrationsMock.mockClear();
 
     // Reset Global This
-    globalThis["__agile__"] = undefined;
+    globalThis['__agile__'] = undefined;
   });
 
-  it("should instantiate Agile (default config)", () => {
+  it('should instantiate Agile (default config)', () => {
     const agile = new Agile();
 
     // Check if Agile properties got instantiated properly
@@ -80,30 +80,30 @@ describe("Agile Tests", () => {
 
     // Check if Static Logger has correct config
     expect(Agile.logger.config).toStrictEqual({
-      prefix: "Agile",
+      prefix: 'Agile',
       level: Logger.level.WARN,
       canUseCustomStyles: true,
     });
     expect(Agile.logger.allowedTags).toStrictEqual([
-      "runtime",
-      "storage",
-      "subscription",
-      "multieditor",
+      'runtime',
+      'storage',
+      'subscription',
+      'multieditor',
     ]);
     expect(Agile.logger.isActive).toBeTruthy();
 
     // Check if global Agile Instance got created
-    expect(globalThis["__agile__"]).toBe(agile);
+    expect(globalThis['__agile__']).toBe(agile);
   });
 
-  it("should instantiate Agile with specific config", () => {
+  it('should instantiate Agile with specific config', () => {
     const agile = new Agile({
       waitForMount: true,
       localStorage: false,
       logConfig: {
         level: Logger.level.DEBUG,
         active: false,
-        prefix: "Jeff",
+        prefix: 'Jeff',
       },
     });
 
@@ -124,45 +124,45 @@ describe("Agile Tests", () => {
 
     // Check if Static Logger has correct config
     expect(Agile.logger.config).toStrictEqual({
-      prefix: "Jeff",
+      prefix: 'Jeff',
       level: Logger.level.DEBUG,
       canUseCustomStyles: true,
     });
     expect(Agile.logger.allowedTags).toStrictEqual([
-      "runtime",
-      "storage",
-      "subscription",
-      "multieditor",
+      'runtime',
+      'storage',
+      'subscription',
+      'multieditor',
     ]);
     expect(Agile.logger.isActive).toBeFalsy();
 
     // Check if global Agile Instance got created
-    expect(globalThis["__agile__"]).toBe(agile);
+    expect(globalThis['__agile__']).toBe(agile);
   });
 
-  describe("Agile Function Tests", () => {
+  describe('Agile Function Tests', () => {
     let agile: Agile;
 
     beforeEach(() => {
       agile = new Agile();
     });
 
-    describe("storage function tests", () => {
+    describe('storage function tests', () => {
       const StorageMock = Storage as jest.MockedClass<typeof Storage>;
 
       beforeEach(() => {
         StorageMock.mockClear();
       });
 
-      it("should create Storage", () => {
+      it('should create Storage', () => {
         const storageConfig = {
-          prefix: "test",
+          prefix: 'test',
           methods: {
             get: () => {},
             set: () => {},
             remove: () => {},
           },
-          key: "myTestStorage",
+          key: 'myTestStorage',
         };
         const storage = agile.Storage(storageConfig);
 
@@ -171,29 +171,29 @@ describe("Agile Tests", () => {
       });
     });
 
-    describe("state function tests", () => {
-      it("should create State", () => {
-        const state = agile.State("testValue", {
-          key: "myCoolState",
+    describe('state function tests', () => {
+      it('should create State', () => {
+        const state = agile.State('testValue', {
+          key: 'myCoolState',
         });
 
         expect(state).toBeInstanceOf(State);
       });
     });
 
-    describe("collection function tests", () => {
+    describe('collection function tests', () => {
       const CollectionMock = Collection as jest.MockedClass<typeof Collection>;
 
       beforeEach(() => {
         CollectionMock.mockClear();
       });
 
-      it("should create Collection", () => {
+      it('should create Collection', () => {
         const collectionConfig = {
-          selectors: ["test", "test1"],
-          groups: ["test2", "test10"],
-          defaultGroupKey: "frank",
-          key: "myCoolCollection",
+          selectors: ['test', 'test1'],
+          groups: ['test2', 'test10'],
+          defaultGroupKey: 'frank',
+          key: 'myCoolCollection',
         };
 
         const collection = agile.Collection(collectionConfig);
@@ -203,14 +203,14 @@ describe("Agile Tests", () => {
       });
     });
 
-    describe("computed function tests", () => {
+    describe('computed function tests', () => {
       const ComputedMock = Computed as jest.MockedClass<typeof Computed>;
 
       beforeEach(() => {
         ComputedMock.mockClear();
       });
 
-      it("should create Computed", () => {
+      it('should create Computed', () => {
         const computedFunction = () => {
           // console.log("Hello Jeff");
         };
@@ -224,19 +224,19 @@ describe("Agile Tests", () => {
       });
     });
 
-    describe("event function tests", () => {
+    describe('event function tests', () => {
       const EventMock = Event as jest.MockedClass<typeof Event>;
 
       beforeEach(() => {
         EventMock.mockClear();
       });
 
-      it("should create Event", () => {
+      it('should create Event', () => {
         const eventConfig = {
           rerender: true,
           delay: 1000,
           enabled: true,
-          key: "myCoolEvent",
+          key: 'myCoolEvent',
         };
 
         const event = agile.Event(eventConfig);
@@ -246,27 +246,27 @@ describe("Agile Tests", () => {
       });
     });
 
-    describe("integrate function tests", () => {
-      it("should integrate provided Framework", () => {
+    describe('integrate function tests', () => {
+      it('should integrate provided Framework', () => {
         const returnedAgile = agile.integrate(testIntegration);
 
         expect(returnedAgile).toBe(agile);
         expect(agile.integrations.integrate).toHaveBeenCalledWith(
-          testIntegration
+          testIntegration,
         );
       });
     });
 
-    describe("registerStorage function tests", () => {
-      it("should register provided Storage", () => {
+    describe('registerStorage function tests', () => {
+      it('should register provided Storage', () => {
         const dummyStorage = new Storage({
-          prefix: "test",
+          prefix: 'test',
           methods: {
             get: () => {},
             set: () => {},
             remove: () => {},
           },
-          key: "myTestStorage",
+          key: 'myTestStorage',
         });
 
         const returnedAgile = agile.registerStorage(dummyStorage, {
@@ -280,16 +280,16 @@ describe("Agile Tests", () => {
       });
     });
 
-    describe("hasIntegration function tests", () => {
-      it("should check if Agile has any registered Integration", () => {
+    describe('hasIntegration function tests', () => {
+      it('should check if Agile has any registered Integration', () => {
         agile.hasIntegration();
 
         expect(agile.integrations.hasIntegration).toHaveBeenCalled();
       });
     });
 
-    describe("hasStorage function tests", () => {
-      it("should check if Agile has any registered Storage", () => {
+    describe('hasStorage function tests', () => {
+      it('should check if Agile has any registered Storage', () => {
         agile.hasStorage();
 
         expect(agile.storages.hasStorage).toHaveBeenCalled();

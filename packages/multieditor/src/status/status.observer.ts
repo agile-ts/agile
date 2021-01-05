@@ -1,4 +1,4 @@
-import { Status, StatusInterface } from "../internal";
+import {Status, StatusInterface} from '../internal';
 import {
   Agile,
   copy,
@@ -9,7 +9,7 @@ import {
   ObserverKey,
   RuntimeJob,
   RuntimeJobConfigInterface,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 
 export class StatusObserver extends Observer {
   public status: () => Status;
@@ -25,7 +25,7 @@ export class StatusObserver extends Observer {
   constructor(
     agileInstance: Agile,
     status: Status,
-    config: StatusObserverConfigInterface = {}
+    config: StatusObserverConfigInterface = {},
   ) {
     super(agileInstance, {
       key: config.key,

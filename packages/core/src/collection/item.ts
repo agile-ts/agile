@@ -5,10 +5,10 @@ import {
   StateKey,
   StateRuntimeJobConfigInterface,
   defineConfig,
-} from "../internal";
+} from '../internal';
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
-  static updateGroupSideEffectKey = "rebuildGroup";
+  static updateGroupSideEffectKey = 'rebuildGroup';
   public isSelected = false; // If Item is selected by a Selector
   public collection: () => Collection<DataType>;
 
@@ -22,7 +22,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
   constructor(
     collection: Collection<DataType>,
     data: DataType,
-    config: ItemConfigInterface = {}
+    config: ItemConfigInterface = {},
   ) {
     super(collection.agileInstance(), data, {
       isPlaceholder: config.isPlaceholder,
@@ -47,7 +47,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    */
   public setKey(
     value: StateKey | undefined,
-    config: SetItemKeyConfig = {}
+    config: SetItemKeyConfig = {},
   ): this {
     super.setKey(value);
     config = defineConfig(config, {
@@ -65,20 +65,20 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
 
     // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it changes
     this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
-      this.collection().rebuildGroupsThatIncludeItemKey(value, config)
+      this.collection().rebuildGroupsThatIncludeItemKey(value, config),
     );
 
     // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
     if (config.updateItemValuePrimaryKey)
       this.patch(
-        { [this.collection().config.primaryKey]: value },
+        {[this.collection().config.primaryKey]: value},
         {
           sideEffects: config.sideEffects,
           background: config.background,
           force: config.force,
           storage: config.storage,
           overwrite: config.overwrite,
-        }
+        },
       );
 
     // Initial Rebuild (not necessary if updating primaryKey in ItemValue because a sideEffect of the patch method is to rebuild the Group)

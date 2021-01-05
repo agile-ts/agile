@@ -1,23 +1,23 @@
-import { Agile, Observer, SubscriptionContainer } from "../../../../../src";
+import {Agile, Observer, SubscriptionContainer} from '../../../../../src';
 
-describe("SubscriptionContainer Tests", () => {
+describe('SubscriptionContainer Tests', () => {
   let dummyAgile: Agile;
   let dummyObserver1: Observer;
   let dummyObserver2: Observer;
 
   beforeEach(() => {
     dummyAgile = new Agile();
-    dummyObserver1 = new Observer(dummyAgile, { key: "dummyObserver1" });
-    dummyObserver2 = new Observer(dummyAgile, { key: "dummyObserver2" });
+    dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
+    dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
   });
 
-  it("should create SubscriptionContainer", () => {
+  it('should create SubscriptionContainer', () => {
     const subscriptionContainer = new SubscriptionContainer(
       [dummyObserver1, dummyObserver2],
-      "dummyKey"
+      'dummyKey',
     );
 
-    expect(subscriptionContainer.key).toBe("dummyKey");
+    expect(subscriptionContainer.key).toBe('dummyKey');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.subs.size).toBe(2);
     expect(subscriptionContainer.subs.has(dummyObserver1)).toBeTruthy();

@@ -16,7 +16,7 @@ import {
   ComputedTracker,
   StateIngestConfigInterface,
   StateRuntimeJobConfigInterface,
-} from "../internal";
+} from '../internal';
 
 export class State<ValueType = any> {
   public agileInstance: () => Agile;
@@ -32,14 +32,14 @@ export class State<ValueType = any> {
 
   public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
   public sideEffects: {
-    [key: string]: (properties?: { [key: string]: any }) => void;
+    [key: string]: (properties?: {[key: string]: any}) => void;
   } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
-  public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
+  public watchers: {[key: string]: StateWatcherCallback<ValueType>} = {};
 
   /**
    * @public
@@ -51,7 +51,7 @@ export class State<ValueType = any> {
   constructor(
     agileInstance: Agile,
     initialValue: ValueType,
-    config: StateConfigInterface = {}
+    config: StateConfigInterface = {},
   ) {
     config = defineConfig(config, {
       deps: [],
@@ -70,7 +70,7 @@ export class State<ValueType = any> {
     this.isPlaceholder = true;
 
     // Initial Set
-    if (!config.isPlaceholder) this.set(initialValue, { overwrite: true });
+    if (!config.isPlaceholder) this.set(initialValue, {overwrite: true});
   }
 
   /**
@@ -141,7 +141,7 @@ export class State<ValueType = any> {
    */
   public set(
     value: ValueType,
-    config: StateRuntimeJobConfigInterface = {}
+    config: StateRuntimeJobConfigInterface = {},
   ): this {
     config = defineConfig(config, {
       sideEffects: true,
@@ -190,12 +190,12 @@ export class State<ValueType = any> {
    * @param type - wished Type ('String', 'Boolean', 'Array', 'Object', 'Number')
    */
   public type(type: any): this {
-    const supportedTypes = ["String", "Boolean", "Array", "Object", "Number"];
+    const supportedTypes = ['String', 'Boolean', 'Array', 'Object', 'Number'];
 
     // Check if type is a supported Type
     if (!supportedTypes.includes(type.name)) {
       Agile.logger.warn(
-        `'${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`
+        `'${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`,
       );
       return this;
     }
@@ -242,7 +242,7 @@ export class State<ValueType = any> {
    */
   public patch(
     targetWithChanges: object,
-    config: PatchConfigInterface = {}
+    config: PatchConfigInterface = {},
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
@@ -255,13 +255,13 @@ export class State<ValueType = any> {
 
     if (!isValidObject(this.nextStateValue)) {
       Agile.logger.error(
-        "You can't use the patch method on a non object based States!"
+        "You can't use the patch method on a non object based States!",
       );
       return this;
     }
 
     if (!isValidObject(targetWithChanges)) {
-      Agile.logger.error("TargetWithChanges has to be an Object!");
+      Agile.logger.error('TargetWithChanges has to be an Object!');
       return this;
     }
 
@@ -269,7 +269,7 @@ export class State<ValueType = any> {
     this.nextStateValue = flatMerge<ValueType>(
       copy(this.nextStateValue),
       targetWithChanges,
-      { addNewProperties: config.addNewProperties }
+      {addNewProperties: config.addNewProperties},
     );
 
     // Ingest updated nextStateValue into Runtime
@@ -303,7 +303,7 @@ export class State<ValueType = any> {
   public watch(key: string, callback: StateWatcherCallback<ValueType>): this;
   public watch(
     keyOrCallback: string | StateWatcherCallback<ValueType>,
-    callback?: StateWatcherCallback<ValueType>
+    callback?: StateWatcherCallback<ValueType>,
   ): this | string {
     const generateKey = isFunction(keyOrCallback);
     let _callback: StateWatcherCallback<ValueType>;
@@ -320,7 +320,7 @@ export class State<ValueType = any> {
     // Check if Callback is valid Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
-        "A Watcher Callback Function has to be typeof Function!"
+        'A Watcher Callback Function has to be typeof Function!',
       );
       return this;
     }
@@ -328,7 +328,7 @@ export class State<ValueType = any> {
     // Check if watcherKey is already occupied
     if (this.watchers[key]) {
       Agile.logger.error(
-        `Watcher Callback Function with the key/name '${key}' already exists!`
+        `Watcher Callback Function with the key/name '${key}' already exists!`,
       );
       return this;
     }
@@ -356,7 +356,7 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public onInaugurated(callback: StateWatcherCallback<ValueType>) {
-    const watcherKey = "InauguratedWatcherKey";
+    const watcherKey = 'InauguratedWatcherKey';
     this.watch(watcherKey, (value) => {
       callback(value);
       this.removeWatcher(watcherKey);
@@ -392,11 +392,11 @@ export class State<ValueType = any> {
    */
   public persist(
     key?: PersistentKey,
-    config?: StatePersistentConfigInterface
+    config?: StatePersistentConfigInterface,
   ): this;
   public persist(
     keyOrConfig: PersistentKey | StatePersistentConfigInterface = {},
-    config: StatePersistentConfigInterface = {}
+    config: StatePersistentConfigInterface = {},
   ): this {
     let _config: StatePersistentConfigInterface;
     let key: PersistentKey | undefined;
@@ -416,7 +416,7 @@ export class State<ValueType = any> {
 
     if (this.persistent)
       Agile.logger.warn(
-        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`
+        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`,
       );
 
     // Create persistent -> Persist Value
@@ -446,7 +446,7 @@ export class State<ValueType = any> {
       if (this.isPersisted) callback(true);
     } else {
       Agile.logger.error(
-        `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`
+        `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`,
       );
     }
     return this;
@@ -507,10 +507,10 @@ export class State<ValueType = any> {
    * Note: Only useful with boolean based States
    */
   public invert(): this {
-    if (typeof this._value === "boolean") {
+    if (typeof this._value === 'boolean') {
       this.set(!this._value as any);
     } else {
-      Agile.logger.error("You can only invert boolean based States!");
+      Agile.logger.error('You can only invert boolean based States!');
     }
     return this;
   }
@@ -525,7 +525,7 @@ export class State<ValueType = any> {
    */
   public compute(method: ComputeMethod<ValueType>): this {
     if (!isFunction(method)) {
-      Agile.logger.error("A computeMethod has to be a function!");
+      Agile.logger.error('A computeMethod has to be a function!');
       return this;
     }
     this.computeMethod = method;
@@ -543,10 +543,10 @@ export class State<ValueType = any> {
    */
   public addSideEffect(
     key: string,
-    sideEffect: (properties?: { [key: string]: any }) => void
+    sideEffect: (properties?: {[key: string]: any}) => void,
   ): this {
     if (!isFunction(sideEffect)) {
-      Agile.logger.error("A sideEffect function has to be a function!");
+      Agile.logger.error('A sideEffect function has to be a function!');
       return this;
     }
     this.sideEffects[key] = sideEffect;
@@ -602,7 +602,7 @@ export class State<ValueType = any> {
    */
   public getPublicValue(): ValueType {
     // If State Value is used internal and output represents the real state value (for instance in Group)
-    if (this["output"] !== undefined) return this["output"];
+    if (this['output'] !== undefined) return this['output'];
 
     return this._value;
   }

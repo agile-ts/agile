@@ -1,9 +1,9 @@
-import { Agile, defineConfig, StorageKey } from "../internal";
+import {Agile, defineConfig, StorageKey} from '../internal';
 
 export class Persistent<ValueType = any> {
   public agileInstance: () => Agile;
 
-  public static placeHolderKey = "__THIS_IS_A_PLACEHOLDER__";
+  public static placeHolderKey = '__THIS_IS_A_PLACEHOLDER__';
 
   public _key: PersistentKey;
   public ready = false;
@@ -23,7 +23,7 @@ export class Persistent<ValueType = any> {
    */
   constructor(
     agileInstance: Agile,
-    config: CreatePersistentConfigInterface = {}
+    config: CreatePersistentConfigInterface = {},
   ) {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
@@ -96,7 +96,7 @@ export class Persistent<ValueType = any> {
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
       Agile.logger.error(
-        "No valid persist Key found! Please provide a Key or assign one to the parent instance."
+        'No valid persist Key found! Please provide a Key or assign one to the parent instance.',
       );
       isValid = false;
     }
@@ -104,7 +104,7 @@ export class Persistent<ValueType = any> {
     // Validate StorageKeys
     if (!this.defaultStorageKey || this.storageKeys.length <= 0) {
       Agile.logger.error(
-        "No persist Storage Key found! Please provide at least one Storage Key."
+        'No persist Storage Key found! Please provide at least one Storage Key.',
       );
       isValid = false;
     }
@@ -162,7 +162,7 @@ export class Persistent<ValueType = any> {
    */
   public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+      `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`,
     );
     return false;
   }
@@ -177,7 +177,7 @@ export class Persistent<ValueType = any> {
    */
   public async persistValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+      `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`,
     );
     return false;
   }
@@ -192,7 +192,7 @@ export class Persistent<ValueType = any> {
    */
   public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
     Agile.logger.error(
-      `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+      `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`,
     );
     return false;
   }

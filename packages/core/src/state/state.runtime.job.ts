@@ -4,14 +4,14 @@ import {
   RuntimeJobConfigInterface,
   RuntimeJobKey,
   StateObserver,
-} from "../internal";
+} from '../internal';
 
 export class StateRuntimeJob extends RuntimeJob<StateObserver> {
   public config: StateRuntimeJobConfigInterface;
 
   constructor(
     observer: StateObserver,
-    config: CreateStateRuntimeJobConfigInterface = {}
+    config: CreateStateRuntimeJobConfigInterface = {},
   ) {
     super(observer, config);
     config = defineConfig(config, {

@@ -8,7 +8,7 @@ import {
   Event,
   StateConfigInterface,
   ComputedTracker,
-} from "../internal";
+} from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
   ComputedValueType
@@ -29,7 +29,7 @@ export class Computed<ComputedValueType = any> extends State<
   constructor(
     agileInstance: Agile,
     computeFunction: () => ComputedValueType,
-    config: ComputedConfigInterface = {}
+    config: ComputedConfigInterface = {},
   ) {
     super(agileInstance, computeFunction(), {
       key: config.key,
@@ -78,7 +78,7 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<Observer | State | Event> = [],
-    config: UpdateComputeFunctionInterface = {}
+    config: UpdateComputeFunctionInterface = {},
   ) {
     config = defineConfig(config, {
       background: false,
@@ -145,10 +145,10 @@ export class Computed<ComputedValueType = any> extends State<
       }
       if (
         instance !== undefined &&
-        instance["observer"] !== undefined &&
-        instance["observer"] instanceof Observer
+        instance['observer'] !== undefined &&
+        instance['observer'] instanceof Observer
       )
-        finalInstances.push(instance["observer"]);
+        finalInstances.push(instance['observer']);
     }
     return finalInstances;
   }
@@ -164,7 +164,7 @@ export class Computed<ComputedValueType = any> extends State<
 
   public persist(
     keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
-    config: StatePersistentConfigInterface = {}
+    config: StatePersistentConfigInterface = {},
   ): this {
     Agile.logger.error("You can't use persist method on ComputedState!");
     return this;
