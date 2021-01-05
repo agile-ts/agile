@@ -51,6 +51,7 @@ AgileTs has two primary branches: `master` and `develop`
 
 `develop` is where development takes place
 
+
 ## Bugs
 
 We use [GitHub Issues](https://github.com/agile-ts/agile/issues) for our public bugs. 
@@ -67,20 +68,95 @@ Don't take this personally if this happens, and feel free to open a new issue on
 - **One issue, one bug** Please report a single bug per issue.
 - **Provide reproduction steps** List all the steps necessary to reproduce the issue. The person reading your bug report should be able to follow these steps to reproduce your issue with minimal effort.
 
+
 ## Installation
 
 1. Ensure you have [Yarn](https://yarnpkg.com/) installed
 2. After cloning the repository, run `yarn run install-packages` in the root of the repository
    which simply runs `yarn install` in each package.
    
-### Run Example Project
+### Run Example Project's
 
 1. Follow the Installation steps
 2. Ensure you have [Yalc](https://www.google.com/search?client=firefox-b-d&q=yalc) installed
 3. Run `yarn run dev-publish` to publish all packages in your local 'npm store'
-4. Run `yarn run dev-push` to push your changes into your local 'npm store'..
-   to see live changes run `yarn run watch` which automatically pushes the changes to your local 'npm store' if a package updates
+4. Run `yarn run dev-push` to push your changes into your local 'npm store' if you made some changes
+   _ProTip:_ To make realtime changes run `yarn run watch`, which automatically runs `yarn run dev-push` if you made some changes in a package
    
+
 ## Pull Request
 
-   
+### Your First Pull Request
+
+So you have also decided to merge code back to the upstream by opening a PR.
+You've invested a good chunk of time, and we appreciate it. 
+We will do our best to work with you and get the PR looked at.
+
+Working on your first Pull Request? You can learn how from this free video series:
+
+[**How to Contribute to an Open Source Project on GitHub**](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github)
+
+We have a list of [beginner friendly issues](https://github.com/agile-ts/agile/labels/good%20first%20issue) to help you to get your feet wet in the AgileTs codebase 
+and familiar with our contribution process. This is a great place to get started.
+
+### Proposing a Change
+
+If you would like to request a new feature or enhancement but you only want to give an impulse and don't want to implement it, 
+feel free to create an issue that follows the [feature template](https://github.com/agile-ts/agile/issues/new?template=feature_request.md).
+
+If you're only fixing a bug, it's fine to submit a pull request right away, 
+but we still recommend creating an [issue](https://github.com/agile-ts/agile/issues/new?template=bug_report.md) detailing what you're fixing. 
+This is helpful in case we don't accept that specific changes, but want to keep track of the issue.
+
+### Sending a Pull Request
+
+Keep in mind that small pull requests are much easier to review and more likely to get merged.
+Make sure your PR only solves one problem (issue), otherwise please split it up in multiple PR's for a better overview.
+Commit Messages that follow this [style guide](#semantic-commit-messages) are very welcome ^^
+
+Please make sure the following is done before submitting a new pull request:
+
+1. Fork [the repository](https://github.com/agile-ts/agile) and create your branch from `develop`.
+2. Make sure your code lints (`yarn prettier && yarn lint`).
+3. Make sure your Jest tests pass (`yarn test`).
+4. Don't forget the **How has this been Tested?** part!
+
+All pull requests should be opened against the `develop` branch 
+and have a related Issue for better organization!
+
+#### Breaking Changes
+
+When adding a new [breaking change](https://stackoverflow.com/questions/21703216/what-is-a-breaking-change-in-software), follow this template in your pull request:
+
+```md
+### New breaking change here
+
+- **Who does this affect**:
+- **How to migrate**:
+- **Why make this breaking change**:
+- **Severity (number of people affected x effort)**:
+```
+
+### What Happens Next?
+
+The core Team of AgileTs is constantly monitoring pull requests and merges them if they seem correct. 
+Help us to keep pull requests consistent by following the guidelines above.
+
+
+## Style Guide
+
+[Prettier](https://prettier.io) will catch most styling issues that may exist in your code. 
+You can check the status of your code styling by simply running `yarn prettier`.
+
+**Most important:** Look around. Match the style you see used in the rest of the project(formatting, naming, ..).
+
+!! However, there are still some bad styles that Prettier cannot fix.
+
+
+## License
+By contributing to AgileTs, you agree that your contributions will be licensed under its **MIT license**.
+
+
+#### Credits
+This File is inspired by the [Docusaurus CONTRIBUTING.md](https://github.com/facebook/docusaurus/blob/master/CONTRIBUTING.md).
+
