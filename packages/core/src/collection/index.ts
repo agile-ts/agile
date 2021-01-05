@@ -8,7 +8,6 @@ import {
   StorageKey,
   GroupConfigInterface,
   defineConfig,
-  flatMerge,
   isValidObject,
   normalizeArray,
   copy,
@@ -279,7 +278,7 @@ export class Collection<DataType = DefaultItem> {
 
     if (!item) {
       Agile.logger.error(
-        `ItemKey '${itemKey}' doesn't exist in Collection '${this._key}'!`
+        `Item with key/name '${itemKey}' doesn't exist in Collection '${this._key}'!`
       );
       return undefined;
     }
@@ -290,26 +289,24 @@ export class Collection<DataType = DefaultItem> {
       return undefined;
     }
 
-    // Merge changes into current ItemValue
-    const newItemValue = flatMerge(copy(item.nextStateValue), changes, {
-      addNewProperties: config.addNewProperties,
-    });
-
     const oldItemKey = item._value[primaryKey];
-    const newItemKey = newItemValue[primaryKey];
-    const updatedItemKey = oldItemKey !== newItemKey;
+    const newItemKey = changes[primaryKey] || oldItemKey;
+    const updateItemKey = oldItemKey !== newItemKey;
 
-    // Apply changes to Item
-    item.set(newItemValue, {
-      background: config.background,
-      storage: !updatedItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
-    });
+    // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (below)
+    if (changes[primaryKey]) delete changes[primaryKey];
 
-    // Update ItemKey of Item
-    if (updatedItemKey)
+    // Update ItemKey
+    if (updateItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
+
+    // Apply changes to Item
+    item.patch(changes as any, {
+      background: config.background,
+      addNewProperties: config.addNewProperties,
+    });
 
     return item;
   }
@@ -347,6 +344,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Group
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Group exists in Collection
+   * @param groupKey - Key/Name of Group
+   * @param config - Config
+   */
+  public hasGroup(
+    groupKey: GroupKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getGroup(groupKey, config);
+  }
+
+  //=========================================================================================================
   // Get Group
   //=========================================================================================================
   /**
@@ -357,7 +370,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroup(
     groupKey: GroupKey | undefined,
-    config: GetGroupConfigInterface = {}
+    config: HasConfigInterface = {}
   ): Group<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -452,6 +465,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Selector
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Selector exists in Collection
+   * @param selectorKey - Key/Name of Selector
+   * @param config - Config
+   */
+  public hasSelector(
+    selectorKey: SelectorKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getSelector(selectorKey, config);
+  }
+
+  //=========================================================================================================
   // Get Selector
   //=========================================================================================================
   /**
@@ -462,7 +491,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getSelector(
     selectorKey: SelectorKey | undefined,
-    config: GetSelectorConfigInterface = {}
+    config: HasConfigInterface = {}
   ): Selector<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -526,6 +555,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Item
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Item exists in Collection
+   * @param itemKey - Key/Name of Item
+   * @param config - Config
+   */
+  public hasItem(
+    itemKey: ItemKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getItem(itemKey, config);
+  }
+
+  //=========================================================================================================
   // Get Item by Id
   //=========================================================================================================
   /**
@@ -536,7 +581,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getItem(
     itemKey: ItemKey | undefined,
-    config: GetItemConfigInterface = {}
+    config: HasConfigInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -590,7 +635,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getItemValue(
     itemKey: ItemKey | undefined,
-    config: GetItemConfigInterface = {}
+    config: HasConfigInterface = {}
   ): DataType | undefined {
     let item = this.getItem(itemKey, config);
     if (!item) return undefined;
@@ -765,12 +810,22 @@ export class Collection<DataType = DefaultItem> {
 
     if (!item || oldItemKey === newItemKey) return false;
 
+    // Check if Item with newItemKey already exists
+    if (this.hasItem(newItemKey)) {
+      Agile.logger.warn(
+        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`
+      );
+      return false;
+    }
+
     // Remove Item from old ItemKey and add Item to new ItemKey
     delete this.data[oldItemKey];
     this.data[newItemKey] = item;
 
     // Update Key/Name of Item
-    item.setKey(newItemKey);
+    item.setKey(newItemKey, {
+      background: config.background,
+    });
 
     // Update persist Key of Item (Doesn't get updated by updating key of Item because PersistKey is special formatted)
     item.persistent?.setKey(
@@ -781,7 +836,7 @@ export class Collection<DataType = DefaultItem> {
     for (let groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (!group || !group.has(oldItemKey)) continue;
-      group.replace(oldItemKey, newItemKey, { background: config?.background });
+      group.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
     // Update ItemKey in Selectors
@@ -793,7 +848,7 @@ export class Collection<DataType = DefaultItem> {
       if (selector.hasSelected(newItemKey)) {
         selector.select(newItemKey, {
           force: true, // Because ItemKeys are the same
-          background: config?.background,
+          background: config.background,
         });
       }
 
@@ -1071,23 +1126,9 @@ export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
 }
 
 /**
- * @param notExisting - If also official not existing Items like Placeholder get found
+ * @param notExisting - If placeholder can be found
  */
-export interface GetItemConfigInterface {
-  notExisting?: boolean;
-}
-
-/**
- * @param notExisting - If also official not existing Groups like Placeholder get found
- */
-export interface GetGroupConfigInterface {
-  notExisting?: boolean;
-}
-
-/**
- * @param notExisting - If also official not existing Selectors like Placeholder get found
- */
-export interface GetSelectorConfigInterface {
+export interface HasConfigInterface {
   notExisting?: boolean;
 }
 

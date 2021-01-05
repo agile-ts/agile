@@ -137,7 +137,7 @@ describe("Collection Persist Function Tests", () => {
         _test__myCollection_item_37: '{"id":37,"name":"Arne"}',
         _test__myCollection_item_3: '{"id":3,"name":"Benno"}',
       });
-      expect(storageMethods.set).toHaveBeenCalledTimes(12);
+      expect(storageMethods.set).toHaveBeenCalledTimes(13);
       expect(storageMethods.get).toHaveBeenCalledTimes(6);
       expect(storageMethods.remove).toHaveBeenCalledTimes(1);
     });
