@@ -8,7 +8,6 @@ import {
   StorageKey,
   GroupConfigInterface,
   defineConfig,
-  flatMerge,
   isValidObject,
   normalizeArray,
   copy,
