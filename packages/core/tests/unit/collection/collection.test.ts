@@ -8,7 +8,6 @@ import {
   ComputedTracker,
   StatePersistent,
 } from "../../../src";
-import * as Utils from "../../../src/utils";
 
 jest.mock("../../../src/collection/collection.persistent");
 
@@ -765,6 +764,45 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("hasGroup function tests", () => {
+      let dummyGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup = new Group(collection, []);
+
+        collection.getGroup = jest.fn();
+      });
+
+      it("should call getGroup and return true if getGroup returns Group (default config)", () => {
+        collection.getGroup = jest.fn(() => dummyGroup as any);
+
+        const response = collection.hasGroup("test");
+
+        expect(response).toBeTruthy();
+        expect(collection.getGroup).toHaveBeenCalledWith("test", {});
+      });
+
+      it("should call getGroup and return true if getGroup returns Group (specific config)", () => {
+        collection.getGroup = jest.fn(() => dummyGroup as any);
+
+        const response = collection.hasGroup("test", { notExisting: true });
+
+        expect(response).toBeTruthy();
+        expect(collection.getGroup).toHaveBeenCalledWith("test", {
+          notExisting: true,
+        });
+      });
+
+      it("should call getGroup and return false if getGroup returns undefined (default config)", () => {
+        collection.getGroup = jest.fn(() => undefined);
+
+        const response = collection.hasGroup("test");
+
+        expect(response).toBeFalsy();
+        expect(collection.getGroup).toHaveBeenCalledWith("test", {});
+      });
+    });
+
     describe("getGroup function tests", () => {
       let dummyGroup: Group;
 
@@ -936,6 +974,45 @@ describe("Collection Tests", () => {
       });
     });
 
+    describe("hasSelector function tests", () => {
+      let dummySelector: Selector;
+
+      beforeEach(() => {
+        dummySelector = new Selector(collection, "unknown");
+
+        collection.getSelector = jest.fn();
+      });
+
+      it("should call getSelector and return true if getSelector returns Selector (default config)", () => {
+        collection.getSelector = jest.fn(() => dummySelector as any);
+
+        const response = collection.hasSelector("test");
+
+        expect(response).toBeTruthy();
+        expect(collection.getSelector).toHaveBeenCalledWith("test", {});
+      });
+
+      it("should call getSelector and return true if getSelector returns Selector (specific config)", () => {
+        collection.getSelector = jest.fn(() => dummySelector as any);
+
+        const response = collection.hasSelector("test", { notExisting: true });
+
+        expect(response).toBeTruthy();
+        expect(collection.getSelector).toHaveBeenCalledWith("test", {
+          notExisting: true,
+        });
+      });
+
+      it("should call getSelector and return false if getSelector returns undefined (default config)", () => {
+        collection.getSelector = jest.fn(() => undefined);
+
+        const response = collection.hasSelector("test");
+
+        expect(response).toBeFalsy();
+        expect(collection.getSelector).toHaveBeenCalledWith("test", {});
+      });
+    });
+
     describe("getSelector function tests", () => {
       let dummySelector: Selector;
 
@@ -1055,6 +1132,45 @@ describe("Collection Tests", () => {
         );
         expect(collection.selectors).toHaveProperty("dummySelector");
         expect(dummySelector.unselect).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("hasItem function tests", () => {
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+
+        collection.getItem = jest.fn();
+      });
+
+      it("should call getItem and return true if getItem returns Item (default config)", () => {
+        collection.getItem = jest.fn(() => dummyItem);
+
+        const response = collection.hasItem("test");
+
+        expect(response).toBeTruthy();
+        expect(collection.getItem).toHaveBeenCalledWith("test", {});
+      });
+
+      it("should call getItem and return true if getItem returns Item (specific config)", () => {
+        collection.getItem = jest.fn(() => dummyItem);
+
+        const response = collection.hasItem("test", { notExisting: true });
+
+        expect(response).toBeTruthy();
+        expect(collection.getItem).toHaveBeenCalledWith("test", {
+          notExisting: true,
+        });
+      });
+
+      it("should call getItem and return false if getItem returns undefined (default config)", () => {
+        collection.getItem = jest.fn(() => undefined);
+
+        const response = collection.hasItem("test");
+
+        expect(response).toBeFalsy();
+        expect(collection.getItem).toHaveBeenCalledWith("test", {});
       });
     });
 
