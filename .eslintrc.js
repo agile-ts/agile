@@ -14,7 +14,6 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
-    'airbnb-base/legacy',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -26,7 +25,6 @@ module.exports = {
   rules: {
     'func-names': OFF,
     '@typescript-eslint/no-explicit-any': OFF,
-    'guard-for-in': OFF,
-    'no-restricted-syntax': OFF,
+    '@typescript-eslint/explicit-module-boundary-types': OFF,
   },
 };
