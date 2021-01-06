@@ -111,7 +111,7 @@ To use AgileTs in a UI-Framework we have to install 2 packages.
 <br />
 
 <br />
-<img src="static/installation_header.png" alt="Installation">
+<img src="static/documentation_header.png" alt="Installation">
 <br />
 
 If AgileTs sounds interesting to you and you want to find out more.
