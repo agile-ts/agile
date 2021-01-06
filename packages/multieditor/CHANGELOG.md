@@ -1,5 +1,13 @@
 # @agile-ts/multieditor
 
+## 0.0.8
+
+### Patch Changes
+
+- 198c212: added prettier and eslint and fixed some small issues
+- Updated dependencies [198c212]
+  - @agile-ts/core@0.0.8
+
 ## 0.0.7
 
 ### Patch Changes
