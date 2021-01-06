@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.8
+
+### Patch Changes
+
+- 198c212: added prettier and eslint and fixed some small issues
+
 ## 0.0.7
 
 ### Patch Changes
@@ -12,8 +18,7 @@
 
 - 86e6890: Updated Tests in Core | Fixed some Bugs
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 ## [0.0.5](https://github.com/agile-ts/agile/compare/v0.0.4...v0.0.5) (2020-11-05)
 
