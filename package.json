@@ -21,7 +21,7 @@
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec yarn install",
-    "version-bump": "changeset",
+    "bump-version": "changeset",
     "release": "lerna run release && changeset publish",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
     "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\""
