@@ -1,6 +1,7 @@
 node_modules/
 dist
 .yalc
+package-lock.json
 
 # Differs on each engine
 yalc.lock
