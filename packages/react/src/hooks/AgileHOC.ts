@@ -10,11 +10,11 @@ import {
 
 export function AgileHOC(
   ReactComponent: any,
-  deps?: Array<State> | {[key: string]: State} | State,
+  deps?: Array<State> | { [key: string]: State } | State,
   agileInstance?: Agile,
 ) {
   let depsArray: Array<Observer>;
-  let depsObject: {[key: string]: Observer} = {};
+  const depsObject: { [key: string]: Observer } = {};
 
   if (deps instanceof State || Array.isArray(deps)) {
     // Normalize Dependencies
@@ -30,9 +30,7 @@ export function AgileHOC(
       }
     }
   } else if (typeof deps === 'object') {
-    for (let dep in deps) {
-      depsObject[dep] = deps[dep].observer;
-    }
+    for (const dep in deps) depsObject[dep] = deps[dep].observer;
 
     // Get Agile Instance
     if (!agileInstance) {

@@ -9,7 +9,7 @@ import {
   State,
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
-import {useIsomorphicLayoutEffect} from '../utils/useIsomorphicLayoutEffect';
+import { useIsomorphicLayoutEffect } from '../utils/useIsomorphicLayoutEffect';
 
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
