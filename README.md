@@ -17,7 +17,9 @@
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
 
+
 <br />
+
 
 <br />
 <img src="static/how_to_create_state_header.png" alt="How to create State Header">
@@ -45,7 +47,9 @@ Test AgileTs yourself in one click. Just select your preferred Framework below.
 - Vue (coming soon)
 - Angular (coming soon)
 
+
 <br />
+
 
 <br />
 <img src="static/why_should_i_use_agile.png" alt="Why should I use AgileTs">
@@ -88,7 +92,9 @@ A good place to start is in our [documentation](https://agile-ts.org/docs).
 AgileTs has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
 and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
+
 <br />
+
 
 <br />
 <img src="static/installation_header.png" alt="Installation">
@@ -105,24 +111,33 @@ To use AgileTs in a UI-Framework we have to install 2 packages.
   npm install @agile-ts/react
   ```
   
+
 <br />
+
 
 <br />
 <img src="static/documentation_header.png" alt="Documentation">
 
 If AgileTs sounds interesting to you and you want to find out more.
-Checkout our [docs](https://agile-ts.org/docs/). 
+Checkout our **[docs](https://agile-ts.org/docs/)**. 
 If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
 <br />
+
 
 <br />
 <img src="static/contribute_header.png" alt="Contribute">
 
 Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## 🗂 Packages of Agile
+
+<br />
+
+
+<br />
+<img src="static/packages_of_agile.png" alt="Packages of Agile">
+
 | Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | Brain of Agile                            |
@@ -131,5 +146,10 @@ Get a part of AgileTs and start contributing. To find out more read the [CONTRIB
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
 
 
-## 🌠 Credits
+<br />
+
+
+<br />
+<img src="static/credits_header.png" alt="Packages of Agile">
+
 AgileTs is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
