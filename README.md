@@ -19,7 +19,9 @@
 
 <br />
 
+<br />
 <img src="static/how_to_create_state_header.png" alt="How to create State Header">
+<br />
 
 ```tsx
 // -- core.js ------------------------------------------
@@ -36,14 +38,19 @@ const MY_FIRST_STATE = App.State("Hello Stranger!");
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
 const myFirstState = useAgile(MY_FIRST_STATE);
 ```
+To find out more checkout our documentation
 
 ### ⛳️ Sandbox
-You want to test AgileTs your self. Just find your preferred Framework below.
+Test AgileTs yourself in one click. Just find your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - Vue (coming soon)
 - Angular (coming soon)
 
-<img src="static/why_should_i_use_agile.png" alt="How to create State Header">
+<br />
+
+<br />
+<img src="static/why_should_i_use_agile.png" alt="Why should I use AgileTs">
+<br />
 
 #### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. 
@@ -71,7 +78,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
 
-#### ⛳🌌 Centralize
+#### 🌌 Centralize
 Manage your Application Logic in a central place outside any UI-Framework.
 This makes your code more decoupled, portable, and above all, easily testable.
 
@@ -83,18 +90,23 @@ A good place to start is in our [documentation](https://agile-ts.org/docs).
 AgileTs has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
 and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
+<br />
 
-## ⬇️ Installation
+<br />
+<img src="static/installation_header.png" alt="Installation">
+<br />
 
-To use AgileTs we have to install the _core_ package, it's the brain and handles your States, Collections, ..
-```
-npm install @agile-ts/core
-```
+To use AgileTs in a UI-Framework we have to install 2 packages.
 
-In addition, we need a _fitting integration_ for the Framework we are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
-```
-npm install @agile-ts/react
-```
+- The Core Package, which is the brain of AgileTs and handles your States, Collections, ..
+  ```
+  npm install @agile-ts/core
+  ```
+
+- A _fitting integration_ for the UI-Framework are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
+  ```
+  npm install @agile-ts/react
+  ```
 
 
 ## 📄 Documentation
