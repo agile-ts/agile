@@ -1,6 +1,6 @@
  <img src="static/header_background.png" alt="Banner">
  
- > **Spacy**, **Simple**, **Scalable** State Management Framework
+ > **Spacy, Simple, Scalable State Management Framework**
  
  <br />
 
@@ -34,14 +34,14 @@ const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // -- myComponent.whatever ------------------------------------------
 
-// Now we can bind our State to any Component. 
+// Now we can bind our State to nearly any UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
-const myFirstState = useAgile(MY_FIRST_STATE);
+const myFirstState = useAgile(MY_FIRST_STATE); // returns "Hello Stranger!"
 ```
-To find out more checkout our documentation
+To find out more checkout our [documentation](https://agile-ts.org/docs).
 
 ### ⛳️ Sandbox
-Test AgileTs yourself in one click. Just find your preferred Framework below.
+Test AgileTs yourself in one click. Just select your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - Vue (coming soon)
 - Angular (coming soon)
@@ -52,7 +52,7 @@ Test AgileTs yourself in one click. Just find your preferred Framework below.
 <img src="static/why_should_i_use_agile.png" alt="Why should I use AgileTs">
 <br />
 
-#### 🚅 Straightforward
+### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. 
 
 **Some straightforward syntax examples:**
@@ -72,21 +72,21 @@ Write minimalistic, boilerplate free code that captures your intent.
   MY_STATE.is({hello: "jeff"}); // Check if State has the Value {hello: "jeff"}
   ```
 
-#### 🤸‍ Flexible
+### 🤸‍ Flexible
 - Works in nearly every UI-Framework. Check [here](TODO) if your framework is supported too.
 - Surly works with the workflow that suits you best.. 
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
 
-#### 🌌 Centralize
+### 🌌 Centralize
 Manage your Application Logic in a central place outside any UI-Framework.
 This makes your code more decoupled, portable, and above all, easily testable.
 
-#### 🎯 Easy to Use
+### 🎯 Easy to Use
 Learn the powerful tools of AgileTs in a short amount of time.
 A good place to start is in our [documentation](https://agile-ts.org/docs).
 
-#### 🍃 Lightweight
+### 🍃 Lightweight
 AgileTs has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
 and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
@@ -107,10 +107,15 @@ To use AgileTs in a UI-Framework we have to install 2 packages.
   ```
   npm install @agile-ts/react
   ```
+  
+<br />
 
+<br />
+<img src="static/installation_header.png" alt="Installation">
+<br />
 
-## 📄 Documentation
-You want to find out more? Checkout our [docs](https://agile-ts.org/docs/).
+If AgileTs sounds interesting to you and you want to find out more.
+Checkout our [docs](https://agile-ts.org/docs/). If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
 ## 🗂 Packages of Agile
