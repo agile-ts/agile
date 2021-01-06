@@ -1,4 +1,4 @@
-import {Agile, Collection} from '@agile-ts/core';
+import {Agile} from '@agile-ts/core';
 import {Alert} from 'react-native';
 
 export const App = new Agile({

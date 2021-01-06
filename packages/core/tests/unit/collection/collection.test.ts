@@ -252,8 +252,8 @@ describe('Collection Tests', () => {
       });
 
       it('should create GroupsObject out of passed Groups Object and add default Group', () => {
-        let dummyGroup1 = new Group(collection);
-        let dummyGroup2 = new Group(collection, ['test1', 'test2'], {
+        const dummyGroup1 = new Group(collection);
+        const dummyGroup2 = new Group(collection, ['test1', 'test2'], {
           key: 'overwrittenKey',
         });
 
@@ -306,8 +306,8 @@ describe('Collection Tests', () => {
       });
 
       it('should create SelectorsObject out of passed Selector Object', () => {
-        let dummySelector1 = new Selector(collection, '1');
-        let dummySelector2 = new Selector(collection, '2', {
+        const dummySelector1 = new Selector(collection, '1');
+        const dummySelector2 = new Selector(collection, '2', {
           key: 'overwrittenKey',
         });
 

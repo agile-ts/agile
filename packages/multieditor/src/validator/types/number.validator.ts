@@ -1,5 +1,5 @@
-import {Validator} from '../../internal';
-import {copy} from '@agile-ts/core';
+import { Validator } from '../../internal';
+import { copy } from '@agile-ts/core';
 
 export class NumberValidator<DataType = any> extends Validator<DataType> {
   /**
@@ -9,10 +9,10 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
    * @param errorMessage - Error Message
    */
   constructor(validator: Validator<DataType>, errorMessage?: string) {
-    super({key: validator.key, prefix: 'number'});
+    super({ key: validator.key, prefix: 'number' });
 
     // Copy ValidationMethods of old Validator into this Validator
-    for (let key in validator.validationMethods) {
+    for (const key in validator.validationMethods) {
       this.validationMethods[key] = copy(validator.validationMethods[key]);
     }
 

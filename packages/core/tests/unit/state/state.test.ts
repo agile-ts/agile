@@ -488,8 +488,12 @@ describe('State Tests', () => {
     });
 
     describe('watch function tests', () => {
-      const dummyCallbackFunction1 = () => {};
-      const dummyCallbackFunction2 = () => {};
+      const dummyCallbackFunction1 = () => {
+        /* empty function */
+      };
+      const dummyCallbackFunction2 = () => {
+        /* empty function */
+      };
 
       it('should add passed watcherFunction to watchers at passed key', () => {
         const response = numberState.watch('dummyKey', dummyCallbackFunction1);
@@ -539,7 +543,9 @@ describe('State Tests', () => {
 
     describe('removeWatcher function tests', () => {
       beforeEach(() => {
-        numberState.watchers['dummyKey'] = () => {};
+        numberState.watchers['dummyKey'] = () => {
+          /* empty function */
+        };
       });
 
       it('should remove watcher at key from State', () => {
@@ -582,7 +588,9 @@ describe('State Tests', () => {
 
     describe('hasWatcher function tests', () => {
       beforeEach(() => {
-        numberState.watchers['dummyKey'] = () => {};
+        numberState.watchers['dummyKey'] = () => {
+          /* empty function */
+        };
       });
 
       it('should return true if Watcher at given Key exists', () => {
@@ -806,7 +814,9 @@ describe('State Tests', () => {
     });
 
     describe('addSideEffect function tests', () => {
-      const sideEffectFunction = () => {};
+      const sideEffectFunction = () => {
+        /* empty function */
+      };
 
       it('should add passed function to sideEffects at passed key', () => {
         numberState.addSideEffect('dummyKey', sideEffectFunction);
