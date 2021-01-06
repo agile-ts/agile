@@ -1,24 +1,24 @@
-import { Agile, clone, Logger } from "@agile-ts/core";
+import { Agile, clone, Logger } from '@agile-ts/core';
 
 export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG },
 });
 
-export const MY_STATE = App.State<string>("MyState", { key: "my-state" }); //.persist();
-export const MY_STATE_2 = App.State<string>("MyState2", {
-  key: "my-state2",
+export const MY_STATE = App.State<string>('MyState', { key: 'my-state' }); //.persist();
+export const MY_STATE_2 = App.State<string>('MyState2', {
+  key: 'my-state2',
 }).persist();
 MY_STATE_2.onLoad(() => {
-  console.log("On Load");
+  console.log('On Load');
 });
 export const MY_STATE_3 = App.State<number>(1); //.persist("my-state2");
 
-MY_STATE.watch("test", (value: any) => {
-  console.log("Watch " + value);
+MY_STATE.watch('test', (value: any) => {
+  console.log('Watch ' + value);
 });
 
 export const MY_COMPUTED = App.Computed<string>(() => {
-  return "test" + MY_STATE.value + "_computed_" + MY_STATE_2.value;
+  return 'test' + MY_STATE.value + '_computed_' + MY_STATE_2.value;
 }, []);
 
 interface collectionValueInterface {
@@ -28,35 +28,35 @@ interface collectionValueInterface {
 
 export const MY_COLLECTION = App.Collection<collectionValueInterface>(
   (collection) => ({
-    key: "my-collection",
+    key: 'my-collection',
     groups: {
       myGroup: collection.Group(),
     },
     selectors: {
-      mySelector: collection.Selector("id3"),
+      mySelector: collection.Selector('id3'),
     },
   })
 ).persist();
-MY_COLLECTION.collect({ id: "id1", name: "test" });
-MY_COLLECTION.collect({ id: "id2", name: "test2" }, "myGroup");
-MY_COLLECTION.update("id1", { id: "id1Updated", name: "testUpdated" });
-MY_COLLECTION.getGroup("myGroup")?.persist({
+MY_COLLECTION.collect({ id: 'id1', name: 'test' });
+MY_COLLECTION.collect({ id: 'id2', name: 'test2' }, 'myGroup');
+MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
+MY_COLLECTION.getGroup('myGroup')?.persist({
   followCollectionPersistKeyPattern: true,
 });
 
-console.log("Initial: myCollection ", clone(MY_COLLECTION));
+console.log('Initial: myCollection ', clone(MY_COLLECTION));
 
 export const MY_EVENT = App.Event<{ name: string }>({
   delay: 3000,
-  key: "myEvent",
+  key: 'myEvent',
 });
 
 MY_EVENT.on(() => {
-  console.log("Triggered Event (noId)");
+  console.log('Triggered Event (noId)');
 });
 
-MY_EVENT.on("Test", () => {
-  console.log("Triggered Event (Test)");
+MY_EVENT.on('Test', () => {
+  console.log('Triggered Event (Test)');
 });
 
 // LOGGER tests

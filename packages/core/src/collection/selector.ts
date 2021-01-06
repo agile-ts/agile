@@ -7,13 +7,13 @@ import {
   ItemKey,
   State,
   StateRuntimeJobConfigInterface,
-} from "../internal";
+} from '../internal';
 
 export class Selector<DataType = DefaultItem> extends State<
   DataType | undefined
 > {
-  static dummyItemKey = "unknown";
-  static rebuildSelectorSideEffectKey = "rebuildSelector";
+  static dummyItemKey = 'unknown';
+  static rebuildSelectorSideEffectKey = 'rebuildSelector';
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
   public _itemKey: ItemKey; // Key of Item the Selector represents
@@ -77,7 +77,7 @@ export class Selector<DataType = DefaultItem> extends State<
     const oldItem = this.collection().getItem(this._itemKey, {
       notExisting: true,
     }); // Because this.item might be outdated
-    let newItem = this.collection().getItemWithReference(itemKey);
+    const newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
       sideEffects: true,

@@ -5,10 +5,10 @@ import {
   StateKey,
   StateRuntimeJobConfigInterface,
   defineConfig,
-} from "../internal";
+} from '../internal';
 
 export class Item<DataType = DefaultItem> extends State<DataType> {
-  static updateGroupSideEffectKey = "rebuildGroup";
+  static updateGroupSideEffectKey = 'rebuildGroup';
   public isSelected = false; // If Item is selected by a Selector
   public collection: () => Collection<DataType>;
 

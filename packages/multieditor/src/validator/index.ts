@@ -4,14 +4,14 @@ import {
   defineConfig,
   generateId,
   isFunction,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 import {
   DataObject,
   MultiEditor,
   ItemKey,
   StringValidator,
   NumberValidator,
-} from "../internal";
+} from '../internal';
 
 export class Validator<DataType = any> {
   public _key?: ValidatorKey;
@@ -25,7 +25,7 @@ export class Validator<DataType = any> {
    */
   constructor(config: ValidatorConfigInterface = {}) {
     this.config = defineConfig(config, {
-      prefix: "default",
+      prefix: 'default',
     });
     this._key = this.config.key;
   }
@@ -72,7 +72,7 @@ export class Validator<DataType = any> {
     item.status.track = true;
 
     // Call validationMethods (Validation Time)
-    for (let validationMethodKey of validationMethodKeys)
+    for (const validationMethodKey of validationMethodKeys)
       isValid =
         (await this.validationMethods[validationMethodKey](
           key,
@@ -125,7 +125,7 @@ export class Validator<DataType = any> {
 
     // Check if Validation Method is a Function
     if (!isFunction(_method)) {
-      Agile.logger.error("A Validation Method has to be a function!");
+      Agile.logger.error('A Validation Method has to be a function!');
       return this;
     }
 
@@ -188,13 +188,13 @@ export class Validator<DataType = any> {
    */
   public required(errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("required"),
+      this.getValidationMethodKey('required'),
       async (key: ItemKey, value: DataType, editor) => {
         const isValid = !!value;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
+            'error',
             errorMessage || `${key} is a required field`
           );
         }

@@ -13,7 +13,7 @@ import {
   StateRuntimeJob,
   StateRuntimeJobConfigInterface,
   RuntimeJobKey,
-} from "../internal";
+} from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
   public state: () => State<ValueType>;
@@ -145,13 +145,13 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = job.observer.state();
 
     // Call Watchers Functions
-    for (let watcherKey in state.watchers)
+    for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
         state.watchers[watcherKey](state.getPublicValue());
 
     // Call SideEffect Functions
     if (job.config?.sideEffects)
-      for (let sideEffectKey in state.sideEffects)
+      for (const sideEffectKey in state.sideEffects)
         if (isFunction(state.sideEffects[sideEffectKey]))
           state.sideEffects[sideEffectKey](job.config);
 

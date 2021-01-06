@@ -6,7 +6,7 @@ import {
   StorageKey,
   StorageItemKey,
   notEqual,
-} from "../internal";
+} from '../internal';
 
 export class Storages {
   public agileInstance: () => Agile;
@@ -40,14 +40,14 @@ export class Storages {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
       Agile.logger.warn(
-        "Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!"
+        'Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!'
       );
       return false;
     }
 
     // Create and register Local Storage
     const _localStorage = new Storage({
-      key: "localStorage",
+      key: 'localStorage',
       async: false,
       methods: {
         get: localStorage.getItem.bind(localStorage),
@@ -74,7 +74,7 @@ export class Storages {
     const hasRegisteredAnyStorage = notEqual(this.storages, {});
 
     // Check if Storage already exists
-    if (this.storages.hasOwnProperty(storage.key)) {
+    if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
       Agile.logger.error(
         `Storage with the key/name '${storage.key}' already exists`
       );
@@ -84,7 +84,7 @@ export class Storages {
     // Set first added Storage as default Storage
     if (!hasRegisteredAnyStorage && config.default === false) {
       Agile.logger.warn(
-        "Be aware that Agile has to assign the first added Storage as default Storage!"
+        'Be aware that Agile has to assign the first added Storage as default Storage!'
       );
     }
     if (!hasRegisteredAnyStorage) config.default = true;
@@ -151,7 +151,7 @@ export class Storages {
   ): Promise<GetType | undefined> {
     if (!this.hasStorage()) {
       Agile.logger.error(
-        "No Storage found! Please provide at least one Storage."
+        'No Storage found! Please provide at least one Storage.'
       );
       return Promise.resolve(undefined);
     }
@@ -183,14 +183,14 @@ export class Storages {
   ): void {
     if (!this.hasStorage()) {
       Agile.logger.error(
-        "No Storage found! Please provide at least one Storage."
+        'No Storage found! Please provide at least one Storage.'
       );
       return;
     }
 
     // Call set Method in specific Storages
     if (storageKeys) {
-      for (let storageKey of storageKeys)
+      for (const storageKey of storageKeys)
         this.getStorage(storageKey)?.set(key, value);
       return;
     }
@@ -211,14 +211,14 @@ export class Storages {
   public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
     if (!this.hasStorage()) {
       Agile.logger.error(
-        "No Storage found! Please provide at least one Storage."
+        'No Storage found! Please provide at least one Storage.'
       );
       return;
     }
 
     // Call remove Method in specific Storages
     if (storageKeys) {
-      for (let storageKey of storageKeys)
+      for (const storageKey of storageKeys)
         this.getStorage(storageKey)?.remove(key);
       return;
     }
@@ -247,8 +247,8 @@ export class Storages {
    */
   static localStorageAvailable(): boolean {
     try {
-      localStorage.setItem("_myDummyKey_", "myDummyValue");
-      localStorage.removeItem("_myDummyKey_");
+      localStorage.setItem('_myDummyKey_', 'myDummyValue');
+      localStorage.removeItem('_myDummyKey_');
       return true;
     } catch (e) {
       return false;

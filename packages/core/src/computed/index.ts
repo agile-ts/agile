@@ -3,12 +3,10 @@ import {
   Agile,
   defineConfig,
   Observer,
-  StorageKey,
-  StatePersistentConfigInterface,
   Event,
   StateConfigInterface,
   ComputedTracker,
-} from "../internal";
+} from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
   ComputedValueType
@@ -113,7 +111,7 @@ export class Computed<ComputedValueType = any> extends State<
     // Auto track Observers the computeFunction might depend on
     ComputedTracker.track();
     const computedValue = this.computeFunction();
-    let foundDeps = ComputedTracker.getTrackedObservers();
+    const foundDeps = ComputedTracker.getTrackedObservers();
 
     // Handle foundDeps and hardCodedDeps
     const newDeps: Array<Observer> = [];
@@ -138,17 +136,17 @@ export class Computed<ComputedValueType = any> extends State<
    */
   public formatDeps(instances: Array<any>): Array<Observer> {
     const finalInstances: Array<Observer> = [];
-    for (let instance of instances) {
+    for (const instance of instances) {
       if (instance instanceof Observer) {
         finalInstances.push(instance);
         continue;
       }
       if (
         instance !== undefined &&
-        instance["observer"] !== undefined &&
-        instance["observer"] instanceof Observer
+        instance['observer'] !== undefined &&
+        instance['observer'] instanceof Observer
       )
-        finalInstances.push(instance["observer"]);
+        finalInstances.push(instance['observer']);
     }
     return finalInstances;
   }
@@ -162,10 +160,7 @@ export class Computed<ComputedValueType = any> extends State<
     return this;
   }
 
-  public persist(
-    keyOrConfig: StorageKey | StatePersistentConfigInterface = {},
-    config: StatePersistentConfigInterface = {}
-  ): this {
+  public persist(): this {
     Agile.logger.error("You can't use persist method on ComputedState!");
     return this;
   }

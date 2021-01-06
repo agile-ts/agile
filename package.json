@@ -22,16 +22,25 @@
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec yarn install",
     "version-bump": "changeset",
-    "release": "lerna run release && changeset publish"
+    "release": "lerna run release && changeset publish",
+    "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
+    "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/agile-ts/agile.git"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.12.0",
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.7",
+    "@typescript-eslint/eslint-plugin": "^4.12.0",
+    "@typescript-eslint/parser": "^4.12.0",
+    "eslint": "^7.17.0",
+    "eslint-plugin-prettier": "^3.3.1",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-config-node": "^4.1.0",
     "jest": "^26.6.3",
     "lerna": "^3.22.1",
     "nodemon": "^2.0.6",
@@ -40,8 +49,7 @@
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.7",
-    "@changesets/cli": "^2.12.0"
+    "typescript": "^3.9.7"
   },
   "workspaces": [
     "packages/*"

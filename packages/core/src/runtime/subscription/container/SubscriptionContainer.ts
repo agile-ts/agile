@@ -1,4 +1,4 @@
-import { Observer } from "../../../internal";
+import { Observer } from '../../../internal';
 
 export class SubscriptionContainer {
   public key?: SubscriptionContainerKeyType;

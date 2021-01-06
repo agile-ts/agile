@@ -4,7 +4,7 @@ import {
   isValidObject,
   generateId,
   isFunction,
-} from "../internal";
+} from '../internal';
 
 export class Logger {
   public key?: LoggerKey;
@@ -22,9 +22,9 @@ export class Logger {
    * Logger - Handy Class for handling console.logs
    */
   constructor(config: LoggerConfig = {}) {
-    let _config = typeof config === "function" ? config(this) : config;
+    let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
-      prefix: "",
+      prefix: '',
       allowedTags: [],
       canUseCustomStyles: true,
       active: true,
@@ -75,38 +75,38 @@ export class Logger {
    */
   private addDefaultLoggerCategories() {
     this.createLoggerCategory({
-      key: "log",
+      key: 'log',
       level: Logger.level.LOG,
     });
     this.createLoggerCategory({
-      key: "debug",
-      customStyle: "color: #3c3c3c;",
-      prefix: "Debug",
+      key: 'debug',
+      customStyle: 'color: #3c3c3c;',
+      prefix: 'Debug',
       level: Logger.level.DEBUG,
     });
     this.createLoggerCategory({
-      key: "info",
-      customStyle: "color: #6c69a0;",
-      prefix: "Info",
+      key: 'info',
+      customStyle: 'color: #6c69a0;',
+      prefix: 'Info',
       level: Logger.level.INFO,
     });
     this.createLoggerCategory({
-      key: "warn",
-      prefix: "Warn",
+      key: 'warn',
+      prefix: 'Warn',
       level: Logger.level.WARN,
     });
     this.createLoggerCategory({
-      key: "error",
-      prefix: "Error",
+      key: 'error',
+      prefix: 'Error',
       level: Logger.level.ERROR,
     });
     this.createLoggerCategory({
-      key: "trace",
-      prefix: "Trace",
+      key: 'trace',
+      prefix: 'Trace',
       level: Logger.level.TRACE,
     });
     this.createLoggerCategory({
-      key: "table",
+      key: 'table',
       level: Logger.level.TABLE,
     });
   }
@@ -132,70 +132,84 @@ export class Logger {
       };
     }
     return {
-      log: () => {},
-      debug: () => {},
-      info: () => {},
-      warn: () => {},
-      error: () => {},
-      trace: () => {},
-      table: () => {},
+      log: () => {
+        /* do nothing */
+      },
+      debug: () => {
+        /* do nothing */
+      },
+      info: () => {
+        /* do nothing */
+      },
+      warn: () => {
+        /* do nothing */
+      },
+      error: () => {
+        /* do nothing */
+      },
+      trace: () => {
+        /* do nothing */
+      },
+      table: () => {
+        /* do nothing */
+      },
     };
   }
 
   public log(...data: any[]) {
-    this.invokeConsole(data, "log", "log");
+    this.invokeConsole(data, 'log', 'log');
   }
 
   public debug(...data: any[]) {
     this.invokeConsole(
       data,
-      "debug",
-      typeof console.debug !== "undefined" ? "debug" : "log"
+      'debug',
+      typeof console.debug !== 'undefined' ? 'debug' : 'log'
     );
   }
 
   public info(...data: any[]) {
     this.invokeConsole(
       data,
-      "info",
-      typeof console.info !== "undefined" ? "info" : "log"
+      'info',
+      typeof console.info !== 'undefined' ? 'info' : 'log'
     );
   }
 
   public warn(...data: any[]) {
     this.invokeConsole(
       data,
-      "warn",
-      typeof console.warn !== "undefined" ? "warn" : "log"
+      'warn',
+      typeof console.warn !== 'undefined' ? 'warn' : 'log'
     );
   }
 
   public error(...data: any[]) {
     this.invokeConsole(
       data,
-      "error",
-      typeof console.error !== "undefined" ? "error" : "log"
+      'error',
+      typeof console.error !== 'undefined' ? 'error' : 'log'
     );
   }
 
   public trace(...data: any[]) {
     this.invokeConsole(
       data,
-      "trace",
-      typeof console.trace !== "undefined" ? "trace" : "log"
+      'trace',
+      typeof console.trace !== 'undefined' ? 'trace' : 'log'
     );
   }
 
   public table(...data: any[]) {
     this.invokeConsole(
       data,
-      "table",
-      typeof console.table !== "undefined" ? "table" : "log"
+      'table',
+      typeof console.table !== 'undefined' ? 'table' : 'log'
     );
   }
 
   public custom(loggerCategory: string, ...data: any[]) {
-    this.invokeConsole(data, loggerCategory, "log");
+    this.invokeConsole(data, loggerCategory, 'log');
   }
 
   //=========================================================================================================
@@ -220,22 +234,22 @@ export class Logger {
 
     // Build Prefix of Log
     const buildPrefix = (): string => {
-      let prefix: string = "";
+      let prefix = '';
       if (this.config.prefix) prefix = prefix.concat(this.config.prefix);
       if (loggerCategory.prefix)
-        prefix = prefix.concat(" " + loggerCategory.prefix);
+        prefix = prefix.concat(' ' + loggerCategory.prefix);
       if (this.config.prefix || loggerCategory.prefix)
-        prefix = prefix.concat(":");
+        prefix = prefix.concat(':');
       return prefix;
     };
 
     // Add built Prefix
-    if (typeof data[0] === "string")
-      data[0] = buildPrefix().concat(" ").concat(data[0]);
+    if (typeof data[0] === 'string')
+      data[0] = buildPrefix().concat(' ').concat(data[0]);
     else data.unshift(buildPrefix());
 
     // Call Watcher Callbacks
-    for (let key in this.watchers) {
+    for (const key in this.watchers) {
       const watcher = this.watchers[key];
       if (loggerCategory.level >= (watcher.level || 0)) {
         watcher.callback(loggerCategory, data);
@@ -246,8 +260,8 @@ export class Logger {
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
       let hasStyledString = false; // NOTE: Only one style can be used for one String block!
-      for (let log of data) {
-        if (!hasStyledString && typeof log === "string") {
+      for (const log of data) {
+        if (!hasStyledString && typeof log === 'string') {
           newLogs.push(`%c${log}`);
           newLogs.push(loggerCategory.customStyle);
           hasStyledString = true;
@@ -259,10 +273,10 @@ export class Logger {
     }
 
     // Handle Console Table Log
-    if (consoleLogType === "table") {
-      if (typeof data[0] === "string") {
+    if (consoleLogType === 'table') {
+      if (typeof data[0] === 'string') {
         console.log(data[0]);
-        console.table(data.filter((d) => typeof d !== "string" && "number"));
+        console.table(data.filter((d) => typeof d !== 'string' && 'number'));
       }
       return;
     }
@@ -281,7 +295,7 @@ export class Logger {
    */
   public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
     loggerCategory = defineConfig(loggerCategory, {
-      prefix: "",
+      prefix: '',
       level: 0,
     });
     this.loggerCategories[loggerCategory.key] = loggerCategory;
@@ -339,7 +353,7 @@ export class Logger {
     // Check if Callback is a Function
     if (!isFunction(_config.callback)) {
       console.error(
-        "Agile: A Watcher Callback Function has to be an function!"
+        'Agile: A Watcher Callback Function has to be an function!'
       );
       return this;
     }
@@ -431,13 +445,13 @@ export type LoggerConfig =
   | ((logger: Logger) => CreateLoggerConfigInterface);
 
 export type ConsoleLogType =
-  | "log"
-  | "warn"
-  | "error"
-  | "trace"
-  | "table"
-  | "info"
-  | "debug";
+  | 'log'
+  | 'warn'
+  | 'error'
+  | 'trace'
+  | 'table'
+  | 'info'
+  | 'debug';
 
 export type LoggerWatcherCallback = (
   loggerCategory: LoggerCategoryInterface,

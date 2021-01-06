@@ -14,7 +14,7 @@ import {
   CollectionPersistent,
   GroupAddConfig,
   ComputedTracker,
-} from "../internal";
+} from '../internal';
 
 export class Collection<DataType = DefaultItem> {
   public agileInstance: () => Agile;
@@ -42,17 +42,17 @@ export class Collection<DataType = DefaultItem> {
 
     // Set temp Config for creating proper Placeholder Items (of Selector)
     this.config = {
-      defaultGroupKey: "default",
-      primaryKey: "id",
+      defaultGroupKey: 'default',
+      primaryKey: 'id',
     };
 
     // Assign Properties
-    let _config = typeof config === "function" ? config(this) : config;
+    let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
-      primaryKey: "id",
+      primaryKey: 'id',
       groups: {},
       selectors: {},
-      defaultGroupKey: "default",
+      defaultGroupKey: 'default',
     });
     this._key = _config.key;
     this.config = {
@@ -160,7 +160,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Set Key/Name of Group to property Name
-    for (let key in groupsObject)
+    for (const key in groupsObject)
       if (!groupsObject[key]._key) groupsObject[key].setKey(key);
 
     this.groups = groupsObject;
@@ -191,7 +191,7 @@ export class Collection<DataType = DefaultItem> {
     } else selectorsObject = selectors;
 
     // Set Key/Name of Selector to property Name
-    for (let key in selectorsObject)
+    for (const key in selectorsObject)
       if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
 
     this.selectors = selectorsObject;
@@ -217,7 +217,7 @@ export class Collection<DataType = DefaultItem> {
     const defaultGroupKey = this.config.defaultGroupKey;
     const primaryKey = this.config.primaryKey;
     config = defineConfig<CollectConfigInterface>(config, {
-      method: "push",
+      method: 'push',
       background: false,
       patch: false,
       select: false,
@@ -523,7 +523,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Create dummy Selector to hold reference
     if (!selector) {
-      selector = new Selector<DataType>(this, "unknown", {
+      selector = new Selector<DataType>(this, 'unknown', {
         key: selectorKey,
         isPlaceholder: true,
       });
@@ -611,7 +611,7 @@ export class Collection<DataType = DefaultItem> {
         this,
         {
           [this.config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
-          dummy: "item",
+          dummy: 'item',
         } as any,
         {
           isPlaceholder: true,
@@ -637,7 +637,7 @@ export class Collection<DataType = DefaultItem> {
     itemKey: ItemKey | undefined,
     config: HasConfigInterface = {}
   ): DataType | undefined {
-    let item = this.getItem(itemKey, config);
+    const item = this.getItem(itemKey, config);
     if (!item) return undefined;
     return item.value;
   }
@@ -728,7 +728,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroupCount(): number {
     let size = 0;
-    for (let group in this.groups) size++;
+    for (const group in this.groups) size++;
     return size;
   }
 
@@ -741,7 +741,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getSelectorCount(): number {
     let size = 0;
-    for (let selector in this.selectors) size++;
+    for (const selector in this.selectors) size++;
     return size;
   }
 
@@ -758,10 +758,10 @@ export class Collection<DataType = DefaultItem> {
     this.size = 0;
 
     // Reset Groups
-    for (let key in this.groups) this.getGroup(key)?.reset();
+    for (const key in this.groups) this.getGroup(key)?.reset();
 
     // Reset Selectors
-    for (let key in this.selectors) this.getSelector(key)?.reset();
+    for (const key in this.selectors) this.getSelector(key)?.reset();
   }
 
   //=========================================================================================================
@@ -833,14 +833,14 @@ export class Collection<DataType = DefaultItem> {
     );
 
     // Update ItemKey in Groups
-    for (let groupKey in this.groups) {
+    for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (!group || !group.has(oldItemKey)) continue;
       group.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
     // Update ItemKey in Selectors
-    for (let selectorKey in this.selectors) {
+    for (const selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
       if (!selector) continue;
 
@@ -872,7 +872,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroupKeysThatHaveItemKey(itemKey: ItemKey): Array<GroupKey> {
     const groupKeys: Array<GroupKey> = [];
-    for (let groupKey in this.groups) {
+    for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (group?.has(itemKey)) groupKeys.push(groupKey);
     }
@@ -947,7 +947,7 @@ export class Collection<DataType = DefaultItem> {
       if (!item) return;
 
       // Remove Item from Groups
-      for (let groupKey in this.groups) {
+      for (const groupKey in this.groups) {
         const group = this.getGroup(groupKey, { notExisting: true });
         if (group?.has(itemKey)) group?.remove(itemKey);
       }
@@ -959,7 +959,7 @@ export class Collection<DataType = DefaultItem> {
       delete this.data[itemKey];
 
       // Reselect Item in Selectors (to create new dummyItem that holds reference)
-      for (let selectorKey in this.selectors) {
+      for (const selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
         if (selector?.hasSelected(itemKey))
           selector?.select(itemKey, { force: true });
@@ -993,7 +993,7 @@ export class Collection<DataType = DefaultItem> {
       return false;
     }
 
-    if (!_data.hasOwnProperty(primaryKey)) {
+    if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
       Agile.logger.error(
         `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`
       );
@@ -1040,7 +1040,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Rebuild Groups that include ItemKey
-    for (let groupKey in this.groups) {
+    for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey);
       if (group?.has(itemKey)) {
         // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
@@ -1092,7 +1092,7 @@ export interface CollectionConfigInterface {
  */
 export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
-  method?: "push" | "unshift";
+  method?: 'push' | 'unshift';
   forEachItem?: (data: DataType, key: ItemKey, index: number) => void;
   background?: boolean;
   select?: boolean;

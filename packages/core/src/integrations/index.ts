@@ -1,4 +1,4 @@
-import { Agile, Integration } from "../internal";
+import { Agile, Integration } from '../internal';
 
 export class Integrations {
   public agileInstance: () => Agile;
@@ -31,7 +31,7 @@ export class Integrations {
     // Check if Integration is valid
     if (!integration._key) {
       Agile.logger.error(
-        "Failed to integrate framework! Invalid Integration!",
+        'Failed to integrate framework! Invalid Integration!',
         integration._key
       );
       return false;

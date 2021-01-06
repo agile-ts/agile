@@ -5,7 +5,7 @@ import {
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
   defineConfig,
-} from "../internal";
+} from '../internal';
 
 export class Runtime {
   public agileInstance: () => Agile;
@@ -42,7 +42,7 @@ export class Runtime {
     this.jobQueue.push(job);
 
     // Logging
-    Agile.logger.if.tag(["runtime"]).info(`Created Job '${job._key}'`, job);
+    Agile.logger.if.tag(['runtime']).info(`Created Job '${job._key}'`, job);
 
     // Perform Job
     if (config.perform) {
@@ -70,7 +70,7 @@ export class Runtime {
     this.currentJob = null;
 
     // Logging
-    Agile.logger.if.tag(["runtime"]).info(`Completed Job '${job._key}'`, job);
+    Agile.logger.if.tag(['runtime']).info(`Completed Job '${job._key}'`, job);
 
     // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
     if (this.jobQueue.length > 0) {
@@ -153,8 +153,8 @@ export class Runtime {
 
     // Logging
     Agile.logger.if
-      .tag(["runtime"])
-      .info("Updated/Rerendered Subscriptions", subscriptionsToUpdate);
+      .tag(['runtime'])
+      .info('Updated/Rerendered Subscriptions', subscriptionsToUpdate);
 
     return true;
   }
@@ -178,7 +178,7 @@ export class Runtime {
     if (!subscriptionContainer.isObjectBased) return;
 
     // Find Key of Job Observer in SubscriptionContainer
-    for (let key in subscriptionContainer.subsObject)
+    for (const key in subscriptionContainer.subsObject)
       if (subscriptionContainer.subsObject[key] === job.observer)
         foundKey = key;
 
@@ -202,10 +202,10 @@ export class Runtime {
     subscriptionContainer.observerKeysToUpdate.forEach((updatedKey) => {
       if (
         subscriptionContainer.subsObject &&
-        subscriptionContainer.subsObject[updatedKey]["value"]
+        subscriptionContainer.subsObject[updatedKey]['value']
       )
         props[updatedKey] =
-          subscriptionContainer.subsObject[updatedKey]["value"];
+          subscriptionContainer.subsObject[updatedKey]['value'];
     });
 
     subscriptionContainer.observerKeysToUpdate = [];

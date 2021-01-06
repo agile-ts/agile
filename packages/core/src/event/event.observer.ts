@@ -8,7 +8,7 @@ import {
   RuntimeJobConfigInterface,
   defineConfig,
   RuntimeJobKey,
-} from "../internal";
+} from '../internal';
 
 export class EventObserver<PayloadType = any> extends Observer {
   public event: () => Event<PayloadType>;

@@ -1,11 +1,10 @@
-import * as http from "http";
 import {
   clone,
   copy,
   defineConfig,
   isValidObject,
   isValidUrl,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 
 export default class API {
   public config: ApiConfig;
@@ -42,7 +41,7 @@ export default class API {
    *  @param config - Config
    */
   public get(path: string, config: RequestInit = {}) {
-    return this.send("GET", path, config);
+    return this.send('GET', path, config);
   }
 
   //=========================================================================================================
@@ -56,7 +55,7 @@ export default class API {
    *  @param config - Config
    */
   public post(path: string, payload?: any, config: RequestInit = {}) {
-    return this.send("POST", path, payload, config);
+    return this.send('POST', path, payload, config);
   }
 
   //=========================================================================================================
@@ -70,7 +69,7 @@ export default class API {
    *  @param config - Config
    */
   public put(path: string, payload?: any, config: RequestInit = {}) {
-    return this.send("PUT", path, payload, config);
+    return this.send('PUT', path, payload, config);
   }
 
   //=========================================================================================================
@@ -84,7 +83,7 @@ export default class API {
    *  @param config - Config
    */
   public patch(path: string, payload?: any, config: RequestInit = {}) {
-    return this.send("PATCH", path, payload, config);
+    return this.send('PATCH', path, payload, config);
   }
 
   //=========================================================================================================
@@ -98,7 +97,7 @@ export default class API {
    *  @param config - Config
    */
   public delete(path: string, payload?: any, config: RequestInit = {}) {
-    return this.send("DELETE", path, payload, config);
+    return this.send('DELETE', path, payload, config);
   }
 
   //=========================================================================================================
@@ -127,16 +126,16 @@ export default class API {
     // Set Body
     if (isValidObject(payload)) {
       config.options.body = JSON.stringify(payload);
-      config.options.headers["content-type"] = "application/json";
+      config.options.headers['content-type'] = 'application/json';
     } else {
       config.options.body = payload;
     }
 
     // Build Url
-    if (endpoint.startsWith("http")) fullUrl = endpoint;
+    if (endpoint.startsWith('http')) fullUrl = endpoint;
     else
-      fullUrl = `${this.config.baseURL || ""}${
-        "/" + this.config.path || ""
+      fullUrl = `${this.config.baseURL || ''}${
+        '/' + this.config.path || ''
       }/${endpoint}`;
 
     // Warning if fullUrl might be invalid
@@ -178,12 +177,12 @@ export default class API {
       status: timedout ? 408 : response?.status || 404,
       raw: response,
       data: {},
-      type: response?.headers?.get("content-type"),
+      type: response?.headers?.get('content-type'),
       timedout: timedout,
     };
 
     // Extract Response Data
-    if (agileResponse.type?.includes("application/json"))
+    if (agileResponse.type?.includes('application/json'))
       agileResponse.data = await agileResponse.raw?.json();
 
     return agileResponse;

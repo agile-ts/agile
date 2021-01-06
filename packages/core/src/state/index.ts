@@ -16,7 +16,7 @@ import {
   ComputedTracker,
   StateIngestConfigInterface,
   StateRuntimeJobConfigInterface,
-} from "../internal";
+} from '../internal';
 
 export class State<ValueType = any> {
   public agileInstance: () => Agile;
@@ -190,7 +190,7 @@ export class State<ValueType = any> {
    * @param type - wished Type ('String', 'Boolean', 'Array', 'Object', 'Number')
    */
   public type(type: any): this {
-    const supportedTypes = ["String", "Boolean", "Array", "Object", "Number"];
+    const supportedTypes = ['String', 'Boolean', 'Array', 'Object', 'Number'];
 
     // Check if type is a supported Type
     if (!supportedTypes.includes(type.name)) {
@@ -261,7 +261,7 @@ export class State<ValueType = any> {
     }
 
     if (!isValidObject(targetWithChanges)) {
-      Agile.logger.error("TargetWithChanges has to be an Object!");
+      Agile.logger.error('TargetWithChanges has to be an Object!');
       return this;
     }
 
@@ -320,7 +320,7 @@ export class State<ValueType = any> {
     // Check if Callback is valid Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
-        "A Watcher Callback Function has to be typeof Function!"
+        'A Watcher Callback Function has to be typeof Function!'
       );
       return this;
     }
@@ -356,7 +356,7 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called if the State Value changes
    */
   public onInaugurated(callback: StateWatcherCallback<ValueType>) {
-    const watcherKey = "InauguratedWatcherKey";
+    const watcherKey = 'InauguratedWatcherKey';
     this.watch(watcherKey, (value) => {
       callback(value);
       this.removeWatcher(watcherKey);
@@ -507,10 +507,10 @@ export class State<ValueType = any> {
    * Note: Only useful with boolean based States
    */
   public invert(): this {
-    if (typeof this._value === "boolean") {
+    if (typeof this._value === 'boolean') {
       this.set(!this._value as any);
     } else {
-      Agile.logger.error("You can only invert boolean based States!");
+      Agile.logger.error('You can only invert boolean based States!');
     }
     return this;
   }
@@ -525,7 +525,7 @@ export class State<ValueType = any> {
    */
   public compute(method: ComputeMethod<ValueType>): this {
     if (!isFunction(method)) {
-      Agile.logger.error("A computeMethod has to be a function!");
+      Agile.logger.error('A computeMethod has to be a function!');
       return this;
     }
     this.computeMethod = method;
@@ -546,7 +546,7 @@ export class State<ValueType = any> {
     sideEffect: (properties?: { [key: string]: any }) => void
   ): this {
     if (!isFunction(sideEffect)) {
-      Agile.logger.error("A sideEffect function has to be a function!");
+      Agile.logger.error('A sideEffect function has to be a function!');
       return this;
     }
     this.sideEffects[key] = sideEffect;
@@ -589,7 +589,7 @@ export class State<ValueType = any> {
    */
   public hasCorrectType(value: any): boolean {
     if (!this.valueType) return true;
-    let type: string = typeof value;
+    const type = typeof value;
     return type === this.valueType;
   }
 
@@ -602,7 +602,7 @@ export class State<ValueType = any> {
    */
   public getPublicValue(): ValueType {
     // If State Value is used internal and output represents the real state value (for instance in Group)
-    if (this["output"] !== undefined) return this["output"];
+    if (this['output'] !== undefined) return this['output'];
 
     return this._value;
   }

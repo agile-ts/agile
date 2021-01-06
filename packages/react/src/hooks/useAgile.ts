@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Agile,
   Collection,
@@ -8,8 +8,8 @@ import {
   Observer,
   State,
   SubscriptionContainerKeyType,
-} from "@agile-ts/core";
-import { useIsomorphicLayoutEffect } from "../utils/useIsomorphicLayoutEffect";
+} from '@agile-ts/core';
+import { useIsomorphicLayoutEffect } from '../utils/useIsomorphicLayoutEffect';
 
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
@@ -119,7 +119,7 @@ export function useAgile<
   useIsomorphicLayoutEffect(() => {
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error("Failed to subscribe Component with deps", depsArray);
+      Agile.logger.error('Failed to subscribe Component with deps', depsArray);
       return;
     }
 

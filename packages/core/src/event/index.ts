@@ -5,8 +5,8 @@ import {
   generateId,
   isFunction,
   Observer,
-} from "../internal";
-import { EventObserver } from "./event.observer";
+} from '../internal';
+import { EventObserver } from './event.observer';
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;
@@ -124,7 +124,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
-        "A Event Callback Function has to be typeof Function!"
+        'A Event Callback Function has to be typeof Function!'
       );
       return this;
     }
@@ -224,9 +224,11 @@ export class Event<PayloadType = DefaultEventPayload> {
   public normalTrigger(payload: PayloadType, keys?: string[]) {
     // Call wished Callback Functions
     if (!keys) {
-      for (let key in this.callbacks) this.callbacks[key](payload);
+      for (const key in this.callbacks) this.callbacks[key](payload);
     } else {
-      for (let key of keys) this.callbacks[key](payload);
+      for (const key of keys) {
+        if (this.callbacks[key]) this.callbacks[key](payload);
+      }
     }
 
     // Cause rerender

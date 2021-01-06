@@ -5,12 +5,12 @@ import {
   Observer,
   StatePersistent,
   ComputedTracker,
-} from "../../../src";
-import * as Utils from "../../../src/utils";
+} from '../../../src';
+import * as Utils from '../../../src/utils';
 
-jest.mock("../../../src/state/state.persistent");
+jest.mock('../../../src/state/state.persistent');
 
-describe("State Tests", () => {
+describe('State Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
@@ -18,26 +18,26 @@ describe("State Tests", () => {
 
     dummyAgile = new Agile({ localStorage: false });
 
-    jest.spyOn(State.prototype, "set");
+    jest.spyOn(State.prototype, 'set');
     console.error = jest.fn();
     console.warn = jest.fn();
   });
 
-  it("should create State and should call initial set (default config)", () => {
+  it('should create State and should call initial set (default config)', () => {
     // Overwrite select once to not call it
-    jest.spyOn(State.prototype, "set").mockReturnValueOnce(undefined);
+    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
 
-    const state = new State(dummyAgile, "coolValue");
+    const state = new State(dummyAgile, 'coolValue');
 
-    expect(state.set).toHaveBeenCalledWith("coolValue", { overwrite: true });
+    expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
     expect(state._key).toBeUndefined();
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
     expect(state.isPlaceholder).toBeTruthy();
-    expect(state.initialStateValue).toBe("coolValue");
-    expect(state._value).toBe("coolValue");
-    expect(state.previousStateValue).toBe("coolValue");
-    expect(state.nextStateValue).toBe("coolValue");
+    expect(state.initialStateValue).toBe('coolValue');
+    expect(state._value).toBe('coolValue');
+    expect(state.previousStateValue).toBe('coolValue');
+    expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
     expect(state.observer.deps.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
@@ -48,30 +48,30 @@ describe("State Tests", () => {
     expect(state.watchers).toStrictEqual({});
   });
 
-  it("should create State and should call initial set (specific config)", () => {
+  it('should create State and should call initial set (specific config)', () => {
     // Overwrite select once to not call it
-    jest.spyOn(State.prototype, "set").mockReturnValueOnce(undefined);
+    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
 
     const dummyObserver = new Observer(dummyAgile);
 
-    const state = new State(dummyAgile, "coolValue", {
-      key: "coolState",
+    const state = new State(dummyAgile, 'coolValue', {
+      key: 'coolState',
       deps: [dummyObserver],
     });
 
-    expect(state.set).toHaveBeenCalledWith("coolValue", { overwrite: true });
-    expect(state._key).toBe("coolState");
+    expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
+    expect(state._key).toBe('coolState');
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
     expect(state.isPlaceholder).toBeTruthy();
-    expect(state.initialStateValue).toBe("coolValue");
-    expect(state._value).toBe("coolValue");
-    expect(state.previousStateValue).toBe("coolValue");
-    expect(state.nextStateValue).toBe("coolValue");
+    expect(state.initialStateValue).toBe('coolValue');
+    expect(state._value).toBe('coolValue');
+    expect(state.previousStateValue).toBe('coolValue');
+    expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
     expect(state.observer.deps.size).toBe(1);
     expect(state.observer.deps.has(dummyObserver)).toBeTruthy();
-    expect(state.observer._key).toBe("coolState");
+    expect(state.observer._key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
     expect(state.isPersisted).toBeFalsy();
@@ -81,19 +81,19 @@ describe("State Tests", () => {
 
   it("should create State and shouldn't call initial set (config.isPlaceholder = true)", () => {
     // Overwrite select once to not call it
-    jest.spyOn(State.prototype, "set").mockReturnValueOnce(undefined);
+    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
 
-    const state = new State(dummyAgile, "coolValue", { isPlaceholder: true });
+    const state = new State(dummyAgile, 'coolValue', { isPlaceholder: true });
 
     expect(state.set).not.toHaveBeenCalled();
     expect(state._key).toBeUndefined();
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
     expect(state.isPlaceholder).toBeTruthy();
-    expect(state.initialStateValue).toBe("coolValue");
-    expect(state._value).toBe("coolValue");
-    expect(state.previousStateValue).toBe("coolValue");
-    expect(state.nextStateValue).toBe("coolValue");
+    expect(state.initialStateValue).toBe('coolValue');
+    expect(state._value).toBe('coolValue');
+    expect(state.previousStateValue).toBe('coolValue');
+    expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
     expect(state.observer.deps.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
@@ -104,7 +104,7 @@ describe("State Tests", () => {
     expect(state.watchers).toStrictEqual({});
   });
 
-  describe("State Function Tests", () => {
+  describe('State Function Tests', () => {
     let numberState: State<number>;
     let objectState: State<{ name: string; age: number }>;
     let arrayState: State<string[]>;
@@ -112,25 +112,25 @@ describe("State Tests", () => {
 
     beforeEach(() => {
       numberState = new State<number>(dummyAgile, 10, {
-        key: "numberStateKey",
+        key: 'numberStateKey',
       });
       objectState = new State<{ name: string; age: number }>(
         dummyAgile,
-        { name: "jeff", age: 10 },
+        { name: 'jeff', age: 10 },
         {
-          key: "objectStateKey",
+          key: 'objectStateKey',
         }
       );
-      arrayState = new State<string[]>(dummyAgile, ["jeff"], {
-        key: "arrayStateKey",
+      arrayState = new State<string[]>(dummyAgile, ['jeff'], {
+        key: 'arrayStateKey',
       });
       booleanState = new State<boolean>(dummyAgile, false, {
-        key: "booleanStateKey",
+        key: 'booleanStateKey',
       });
     });
 
-    describe("value set function tests", () => {
-      it("should call set function with passed value", () => {
+    describe('value set function tests', () => {
+      it('should call set function with passed value', () => {
         numberState.set = jest.fn();
 
         numberState.value = 20;
@@ -139,13 +139,13 @@ describe("State Tests", () => {
       });
     });
 
-    describe("value get function tests", () => {
-      it("should return current value", () => {
+    describe('value get function tests', () => {
+      it('should return current value', () => {
         expect(numberState.value).toBe(10);
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return current value", () => {
+      it('should return current value', () => {
         const value = numberState.value;
 
         expect(value).toBe(10);
@@ -155,51 +155,51 @@ describe("State Tests", () => {
       });
     });
 
-    describe("key set function tests", () => {
-      it("should call setKey with passed value", () => {
+    describe('key set function tests', () => {
+      it('should call setKey with passed value', () => {
         numberState.setKey = jest.fn();
 
-        numberState.key = "newKey";
+        numberState.key = 'newKey';
 
-        expect(numberState.setKey).toHaveBeenCalledWith("newKey");
+        expect(numberState.setKey).toHaveBeenCalledWith('newKey');
       });
     });
 
-    describe("key get function tests", () => {
-      it("should return current State Key", () => {
-        expect(numberState.key).toBe("numberStateKey");
+    describe('key get function tests', () => {
+      it('should return current State Key', () => {
+        expect(numberState.key).toBe('numberStateKey');
       });
     });
 
-    describe("setKey function tests", () => {
+    describe('setKey function tests', () => {
       beforeEach(() => {
         numberState.persistent = new StatePersistent(numberState);
 
         numberState.persistent.setKey = jest.fn();
       });
 
-      it("should update existing Key in all instances", () => {
-        numberState.persistent._key = "numberStateKey";
+      it('should update existing Key in all instances', () => {
+        numberState.persistent._key = 'numberStateKey';
 
-        numberState.setKey("newKey");
+        numberState.setKey('newKey');
 
-        expect(numberState._key).toBe("newKey");
-        expect(numberState.observer._key).toBe("newKey");
-        expect(numberState.persistent.setKey).toHaveBeenCalledWith("newKey");
+        expect(numberState._key).toBe('newKey');
+        expect(numberState.observer._key).toBe('newKey');
+        expect(numberState.persistent.setKey).toHaveBeenCalledWith('newKey');
       });
 
       it("should update existing Key in all instances except persistent if the StateKey and PersistKey aren't equal", () => {
-        numberState.persistent._key = "randomKey";
+        numberState.persistent._key = 'randomKey';
 
-        numberState.setKey("newKey");
+        numberState.setKey('newKey');
 
-        expect(numberState._key).toBe("newKey");
-        expect(numberState.observer._key).toBe("newKey");
+        expect(numberState._key).toBe('newKey');
+        expect(numberState.observer._key).toBe('newKey');
         expect(numberState.persistent.setKey).not.toHaveBeenCalled();
       });
 
-      it("should update existing Key in all instances except persistent if new StateKey is undefined", () => {
-        numberState.persistent._key = "numberStateKey";
+      it('should update existing Key in all instances except persistent if new StateKey is undefined', () => {
+        numberState.persistent._key = 'numberStateKey';
 
         numberState.setKey(undefined);
 
@@ -209,12 +209,12 @@ describe("State Tests", () => {
       });
     });
 
-    describe("set function tests", () => {
+    describe('set function tests', () => {
       beforeEach(() => {
-        jest.spyOn(numberState.observer, "ingestValue");
+        jest.spyOn(numberState.observer, 'ingestValue');
       });
 
-      it("should ingestValue if value has correct type (default config)", () => {
+      it('should ingestValue if value has correct type (default config)', () => {
         numberState.set(20);
 
         expect(console.warn).not.toHaveBeenCalled();
@@ -228,7 +228,7 @@ describe("State Tests", () => {
         });
       });
 
-      it("should ingestValue if value has correct type (specific config)", () => {
+      it('should ingestValue if value has correct type (specific config)', () => {
         numberState.set(20, {
           sideEffects: false,
           background: true,
@@ -249,11 +249,11 @@ describe("State Tests", () => {
       it("shouldn't ingestValue if value hasn't correct type (default config)", () => {
         numberState.type(Number);
 
-        numberState.set("coolValue" as any);
+        numberState.set('coolValue' as any);
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Incorrect type (string) was provided."
+          'Agile Error: Incorrect type (string) was provided.'
         );
         expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
       });
@@ -261,14 +261,14 @@ describe("State Tests", () => {
       it("should ingestValue if value hasn't correct type (config.force = true)", () => {
         numberState.type(Number);
 
-        numberState.set("coolValue" as any, { force: true });
+        numberState.set('coolValue' as any, { force: true });
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Incorrect type (string) was provided."
+          'Agile Warn: Incorrect type (string) was provided.'
         );
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
-          "coolValue",
+          'coolValue',
           {
             sideEffects: true,
             background: false,
@@ -280,12 +280,12 @@ describe("State Tests", () => {
       });
 
       it("should ingestValue if value hasn't correct type but the type isn't explicit defined (default config)", () => {
-        numberState.set("coolValue" as any);
+        numberState.set('coolValue' as any);
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
-          "coolValue",
+          'coolValue',
           {
             sideEffects: true,
             background: false,
@@ -297,18 +297,18 @@ describe("State Tests", () => {
       });
     });
 
-    describe("ingest function tests", () => {
+    describe('ingest function tests', () => {
       beforeEach(() => {
         numberState.observer.ingest = jest.fn();
       });
 
-      it("should call ingest function in Observer (default config)", () => {
+      it('should call ingest function in Observer (default config)', () => {
         numberState.ingest();
 
         expect(numberState.observer.ingest).toHaveBeenCalledWith({});
       });
 
-      it("should call ingest function in Observer (specific config)", () => {
+      it('should call ingest function in Observer (specific config)', () => {
         numberState.ingest({
           force: true,
           background: true,
@@ -321,15 +321,15 @@ describe("State Tests", () => {
       });
     });
 
-    describe("type function tests", () => {
-      it("should assign valid Type to State", () => {
+    describe('type function tests', () => {
+      it('should assign valid Type to State', () => {
         numberState.type(Number);
 
-        expect(numberState.valueType).toBe("number");
+        expect(numberState.valueType).toBe('number');
       });
 
       it("shouldn't assign invalid Type to State", () => {
-        numberState.type("fuckingType");
+        numberState.type('fuckingType');
 
         expect(numberState.valueType).toBeUndefined();
         expect(console.warn).toHaveBeenCalledWith(
@@ -338,12 +338,12 @@ describe("State Tests", () => {
       });
     });
 
-    describe("undo function tests", () => {
+    describe('undo function tests', () => {
       beforeEach(() => {
         numberState.set = jest.fn();
       });
 
-      it("should assign previousStateValue to currentValue (default config)", () => {
+      it('should assign previousStateValue to currentValue (default config)', () => {
         numberState.previousStateValue = 99;
 
         numberState.undo();
@@ -354,7 +354,7 @@ describe("State Tests", () => {
         );
       });
 
-      it("should assign previousStateValue to currentValue (specific config)", () => {
+      it('should assign previousStateValue to currentValue (specific config)', () => {
         numberState.previousStateValue = 99;
 
         numberState.undo({
@@ -372,12 +372,12 @@ describe("State Tests", () => {
       });
     });
 
-    describe("reset function tests", () => {
+    describe('reset function tests', () => {
       beforeEach(() => {
         numberState.set = jest.fn();
       });
 
-      it("should assign initialStateValue to currentValue (default config)", () => {
+      it('should assign initialStateValue to currentValue (default config)', () => {
         numberState.initialStateValue = 99;
 
         numberState.reset();
@@ -388,7 +388,7 @@ describe("State Tests", () => {
         );
       });
 
-      it("should assign initialStateValue to currentValue (specific config)", () => {
+      it('should assign initialStateValue to currentValue (specific config)', () => {
         numberState.initialStateValue = 99;
 
         numberState.reset({
@@ -406,15 +406,15 @@ describe("State Tests", () => {
       });
     });
 
-    describe("patch function tests", () => {
+    describe('patch function tests', () => {
       beforeEach(() => {
         objectState.ingest = jest.fn();
         numberState.ingest = jest.fn();
-        jest.spyOn(Utils, "flatMerge");
+        jest.spyOn(Utils, 'flatMerge');
       });
 
       it("shouldn't patch and ingest passed object based value into a not object based State (default config)", () => {
-        numberState.patch({ changed: "object" });
+        numberState.patch({ changed: 'object' });
 
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: You can't use the patch method on a non object based States!"
@@ -423,27 +423,27 @@ describe("State Tests", () => {
       });
 
       it("shouldn't patch and ingest passed not object based value into object based State (default config)", () => {
-        objectState.patch("number" as any);
+        objectState.patch('number' as any);
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: TargetWithChanges has to be an Object!"
+          'Agile Error: TargetWithChanges has to be an Object!'
         );
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
-      it("should patch and ingest passed object based value into a object based State (default config)", () => {
-        objectState.patch({ name: "frank" });
+      it('should patch and ingest passed object based value into a object based State (default config)', () => {
+        objectState.patch({ name: 'frank' });
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { age: 10, name: "jeff" },
-          { name: "frank" },
+          { age: 10, name: 'jeff' },
+          { name: 'frank' },
           {
             addNewProperties: true,
           }
         );
         expect(objectState.nextStateValue).toStrictEqual({
           age: 10,
-          name: "frank",
+          name: 'frank',
         });
         expect(objectState.ingest).toHaveBeenCalledWith({
           background: false,
@@ -454,9 +454,9 @@ describe("State Tests", () => {
         });
       });
 
-      it("should patch and ingest passed object based value into a object based State (specific config)", () => {
+      it('should patch and ingest passed object based value into a object based State (specific config)', () => {
         objectState.patch(
-          { name: "frank" },
+          { name: 'frank' },
           {
             addNewProperties: false,
             background: true,
@@ -467,15 +467,15 @@ describe("State Tests", () => {
         );
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { age: 10, name: "jeff" },
-          { name: "frank" },
+          { age: 10, name: 'jeff' },
+          { name: 'frank' },
           {
             addNewProperties: false,
           }
         );
         expect(objectState.nextStateValue).toStrictEqual({
           age: 10,
-          name: "frank",
+          name: 'frank',
         });
         expect(objectState.ingest).toHaveBeenCalledWith({
           background: true,
@@ -487,115 +487,123 @@ describe("State Tests", () => {
       });
     });
 
-    describe("watch function tests", () => {
-      const dummyCallbackFunction1 = () => {};
-      const dummyCallbackFunction2 = () => {};
+    describe('watch function tests', () => {
+      const dummyCallbackFunction1 = () => {
+        /* empty function */
+      };
+      const dummyCallbackFunction2 = () => {
+        /* empty function */
+      };
 
-      it("should add passed watcherFunction to watchers at passed key", () => {
-        const response = numberState.watch("dummyKey", dummyCallbackFunction1);
+      it('should add passed watcherFunction to watchers at passed key', () => {
+        const response = numberState.watch('dummyKey', dummyCallbackFunction1);
 
         expect(response).toBe(numberState);
-        expect(numberState.watchers).toHaveProperty("dummyKey");
-        expect(numberState.watchers["dummyKey"]).toBe(dummyCallbackFunction1);
+        expect(numberState.watchers).toHaveProperty('dummyKey');
+        expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction1);
       });
 
-      it("should add passed watcherFunction to watchers at random key if no key passed and return that generated key", () => {
-        jest.spyOn(Utils, "generateId").mockReturnValue("randomKey");
+      it('should add passed watcherFunction to watchers at random key if no key passed and return that generated key', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
 
         const response = numberState.watch(dummyCallbackFunction1);
 
-        expect(response).toBe("randomKey");
-        expect(numberState.watchers).toHaveProperty("randomKey");
-        expect(numberState.watchers["randomKey"]).toBe(dummyCallbackFunction1);
+        expect(response).toBe('randomKey');
+        expect(numberState.watchers).toHaveProperty('randomKey');
+        expect(numberState.watchers['randomKey']).toBe(dummyCallbackFunction1);
         expect(Utils.generateId).toHaveBeenCalled();
       });
 
       it("shouldn't add passed invalid watcherFunction to watchers at passed key", () => {
         const response = numberState.watch(
-          "dummyKey",
-          "noFunction hehe" as any
+          'dummyKey',
+          'noFunction hehe' as any
         );
 
         expect(response).toBe(numberState);
-        expect(numberState.watchers).not.toHaveProperty("dummyKey");
+        expect(numberState.watchers).not.toHaveProperty('dummyKey');
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: A Watcher Callback Function has to be typeof Function!"
+          'Agile Error: A Watcher Callback Function has to be typeof Function!'
         );
       });
 
       it("shouldn't add passed watcherFunction to watchers at passed key if passed key is already occupied", () => {
-        numberState.watchers["dummyKey"] = dummyCallbackFunction2;
+        numberState.watchers['dummyKey'] = dummyCallbackFunction2;
 
-        const response = numberState.watch("dummyKey", dummyCallbackFunction1);
+        const response = numberState.watch('dummyKey', dummyCallbackFunction1);
 
         expect(response).toBe(numberState);
-        expect(numberState.watchers).toHaveProperty("dummyKey");
-        expect(numberState.watchers["dummyKey"]).toBe(dummyCallbackFunction2);
+        expect(numberState.watchers).toHaveProperty('dummyKey');
+        expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction2);
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: Watcher Callback Function with the key/name 'dummyKey' already exists!"
         );
       });
     });
 
-    describe("removeWatcher function tests", () => {
+    describe('removeWatcher function tests', () => {
       beforeEach(() => {
-        numberState.watchers["dummyKey"] = () => {};
+        numberState.watchers['dummyKey'] = () => {
+          /* empty function */
+        };
       });
 
-      it("should remove watcher at key from State", () => {
-        numberState.removeWatcher("dummyKey");
+      it('should remove watcher at key from State', () => {
+        numberState.removeWatcher('dummyKey');
 
-        expect(numberState.watchers).not.toHaveProperty("dummyKey");
+        expect(numberState.watchers).not.toHaveProperty('dummyKey');
       });
     });
 
-    describe("onInaugurated function tests", () => {
+    describe('onInaugurated function tests', () => {
       let dummyCallbackFunction;
 
       beforeEach(() => {
-        jest.spyOn(numberState, "watch");
+        jest.spyOn(numberState, 'watch');
         dummyCallbackFunction = jest.fn();
       });
 
-      it("should add watcher called InauguratedWatcherKey to State that destroys it self after it got called", () => {
+      it('should add watcher called InauguratedWatcherKey to State that destroys it self after it got called', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         expect(numberState.watch).toHaveBeenCalledWith(
-          "InauguratedWatcherKey",
+          'InauguratedWatcherKey',
           expect.any(Function)
         );
-        expect(numberState.watchers).toHaveProperty("InauguratedWatcherKey");
+        expect(numberState.watchers).toHaveProperty('InauguratedWatcherKey');
       });
 
-      it("should remove itself after getting called", () => {
+      it('should remove itself after getting called', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         // Call Inaugurated Watcher
-        numberState.watchers["InauguratedWatcherKey"](10);
+        numberState.watchers['InauguratedWatcherKey'](10);
 
         expect(dummyCallbackFunction).toHaveBeenCalledWith(10);
         expect(numberState.watchers).not.toHaveProperty(
-          "InauguratedWatcherKey"
+          'InauguratedWatcherKey'
         );
       });
     });
 
-    describe("hasWatcher function tests", () => {
+    describe('hasWatcher function tests', () => {
       beforeEach(() => {
-        numberState.watchers["dummyKey"] = () => {};
+        numberState.watchers['dummyKey'] = () => {
+          /* empty function */
+        };
       });
 
-      it("should return true if Watcher at given Key exists", () => {
-        expect(numberState.hasWatcher("dummyKey")).toBeTruthy();
+      it('should return true if Watcher at given Key exists', () => {
+        expect(numberState.hasWatcher('dummyKey')).toBeTruthy();
       });
 
       it("should return false if Watcher at given Key doesn't exists", () => {
-        expect(numberState.hasWatcher("notExistingDummyKey")).toBeFalsy();
+        expect(numberState.hasWatcher('notExistingDummyKey')).toBeFalsy();
       });
     });
 
-    describe("persist function tests", () => {
-      it("should create persistent with StateKey (default config)", () => {
+    describe('persist function tests', () => {
+      it('should create persistent with StateKey (default config)', () => {
         numberState.persist();
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
@@ -606,56 +614,56 @@ describe("State Tests", () => {
         });
       });
 
-      it("should create persistent with StateKey (specific config)", () => {
+      it('should create persistent with StateKey (specific config)', () => {
         numberState.persist({
-          storageKeys: ["test1", "test2"],
+          storageKeys: ['test1', 'test2'],
           instantiate: false,
         });
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
           instantiate: false,
-          storageKeys: ["test1", "test2"],
+          storageKeys: ['test1', 'test2'],
           key: numberState._key,
         });
       });
 
-      it("should create persistent with passed Key (default config)", () => {
-        numberState.persist("passedKey");
+      it('should create persistent with passed Key (default config)', () => {
+        numberState.persist('passedKey');
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
           instantiate: true,
           storageKeys: [],
-          key: "passedKey",
+          key: 'passedKey',
         });
       });
 
-      it("should create persistent with passed Key (specific config)", () => {
-        numberState.persist("passedKey", {
-          storageKeys: ["test1", "test2"],
+      it('should create persistent with passed Key (specific config)', () => {
+        numberState.persist('passedKey', {
+          storageKeys: ['test1', 'test2'],
           instantiate: false,
         });
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
           instantiate: false,
-          storageKeys: ["test1", "test2"],
-          key: "passedKey",
+          storageKeys: ['test1', 'test2'],
+          key: 'passedKey',
         });
       });
 
-      it("should overwrite existing persistent with a warning", () => {
+      it('should overwrite existing persistent with a warning', () => {
         numberState.persistent = new StatePersistent(numberState);
 
-        numberState.persist("newPersistentKey");
+        numberState.persist('newPersistentKey');
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         // expect(numberState.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
           instantiate: true,
           storageKeys: [],
-          key: "newPersistentKey",
+          key: 'newPersistentKey',
         });
         expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`
@@ -663,7 +671,7 @@ describe("State Tests", () => {
       });
     });
 
-    describe("onLoad function tests", () => {
+    describe('onLoad function tests', () => {
       const dummyCallbackFunction = jest.fn();
 
       it("should set onLoad function if State is persisted and shouldn't call it initially (state.isPersisted = false)", () => {
@@ -676,7 +684,7 @@ describe("State Tests", () => {
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
       });
 
-      it("should set onLoad function if State is persisted and should call it initially (state.isPersisted = true)", () => {
+      it('should set onLoad function if State is persisted and should call it initially (state.isPersisted = true)', () => {
         numberState.persistent = new StatePersistent(numberState);
         numberState.isPersisted = true;
 
@@ -696,9 +704,9 @@ describe("State Tests", () => {
       });
     });
 
-    describe("copy function tests", () => {
-      it("should return a reference free copy of the current State Value", () => {
-        jest.spyOn(Utils, "copy");
+    describe('copy function tests', () => {
+      it('should return a reference free copy of the current State Value', () => {
+        jest.spyOn(Utils, 'copy');
         const value = numberState.copy();
 
         expect(value).toBe(10);
@@ -706,12 +714,12 @@ describe("State Tests", () => {
       });
     });
 
-    describe("exists get function tests", () => {
+    describe('exists get function tests', () => {
       it("should return true if value isn't undefined and State is no placeholder", () => {
         expect(numberState.exists).toBeTruthy();
       });
 
-      it("should return false if value is undefined and State is no placeholder", () => {
+      it('should return false if value is undefined and State is no placeholder', () => {
         numberState._value = undefined;
 
         expect(numberState.exists).toBeFalsy();
@@ -724,19 +732,19 @@ describe("State Tests", () => {
       });
     });
 
-    describe("is function tests", () => {
+    describe('is function tests', () => {
       beforeEach(() => {
-        jest.spyOn(Utils, "equal");
+        jest.spyOn(Utils, 'equal');
       });
 
-      it("should return true if passed value is equal to the current StateValue", () => {
+      it('should return true if passed value is equal to the current StateValue', () => {
         const response = numberState.is(10);
 
         expect(response).toBeTruthy();
         expect(Utils.equal).toHaveBeenCalledWith(10, numberState._value);
       });
 
-      it("should return false if passed value is not equal to the current StateValue", () => {
+      it('should return false if passed value is not equal to the current StateValue', () => {
         const response = numberState.is(20);
 
         expect(response).toBeFalsy();
@@ -744,19 +752,19 @@ describe("State Tests", () => {
       });
     });
 
-    describe("isNot function tests", () => {
+    describe('isNot function tests', () => {
       beforeEach(() => {
-        jest.spyOn(Utils, "notEqual");
+        jest.spyOn(Utils, 'notEqual');
       });
 
-      it("should return false if passed value is equal to the current StateValue", () => {
+      it('should return false if passed value is equal to the current StateValue', () => {
         const response = numberState.isNot(10);
 
         expect(response).toBeFalsy();
         expect(Utils.notEqual).toHaveBeenCalledWith(10, numberState._value);
       });
 
-      it("should return true if passed value is not equal to the current StateValue", () => {
+      it('should return true if passed value is not equal to the current StateValue', () => {
         const response = numberState.isNot(20);
 
         expect(response).toBeTruthy();
@@ -764,13 +772,13 @@ describe("State Tests", () => {
       });
     });
 
-    describe("invert function tests", () => {
+    describe('invert function tests', () => {
       beforeEach(() => {
         numberState.set = jest.fn();
         booleanState.set = jest.fn();
       });
 
-      it("should invert current value of a boolean based State", () => {
+      it('should invert current value of a boolean based State', () => {
         booleanState.invert();
 
         expect(booleanState.set).toHaveBeenCalledWith(true);
@@ -781,13 +789,13 @@ describe("State Tests", () => {
 
         expect(numberState.set).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can only invert boolean based States!"
+          'Agile Error: You can only invert boolean based States!'
         );
       });
     });
 
-    describe("compute function tests", () => {
-      it("should assign passed function to computeMethod", () => {
+    describe('compute function tests', () => {
+      it('should assign passed function to computeMethod', () => {
         const computeMethod = () => 10;
 
         numberState.compute(computeMethod);
@@ -800,59 +808,61 @@ describe("State Tests", () => {
 
         expect(numberState.computeMethod).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: A computeMethod has to be a function!"
+          'Agile Error: A computeMethod has to be a function!'
         );
       });
     });
 
-    describe("addSideEffect function tests", () => {
-      const sideEffectFunction = () => {};
+    describe('addSideEffect function tests', () => {
+      const sideEffectFunction = () => {
+        /* empty function */
+      };
 
-      it("should add passed function to sideEffects at passed key", () => {
-        numberState.addSideEffect("dummyKey", sideEffectFunction);
+      it('should add passed function to sideEffects at passed key', () => {
+        numberState.addSideEffect('dummyKey', sideEffectFunction);
 
-        expect(numberState.sideEffects).toHaveProperty("dummyKey");
-        expect(numberState.sideEffects["dummyKey"]).toBe(sideEffectFunction);
+        expect(numberState.sideEffects).toHaveProperty('dummyKey');
+        expect(numberState.sideEffects['dummyKey']).toBe(sideEffectFunction);
       });
 
       it("shouldn't add passed invalid function to sideEffects at passed key", () => {
-        numberState.addSideEffect("dummyKey", 10 as any);
+        numberState.addSideEffect('dummyKey', 10 as any);
 
-        expect(numberState.sideEffects).not.toHaveProperty("dummyKey");
+        expect(numberState.sideEffects).not.toHaveProperty('dummyKey');
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: A sideEffect function has to be a function!"
+          'Agile Error: A sideEffect function has to be a function!'
         );
       });
     });
 
-    describe("removeSideEffect function tests", () => {
+    describe('removeSideEffect function tests', () => {
       beforeEach(() => {
-        numberState.sideEffects["dummyKey"] = jest.fn();
+        numberState.sideEffects['dummyKey'] = jest.fn();
       });
 
-      it("should remove sideEffect at key from State", () => {
-        numberState.removeSideEffect("dummyKey");
+      it('should remove sideEffect at key from State', () => {
+        numberState.removeSideEffect('dummyKey');
 
-        expect(numberState.sideEffects).not.toHaveProperty("dummyKey");
+        expect(numberState.sideEffects).not.toHaveProperty('dummyKey');
       });
     });
 
-    describe("hasSideEffect function tests", () => {
+    describe('hasSideEffect function tests', () => {
       beforeEach(() => {
-        numberState.sideEffects["dummyKey"] = jest.fn();
+        numberState.sideEffects['dummyKey'] = jest.fn();
       });
 
-      it("should return true if SideEffect at given Key exists", () => {
-        expect(numberState.hasSideEffect("dummyKey")).toBeTruthy();
+      it('should return true if SideEffect at given Key exists', () => {
+        expect(numberState.hasSideEffect('dummyKey')).toBeTruthy();
       });
 
       it("should return false if SideEffect at given Key doesn't exists", () => {
-        expect(numberState.hasSideEffect("notExistingDummyKey")).toBeFalsy();
+        expect(numberState.hasSideEffect('notExistingDummyKey')).toBeFalsy();
       });
     });
 
-    describe("hasCorrectType function tests", () => {
-      it("should return true if State Type matches passed type", () => {
+    describe('hasCorrectType function tests', () => {
+      it('should return true if State Type matches passed type', () => {
         numberState.type(Number);
 
         expect(numberState.hasCorrectType(10)).toBeTruthy();
@@ -861,21 +871,21 @@ describe("State Tests", () => {
       it("should return false if State Type doesn't matches passed type", () => {
         numberState.type(Number);
 
-        expect(numberState.hasCorrectType("stringValue")).toBeFalsy();
+        expect(numberState.hasCorrectType('stringValue')).toBeFalsy();
       });
 
-      it("should return true if State has no defined Type", () => {
-        expect(numberState.hasCorrectType("stringValue")).toBeTruthy();
+      it('should return true if State has no defined Type', () => {
+        expect(numberState.hasCorrectType('stringValue')).toBeTruthy();
       });
     });
 
-    describe("getPublicValue function tests", () => {
-      it("should return value of State", () => {
+    describe('getPublicValue function tests', () => {
+      it('should return value of State', () => {
         expect(numberState.getPublicValue()).toBe(10);
       });
 
-      it("should return output of State", () => {
-        numberState["output"] = 99;
+      it('should return output of State', () => {
+        numberState['output'] = 99;
 
         expect(numberState.getPublicValue()).toBe(99);
       });

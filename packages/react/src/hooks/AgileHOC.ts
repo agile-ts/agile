@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   State,
   Agile,
@@ -6,7 +6,7 @@ import {
   getAgileInstance,
   normalizeArray,
   Observer,
-} from "@agile-ts/core";
+} from '@agile-ts/core';
 
 export function AgileHOC(
   ReactComponent: any,
@@ -14,7 +14,7 @@ export function AgileHOC(
   agileInstance?: Agile
 ) {
   let depsArray: Array<Observer>;
-  let depsObject: { [key: string]: Observer } = {};
+  const depsObject: { [key: string]: Observer } = {};
 
   if (deps instanceof State || Array.isArray(deps)) {
     // Normalize Dependencies
@@ -29,10 +29,8 @@ export function AgileHOC(
         Agile.logger.error("Please don't pass an empty array!");
       }
     }
-  } else if (typeof deps === "object") {
-    for (let dep in deps) {
-      depsObject[dep] = deps[dep].observer;
-    }
+  } else if (typeof deps === 'object') {
+    for (const dep in deps) depsObject[dep] = deps[dep].observer;
 
     // Get Agile Instance
     if (!agileInstance) {
@@ -45,13 +43,13 @@ export function AgileHOC(
       }
     }
   } else {
-    Agile.logger.error("No Valid AgileHOC properties");
+    Agile.logger.error('No Valid AgileHOC properties');
     return ReactComponent;
   }
 
   // Check if agile Instance exists
   if (!agileInstance) {
-    Agile.logger.error("Failed to get Agile Instance");
+    Agile.logger.error('Failed to get Agile Instance');
     return ReactComponent;
   }
 

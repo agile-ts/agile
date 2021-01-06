@@ -4,7 +4,7 @@ import {
   isAsyncFunction,
   isFunction,
   Agile,
-} from "../internal";
+} from '../internal';
 
 export class Storage {
   public key: StorageKey;
@@ -19,7 +19,7 @@ export class Storage {
    */
   constructor(config: CreateStorageConfigInterface) {
     config = defineConfig(config, {
-      prefix: "agile",
+      prefix: 'agile',
       async: false,
     });
     this.key = config.key;

@@ -5,10 +5,10 @@ import {
   PersistentKey,
   State,
   StorageKey,
-} from "../internal";
+} from '../internal';
 
 export class StatePersistent<ValueType = any> extends Persistent {
-  static storeValueSideEffectKey = "rebuildStateStorageValue";
+  static storeValueSideEffectKey = 'rebuildStateStorageValue';
   public state: () => State;
 
   /**

@@ -2,7 +2,7 @@ import {
   Observer,
   SubscriptionContainer,
   SubscriptionContainerKeyType,
-} from "../../../internal";
+} from '../../../internal';
 
 export class ComponentSubscriptionContainer extends SubscriptionContainer {
   public component: any;

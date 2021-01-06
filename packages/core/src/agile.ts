@@ -21,7 +21,7 @@ import {
   Logger,
   CreateLoggerConfigInterface,
   StateConfigInterface,
-} from "./internal";
+} from './internal';
 
 export class Agile {
   public config: AgileConfigInterface;
@@ -36,7 +36,7 @@ export class Agile {
 
   // Static Logger with default config -> will be overwritten by config of last created Agile Instance
   static logger = new Logger({
-    prefix: "Agile",
+    prefix: 'Agile',
     active: true,
     level: Logger.level.WARN,
   });
@@ -53,11 +53,11 @@ export class Agile {
       logConfig: {},
     });
     config.logConfig = defineConfig(config.logConfig, {
-      prefix: "Agile",
+      prefix: 'Agile',
       active: true,
       level: Logger.level.WARN,
       canUseCustomStyles: true,
-      allowedTags: ["runtime", "storage", "subscription", "multieditor"],
+      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
     });
     this.config = {
       waitForMount: config.waitForMount as any,
@@ -73,9 +73,9 @@ export class Agile {
     Agile.logger = new Logger(config.logConfig);
 
     // Create global instance of Agile
-    if (!globalBind("__agile__", this))
+    if (!globalBind('__agile__', this))
       Agile.logger.warn(
-        "Be careful with multiple Agile Instances in one Application!"
+        'Be careful with multiple Agile Instances in one Application!'
       );
   }
 
