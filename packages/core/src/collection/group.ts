@@ -14,10 +14,10 @@ import {
   PersistentKey,
   ComputedTracker,
   StateRuntimeJobConfigInterface,
-} from "../internal";
+} from '../internal';
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
-  static rebuildGroupSideEffectKey = "rebuildGroup";
+  static rebuildGroupSideEffectKey = 'rebuildGroup';
   collection: () => Collection<DataType>;
 
   _output: Array<DataType> = []; // Output of Group
@@ -171,7 +171,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     const existingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
     config = defineConfig<GroupAddConfig>(config, {
-      method: "push",
+      method: 'push',
       overwrite: false,
       background: false,
     });
@@ -195,7 +195,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       }
 
       // Add new ItemKey to Group
-      newGroupValue[config.method || "push"](itemKey);
+      newGroupValue[config.method || 'push'](itemKey);
     });
 
     // Return if passed ItemKeys already exist
@@ -228,7 +228,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     newItemKey: ItemKey,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
-    let newGroupValue = copy(this._value);
+    const newGroupValue = copy(this._value);
     newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
     this.set(newGroupValue, config);
     return this;
@@ -299,7 +299,6 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public rebuild() {
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
     const groupItems: Array<Item<DataType>> = [];
-    let groupOutput: Array<DataType>;
 
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
@@ -309,7 +308,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Create groupOutput out of groupItems
-    groupOutput = groupItems.map((item) => {
+    const groupOutput = groupItems.map((item) => {
       return item.getPublicValue();
     });
 
@@ -337,7 +336,7 @@ export type GroupKey = string | number;
  * @param background - If adding ItemKey happens in the background (-> not causing any rerender)
  */
 export interface GroupAddConfig {
-  method?: "unshift" | "push";
+  method?: 'unshift' | 'push';
   overwrite?: boolean;
   background?: boolean;
 }

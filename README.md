@@ -1,4 +1,4 @@
- <img src="./HeaderBackground.png" alt="Banner">
+ <img src="static/header_background.png" alt="Banner">
  
  > **Spacy**, **Simple**, **Scalable** State Management Framework
  

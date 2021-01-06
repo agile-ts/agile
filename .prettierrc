@@ -1,0 +1,13 @@
+{
+  "_comment": "To apply prettier config to Webstorm https://intellij-support.jetbrains.com/hc/en-us/community/posts/360002745119-How-to-have-Reformat-Code-feature-behave-exactly-like-Prettier-",
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "jsxBracketSameLine": true,
+  "printWidth": 80,
+  "tabWidth": 2,
+  "proseWrap": "never",
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "endOfLine": "lf",
+  "semi": true
+}

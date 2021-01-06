@@ -1,4 +1,4 @@
-import { Observer, defineConfig, SubscriptionContainer } from "../internal";
+import { Observer, defineConfig, SubscriptionContainer } from '../internal';
 
 export class RuntimeJob<ObserverType extends Observer = Observer> {
   public _key?: RuntimeJobKey;

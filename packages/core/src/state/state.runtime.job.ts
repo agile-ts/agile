@@ -4,7 +4,7 @@ import {
   RuntimeJobConfigInterface,
   RuntimeJobKey,
   StateObserver,
-} from "../internal";
+} from '../internal';
 
 export class StateRuntimeJob extends RuntimeJob<StateObserver> {
   public config: StateRuntimeJobConfigInterface;

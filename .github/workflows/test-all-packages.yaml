@@ -28,6 +28,10 @@ jobs:
       - name: 🤔 Test
         run: yarn test
 
+        # Run Linter
+      - name: 🤖 Lint
+        run: yarn run lint
+
         # Build Packages for Testing
       - name: 🔨 Build Packages
         run: yarn run build

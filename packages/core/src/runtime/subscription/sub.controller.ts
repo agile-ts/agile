@@ -6,7 +6,7 @@ import {
   CallbackSubscriptionContainer,
   isFunction,
   SubscriptionContainerKeyType,
-} from "../../internal";
+} from '../../internal';
 
 export class SubController {
   public agileInstance: () => Agile;
@@ -41,13 +41,13 @@ export class SubController {
     key?: SubscriptionContainerKeyType
   ): {
     subscriptionContainer: SubscriptionContainer;
-    props: { [key: string]: Observer["value"] };
+    props: { [key: string]: Observer['value'] };
   } {
-    const props: { [key: string]: Observer["value"] } = {};
+    const props: { [key: string]: Observer['value'] } = {};
 
     // Create subsArray
     const subsArray: Observer[] = [];
-    for (let key in subs) subsArray.push(subs[key]);
+    for (const key in subs) subsArray.push(subs[key]);
 
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
@@ -61,7 +61,7 @@ export class SubController {
     subscriptionContainer.subsObject = subs;
 
     // Register subs and build props object
-    for (let key in subs) {
+    for (const key in subs) {
       const observer = subs[key];
       observer.subscribe(subscriptionContainer);
       if (observer.value) props[key] = observer.value;
@@ -127,9 +127,9 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(["core", "subscription"])
+        .tag(['core', 'subscription'])
         .info(
-          "Unregistered Callback based Subscription ",
+          'Unregistered Callback based Subscription ',
           subscriptionInstance
         );
       return;
@@ -142,9 +142,9 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(["core", "subscription"])
+        .tag(['core', 'subscription'])
         .info(
-          "Unregistered Component based Subscription ",
+          'Unregistered Component based Subscription ',
           subscriptionInstance
         );
       return;
@@ -161,9 +161,9 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(["core", "subscription"])
+        .tag(['core', 'subscription'])
         .info(
-          "Unregistered Component based Subscription ",
+          'Unregistered Component based Subscription ',
           subscriptionInstance
         );
       return;
@@ -223,9 +223,9 @@ export class SubController {
 
     // Logging
     Agile.logger.if
-      .tag(["core", "subscription"])
+      .tag(['core', 'subscription'])
       .info(
-        "Registered Component based Subscription ",
+        'Registered Component based Subscription ',
         componentSubscriptionContainer
       );
 
@@ -257,9 +257,9 @@ export class SubController {
 
     // Logging
     Agile.logger.if
-      .tag(["core", "subscription"])
+      .tag(['core', 'subscription'])
       .info(
-        "Registered Callback based Subscription ",
+        'Registered Callback based Subscription ',
         callbackSubscriptionContainer
       );
 

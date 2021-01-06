@@ -1,5 +1,5 @@
-import { Validator } from "../../internal";
-import { copy } from "@agile-ts/core";
+import { Validator } from '../../internal';
+import { copy } from '@agile-ts/core';
 
 export class StringValidator<DataType = any> extends Validator<DataType> {
   /**
@@ -9,22 +9,21 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    * @param errorMessage - Error Message
    */
   constructor(validator: Validator<DataType>, errorMessage?: string) {
-    super({ key: validator.key, prefix: "string" });
+    super({ key: validator.key, prefix: 'string' });
 
     // Copy ValidationMethods of old Validator into this Validator
-    for (let key in validator.validationMethods) {
+    for (const key in validator.validationMethods)
       this.validationMethods[key] = copy(validator.validationMethods[key]);
-    }
 
     // Add String Validation Method
     this.addValidationMethod(
-      this.getValidationMethodKey("isString"),
+      this.getValidationMethodKey('isString'),
       async (key, value, editor) => {
-        const isValid = typeof value === "string";
+        const isValid = typeof value === 'string';
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
+            'error',
             errorMessage || `${key} is no valid String!`
           );
         }
@@ -44,14 +43,14 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    */
   public max(length: number, errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("maxLength"),
+      this.getValidationMethodKey('maxLength'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "string") return false;
+        if (!value || typeof value !== 'string') return false;
         const isValid = value.length <= length;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
+            'error',
             errorMessage || `${key} has more than ${length} characters`
           );
         }
@@ -72,14 +71,14 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    */
   public min(length: number, errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("minLength"),
+      this.getValidationMethodKey('minLength'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "string") return false;
+        if (!value || typeof value !== 'string') return false;
         const isValid = value.length >= length;
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
+            'error',
             errorMessage || `${key} needs at least ${length} characters`
           );
         }
@@ -99,15 +98,15 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    */
   public email(errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("email"),
+      this.getValidationMethodKey('email'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "string") return false;
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!value || typeof value !== 'string') return false;
+        const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const isValid = emailRegex.test(value.toLowerCase());
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
+            'error',
             errorMessage || `${key} is no valid email`
           );
         }
@@ -127,15 +126,15 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    */
   public url(errorMessage?: string): this {
     this.addValidationMethod(
-      this.getValidationMethodKey("email"),
+      this.getValidationMethodKey('email'),
       async (key, value, editor) => {
-        if (!value || typeof value !== "string") return false;
-        const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+        if (!value || typeof value !== 'string') return false;
+        const urlRegex = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
         const isValid = urlRegex.test(value.toLowerCase());
         if (!isValid) {
           editor.setStatus(
             key,
-            "error",
+            'error',
             errorMessage || `${key} is no valid url`
           );
         }
@@ -156,12 +155,12 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    */
   public matches(regex: RegExp, errorMessage?: string): this {
     this.addValidationMethod(async (key, value, editor) => {
-      if (!value || typeof value !== "string") return false;
+      if (!value || typeof value !== 'string') return false;
       const isValid = regex.test(value.toLowerCase());
       if (!isValid) {
         editor.setStatus(
           key,
-          "error",
+          'error',
           errorMessage || `${key} doesn't follow defined regex`
         );
       }

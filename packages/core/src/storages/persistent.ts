@@ -1,9 +1,9 @@
-import { Agile, defineConfig, StorageKey } from "../internal";
+import { Agile, defineConfig, StorageKey } from '../internal';
 
-export class Persistent<ValueType = any> {
+export class Persistent {
   public agileInstance: () => Agile;
 
-  public static placeHolderKey = "__THIS_IS_A_PLACEHOLDER__";
+  public static placeHolderKey = '__THIS_IS_A_PLACEHOLDER__';
 
   public _key: PersistentKey;
   public ready = false;
@@ -96,7 +96,7 @@ export class Persistent<ValueType = any> {
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
       Agile.logger.error(
-        "No valid persist Key found! Please provide a Key or assign one to the parent instance."
+        'No valid persist Key found! Please provide a Key or assign one to the parent instance.'
       );
       isValid = false;
     }
@@ -104,7 +104,7 @@ export class Persistent<ValueType = any> {
     // Validate StorageKeys
     if (!this.defaultStorageKey || this.storageKeys.length <= 0) {
       Agile.logger.error(
-        "No persist Storage Key found! Please provide at least one Storage Key."
+        'No persist Storage Key found! Please provide at least one Storage Key.'
       );
       isValid = false;
     }
@@ -160,7 +160,7 @@ export class Persistent<ValueType = any> {
    * Loads Value from Storage
    * @return Success?
    */
-  public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
+  public async loadPersistedValue(): Promise<boolean> {
     Agile.logger.error(
       `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
@@ -175,7 +175,7 @@ export class Persistent<ValueType = any> {
    * Saves/Updates Value in Storage
    * @return Success?
    */
-  public async persistValue(key?: PersistentKey): Promise<boolean> {
+  public async persistValue(): Promise<boolean> {
     Agile.logger.error(
       `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
@@ -190,7 +190,7 @@ export class Persistent<ValueType = any> {
    * Removes Value form Storage
    * @return Success?
    */
-  public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
+  public async removePersistedValue(): Promise<boolean> {
     Agile.logger.error(
       `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );

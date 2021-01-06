@@ -7,42 +7,42 @@ import {
   CollectionPersistent,
   ComputedTracker,
   StatePersistent,
-} from "../../../src";
-import * as Utils from "../../../src/utils";
+} from '../../../src';
 
-jest.mock("../../../src/collection/collection.persistent");
+jest.mock('../../../src/collection/collection.persistent');
 
-describe("Collection Tests", () => {
+describe('Collection Tests', () => {
   interface ItemInterface {
     id: string;
     name: string;
   }
+
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
     dummyAgile = new Agile({ localStorage: false });
 
-    jest.spyOn(Collection.prototype, "initSelectors");
-    jest.spyOn(Collection.prototype, "initGroups");
+    jest.spyOn(Collection.prototype, 'initSelectors');
+    jest.spyOn(Collection.prototype, 'initGroups');
     console.error = jest.fn();
     console.warn = jest.fn();
   });
 
-  it("should create Collection (default config)", () => {
+  it('should create Collection (default config)', () => {
     // Overwrite methods once to not call id
     jest
-      .spyOn(Collection.prototype, "initSelectors")
+      .spyOn(Collection.prototype, 'initSelectors')
       .mockReturnValueOnce(undefined);
     jest
-      .spyOn(Collection.prototype, "initGroups")
+      .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
 
     const collection = new Collection<ItemInterface>(dummyAgile);
 
     expect(collection.config).toStrictEqual({
-      primaryKey: "id",
-      defaultGroupKey: "default",
+      primaryKey: 'id',
+      defaultGroupKey: 'default',
     });
     expect(collection.size).toBe(0);
     expect(collection.data).toStrictEqual({});
@@ -56,78 +56,78 @@ describe("Collection Tests", () => {
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith({});
   });
 
-  it("should create Collection (specific config)", () => {
+  it('should create Collection (specific config)', () => {
     // Overwrite methods once to not call id
     jest
-      .spyOn(Collection.prototype, "initSelectors")
+      .spyOn(Collection.prototype, 'initSelectors')
       .mockReturnValueOnce(undefined);
     jest
-      .spyOn(Collection.prototype, "initGroups")
+      .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
 
     const collection = new Collection<ItemInterface>(dummyAgile, {
-      defaultGroupKey: "general",
-      groups: ["group1", "group2"],
-      selectors: ["selector1", "selector2"],
-      key: "dummyCollectionKey",
-      primaryKey: "key",
+      defaultGroupKey: 'general',
+      groups: ['group1', 'group2'],
+      selectors: ['selector1', 'selector2'],
+      key: 'dummyCollectionKey',
+      primaryKey: 'key',
     });
 
     expect(collection.config).toStrictEqual({
-      primaryKey: "key",
-      defaultGroupKey: "general",
+      primaryKey: 'key',
+      defaultGroupKey: 'general',
     });
     expect(collection.size).toBe(0);
     expect(collection.data).toStrictEqual({});
-    expect(collection._key).toBe("dummyCollectionKey");
+    expect(collection._key).toBe('dummyCollectionKey');
     expect(collection.isPersisted).toBeFalsy();
     expect(collection.persistent).toBeUndefined();
     expect(collection.groups).toStrictEqual({});
     expect(collection.selectors).toStrictEqual({});
 
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith([
-      "group1",
-      "group2",
+      'group1',
+      'group2',
     ]);
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith([
-      "selector1",
-      "selector2",
+      'selector1',
+      'selector2',
     ]);
   });
 
-  it("should create Collection (specific config in function form)", () => {
+  it('should create Collection (specific config in function form)', () => {
     // Overwrite methods once to not call id
     jest
-      .spyOn(Collection.prototype, "initSelectors")
+      .spyOn(Collection.prototype, 'initSelectors')
       .mockReturnValueOnce(undefined);
     jest
-      .spyOn(Collection.prototype, "initGroups")
+      .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
 
     const collection = new Collection<ItemInterface>(
       dummyAgile,
       (collection) => ({
-        defaultGroupKey: "general",
+        defaultGroupKey: 'general',
         groups: {
           group1: collection.Group(),
         },
         selectors: {
-          selector1: collection.Selector("id1"),
+          selector1: collection.Selector('id1'),
         },
-        key: "dummyCollectionKey",
-        primaryKey: "key",
+        key: 'dummyCollectionKey',
+        primaryKey: 'key',
       })
     );
 
     expect(collection.config).toStrictEqual({
-      primaryKey: "key",
-      defaultGroupKey: "general",
+      primaryKey: 'key',
+      defaultGroupKey: 'general',
     });
     expect(collection.size).toBe(0);
     expect(collection.data).toStrictEqual({
       id1: expect.any(Item), // Placeholder Item created by Selector
     });
-    expect(collection._key).toBe("dummyCollectionKey");
+    expect(collection._key).toBe('dummyCollectionKey');
     expect(collection.isPersisted).toBeFalsy();
     expect(collection.persistent).toBeUndefined();
     expect(collection.groups).toStrictEqual({});
@@ -141,54 +141,54 @@ describe("Collection Tests", () => {
     });
   });
 
-  describe("Collection Function Tests", () => {
+  describe('Collection Function Tests', () => {
     let collection: Collection<ItemInterface>;
 
     beforeEach(() => {
-      collection = new Collection(dummyAgile, { key: "collectionKey" });
+      collection = new Collection(dummyAgile, { key: 'collectionKey' });
     });
 
-    it("should call setKey with passed value", () => {
+    it('should call setKey with passed value', () => {
       collection.setKey = jest.fn();
 
-      collection.key = "newKey";
+      collection.key = 'newKey';
 
-      expect(collection.setKey).toHaveBeenCalledWith("newKey");
+      expect(collection.setKey).toHaveBeenCalledWith('newKey');
     });
 
-    describe("key get function tests", () => {
-      it("should return current State Key", () => {
-        expect(collection.key).toBe("collectionKey");
+    describe('key get function tests', () => {
+      it('should return current State Key', () => {
+        expect(collection.key).toBe('collectionKey');
       });
     });
 
-    describe("setKey function tests", () => {
+    describe('setKey function tests', () => {
       beforeEach(() => {
         collection.persistent = new CollectionPersistent(collection);
 
         collection.persistent.setKey = jest.fn();
       });
 
-      it("should update existing Key in all instances", () => {
-        collection.persistent._key = "collectionKey";
+      it('should update existing Key in all instances', () => {
+        collection.persistent._key = 'collectionKey';
 
-        collection.setKey("newKey");
+        collection.setKey('newKey');
 
-        expect(collection._key).toBe("newKey");
-        expect(collection.persistent.setKey).toHaveBeenCalledWith("newKey");
+        expect(collection._key).toBe('newKey');
+        expect(collection.persistent.setKey).toHaveBeenCalledWith('newKey');
       });
 
       it("should update existing Key in all instances except persistent if the CollectionKey and PersistKey aren't equal", () => {
-        collection.persistent._key = "randomKey";
+        collection.persistent._key = 'randomKey';
 
-        collection.setKey("newKey");
+        collection.setKey('newKey');
 
-        expect(collection._key).toBe("newKey");
+        expect(collection._key).toBe('newKey');
         expect(collection.persistent.setKey).not.toHaveBeenCalled();
       });
 
-      it("should update existing Key in all instances except persistent if new CollectionKey is undefined", () => {
-        collection.persistent._key = "collectionKey";
+      it('should update existing Key in all instances except persistent if new CollectionKey is undefined', () => {
+        collection.persistent._key = 'collectionKey';
 
         collection.setKey(undefined);
 
@@ -197,51 +197,51 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("Group function tests", () => {
-      it("should create Group which belongs to Collection", () => {
+    describe('Group function tests', () => {
+      it('should create Group which belongs to Collection', () => {
         const response = collection.Group([1, 2], {
-          key: "group1Key",
+          key: 'group1Key',
         });
 
         expect(response).toBeInstanceOf(Group);
-        expect(response._key).toBe("group1Key");
+        expect(response._key).toBe('group1Key');
         expect(response._value).toStrictEqual([1, 2]);
         expect(response.collection()).toBe(collection);
       });
     });
 
-    describe("Selector function tests", () => {
-      it("should create Selector which belongs to Collection", () => {
-        const response = collection.Selector("id1", {
-          key: "selector1Key",
+    describe('Selector function tests', () => {
+      it('should create Selector which belongs to Collection', () => {
+        const response = collection.Selector('id1', {
+          key: 'selector1Key',
         });
 
         expect(response).toBeInstanceOf(Selector);
-        expect(response._key).toBe("selector1Key");
-        expect(response._itemKey).toBe("id1");
+        expect(response._key).toBe('selector1Key');
+        expect(response._itemKey).toBe('id1');
         expect(response.collection()).toBe(collection);
       });
     });
 
-    describe("initGroups function tests", () => {
-      it("should create GroupsObject out of passed GroupKeys Array and add defaultGroup", () => {
-        collection.initGroups(["group1", "group2"]);
+    describe('initGroups function tests', () => {
+      it('should create GroupsObject out of passed GroupKeys Array and add defaultGroup', () => {
+        collection.initGroups(['group1', 'group2']);
 
-        expect(collection.groups).toHaveProperty("group1");
-        expect(collection.groups["group1"]._key).toBe("group1");
-        expect(collection.groups["group1"]._value).toStrictEqual([]);
-        expect(collection.groups["group1"].collection()).toBe(collection);
+        expect(collection.groups).toHaveProperty('group1');
+        expect(collection.groups['group1']._key).toBe('group1');
+        expect(collection.groups['group1']._value).toStrictEqual([]);
+        expect(collection.groups['group1'].collection()).toBe(collection);
 
-        expect(collection.groups).toHaveProperty("group2");
-        expect(collection.groups["group2"]._key).toBe("group2");
-        expect(collection.groups["group2"]._value).toStrictEqual([]);
-        expect(collection.groups["group2"].collection()).toBe(collection);
+        expect(collection.groups).toHaveProperty('group2');
+        expect(collection.groups['group2']._key).toBe('group2');
+        expect(collection.groups['group2']._value).toStrictEqual([]);
+        expect(collection.groups['group2'].collection()).toBe(collection);
 
         expect(collection.groups).toHaveProperty(
           collection.config.defaultGroupKey as any
         );
         expect(collection.groups[collection.config.defaultGroupKey]._key).toBe(
-          "default"
+          'default'
         );
         expect(
           collection.groups[collection.config.defaultGroupKey]._value
@@ -251,10 +251,10 @@ describe("Collection Tests", () => {
         ).toBe(collection);
       });
 
-      it("should create GroupsObject out of passed Groups Object and add default Group", () => {
-        let dummyGroup1 = new Group(collection);
-        let dummyGroup2 = new Group(collection, ["test1", "test2"], {
-          key: "overwrittenKey",
+      it('should create GroupsObject out of passed Groups Object and add default Group', () => {
+        const dummyGroup1 = new Group(collection);
+        const dummyGroup2 = new Group(collection, ['test1', 'test2'], {
+          key: 'overwrittenKey',
         });
 
         collection.initGroups({
@@ -262,24 +262,24 @@ describe("Collection Tests", () => {
           dummyGroup2: dummyGroup2,
         });
 
-        expect(collection.groups).toHaveProperty("dummyGroup1");
-        expect(collection.groups["dummyGroup1"]._key).toBe("dummyGroup1");
-        expect(collection.groups["dummyGroup1"]._value).toStrictEqual([]);
-        expect(collection.groups["dummyGroup1"].collection()).toBe(collection);
+        expect(collection.groups).toHaveProperty('dummyGroup1');
+        expect(collection.groups['dummyGroup1']._key).toBe('dummyGroup1');
+        expect(collection.groups['dummyGroup1']._value).toStrictEqual([]);
+        expect(collection.groups['dummyGroup1'].collection()).toBe(collection);
 
-        expect(collection.groups).toHaveProperty("dummyGroup2");
-        expect(collection.groups["dummyGroup2"]._key).toBe("overwrittenKey");
-        expect(collection.groups["dummyGroup2"]._value).toStrictEqual([
-          "test1",
-          "test2",
+        expect(collection.groups).toHaveProperty('dummyGroup2');
+        expect(collection.groups['dummyGroup2']._key).toBe('overwrittenKey');
+        expect(collection.groups['dummyGroup2']._value).toStrictEqual([
+          'test1',
+          'test2',
         ]);
-        expect(collection.groups["dummyGroup2"].collection()).toBe(collection);
+        expect(collection.groups['dummyGroup2'].collection()).toBe(collection);
 
         expect(collection.groups).toHaveProperty(
           collection.config.defaultGroupKey as any
         );
         expect(collection.groups[collection.config.defaultGroupKey]._key).toBe(
-          "default"
+          'default'
         );
         expect(
           collection.groups[collection.config.defaultGroupKey]._value
@@ -290,25 +290,25 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("initSelectors function tests", () => {
-      it("should create SelectorsObject out of passed SelectorKeys Array", () => {
-        collection.initSelectors(["selector1", "selector2"]);
+    describe('initSelectors function tests', () => {
+      it('should create SelectorsObject out of passed SelectorKeys Array', () => {
+        collection.initSelectors(['selector1', 'selector2']);
 
-        expect(collection.selectors).toHaveProperty("selector1");
-        expect(collection.selectors["selector1"]._key).toBe("selector1");
-        expect(collection.selectors["selector1"]._itemKey).toBe("selector1");
-        expect(collection.selectors["selector1"].collection()).toBe(collection);
+        expect(collection.selectors).toHaveProperty('selector1');
+        expect(collection.selectors['selector1']._key).toBe('selector1');
+        expect(collection.selectors['selector1']._itemKey).toBe('selector1');
+        expect(collection.selectors['selector1'].collection()).toBe(collection);
 
-        expect(collection.selectors).toHaveProperty("selector2");
-        expect(collection.selectors["selector2"]._key).toBe("selector2");
-        expect(collection.selectors["selector2"]._itemKey).toBe("selector2");
-        expect(collection.selectors["selector2"].collection()).toBe(collection);
+        expect(collection.selectors).toHaveProperty('selector2');
+        expect(collection.selectors['selector2']._key).toBe('selector2');
+        expect(collection.selectors['selector2']._itemKey).toBe('selector2');
+        expect(collection.selectors['selector2'].collection()).toBe(collection);
       });
 
-      it("should create SelectorsObject out of passed Selector Object", () => {
-        let dummySelector1 = new Selector(collection, "1");
-        let dummySelector2 = new Selector(collection, "2", {
-          key: "overwrittenKey",
+      it('should create SelectorsObject out of passed Selector Object', () => {
+        const dummySelector1 = new Selector(collection, '1');
+        const dummySelector2 = new Selector(collection, '2', {
+          key: 'overwrittenKey',
         });
 
         collection.initSelectors({
@@ -316,27 +316,27 @@ describe("Collection Tests", () => {
           dummySelector2: dummySelector2,
         });
 
-        expect(collection.selectors).toHaveProperty("dummySelector1");
-        expect(collection.selectors["dummySelector1"]._key).toBe(
-          "dummySelector1"
+        expect(collection.selectors).toHaveProperty('dummySelector1');
+        expect(collection.selectors['dummySelector1']._key).toBe(
+          'dummySelector1'
         );
-        expect(collection.selectors["dummySelector1"]._itemKey).toBe("1");
-        expect(collection.selectors["dummySelector1"].collection()).toBe(
+        expect(collection.selectors['dummySelector1']._itemKey).toBe('1');
+        expect(collection.selectors['dummySelector1'].collection()).toBe(
           collection
         );
 
-        expect(collection.selectors).toHaveProperty("dummySelector2");
-        expect(collection.selectors["dummySelector2"]._key).toBe(
-          "overwrittenKey"
+        expect(collection.selectors).toHaveProperty('dummySelector2');
+        expect(collection.selectors['dummySelector2']._key).toBe(
+          'overwrittenKey'
         );
-        expect(collection.selectors["dummySelector2"]._itemKey).toBe("2");
-        expect(collection.selectors["dummySelector2"].collection()).toBe(
+        expect(collection.selectors['dummySelector2']._itemKey).toBe('2');
+        expect(collection.selectors['dummySelector2'].collection()).toBe(
           collection
         );
       });
     });
 
-    describe("collect function tests", () => {
+    describe('collect function tests', () => {
       let dummyGroup1: Group;
       let dummyGroup2: Group;
       let defaultGroup: Group;
@@ -361,15 +361,15 @@ describe("Collection Tests", () => {
         defaultGroup.add = jest.fn();
       });
 
-      it("should add Data to Collection and to default Group (default config)", () => {
+      it('should add Data to Collection and to default Group (default config)', () => {
         collection.setData = jest.fn(() => true);
 
-        collection.collect({ id: "1", name: "frank" });
+        collection.collect({ id: '1', name: 'frank' });
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
-            id: "1",
-            name: "frank",
+            id: '1',
+            name: 'frank',
           },
           {
             patch: false,
@@ -380,27 +380,27 @@ describe("Collection Tests", () => {
 
         expect(dummyGroup1.add).not.toHaveBeenCalled();
         expect(dummyGroup2.add).not.toHaveBeenCalled();
-        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
-          method: "push",
+        expect(defaultGroup.add).toHaveBeenCalledWith('1', {
+          method: 'push',
           background: false,
         });
 
         expect(collection.createSelector).not.toHaveBeenCalled();
       });
 
-      it("should add Data to Collection and to default Group (specific config)", () => {
+      it('should add Data to Collection and to default Group (specific config)', () => {
         collection.setData = jest.fn(() => true);
 
-        collection.collect({ id: "1", name: "frank" }, [], {
+        collection.collect({ id: '1', name: 'frank' }, [], {
           background: true,
-          method: "unshift",
+          method: 'unshift',
           patch: true,
         });
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
-            id: "1",
-            name: "frank",
+            id: '1',
+            name: 'frank',
           },
           {
             patch: true,
@@ -411,29 +411,29 @@ describe("Collection Tests", () => {
 
         expect(dummyGroup1.add).not.toHaveBeenCalled();
         expect(dummyGroup2.add).not.toHaveBeenCalled();
-        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
-          method: "unshift",
+        expect(defaultGroup.add).toHaveBeenCalledWith('1', {
+          method: 'unshift',
           background: true,
         });
 
         expect(collection.createSelector).not.toHaveBeenCalled();
       });
 
-      it("should add Data to Collection and to passed Groups + default Group (default config)", () => {
+      it('should add Data to Collection and to passed Groups + default Group (default config)', () => {
         collection.setData = jest.fn(() => true);
 
         collection.collect(
           [
-            { id: "1", name: "frank" },
-            { id: "2", name: "hans" },
+            { id: '1', name: 'frank' },
+            { id: '2', name: 'hans' },
           ],
-          ["dummyGroup1", "dummyGroup2"]
+          ['dummyGroup1', 'dummyGroup2']
         );
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
-            id: "1",
-            name: "frank",
+            id: '1',
+            name: 'frank',
           },
           {
             patch: false,
@@ -442,8 +442,8 @@ describe("Collection Tests", () => {
         );
         expect(collection.setData).toHaveBeenCalledWith(
           {
-            id: "2",
-            name: "hans",
+            id: '2',
+            name: 'hans',
           },
           {
             patch: false,
@@ -452,28 +452,28 @@ describe("Collection Tests", () => {
         );
         expect(collection.createGroup).not.toHaveBeenCalled();
 
-        expect(dummyGroup1.add).toHaveBeenCalledWith("1", {
-          method: "push",
+        expect(dummyGroup1.add).toHaveBeenCalledWith('1', {
+          method: 'push',
           background: false,
         });
-        expect(dummyGroup1.add).toHaveBeenCalledWith("2", {
-          method: "push",
+        expect(dummyGroup1.add).toHaveBeenCalledWith('2', {
+          method: 'push',
           background: false,
         });
-        expect(dummyGroup2.add).toHaveBeenCalledWith("1", {
-          method: "push",
+        expect(dummyGroup2.add).toHaveBeenCalledWith('1', {
+          method: 'push',
           background: false,
         });
-        expect(dummyGroup2.add).toHaveBeenCalledWith("2", {
-          method: "push",
+        expect(dummyGroup2.add).toHaveBeenCalledWith('2', {
+          method: 'push',
           background: false,
         });
-        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
-          method: "push",
+        expect(defaultGroup.add).toHaveBeenCalledWith('1', {
+          method: 'push',
           background: false,
         });
-        expect(defaultGroup.add).toHaveBeenCalledWith("2", {
-          method: "push",
+        expect(defaultGroup.add).toHaveBeenCalledWith('2', {
+          method: 'push',
           background: false,
         });
 
@@ -483,15 +483,15 @@ describe("Collection Tests", () => {
       it("should call setData and shouldn't add Items to passed Groups if setData failed (default config)", () => {
         collection.setData = jest.fn(() => false);
 
-        collection.collect({ id: "1", name: "frank" }, [
-          "dummyGroup1",
-          "dummyGroup2",
+        collection.collect({ id: '1', name: 'frank' }, [
+          'dummyGroup1',
+          'dummyGroup2',
         ]);
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
-            id: "1",
-            name: "frank",
+            id: '1',
+            name: 'frank',
           },
           {
             patch: false,
@@ -516,48 +516,48 @@ describe("Collection Tests", () => {
           return notExistingGroup as any;
         });
 
-        collection.collect({ id: "1", name: "frank" }, "notExistingGroup");
+        collection.collect({ id: '1', name: 'frank' }, 'notExistingGroup');
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
-            id: "1",
-            name: "frank",
+            id: '1',
+            name: 'frank',
           },
           {
             patch: false,
             background: false,
           }
         );
-        expect(collection.createGroup).toHaveBeenCalledWith("notExistingGroup");
+        expect(collection.createGroup).toHaveBeenCalledWith('notExistingGroup');
 
         expect(dummyGroup1.add).not.toHaveBeenCalled();
         expect(dummyGroup2.add).not.toHaveBeenCalled();
-        expect(notExistingGroup.add).toHaveBeenCalledWith("1", {
-          method: "push",
+        expect(notExistingGroup.add).toHaveBeenCalledWith('1', {
+          method: 'push',
           background: false,
         });
-        expect(defaultGroup.add).toHaveBeenCalledWith("1", {
-          method: "push",
+        expect(defaultGroup.add).toHaveBeenCalledWith('1', {
+          method: 'push',
           background: false,
         });
 
         expect(collection.createSelector).not.toHaveBeenCalled();
       });
 
-      it("should create Selector for each Item (config.select)", () => {
+      it('should create Selector for each Item (config.select)', () => {
         collection.setData = jest.fn(() => true);
 
         collection.collect(
           [
-            { id: "1", name: "frank" },
-            { id: "2", name: "hans" },
+            { id: '1', name: 'frank' },
+            { id: '2', name: 'hans' },
           ],
           [],
           { select: true }
         );
 
-        expect(collection.createSelector).toHaveBeenCalledWith("1", "1");
-        expect(collection.createSelector).toHaveBeenCalledWith("2", "2");
+        expect(collection.createSelector).toHaveBeenCalledWith('1', '1');
+        expect(collection.createSelector).toHaveBeenCalledWith('2', '2');
       });
 
       it("should call 'forEachItem' for each Item (default config)", () => {
@@ -566,69 +566,60 @@ describe("Collection Tests", () => {
 
         collection.collect(
           [
-            { id: "1", name: "frank" },
-            { id: "2", name: "hans" },
+            { id: '1', name: 'frank' },
+            { id: '2', name: 'hans' },
           ],
           [],
           { forEachItem: forEachItemMock }
         );
 
         expect(forEachItemMock).toHaveBeenCalledWith(
-          { id: "1", name: "frank" },
-          "1",
+          { id: '1', name: 'frank' },
+          '1',
           0
         );
         expect(forEachItemMock).toHaveBeenCalledWith(
-          { id: "2", name: "hans" },
-          "2",
+          { id: '2', name: 'hans' },
+          '2',
           1
         );
       });
     });
 
-    describe("update function tests", () => {
+    describe('update function tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
 
-        dummyItem.set = jest.fn();
+        dummyItem.patch = jest.fn();
         collection.updateItemKey = jest.fn();
-        jest.spyOn(Utils, "flatMerge");
       });
 
-      it("should update existing Item with valid changes Object (default config)", () => {
-        const response = collection.update("dummyItem", { name: "hans" });
+      it('should update existing Item with valid changes Object (default config)', () => {
+        const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "dummyItem",
-            name: "hans",
+            name: 'hans',
           },
           {
             background: false,
-            storage: true,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { name: "hans" },
-          {
             addNewProperties: false,
           }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
-      it("should update existing Item with valid changes Object (specific config)", () => {
+      it('should update existing Item with valid changes Object (specific config)', () => {
         const response = collection.update(
-          "dummyItem",
-          { name: "hans" },
+          'dummyItem',
+          { name: 'hans' },
           {
             addNewProperties: true,
             background: true,
@@ -637,47 +628,31 @@ describe("Collection Tests", () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "dummyItem",
-            name: "hans",
+            name: 'hans',
           },
           {
             background: true,
-            storage: true,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { name: "hans" },
-          {
             addNewProperties: true,
           }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
-      it("should update existing placeholder Item with valid changes Object (default config)", () => {
+      it('should update existing placeholder Item with valid changes Object (default config)', () => {
         dummyItem.isPlaceholder = true;
 
-        const response = collection.update("dummyItem", { name: "hans" });
+        const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "dummyItem",
-            name: "hans",
+            name: 'hans',
           },
           {
             background: false,
-            storage: true,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { name: "hans" },
-          {
             addNewProperties: false,
           }
         );
@@ -685,60 +660,50 @@ describe("Collection Tests", () => {
       });
 
       it("shouldn't update not existing Item and should print error", () => {
-        const response = collection.update("notExisting", { name: "hans" });
+        const response = collection.update('notExisting', { name: 'hans' });
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: ItemKey 'notExisting' doesn't exist in Collection '${collection._key}'!`
+          `Agile Error: Item with key/name 'notExisting' doesn't exist in Collection '${collection._key}'!`
         );
-        expect(dummyItem.set).not.toHaveBeenCalled();
-        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
       it("shouldn't update existing Item with invalid changes Object and should print error", () => {
         const response = collection.update(
-          "dummyItem",
-          "notValidChanges" as any
+          'dummyItem',
+          'notValidChanges' as any
         );
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`
         );
-        expect(dummyItem.set).not.toHaveBeenCalled();
-        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
-      it("should update existing Item and its ItemKey with valid changes Object if ItemKey has changed (default config)", () => {
-        const response = collection.update("dummyItem", {
-          id: "newDummyItemKey",
-          name: "hans",
+      it('should update existing Item and its ItemKey with valid changes Object if ItemKey has changed (default config)', () => {
+        const response = collection.update('dummyItem', {
+          id: 'newDummyItemKey',
+          name: 'hans',
         });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(dummyItem.set).toHaveBeenCalledWith(
+        expect(dummyItem.patch).toHaveBeenCalledWith(
           {
-            id: "newDummyItemKey",
-            name: "hans",
+            name: 'hans',
           },
           {
             background: false,
-            storage: false,
-          }
-        );
-        expect(Utils.flatMerge).toHaveBeenCalledWith(
-          { id: "dummyItem", name: "frank" },
-          { id: "newDummyItemKey", name: "hans" },
-          {
             addNewProperties: false,
           }
         );
         expect(collection.updateItemKey).toHaveBeenCalledWith(
-          "dummyItem",
-          "newDummyItemKey",
+          'dummyItem',
+          'newDummyItemKey',
           {
             background: false,
           }
@@ -746,17 +711,17 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("createGroup function tests", () => {
+    describe('createGroup function tests', () => {
       let dummyGroup: Group;
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
 
-        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -764,47 +729,86 @@ describe("Collection Tests", () => {
         dummyGroup.set = jest.fn();
       });
 
-      it("should create and add not existing Group to Collection", () => {
-        const response = collection.createGroup("newGroup", ["dummyItem"]);
+      it('should create and add not existing Group to Collection', () => {
+        const response = collection.createGroup('newGroup', ['dummyItem']);
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(response).toBeInstanceOf(Group);
-        expect(response._key).toBe("newGroup");
+        expect(response._key).toBe('newGroup');
         expect(response.isPlaceholder).toBeFalsy();
-        expect(response._value).toStrictEqual(["dummyItem"]);
-        expect(collection.groups["newGroup"]).toBe(response);
+        expect(response._value).toStrictEqual(['dummyItem']);
+        expect(collection.groups['newGroup']).toBe(response);
       });
 
       it("shouldn't create and add existing Group to Collection", () => {
-        const response = collection.createGroup("dummyGroup", ["dummyItem"]);
+        const response = collection.createGroup('dummyGroup', ['dummyItem']);
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: Group with the name 'dummyGroup' already exists!"
         );
         expect(response).toBe(dummyGroup);
-        expect(collection.groups["dummyGroup"]).toBe(dummyGroup);
+        expect(collection.groups['dummyGroup']).toBe(dummyGroup);
         expect(dummyGroup.set).not.toHaveBeenCalled();
       });
 
-      it("should update existing placeholder Group of Collection", () => {
+      it('should update existing placeholder Group of Collection', () => {
         dummyGroup.isPlaceholder = true;
 
-        const response = collection.createGroup("dummyGroup", ["dummyItem"]);
+        const response = collection.createGroup('dummyGroup', ['dummyItem']);
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(response).toBe(dummyGroup);
-        expect(collection.groups["dummyGroup"]).toBe(dummyGroup);
-        expect(dummyGroup.set).toHaveBeenCalledWith(["dummyItem"], {
+        expect(collection.groups['dummyGroup']).toBe(dummyGroup);
+        expect(dummyGroup.set).toHaveBeenCalledWith(['dummyItem'], {
           overwrite: true,
         });
       });
     });
 
-    describe("getGroup function tests", () => {
+    describe('hasGroup function tests', () => {
       let dummyGroup: Group;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        dummyGroup = new Group(collection, []);
+
+        collection.getGroup = jest.fn();
+      });
+
+      it('should call getGroup and return true if getGroup returns Group (default config)', () => {
+        collection.getGroup = jest.fn(() => dummyGroup as any);
+
+        const response = collection.hasGroup('test');
+
+        expect(response).toBeTruthy();
+        expect(collection.getGroup).toHaveBeenCalledWith('test', {});
+      });
+
+      it('should call getGroup and return true if getGroup returns Group (specific config)', () => {
+        collection.getGroup = jest.fn(() => dummyGroup as any);
+
+        const response = collection.hasGroup('test', { notExisting: true });
+
+        expect(response).toBeTruthy();
+        expect(collection.getGroup).toHaveBeenCalledWith('test', {
+          notExisting: true,
+        });
+      });
+
+      it('should call getGroup and return false if getGroup returns undefined (default config)', () => {
+        collection.getGroup = jest.fn(() => undefined);
+
+        const response = collection.hasGroup('test');
+
+        expect(response).toBeFalsy();
+        expect(collection.getGroup).toHaveBeenCalledWith('test', {});
+      });
+    });
+
+    describe('getGroup function tests', () => {
+      let dummyGroup: Group;
+
+      beforeEach(() => {
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -812,8 +816,8 @@ describe("Collection Tests", () => {
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return and track existing Group (default config)", () => {
-        const response = collection.getGroup("dummyGroup");
+      it('should return and track existing Group (default config)', () => {
+        const response = collection.getGroup('dummyGroup');
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
@@ -822,7 +826,7 @@ describe("Collection Tests", () => {
       });
 
       it("shouldn't return and track not existing Group (default config)", () => {
-        const response = collection.getGroup("notExistingGroup");
+        const response = collection.getGroup('notExistingGroup');
 
         expect(response).toBeUndefined();
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
@@ -831,16 +835,16 @@ describe("Collection Tests", () => {
       it("shouldn't return and track existing placeholder Group (default config)", () => {
         dummyGroup.isPlaceholder = true;
 
-        const response = collection.getGroup("dummyGroup");
+        const response = collection.getGroup('dummyGroup');
 
         expect(response).toBeUndefined();
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
       });
 
-      it("should return and track  existing placeholder Group (config.notExisting = true)", () => {
+      it('should return and track  existing placeholder Group (config.notExisting = true)', () => {
         dummyGroup.isPlaceholder = true;
 
-        const response = collection.getGroup("dummyGroup", {
+        const response = collection.getGroup('dummyGroup', {
           notExisting: true,
         });
 
@@ -851,11 +855,11 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("getGroupWithReference function tests", () => {
+    describe('getGroupWithReference function tests', () => {
       let dummyGroup: Group;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -863,8 +867,8 @@ describe("Collection Tests", () => {
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return and track existing Group", () => {
-        const response = collection.getGroupWithReference("dummyGroup");
+      it('should return and track existing Group', () => {
+        const response = collection.getGroupWithReference('dummyGroup');
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
@@ -873,35 +877,35 @@ describe("Collection Tests", () => {
       });
 
       it("should return and track created reference Group if Group doesn't exist yet", () => {
-        const response = collection.getGroupWithReference("notExistingGroup");
+        const response = collection.getGroupWithReference('notExistingGroup');
 
         expect(response).toBeInstanceOf(Group);
         expect(response.isPlaceholder).toBeTruthy();
-        expect(response._key).toBe("notExistingGroup");
-        expect(collection.groups["notExistingGroup"]).toBe(response);
+        expect(response._key).toBe('notExistingGroup');
+        expect(collection.groups['notExistingGroup']).toBe(response);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
       });
     });
 
-    describe("removeGroup function tests", () => {
+    describe('removeGroup function tests', () => {
       let dummyGroup: Group;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
       });
 
-      it("should remove existing Group", () => {
-        collection.removeGroup("dummyGroup");
+      it('should remove existing Group', () => {
+        collection.removeGroup('dummyGroup');
 
         expect(console.warn).not.toHaveBeenCalled();
-        expect(collection.groups["dummyGroup"]).toBeUndefined();
+        expect(collection.groups['dummyGroup']).toBeUndefined();
       });
 
       it("shouldn't remove not existing Group and print warning", () => {
-        collection.removeGroup("notExistingGroup");
+        collection.removeGroup('notExistingGroup');
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: Group with the key/name 'notExistingGroup' doesn't exist!"
@@ -909,18 +913,18 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("createSelector function tests", () => {
+    describe('createSelector function tests', () => {
       let dummySelector: Selector;
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
 
-        dummySelector = new Selector(collection, "dummyItem", {
-          key: "dummySelector",
+        dummySelector = new Selector(collection, 'dummyItem', {
+          key: 'dummySelector',
         });
         collection.selectors = {
           dummySelector: dummySelector,
@@ -929,54 +933,93 @@ describe("Collection Tests", () => {
         dummySelector.select = jest.fn();
       });
 
-      it("should create and add not existing Selector to Collection", () => {
-        const response = collection.createSelector("newSelector", "dummyItem");
+      it('should create and add not existing Selector to Collection', () => {
+        const response = collection.createSelector('newSelector', 'dummyItem');
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(response).toBeInstanceOf(Selector);
-        expect(response._key).toBe("newSelector");
+        expect(response._key).toBe('newSelector');
         expect(response.isPlaceholder).toBeFalsy();
-        expect(response._itemKey).toStrictEqual("dummyItem");
-        expect(collection.selectors["newSelector"]).toBe(response);
+        expect(response._itemKey).toStrictEqual('dummyItem');
+        expect(collection.selectors['newSelector']).toBe(response);
       });
 
       it("shouldn't create and add existing Selector to Collection", () => {
         const response = collection.createSelector(
-          "dummySelector",
-          "dummyItem"
+          'dummySelector',
+          'dummyItem'
         );
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: Selector with the name 'dummySelector' already exists!"
         );
         expect(response).toBe(dummySelector);
-        expect(collection.selectors["dummySelector"]).toBe(dummySelector);
+        expect(collection.selectors['dummySelector']).toBe(dummySelector);
         expect(dummySelector.select).not.toHaveBeenCalled();
       });
 
-      it("should update existing placeholder Selector of Collection", () => {
+      it('should update existing placeholder Selector of Collection', () => {
         dummySelector.isPlaceholder = true;
 
         const response = collection.createSelector(
-          "dummySelector",
-          "dummyItem"
+          'dummySelector',
+          'dummyItem'
         );
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(response).toBe(dummySelector);
-        expect(collection.selectors["dummySelector"]).toBe(dummySelector);
-        expect(dummySelector.select).toHaveBeenCalledWith("dummyItem", {
+        expect(collection.selectors['dummySelector']).toBe(dummySelector);
+        expect(dummySelector.select).toHaveBeenCalledWith('dummyItem', {
           overwrite: true,
         });
       });
     });
 
-    describe("getSelector function tests", () => {
+    describe('hasSelector function tests', () => {
       let dummySelector: Selector;
 
       beforeEach(() => {
-        dummySelector = new Selector(collection, "dummyItem", {
-          key: "dummySelector",
+        dummySelector = new Selector(collection, 'unknown');
+
+        collection.getSelector = jest.fn();
+      });
+
+      it('should call getSelector and return true if getSelector returns Selector (default config)', () => {
+        collection.getSelector = jest.fn(() => dummySelector as any);
+
+        const response = collection.hasSelector('test');
+
+        expect(response).toBeTruthy();
+        expect(collection.getSelector).toHaveBeenCalledWith('test', {});
+      });
+
+      it('should call getSelector and return true if getSelector returns Selector (specific config)', () => {
+        collection.getSelector = jest.fn(() => dummySelector as any);
+
+        const response = collection.hasSelector('test', { notExisting: true });
+
+        expect(response).toBeTruthy();
+        expect(collection.getSelector).toHaveBeenCalledWith('test', {
+          notExisting: true,
+        });
+      });
+
+      it('should call getSelector and return false if getSelector returns undefined (default config)', () => {
+        collection.getSelector = jest.fn(() => undefined);
+
+        const response = collection.hasSelector('test');
+
+        expect(response).toBeFalsy();
+        expect(collection.getSelector).toHaveBeenCalledWith('test', {});
+      });
+    });
+
+    describe('getSelector function tests', () => {
+      let dummySelector: Selector;
+
+      beforeEach(() => {
+        dummySelector = new Selector(collection, 'dummyItem', {
+          key: 'dummySelector',
         });
         collection.selectors = {
           dummySelector: dummySelector,
@@ -985,8 +1028,8 @@ describe("Collection Tests", () => {
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return and track existing Selector (default config)", () => {
-        const response = collection.getSelector("dummySelector");
+      it('should return and track existing Selector (default config)', () => {
+        const response = collection.getSelector('dummySelector');
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
@@ -995,7 +1038,7 @@ describe("Collection Tests", () => {
       });
 
       it("shouldn't return and track not existing Selector (default config)", () => {
-        const response = collection.getSelector("notExistingSelector");
+        const response = collection.getSelector('notExistingSelector');
 
         expect(response).toBeUndefined();
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
@@ -1004,16 +1047,16 @@ describe("Collection Tests", () => {
       it("shouldn't return and track existing placeholder Selector (default config)", () => {
         dummySelector.isPlaceholder = true;
 
-        const response = collection.getSelector("dummySelector");
+        const response = collection.getSelector('dummySelector');
 
         expect(response).toBeUndefined();
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
       });
 
-      it("should return and track existing placeholder Selector (config.notExisting = true)", () => {
+      it('should return and track existing placeholder Selector (config.notExisting = true)', () => {
         dummySelector.isPlaceholder = true;
 
-        const response = collection.getSelector("dummySelector", {
+        const response = collection.getSelector('dummySelector', {
           notExisting: true,
         });
 
@@ -1024,12 +1067,12 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("getSelectorWithReference function tests", () => {
+    describe('getSelectorWithReference function tests', () => {
       let dummySelector: Selector;
 
       beforeEach(() => {
-        dummySelector = new Selector(collection, "dummyItem", {
-          key: "dummySelector",
+        dummySelector = new Selector(collection, 'dummyItem', {
+          key: 'dummySelector',
         });
         collection.selectors = {
           dummySelector: dummySelector,
@@ -1038,8 +1081,8 @@ describe("Collection Tests", () => {
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return and track existing Selector", () => {
-        const response = collection.getSelectorWithReference("dummySelector");
+      it('should return and track existing Selector', () => {
+        const response = collection.getSelectorWithReference('dummySelector');
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
@@ -1049,23 +1092,23 @@ describe("Collection Tests", () => {
 
       it("should return and track created reference Selector if Selector doesn't exist yet", () => {
         const response = collection.getSelectorWithReference(
-          "notExistingSelector"
+          'notExistingSelector'
         );
 
         expect(response).toBeInstanceOf(Selector);
         expect(response.isPlaceholder).toBeTruthy();
-        expect(response._key).toBe("notExistingSelector");
-        expect(collection.selectors["notExistingSelector"]).toBe(response);
+        expect(response._key).toBe('notExistingSelector');
+        expect(collection.selectors['notExistingSelector']).toBe(response);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
       });
     });
 
-    describe("removeSelector function tests", () => {
+    describe('removeSelector function tests', () => {
       let dummySelector: Selector;
 
       beforeEach(() => {
-        dummySelector = new Selector(collection, "dummyItem", {
-          key: "dummySelector",
+        dummySelector = new Selector(collection, 'dummyItem', {
+          key: 'dummySelector',
         });
         collection.selectors = {
           dummySelector: dummySelector,
@@ -1074,39 +1117,78 @@ describe("Collection Tests", () => {
         dummySelector.unselect = jest.fn();
       });
 
-      it("should remove existing Selector", () => {
-        collection.removeSelector("dummySelector");
+      it('should remove existing Selector', () => {
+        collection.removeSelector('dummySelector');
 
         expect(console.warn).not.toHaveBeenCalled();
-        expect(collection.selectors).not.toHaveProperty("dummySelector");
+        expect(collection.selectors).not.toHaveProperty('dummySelector');
         expect(dummySelector.unselect).toHaveBeenCalled();
       });
 
       it("shouldn't remove not existing Selector and print warning", () => {
-        collection.removeSelector("notExistingSelector");
+        collection.removeSelector('notExistingSelector');
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: Selector with the key/name 'notExistingSelector' doesn't exist!"
         );
-        expect(collection.selectors).toHaveProperty("dummySelector");
+        expect(collection.selectors).toHaveProperty('dummySelector');
         expect(dummySelector.unselect).not.toHaveBeenCalled();
       });
     });
 
-    describe("getItem function tests", () => {
+    describe('hasItem function tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
+
+        collection.getItem = jest.fn();
+      });
+
+      it('should call getItem and return true if getItem returns Item (default config)', () => {
+        collection.getItem = jest.fn(() => dummyItem);
+
+        const response = collection.hasItem('test');
+
+        expect(response).toBeTruthy();
+        expect(collection.getItem).toHaveBeenCalledWith('test', {});
+      });
+
+      it('should call getItem and return true if getItem returns Item (specific config)', () => {
+        collection.getItem = jest.fn(() => dummyItem);
+
+        const response = collection.hasItem('test', { notExisting: true });
+
+        expect(response).toBeTruthy();
+        expect(collection.getItem).toHaveBeenCalledWith('test', {
+          notExisting: true,
+        });
+      });
+
+      it('should call getItem and return false if getItem returns undefined (default config)', () => {
+        collection.getItem = jest.fn(() => undefined);
+
+        const response = collection.hasItem('test');
+
+        expect(response).toBeFalsy();
+        expect(collection.getItem).toHaveBeenCalledWith('test', {});
+      });
+    });
+
+    describe('getItem function tests', () => {
+      let dummyItem: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
         collection.data = {
-          ["1"]: dummyItem,
+          ['1']: dummyItem,
         };
 
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return and track existing Item (default config)", () => {
-        const response = collection.getItem("1");
+      it('should return and track existing Item (default config)', () => {
+        const response = collection.getItem('1');
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
@@ -1115,7 +1197,7 @@ describe("Collection Tests", () => {
       });
 
       it("shouldn't return and track not existing Item (default config)", () => {
-        const response = collection.getItem("notExistingItem");
+        const response = collection.getItem('notExistingItem');
 
         expect(response).toBeUndefined();
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
@@ -1124,16 +1206,16 @@ describe("Collection Tests", () => {
       it("shouldn't return and track existing placeholder Item (default config)", () => {
         dummyItem.isPlaceholder = true;
 
-        const response = collection.getItem("1");
+        const response = collection.getItem('1');
 
         expect(response).toBeUndefined();
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
       });
 
-      it("should return and track existing placeholder Item (config.notExisting = true)", () => {
+      it('should return and track existing placeholder Item (config.notExisting = true)', () => {
         dummyItem.isPlaceholder = true;
 
-        const response = collection.getItem("1", {
+        const response = collection.getItem('1', {
           notExisting: true,
         });
 
@@ -1144,20 +1226,20 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("getItemWithReference function tests", () => {
+    describe('getItemWithReference function tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
         collection.data = {
-          ["1"]: dummyItem,
+          ['1']: dummyItem,
         };
 
         ComputedTracker.tracked = jest.fn();
       });
 
-      it("should return and track existing Item", () => {
-        const response = collection.getItemWithReference("1");
+      it('should return and track existing Item', () => {
+        const response = collection.getItemWithReference('1');
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
@@ -1166,67 +1248,67 @@ describe("Collection Tests", () => {
       });
 
       it("should return and track created reference Item if Item doesn't exist yet", () => {
-        const response = collection.getItemWithReference("notExistingItem");
+        const response = collection.getItemWithReference('notExistingItem');
 
         expect(response).toBeInstanceOf(Item);
         expect(response.isPlaceholder).toBeTruthy();
-        expect(response._key).toBe("notExistingItem");
-        expect(collection.data["notExistingItem"]).toBe(response);
+        expect(response._key).toBe('notExistingItem');
+        expect(collection.data['notExistingItem']).toBe(response);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
       });
     });
 
-    describe("getItemValue function tests", () => {
+    describe('getItemValue function tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "1", name: "Jeff" });
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
         collection.data = {
-          ["1"]: dummyItem,
+          ['1']: dummyItem,
         };
 
-        jest.spyOn(collection, "getItem");
+        jest.spyOn(collection, 'getItem');
       });
 
-      it("should return existing Item Value (default config)", () => {
-        const response = collection.getItemValue("1");
+      it('should return existing Item Value (default config)', () => {
+        const response = collection.getItemValue('1');
 
         expect(response).toBe(dummyItem._value);
-        expect(collection.getItem).toHaveBeenCalledWith("1", {});
+        expect(collection.getItem).toHaveBeenCalledWith('1', {});
       });
 
       it("shouldn't return not existing Item Value (default config)", () => {
-        const response = collection.getItemValue("notExistingItem");
+        const response = collection.getItemValue('notExistingItem');
 
         expect(response).toBeUndefined();
-        expect(collection.getItem).toHaveBeenCalledWith("notExistingItem", {});
+        expect(collection.getItem).toHaveBeenCalledWith('notExistingItem', {});
       });
 
       it("shouldn't return existing placeholder Item Value (default config)", () => {
         dummyItem.isPlaceholder = true;
 
-        const response = collection.getItemValue("1");
+        const response = collection.getItemValue('1');
 
         expect(response).toBeUndefined();
-        expect(collection.getItem).toHaveBeenCalledWith("1", {});
+        expect(collection.getItem).toHaveBeenCalledWith('1', {});
       });
 
-      it("should return existing placeholder Item Value (config.notExisting = true)", () => {
+      it('should return existing placeholder Item Value (config.notExisting = true)', () => {
         dummyItem.isPlaceholder = true;
 
-        const response = collection.getItemValue("1", {
+        const response = collection.getItemValue('1', {
           notExisting: true,
         });
 
         expect(response).toBe(dummyItem._value);
-        expect(collection.getItem).toHaveBeenCalledWith("1", {
+        expect(collection.getItem).toHaveBeenCalledWith('1', {
           notExisting: true,
         });
       });
     });
 
-    describe("persist function tests", () => {
-      it("should create persistent with CollectionKey (default config)", () => {
+    describe('persist function tests', () => {
+      it('should create persistent with CollectionKey (default config)', () => {
         collection.persist();
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
@@ -1237,56 +1319,56 @@ describe("Collection Tests", () => {
         });
       });
 
-      it("should create persistent with CollectionKey (specific config)", () => {
+      it('should create persistent with CollectionKey (specific config)', () => {
         collection.persist({
-          storageKeys: ["test1", "test2"],
+          storageKeys: ['test1', 'test2'],
           instantiate: false,
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
           instantiate: false,
-          storageKeys: ["test1", "test2"],
+          storageKeys: ['test1', 'test2'],
           key: collection._key,
         });
       });
 
-      it("should create persistent with passed Key (default config)", () => {
-        collection.persist("passedKey");
+      it('should create persistent with passed Key (default config)', () => {
+        collection.persist('passedKey');
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
           instantiate: true,
           storageKeys: [],
-          key: "passedKey",
+          key: 'passedKey',
         });
       });
 
-      it("should create persistent with passed Key (specific config)", () => {
-        collection.persist("passedKey", {
-          storageKeys: ["test1", "test2"],
+      it('should create persistent with passed Key (specific config)', () => {
+        collection.persist('passedKey', {
+          storageKeys: ['test1', 'test2'],
           instantiate: false,
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
           instantiate: false,
-          storageKeys: ["test1", "test2"],
-          key: "passedKey",
+          storageKeys: ['test1', 'test2'],
+          key: 'passedKey',
         });
       });
 
-      it("should overwrite existing persistent with a warning", () => {
+      it('should overwrite existing persistent with a warning', () => {
         collection.persistent = new CollectionPersistent(collection);
 
-        collection.persist("newPersistentKey");
+        collection.persist('newPersistentKey');
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         // expect(collection.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
           instantiate: true,
           storageKeys: [],
-          key: "newPersistentKey",
+          key: 'newPersistentKey',
         });
         expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`
@@ -1294,7 +1376,7 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("onLoad function tests", () => {
+    describe('onLoad function tests', () => {
       const dummyCallbackFunction = jest.fn();
 
       it("should set onLoad function if Collection is persisted and shouldn't call it initially (collection.isPersisted = false)", () => {
@@ -1307,7 +1389,7 @@ describe("Collection Tests", () => {
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
       });
 
-      it("should set onLoad function if Collection is persisted and should call it initially (collection.isPersisted = true)", () => {
+      it('should set onLoad function if Collection is persisted and should call it initially (collection.isPersisted = true)', () => {
         collection.persistent = new CollectionPersistent(collection);
         collection.isPersisted = true;
 
@@ -1327,50 +1409,50 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("getGroupCount function tests", () => {
+    describe('getGroupCount function tests', () => {
       beforeEach(() => {
         collection.groups = {
-          1: "x" as any,
-          2: "y" as any,
-          10: "z" as any,
+          1: 'x' as any,
+          2: 'y' as any,
+          10: 'z' as any,
         };
       });
 
-      it("should return count of registered Groups", () => {
+      it('should return count of registered Groups', () => {
         expect(collection.getGroupCount()).toBe(3);
       });
     });
 
-    describe("getSelectorCount function tests", () => {
+    describe('getSelectorCount function tests', () => {
       beforeEach(() => {
         collection.selectors = {
-          1: "x" as any,
-          2: "y" as any,
-          10: "z" as any,
+          1: 'x' as any,
+          2: 'y' as any,
+          10: 'z' as any,
         };
       });
 
-      it("should return count of registered Selectors", () => {
+      it('should return count of registered Selectors', () => {
         expect(collection.getSelectorCount()).toBe(3);
       });
     });
 
-    describe("reset function tests", () => {
+    describe('reset function tests', () => {
       let dummyGroup: Group;
       let dummySelector: Selector;
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, { id: "dummyItem", name: "frank" });
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
-        dummyGroup = new Group(collection, [], { key: "dummyGroup" });
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
-        dummySelector = new Selector(collection, "dummyItem", {
-          key: "dummySelector",
+        dummySelector = new Selector(collection, 'dummyItem', {
+          key: 'dummySelector',
         });
         collection.selectors = {
           dummySelector: dummySelector,
@@ -1380,7 +1462,7 @@ describe("Collection Tests", () => {
         dummySelector.reset = jest.fn();
       });
 
-      it("should reset Collection and its Selectors and Groups", () => {
+      it('should reset Collection and its Selectors and Groups', () => {
         collection.reset();
 
         expect(collection.data).toStrictEqual({});
@@ -1390,13 +1472,13 @@ describe("Collection Tests", () => {
       });
     });
 
-    describe("put function tests", () => {
+    describe('put function tests', () => {
       let dummyGroup1: Group;
       let dummyGroup2: Group;
 
       beforeEach(() => {
-        dummyGroup1 = new Group(collection, [], { key: "dummyGroup1" });
-        dummyGroup2 = new Group(collection, [], { key: "dummyGroup2" });
+        dummyGroup1 = new Group(collection, [], { key: 'dummyGroup1' });
+        dummyGroup2 = new Group(collection, [], { key: 'dummyGroup2' });
         collection.groups = {
           dummyGroup1: dummyGroup1,
           dummyGroup2: dummyGroup2,
@@ -1406,38 +1488,38 @@ describe("Collection Tests", () => {
         dummyGroup2.add = jest.fn();
       });
 
-      it("should add passed itemKey to passed Group (default config)", () => {
-        collection.put("1", "dummyGroup1");
+      it('should add passed itemKey to passed Group (default config)', () => {
+        collection.put('1', 'dummyGroup1');
 
-        expect(dummyGroup1.add).toHaveBeenCalledWith(["1"], {});
+        expect(dummyGroup1.add).toHaveBeenCalledWith(['1'], {});
         expect(dummyGroup2.add).not.toHaveBeenCalled();
       });
 
-      it("should add passed itemKey to passed Group (specific config)", () => {
-        collection.put("1", "dummyGroup1", {
+      it('should add passed itemKey to passed Group (specific config)', () => {
+        collection.put('1', 'dummyGroup1', {
           overwrite: true,
-          method: "push",
+          method: 'push',
         });
 
-        expect(dummyGroup1.add).toHaveBeenCalledWith(["1"], {
+        expect(dummyGroup1.add).toHaveBeenCalledWith(['1'], {
           overwrite: true,
-          method: "push",
+          method: 'push',
         });
         expect(dummyGroup2.add).not.toHaveBeenCalled();
       });
 
-      it("should add passed itemKeys to passed Groups (default config)", () => {
+      it('should add passed itemKeys to passed Groups (default config)', () => {
         collection.put(
-          ["1", "2", "3"],
-          ["dummyGroup1", "notExistingGroup", "dummyGroup2"]
+          ['1', '2', '3'],
+          ['dummyGroup1', 'notExistingGroup', 'dummyGroup2']
         );
 
-        expect(dummyGroup1.add).toHaveBeenCalledWith(["1", "2", "3"], {});
-        expect(dummyGroup2.add).toHaveBeenCalledWith(["1", "2", "3"], {});
+        expect(dummyGroup1.add).toHaveBeenCalledWith(['1', '2', '3'], {});
+        expect(dummyGroup2.add).toHaveBeenCalledWith(['1', '2', '3'], {});
       });
     });
 
-    describe("updateItemKey function tests", () => {
+    describe('updateItemKey function tests', () => {
       let dummySelector1: Selector;
       let dummySelector2: Selector;
       let dummySelector3: Selector;
@@ -1447,34 +1529,34 @@ describe("Collection Tests", () => {
       let dummyItem2: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item(collection, { id: "dummyItem1", name: "Jeff" });
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         dummyItem1.persistent = new StatePersistent(dummyItem1);
-        dummyItem2 = new Item(collection, { id: "dummyItem2", name: "Hans" });
+        dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Hans' });
         dummyItem2.persistent = new StatePersistent(dummyItem2);
         collection.data = {
           dummyItem1: dummyItem1,
           dummyItem2: dummyItem2,
         };
 
-        dummyGroup1 = new Group(collection, ["dummyItem1", "dummyItem2"], {
-          key: "dummyGroup1",
+        dummyGroup1 = new Group(collection, ['dummyItem1', 'dummyItem2'], {
+          key: 'dummyGroup1',
         });
-        dummyGroup2 = new Group(collection, ["dummyItem2"], {
-          key: "dummyGroup2",
+        dummyGroup2 = new Group(collection, ['dummyItem2'], {
+          key: 'dummyGroup2',
         });
         collection.groups = {
           dummyGroup1: dummyGroup1,
           dummyGroup2: dummyGroup2,
         };
 
-        dummySelector1 = new Selector(collection, "dummyItem1", {
-          key: "dummySelector1",
+        dummySelector1 = new Selector(collection, 'dummyItem1', {
+          key: 'dummySelector1',
         });
-        dummySelector2 = new Selector(collection, "dummyItem2", {
-          key: "dummySelector2",
+        dummySelector2 = new Selector(collection, 'dummyItem2', {
+          key: 'dummySelector2',
         });
-        dummySelector3 = new Selector(collection, "newDummyItem", {
-          key: "dummySelector3",
+        dummySelector3 = new Selector(collection, 'newDummyItem', {
+          key: 'dummySelector3',
         });
         collection.selectors = {
           dummySelector1: dummySelector1,
@@ -1495,44 +1577,46 @@ describe("Collection Tests", () => {
         dummySelector3.select = jest.fn();
       });
 
-      it("should update ItemKey in Collection, Selectors and Groups (default config)", () => {
-        const response = collection.updateItemKey("dummyItem1", "newDummyItem");
+      it('should update ItemKey in Collection, Selectors and Groups (default config)', () => {
+        const response = collection.updateItemKey('dummyItem1', 'newDummyItem');
 
         expect(response).toBeTruthy();
 
-        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.setKey).toHaveBeenCalledWith('newDummyItem', {
+          background: false,
+        });
         expect(dummyItem2.setKey).not.toHaveBeenCalled();
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
-            "newDummyItem",
+            'newDummyItem',
             collection._key
           )
         );
         expect(dummyItem2.persistent.setKey).not.toHaveBeenCalled();
 
         expect(dummyGroup1.replace).toHaveBeenCalledWith(
-          "dummyItem1",
-          "newDummyItem",
+          'dummyItem1',
+          'newDummyItem',
           {
             background: false,
           }
         );
         expect(dummyGroup2.replace).not.toHaveBeenCalled();
 
-        expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+        expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: false,
         });
         expect(dummySelector2.select).not.toHaveBeenCalled();
-        expect(dummySelector3.select).toHaveBeenCalledWith("newDummyItem", {
+        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
           force: true,
           background: false,
         });
       });
 
-      it("should update ItemKey in Collection, Selectors and Groups (specific config)", () => {
+      it('should update ItemKey in Collection, Selectors and Groups (specific config)', () => {
         const response = collection.updateItemKey(
-          "dummyItem1",
-          "newDummyItem",
+          'dummyItem1',
+          'newDummyItem',
           {
             background: true,
           }
@@ -1540,59 +1624,63 @@ describe("Collection Tests", () => {
 
         expect(response).toBeTruthy();
 
-        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.setKey).toHaveBeenCalledWith('newDummyItem', {
+          background: true,
+        });
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
-            "newDummyItem",
+            'newDummyItem',
             collection._key
           )
         );
 
         expect(dummyGroup1.replace).toHaveBeenCalledWith(
-          "dummyItem1",
-          "newDummyItem",
+          'dummyItem1',
+          'newDummyItem',
           {
             background: true,
           }
         );
 
-        expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+        expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: true,
         });
-        expect(dummySelector3.select).toHaveBeenCalledWith("newDummyItem", {
+        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
           force: true,
           background: true,
         });
       });
 
-      it("should update ItemKey in Collection, dummy Selectors and dummy Groups (default config)", () => {
+      it('should update ItemKey in Collection, dummy Selectors and dummy Groups (default config)', () => {
         dummyGroup1.isPlaceholder = true;
         dummySelector1.isPlaceholder = true;
 
-        const response = collection.updateItemKey("dummyItem1", "newDummyItem");
+        const response = collection.updateItemKey('dummyItem1', 'newDummyItem');
 
         expect(response).toBeTruthy();
 
-        expect(dummyItem1.setKey).toHaveBeenCalledWith("newDummyItem");
+        expect(dummyItem1.setKey).toHaveBeenCalledWith('newDummyItem', {
+          background: false,
+        });
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
-            "newDummyItem",
+            'newDummyItem',
             collection._key
           )
         );
 
         expect(dummyGroup1.replace).toHaveBeenCalledWith(
-          "dummyItem1",
-          "newDummyItem",
+          'dummyItem1',
+          'newDummyItem',
           {
             background: false,
           }
         );
 
-        expect(dummySelector1.select).toHaveBeenCalledWith("newDummyItem", {
+        expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: false,
         });
-        expect(dummySelector3.select).toHaveBeenCalledWith("newDummyItem", {
+        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
           force: true,
           background: false,
         });
@@ -1600,21 +1688,30 @@ describe("Collection Tests", () => {
 
       it("shouldn't update ItemKey of Item that doesn't exist (default config)", () => {
         const response = collection.updateItemKey(
-          "notExistingItem",
-          "newDummyItem"
+          'notExistingItem',
+          'newDummyItem'
         );
 
         expect(response).toBeFalsy();
       });
 
       it("shouldn't update ItemKey if it stayed the same (default config)", () => {
-        const response = collection.updateItemKey("dummyItem1", "dummyItem1");
+        const response = collection.updateItemKey('dummyItem1', 'dummyItem1');
 
         expect(response).toBeFalsy();
       });
+
+      it("shouldn't update ItemKey if ItemKey called after the newItemKey already exists and should print warning (default config)", () => {
+        const response = collection.updateItemKey('dummyItem1', 'dummyItem2');
+
+        expect(response).toBeFalsy();
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: Couldn't update ItemKey from 'dummyItem1' to 'dummyItem2' because an Item with the key/name 'dummyItem2' already exists!"
+        );
+      });
     });
 
-    describe("getGroupKeysThatHaveItemKey function tests", () => {
+    describe('getGroupKeysThatHaveItemKey function tests', () => {
       let dummyGroup1: Group;
       let dummyGroup2: Group;
       let dummyGroup3: Group;
@@ -1622,16 +1719,16 @@ describe("Collection Tests", () => {
       beforeEach(() => {
         dummyGroup1 = new Group(
           collection,
-          ["dummyItem1", "dummyItem2", "dummyItem3"],
+          ['dummyItem1', 'dummyItem2', 'dummyItem3'],
           {
-            key: "dummyGroup1",
+            key: 'dummyGroup1',
           }
         );
-        dummyGroup2 = new Group(collection, ["dummyItem2", "dummyItem3"], {
-          key: "dummyGroup2",
+        dummyGroup2 = new Group(collection, ['dummyItem2', 'dummyItem3'], {
+          key: 'dummyGroup2',
         });
-        dummyGroup3 = new Group(collection, ["dummyItem3"], {
-          key: "dummyGroup3",
+        dummyGroup3 = new Group(collection, ['dummyItem3'], {
+          key: 'dummyGroup3',
         });
         collection.groups = {
           dummyGroup1: dummyGroup1,
@@ -1640,49 +1737,49 @@ describe("Collection Tests", () => {
         };
       });
 
-      it("should return groupKeys that contain ItemKey", () => {
+      it('should return groupKeys that contain ItemKey', () => {
         expect(
-          collection.getGroupKeysThatHaveItemKey("unknownItem")
+          collection.getGroupKeysThatHaveItemKey('unknownItem')
         ).toStrictEqual([]);
         expect(
-          collection.getGroupKeysThatHaveItemKey("dummyItem1")
-        ).toStrictEqual(["dummyGroup1"]);
+          collection.getGroupKeysThatHaveItemKey('dummyItem1')
+        ).toStrictEqual(['dummyGroup1']);
         expect(
-          collection.getGroupKeysThatHaveItemKey("dummyItem2")
-        ).toStrictEqual(["dummyGroup1", "dummyGroup2"]);
+          collection.getGroupKeysThatHaveItemKey('dummyItem2')
+        ).toStrictEqual(['dummyGroup1', 'dummyGroup2']);
         expect(
-          collection.getGroupKeysThatHaveItemKey("dummyItem3")
-        ).toStrictEqual(["dummyGroup1", "dummyGroup2", "dummyGroup3"]);
+          collection.getGroupKeysThatHaveItemKey('dummyItem3')
+        ).toStrictEqual(['dummyGroup1', 'dummyGroup2', 'dummyGroup3']);
       });
     });
 
-    describe("remove function tests", () => {
+    describe('remove function tests', () => {
       beforeEach(() => {
         collection.removeFromGroups = jest.fn();
         collection.removeItems = jest.fn();
       });
 
-      it("should remove Items from Group", () => {
+      it('should remove Items from Group', () => {
         collection
-          .remove(["test1", "test2"])
-          .fromGroups(["testGroup1", "testGroup2"]);
+          .remove(['test1', 'test2'])
+          .fromGroups(['testGroup1', 'testGroup2']);
 
         expect(collection.removeFromGroups).toHaveBeenCalledWith(
-          ["test1", "test2"],
-          ["testGroup1", "testGroup2"]
+          ['test1', 'test2'],
+          ['testGroup1', 'testGroup2']
         );
         expect(collection.removeItems).not.toHaveBeenCalled();
       });
 
-      it("should remove Items from everywhere", () => {
-        collection.remove(["test1", "test2"]).everywhere();
+      it('should remove Items from everywhere', () => {
+        collection.remove(['test1', 'test2']).everywhere();
 
         expect(collection.removeFromGroups).not.toHaveBeenCalled();
-        expect(collection.removeItems).toHaveBeenCalledWith(["test1", "test2"]);
+        expect(collection.removeItems).toHaveBeenCalledWith(['test1', 'test2']);
       });
     });
 
-    describe("removeFromGroups function tests", () => {
+    describe('removeFromGroups function tests', () => {
       let dummyGroup1: Group;
       let dummyGroup2: Group;
       let dummyGroup3: Group;
@@ -1690,20 +1787,20 @@ describe("Collection Tests", () => {
       beforeEach(() => {
         dummyGroup1 = new Group(
           collection,
-          ["dummyItem1", "dummyItem2", "dummyItem3", "unknownItem"],
+          ['dummyItem1', 'dummyItem2', 'dummyItem3', 'unknownItem'],
           {
-            key: "dummyGroup1",
+            key: 'dummyGroup1',
           }
         );
         dummyGroup2 = new Group(
           collection,
-          ["dummyItem2", "dummyItem3", "unknownItem"],
+          ['dummyItem2', 'dummyItem3', 'unknownItem'],
           {
-            key: "dummyGroup2",
+            key: 'dummyGroup2',
           }
         );
-        dummyGroup3 = new Group(collection, ["dummyItem3", "unknownItem"], {
-          key: "dummyGroup3",
+        dummyGroup3 = new Group(collection, ['dummyItem3', 'unknownItem'], {
+          key: 'dummyGroup3',
         });
         collection.groups = {
           dummyGroup1: dummyGroup1,
@@ -1717,42 +1814,42 @@ describe("Collection Tests", () => {
         dummyGroup3.remove = jest.fn();
       });
 
-      it("should remove ItemKey from Group", () => {
-        collection.removeFromGroups("dummyItem2", "dummyGroup1");
+      it('should remove ItemKey from Group', () => {
+        collection.removeFromGroups('dummyItem2', 'dummyGroup1');
 
         expect(collection.removeItems).not.toHaveBeenCalled();
-        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem2');
         expect(dummyGroup2.remove).not.toHaveBeenCalled();
         expect(dummyGroup3.remove).not.toHaveBeenCalled();
       });
 
-      it("should remove ItemKeys from Groups", () => {
+      it('should remove ItemKeys from Groups', () => {
         collection.removeFromGroups(
-          ["dummyItem2", "dummyItem3"],
-          ["dummyGroup2", "dummyGroup3"]
+          ['dummyItem2', 'dummyItem3'],
+          ['dummyGroup2', 'dummyGroup3']
         );
 
         expect(collection.removeItems).not.toHaveBeenCalled();
         expect(dummyGroup1.remove).not.toHaveBeenCalled();
-        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
-        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem3");
-        expect(dummyGroup3.remove).not.toHaveBeenCalledWith("dummyItem2");
-        expect(dummyGroup3.remove).toHaveBeenCalledWith("dummyItem3");
+        expect(dummyGroup2.remove).toHaveBeenCalledWith('dummyItem2');
+        expect(dummyGroup2.remove).toHaveBeenCalledWith('dummyItem3');
+        expect(dummyGroup3.remove).not.toHaveBeenCalledWith('dummyItem2');
+        expect(dummyGroup3.remove).toHaveBeenCalledWith('dummyItem3');
       });
 
-      it("should remove Item from Collection if it got removed from all Groups in which it was in", () => {
-        collection.removeFromGroups("dummyItem2", [
-          "dummyGroup2",
-          "dummyGroup1",
+      it('should remove Item from Collection if it got removed from all Groups in which it was in', () => {
+        collection.removeFromGroups('dummyItem2', [
+          'dummyGroup2',
+          'dummyGroup1',
         ]);
 
-        expect(collection.removeItems).toHaveBeenCalledWith("dummyItem2");
-        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
-        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(collection.removeItems).toHaveBeenCalledWith('dummyItem2');
+        expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem2');
+        expect(dummyGroup2.remove).toHaveBeenCalledWith('dummyItem2');
       });
     });
 
-    describe("removeItems function test", () => {
+    describe('removeItems function test', () => {
       let dummySelector1: Selector;
       let dummySelector2: Selector;
       let dummyGroup1: Group;
@@ -1761,9 +1858,9 @@ describe("Collection Tests", () => {
       let dummyItem2: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item(collection, { id: "dummyItem1", name: "Jeff" });
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         dummyItem1.persistent = new StatePersistent(dummyItem1);
-        dummyItem2 = new Item(collection, { id: "dummyItem2", name: "Hans" });
+        dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Hans' });
         dummyItem2.persistent = new StatePersistent(dummyItem2);
         collection.data = {
           dummyItem1: dummyItem1,
@@ -1771,22 +1868,22 @@ describe("Collection Tests", () => {
         };
         collection.size = 2;
 
-        dummyGroup1 = new Group(collection, ["dummyItem1", "dummyItem2"], {
-          key: "dummyGroup1",
+        dummyGroup1 = new Group(collection, ['dummyItem1', 'dummyItem2'], {
+          key: 'dummyGroup1',
         });
-        dummyGroup2 = new Group(collection, ["dummyItem2"], {
-          key: "dummyGroup2",
+        dummyGroup2 = new Group(collection, ['dummyItem2'], {
+          key: 'dummyGroup2',
         });
         collection.groups = {
           dummyGroup1: dummyGroup1,
           dummyGroup2: dummyGroup2,
         };
 
-        dummySelector1 = new Selector(collection, "dummyItem1", {
-          key: "dummySelector1",
+        dummySelector1 = new Selector(collection, 'dummyItem1', {
+          key: 'dummySelector1',
         });
-        dummySelector2 = new Selector(collection, "dummyItem2", {
-          key: "dummySelector2",
+        dummySelector2 = new Selector(collection, 'dummyItem2', {
+          key: 'dummySelector2',
         });
         collection.selectors = {
           dummySelector1: dummySelector1,
@@ -1803,11 +1900,11 @@ describe("Collection Tests", () => {
         dummySelector2.select = jest.fn();
       });
 
-      it("should remove Item from Collection, Groups and Selectors", () => {
-        collection.removeItems("dummyItem1");
+      it('should remove Item from Collection, Groups and Selectors', () => {
+        collection.removeItems('dummyItem1');
 
-        expect(collection.data).not.toHaveProperty("dummyItem1");
-        expect(collection.data).toHaveProperty("dummyItem2");
+        expect(collection.data).not.toHaveProperty('dummyItem1');
+        expect(collection.data).toHaveProperty('dummyItem2');
         expect(collection.size).toBe(1);
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
@@ -1815,73 +1912,69 @@ describe("Collection Tests", () => {
           dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
-        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem1");
+        expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem1');
         expect(dummyGroup2.remove).not.toHaveBeenCalled();
 
-        expect(dummySelector1.select).toHaveBeenCalledWith("dummyItem1", {
+        expect(dummySelector1.select).toHaveBeenCalledWith('dummyItem1', {
           force: true,
         });
         expect(dummySelector2.select).not.toHaveBeenCalled();
       });
 
-      it("should remove Items from Collection, Groups and Selectors", () => {
-        collection.removeItems(["dummyItem1", "dummyItem2", "notExistingItem"]);
+      it('should remove Items from Collection, Groups and Selectors', () => {
+        collection.removeItems(['dummyItem1', 'dummyItem2', 'notExistingItem']);
 
-        expect(collection.data).not.toHaveProperty("dummyItem1");
-        expect(collection.data).not.toHaveProperty("dummyItem2");
+        expect(collection.data).not.toHaveProperty('dummyItem1');
+        expect(collection.data).not.toHaveProperty('dummyItem2');
         expect(collection.size).toBe(0);
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
         expect(dummyItem2.persistent.removePersistedValue).toHaveBeenCalled();
 
-        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem1");
-        expect(dummyGroup1.remove).toHaveBeenCalledWith("dummyItem2");
-        expect(dummyGroup2.remove).not.toHaveBeenCalledWith("dummyItem1");
-        expect(dummyGroup2.remove).toHaveBeenCalledWith("dummyItem2");
+        expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem1');
+        expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem2');
+        expect(dummyGroup2.remove).not.toHaveBeenCalledWith('dummyItem1');
+        expect(dummyGroup2.remove).toHaveBeenCalledWith('dummyItem2');
 
-        expect(dummySelector1.select).toHaveBeenCalledWith("dummyItem1", {
+        expect(dummySelector1.select).toHaveBeenCalledWith('dummyItem1', {
           force: true,
         });
-        expect(dummySelector2.select).toHaveBeenCalledWith("dummyItem2", {
+        expect(dummySelector2.select).toHaveBeenCalledWith('dummyItem2', {
           force: true,
         });
       });
     });
 
-    describe("setData function tests", () => {
+    describe('setData function tests', () => {
       let dummyItem1: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item(collection, { id: "dummyItem1", name: "Jeff" });
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         collection.data = {
           dummyItem1: dummyItem1,
         };
         collection.size = 1;
 
-        collection.rebuildGroupsThatIncludeItemKey = jest.fn();
         dummyItem1.patch = jest.fn();
         dummyItem1.set = jest.fn();
       });
 
-      it("should create new Item out of valid Data, rebuild Groups and increase size (default config)", () => {
-        const response = collection.setData({ id: "dummyItem2", name: "Hans" });
+      it('should create new Item out of valid Data, rebuild Groups and increase size (default config)', () => {
+        const response = collection.setData({ id: 'dummyItem2', name: 'Hans' });
 
         expect(response).toBeTruthy();
-        expect(collection.data).toHaveProperty("dummyItem1");
-        expect(collection.data).toHaveProperty("dummyItem2");
-        expect(collection.data["dummyItem2"]).toBeInstanceOf(Item);
-        expect(collection.data["dummyItem2"]._value).toStrictEqual({
-          id: "dummyItem2",
-          name: "Hans",
+        expect(collection.data).toHaveProperty('dummyItem1');
+        expect(collection.data).toHaveProperty('dummyItem2');
+        expect(collection.data['dummyItem2']).toBeInstanceOf(Item);
+        expect(collection.data['dummyItem2']._value).toStrictEqual({
+          id: 'dummyItem2',
+          name: 'Hans',
         });
         expect(collection.size).toBe(2);
-        expect(collection.rebuildGroupsThatIncludeItemKey).toHaveBeenCalledWith(
-          "dummyItem2"
-        );
       });
 
       it("shouldn't create new Item if passed Data is no valid Object", () => {
-        const response = collection.setData("noObject" as any);
+        const response = collection.setData('noObject' as any);
 
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: Item Data of Collection '${collection._key}' has to be an valid Object!`
@@ -1889,13 +1982,10 @@ describe("Collection Tests", () => {
 
         expect(response).toBeFalsy();
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
       });
 
       it("shouldn't create new Item if passed Data has no primaryKey", () => {
-        const response = collection.setData({ name: "Frank" } as any);
+        const response = collection.setData({ name: 'Frank' } as any);
 
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: Collection '${collection._key}' Item Data has to contain a primaryKey property called '${collection.config.primaryKey}'!`
@@ -1903,28 +1993,22 @@ describe("Collection Tests", () => {
 
         expect(response).toBeFalsy();
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (default config)", () => {
         const response = collection.setData({
-          id: "dummyItem1",
-          name: "Dieter",
+          id: 'dummyItem1',
+          name: 'Dieter',
         });
 
         expect(response).toBeTruthy();
 
-        expect(collection.data).toHaveProperty("dummyItem1");
-        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.data).toHaveProperty('dummyItem1');
+        expect(collection.data['dummyItem1']).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
-          { id: "dummyItem1", name: "Dieter" },
+          { id: 'dummyItem1', name: 'Dieter' },
           { background: false }
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
@@ -1933,23 +2017,20 @@ describe("Collection Tests", () => {
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.background = true)", () => {
         const response = collection.setData(
           {
-            id: "dummyItem1",
-            name: "Dieter",
+            id: 'dummyItem1',
+            name: 'Dieter',
           },
           { background: true }
         );
 
         expect(response).toBeTruthy();
 
-        expect(collection.data).toHaveProperty("dummyItem1");
-        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.data).toHaveProperty('dummyItem1');
+        expect(collection.data['dummyItem1']).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
-          { id: "dummyItem1", name: "Dieter" },
+          { id: 'dummyItem1', name: 'Dieter' },
           { background: true }
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
@@ -1958,24 +2039,21 @@ describe("Collection Tests", () => {
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true, background: true)", () => {
         const response = collection.setData(
           {
-            id: "dummyItem1",
-            name: "Dieter",
+            id: 'dummyItem1',
+            name: 'Dieter',
           },
           { patch: true, background: true }
         );
 
         expect(response).toBeTruthy();
 
-        expect(collection.data).toHaveProperty("dummyItem1");
-        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.data).toHaveProperty('dummyItem1');
+        expect(collection.data['dummyItem1']).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).not.toHaveBeenCalled();
         expect(dummyItem1.patch).toHaveBeenCalledWith(
-          { id: "dummyItem1", name: "Dieter" },
+          { id: 'dummyItem1', name: 'Dieter' },
           { background: true }
         );
       });
@@ -1985,36 +2063,33 @@ describe("Collection Tests", () => {
         collection.size = 0;
 
         const response = collection.setData({
-          id: "dummyItem1",
-          name: "Dieter",
+          id: 'dummyItem1',
+          name: 'Dieter',
         });
 
         expect(response).toBeTruthy();
 
-        expect(collection.data).toHaveProperty("dummyItem1");
-        expect(collection.data["dummyItem1"]).toBeInstanceOf(Item);
+        expect(collection.data).toHaveProperty('dummyItem1');
+        expect(collection.data['dummyItem1']).toBeInstanceOf(Item);
         expect(collection.size).toBe(1);
-        expect(
-          collection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
-          { id: "dummyItem1", name: "Dieter" },
+          { id: 'dummyItem1', name: 'Dieter' },
           { background: false }
         );
       });
     });
 
-    describe("rebuildGroupsThatIncludeItemKey function tests", () => {
+    describe('rebuildGroupsThatIncludeItemKey function tests', () => {
       let dummyGroup1: Group;
       let dummyGroup2: Group;
 
       beforeEach(() => {
-        dummyGroup1 = new Group(collection, ["dummyItem1", "dummyItem2"], {
-          key: "dummyGroup1",
+        dummyGroup1 = new Group(collection, ['dummyItem1', 'dummyItem2'], {
+          key: 'dummyGroup1',
         });
-        dummyGroup2 = new Group(collection, ["dummyItem2"], {
-          key: "dummyGroup2",
+        dummyGroup2 = new Group(collection, ['dummyItem2'], {
+          key: 'dummyGroup2',
         });
         collection.groups = {
           dummyGroup1: dummyGroup1,
@@ -2025,8 +2100,8 @@ describe("Collection Tests", () => {
         dummyGroup2.ingest = jest.fn();
       });
 
-      it("should call ingest on each Group that includes the passed ItemKey (default config)", () => {
-        collection.rebuildGroupsThatIncludeItemKey("dummyItem1");
+      it('should call ingest on each Group that includes the passed ItemKey (default config)', () => {
+        collection.rebuildGroupsThatIncludeItemKey('dummyItem1');
 
         expect(dummyGroup1.ingest).toHaveBeenCalledWith({
           background: false,
@@ -2037,8 +2112,8 @@ describe("Collection Tests", () => {
         expect(dummyGroup2.ingest).not.toHaveBeenCalled();
       });
 
-      it("should call ingest on each Group that includes the passed ItemKey (specific config)", () => {
-        collection.rebuildGroupsThatIncludeItemKey("dummyItem2", {
+      it('should call ingest on each Group that includes the passed ItemKey (specific config)', () => {
+        collection.rebuildGroupsThatIncludeItemKey('dummyItem2', {
           background: true,
           sideEffects: false,
         });

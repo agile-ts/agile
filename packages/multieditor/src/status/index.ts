@@ -1,5 +1,5 @@
-import { Agile, copy, RuntimeJobConfigInterface } from "@agile-ts/core";
-import { Item, StatusObserver } from "../internal";
+import { Agile, copy, RuntimeJobConfigInterface } from '@agile-ts/core';
+import { Item, StatusObserver } from '../internal';
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
@@ -7,13 +7,13 @@ export class Status<DataType = any> {
   public item: Item<DataType>;
   public observer: StatusObserver; // Handles deps and subs of Status and is like an interface to the Runtime
 
-  public display: boolean = false;
+  public display = false;
   public _value: StatusInterface | null; // The last assigned Value
   public nextValue: StatusInterface | null; // The last set Value
   public activeValues: Set<StatusInterface> = new Set(); // All Values that got set during the validation Time of the Validator
 
   // Tracking
-  public track: boolean = false;
+  public track = false;
   public foundValues: Set<StatusInterface> = new Set();
 
   /**
@@ -89,7 +89,7 @@ export class Status<DataType = any> {
   }
 }
 
-export type StatusType = "error" | "success";
+export type StatusType = 'error' | 'success';
 
 /**
  * @param type - Type of Status

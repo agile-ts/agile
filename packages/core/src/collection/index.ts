@@ -8,14 +8,13 @@ import {
   StorageKey,
   GroupConfigInterface,
   defineConfig,
-  flatMerge,
   isValidObject,
   normalizeArray,
   copy,
   CollectionPersistent,
   GroupAddConfig,
   ComputedTracker,
-} from "../internal";
+} from '../internal';
 
 export class Collection<DataType = DefaultItem> {
   public agileInstance: () => Agile;
@@ -43,17 +42,17 @@ export class Collection<DataType = DefaultItem> {
 
     // Set temp Config for creating proper Placeholder Items (of Selector)
     this.config = {
-      defaultGroupKey: "default",
-      primaryKey: "id",
+      defaultGroupKey: 'default',
+      primaryKey: 'id',
     };
 
     // Assign Properties
-    let _config = typeof config === "function" ? config(this) : config;
+    let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
-      primaryKey: "id",
+      primaryKey: 'id',
       groups: {},
       selectors: {},
-      defaultGroupKey: "default",
+      defaultGroupKey: 'default',
     });
     this._key = _config.key;
     this.config = {
@@ -161,7 +160,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Set Key/Name of Group to property Name
-    for (let key in groupsObject)
+    for (const key in groupsObject)
       if (!groupsObject[key]._key) groupsObject[key].setKey(key);
 
     this.groups = groupsObject;
@@ -192,7 +191,7 @@ export class Collection<DataType = DefaultItem> {
     } else selectorsObject = selectors;
 
     // Set Key/Name of Selector to property Name
-    for (let key in selectorsObject)
+    for (const key in selectorsObject)
       if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
 
     this.selectors = selectorsObject;
@@ -218,7 +217,7 @@ export class Collection<DataType = DefaultItem> {
     const defaultGroupKey = this.config.defaultGroupKey;
     const primaryKey = this.config.primaryKey;
     config = defineConfig<CollectConfigInterface>(config, {
-      method: "push",
+      method: 'push',
       background: false,
       patch: false,
       select: false,
@@ -279,7 +278,7 @@ export class Collection<DataType = DefaultItem> {
 
     if (!item) {
       Agile.logger.error(
-        `ItemKey '${itemKey}' doesn't exist in Collection '${this._key}'!`
+        `Item with key/name '${itemKey}' doesn't exist in Collection '${this._key}'!`
       );
       return undefined;
     }
@@ -290,26 +289,24 @@ export class Collection<DataType = DefaultItem> {
       return undefined;
     }
 
-    // Merge changes into current ItemValue
-    const newItemValue = flatMerge(copy(item.nextStateValue), changes, {
-      addNewProperties: config.addNewProperties,
-    });
-
     const oldItemKey = item._value[primaryKey];
-    const newItemKey = newItemValue[primaryKey];
-    const updatedItemKey = oldItemKey !== newItemKey;
+    const newItemKey = changes[primaryKey] || oldItemKey;
+    const updateItemKey = oldItemKey !== newItemKey;
 
-    // Apply changes to Item
-    item.set(newItemValue, {
-      background: config.background,
-      storage: !updatedItemKey, // depends if the ItemKey got updated since it would get overwritten if the ItemKey/StorageKey gets updated anyway
-    });
+    // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (below)
+    if (changes[primaryKey]) delete changes[primaryKey];
 
-    // Update ItemKey of Item
-    if (updatedItemKey)
+    // Update ItemKey
+    if (updateItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
+
+    // Apply changes to Item
+    item.patch(changes as any, {
+      background: config.background,
+      addNewProperties: config.addNewProperties,
+    });
 
     return item;
   }
@@ -347,6 +344,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Group
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Group exists in Collection
+   * @param groupKey - Key/Name of Group
+   * @param config - Config
+   */
+  public hasGroup(
+    groupKey: GroupKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getGroup(groupKey, config);
+  }
+
+  //=========================================================================================================
   // Get Group
   //=========================================================================================================
   /**
@@ -357,7 +370,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroup(
     groupKey: GroupKey | undefined,
-    config: GetGroupConfigInterface = {}
+    config: HasConfigInterface = {}
   ): Group<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -452,6 +465,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Selector
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Selector exists in Collection
+   * @param selectorKey - Key/Name of Selector
+   * @param config - Config
+   */
+  public hasSelector(
+    selectorKey: SelectorKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getSelector(selectorKey, config);
+  }
+
+  //=========================================================================================================
   // Get Selector
   //=========================================================================================================
   /**
@@ -462,7 +491,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getSelector(
     selectorKey: SelectorKey | undefined,
-    config: GetSelectorConfigInterface = {}
+    config: HasConfigInterface = {}
   ): Selector<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -494,7 +523,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Create dummy Selector to hold reference
     if (!selector) {
-      selector = new Selector<DataType>(this, "unknown", {
+      selector = new Selector<DataType>(this, 'unknown', {
         key: selectorKey,
         isPlaceholder: true,
       });
@@ -526,6 +555,22 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Has Item
+  //=========================================================================================================
+  /**
+   * @public
+   * Check if Item exists in Collection
+   * @param itemKey - Key/Name of Item
+   * @param config - Config
+   */
+  public hasItem(
+    itemKey: ItemKey | undefined,
+    config: HasConfigInterface = {}
+  ): boolean {
+    return !!this.getItem(itemKey, config);
+  }
+
+  //=========================================================================================================
   // Get Item by Id
   //=========================================================================================================
   /**
@@ -536,7 +581,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getItem(
     itemKey: ItemKey | undefined,
-    config: GetItemConfigInterface = {}
+    config: HasConfigInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -566,7 +611,7 @@ export class Collection<DataType = DefaultItem> {
         this,
         {
           [this.config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
-          dummy: "item",
+          dummy: 'item',
         } as any,
         {
           isPlaceholder: true,
@@ -590,9 +635,9 @@ export class Collection<DataType = DefaultItem> {
    */
   public getItemValue(
     itemKey: ItemKey | undefined,
-    config: GetItemConfigInterface = {}
+    config: HasConfigInterface = {}
   ): DataType | undefined {
-    let item = this.getItem(itemKey, config);
+    const item = this.getItem(itemKey, config);
     if (!item) return undefined;
     return item.value;
   }
@@ -683,7 +728,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroupCount(): number {
     let size = 0;
-    for (let group in this.groups) size++;
+    for (const group in this.groups) size++;
     return size;
   }
 
@@ -696,7 +741,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getSelectorCount(): number {
     let size = 0;
-    for (let selector in this.selectors) size++;
+    for (const selector in this.selectors) size++;
     return size;
   }
 
@@ -713,10 +758,10 @@ export class Collection<DataType = DefaultItem> {
     this.size = 0;
 
     // Reset Groups
-    for (let key in this.groups) this.getGroup(key)?.reset();
+    for (const key in this.groups) this.getGroup(key)?.reset();
 
     // Reset Selectors
-    for (let key in this.selectors) this.getSelector(key)?.reset();
+    for (const key in this.selectors) this.getSelector(key)?.reset();
   }
 
   //=========================================================================================================
@@ -765,12 +810,22 @@ export class Collection<DataType = DefaultItem> {
 
     if (!item || oldItemKey === newItemKey) return false;
 
+    // Check if Item with newItemKey already exists
+    if (this.hasItem(newItemKey)) {
+      Agile.logger.warn(
+        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`
+      );
+      return false;
+    }
+
     // Remove Item from old ItemKey and add Item to new ItemKey
     delete this.data[oldItemKey];
     this.data[newItemKey] = item;
 
     // Update Key/Name of Item
-    item.setKey(newItemKey);
+    item.setKey(newItemKey, {
+      background: config.background,
+    });
 
     // Update persist Key of Item (Doesn't get updated by updating key of Item because PersistKey is special formatted)
     item.persistent?.setKey(
@@ -778,14 +833,14 @@ export class Collection<DataType = DefaultItem> {
     );
 
     // Update ItemKey in Groups
-    for (let groupKey in this.groups) {
+    for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (!group || !group.has(oldItemKey)) continue;
-      group.replace(oldItemKey, newItemKey, { background: config?.background });
+      group.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
     // Update ItemKey in Selectors
-    for (let selectorKey in this.selectors) {
+    for (const selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
       if (!selector) continue;
 
@@ -793,7 +848,7 @@ export class Collection<DataType = DefaultItem> {
       if (selector.hasSelected(newItemKey)) {
         selector.select(newItemKey, {
           force: true, // Because ItemKeys are the same
-          background: config?.background,
+          background: config.background,
         });
       }
 
@@ -817,7 +872,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroupKeysThatHaveItemKey(itemKey: ItemKey): Array<GroupKey> {
     const groupKeys: Array<GroupKey> = [];
-    for (let groupKey in this.groups) {
+    for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (group?.has(itemKey)) groupKeys.push(groupKey);
     }
@@ -892,7 +947,7 @@ export class Collection<DataType = DefaultItem> {
       if (!item) return;
 
       // Remove Item from Groups
-      for (let groupKey in this.groups) {
+      for (const groupKey in this.groups) {
         const group = this.getGroup(groupKey, { notExisting: true });
         if (group?.has(itemKey)) group?.remove(itemKey);
       }
@@ -904,7 +959,7 @@ export class Collection<DataType = DefaultItem> {
       delete this.data[itemKey];
 
       // Reselect Item in Selectors (to create new dummyItem that holds reference)
-      for (let selectorKey in this.selectors) {
+      for (const selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
         if (selector?.hasSelected(itemKey))
           selector?.select(itemKey, { force: true });
@@ -938,7 +993,7 @@ export class Collection<DataType = DefaultItem> {
       return false;
     }
 
-    if (!_data.hasOwnProperty(primaryKey)) {
+    if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
       Agile.logger.error(
         `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`
       );
@@ -985,7 +1040,7 @@ export class Collection<DataType = DefaultItem> {
     });
 
     // Rebuild Groups that include ItemKey
-    for (let groupKey in this.groups) {
+    for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey);
       if (group?.has(itemKey)) {
         // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
@@ -1037,7 +1092,7 @@ export interface CollectionConfigInterface {
  */
 export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
-  method?: "push" | "unshift";
+  method?: 'push' | 'unshift';
   forEachItem?: (data: DataType, key: ItemKey, index: number) => void;
   background?: boolean;
   select?: boolean;
@@ -1071,23 +1126,9 @@ export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
 }
 
 /**
- * @param notExisting - If also official not existing Items like Placeholder get found
+ * @param notExisting - If placeholder can be found
  */
-export interface GetItemConfigInterface {
-  notExisting?: boolean;
-}
-
-/**
- * @param notExisting - If also official not existing Groups like Placeholder get found
- */
-export interface GetGroupConfigInterface {
-  notExisting?: boolean;
-}
-
-/**
- * @param notExisting - If also official not existing Selectors like Placeholder get found
- */
-export interface GetSelectorConfigInterface {
+export interface HasConfigInterface {
   notExisting?: boolean;
 }
 

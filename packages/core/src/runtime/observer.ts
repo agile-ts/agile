@@ -4,7 +4,7 @@ import {
   RuntimeJob,
   SubscriptionContainer,
   defineConfig,
-} from "../internal";
+} from '../internal';
 
 export type ObserverKey = string | number;
 

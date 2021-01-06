@@ -1,15 +1,14 @@
 import {
   Agile,
-  RuntimeJob,
   StateObserver,
   StateRuntimeJob,
   State,
   Integration,
-} from "../../../src";
+} from '../../../src';
 
 // jest.mock("../../../src/runtime/runtime.job"); // Can't mock RuntimeJob because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
-describe("RuntimeJob Tests", () => {
+describe('RuntimeJob Tests', () => {
   let dummyAgile: Agile;
   let dummyIntegration: Integration;
   let dummyState: State;
@@ -18,13 +17,13 @@ describe("RuntimeJob Tests", () => {
   beforeEach(() => {
     dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({
-      key: "myIntegration",
+      key: 'myIntegration',
     });
-    dummyState = new State(dummyAgile, "dummyValue");
+    dummyState = new State(dummyAgile, 'dummyValue');
     dummyObserver = new StateObserver(dummyState);
   });
 
-  it("should create RuntimeJob with Agile that has integrations (default config)", () => {
+  it('should create RuntimeJob with Agile that has integrations (default config)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new StateRuntimeJob(dummyObserver);
@@ -43,16 +42,16 @@ describe("RuntimeJob Tests", () => {
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create RuntimeJob with Agile that has integrations (specific config)", () => {
+  it('should create RuntimeJob with Agile that has integrations (specific config)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new StateRuntimeJob(dummyObserver, {
-      key: "dummyJob",
+      key: 'dummyJob',
       sideEffects: false,
       force: true,
     });
 
-    expect(job._key).toBe("dummyJob");
+    expect(job._key).toBe('dummyJob');
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
@@ -66,7 +65,7 @@ describe("RuntimeJob Tests", () => {
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create RuntimeJob with Agile that has no integrations (default config)", () => {
+  it('should create RuntimeJob with Agile that has no integrations (default config)', () => {
     const job = new StateRuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();
@@ -83,7 +82,7 @@ describe("RuntimeJob Tests", () => {
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it("should create RuntimeJob and Agile that has integrations (config.background = true)", () => {
+  it('should create RuntimeJob and Agile that has integrations (config.background = true)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new StateRuntimeJob(dummyObserver, { background: true });

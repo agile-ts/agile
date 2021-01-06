@@ -2,7 +2,7 @@ import {
   Observer,
   SubscriptionContainer,
   SubscriptionContainerKeyType,
-} from "../../../internal";
+} from '../../../internal';
 
 export class CallbackSubscriptionContainer extends SubscriptionContainer {
   public callback: Function;
