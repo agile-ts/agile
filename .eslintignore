@@ -4,3 +4,4 @@ node_modules
 jest.config.js
 jest.config.base.js
 scripts/
+examples/
