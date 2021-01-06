@@ -21,7 +21,6 @@
 
 <br />
 <img src="static/how_to_create_state_header.png" alt="How to create State Header">
-<br />
 
 ```tsx
 // -- core.js ------------------------------------------
@@ -50,7 +49,6 @@ Test AgileTs yourself in one click. Just select your preferred Framework below.
 
 <br />
 <img src="static/why_should_i_use_agile.png" alt="Why should I use AgileTs">
-<br />
 
 ### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. 
@@ -94,7 +92,6 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
 <br />
 <img src="static/installation_header.png" alt="Installation">
-<br />
 
 To use AgileTs in a UI-Framework we have to install 2 packages.
 
@@ -111,12 +108,19 @@ To use AgileTs in a UI-Framework we have to install 2 packages.
 <br />
 
 <br />
-<img src="static/documentation_header.png" alt="Installation">
-<br />
+<img src="static/documentation_header.png" alt="Documentation">
 
 If AgileTs sounds interesting to you and you want to find out more.
-Checkout our [docs](https://agile-ts.org/docs/). If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
+Checkout our [docs](https://agile-ts.org/docs/). 
+If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
+
+<br />
+
+<br />
+<img src="static/contribute_header.png" alt="Contribute">
+
+Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## 🗂 Packages of Agile
 | Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
@@ -125,10 +129,6 @@ Checkout our [docs](https://agile-ts.org/docs/). If you have any questions don't
 | [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                         |
 | [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based Api                         |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
-
-
-## 👨‍💻 Contribute
-Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 
 ## 🌠 Credits
