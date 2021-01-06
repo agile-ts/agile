@@ -41,7 +41,7 @@ describe('SubController Tests', () => {
         dummyObserver1.value = 'myCoolValue';
 
         subController.registerSubscription = jest.fn(
-          () => dummySubscriptionContainer,
+          () => dummySubscriptionContainer
         );
         jest.spyOn(dummyObserver1, 'subscribe');
         jest.spyOn(dummyObserver2, 'subscribe');
@@ -54,7 +54,7 @@ describe('SubController Tests', () => {
             dummyObserver1: dummyObserver1,
             dummyObserver2: dummyObserver2,
           },
-          'subscribeWithSubsObjectKey',
+          'subscribeWithSubsObjectKey'
         );
 
         expect(subscribeWithSubsResponse).toStrictEqual({
@@ -67,7 +67,7 @@ describe('SubController Tests', () => {
         expect(subController.registerSubscription).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'subscribeWithSubsObjectKey',
+          'subscribeWithSubsObjectKey'
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeTruthy();
@@ -78,17 +78,17 @@ describe('SubController Tests', () => {
 
         expect(dummySubscriptionContainer.subs.size).toBe(2);
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver1),
+          dummySubscriptionContainer.subs.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver2),
+          dummySubscriptionContainer.subs.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer,
+          dummySubscriptionContainer
         );
         expect(dummyObserver2.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer,
+          dummySubscriptionContainer
         );
       });
     });
@@ -101,7 +101,7 @@ describe('SubController Tests', () => {
         dummySubscriptionContainer = new SubscriptionContainer();
 
         subController.registerSubscription = jest.fn(
-          () => dummySubscriptionContainer,
+          () => dummySubscriptionContainer
         );
         jest.spyOn(dummyObserver1, 'subscribe');
         jest.spyOn(dummyObserver2, 'subscribe');
@@ -111,7 +111,7 @@ describe('SubController Tests', () => {
         const subscribeWithSubsArrayResponse = subController.subscribeWithSubsArray(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'subscribeWithSubsArrayKey',
+          'subscribeWithSubsArrayKey'
         );
 
         expect(subscribeWithSubsArrayResponse).toBe(dummySubscriptionContainer);
@@ -119,7 +119,7 @@ describe('SubController Tests', () => {
         expect(subController.registerSubscription).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'subscribeWithSubsArrayKey',
+          'subscribeWithSubsArrayKey'
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeFalsy();
@@ -127,17 +127,17 @@ describe('SubController Tests', () => {
 
         expect(dummySubscriptionContainer.subs.size).toBe(2);
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver1),
+          dummySubscriptionContainer.subs.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver2),
+          dummySubscriptionContainer.subs.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer,
+          dummySubscriptionContainer
         );
         expect(dummyObserver2.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer,
+          dummySubscriptionContainer
         );
       });
     });
@@ -155,7 +155,7 @@ describe('SubController Tests', () => {
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         subController.unsubscribe(callbackSubscriptionContainer);
@@ -163,10 +163,10 @@ describe('SubController Tests', () => {
         expect(subController.callbackSubs.size).toBe(0);
         expect(callbackSubscriptionContainer.ready).toBeFalsy();
         expect(dummyObserver1.unsubscribe).toHaveBeenCalledWith(
-          callbackSubscriptionContainer,
+          callbackSubscriptionContainer
         );
         expect(dummyObserver2.unsubscribe).toHaveBeenCalledWith(
-          callbackSubscriptionContainer,
+          callbackSubscriptionContainer
         );
       });
 
@@ -177,7 +177,7 @@ describe('SubController Tests', () => {
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         subController.unsubscribe(componentSubscriptionContainer);
@@ -185,10 +185,10 @@ describe('SubController Tests', () => {
         expect(subController.componentSubs.size).toBe(0);
         expect(componentSubscriptionContainer.ready).toBeFalsy();
         expect(dummyObserver1.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer,
+          componentSubscriptionContainer
         );
         expect(dummyObserver2.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer,
+          componentSubscriptionContainer
         );
       });
 
@@ -199,7 +199,7 @@ describe('SubController Tests', () => {
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         subController.unsubscribe(dummyIntegration);
@@ -207,10 +207,10 @@ describe('SubController Tests', () => {
         expect(subController.componentSubs.size).toBe(0);
         expect(componentSubscriptionContainer.ready).toBeFalsy();
         expect(dummyObserver1.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer,
+          componentSubscriptionContainer
         );
         expect(dummyObserver2.unsubscribe).toHaveBeenCalledWith(
-          componentSubscriptionContainer,
+          componentSubscriptionContainer
         );
       });
     });
@@ -222,10 +222,10 @@ describe('SubController Tests', () => {
         dummySubscriptionContainer = new SubscriptionContainer();
 
         subController.registerCallbackSubscription = jest.fn(
-          () => dummySubscriptionContainer as CallbackSubscriptionContainer,
+          () => dummySubscriptionContainer as CallbackSubscriptionContainer
         );
         subController.registerComponentSubscription = jest.fn(
-          () => dummySubscriptionContainer as ComponentSubscriptionContainer,
+          () => dummySubscriptionContainer as ComponentSubscriptionContainer
         );
       });
 
@@ -237,17 +237,17 @@ describe('SubController Tests', () => {
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey',
+          'niceKey'
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
         expect(subController.registerCallbackSubscription).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey',
+          'niceKey'
         );
         expect(
-          subController.registerComponentSubscription,
+          subController.registerComponentSubscription
         ).not.toHaveBeenCalled();
       });
 
@@ -257,19 +257,19 @@ describe('SubController Tests', () => {
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey',
+          'niceKey'
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
         expect(
-          subController.registerComponentSubscription,
+          subController.registerComponentSubscription
         ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey',
+          'niceKey'
         );
         expect(
-          subController.registerCallbackSubscription,
+          subController.registerCallbackSubscription
         ).not.toHaveBeenCalled();
       });
     });
@@ -281,33 +281,33 @@ describe('SubController Tests', () => {
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
-          ComponentSubscriptionContainer,
+          ComponentSubscriptionContainer
         );
         expect(componentSubscriptionContainer.key).toBe('myKey');
         expect(componentSubscriptionContainer.component).toStrictEqual(
-          dummyIntegration,
+          dummyIntegration
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
 
         expect(componentSubscriptionContainer.subs.size).toBe(2);
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver1),
+          componentSubscriptionContainer.subs.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver2),
+          componentSubscriptionContainer.subs.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(subController.componentSubs.size).toBe(1);
         expect(
-          subController.componentSubs.has(componentSubscriptionContainer),
+          subController.componentSubs.has(componentSubscriptionContainer)
         ).toBeTruthy();
 
         expect(dummyIntegration.componentSubscriptionContainer).toBe(
-          componentSubscriptionContainer,
+          componentSubscriptionContainer
         );
       });
 
@@ -320,11 +320,11 @@ describe('SubController Tests', () => {
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
-          ComponentSubscriptionContainer,
+          ComponentSubscriptionContainer
         );
         expect(componentSubscriptionContainer.ready).toBeFalsy();
       });
@@ -339,11 +339,11 @@ describe('SubController Tests', () => {
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
-          ComponentSubscriptionContainer,
+          ComponentSubscriptionContainer
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
       });
@@ -358,11 +358,11 @@ describe('SubController Tests', () => {
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
 
         expect(callbackSubscriptionContainer).toBeInstanceOf(
-          CallbackSubscriptionContainer,
+          CallbackSubscriptionContainer
         );
         expect(callbackSubscriptionContainer.key).toBe('myKey');
         expect(callbackSubscriptionContainer.callback).toBe(dummyIntegration);
@@ -370,15 +370,15 @@ describe('SubController Tests', () => {
 
         expect(callbackSubscriptionContainer.subs.size).toBe(2);
         expect(
-          callbackSubscriptionContainer.subs.has(dummyObserver1),
+          callbackSubscriptionContainer.subs.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          callbackSubscriptionContainer.subs.has(dummyObserver2),
+          callbackSubscriptionContainer.subs.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(subController.callbackSubs.size).toBe(1);
         expect(
-          subController.callbackSubs.has(callbackSubscriptionContainer),
+          subController.callbackSubs.has(callbackSubscriptionContainer)
         ).toBeTruthy();
       });
     });
@@ -394,7 +394,7 @@ describe('SubController Tests', () => {
         componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
       });
 
@@ -404,7 +404,7 @@ describe('SubController Tests', () => {
         expect(componentSubscriptionContainer.ready).toBeTruthy();
         expect(subController.mountedComponents.size).toBe(1);
         expect(
-          subController.mountedComponents.has(dummyIntegration),
+          subController.mountedComponents.has(dummyIntegration)
         ).toBeTruthy();
       });
     });
@@ -420,7 +420,7 @@ describe('SubController Tests', () => {
         componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'myKey',
+          'myKey'
         );
         subController.mount(dummyIntegration);
       });

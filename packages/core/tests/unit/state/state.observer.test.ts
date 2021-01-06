@@ -76,7 +76,7 @@ describe('StateObserver Tests', () => {
           },
           {
             key: 'dummyComputed',
-          },
+          }
         );
         computedObserver = new StateObserver(dummyComputed, {
           key: 'computedObserverKey',
@@ -123,7 +123,7 @@ describe('StateObserver Tests', () => {
 
         expect(computedObserver.ingestValue).toHaveBeenCalledWith(
           'computedValue',
-          {},
+          {}
         );
         expect(dummyComputed.computeValue).toHaveBeenCalled();
       });
@@ -154,7 +154,7 @@ describe('StateObserver Tests', () => {
           expect.any(StateRuntimeJob),
           {
             perform: true,
-          },
+          }
         );
       });
 
@@ -184,7 +184,7 @@ describe('StateObserver Tests', () => {
           expect.any(StateRuntimeJob),
           {
             perform: false,
-          },
+          }
         );
       });
 
@@ -218,7 +218,7 @@ describe('StateObserver Tests', () => {
           expect.any(StateRuntimeJob),
           {
             perform: true,
-          },
+          }
         );
       });
 
@@ -243,7 +243,7 @@ describe('StateObserver Tests', () => {
           expect.any(StateRuntimeJob),
           {
             perform: true,
-          },
+          }
         );
       });
 
@@ -253,13 +253,13 @@ describe('StateObserver Tests', () => {
         stateObserver.ingestValue('updatedDummyValue');
 
         expect(stateObserver.nextStateValue).toBe(
-          "cool value 'updatedDummyValue'",
+          "cool value 'updatedDummyValue'"
         );
         expect(dummyAgile.runtime.ingest).toHaveBeenCalledWith(
           expect.any(StateRuntimeJob),
           {
             perform: true,
-          },
+          }
         );
       });
     });
@@ -351,10 +351,10 @@ describe('StateObserver Tests', () => {
         stateObserver.sideEffects(dummyJob);
 
         expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-          'dummyValue',
+          'dummyValue'
         );
         expect(dummyState.sideEffects['dummySideEffect']).toHaveBeenCalledWith(
-          dummyJob.config,
+          dummyJob.config
         );
         expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
           perform: false,
@@ -367,10 +367,10 @@ describe('StateObserver Tests', () => {
         stateObserver.sideEffects(dummyJob);
 
         expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-          'dummyValue',
+          'dummyValue'
         );
         expect(
-          dummyState.sideEffects['dummySideEffect'],
+          dummyState.sideEffects['dummySideEffect']
         ).not.toHaveBeenCalled();
         expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
           perform: false,

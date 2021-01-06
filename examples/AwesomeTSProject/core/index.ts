@@ -1,5 +1,5 @@
-import {Agile} from '@agile-ts/core';
-import {Alert} from 'react-native';
+import { Agile } from '@agile-ts/core';
+import { Alert } from 'react-native';
 
 export const App = new Agile({
   logJobs: true,
@@ -31,16 +31,16 @@ export const MY_COLLECTION = App.Collection<collectionValueInterface>(
     selectors: {
       mySelector: collection.Selector('id3'),
     },
-  }),
+  })
 ).persist();
-MY_COLLECTION.collect({id: 'id1', name: 'test'});
-MY_COLLECTION.collect({id: 'id2', name: 'test2'}, 'myGroup');
-MY_COLLECTION.update('id1', {id: 'id1Updated', name: 'testUpdated'});
-MY_COLLECTION.getGroup('myGroup')?.persist({followCollectionPattern: true});
+MY_COLLECTION.collect({ id: 'id1', name: 'test' });
+MY_COLLECTION.collect({ id: 'id2', name: 'test2' }, 'myGroup');
+MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
+MY_COLLECTION.getGroup('myGroup')?.persist({ followCollectionPattern: true });
 
 console.log('Initial: myCollection ', MY_COLLECTION);
 
-export const MY_EVENT = App.Event<{name: string}>();
+export const MY_EVENT = App.Event<{ name: string }>();
 
 MY_EVENT.on('Test', (payload) => {
   Alert.alert(
@@ -52,8 +52,8 @@ MY_EVENT.on('Test', (payload) => {
         onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
-      {text: 'OK', onPress: () => console.log('OK Pressed')},
+      { text: 'OK', onPress: () => console.log('OK Pressed') },
     ],
-    {cancelable: false},
+    { cancelable: false }
   );
 });

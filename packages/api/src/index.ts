@@ -111,7 +111,7 @@ export default class API {
     method: string,
     endpoint: string,
     payload?: any,
-    options: RequestInit = {},
+    options: RequestInit = {}
   ): Promise<AgileResponse> {
     let fullUrl: string;
     let response: Response | undefined;

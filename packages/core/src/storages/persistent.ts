@@ -23,7 +23,7 @@ export class Persistent {
    */
   constructor(
     agileInstance: Agile,
-    config: CreatePersistentConfigInterface = {},
+    config: CreatePersistentConfigInterface = {}
   ) {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
@@ -96,7 +96,7 @@ export class Persistent {
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
       Agile.logger.error(
-        'No valid persist Key found! Please provide a Key or assign one to the parent instance.',
+        'No valid persist Key found! Please provide a Key or assign one to the parent instance.'
       );
       isValid = false;
     }
@@ -104,7 +104,7 @@ export class Persistent {
     // Validate StorageKeys
     if (!this.defaultStorageKey || this.storageKeys.length <= 0) {
       Agile.logger.error(
-        'No persist Storage Key found! Please provide at least one Storage Key.',
+        'No persist Storage Key found! Please provide at least one Storage Key.'
       );
       isValid = false;
     }
@@ -162,7 +162,7 @@ export class Persistent {
    */
   public async loadPersistedValue(): Promise<boolean> {
     Agile.logger.error(
-      `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`,
+      `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
@@ -177,7 +177,7 @@ export class Persistent {
    */
   public async persistValue(): Promise<boolean> {
     Agile.logger.error(
-      `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`,
+      `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }
@@ -192,7 +192,7 @@ export class Persistent {
    */
   public async removePersistedValue(): Promise<boolean> {
     Agile.logger.error(
-      `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`,
+      `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
     );
     return false;
   }

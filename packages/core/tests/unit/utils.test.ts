@@ -124,7 +124,7 @@ describe('Utils Tests', () => {
     it('should return true if passed instance is valid Object', () => {
       expect(isValidObject({ hello: 'jeff' })).toBe(true);
       expect(isValidObject({ hello: 'jeff', deep: { hello: 'franz' } })).toBe(
-        true,
+        true
       );
     });
   });
@@ -168,7 +168,7 @@ describe('Utils Tests', () => {
 
     it('should normalize undefined (config.createUndefinedArray = true)', () => {
       expect(
-        normalizeArray(undefined, { createUndefinedArray: true }),
+        normalizeArray(undefined, { createUndefinedArray: true })
       ).toStrictEqual([undefined]);
     });
   });
@@ -215,7 +215,7 @@ describe('Utils Tests', () => {
       expect(response).toBeUndefined();
       expect(console.error).toHaveBeenCalledWith(
         'Agile Error: Failed to get Agile Instance from ',
-        'weiredInstance',
+        'weiredInstance'
       );
     });
   });
@@ -225,7 +225,7 @@ describe('Utils Tests', () => {
       expect(
         isFunction(() => {
           /* empty function */
-        }),
+        })
       ).toBe(true);
     });
 
@@ -242,12 +242,12 @@ describe('Utils Tests', () => {
       expect(
         isAsyncFunction(async () => {
           /* empty function */
-        }),
+        })
       ).toBe(true);
       expect(
         isAsyncFunction(async function () {
           /* empty function */
-        }),
+        })
       ).toBe(true);
     });
 
@@ -259,12 +259,12 @@ describe('Utils Tests', () => {
       expect(
         isAsyncFunction(() => {
           /* empty function */
-        }),
+        })
       ).toBe(false);
       expect(
         isAsyncFunction(function () {
           /* empty function */
-        }),
+        })
       ).toBe(false);
     });
   });
@@ -292,14 +292,14 @@ describe('Utils Tests', () => {
   describe('isJsonString function tests', () => {
     it('should return true if passed instance is valid Json String', () => {
       expect(isJsonString('{"name":"John", "age":31, "city":"New York"}')).toBe(
-        true,
+        true
       );
     });
 
     it('should return false if passed instance is invalid Json String', () => {
       expect(isJsonString('frank')).toBe(false);
       expect(isJsonString('{name":"John", "age":31, "city":"New York"}')).toBe(
-        false,
+        false
       );
       expect(isJsonString(10)).toBe(false);
       expect(isJsonString({ name: 'John', age: 31 })).toBe(false);
@@ -320,7 +320,7 @@ describe('Utils Tests', () => {
           isHuman: true,
           isRobot: false,
           name: 'jeff',
-        }),
+        })
       ).toStrictEqual({
         allowLogging: true,
         loops: 10,
@@ -346,8 +346,8 @@ describe('Utils Tests', () => {
             isRobot: false,
             name: 'jeff',
           },
-          false,
-        ),
+          false
+        )
       ).toStrictEqual({
         allowLogging: true,
         loops: 10,
@@ -369,7 +369,7 @@ describe('Utils Tests', () => {
         flatMerge(source, {
           name: 'hans',
           size: 177,
-        }),
+        })
       ).toStrictEqual({
         id: 123,
         name: 'hans',
@@ -388,7 +388,7 @@ describe('Utils Tests', () => {
           name: 'hans',
           size: 177,
           location: 'behind you',
-        }),
+        })
       ).toStrictEqual({
         id: 123,
         name: 'hans',
@@ -410,8 +410,8 @@ describe('Utils Tests', () => {
             size: 177,
             location: 'behind you',
           },
-          { addNewProperties: true },
-        ),
+          { addNewProperties: true }
+        )
       ).toStrictEqual({
         id: 123,
         name: 'hans',
@@ -433,7 +433,7 @@ describe('Utils Tests', () => {
       expect(
         flatMerge(source, {
           place: 'JeffsNewHome',
-        }),
+        })
       ).toStrictEqual({
         id: 123,
         name: 'jeff',
@@ -448,7 +448,7 @@ describe('Utils Tests', () => {
   describe('equal function tests', () => {
     it('should return true if value1 and value2 are equal', () => {
       expect(equal({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' })).toBe(
-        true,
+        true
       );
       expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
       expect(equal(12, 12)).toBe(true);
@@ -457,7 +457,7 @@ describe('Utils Tests', () => {
 
     it("should return false if value1 and value2 aren't equal", () => {
       expect(equal({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' })).toBe(
-        false,
+        false
       );
       expect(equal([1, 2], [3, 5])).toBe(false);
       expect(equal(12, 13)).toBe(false);
@@ -468,7 +468,7 @@ describe('Utils Tests', () => {
   describe('notEqual function tests', () => {
     it('should return false if value1 and value2 are equal', () => {
       expect(
-        notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' }),
+        notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' })
       ).toBe(false);
       expect(notEqual([1, 2, 3], [1, 2, 3])).toBe(false);
       expect(notEqual(12, 12)).toBe(false);
@@ -477,7 +477,7 @@ describe('Utils Tests', () => {
 
     it("should return true if value1 and value2 aren't equal", () => {
       expect(
-        notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' }),
+        notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' })
       ).toBe(true);
       expect(notEqual([1, 2], [3, 5])).toBe(true);
       expect(notEqual(12, 13)).toBe(true);
@@ -504,7 +504,7 @@ describe('Utils Tests', () => {
         constructor(
           public id: number,
           public name: string,
-          public location: { country: string; state: string },
+          public location: { country: string; state: string }
         ) {}
       }
       const dummyClass = new DummyClass(10, 'jeff', {
@@ -582,7 +582,7 @@ describe('Utils Tests', () => {
       globalBind(dummyKey, 'dummyInstance');
 
       expect(console.error).toHaveBeenCalledWith(
-        `Agile Error: Failed to create global Instance called '${dummyKey}'`,
+        `Agile Error: Failed to create global Instance called '${dummyKey}'`
       );
     });
   });

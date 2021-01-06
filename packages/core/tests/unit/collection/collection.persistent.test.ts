@@ -134,7 +134,7 @@ describe('CollectionPersistent Tests', () => {
             remove: jest.fn(),
             set: jest.fn(),
           },
-        }),
+        })
       );
       dummyItem1 = new Item<ItemInterface>(dummyCollection, {
         id: '1',
@@ -179,10 +179,10 @@ describe('CollectionPersistent Tests', () => {
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
         expect(collectionPersistent.persistValue).toHaveBeenCalledWith(
-          'newKey',
+          'newKey'
         );
         expect(collectionPersistent.removePersistedValue).toHaveBeenCalledWith(
-          'dummyKey',
+          'dummyKey'
         );
       });
 
@@ -193,14 +193,14 @@ describe('CollectionPersistent Tests', () => {
         await collectionPersistent.setKey();
 
         expect(collectionPersistent._key).toBe(
-          CollectionPersistent.placeHolderKey,
+          CollectionPersistent.placeHolderKey
         );
         expect(collectionPersistent.ready).toBeFalsy();
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
         expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
         expect(collectionPersistent.removePersistedValue).toHaveBeenCalledWith(
-          'dummyKey',
+          'dummyKey'
         );
       });
 
@@ -215,7 +215,7 @@ describe('CollectionPersistent Tests', () => {
         expect(collectionPersistent.initialLoading).toHaveBeenCalled();
         expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
         expect(
-          collectionPersistent.removePersistedValue,
+          collectionPersistent.removePersistedValue
         ).not.toHaveBeenCalled();
       });
 
@@ -225,14 +225,14 @@ describe('CollectionPersistent Tests', () => {
         await collectionPersistent.setKey();
 
         expect(collectionPersistent._key).toBe(
-          CollectionPersistent.placeHolderKey,
+          CollectionPersistent.placeHolderKey
         );
         expect(collectionPersistent.ready).toBeFalsy();
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
         expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
         expect(
-          collectionPersistent.removePersistedValue,
+          collectionPersistent.removePersistedValue
         ).not.toHaveBeenCalled();
       });
     });
@@ -283,33 +283,33 @@ describe('CollectionPersistent Tests', () => {
         expect(response).toBeTruthy();
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '1',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '2',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '3',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
@@ -330,7 +330,7 @@ describe('CollectionPersistent Tests', () => {
         });
 
         expect(collectionPersistent.persistValue).toHaveBeenCalledWith(
-          collectionPersistent._key,
+          collectionPersistent._key
         );
       });
 
@@ -349,33 +349,33 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '1',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '2',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '3',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.initialLoading,
+          dummyDefaultGroup.persistent.initialLoading
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeFalsy();
 
@@ -395,30 +395,30 @@ describe('CollectionPersistent Tests', () => {
         dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.loadPersistedValue(
-          'dummyKey',
+          'dummyKey'
         );
 
         expect(response).toBeTruthy();
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           'dummyKey',
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('1', 'dummyKey'),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('2', 'dummyKey'),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('3', 'dummyKey'),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
@@ -439,14 +439,14 @@ describe('CollectionPersistent Tests', () => {
         });
 
         expect(collectionPersistent.persistValue).toHaveBeenCalledWith(
-          'dummyKey',
+          'dummyKey'
         );
       });
 
       it("shouldn't load default Group and its Items if Persistent isn't ready", async () => {
         collectionPersistent.ready = false;
         dummyAgile.storages.get = jest.fn(() =>
-          Promise.resolve(undefined as any),
+          Promise.resolve(undefined as any)
         );
         dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
@@ -460,7 +460,7 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.initialLoading,
+          dummyDefaultGroup.persistent.initialLoading
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeFalsy();
 
@@ -482,38 +482,38 @@ describe('CollectionPersistent Tests', () => {
         expect(response).toBeFalsy();
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '1',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '2',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '3',
-            collectionPersistent._key,
+            collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey,
+          collectionPersistent.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.initialLoading,
+          dummyDefaultGroup.persistent.initialLoading
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeFalsy();
 
@@ -558,31 +558,31 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyAgile.storages.set).toHaveBeenCalledWith(
           collectionPersistent._key,
           true,
-          collectionPersistent.storageKeys,
+          collectionPersistent.storageKeys
         );
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
           followCollectionPersistKeyPattern: true,
         });
         expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
-          expect.any(Function),
+          expect.any(Function)
         );
 
         expect(dummyItem1.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             dummyItem1._key,
-            collectionPersistent._key,
-          ),
+            collectionPersistent._key
+          )
         );
         expect(dummyItem3.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             dummyItem3._key,
-            collectionPersistent._key,
-          ),
+            collectionPersistent._key
+          )
         );
 
         expect(collectionPersistent.isPersisted).toBeTruthy();
@@ -599,25 +599,25 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyAgile.storages.set).toHaveBeenCalledWith(
           'dummyKey',
           true,
-          collectionPersistent.storageKeys,
+          collectionPersistent.storageKeys
         );
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
           followCollectionPersistKeyPattern: true,
         });
         expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
-          expect.any(Function),
+          expect.any(Function)
         );
 
         expect(dummyItem1.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(dummyItem1._key, 'dummyKey'),
+          CollectionPersistent.getItemStorageKey(dummyItem1._key, 'dummyKey')
         );
         expect(dummyItem3.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(dummyItem3._key, 'dummyKey'),
+          CollectionPersistent.getItemStorageKey(dummyItem3._key, 'dummyKey')
         );
 
         expect(collectionPersistent.isPersisted).toBeTruthy();
@@ -654,7 +654,7 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyAgile.storages.set).not.toHaveBeenCalled();
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.addSideEffect).not.toHaveBeenCalled();
@@ -681,7 +681,7 @@ describe('CollectionPersistent Tests', () => {
           ]();
 
           expect(
-            collectionPersistent.rebuildStorageSideEffect,
+            collectionPersistent.rebuildStorageSideEffect
           ).toHaveBeenCalledWith(dummyDefaultGroup, collectionPersistent._key);
         });
 
@@ -696,7 +696,7 @@ describe('CollectionPersistent Tests', () => {
           ]();
 
           expect(
-            collectionPersistent.rebuildStorageSideEffect,
+            collectionPersistent.rebuildStorageSideEffect
           ).toHaveBeenCalledWith(dummyDefaultGroup, 'dummyKey');
         });
       });
@@ -735,17 +735,17 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.storageKeys,
+          collectionPersistent.storageKeys
         );
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue,
+          dummyDefaultGroup.persistent.removePersistedValue
         ).toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
-          CollectionPersistent.defaultGroupSideEffectKey,
+          CollectionPersistent.defaultGroupSideEffectKey
         );
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
@@ -759,24 +759,24 @@ describe('CollectionPersistent Tests', () => {
         dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.removePersistedValue(
-          'dummyKey',
+          'dummyKey'
         );
 
         expect(response).toBeTruthy();
 
         expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
           'dummyKey',
-          collectionPersistent.storageKeys,
+          collectionPersistent.storageKeys
         );
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue,
+          dummyDefaultGroup.persistent.removePersistedValue
         ).toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
-          CollectionPersistent.defaultGroupSideEffectKey,
+          CollectionPersistent.defaultGroupSideEffectKey
         );
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
@@ -797,15 +797,15 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyCollection.getGroup).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue,
+          dummyDefaultGroup.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue,
+          dummyItem1.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue,
+          dummyItem3.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(collectionPersistent.isPersisted).toBeUndefined();
@@ -822,18 +822,18 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
 
         expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey,
+          dummyCollection.config.defaultGroupKey
         );
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue,
+          dummyDefaultGroup.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue,
+          dummyItem1.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue,
+          dummyItem3.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(collectionPersistent.isPersisted).toBeUndefined();
@@ -914,13 +914,13 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue,
+          dummyItem1.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue,
+          dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue,
+          dummyItem3.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
@@ -940,19 +940,13 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            '1',
-            collectionPersistent._key,
-          ),
+          CollectionPersistent.getItemStorageKey('1', collectionPersistent._key)
         );
         expect(
-          dummyItem2.persistent.removePersistedValue,
+          dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            '3',
-            collectionPersistent._key,
-          ),
+          CollectionPersistent.getItemStorageKey('3', collectionPersistent._key)
         );
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
@@ -972,27 +966,21 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue,
+          dummyItem1.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue,
+          dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue,
+          dummyItem3.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
         expect(dummyItem2.persistent.persistValue).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            '2',
-            collectionPersistent._key,
-          ),
+          CollectionPersistent.getItemStorageKey('2', collectionPersistent._key)
         );
         expect(dummyItem3.persistent.persistValue).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            '3',
-            collectionPersistent._key,
-          ),
+          CollectionPersistent.getItemStorageKey('3', collectionPersistent._key)
         );
       });
 
@@ -1006,20 +994,17 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
         expect(dummyItem4WithoutPersistent.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            '4',
-            collectionPersistent._key,
-          ),
+          CollectionPersistent.getItemStorageKey('4', collectionPersistent._key)
         );
 
         expect(
-          dummyItem1.persistent.removePersistedValue,
+          dummyItem1.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue,
+          dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue,
+          dummyItem3.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
@@ -1036,7 +1021,7 @@ describe('CollectionPersistent Tests', () => {
       it('should build ItemStorageKey out of itemKey and collectionKey', () => {
         const response = CollectionPersistent.getItemStorageKey(
           'itemKey',
-          'collectionKey',
+          'collectionKey'
         );
 
         expect(response).toBe('_collectionKey_item_itemKey');
@@ -1046,36 +1031,36 @@ describe('CollectionPersistent Tests', () => {
       it('should build ItemStorageKey out of collectionKey with warning', () => {
         const response = CollectionPersistent.getItemStorageKey(
           undefined,
-          'collectionKey',
+          'collectionKey'
         );
 
         expect(response).toBe('_collectionKey_item_unknown');
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Item StorageKey!',
+          'Agile Warn: Failed to build unique Item StorageKey!'
         );
       });
 
       it('should build ItemStorageKey out of itemKey with warning', () => {
         const response = CollectionPersistent.getItemStorageKey(
           'itemKey',
-          undefined,
+          undefined
         );
 
         expect(response).toBe('_unknown_item_itemKey');
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Item StorageKey!',
+          'Agile Warn: Failed to build unique Item StorageKey!'
         );
       });
 
       it('should build ItemStorageKey out of nothing with warning', () => {
         const response = CollectionPersistent.getItemStorageKey(
           undefined,
-          undefined,
+          undefined
         );
 
         expect(response).toBe('_unknown_item_unknown');
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Item StorageKey!',
+          'Agile Warn: Failed to build unique Item StorageKey!'
         );
       });
     });
@@ -1088,7 +1073,7 @@ describe('CollectionPersistent Tests', () => {
       it('should build GroupStorageKey out of groupKey and collectionKey', () => {
         const response = CollectionPersistent.getGroupStorageKey(
           'groupKey',
-          'collectionKey',
+          'collectionKey'
         );
 
         expect(response).toBe('_collectionKey_group_groupKey');
@@ -1098,36 +1083,36 @@ describe('CollectionPersistent Tests', () => {
       it('should build GroupStorageKey out of collectionKey with warning', () => {
         const response = CollectionPersistent.getGroupStorageKey(
           undefined,
-          'collectionKey',
+          'collectionKey'
         );
 
         expect(response).toBe('_collectionKey_group_unknown');
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Group StorageKey!',
+          'Agile Warn: Failed to build unique Group StorageKey!'
         );
       });
 
       it('should build GroupStorageKey out of groupKey with warning', () => {
         const response = CollectionPersistent.getGroupStorageKey(
           'groupKey',
-          undefined,
+          undefined
         );
 
         expect(response).toBe('_unknown_group_groupKey');
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Group StorageKey!',
+          'Agile Warn: Failed to build unique Group StorageKey!'
         );
       });
 
       it('should build GroupStorageKey out of nothing with warning', () => {
         const response = CollectionPersistent.getGroupStorageKey(
           undefined,
-          undefined,
+          undefined
         );
 
         expect(response).toBe('_unknown_group_unknown');
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Group StorageKey!',
+          'Agile Warn: Failed to build unique Group StorageKey!'
         );
       });
     });

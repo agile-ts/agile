@@ -177,7 +177,7 @@ describe('Computed Tests', () => {
         computed.updateComputeFunction(
           newComputeFunction,
           [dummyState, dummyObserver],
-          { overwriteDeps: false },
+          { overwriteDeps: false }
         );
 
         expect(computed.hardCodedDeps).toStrictEqual([
@@ -272,7 +272,7 @@ describe('Computed Tests', () => {
         computed.patch();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use patch method on ComputedState!",
+          "Agile Error: You can't use patch method on ComputedState!"
         );
       });
     });
@@ -282,7 +282,7 @@ describe('Computed Tests', () => {
         computed.persist();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use persist method on ComputedState!",
+          "Agile Error: You can't use persist method on ComputedState!"
         );
       });
     });
@@ -292,7 +292,7 @@ describe('Computed Tests', () => {
         computed.invert();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use invert method on ComputedState!",
+          "Agile Error: You can't use invert method on ComputedState!"
         );
       });
     });

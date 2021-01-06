@@ -14,7 +14,7 @@ describe('SubscriptionContainer Tests', () => {
   it('should create SubscriptionContainer', () => {
     const subscriptionContainer = new SubscriptionContainer(
       [dummyObserver1, dummyObserver2],
-      'dummyKey',
+      'dummyKey'
     );
 
     expect(subscriptionContainer.key).toBe('dummyKey');

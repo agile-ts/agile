@@ -164,7 +164,7 @@ export class Logger {
     this.invokeConsole(
       data,
       'debug',
-      typeof console.debug !== 'undefined' ? 'debug' : 'log',
+      typeof console.debug !== 'undefined' ? 'debug' : 'log'
     );
   }
 
@@ -172,7 +172,7 @@ export class Logger {
     this.invokeConsole(
       data,
       'info',
-      typeof console.info !== 'undefined' ? 'info' : 'log',
+      typeof console.info !== 'undefined' ? 'info' : 'log'
     );
   }
 
@@ -180,7 +180,7 @@ export class Logger {
     this.invokeConsole(
       data,
       'warn',
-      typeof console.warn !== 'undefined' ? 'warn' : 'log',
+      typeof console.warn !== 'undefined' ? 'warn' : 'log'
     );
   }
 
@@ -188,7 +188,7 @@ export class Logger {
     this.invokeConsole(
       data,
       'error',
-      typeof console.error !== 'undefined' ? 'error' : 'log',
+      typeof console.error !== 'undefined' ? 'error' : 'log'
     );
   }
 
@@ -196,7 +196,7 @@ export class Logger {
     this.invokeConsole(
       data,
       'trace',
-      typeof console.trace !== 'undefined' ? 'trace' : 'log',
+      typeof console.trace !== 'undefined' ? 'trace' : 'log'
     );
   }
 
@@ -204,7 +204,7 @@ export class Logger {
     this.invokeConsole(
       data,
       'table',
-      typeof console.table !== 'undefined' ? 'table' : 'log',
+      typeof console.table !== 'undefined' ? 'table' : 'log'
     );
   }
 
@@ -225,7 +225,7 @@ export class Logger {
   private invokeConsole(
     data: any[],
     loggerCategoryKey: LoggerCategoryKey,
-    consoleLogType: ConsoleLogType,
+    consoleLogType: ConsoleLogType
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
 
@@ -332,7 +332,7 @@ export class Logger {
   public watch(key: string, config: LoggerWatcherConfigInterface): this;
   public watch(
     keyOrConfig: string | LoggerWatcherConfigInterface,
-    config?: LoggerWatcherConfigInterface,
+    config?: LoggerWatcherConfigInterface
   ): this | string {
     const generateKey = isValidObject(keyOrConfig);
     let _config: LoggerWatcherConfigInterface;
@@ -353,7 +353,7 @@ export class Logger {
     // Check if Callback is a Function
     if (!isFunction(_config.callback)) {
       console.error(
-        'Agile: A Watcher Callback Function has to be an function!',
+        'Agile: A Watcher Callback Function has to be an function!'
       );
       return this;
     }
@@ -361,7 +361,7 @@ export class Logger {
     // Check if Callback Function already exists
     if (this.watchers[key]) {
       console.error(
-        `Agile: Watcher Callback Function with the key/name ${key} already exists!`,
+        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
       );
       return this;
     }
@@ -455,7 +455,7 @@ export type ConsoleLogType =
 
 export type LoggerWatcherCallback = (
   loggerCategory: LoggerCategoryInterface,
-  data: any[],
+  data: any[]
 ) => void;
 
 /**

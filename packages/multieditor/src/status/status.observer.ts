@@ -25,7 +25,7 @@ export class StatusObserver extends Observer {
   constructor(
     agileInstance: Agile,
     status: Status,
-    config: StatusObserverConfigInterface = {},
+    config: StatusObserverConfigInterface = {}
   ) {
     super(agileInstance, {
       key: config.key,

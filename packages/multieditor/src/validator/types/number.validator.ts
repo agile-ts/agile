@@ -25,11 +25,11 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} is no valid Number!`,
+            errorMessage || `${key} is no valid Number!`
           );
         }
         return isValid;
-      },
+      }
     );
   }
 
@@ -52,11 +52,11 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} has to be smaller than ${number}`,
+            errorMessage || `${key} has to be smaller than ${number}`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -80,11 +80,11 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} has to be larger than ${number}`,
+            errorMessage || `${key} has to be larger than ${number}`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -107,11 +107,11 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} has to be positive`,
+            errorMessage || `${key} has to be positive`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -134,11 +134,11 @@ export class NumberValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} has to be negative`,
+            errorMessage || `${key} has to be negative`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }

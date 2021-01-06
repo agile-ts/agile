@@ -99,7 +99,7 @@ describe('Integrations Tests', () => {
 
         expect(console.error).toHaveBeenCalledWith(
           'Agile Error: Failed to integrate framework! Invalid Integration!',
-          dummyIntegration1._key,
+          dummyIntegration1._key
         );
       });
     });
@@ -123,11 +123,11 @@ describe('Integrations Tests', () => {
         expect(dummyIntegration1.methods.updateMethod).not.toHaveBeenCalled();
         expect(dummyIntegration2.methods.updateMethod).toHaveBeenCalledWith(
           dummyComponentInstance,
-          dummyUpdatedData,
+          dummyUpdatedData
         );
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Integration 'dummyIntegration1' isn't ready yet!",
+          "Agile Warn: Integration 'dummyIntegration1' isn't ready yet!"
         );
       });
     });

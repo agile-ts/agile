@@ -51,7 +51,7 @@ export class State<ValueType = any> {
   constructor(
     agileInstance: Agile,
     initialValue: ValueType,
-    config: StateConfigInterface = {},
+    config: StateConfigInterface = {}
   ) {
     config = defineConfig(config, {
       deps: [],
@@ -141,7 +141,7 @@ export class State<ValueType = any> {
    */
   public set(
     value: ValueType,
-    config: StateRuntimeJobConfigInterface = {},
+    config: StateRuntimeJobConfigInterface = {}
   ): this {
     config = defineConfig(config, {
       sideEffects: true,
@@ -195,7 +195,7 @@ export class State<ValueType = any> {
     // Check if type is a supported Type
     if (!supportedTypes.includes(type.name)) {
       Agile.logger.warn(
-        `'${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`,
+        `'${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`
       );
       return this;
     }
@@ -242,7 +242,7 @@ export class State<ValueType = any> {
    */
   public patch(
     targetWithChanges: object,
-    config: PatchConfigInterface = {},
+    config: PatchConfigInterface = {}
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
@@ -255,7 +255,7 @@ export class State<ValueType = any> {
 
     if (!isValidObject(this.nextStateValue)) {
       Agile.logger.error(
-        "You can't use the patch method on a non object based States!",
+        "You can't use the patch method on a non object based States!"
       );
       return this;
     }
@@ -269,7 +269,7 @@ export class State<ValueType = any> {
     this.nextStateValue = flatMerge<ValueType>(
       copy(this.nextStateValue),
       targetWithChanges,
-      { addNewProperties: config.addNewProperties },
+      { addNewProperties: config.addNewProperties }
     );
 
     // Ingest updated nextStateValue into Runtime
@@ -303,7 +303,7 @@ export class State<ValueType = any> {
   public watch(key: string, callback: StateWatcherCallback<ValueType>): this;
   public watch(
     keyOrCallback: string | StateWatcherCallback<ValueType>,
-    callback?: StateWatcherCallback<ValueType>,
+    callback?: StateWatcherCallback<ValueType>
   ): this | string {
     const generateKey = isFunction(keyOrCallback);
     let _callback: StateWatcherCallback<ValueType>;
@@ -320,7 +320,7 @@ export class State<ValueType = any> {
     // Check if Callback is valid Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
-        'A Watcher Callback Function has to be typeof Function!',
+        'A Watcher Callback Function has to be typeof Function!'
       );
       return this;
     }
@@ -328,7 +328,7 @@ export class State<ValueType = any> {
     // Check if watcherKey is already occupied
     if (this.watchers[key]) {
       Agile.logger.error(
-        `Watcher Callback Function with the key/name '${key}' already exists!`,
+        `Watcher Callback Function with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -392,11 +392,11 @@ export class State<ValueType = any> {
    */
   public persist(
     key?: PersistentKey,
-    config?: StatePersistentConfigInterface,
+    config?: StatePersistentConfigInterface
   ): this;
   public persist(
     keyOrConfig: PersistentKey | StatePersistentConfigInterface = {},
-    config: StatePersistentConfigInterface = {},
+    config: StatePersistentConfigInterface = {}
   ): this {
     let _config: StatePersistentConfigInterface;
     let key: PersistentKey | undefined;
@@ -416,7 +416,7 @@ export class State<ValueType = any> {
 
     if (this.persistent)
       Agile.logger.warn(
-        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`,
+        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`
       );
 
     // Create persistent -> Persist Value
@@ -446,7 +446,7 @@ export class State<ValueType = any> {
       if (this.isPersisted) callback(true);
     } else {
       Agile.logger.error(
-        `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`,
+        `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`
       );
     }
     return this;
@@ -543,7 +543,7 @@ export class State<ValueType = any> {
    */
   public addSideEffect(
     key: string,
-    sideEffect: (properties?: { [key: string]: any }) => void,
+    sideEffect: (properties?: { [key: string]: any }) => void
   ): this {
     if (!isFunction(sideEffect)) {
       Agile.logger.error('A sideEffect function has to be a function!');

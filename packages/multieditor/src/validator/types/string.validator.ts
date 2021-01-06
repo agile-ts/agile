@@ -24,11 +24,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} is no valid String!`,
+            errorMessage || `${key} is no valid String!`
           );
         }
         return isValid;
-      },
+      }
     );
   }
 
@@ -51,11 +51,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} has more than ${length} characters`,
+            errorMessage || `${key} has more than ${length} characters`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -79,11 +79,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} needs at least ${length} characters`,
+            errorMessage || `${key} needs at least ${length} characters`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -107,11 +107,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} is no valid email`,
+            errorMessage || `${key} is no valid email`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -135,11 +135,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
           editor.setStatus(
             key,
             'error',
-            errorMessage || `${key} is no valid url`,
+            errorMessage || `${key} is no valid url`
           );
         }
         return isValid;
-      },
+      }
     );
     return this;
   }
@@ -161,7 +161,7 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
         editor.setStatus(
           key,
           'error',
-          errorMessage || `${key} doesn't follow defined regex`,
+          errorMessage || `${key} doesn't follow defined regex`
         );
       }
       return isValid;

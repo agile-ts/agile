@@ -34,7 +34,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   constructor(
     collection: Collection<DataType>,
     initialItems?: Array<ItemKey>,
-    config: GroupConfigInterface = {},
+    config: GroupConfigInterface = {}
   ) {
     super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
@@ -114,7 +114,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    config: GroupRemoveConfig = {},
+    config: GroupRemoveConfig = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
@@ -129,7 +129,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
         Agile.logger.error(
-          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`,
+          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`
         );
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
@@ -226,7 +226,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public replace(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
-    config: StateRuntimeJobConfigInterface = {},
+    config: StateRuntimeJobConfigInterface = {}
   ): this {
     const newGroupValue = copy(this._value);
     newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
@@ -251,11 +251,11 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public persist(
     key?: PersistentKey,
-    config?: GroupPersistConfigInterface,
+    config?: GroupPersistConfigInterface
   ): this;
   public persist(
     keyOrConfig: PersistentKey | GroupPersistConfigInterface = {},
-    config: GroupPersistConfigInterface = {},
+    config: GroupPersistConfigInterface = {}
   ): this {
     let _config: GroupPersistConfigInterface;
     let key: PersistentKey | undefined;
@@ -277,7 +277,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this._key,
-        this.collection()._key,
+        this.collection()._key
       );
     }
 
@@ -318,7 +318,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
         `Couldn't find some Items in Collection '${this.collection()._key}' (${
           this._key
         })`,
-        notFoundItemKeys,
+        notFoundItemKeys
       );
     }
 

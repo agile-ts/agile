@@ -1,6 +1,6 @@
-import MultiEditor, {Validator} from '@agile-ts/multieditor';
+import MultiEditor, { Validator } from '@agile-ts/multieditor';
 import App from './agile';
-import {generateColor, generateId, isLight} from './utils';
+import { generateColor, generateId, isLight } from './utils';
 
 export const isValidNameValidator = new Validator()
   .required()
@@ -39,7 +39,7 @@ export const signUpEditor = new MultiEditor(
             editor.setStatus(
               key,
               'error',
-              'Sry only the name Jeff is allowed!',
+              'Sry only the name Jeff is allowed!'
             );
           return isValid;
         }),
@@ -77,5 +77,5 @@ export const signUpEditor = new MultiEditor(
     fixedProperties: ['id'],
     reValidateMode: 'afterFirstSubmit',
   }),
-  App,
+  App
 );

@@ -36,7 +36,7 @@ describe('ComputedTracker Tests', () => {
 
         expect(ComputedTracker.trackedObservers.size).toBe(1);
         expect(
-          ComputedTracker.trackedObservers.has(dummyObserver),
+          ComputedTracker.trackedObservers.has(dummyObserver)
         ).toBeTruthy();
       });
 

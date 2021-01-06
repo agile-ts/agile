@@ -7,6 +7,6 @@
   "tabWidth": 2,
   "proseWrap": "never",
   "singleQuote": true,
-  "trailingComma": "all",
+  "trailingComma": "es5",
   "endOfLine": "lf"
 }

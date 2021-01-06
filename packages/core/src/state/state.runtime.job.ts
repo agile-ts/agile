@@ -11,7 +11,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
 
   constructor(
     observer: StateObserver,
-    config: CreateStateRuntimeJobConfigInterface = {},
+    config: CreateStateRuntimeJobConfigInterface = {}
   ) {
     super(observer, config);
     config = defineConfig(config, {

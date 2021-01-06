@@ -25,7 +25,7 @@ export class Observer<ValueType = any> {
    */
   constructor(
     agileInstance: Agile,
-    config: CreateObserverConfigInterface<ValueType> = {},
+    config: CreateObserverConfigInterface<ValueType> = {}
   ) {
     config = defineConfig(config, {
       deps: [],
@@ -36,7 +36,7 @@ export class Observer<ValueType = any> {
     this.value = config.value;
     config.deps?.forEach((observer) => this.depend(observer));
     config.subs?.forEach((subscriptionContainer) =>
-      this.subscribe(subscriptionContainer),
+      this.subscribe(subscriptionContainer)
     );
   }
 
@@ -66,7 +66,7 @@ export class Observer<ValueType = any> {
    */
   public perform(job: RuntimeJob) {
     Agile.logger.warn(
-      "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!",
+      "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
     );
   }
 

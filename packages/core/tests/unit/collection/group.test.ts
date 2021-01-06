@@ -243,7 +243,7 @@ describe('Group Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          { background: false },
+          { background: false }
         );
       });
 
@@ -253,7 +253,7 @@ describe('Group Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          { background: true },
+          { background: true }
         );
       });
 
@@ -261,7 +261,7 @@ describe('Group Tests', () => {
         group.remove('notExistingKey');
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingKey' in Group 'groupKey'!",
+          "Agile Error: Couldn't find ItemKey 'notExistingKey' in Group 'groupKey'!"
         );
         expect(group.set).not.toHaveBeenCalled();
       });
@@ -272,7 +272,7 @@ describe('Group Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
-          { background: true },
+          { background: true }
         );
       });
 
@@ -280,7 +280,7 @@ describe('Group Tests', () => {
         group.remove(['dummyItem1Key', 'notExistingItemKey', 'dummyItem3Key']);
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!",
+          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
         );
         expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {
           background: false,
@@ -291,13 +291,13 @@ describe('Group Tests', () => {
         group.remove(['notExistingItemKey', 'dummyItem3Key']);
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!",
+          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
         );
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
           {
             background: true,
-          },
+          }
         );
       });
     });
@@ -313,7 +313,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          { background: false },
+          { background: false }
         );
       });
 
@@ -322,7 +322,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'placeholder', 'dummyItem1Key', 'placeholder'],
-          { background: false },
+          { background: false }
         );
       });
 
@@ -331,7 +331,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          { background: true },
+          { background: true }
         );
       });
 
@@ -340,7 +340,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-          { background: true },
+          { background: true }
         );
       });
 
@@ -355,7 +355,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'placeholder', 'dummyItem1Key'],
-          { background: false },
+          { background: false }
         );
       });
 
@@ -370,7 +370,7 @@ describe('Group Tests', () => {
             'dummyItem2Key',
             'dummyItem3Key',
           ],
-          { background: false },
+          { background: false }
         );
       });
 
@@ -379,7 +379,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-          { background: true },
+          { background: true }
         );
       });
     });
@@ -460,12 +460,12 @@ describe('Group Tests', () => {
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
             group._key,
-            dummyCollection._key,
+            dummyCollection._key
           ),
           {
             instantiate: true,
             storageKeys: [],
-          },
+          }
         );
       });
 
@@ -475,12 +475,12 @@ describe('Group Tests', () => {
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
             'dummyKey',
-            dummyCollection._key,
+            dummyCollection._key
           ),
           {
             instantiate: true,
             storageKeys: [],
-          },
+          }
         );
       });
     });
@@ -494,10 +494,10 @@ describe('Group Tests', () => {
         group.rebuild();
 
         expect(
-          console.warn,
+          console.warn
         ).toHaveBeenCalledWith(
           `Agile Warn: Couldn't find some Items in Collection '${dummyCollection._key}' (${group._key})`,
-          ['dummyItem3Key'],
+          ['dummyItem3Key']
         );
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
         expect(group.items).toStrictEqual([dummyItem1, dummyItem2]);

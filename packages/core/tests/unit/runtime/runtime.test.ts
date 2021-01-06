@@ -164,14 +164,14 @@ describe('Runtime Tests', () => {
         // Create Ready Callback Subscription
         rCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
           rCallbackSubContainerCallbackFunction,
-          [dummyObserver1, dummyObserver2],
+          [dummyObserver1, dummyObserver2]
         ) as CallbackSubscriptionContainer;
         rCallbackSubContainer.callback = jest.fn();
 
         // Create Not Ready Callback Subscription
         nrCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
           nrCallbackSubContainerCallbackFunction,
-          [dummyObserver2],
+          [dummyObserver2]
         ) as CallbackSubscriptionContainer;
         nrCallbackSubContainer.callback = jest.fn();
         nrCallbackSubContainer.ready = false;
@@ -182,7 +182,7 @@ describe('Runtime Tests', () => {
           {
             observer3: dummyObserver3,
             observer4: dummyObserver4,
-          },
+          }
         ).subscriptionContainer as ComponentSubscriptionContainer;
 
         // Create Not Ready Component Subscription
@@ -190,7 +190,7 @@ describe('Runtime Tests', () => {
           nrComponentSubContainerComponent,
           {
             observer4: dummyObserver4,
-          },
+          }
         ).subscriptionContainer as ComponentSubscriptionContainer;
         nrComponentSubContainer.ready = false;
 
@@ -246,11 +246,11 @@ describe('Runtime Tests', () => {
           rComponentSubContainerComponent,
           {
             observer3: 'dummyObserverValue3',
-          },
+          }
         );
         expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
           rComponentSubContainer,
-          rComponentSubJob,
+          rComponentSubJob
         );
         expect(rComponentSubJob.subscriptionContainersToUpdate.size).toBe(0);
         expect(dummyObserver3.subs.size).toBe(1);
@@ -280,23 +280,23 @@ describe('Runtime Tests', () => {
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(2);
         expect(
-          runtime.notReadyJobsToRerender.has(nrArCallbackSubJob),
+          runtime.notReadyJobsToRerender.has(nrArCallbackSubJob)
         ).toBeTruthy();
         expect(
-          runtime.notReadyJobsToRerender.has(nrArComponentSubJob),
+          runtime.notReadyJobsToRerender.has(nrArComponentSubJob)
         ).toBeTruthy();
 
         expect(nrArCallbackSubJob.subscriptionContainersToUpdate.size).toBe(1);
         expect(
           nrArCallbackSubJob.subscriptionContainersToUpdate.has(
-            nrCallbackSubContainer,
-          ),
+            nrCallbackSubContainer
+          )
         ).toBeTruthy();
         expect(nrArComponentSubJob.subscriptionContainersToUpdate.size).toBe(1);
         expect(
           nrArComponentSubJob.subscriptionContainersToUpdate.has(
-            nrComponentSubContainer,
-          ),
+            nrComponentSubContainer
+          )
         ).toBeTruthy();
 
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
@@ -307,13 +307,13 @@ describe('Runtime Tests', () => {
           rComponentSubContainerComponent,
           {
             observer4: 'dummyObserverValue4',
-          },
+          }
         );
         expect(dummyAgile.integrations.update).not.toHaveBeenCalledWith(
           nrComponentSubContainerComponent,
           {
             observer4: 'dummyObserverValue4',
-          },
+          }
         );
 
         expect(dummyObserver2.subs.size).toBe(2);
@@ -321,20 +321,20 @@ describe('Runtime Tests', () => {
 
         expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
           rComponentSubContainer,
-          nrArComponentSubJob,
+          nrArComponentSubJob
         );
         expect(runtime.handleObjectBasedSubscription).not.toHaveBeenCalledWith(
           nrComponentSubContainer,
-          nrArComponentSubJob,
+          nrArComponentSubJob
         );
 
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
-          nrCallbackSubContainer,
+          nrCallbackSubContainer
         );
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
-          nrComponentSubContainer,
+          nrComponentSubContainer
         );
       });
 
@@ -369,7 +369,7 @@ describe('Runtime Tests', () => {
       beforeEach(() => {
         arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsArray(
           dummyComponent,
-          [dummyObserver1, dummyObserver2, dummyObserver3],
+          [dummyObserver1, dummyObserver2, dummyObserver3]
         );
         arrayJob = new RuntimeJob(dummyObserver1, { key: 'dummyArrayJob' });
 
@@ -379,7 +379,7 @@ describe('Runtime Tests', () => {
             observer1: dummyObserver1,
             observer2: dummyObserver2,
             observer3: dummyObserver3,
-          },
+          }
         ).subscriptionContainer;
         objectJob1 = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
         objectJob2 = new RuntimeJob(dummyObserver3, { key: 'dummyObjectJob2' });
@@ -388,18 +388,18 @@ describe('Runtime Tests', () => {
       it('should ignore not object based SubscriptionContainer', () => {
         runtime.handleObjectBasedSubscription(
           arraySubscriptionContainer,
-          arrayJob,
+          arrayJob
         );
 
         expect(arraySubscriptionContainer.observerKeysToUpdate).toStrictEqual(
-          [],
+          []
         );
       });
 
       it('should add Job Observer to changedObjectKeys in SubscriptionContainer', () => {
         runtime.handleObjectBasedSubscription(
           objectSubscriptionContainer,
-          objectJob1,
+          objectJob1
         );
 
         expect(objectSubscriptionContainer.observerKeysToUpdate).toStrictEqual([
@@ -421,7 +421,7 @@ describe('Runtime Tests', () => {
             observer1: dummyObserver1,
             observer2: dummyObserver2,
             observer3: dummyObserver3,
-          },
+          }
         ).subscriptionContainer;
         dummyObserver1.value = 'dummyObserverValue1';
         dummyObserver3.value = 'dummyObserverValue3';

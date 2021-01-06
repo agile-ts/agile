@@ -27,7 +27,7 @@ export class Computed<ComputedValueType = any> extends State<
   constructor(
     agileInstance: Agile,
     computeFunction: () => ComputedValueType,
-    config: ComputedConfigInterface = {},
+    config: ComputedConfigInterface = {}
   ) {
     super(agileInstance, computeFunction(), {
       key: config.key,
@@ -76,7 +76,7 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<Observer | State | Event> = [],
-    config: UpdateComputeFunctionInterface = {},
+    config: UpdateComputeFunctionInterface = {}
   ) {
     config = defineConfig(config, {
       background: false,

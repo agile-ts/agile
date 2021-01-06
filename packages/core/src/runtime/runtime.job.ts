@@ -16,7 +16,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
    */
   constructor(
     observer: ObserverType,
-    config: CreateRuntimeJobConfigInterface = {},
+    config: CreateRuntimeJobConfigInterface = {}
   ) {
     config = defineConfig<RuntimeJobConfigInterface>(config, {
       background: false,

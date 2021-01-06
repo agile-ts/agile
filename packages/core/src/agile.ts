@@ -75,7 +75,7 @@ export class Agile {
     // Create global instance of Agile
     if (!globalBind('__agile__', this))
       Agile.logger.warn(
-        'Be careful with multiple Agile Instances in one Application!',
+        'Be careful with multiple Agile Instances in one Application!'
       );
   }
 
@@ -101,7 +101,7 @@ export class Agile {
    */
   public State = <ValueType>(
     initialValue: ValueType,
-    config: StateConfigInterface = {},
+    config: StateConfigInterface = {}
   ) => new State<ValueType>(this, initialValue, config);
 
   //=========================================================================================================
@@ -113,7 +113,7 @@ export class Agile {
    * @param config - Config
    */
   public Collection = <DataType = DefaultItem>(
-    config?: CollectionConfig<DataType>,
+    config?: CollectionConfig<DataType>
   ) => new Collection<DataType>(this, config);
 
   //=========================================================================================================
@@ -127,7 +127,7 @@ export class Agile {
    */
   public Computed = <ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
-    deps?: Array<Observer | State | Event>,
+    deps?: Array<Observer | State | Event>
   ) =>
     new Computed<ComputedValueType>(this, computeFunction, {
       computedDeps: deps,
@@ -142,7 +142,7 @@ export class Agile {
    * @param config - Config
    */
   public Event = <PayloadType = DefaultEventPayload>(
-    config?: CreateEventConfigInterface,
+    config?: CreateEventConfigInterface
   ) => new Event<PayloadType>(this, config);
 
   //=========================================================================================================
@@ -169,7 +169,7 @@ export class Agile {
    */
   public registerStorage(
     storage: Storage,
-    config: RegisterConfigInterface = {},
+    config: RegisterConfigInterface = {}
   ): this {
     this.storages.register(storage, config);
     return this;

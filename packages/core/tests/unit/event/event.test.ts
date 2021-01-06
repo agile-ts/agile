@@ -129,7 +129,7 @@ describe('Event Tests', () => {
         expect(response).toBe(event);
         expect(event.callbacks).not.toHaveProperty('dummyKey');
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A Event Callback Function has to be typeof Function!',
+          'Agile Error: A Event Callback Function has to be typeof Function!'
         );
       });
 
@@ -142,7 +142,7 @@ describe('Event Tests', () => {
         expect(event.callbacks).toHaveProperty('dummyKey');
         expect(event.callbacks['dummyKey']).toBe(dummyCallbackFunction2);
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Event Callback Function with the key/name 'dummyKey' already exists!",
+          "Agile Error: Event Callback Function with the key/name 'dummyKey' already exists!"
         );
       });
     });

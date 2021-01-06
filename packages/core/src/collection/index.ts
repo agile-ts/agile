@@ -113,7 +113,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Group(
     initialItems?: Array<ItemKey>,
-    config?: GroupConfigInterface,
+    config?: GroupConfigInterface
   ): Group<DataType> {
     return new Group<DataType>(this, initialItems, config);
   }
@@ -129,7 +129,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Selector(
     initialKey: ItemKey,
-    config?: { key?: SelectorKey },
+    config?: { key?: SelectorKey }
   ): Selector<DataType> {
     return new Selector<DataType>(this, initialKey, config);
   }
@@ -185,7 +185,7 @@ export class Collection<DataType = DefaultItem> {
           selectorKey,
           {
             key: selectorKey,
-          },
+          }
         );
       });
     } else selectorsObject = selectors;
@@ -210,7 +210,7 @@ export class Collection<DataType = DefaultItem> {
   public collect(
     data: DataType | Array<DataType>,
     groupKeys?: GroupKey | Array<GroupKey>,
-    config: CollectConfigInterface<DataType> = {},
+    config: CollectConfigInterface<DataType> = {}
   ): this {
     const _data = normalizeArray<DataType>(data);
     const _groupKeys = normalizeArray<GroupKey>(groupKeys);
@@ -267,7 +267,7 @@ export class Collection<DataType = DefaultItem> {
   public update(
     itemKey: ItemKey,
     changes: DefaultItem | DataType,
-    config: UpdateConfigInterface = {},
+    config: UpdateConfigInterface = {}
   ): Item<DataType> | undefined {
     const item = this.getItem(itemKey, { notExisting: true });
     const primaryKey = this.config.primaryKey;
@@ -278,13 +278,13 @@ export class Collection<DataType = DefaultItem> {
 
     if (!item) {
       Agile.logger.error(
-        `Item with key/name '${itemKey}' doesn't exist in Collection '${this._key}'!`,
+        `Item with key/name '${itemKey}' doesn't exist in Collection '${this._key}'!`
       );
       return undefined;
     }
     if (!isValidObject(changes)) {
       Agile.logger.error(
-        `You have to pass an valid Changes Object to update '${itemKey}' in '${this._key}'!`,
+        `You have to pass an valid Changes Object to update '${itemKey}' in '${this._key}'!`
       );
       return undefined;
     }
@@ -322,7 +322,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public createGroup(
     groupKey: GroupKey,
-    initialItems: Array<ItemKey> = [],
+    initialItems: Array<ItemKey> = []
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
@@ -354,7 +354,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public hasGroup(
     groupKey: GroupKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): boolean {
     return !!this.getGroup(groupKey, config);
   }
@@ -370,7 +370,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getGroup(
     groupKey: GroupKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): Group<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -439,7 +439,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public createSelector(
     selectorKey: SelectorKey,
-    itemKey: ItemKey,
+    itemKey: ItemKey
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
 
@@ -447,7 +447,7 @@ export class Collection<DataType = DefaultItem> {
     if (selector) {
       if (!selector.isPlaceholder) {
         Agile.logger.warn(
-          `Selector with the name '${selectorKey}' already exists!`,
+          `Selector with the name '${selectorKey}' already exists!`
         );
         return selector;
       }
@@ -475,7 +475,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public hasSelector(
     selectorKey: SelectorKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): boolean {
     return !!this.getSelector(selectorKey, config);
   }
@@ -491,7 +491,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getSelector(
     selectorKey: SelectorKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): Selector<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -517,7 +517,7 @@ export class Collection<DataType = DefaultItem> {
    * @param selectorKey - Name/Key of Selector
    */
   public getSelectorWithReference(
-    selectorKey: SelectorKey,
+    selectorKey: SelectorKey
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
 
@@ -545,7 +545,7 @@ export class Collection<DataType = DefaultItem> {
   public removeSelector(selectorKey: SelectorKey): this {
     if (!this.selectors[selectorKey]) {
       Agile.logger.warn(
-        `Selector with the key/name '${selectorKey}' doesn't exist!`,
+        `Selector with the key/name '${selectorKey}' doesn't exist!`
       );
       return this;
     }
@@ -565,7 +565,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public hasItem(
     itemKey: ItemKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): boolean {
     return !!this.getItem(itemKey, config);
   }
@@ -581,7 +581,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getItem(
     itemKey: ItemKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {
       notExisting: false,
@@ -615,7 +615,7 @@ export class Collection<DataType = DefaultItem> {
         } as any,
         {
           isPlaceholder: true,
-        },
+        }
       );
       this.data[itemKey] = item;
     }
@@ -635,7 +635,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public getItemValue(
     itemKey: ItemKey | undefined,
-    config: HasConfigInterface = {},
+    config: HasConfigInterface = {}
   ): DataType | undefined {
     const item = this.getItem(itemKey, config);
     if (!item) return undefined;
@@ -659,11 +659,11 @@ export class Collection<DataType = DefaultItem> {
    */
   public persist(
     key?: StorageKey,
-    config?: CollectionPersistentConfigInterface,
+    config?: CollectionPersistentConfigInterface
   ): this;
   public persist(
     keyOrConfig: StorageKey | CollectionPersistentConfigInterface = {},
-    config: CollectionPersistentConfigInterface = {},
+    config: CollectionPersistentConfigInterface = {}
   ): this {
     let _config: CollectionPersistentConfigInterface;
     let key: StorageKey | undefined;
@@ -683,7 +683,7 @@ export class Collection<DataType = DefaultItem> {
 
     if (this.persistent)
       Agile.logger.warn(
-        `By persisting the Collection '${this._key}' twice you overwrite the old Persistent Instance!`,
+        `By persisting the Collection '${this._key}' twice you overwrite the old Persistent Instance!`
       );
 
     // Create persistent -> Persist Value
@@ -713,7 +713,7 @@ export class Collection<DataType = DefaultItem> {
       if (this.isPersisted) callback(true);
     } else {
       Agile.logger.error(
-        `Please make sure you persist the Collection '${this._key}' before using the 'onLoad' function!`,
+        `Please make sure you persist the Collection '${this._key}' before using the 'onLoad' function!`
       );
     }
     return this;
@@ -777,7 +777,7 @@ export class Collection<DataType = DefaultItem> {
   public put(
     itemKeys: ItemKey | Array<ItemKey>,
     groupKeys: GroupKey | Array<GroupKey>,
-    config: GroupAddConfig = {},
+    config: GroupAddConfig = {}
   ) {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
@@ -801,7 +801,7 @@ export class Collection<DataType = DefaultItem> {
   public updateItemKey(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
-    config: UpdateItemKeyConfigInterface = {},
+    config: UpdateItemKeyConfigInterface = {}
   ): boolean {
     const item = this.getItem(oldItemKey, { notExisting: true });
     config = defineConfig(config, {
@@ -813,7 +813,7 @@ export class Collection<DataType = DefaultItem> {
     // Check if Item with newItemKey already exists
     if (this.hasItem(newItemKey)) {
       Agile.logger.warn(
-        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`,
+        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`
       );
       return false;
     }
@@ -829,7 +829,7 @@ export class Collection<DataType = DefaultItem> {
 
     // Update persist Key of Item (Doesn't get updated by updating key of Item because PersistKey is special formatted)
     item.persistent?.setKey(
-      CollectionPersistent.getItemStorageKey(newItemKey, this._key),
+      CollectionPersistent.getItemStorageKey(newItemKey, this._key)
     );
 
     // Update ItemKey in Groups
@@ -906,7 +906,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public removeFromGroups(
     itemKeys: ItemKey | Array<ItemKey>,
-    groupKeys: GroupKey | Array<GroupKey>,
+    groupKeys: GroupKey | Array<GroupKey>
   ): void {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
@@ -988,14 +988,14 @@ export class Collection<DataType = DefaultItem> {
 
     if (!isValidObject(_data)) {
       Agile.logger.error(
-        `Item Data of Collection '${this._key}' has to be an valid Object!`,
+        `Item Data of Collection '${this._key}' has to be an valid Object!`
       );
       return false;
     }
 
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
       Agile.logger.error(
-        `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`,
+        `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`
       );
       return false;
     }
@@ -1032,7 +1032,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public rebuildGroupsThatIncludeItemKey(
     itemKey: ItemKey,
-    config: RebuildGroupsThatIncludeItemKeyConfigInterface = {},
+    config: RebuildGroupsThatIncludeItemKeyConfigInterface = {}
   ): void {
     config = defineConfig(config, {
       background: false,

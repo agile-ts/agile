@@ -11,7 +11,7 @@ import {
 export function AgileHOC(
   ReactComponent: any,
   deps?: Array<State> | { [key: string]: State } | State,
-  agileInstance?: Agile,
+  agileInstance?: Agile
 ) {
   let depsArray: Array<Observer>;
   const depsObject: { [key: string]: Observer } = {};
@@ -67,14 +67,14 @@ export function AgileHOC(
       if (depsArray)
         this.agileInstance().subController.subscribeWithSubsArray(
           this,
-          depsArray,
+          depsArray
         );
 
       // Create HOC based Subscription with Object
       if (depsObject) {
         const response = this.agileInstance().subController.subscribeWithSubsObject(
           this,
-          depsObject,
+          depsObject
         );
         this.updatedProps = {
           ...props,

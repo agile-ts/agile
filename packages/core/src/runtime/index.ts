@@ -110,7 +110,7 @@ export class Runtime {
 
     // Build final jobsToRerender and reset jobsToRerender Instances
     const jobsToRerender = this.jobsToRerender.concat(
-      Array.from(this.notReadyJobsToRerender),
+      Array.from(this.notReadyJobsToRerender)
     );
     this.notReadyJobsToRerender = new Set();
     this.jobsToRerender = [];
@@ -124,7 +124,7 @@ export class Runtime {
           // Logging
           Agile.logger.warn(
             "SubscriptionContainer/Component isn't ready to rerender!",
-            subscriptionContainer,
+            subscriptionContainer
           );
           return;
         }
@@ -147,7 +147,7 @@ export class Runtime {
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
-          this.getObjectBasedProps(subscriptionContainer),
+          this.getObjectBasedProps(subscriptionContainer)
         );
     });
 
@@ -170,7 +170,7 @@ export class Runtime {
    */
   public handleObjectBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
-    job: RuntimeJob,
+    job: RuntimeJob
   ): void {
     let foundKey: string | null = null;
 
@@ -194,7 +194,7 @@ export class Runtime {
    * @param subscriptionContainer - Object based SubscriptionContainer
    */
   public getObjectBasedProps(
-    subscriptionContainer: SubscriptionContainer,
+    subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
     const props: { [key: string]: any } = {};
 

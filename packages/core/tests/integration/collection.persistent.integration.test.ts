@@ -27,7 +27,7 @@ describe('Collection Persist Function Tests', () => {
       key: 'testStorage',
       prefix: 'test',
       methods: storageMethods,
-    }),
+    })
   );
 
   interface User {

@@ -22,7 +22,7 @@ describe('Item Tests', () => {
     expect(item.collection()).toBe(dummyCollection);
     expect(item.setKey).toHaveBeenCalledWith(
       dummyData[dummyCollection.config.primaryKey],
-      { updateItemValuePrimaryKey: false },
+      { updateItemValuePrimaryKey: false }
     );
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
@@ -36,7 +36,7 @@ describe('Item Tests', () => {
     expect(item.observer).toBeInstanceOf(StateObserver);
     expect(item.observer.deps.size).toBe(0);
     expect(item.observer._key).toBe(
-      dummyData[dummyCollection.config.primaryKey],
+      dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
     expect(item.computeMethod).toBeUndefined();
@@ -58,7 +58,7 @@ describe('Item Tests', () => {
     expect(item.collection()).toBe(dummyCollection);
     expect(item.setKey).toHaveBeenCalledWith(
       dummyData[dummyCollection.config.primaryKey],
-      { updateItemValuePrimaryKey: false },
+      { updateItemValuePrimaryKey: false }
     );
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
@@ -72,7 +72,7 @@ describe('Item Tests', () => {
     expect(item.observer).toBeInstanceOf(StateObserver);
     expect(item.observer.deps.size).toBe(0);
     expect(item.observer._key).toBe(
-      dummyData[dummyCollection.config.primaryKey],
+      dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
     expect(item.computeMethod).toBeUndefined();
@@ -100,11 +100,11 @@ describe('Item Tests', () => {
 
         expect(State.prototype.setKey).toHaveBeenCalledWith('myNewKey');
         expect(item.removeSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey,
+          Item.updateGroupSideEffectKey
         );
         expect(item.addSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
-          expect.any(Function),
+          expect.any(Function)
         );
         expect(item.patch).toHaveBeenCalledWith(
           {
@@ -116,11 +116,11 @@ describe('Item Tests', () => {
             force: false,
             storage: true,
             overwrite: false,
-          },
+          }
         );
 
         expect(
-          dummyCollection.rebuildGroupsThatIncludeItemKey,
+          dummyCollection.rebuildGroupsThatIncludeItemKey
         ).not.toHaveBeenCalled();
       });
 
@@ -133,11 +133,11 @@ describe('Item Tests', () => {
 
         expect(State.prototype.setKey).toHaveBeenCalledWith('myNewKey');
         expect(item.removeSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey,
+          Item.updateGroupSideEffectKey
         );
         expect(item.addSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
-          expect.any(Function),
+          expect.any(Function)
         );
         expect(item.patch).toHaveBeenCalledWith(
           {
@@ -149,11 +149,11 @@ describe('Item Tests', () => {
             force: true,
             storage: true,
             overwrite: false,
-          },
+          }
         );
 
         expect(
-          dummyCollection.rebuildGroupsThatIncludeItemKey,
+          dummyCollection.rebuildGroupsThatIncludeItemKey
         ).not.toHaveBeenCalled();
       });
 
@@ -164,16 +164,16 @@ describe('Item Tests', () => {
 
         expect(State.prototype.setKey).toHaveBeenCalledWith('myNewKey');
         expect(item.removeSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey,
+          Item.updateGroupSideEffectKey
         );
         expect(item.addSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
-          expect.any(Function),
+          expect.any(Function)
         );
         expect(item.patch).not.toHaveBeenCalled();
 
         expect(
-          dummyCollection.rebuildGroupsThatIncludeItemKey,
+          dummyCollection.rebuildGroupsThatIncludeItemKey
         ).toHaveBeenCalledWith('myNewKey', {
           background: false,
           force: false,
@@ -194,7 +194,7 @@ describe('Item Tests', () => {
           });
 
           expect(
-            dummyCollection.rebuildGroupsThatIncludeItemKey,
+            dummyCollection.rebuildGroupsThatIncludeItemKey
           ).toHaveBeenCalledWith('myNewKey', { dummy: 'property' });
         });
       });

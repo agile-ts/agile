@@ -107,7 +107,7 @@ export class Event<PayloadType = DefaultEventPayload> {
   public on(key: string, callback: EventCallbackFunction<PayloadType>): this;
   public on(
     keyOrCallback: string | EventCallbackFunction<PayloadType>,
-    callback?: EventCallbackFunction<PayloadType>,
+    callback?: EventCallbackFunction<PayloadType>
   ): this | string {
     const generateKey = isFunction(keyOrCallback);
     let _callback: EventCallbackFunction<PayloadType>;
@@ -124,7 +124,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
       Agile.logger.error(
-        'A Event Callback Function has to be typeof Function!',
+        'A Event Callback Function has to be typeof Function!'
       );
       return this;
     }
@@ -132,7 +132,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
       Agile.logger.error(
-        `Event Callback Function with the key/name '${key}' already exists!`,
+        `Event Callback Function with the key/name '${key}' already exists!`
       );
       return this;
     }
@@ -287,7 +287,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 export type EventKey = string | number;
 export type DefaultEventPayload = { [key: string]: any };
 export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
-  payload: PayloadType,
+  payload: PayloadType
 ) => void;
 
 /**

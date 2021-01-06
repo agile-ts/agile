@@ -67,7 +67,7 @@ export function useAgile<
 >(
   deps: X | [],
   key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile,
+  agileInstance?: Agile
 ): AgileHookArrayType<X>;
 
 /**
@@ -79,7 +79,7 @@ export function useAgile<
 export function useAgile<X extends State | Collection | Observer | undefined>(
   dep: X,
   key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile,
+  agileInstance?: Agile
 ): AgileHookType<X>;
 
 export function useAgile<
@@ -88,7 +88,7 @@ export function useAgile<
 >(
   deps: X | Y,
   key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile,
+  agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   // Normalize Dependencies and special Agile Instance Types like Collection
   const depsArray = normalizeArray(deps, {
@@ -96,12 +96,12 @@ export function useAgile<
   }).map((item) =>
     item instanceof Collection
       ? item.getGroupWithReference(item.config.defaultGroupKey)
-      : item,
+      : item
   );
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
-    depsArray: (State | Observer | undefined)[],
+    depsArray: (State | Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
     if (depsArray.length === 1 && !Array.isArray(deps))
       return depsArray[0] instanceof Observer
@@ -134,7 +134,7 @@ export function useAgile<
         forceRender();
       },
       observers,
-      key,
+      key
     );
 
     // Unsubscribe Callback based Subscription on Unmount

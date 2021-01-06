@@ -26,7 +26,7 @@ describe('Persistent Tests', () => {
       key: undefined,
     });
     expect(
-      dummyAgile.storages.persistentInstances.has(persistent),
+      dummyAgile.storages.persistentInstances.has(persistent)
     ).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
@@ -54,7 +54,7 @@ describe('Persistent Tests', () => {
       key: 'persistentKey',
     });
     expect(
-      dummyAgile.storages.persistentInstances.has(persistent),
+      dummyAgile.storages.persistentInstances.has(persistent)
     ).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
@@ -76,7 +76,7 @@ describe('Persistent Tests', () => {
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
     expect(
-      dummyAgile.storages.persistentInstances.has(persistent),
+      dummyAgile.storages.persistentInstances.has(persistent)
     ).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
@@ -149,7 +149,7 @@ describe('Persistent Tests', () => {
         expect(persistent.ready).toBeFalsy();
 
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance.',
+          'Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance.'
         );
       });
 
@@ -162,7 +162,7 @@ describe('Persistent Tests', () => {
         expect(persistent.ready).toBeFalsy();
 
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No persist Storage Key found! Please provide at least one Storage Key.',
+          'Agile Error: No persist Storage Key found! Please provide at least one Storage Key.'
         );
       });
 
@@ -176,7 +176,7 @@ describe('Persistent Tests', () => {
         expect(persistent.ready).toBeFalsy();
 
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance.',
+          'Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance.'
         );
       });
 
@@ -220,7 +220,7 @@ describe('Persistent Tests', () => {
               },
             },
           }),
-          { default: true },
+          { default: true }
         );
 
         persistent.assignStorageKeys();
@@ -263,7 +263,7 @@ describe('Persistent Tests', () => {
         persistent.loadPersistedValue();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: 'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!",
+          "Agile Error: 'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
         );
       });
     });
@@ -273,7 +273,7 @@ describe('Persistent Tests', () => {
         persistent.persistValue();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: 'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!",
+          "Agile Error: 'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
         );
       });
     });
@@ -283,7 +283,7 @@ describe('Persistent Tests', () => {
         persistent.removePersistedValue();
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: 'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!",
+          "Agile Error: 'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
         );
       });
 

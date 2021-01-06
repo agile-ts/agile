@@ -23,7 +23,7 @@ describe('CallbackSubscriptionContainer Tests', () => {
     const subscriptionContainer = new CallbackSubscriptionContainer(
       dummyIntegration,
       [dummyObserver1, dummyObserver2],
-      'dummyKey',
+      'dummyKey'
     );
 
     expect(subscriptionContainer.callback).toBe(dummyIntegration);

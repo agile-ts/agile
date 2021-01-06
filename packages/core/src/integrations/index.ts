@@ -15,7 +15,7 @@ export class Integrations {
 
     // Integrate initial Integrations which are static and got set external
     Agile.initialIntegrations.forEach((integration) =>
-      this.integrate(integration),
+      this.integrate(integration)
     );
   }
 
@@ -32,7 +32,7 @@ export class Integrations {
     if (!integration._key) {
       Agile.logger.error(
         'Failed to integrate framework! Invalid Integration!',
-        integration._key,
+        integration._key
       );
       return false;
     }

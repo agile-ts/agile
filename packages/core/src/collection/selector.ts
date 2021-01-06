@@ -28,7 +28,7 @@ export class Selector<DataType = DefaultItem> extends State<
   constructor(
     collection: Collection<DataType>,
     itemKey: ItemKey,
-    config: SelectorConfigInterface = {},
+    config: SelectorConfigInterface = {}
   ) {
     super(collection.agileInstance(), undefined, config);
     config = defineConfig(config, {
@@ -72,7 +72,7 @@ export class Selector<DataType = DefaultItem> extends State<
    */
   public select(
     itemKey: ItemKey,
-    config: StateRuntimeJobConfigInterface = {},
+    config: StateRuntimeJobConfigInterface = {}
   ): this {
     const oldItem = this.collection().getItem(this._itemKey, {
       notExisting: true,
@@ -100,7 +100,7 @@ export class Selector<DataType = DefaultItem> extends State<
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, (config) =>
-      this.rebuildSelector(config),
+      this.rebuildSelector(config)
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly

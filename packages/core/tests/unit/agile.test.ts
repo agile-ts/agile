@@ -258,7 +258,7 @@ describe('Agile Tests', () => {
 
         expect(returnedAgile).toBe(agile);
         expect(agile.integrations.integrate).toHaveBeenCalledWith(
-          testIntegration,
+          testIntegration
         );
       });
     });

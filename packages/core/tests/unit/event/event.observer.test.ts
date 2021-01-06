@@ -78,7 +78,7 @@ describe('EventObserver Tests', () => {
           expect.any(RuntimeJob),
           {
             perform: true,
-          },
+          }
         );
       });
 
@@ -104,7 +104,7 @@ describe('EventObserver Tests', () => {
           expect.any(RuntimeJob),
           {
             perform: false,
-          },
+          }
         );
       });
     });

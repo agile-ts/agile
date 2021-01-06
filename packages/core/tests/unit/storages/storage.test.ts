@@ -135,7 +135,7 @@ describe('Storage Tests', () => {
 
         expect(response).toBeFalsy();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Your GET StorageMethod isn't valid!",
+          "Agile Error: Your GET StorageMethod isn't valid!"
         );
       });
 
@@ -146,7 +146,7 @@ describe('Storage Tests', () => {
 
         expect(response).toBeFalsy();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Your SET StorageMethod isn't valid!",
+          "Agile Error: Your SET StorageMethod isn't valid!"
         );
       });
 
@@ -157,7 +157,7 @@ describe('Storage Tests', () => {
 
         expect(response).toBeFalsy();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Your REMOVE StorageMethod isn't valid!",
+          "Agile Error: Your REMOVE StorageMethod isn't valid!"
         );
       });
     });
@@ -171,7 +171,7 @@ describe('Storage Tests', () => {
 
         expect(response).toBe('dummyResponse');
         expect(storage.methods.get).toHaveBeenCalledWith(
-          storage.getStorageKey('myTestKey'),
+          storage.getStorageKey('myTestKey')
         );
       });
 
@@ -187,7 +187,7 @@ describe('Storage Tests', () => {
 
         expect(response).toStrictEqual([{ dummy: 'json' }]);
         expect(storage.methods.get).toHaveBeenCalledWith(
-          storage.getStorageKey('myTestKey'),
+          storage.getStorageKey('myTestKey')
         );
       });
 
@@ -214,7 +214,7 @@ describe('Storage Tests', () => {
         //  storage.getStorageKey("myTestKey")
         // );
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!",
+          "Agile Warn: Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
         );
 
         return response.then((value) => {
@@ -288,7 +288,7 @@ describe('Storage Tests', () => {
 
         expect(storage.methods.set).toHaveBeenCalledWith(
           storage.getStorageKey('myTestKey'),
-          JSON.stringify('hello there'),
+          JSON.stringify('hello there')
         );
       });
 
@@ -308,7 +308,7 @@ describe('Storage Tests', () => {
         storage.remove('myTestKey');
 
         expect(storage.methods.remove).toHaveBeenCalledWith(
-          storage.getStorageKey('myTestKey'),
+          storage.getStorageKey('myTestKey')
         );
       });
 

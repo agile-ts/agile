@@ -26,7 +26,7 @@ export class Item<DataType = any> extends State<DataType> {
     editor: MultiEditor<DataType>,
     data: DataType,
     key: ItemKey,
-    config: ItemConfigInterface = {},
+    config: ItemConfigInterface = {}
   ) {
     super(editor.agileInstance(), data, {
       key: key,
@@ -44,7 +44,7 @@ export class Item<DataType = any> extends State<DataType> {
       this.isValid = await this.validator.validate(
         key,
         this.value,
-        this.editor(),
+        this.editor()
       );
       if (this.editor().canAssignStatusToItemOnChange(this))
         this.status.display = true;

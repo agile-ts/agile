@@ -83,7 +83,7 @@ describe('Observer Tests', () => {
         observer.perform(dummyJob);
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!",
+          "Agile Warn: Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
         );
       });
     });

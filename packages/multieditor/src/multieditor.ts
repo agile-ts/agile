@@ -33,7 +33,7 @@ export class MultiEditor<
   public computeMethods: DataObject<ComputeMethod<DataType>> = {};
   public onSubmit: (
     preparedData: DataObject<DataType>,
-    config?: OnSubmitConfigType,
+    config?: OnSubmitConfigType
   ) => Promise<SubmitReturnType>;
 
   public _key?: EditorKey;
@@ -48,12 +48,12 @@ export class MultiEditor<
    */
   constructor(
     config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
-    agileInstance?: Agile,
+    agileInstance?: Agile
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
       Agile.logger.error(
-        'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!',
+        'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!'
       );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === 'function' ? config(this) : config;
@@ -162,7 +162,7 @@ export class MultiEditor<
   public setValue(
     key: ItemKey,
     value: DataType,
-    config: SetValueConfigInterface = {},
+    config: SetValueConfigInterface = {}
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
@@ -189,7 +189,7 @@ export class MultiEditor<
   public updateInitialValue(
     key: ItemKey,
     value: DataType,
-    config: UpdateInitialValueConfigInterface = {},
+    config: UpdateInitialValueConfigInterface = {}
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
@@ -224,7 +224,7 @@ export class MultiEditor<
    * @return false if MultiEditor is not valid
    */
   public async submit(
-    config: SubmitConfigInterface<OnSubmitConfigType> = {},
+    config: SubmitConfigInterface<OnSubmitConfigType> = {}
   ): Promise<SubmitReturnType | false> {
     const preparedData: DataObject<DataType> = {};
     config = defineConfig(config, {
@@ -517,7 +517,7 @@ export interface CreateEditorConfigInterface<
   computeMethods?: DataObject<ComputeMethod<DataType>>;
   onSubmit: (
     preparedData: DataObject<DataType>,
-    config?: onSubmitConfig,
+    config?: onSubmitConfig
   ) => Promise<SubmitReturnType>;
   reValidateMode?: RevalidationModeType;
   validate?: ValidateType;
@@ -539,7 +539,7 @@ export type EditorConfig<
 > =
   | CreateEditorConfigInterface<DataType, SubmitReturnType, OnSubmitConfigType>
   | ((
-      editor: MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>,
+      editor: MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>
     ) => CreateEditorConfigInterface<
       DataType,
       SubmitReturnType,

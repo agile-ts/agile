@@ -116,7 +116,7 @@ describe('Collection Tests', () => {
         },
         key: 'dummyCollectionKey',
         primaryKey: 'key',
-      }),
+      })
     );
 
     expect(collection.config).toStrictEqual({
@@ -238,16 +238,16 @@ describe('Collection Tests', () => {
         expect(collection.groups['group2'].collection()).toBe(collection);
 
         expect(collection.groups).toHaveProperty(
-          collection.config.defaultGroupKey as any,
+          collection.config.defaultGroupKey as any
         );
         expect(collection.groups[collection.config.defaultGroupKey]._key).toBe(
-          'default',
+          'default'
         );
         expect(
-          collection.groups[collection.config.defaultGroupKey]._value,
+          collection.groups[collection.config.defaultGroupKey]._value
         ).toStrictEqual([]);
         expect(
-          collection.groups[collection.config.defaultGroupKey].collection(),
+          collection.groups[collection.config.defaultGroupKey].collection()
         ).toBe(collection);
       });
 
@@ -276,16 +276,16 @@ describe('Collection Tests', () => {
         expect(collection.groups['dummyGroup2'].collection()).toBe(collection);
 
         expect(collection.groups).toHaveProperty(
-          collection.config.defaultGroupKey as any,
+          collection.config.defaultGroupKey as any
         );
         expect(collection.groups[collection.config.defaultGroupKey]._key).toBe(
-          'default',
+          'default'
         );
         expect(
-          collection.groups[collection.config.defaultGroupKey]._value,
+          collection.groups[collection.config.defaultGroupKey]._value
         ).toStrictEqual([]);
         expect(
-          collection.groups[collection.config.defaultGroupKey].collection(),
+          collection.groups[collection.config.defaultGroupKey].collection()
         ).toBe(collection);
       });
     });
@@ -318,20 +318,20 @@ describe('Collection Tests', () => {
 
         expect(collection.selectors).toHaveProperty('dummySelector1');
         expect(collection.selectors['dummySelector1']._key).toBe(
-          'dummySelector1',
+          'dummySelector1'
         );
         expect(collection.selectors['dummySelector1']._itemKey).toBe('1');
         expect(collection.selectors['dummySelector1'].collection()).toBe(
-          collection,
+          collection
         );
 
         expect(collection.selectors).toHaveProperty('dummySelector2');
         expect(collection.selectors['dummySelector2']._key).toBe(
-          'overwrittenKey',
+          'overwrittenKey'
         );
         expect(collection.selectors['dummySelector2']._itemKey).toBe('2');
         expect(collection.selectors['dummySelector2'].collection()).toBe(
-          collection,
+          collection
         );
       });
     });
@@ -374,7 +374,7 @@ describe('Collection Tests', () => {
           {
             patch: false,
             background: false,
-          },
+          }
         );
         expect(collection.createGroup).not.toHaveBeenCalled();
 
@@ -405,7 +405,7 @@ describe('Collection Tests', () => {
           {
             patch: true,
             background: true,
-          },
+          }
         );
         expect(collection.createGroup).not.toHaveBeenCalled();
 
@@ -427,7 +427,7 @@ describe('Collection Tests', () => {
             { id: '1', name: 'frank' },
             { id: '2', name: 'hans' },
           ],
-          ['dummyGroup1', 'dummyGroup2'],
+          ['dummyGroup1', 'dummyGroup2']
         );
 
         expect(collection.setData).toHaveBeenCalledWith(
@@ -438,7 +438,7 @@ describe('Collection Tests', () => {
           {
             patch: false,
             background: false,
-          },
+          }
         );
         expect(collection.setData).toHaveBeenCalledWith(
           {
@@ -448,7 +448,7 @@ describe('Collection Tests', () => {
           {
             patch: false,
             background: false,
-          },
+          }
         );
         expect(collection.createGroup).not.toHaveBeenCalled();
 
@@ -496,7 +496,7 @@ describe('Collection Tests', () => {
           {
             patch: false,
             background: false,
-          },
+          }
         );
         expect(collection.createGroup).not.toHaveBeenCalled();
 
@@ -526,7 +526,7 @@ describe('Collection Tests', () => {
           {
             patch: false,
             background: false,
-          },
+          }
         );
         expect(collection.createGroup).toHaveBeenCalledWith('notExistingGroup');
 
@@ -553,7 +553,7 @@ describe('Collection Tests', () => {
             { id: '2', name: 'hans' },
           ],
           [],
-          { select: true },
+          { select: true }
         );
 
         expect(collection.createSelector).toHaveBeenCalledWith('1', '1');
@@ -570,18 +570,18 @@ describe('Collection Tests', () => {
             { id: '2', name: 'hans' },
           ],
           [],
-          { forEachItem: forEachItemMock },
+          { forEachItem: forEachItemMock }
         );
 
         expect(forEachItemMock).toHaveBeenCalledWith(
           { id: '1', name: 'frank' },
           '1',
-          0,
+          0
         );
         expect(forEachItemMock).toHaveBeenCalledWith(
           { id: '2', name: 'hans' },
           '2',
-          1,
+          1
         );
       });
     });
@@ -611,7 +611,7 @@ describe('Collection Tests', () => {
           {
             background: false,
             addNewProperties: false,
-          },
+          }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
@@ -623,7 +623,7 @@ describe('Collection Tests', () => {
           {
             addNewProperties: true,
             background: true,
-          },
+          }
         );
 
         expect(response).toBe(dummyItem);
@@ -635,7 +635,7 @@ describe('Collection Tests', () => {
           {
             background: true,
             addNewProperties: true,
-          },
+          }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
@@ -654,7 +654,7 @@ describe('Collection Tests', () => {
           {
             background: false,
             addNewProperties: false,
-          },
+          }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
@@ -664,7 +664,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: Item with key/name 'notExisting' doesn't exist in Collection '${collection._key}'!`,
+          `Agile Error: Item with key/name 'notExisting' doesn't exist in Collection '${collection._key}'!`
         );
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
@@ -673,12 +673,12 @@ describe('Collection Tests', () => {
       it("shouldn't update existing Item with invalid changes Object and should print error", () => {
         const response = collection.update(
           'dummyItem',
-          'notValidChanges' as any,
+          'notValidChanges' as any
         );
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`,
+          `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`
         );
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
@@ -699,14 +699,14 @@ describe('Collection Tests', () => {
           {
             background: false,
             addNewProperties: false,
-          },
+          }
         );
         expect(collection.updateItemKey).toHaveBeenCalledWith(
           'dummyItem',
           'newDummyItemKey',
           {
             background: false,
-          },
+          }
         );
       });
     });
@@ -744,7 +744,7 @@ describe('Collection Tests', () => {
         const response = collection.createGroup('dummyGroup', ['dummyItem']);
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Group with the name 'dummyGroup' already exists!",
+          "Agile Warn: Group with the name 'dummyGroup' already exists!"
         );
         expect(response).toBe(dummyGroup);
         expect(collection.groups['dummyGroup']).toBe(dummyGroup);
@@ -821,7 +821,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyGroup.observer,
+          dummyGroup.observer
         );
       });
 
@@ -850,7 +850,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyGroup.observer,
+          dummyGroup.observer
         );
       });
     });
@@ -872,7 +872,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyGroup.observer,
+          dummyGroup.observer
         );
       });
 
@@ -908,7 +908,7 @@ describe('Collection Tests', () => {
         collection.removeGroup('notExistingGroup');
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Group with the key/name 'notExistingGroup' doesn't exist!",
+          "Agile Warn: Group with the key/name 'notExistingGroup' doesn't exist!"
         );
       });
     });
@@ -947,11 +947,11 @@ describe('Collection Tests', () => {
       it("shouldn't create and add existing Selector to Collection", () => {
         const response = collection.createSelector(
           'dummySelector',
-          'dummyItem',
+          'dummyItem'
         );
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Selector with the name 'dummySelector' already exists!",
+          "Agile Warn: Selector with the name 'dummySelector' already exists!"
         );
         expect(response).toBe(dummySelector);
         expect(collection.selectors['dummySelector']).toBe(dummySelector);
@@ -963,7 +963,7 @@ describe('Collection Tests', () => {
 
         const response = collection.createSelector(
           'dummySelector',
-          'dummyItem',
+          'dummyItem'
         );
 
         expect(console.warn).not.toHaveBeenCalled();
@@ -1033,7 +1033,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummySelector.observer,
+          dummySelector.observer
         );
       });
 
@@ -1062,7 +1062,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummySelector.observer,
+          dummySelector.observer
         );
       });
     });
@@ -1086,13 +1086,13 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummySelector.observer,
+          dummySelector.observer
         );
       });
 
       it("should return and track created reference Selector if Selector doesn't exist yet", () => {
         const response = collection.getSelectorWithReference(
-          'notExistingSelector',
+          'notExistingSelector'
         );
 
         expect(response).toBeInstanceOf(Selector);
@@ -1129,7 +1129,7 @@ describe('Collection Tests', () => {
         collection.removeSelector('notExistingSelector');
 
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Selector with the key/name 'notExistingSelector' doesn't exist!",
+          "Agile Warn: Selector with the key/name 'notExistingSelector' doesn't exist!"
         );
         expect(collection.selectors).toHaveProperty('dummySelector');
         expect(dummySelector.unselect).not.toHaveBeenCalled();
@@ -1192,7 +1192,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyItem.observer,
+          dummyItem.observer
         );
       });
 
@@ -1221,7 +1221,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyItem.observer,
+          dummyItem.observer
         );
       });
     });
@@ -1243,7 +1243,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyItem.observer,
+          dummyItem.observer
         );
       });
 
@@ -1371,7 +1371,7 @@ describe('Collection Tests', () => {
           key: 'newPersistentKey',
         });
         expect(console.warn).toHaveBeenCalledWith(
-          `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`,
+          `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`
         );
       });
     });
@@ -1404,7 +1404,7 @@ describe('Collection Tests', () => {
 
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Please make sure you persist the Collection 'collectionKey' before using the 'onLoad' function!",
+          "Agile Error: Please make sure you persist the Collection 'collectionKey' before using the 'onLoad' function!"
         );
       });
     });
@@ -1511,7 +1511,7 @@ describe('Collection Tests', () => {
       it('should add passed itemKeys to passed Groups (default config)', () => {
         collection.put(
           ['1', '2', '3'],
-          ['dummyGroup1', 'notExistingGroup', 'dummyGroup2'],
+          ['dummyGroup1', 'notExistingGroup', 'dummyGroup2']
         );
 
         expect(dummyGroup1.add).toHaveBeenCalledWith(['1', '2', '3'], {});
@@ -1589,8 +1589,8 @@ describe('Collection Tests', () => {
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             'newDummyItem',
-            collection._key,
-          ),
+            collection._key
+          )
         );
         expect(dummyItem2.persistent.setKey).not.toHaveBeenCalled();
 
@@ -1599,7 +1599,7 @@ describe('Collection Tests', () => {
           'newDummyItem',
           {
             background: false,
-          },
+          }
         );
         expect(dummyGroup2.replace).not.toHaveBeenCalled();
 
@@ -1619,7 +1619,7 @@ describe('Collection Tests', () => {
           'newDummyItem',
           {
             background: true,
-          },
+          }
         );
 
         expect(response).toBeTruthy();
@@ -1630,8 +1630,8 @@ describe('Collection Tests', () => {
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             'newDummyItem',
-            collection._key,
-          ),
+            collection._key
+          )
         );
 
         expect(dummyGroup1.replace).toHaveBeenCalledWith(
@@ -1639,7 +1639,7 @@ describe('Collection Tests', () => {
           'newDummyItem',
           {
             background: true,
-          },
+          }
         );
 
         expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
@@ -1665,8 +1665,8 @@ describe('Collection Tests', () => {
         expect(dummyItem1.persistent.setKey).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             'newDummyItem',
-            collection._key,
-          ),
+            collection._key
+          )
         );
 
         expect(dummyGroup1.replace).toHaveBeenCalledWith(
@@ -1674,7 +1674,7 @@ describe('Collection Tests', () => {
           'newDummyItem',
           {
             background: false,
-          },
+          }
         );
 
         expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
@@ -1689,7 +1689,7 @@ describe('Collection Tests', () => {
       it("shouldn't update ItemKey of Item that doesn't exist (default config)", () => {
         const response = collection.updateItemKey(
           'notExistingItem',
-          'newDummyItem',
+          'newDummyItem'
         );
 
         expect(response).toBeFalsy();
@@ -1706,7 +1706,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBeFalsy();
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Couldn't update ItemKey from 'dummyItem1' to 'dummyItem2' because an Item with the key/name 'dummyItem2' already exists!",
+          "Agile Warn: Couldn't update ItemKey from 'dummyItem1' to 'dummyItem2' because an Item with the key/name 'dummyItem2' already exists!"
         );
       });
     });
@@ -1722,7 +1722,7 @@ describe('Collection Tests', () => {
           ['dummyItem1', 'dummyItem2', 'dummyItem3'],
           {
             key: 'dummyGroup1',
-          },
+          }
         );
         dummyGroup2 = new Group(collection, ['dummyItem2', 'dummyItem3'], {
           key: 'dummyGroup2',
@@ -1739,16 +1739,16 @@ describe('Collection Tests', () => {
 
       it('should return groupKeys that contain ItemKey', () => {
         expect(
-          collection.getGroupKeysThatHaveItemKey('unknownItem'),
+          collection.getGroupKeysThatHaveItemKey('unknownItem')
         ).toStrictEqual([]);
         expect(
-          collection.getGroupKeysThatHaveItemKey('dummyItem1'),
+          collection.getGroupKeysThatHaveItemKey('dummyItem1')
         ).toStrictEqual(['dummyGroup1']);
         expect(
-          collection.getGroupKeysThatHaveItemKey('dummyItem2'),
+          collection.getGroupKeysThatHaveItemKey('dummyItem2')
         ).toStrictEqual(['dummyGroup1', 'dummyGroup2']);
         expect(
-          collection.getGroupKeysThatHaveItemKey('dummyItem3'),
+          collection.getGroupKeysThatHaveItemKey('dummyItem3')
         ).toStrictEqual(['dummyGroup1', 'dummyGroup2', 'dummyGroup3']);
       });
     });
@@ -1766,7 +1766,7 @@ describe('Collection Tests', () => {
 
         expect(collection.removeFromGroups).toHaveBeenCalledWith(
           ['test1', 'test2'],
-          ['testGroup1', 'testGroup2'],
+          ['testGroup1', 'testGroup2']
         );
         expect(collection.removeItems).not.toHaveBeenCalled();
       });
@@ -1790,14 +1790,14 @@ describe('Collection Tests', () => {
           ['dummyItem1', 'dummyItem2', 'dummyItem3', 'unknownItem'],
           {
             key: 'dummyGroup1',
-          },
+          }
         );
         dummyGroup2 = new Group(
           collection,
           ['dummyItem2', 'dummyItem3', 'unknownItem'],
           {
             key: 'dummyGroup2',
-          },
+          }
         );
         dummyGroup3 = new Group(collection, ['dummyItem3', 'unknownItem'], {
           key: 'dummyGroup3',
@@ -1826,7 +1826,7 @@ describe('Collection Tests', () => {
       it('should remove ItemKeys from Groups', () => {
         collection.removeFromGroups(
           ['dummyItem2', 'dummyItem3'],
-          ['dummyGroup2', 'dummyGroup3'],
+          ['dummyGroup2', 'dummyGroup3']
         );
 
         expect(collection.removeItems).not.toHaveBeenCalled();
@@ -1909,7 +1909,7 @@ describe('Collection Tests', () => {
 
         expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue,
+          dummyItem2.persistent.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem1');
@@ -1977,7 +1977,7 @@ describe('Collection Tests', () => {
         const response = collection.setData('noObject' as any);
 
         expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: Item Data of Collection '${collection._key}' has to be an valid Object!`,
+          `Agile Error: Item Data of Collection '${collection._key}' has to be an valid Object!`
         );
 
         expect(response).toBeFalsy();
@@ -1988,7 +1988,7 @@ describe('Collection Tests', () => {
         const response = collection.setData({ name: 'Frank' } as any);
 
         expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: Collection '${collection._key}' Item Data has to contain a primaryKey property called '${collection.config.primaryKey}'!`,
+          `Agile Error: Collection '${collection._key}' Item Data has to contain a primaryKey property called '${collection.config.primaryKey}'!`
         );
 
         expect(response).toBeFalsy();
@@ -2009,7 +2009,7 @@ describe('Collection Tests', () => {
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
           { id: 'dummyItem1', name: 'Dieter' },
-          { background: false },
+          { background: false }
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
       });
@@ -2020,7 +2020,7 @@ describe('Collection Tests', () => {
             id: 'dummyItem1',
             name: 'Dieter',
           },
-          { background: true },
+          { background: true }
         );
 
         expect(response).toBeTruthy();
@@ -2031,7 +2031,7 @@ describe('Collection Tests', () => {
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
           { id: 'dummyItem1', name: 'Dieter' },
-          { background: true },
+          { background: true }
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
       });
@@ -2042,7 +2042,7 @@ describe('Collection Tests', () => {
             id: 'dummyItem1',
             name: 'Dieter',
           },
-          { patch: true, background: true },
+          { patch: true, background: true }
         );
 
         expect(response).toBeTruthy();
@@ -2054,7 +2054,7 @@ describe('Collection Tests', () => {
         expect(dummyItem1.set).not.toHaveBeenCalled();
         expect(dummyItem1.patch).toHaveBeenCalledWith(
           { id: 'dummyItem1', name: 'Dieter' },
-          { background: true },
+          { background: true }
         );
       });
 
@@ -2075,7 +2075,7 @@ describe('Collection Tests', () => {
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
           { id: 'dummyItem1', name: 'Dieter' },
-          { background: false },
+          { background: false }
         );
       });
     });

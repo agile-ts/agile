@@ -63,7 +63,7 @@ export function isValidObject(value: any): boolean {
  */
 export function includesArray<DataType = any>(
   array1: Array<DataType>,
-  array2: Array<DataType>,
+  array2: Array<DataType>
 ): boolean {
   return array2.every((element) => array1.includes(element));
 }
@@ -79,7 +79,7 @@ export function includesArray<DataType = any>(
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
-  config: { createUndefinedArray?: boolean } = {},
+  config: { createUndefinedArray?: boolean } = {}
 ): Array<DataType> {
   config = defineConfig(config, {
     createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
@@ -162,7 +162,7 @@ export function isValidUrl(url: string): boolean {
       '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
       '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
-    'i',
+    'i'
   );
   return pattern.test(url);
 }
@@ -198,7 +198,7 @@ export function isJsonString(value: any): boolean {
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
   defaults: Object,
-  overwriteUndefinedProperties?: boolean,
+  overwriteUndefinedProperties?: boolean
 ): ConfigInterface {
   if (overwriteUndefinedProperties === undefined)
     overwriteUndefinedProperties = true;
@@ -234,7 +234,7 @@ export interface FlatMergeConfigInterface {
 export function flatMerge<DataType = Object>(
   source: DataType,
   changes: Object,
-  config: FlatMergeConfigInterface = {},
+  config: FlatMergeConfigInterface = {}
 ): DataType {
   // Copy Source to avoid references
   const _source = copy<DataType>(source);
@@ -330,7 +330,7 @@ export function clone<T = any>(instance: T): T {
 export function globalBind(
   key: string,
   instance: any,
-  overwrite = false,
+  overwrite = false
 ): boolean {
   try {
     if (overwrite) {

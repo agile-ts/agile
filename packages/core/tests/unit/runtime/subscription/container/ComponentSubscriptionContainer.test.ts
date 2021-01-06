@@ -21,7 +21,7 @@ describe('ComponentSubscriptionContainer Tests', () => {
     const subscriptionContainer = new ComponentSubscriptionContainer(
       dummyIntegration,
       [dummyObserver1, dummyObserver2],
-      'dummyKey',
+      'dummyKey'
     );
 
     expect(subscriptionContainer.component).toStrictEqual(dummyIntegration);

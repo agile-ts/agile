@@ -107,7 +107,7 @@ describe('Storages Tests', () => {
         const response = storages.register(dummyStorage1, { default: false });
 
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Be aware that Agile has to assign the first added Storage as default Storage!',
+          'Agile Warn: Be aware that Agile has to assign the first added Storage as default Storage!'
         );
 
         expect(storages.storages).toHaveProperty('storage1');
@@ -148,7 +148,7 @@ describe('Storages Tests', () => {
         const response = storages.register(dummyStorage1);
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'storage1' already exists",
+          "Agile Error: Storage with the key/name 'storage1' already exists"
         );
 
         expect(storages.storages).toHaveProperty('storage1');
@@ -217,7 +217,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist",
+          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist"
         );
       });
 
@@ -228,7 +228,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'storage1' isn't ready",
+          "Agile Error: Storage with the key/name 'storage1' isn't ready"
         );
       });
     });
@@ -264,7 +264,7 @@ describe('Storages Tests', () => {
         expect(response).toBe('dummyStorage1Response');
         expect(dummyStorage1.get).toHaveBeenCalledWith('value1');
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist",
+          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist"
         );
       });
 
@@ -275,7 +275,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No Storage found! Please provide at least one Storage.',
+          'Agile Error: No Storage found! Please provide at least one Storage.'
         );
       });
     });
@@ -314,7 +314,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No Storage found! Please provide at least one Storage.',
+          'Agile Error: No Storage found! Please provide at least one Storage.'
         );
       });
     });
@@ -353,7 +353,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No Storage found! Please provide at least one Storage.',
+          'Agile Error: No Storage found! Please provide at least one Storage.'
         );
       });
     });

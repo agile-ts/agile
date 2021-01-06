@@ -119,7 +119,7 @@ describe('State Tests', () => {
         { name: 'jeff', age: 10 },
         {
           key: 'objectStateKey',
-        },
+        }
       );
       arrayState = new State<string[]>(dummyAgile, ['jeff'], {
         key: 'arrayStateKey',
@@ -150,7 +150,7 @@ describe('State Tests', () => {
 
         expect(value).toBe(10);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          numberState.observer,
+          numberState.observer
         );
       });
     });
@@ -253,7 +253,7 @@ describe('State Tests', () => {
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: Incorrect type (string) was provided.',
+          'Agile Error: Incorrect type (string) was provided.'
         );
         expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
       });
@@ -264,7 +264,7 @@ describe('State Tests', () => {
         numberState.set('coolValue' as any, { force: true });
 
         expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Incorrect type (string) was provided.',
+          'Agile Warn: Incorrect type (string) was provided.'
         );
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
@@ -275,7 +275,7 @@ describe('State Tests', () => {
             force: true,
             storage: true,
             overwrite: false,
-          },
+          }
         );
       });
 
@@ -292,7 +292,7 @@ describe('State Tests', () => {
             force: false,
             storage: true,
             overwrite: false,
-          },
+          }
         );
       });
     });
@@ -333,7 +333,7 @@ describe('State Tests', () => {
 
         expect(numberState.valueType).toBeUndefined();
         expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: 'fuckingType' is not supported! Supported types: String, Boolean, Array, Object, Number",
+          "Agile Warn: 'fuckingType' is not supported! Supported types: String, Boolean, Array, Object, Number"
         );
       });
     });
@@ -350,7 +350,7 @@ describe('State Tests', () => {
 
         expect(numberState.set).toHaveBeenCalledWith(
           numberState.previousStateValue,
-          {},
+          {}
         );
       });
 
@@ -367,7 +367,7 @@ describe('State Tests', () => {
           {
             force: true,
             storage: false,
-          },
+          }
         );
       });
     });
@@ -384,7 +384,7 @@ describe('State Tests', () => {
 
         expect(numberState.set).toHaveBeenCalledWith(
           numberState.initialStateValue,
-          {},
+          {}
         );
       });
 
@@ -401,7 +401,7 @@ describe('State Tests', () => {
           {
             force: true,
             storage: false,
-          },
+          }
         );
       });
     });
@@ -417,7 +417,7 @@ describe('State Tests', () => {
         numberState.patch({ changed: 'object' });
 
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use the patch method on a non object based States!",
+          "Agile Error: You can't use the patch method on a non object based States!"
         );
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
@@ -426,7 +426,7 @@ describe('State Tests', () => {
         objectState.patch('number' as any);
 
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: TargetWithChanges has to be an Object!',
+          'Agile Error: TargetWithChanges has to be an Object!'
         );
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
@@ -439,7 +439,7 @@ describe('State Tests', () => {
           { name: 'frank' },
           {
             addNewProperties: true,
-          },
+          }
         );
         expect(objectState.nextStateValue).toStrictEqual({
           age: 10,
@@ -463,7 +463,7 @@ describe('State Tests', () => {
             force: true,
             overwrite: true,
             sideEffects: false,
-          },
+          }
         );
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
@@ -471,7 +471,7 @@ describe('State Tests', () => {
           { name: 'frank' },
           {
             addNewProperties: false,
-          },
+          }
         );
         expect(objectState.nextStateValue).toStrictEqual({
           age: 10,
@@ -517,13 +517,13 @@ describe('State Tests', () => {
       it("shouldn't add passed invalid watcherFunction to watchers at passed key", () => {
         const response = numberState.watch(
           'dummyKey',
-          'noFunction hehe' as any,
+          'noFunction hehe' as any
         );
 
         expect(response).toBe(numberState);
         expect(numberState.watchers).not.toHaveProperty('dummyKey');
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A Watcher Callback Function has to be typeof Function!',
+          'Agile Error: A Watcher Callback Function has to be typeof Function!'
         );
       });
 
@@ -536,7 +536,7 @@ describe('State Tests', () => {
         expect(numberState.watchers).toHaveProperty('dummyKey');
         expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction2);
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Watcher Callback Function with the key/name 'dummyKey' already exists!",
+          "Agile Error: Watcher Callback Function with the key/name 'dummyKey' already exists!"
         );
       });
     });
@@ -568,7 +568,7 @@ describe('State Tests', () => {
 
         expect(numberState.watch).toHaveBeenCalledWith(
           'InauguratedWatcherKey',
-          expect.any(Function),
+          expect.any(Function)
         );
         expect(numberState.watchers).toHaveProperty('InauguratedWatcherKey');
       });
@@ -581,7 +581,7 @@ describe('State Tests', () => {
 
         expect(dummyCallbackFunction).toHaveBeenCalledWith(10);
         expect(numberState.watchers).not.toHaveProperty(
-          'InauguratedWatcherKey',
+          'InauguratedWatcherKey'
         );
       });
     });
@@ -666,7 +666,7 @@ describe('State Tests', () => {
           key: 'newPersistentKey',
         });
         expect(console.warn).toHaveBeenCalledWith(
-          `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`,
+          `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`
         );
       });
     });
@@ -699,7 +699,7 @@ describe('State Tests', () => {
 
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Please make sure you persist the State 'numberStateKey' before using the 'onLoad' function!",
+          "Agile Error: Please make sure you persist the State 'numberStateKey' before using the 'onLoad' function!"
         );
       });
     });
@@ -789,7 +789,7 @@ describe('State Tests', () => {
 
         expect(numberState.set).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: You can only invert boolean based States!',
+          'Agile Error: You can only invert boolean based States!'
         );
       });
     });
@@ -808,7 +808,7 @@ describe('State Tests', () => {
 
         expect(numberState.computeMethod).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A computeMethod has to be a function!',
+          'Agile Error: A computeMethod has to be a function!'
         );
       });
     });
@@ -830,7 +830,7 @@ describe('State Tests', () => {
 
         expect(numberState.sideEffects).not.toHaveProperty('dummyKey');
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A sideEffect function has to be a function!',
+          'Agile Error: A sideEffect function has to be a function!'
         );
       });
     });
