@@ -1,4 +1,3 @@
-import * as http from 'http';
 import {
   clone,
   copy,
@@ -14,7 +13,7 @@ export default class API {
    * @public
    * @param config - Config
    */
-  constructor(config: ApiConfig = {options: {}}) {
+  constructor(config: ApiConfig = { options: {} }) {
     this.config = config;
   }
 
@@ -28,7 +27,7 @@ export default class API {
    */
   public with(config: ApiConfig): API {
     const modifiedApi = clone(this);
-    modifiedApi.config = {...this.config, ...config};
+    modifiedApi.config = { ...this.config, ...config };
     return modifiedApi;
   }
 
