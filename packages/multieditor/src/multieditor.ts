@@ -22,9 +22,9 @@ export class MultiEditor<
   public agileInstance: () => Agile;
 
   public config: EditorConfigInterface;
-  public isModified: boolean = false;
-  public isValid: boolean = false;
-  public submitted: boolean = false;
+  public isModified = false;
+  public isValid = false;
+  public submitted = false;
   public fixedProperties: ItemKey[] = [];
   public editableProperties: ItemKey[] = [];
   public validateMethods: DataObject<
@@ -77,13 +77,13 @@ export class MultiEditor<
     };
 
     // Add Items to Data Object and validate it for the first Time
-    for (let key in _config.data) {
+    for (const key in _config.data) {
       const item = new Item<DataType>(this as any, _config.data[key], key, {
         canBeEdited: this.editableProperties.includes(key),
       });
       this.data[key] = item;
       item.validate();
-      if (this.computeMethods.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(this.computeMethods, key)) {
         const computeMethod = this.computeMethods[key];
         item.compute(computeMethod);
       }
@@ -112,7 +112,7 @@ export class MultiEditor<
    */
   public get deps(): Array<Observer> {
     const deps: Array<Observer> = [];
-    for (let key in this.data) {
+    for (const key in this.data) {
       const item = this.data[key];
       deps.push(item.observer);
       deps.push(item.status.observer);
@@ -208,7 +208,7 @@ export class MultiEditor<
         background: config.background,
       });
     } else {
-      item.ingest({force: true, background: config.background});
+      item.ingest({ force: true, background: config.background });
     }
 
     return this;
@@ -233,7 +233,7 @@ export class MultiEditor<
     });
 
     // Assign Statuses to Items
-    for (let key in this.data) {
+    for (const key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
         item.status.assign({
@@ -255,7 +255,7 @@ export class MultiEditor<
     if (!this.isValid) return false;
 
     // Add prepared Items to prepared Data
-    for (let key in this.data) {
+    for (const key in this.data) {
       const item = this.data[key];
       if (item.isSet && item.config.canBeEdited) {
         preparedData[key] = item.value;
@@ -264,7 +264,7 @@ export class MultiEditor<
     }
 
     // Add fixed Properties(Items) to Prepared Data
-    for (let key of this.fixedProperties) {
+    for (const key of this.fixedProperties) {
       const item = this.getItemById(key);
       if (!item) continue;
       preparedData[key] = item.value;
@@ -282,7 +282,7 @@ export class MultiEditor<
    */
   public reset(): this {
     // Reset Items
-    for (let key in this.data) {
+    for (const key in this.data) {
       const item = this.data[key];
       item.reset();
     }
@@ -353,7 +353,7 @@ export class MultiEditor<
    * @param key - Key/Name of Item
    */
   public getItemById(key: ItemKey): Item<DataType> | undefined {
-    if (!this.data.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(this.data, key)) {
       Agile.logger.error(`Editor Item '${key}' does not exists!`);
       return undefined;
     }
@@ -382,7 +382,7 @@ export class MultiEditor<
    */
   public areModified(keys: ItemKey[]): boolean {
     let _isModified = false;
-    for (let key of keys) {
+    for (const key of keys) {
       const item = this.getItemById(key);
       if (!item) continue;
       _isModified = _isModified || item?.isSet;
@@ -399,7 +399,7 @@ export class MultiEditor<
    * @param key - Key/Name of Item
    */
   public getValidator(key: ItemKey): Validator<DataType> {
-    if (this.validateMethods.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(this.validateMethods, key)) {
       const validation = this.validateMethods[key];
       if (validation instanceof Validator) {
         if (!validation.key) validation.key = key;
@@ -410,7 +410,7 @@ export class MultiEditor<
         }).addValidationMethod(validation);
       }
     }
-    return new Validator<DataType>({key: key});
+    return new Validator<DataType>({ key: key });
   }
 
   //=========================================================================================================
@@ -436,7 +436,7 @@ export class MultiEditor<
     let isValid = true;
 
     // Check if Items are Valid
-    for (let key in this.data) {
+    for (const key in this.data) {
       const item = this.data[key];
       if (!item.config.canBeEdited && this.config.validate === 'editable')
         continue;
@@ -487,7 +487,7 @@ export class MultiEditor<
   }
 }
 
-export type DataObject<T = any> = {[key: string]: T};
+export type DataObject<T = any> = { [key: string]: T };
 export type EditorKey = string | number;
 export type ItemKey = string | number;
 

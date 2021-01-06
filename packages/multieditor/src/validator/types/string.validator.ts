@@ -1,5 +1,5 @@
-import {Validator} from '../../internal';
-import {copy} from '@agile-ts/core';
+import { Validator } from '../../internal';
+import { copy } from '@agile-ts/core';
 
 export class StringValidator<DataType = any> extends Validator<DataType> {
   /**
@@ -9,12 +9,11 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
    * @param errorMessage - Error Message
    */
   constructor(validator: Validator<DataType>, errorMessage?: string) {
-    super({key: validator.key, prefix: 'string'});
+    super({ key: validator.key, prefix: 'string' });
 
     // Copy ValidationMethods of old Validator into this Validator
-    for (let key in validator.validationMethods) {
+    for (const key in validator.validationMethods)
       this.validationMethods[key] = copy(validator.validationMethods[key]);
-    }
 
     // Add String Validation Method
     this.addValidationMethod(
@@ -102,7 +101,7 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
       this.getValidationMethodKey('email'),
       async (key, value, editor) => {
         if (!value || typeof value !== 'string') return false;
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         const isValid = emailRegex.test(value.toLowerCase());
         if (!isValid) {
           editor.setStatus(
@@ -130,7 +129,7 @@ export class StringValidator<DataType = any> extends Validator<DataType> {
       this.getValidationMethodKey('email'),
       async (key, value, editor) => {
         if (!value || typeof value !== 'string') return false;
-        const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+        const urlRegex = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
         const isValid = urlRegex.test(value.toLowerCase());
         if (!isValid) {
           editor.setStatus(

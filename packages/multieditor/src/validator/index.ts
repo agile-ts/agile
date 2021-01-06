@@ -72,7 +72,7 @@ export class Validator<DataType = any> {
     item.status.track = true;
 
     // Call validationMethods (Validation Time)
-    for (let validationMethodKey of validationMethodKeys)
+    for (const validationMethodKey of validationMethodKeys)
       isValid =
         (await this.validationMethods[validationMethodKey](
           key,

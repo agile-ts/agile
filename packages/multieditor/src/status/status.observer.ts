@@ -1,4 +1,4 @@
-import {Status, StatusInterface} from '../internal';
+import { Status, StatusInterface } from '../internal';
 import {
   Agile,
   copy,
