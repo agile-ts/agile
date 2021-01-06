@@ -71,7 +71,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
     if (config.updateItemValuePrimaryKey)
       this.patch(
-        {[this.collection().config.primaryKey]: value},
+        { [this.collection().config.primaryKey]: value },
         {
           sideEffects: config.sideEffects,
           background: config.background,

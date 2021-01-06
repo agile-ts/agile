@@ -1,4 +1,10 @@
-import {Agile, State, StatePersistent, Storage, Persistent} from '../../../src';
+import {
+  Agile,
+  State,
+  StatePersistent,
+  Storage,
+  Persistent,
+} from '../../../src';
 
 describe('StatePersistent Tests', () => {
   let dummyAgile: Agile;
@@ -7,7 +13,7 @@ describe('StatePersistent Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyState = new State(dummyAgile, 'dummyValue');
 
     jest.spyOn(StatePersistent.prototype, 'instantiatePersistent');

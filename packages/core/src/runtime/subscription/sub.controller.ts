@@ -37,17 +37,17 @@ export class SubController {
    */
   public subscribeWithSubsObject(
     integrationInstance: any,
-    subs: {[key: string]: Observer} = {},
+    subs: { [key: string]: Observer } = {},
     key?: SubscriptionContainerKeyType,
   ): {
     subscriptionContainer: SubscriptionContainer;
-    props: {[key: string]: Observer['value']};
+    props: { [key: string]: Observer['value'] };
   } {
-    const props: {[key: string]: Observer['value']} = {};
+    const props: { [key: string]: Observer['value'] } = {};
 
     // Create subsArray
     const subsArray: Observer[] = [];
-    for (let key in subs) subsArray.push(subs[key]);
+    for (const key in subs) subsArray.push(subs[key]);
 
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
@@ -61,7 +61,7 @@ export class SubController {
     subscriptionContainer.subsObject = subs;
 
     // Register subs and build props object
-    for (let key in subs) {
+    for (const key in subs) {
       const observer = subs[key];
       observer.subscribe(subscriptionContainer);
       if (observer.value) props[key] = observer.value;

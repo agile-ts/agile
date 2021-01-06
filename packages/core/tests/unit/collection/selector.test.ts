@@ -1,4 +1,4 @@
-import {Selector, Agile, Collection, StateObserver, Item} from '../../../src';
+import { Selector, Agile, Collection, StateObserver, Item } from '../../../src';
 
 describe('Selector Tests', () => {
   interface ItemInterface {
@@ -11,7 +11,7 @@ describe('Selector Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Selector.prototype, 'select');
@@ -174,7 +174,7 @@ describe('Selector Tests', () => {
 
         expect(selector._itemKey).toBe('dummyItem2');
         expect(selector.item).toBe(dummyItem2);
-        expect(selector.unselect).toHaveBeenCalledWith({background: true});
+        expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,
@@ -206,7 +206,7 @@ describe('Selector Tests', () => {
 
         expect(selector._itemKey).toBe('dummyItem2');
         expect(selector.item).toBe(dummyItem2);
-        expect(selector.unselect).toHaveBeenCalledWith({background: true});
+        expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: true,
           sideEffects: false,
@@ -246,7 +246,7 @@ describe('Selector Tests', () => {
       it('should be able to select selected Item again (config.force = true)', () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem1);
 
-        selector.select('dummyItem1', {force: true});
+        selector.select('dummyItem1', { force: true });
 
         expect(console.warn).not.toHaveBeenCalled();
 
@@ -256,7 +256,7 @@ describe('Selector Tests', () => {
 
         expect(selector._itemKey).toBe('dummyItem1');
         expect(selector.item).toBe(dummyItem1);
-        expect(selector.unselect).toHaveBeenCalledWith({background: true});
+        expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,
@@ -283,7 +283,7 @@ describe('Selector Tests', () => {
         );
         expect(selector._itemKey).toBe('dummyItem2');
         expect(selector.item).toBe(dummyItem2);
-        expect(selector.unselect).toHaveBeenCalledWith({background: true});
+        expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,
@@ -303,14 +303,14 @@ describe('Selector Tests', () => {
         dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
         dummyItem1.isPlaceholder = true;
 
-        selector.select('dummyItem2', {overwrite: false});
+        selector.select('dummyItem2', { overwrite: false });
 
         expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
           'dummyItem2',
         );
         expect(selector._itemKey).toBe('dummyItem2');
         expect(selector.item).toBe(dummyItem2);
-        expect(selector.unselect).toHaveBeenCalledWith({background: true});
+        expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
           sideEffects: true,

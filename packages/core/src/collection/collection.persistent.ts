@@ -128,7 +128,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       }
 
       // Load Items into Collection
-      for (let itemKey of defaultGroup._value) {
+      for (const itemKey of defaultGroup._value) {
         const itemStorageKey = CollectionPersistent.getItemStorageKey(
           itemKey,
           _key,
@@ -176,7 +176,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
     // Persist default Group
     if (!defaultGroup.isPersisted)
-      defaultGroup.persist({followCollectionPersistKeyPattern: true});
+      defaultGroup.persist({ followCollectionPersistKeyPattern: true });
 
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     defaultGroup.addSideEffect(
@@ -185,7 +185,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     );
 
     // Persist Collection Items
-    for (let itemKey of defaultGroup._value) {
+    for (const itemKey of defaultGroup._value) {
       const item = this.collection().getItem(itemKey);
       const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
@@ -227,7 +227,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     );
 
     // Remove Collection Items from Storage
-    for (let itemKey of defaultGroup._value) {
+    for (const itemKey of defaultGroup._value) {
       const item = this.collection().getItem(itemKey);
       item?.persistent?.removePersistedValue();
     }

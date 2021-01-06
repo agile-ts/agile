@@ -1,4 +1,9 @@
-import {Observer, Agile, SubscriptionContainer, RuntimeJob} from '../../../src';
+import {
+  Observer,
+  Agile,
+  SubscriptionContainer,
+  RuntimeJob,
+} from '../../../src';
 
 describe('Observer Tests', () => {
   let dummyAgile: Agile;
@@ -9,8 +14,8 @@ describe('Observer Tests', () => {
 
   beforeEach(() => {
     dummyAgile = new Agile();
-    dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-    dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+    dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+    dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
     dummySubscription1 = new SubscriptionContainer();
     dummySubscription2 = new SubscriptionContainer();
 
@@ -52,7 +57,7 @@ describe('Observer Tests', () => {
     let observer: Observer;
 
     beforeEach(() => {
-      observer = new Observer(dummyAgile, {key: 'observer'});
+      observer = new Observer(dummyAgile, { key: 'observer' });
     });
 
     describe('key set function tests', () => {
@@ -88,8 +93,8 @@ describe('Observer Tests', () => {
       let dummyObserver2: Observer;
 
       beforeEach(() => {
-        dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-        dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+        dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+        dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
       });
 
       it('should add passed Observer to deps', () => {
@@ -111,11 +116,9 @@ describe('Observer Tests', () => {
 
     describe('subscribe function tests', () => {
       let dummySubscriptionContainer1: SubscriptionContainer;
-      let dummySubscriptionContainer2: SubscriptionContainer;
 
       beforeEach(() => {
         dummySubscriptionContainer1 = new SubscriptionContainer();
-        dummySubscriptionContainer2 = new SubscriptionContainer();
       });
 
       it('should add subscriptionContainer to subs and this(Observer) to SubscriptionContainer subs', () => {

@@ -21,7 +21,7 @@ describe('CollectionPersistent Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
       key: 'dummyCollectionKey',
     });
@@ -273,9 +273,9 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest
           .fn()
           .mockReturnValueOnce(Promise.resolve(true))
-          .mockReturnValueOnce({id: '1', name: 'hans'})
+          .mockReturnValueOnce({ id: '1', name: 'hans' })
           .mockReturnValueOnce(undefined)
-          .mockReturnValueOnce({id: '3', name: 'frank'});
+          .mockReturnValueOnce({ id: '3', name: 'frank' });
         dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.loadPersistedValue();
@@ -389,9 +389,9 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest
           .fn()
           .mockReturnValueOnce(Promise.resolve(true))
-          .mockReturnValueOnce({id: '1', name: 'hans'})
+          .mockReturnValueOnce({ id: '1', name: 'hans' })
           .mockReturnValueOnce(undefined)
-          .mockReturnValueOnce({id: '3', name: 'frank'});
+          .mockReturnValueOnce({ id: '3', name: 'frank' });
         dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.loadPersistedValue(

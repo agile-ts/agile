@@ -13,7 +13,7 @@ describe('Runtime Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     console.warn = jest.fn();
   });
@@ -35,9 +35,9 @@ describe('Runtime Tests', () => {
 
     beforeEach(() => {
       runtime = new Runtime(dummyAgile);
-      dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-      dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
-      dummyObserver3 = new Observer(dummyAgile, {key: 'dummyObserver3'});
+      dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+      dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
+      dummyObserver3 = new Observer(dummyAgile, { key: 'dummyObserver3' });
     });
 
     describe('ingest function tests', () => {
@@ -57,7 +57,7 @@ describe('Runtime Tests', () => {
       });
 
       it("shouldn't perform passed Job (config.perform = false)", () => {
-        runtime.ingest(dummyJob, {perform: false});
+        runtime.ingest(dummyJob, { perform: false });
 
         expect(runtime.jobQueue.length).toBe(1);
         expect(runtime.jobQueue[0]).toBe(dummyJob);
@@ -71,9 +71,9 @@ describe('Runtime Tests', () => {
       let dummyJob3: RuntimeJob;
 
       beforeEach(() => {
-        dummyJob1 = new RuntimeJob(dummyObserver1, {key: 'dummyJob1'});
-        dummyJob2 = new RuntimeJob(dummyObserver2, {key: 'dummyJob2'});
-        dummyJob3 = new RuntimeJob(dummyObserver1, {key: 'dummyJob3'});
+        dummyJob1 = new RuntimeJob(dummyObserver1, { key: 'dummyJob1' });
+        dummyJob2 = new RuntimeJob(dummyObserver2, { key: 'dummyJob2' });
+        dummyJob3 = new RuntimeJob(dummyObserver1, { key: 'dummyJob3' });
         dummyJob1.rerender = true;
         dummyJob2.rerender = true;
         dummyJob3.rerender = false;
@@ -136,21 +136,25 @@ describe('Runtime Tests', () => {
       let rComponentSubJob: RuntimeJob;
       let nrArComponentSubJob: RuntimeJob;
       let rCallbackSubContainer: CallbackSubscriptionContainer;
-      let rCallbackSubContainerCallbackFunction = () => {};
+      const rCallbackSubContainerCallbackFunction = () => {
+        /* empty function */
+      };
       let nrCallbackSubContainer: CallbackSubscriptionContainer;
-      let nrCallbackSubContainerCallbackFunction = () => {};
+      const nrCallbackSubContainerCallbackFunction = () => {
+        /* empty function */
+      };
       let rComponentSubContainer: ComponentSubscriptionContainer;
-      let rComponentSubContainerComponent = {
+      const rComponentSubContainerComponent = {
         my: 'cool component',
       };
       let nrComponentSubContainer: ComponentSubscriptionContainer;
-      let nrComponentSubContainerComponent = {
+      const nrComponentSubContainerComponent = {
         my: 'second cool component',
       };
 
       beforeEach(() => {
         dummyAgile.integrate(testIntegration);
-        dummyObserver4 = new Observer(dummyAgile, {key: 'dummyObserver4'});
+        dummyObserver4 = new Observer(dummyAgile, { key: 'dummyObserver4' });
 
         dummyObserver1.value = 'dummyObserverValue1';
         dummyObserver2.value = 'dummyObserverValue2';
@@ -190,8 +194,8 @@ describe('Runtime Tests', () => {
         ).subscriptionContainer as ComponentSubscriptionContainer;
         nrComponentSubContainer.ready = false;
 
-        rComponentSubJob = new RuntimeJob(dummyObserver3, {key: 'dummyJob3'}); // Job with ready Component Subscription
-        rCallbackSubJob = new RuntimeJob(dummyObserver1, {key: 'dummyJob1'}); // Job with ready CallbackSubscription
+        rComponentSubJob = new RuntimeJob(dummyObserver3, { key: 'dummyJob3' }); // Job with ready Component Subscription
+        rCallbackSubJob = new RuntimeJob(dummyObserver1, { key: 'dummyJob1' }); // Job with ready CallbackSubscription
         nrArComponentSubJob = new RuntimeJob(dummyObserver4, {
           key: 'dummyJob4',
         }); // Job with not ready and ready Component Subscription
@@ -351,11 +355,11 @@ describe('Runtime Tests', () => {
 
     describe('handleObjectBasedSubscription function tests', () => {
       let arraySubscriptionContainer: SubscriptionContainer;
-      let dummyComponent = {
+      const dummyComponent = {
         my: 'cool component',
       };
       let objectSubscriptionContainer: SubscriptionContainer;
-      let dummyComponent2 = {
+      const dummyComponent2 = {
         my: 'second cool component',
       };
       let arrayJob: RuntimeJob;
@@ -367,7 +371,7 @@ describe('Runtime Tests', () => {
           dummyComponent,
           [dummyObserver1, dummyObserver2, dummyObserver3],
         );
-        arrayJob = new RuntimeJob(dummyObserver1, {key: 'dummyArrayJob'});
+        arrayJob = new RuntimeJob(dummyObserver1, { key: 'dummyArrayJob' });
 
         objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
           dummyComponent2,
@@ -377,8 +381,8 @@ describe('Runtime Tests', () => {
             observer3: dummyObserver3,
           },
         ).subscriptionContainer;
-        objectJob1 = new RuntimeJob(dummyObserver1, {key: 'dummyObjectJob1'});
-        objectJob2 = new RuntimeJob(dummyObserver3, {key: 'dummyObjectJob2'});
+        objectJob1 = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
+        objectJob2 = new RuntimeJob(dummyObserver3, { key: 'dummyObjectJob2' });
       });
 
       it('should ignore not object based SubscriptionContainer', () => {
@@ -406,7 +410,9 @@ describe('Runtime Tests', () => {
 
     describe('getObjectBasedProps function tests', () => {
       let subscriptionContainer: SubscriptionContainer;
-      let dummyFunction = () => {};
+      const dummyFunction = () => {
+        /* empty function */
+      };
 
       beforeEach(() => {
         subscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(

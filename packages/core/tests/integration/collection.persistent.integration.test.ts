@@ -1,7 +1,7 @@
 // Note: This is no optimized Test!
 //       It was manly used to see if the collection persistent works during the development
 
-import {Agile, Item} from '../../src';
+import { Agile, Item } from '../../src';
 
 describe('Collection Persist Function Tests', () => {
   const myStorage: any = {};
@@ -41,7 +41,7 @@ describe('Collection Persist Function Tests', () => {
       const MY_COLLECTION = App.Collection<User>();
 
       // Test Collecting Item before Persisting
-      MY_COLLECTION.collect({id: 2, name: 'hans'});
+      MY_COLLECTION.collect({ id: 2, name: 'hans' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({});
@@ -63,7 +63,7 @@ describe('Collection Persist Function Tests', () => {
       expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
       // Test collecting new Item
-      MY_COLLECTION.collect({id: 1, name: 'frank'});
+      MY_COLLECTION.collect({ id: 1, name: 'frank' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
@@ -94,7 +94,7 @@ describe('Collection Persist Function Tests', () => {
       expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
       // Test collecting new Item
-      MY_COLLECTION.collect({id: 3, name: 'günter'});
+      MY_COLLECTION.collect({ id: 3, name: 'günter' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
@@ -110,7 +110,7 @@ describe('Collection Persist Function Tests', () => {
       expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
       // Test updating Item
-      MY_COLLECTION.update(3, {name: 'Benno'});
+      MY_COLLECTION.update(3, { name: 'Benno' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
@@ -126,7 +126,7 @@ describe('Collection Persist Function Tests', () => {
       expect(storageMethods.remove).toHaveBeenCalledTimes(0);
 
       // Test updating Item with ItemKey
-      MY_COLLECTION.update(1, {id: 37, name: 'Arne'});
+      MY_COLLECTION.update(1, { id: 37, name: 'Arne' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
@@ -165,9 +165,9 @@ describe('Collection Persist Function Tests', () => {
       expect(MY_COLLECTION.data['3']).toBeInstanceOf(Item);
 
       // Updating some Collection Stuff
-      MY_COLLECTION.update(3, {name: 'Angela'});
-      MY_COLLECTION.collect({id: 4, name: 'Paul'});
-      MY_COLLECTION.collect({id: 99, name: 'Jeff'});
+      MY_COLLECTION.update(3, { name: 'Angela' });
+      MY_COLLECTION.collect({ id: 4, name: 'Paul' });
+      MY_COLLECTION.collect({ id: 99, name: 'Jeff' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({

@@ -16,7 +16,7 @@ describe('State Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(State.prototype, 'set');
     console.error = jest.fn();
@@ -29,7 +29,7 @@ describe('State Tests', () => {
 
     const state = new State(dummyAgile, 'coolValue');
 
-    expect(state.set).toHaveBeenCalledWith('coolValue', {overwrite: true});
+    expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
     expect(state._key).toBeUndefined();
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
@@ -59,7 +59,7 @@ describe('State Tests', () => {
       deps: [dummyObserver],
     });
 
-    expect(state.set).toHaveBeenCalledWith('coolValue', {overwrite: true});
+    expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
     expect(state._key).toBe('coolState');
     expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
@@ -83,7 +83,7 @@ describe('State Tests', () => {
     // Overwrite select once to not call it
     jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
 
-    const state = new State(dummyAgile, 'coolValue', {isPlaceholder: true});
+    const state = new State(dummyAgile, 'coolValue', { isPlaceholder: true });
 
     expect(state.set).not.toHaveBeenCalled();
     expect(state._key).toBeUndefined();
@@ -106,7 +106,7 @@ describe('State Tests', () => {
 
   describe('State Function Tests', () => {
     let numberState: State<number>;
-    let objectState: State<{name: string; age: number}>;
+    let objectState: State<{ name: string; age: number }>;
     let arrayState: State<string[]>;
     let booleanState: State<boolean>;
 
@@ -114,9 +114,9 @@ describe('State Tests', () => {
       numberState = new State<number>(dummyAgile, 10, {
         key: 'numberStateKey',
       });
-      objectState = new State<{name: string; age: number}>(
+      objectState = new State<{ name: string; age: number }>(
         dummyAgile,
-        {name: 'jeff', age: 10},
+        { name: 'jeff', age: 10 },
         {
           key: 'objectStateKey',
         },
@@ -261,7 +261,7 @@ describe('State Tests', () => {
       it("should ingestValue if value hasn't correct type (config.force = true)", () => {
         numberState.type(Number);
 
-        numberState.set('coolValue' as any, {force: true});
+        numberState.set('coolValue' as any, { force: true });
 
         expect(console.warn).toHaveBeenCalledWith(
           'Agile Warn: Incorrect type (string) was provided.',
@@ -414,7 +414,7 @@ describe('State Tests', () => {
       });
 
       it("shouldn't patch and ingest passed object based value into a not object based State (default config)", () => {
-        numberState.patch({changed: 'object'});
+        numberState.patch({ changed: 'object' });
 
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: You can't use the patch method on a non object based States!",
@@ -432,11 +432,11 @@ describe('State Tests', () => {
       });
 
       it('should patch and ingest passed object based value into a object based State (default config)', () => {
-        objectState.patch({name: 'frank'});
+        objectState.patch({ name: 'frank' });
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
-          {age: 10, name: 'jeff'},
-          {name: 'frank'},
+          { age: 10, name: 'jeff' },
+          { name: 'frank' },
           {
             addNewProperties: true,
           },
@@ -456,7 +456,7 @@ describe('State Tests', () => {
 
       it('should patch and ingest passed object based value into a object based State (specific config)', () => {
         objectState.patch(
-          {name: 'frank'},
+          { name: 'frank' },
           {
             addNewProperties: false,
             background: true,
@@ -467,8 +467,8 @@ describe('State Tests', () => {
         );
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
-          {age: 10, name: 'jeff'},
-          {name: 'frank'},
+          { age: 10, name: 'jeff' },
+          { name: 'frank' },
           {
             addNewProperties: false,
           },

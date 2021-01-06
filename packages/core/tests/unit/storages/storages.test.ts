@@ -1,10 +1,10 @@
-import {Storages, Agile, Storage, Persistent} from '../../../src';
+import { Storages, Agile, Storage, Persistent } from '../../../src';
 
 describe('Storages Tests', () => {
   let dummyAgile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Storages.prototype, 'instantiateLocalStorage');
     console.error = jest.fn();
@@ -21,7 +21,7 @@ describe('Storages Tests', () => {
   });
 
   it('should create Storages and should get a warning (config.localStorage = true)', () => {
-    const storages = new Storages(dummyAgile, {localStorage: true});
+    const storages = new Storages(dummyAgile, { localStorage: true });
 
     expect(storages.defaultStorage).toBeUndefined();
     expect(storages.storages).toStrictEqual({});
@@ -104,7 +104,7 @@ describe('Storages Tests', () => {
       });
 
       it('should register Storage and assign it as default Storage with a warning (config.default = false)', () => {
-        const response = storages.register(dummyStorage1, {default: false});
+        const response = storages.register(dummyStorage1, { default: false });
 
         expect(console.warn).toHaveBeenCalledWith(
           'Agile Warn: Be aware that Agile has to assign the first added Storage as default Storage!',
@@ -130,7 +130,7 @@ describe('Storages Tests', () => {
       it('should register second Storage and should assign it as default Storage (config.default = true)', () => {
         storages.register(dummyStorage1);
 
-        const response = storages.register(dummyStorage2, {default: true});
+        const response = storages.register(dummyStorage2, { default: true });
 
         expect(storages.storages).toHaveProperty('storage2');
         expect(storages.storages['storage2']).toBe(dummyStorage2);

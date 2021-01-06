@@ -1,4 +1,4 @@
-import {Observer} from '../../../internal';
+import { Observer } from '../../../internal';
 
 export class SubscriptionContainer {
   public key?: SubscriptionContainerKeyType;
@@ -8,7 +8,7 @@ export class SubscriptionContainer {
   // For Object based Subscription
   public isObjectBased = false;
   public observerKeysToUpdate: Array<string> = []; // Holds temporary keys of Observers that got updated (Note: keys based on 'subsObject')
-  public subsObject?: {[key: string]: Observer}; // Same as subs but in Object shape
+  public subsObject?: { [key: string]: Observer }; // Same as subs but in Object shape
 
   /**
    * @internal

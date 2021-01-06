@@ -1,10 +1,10 @@
-import {Agile, Integration, Integrations} from '../../../src';
+import { Agile, Integration, Integrations } from '../../../src';
 
 describe('Integrations Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     Agile.initialIntegrations = [];
 
     console.error = jest.fn();
@@ -105,8 +105,8 @@ describe('Integrations Tests', () => {
     });
 
     describe('update function tests', () => {
-      const dummyComponentInstance = {my: 'component'};
-      const dummyUpdatedData = {my: 'updatedData'};
+      const dummyComponentInstance = { my: 'component' };
+      const dummyUpdatedData = { my: 'updatedData' };
 
       beforeEach(() => {
         integrations.integrate(dummyIntegration1);

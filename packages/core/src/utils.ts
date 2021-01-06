@@ -1,4 +1,4 @@
-import {State, Agile, Event, Collection, Observer} from './internal';
+import { Agile } from './internal';
 
 //=========================================================================================================
 // Copy
@@ -13,8 +13,8 @@ export function copy<T = any>(value: T): T {
   // Extra checking '!value' because 'typeof null === object'
   if (!value || typeof value !== 'object') return value;
   let temp;
-  let newObject: any = Array.isArray(value) ? [] : {};
-  for (let property in value) {
+  const newObject: any = Array.isArray(value) ? [] : {};
+  for (const property in value) {
     temp = value[property];
     newObject[property] = typeof temp === 'object' ? copy(temp) : temp;
   }
@@ -79,7 +79,7 @@ export function includesArray<DataType = any>(
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
-  config: {createUndefinedArray?: boolean} = {},
+  config: { createUndefinedArray?: boolean } = {},
 ): Array<DataType> {
   config = defineConfig(config, {
     createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
@@ -204,13 +204,13 @@ export function defineConfig<ConfigInterface = Object>(
     overwriteUndefinedProperties = true;
 
   if (overwriteUndefinedProperties) {
-    const finalConfig = {...defaults, ...config};
-    for (let key in finalConfig)
+    const finalConfig = { ...defaults, ...config };
+    for (const key in finalConfig)
       if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
     return finalConfig;
   }
 
-  return {...defaults, ...config};
+  return { ...defaults, ...config };
 }
 
 //=========================================================================================================
@@ -241,7 +241,7 @@ export function flatMerge<DataType = Object>(
   if (!_source) return _source;
 
   // Loop through source object an merge changes into it
-  let keys = Object.keys(changes);
+  const keys = Object.keys(changes);
   keys.forEach((property) => {
     if (!config.addNewProperties && !_source[property]) return;
     _source[property] = changes[property];
@@ -310,7 +310,7 @@ export function clone<T = any>(instance: T): T {
   const objectClone = Object.assign(objectCopy, instance);
 
   // Copy Properties of Class
-  for (let key in objectClone) objectClone[key] = copy(objectClone[key]);
+  for (const key in objectClone) objectClone[key] = copy(objectClone[key]);
 
   return objectClone;
 }

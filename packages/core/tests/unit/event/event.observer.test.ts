@@ -12,7 +12,7 @@ describe('EventObserver Tests', () => {
   let dummyEvent: Event;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyEvent = new Event(dummyAgile);
   });
 
@@ -28,8 +28,8 @@ describe('EventObserver Tests', () => {
   });
 
   it('should create EventObserver (specific config)', () => {
-    const dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-    const dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+    const dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+    const dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
     const dummySubscription1 = new SubscriptionContainer();
     const dummySubscription2 = new SubscriptionContainer();
 

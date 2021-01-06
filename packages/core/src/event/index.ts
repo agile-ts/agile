@@ -6,7 +6,7 @@ import {
   isFunction,
   Observer,
 } from '../internal';
-import {EventObserver} from './event.observer';
+import { EventObserver } from './event.observer';
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;
@@ -16,7 +16,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
   public _key?: EventKey;
   public uses = 0;
-  public callbacks: {[key: string]: EventCallbackFunction<PayloadType>} = {}; // All 'subscribed' callback function
+  public callbacks: { [key: string]: EventCallbackFunction<PayloadType> } = {}; // All 'subscribed' callback function
   public enabled = true;
   public observer: EventObserver;
 
@@ -224,9 +224,11 @@ export class Event<PayloadType = DefaultEventPayload> {
   public normalTrigger(payload: PayloadType, keys?: string[]) {
     // Call wished Callback Functions
     if (!keys) {
-      for (let key in this.callbacks) this.callbacks[key](payload);
+      for (const key in this.callbacks) this.callbacks[key](payload);
     } else {
-      for (let key of keys) this.callbacks[key](payload);
+      for (const key of keys) {
+        if (this.callbacks[key]) this.callbacks[key](payload);
+      }
     }
 
     // Cause rerender
@@ -283,7 +285,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 }
 
 export type EventKey = string | number;
-export type DefaultEventPayload = {[key: string]: any};
+export type DefaultEventPayload = { [key: string]: any };
 export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
   payload: PayloadType,
 ) => void;

@@ -11,12 +11,12 @@ describe('ComponentSubscriptionContainer Tests', () => {
 
   beforeEach(() => {
     dummyAgile = new Agile();
-    dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-    dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+    dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+    dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
   });
 
   it('should create ComponentSubscriptionContainer', () => {
-    const dummyIntegration = {dummy: 'integration'};
+    const dummyIntegration = { dummy: 'integration' };
 
     const subscriptionContainer = new ComponentSubscriptionContainer(
       dummyIntegration,

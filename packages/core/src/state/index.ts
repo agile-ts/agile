@@ -32,14 +32,14 @@ export class State<ValueType = any> {
 
   public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
   public sideEffects: {
-    [key: string]: (properties?: {[key: string]: any}) => void;
+    [key: string]: (properties?: { [key: string]: any }) => void;
   } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
 
-  public watchers: {[key: string]: StateWatcherCallback<ValueType>} = {};
+  public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
 
   /**
    * @public
@@ -70,7 +70,7 @@ export class State<ValueType = any> {
     this.isPlaceholder = true;
 
     // Initial Set
-    if (!config.isPlaceholder) this.set(initialValue, {overwrite: true});
+    if (!config.isPlaceholder) this.set(initialValue, { overwrite: true });
   }
 
   /**
@@ -269,7 +269,7 @@ export class State<ValueType = any> {
     this.nextStateValue = flatMerge<ValueType>(
       copy(this.nextStateValue),
       targetWithChanges,
-      {addNewProperties: config.addNewProperties},
+      { addNewProperties: config.addNewProperties },
     );
 
     // Ingest updated nextStateValue into Runtime
@@ -543,7 +543,7 @@ export class State<ValueType = any> {
    */
   public addSideEffect(
     key: string,
-    sideEffect: (properties?: {[key: string]: any}) => void,
+    sideEffect: (properties?: { [key: string]: any }) => void,
   ): this {
     if (!isFunction(sideEffect)) {
       Agile.logger.error('A sideEffect function has to be a function!');
@@ -589,7 +589,7 @@ export class State<ValueType = any> {
    */
   public hasCorrectType(value: any): boolean {
     if (!this.valueType) return true;
-    let type: string = typeof value;
+    const type = typeof value;
     return type === this.valueType;
   }
 

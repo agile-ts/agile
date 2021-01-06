@@ -11,12 +11,14 @@ describe('CallbackSubscriptionContainer Tests', () => {
 
   beforeEach(() => {
     dummyAgile = new Agile();
-    dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-    dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+    dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+    dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
   });
 
   it('should create CallbackSubscriptionContainer', () => {
-    const dummyIntegration = () => {};
+    const dummyIntegration = () => {
+      /* empty function */
+    };
 
     const subscriptionContainer = new CallbackSubscriptionContainer(
       dummyIntegration,

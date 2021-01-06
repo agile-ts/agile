@@ -1,4 +1,4 @@
-import {Agile, Persistent, Storage} from '../../../src';
+import { Agile, Persistent, Storage } from '../../../src';
 
 describe('Persistent Tests', () => {
   let dummyAgile: Agile;
@@ -6,7 +6,7 @@ describe('Persistent Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
     console.error = jest.fn();
@@ -71,7 +71,7 @@ describe('Persistent Tests', () => {
       .spyOn(Persistent.prototype, 'instantiatePersistent')
       .mockReturnValueOnce(undefined);
 
-    const persistent = new Persistent(dummyAgile, {instantiate: false});
+    const persistent = new Persistent(dummyAgile, { instantiate: false });
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
@@ -209,12 +209,18 @@ describe('Persistent Tests', () => {
           new Storage({
             key: 'storage1',
             methods: {
-              get: (key) => {},
-              set: (key, value) => {},
-              remove: (key) => {},
+              get: () => {
+                /* empty function */
+              },
+              set: () => {
+                /* empty function */
+              },
+              remove: () => {
+                /* empty function */
+              },
             },
           }),
-          {default: true},
+          { default: true },
         );
 
         persistent.assignStorageKeys();

@@ -1,4 +1,4 @@
-import {Agile, Integration, RuntimeJob, Observer} from '../../../src';
+import { Agile, Integration, RuntimeJob, Observer } from '../../../src';
 
 describe('RuntimeJob Tests', () => {
   let dummyAgile: Agile;
@@ -6,7 +6,7 @@ describe('RuntimeJob Tests', () => {
   let dummyObserver: Observer;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({
       key: 'myIntegration',
     });
@@ -69,7 +69,7 @@ describe('RuntimeJob Tests', () => {
   it('should create RuntimeJob and Agile that has integrations (config.background = true)', () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new RuntimeJob(dummyObserver, {background: true});
+    const job = new RuntimeJob(dummyObserver, { background: true });
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);

@@ -29,7 +29,7 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {},
   ) {
-    super(state.agileInstance(), {...config, ...{value: state._value}});
+    super(state.agileInstance(), { ...config, ...{ value: state._value } });
     this.state = () => state;
     this.nextStateValue = copy(state._value);
   }
@@ -145,20 +145,21 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = job.observer.state();
 
     // Call Watchers Functions
-    for (let watcherKey in state.watchers)
+    for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
         state.watchers[watcherKey](state.getPublicValue());
 
     // Call SideEffect Functions
     if (job.config?.sideEffects)
-      for (let sideEffectKey in state.sideEffects)
+      for (const sideEffectKey in state.sideEffects)
         if (isFunction(state.sideEffects[sideEffectKey]))
           state.sideEffects[sideEffectKey](job.config);
 
     // Ingest Dependencies of Observer into Runtime
     state.observer.deps.forEach(
       (observer) =>
-        observer instanceof StateObserver && observer.ingest({perform: false}),
+        observer instanceof StateObserver &&
+        observer.ingest({ perform: false }),
     );
   }
 }

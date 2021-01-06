@@ -1,13 +1,15 @@
-import {Integration} from '../../../src';
+import { Integration } from '../../../src';
 
 describe('Integration Tests', () => {
   it('should create Integration', () => {
     const methods = {
       bind: () => Promise.resolve(true),
-      updateMethod: () => {},
+      updateMethod: () => {
+        /* empty function */
+      },
     };
     const integrationConfig = {
-      frameworkInstance: {react: 'native'},
+      frameworkInstance: { react: 'native' },
       key: 'test',
       ...methods,
     };
@@ -15,7 +17,7 @@ describe('Integration Tests', () => {
     const integration = new Integration(integrationConfig);
 
     expect(integration._key).toBe('test');
-    expect(integration.frameworkInstance).toStrictEqual({react: 'native'});
+    expect(integration.frameworkInstance).toStrictEqual({ react: 'native' });
     expect(integration.ready).toBeFalsy();
     expect(integration.integrated).toBeFalsy();
     expect(integration.methods).toStrictEqual(methods);
@@ -25,7 +27,7 @@ describe('Integration Tests', () => {
     let integration: Integration;
 
     beforeEach(() => {
-      integration = new Integration({key: 'dummyIntegration'});
+      integration = new Integration({ key: 'dummyIntegration' });
     });
 
     describe('key set function tests', () => {

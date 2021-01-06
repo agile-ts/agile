@@ -1,11 +1,11 @@
-import {Event, Agile, Observer, EventObserver} from '../../../src';
+import { Event, Agile, Observer, EventObserver } from '../../../src';
 import * as Utils from '../../../src/utils';
 
 describe('Event Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     console.error = jest.fn();
   });
@@ -97,8 +97,12 @@ describe('Event Tests', () => {
     });
 
     describe('on function tests', () => {
-      const dummyCallbackFunction1 = () => {};
-      const dummyCallbackFunction2 = () => {};
+      const dummyCallbackFunction1 = () => {
+        /* empty function */
+      };
+      const dummyCallbackFunction2 = () => {
+        /* empty function */
+      };
 
       it('should add passed callbackFunction to callbacks at passed key', () => {
         const response = event.on('dummyKey', dummyCallbackFunction1);
@@ -216,8 +220,11 @@ describe('Event Tests', () => {
 
     describe('reset function tests', () => {
       it('should reset enabled, uses and the currentTimeout', () => {
-        const timeout = setTimeout(() => {}, 1000);
+        const timeout = setTimeout(() => {
+          /* empty function */
+        }, 1000);
         // @ts-ignore
+        // eslint-disable-next-line no-global-assign
         clearTimeout = jest.fn();
         event.enabled = undefined;
         event.uses = 100;
@@ -234,7 +241,9 @@ describe('Event Tests', () => {
 
     describe('removeCallback function tests', () => {
       beforeEach(() => {
-        event.callbacks['dummyKey'] = () => {};
+        event.callbacks['dummyKey'] = () => {
+          /* empty function */
+        };
       });
 
       it('should remove callback at key from Event', () => {

@@ -1,4 +1,4 @@
-import {Agile} from '../internal';
+import { Agile } from '../internal';
 
 export class Integration<F = any, C = any> {
   public _key: IntegrationKey;

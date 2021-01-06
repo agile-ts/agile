@@ -102,7 +102,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!loadedValue) return false;
 
     // Assign loaded Value to State
-    this.state().set(loadedValue, {storage: false});
+    this.state().set(loadedValue, { storage: false });
 
     // Persist State, so that the Storage Value updates dynamically if the State updates
     await this.persistValue(_key);

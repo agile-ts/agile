@@ -1,10 +1,10 @@
-import {ComputedTracker, Observer, Agile} from '../../../src';
+import { ComputedTracker, Observer, Agile } from '../../../src';
 
 describe('ComputedTracker Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     // Reset ComputedTracker (because it works static)
     ComputedTracker.isTracking = false;

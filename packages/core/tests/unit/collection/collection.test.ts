@@ -16,11 +16,12 @@ describe('Collection Tests', () => {
     id: string;
     name: string;
   }
+
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
@@ -144,7 +145,7 @@ describe('Collection Tests', () => {
     let collection: Collection<ItemInterface>;
 
     beforeEach(() => {
-      collection = new Collection(dummyAgile, {key: 'collectionKey'});
+      collection = new Collection(dummyAgile, { key: 'collectionKey' });
     });
 
     it('should call setKey with passed value', () => {
@@ -363,7 +364,7 @@ describe('Collection Tests', () => {
       it('should add Data to Collection and to default Group (default config)', () => {
         collection.setData = jest.fn(() => true);
 
-        collection.collect({id: '1', name: 'frank'});
+        collection.collect({ id: '1', name: 'frank' });
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
@@ -390,7 +391,7 @@ describe('Collection Tests', () => {
       it('should add Data to Collection and to default Group (specific config)', () => {
         collection.setData = jest.fn(() => true);
 
-        collection.collect({id: '1', name: 'frank'}, [], {
+        collection.collect({ id: '1', name: 'frank' }, [], {
           background: true,
           method: 'unshift',
           patch: true,
@@ -423,8 +424,8 @@ describe('Collection Tests', () => {
 
         collection.collect(
           [
-            {id: '1', name: 'frank'},
-            {id: '2', name: 'hans'},
+            { id: '1', name: 'frank' },
+            { id: '2', name: 'hans' },
           ],
           ['dummyGroup1', 'dummyGroup2'],
         );
@@ -482,7 +483,7 @@ describe('Collection Tests', () => {
       it("should call setData and shouldn't add Items to passed Groups if setData failed (default config)", () => {
         collection.setData = jest.fn(() => false);
 
-        collection.collect({id: '1', name: 'frank'}, [
+        collection.collect({ id: '1', name: 'frank' }, [
           'dummyGroup1',
           'dummyGroup2',
         ]);
@@ -515,7 +516,7 @@ describe('Collection Tests', () => {
           return notExistingGroup as any;
         });
 
-        collection.collect({id: '1', name: 'frank'}, 'notExistingGroup');
+        collection.collect({ id: '1', name: 'frank' }, 'notExistingGroup');
 
         expect(collection.setData).toHaveBeenCalledWith(
           {
@@ -548,11 +549,11 @@ describe('Collection Tests', () => {
 
         collection.collect(
           [
-            {id: '1', name: 'frank'},
-            {id: '2', name: 'hans'},
+            { id: '1', name: 'frank' },
+            { id: '2', name: 'hans' },
           ],
           [],
-          {select: true},
+          { select: true },
         );
 
         expect(collection.createSelector).toHaveBeenCalledWith('1', '1');
@@ -565,20 +566,20 @@ describe('Collection Tests', () => {
 
         collection.collect(
           [
-            {id: '1', name: 'frank'},
-            {id: '2', name: 'hans'},
+            { id: '1', name: 'frank' },
+            { id: '2', name: 'hans' },
           ],
           [],
-          {forEachItem: forEachItemMock},
+          { forEachItem: forEachItemMock },
         );
 
         expect(forEachItemMock).toHaveBeenCalledWith(
-          {id: '1', name: 'frank'},
+          { id: '1', name: 'frank' },
           '1',
           0,
         );
         expect(forEachItemMock).toHaveBeenCalledWith(
-          {id: '2', name: 'hans'},
+          { id: '2', name: 'hans' },
           '2',
           1,
         );
@@ -589,7 +590,7 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: 'dummyItem', name: 'frank'});
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
@@ -599,7 +600,7 @@ describe('Collection Tests', () => {
       });
 
       it('should update existing Item with valid changes Object (default config)', () => {
-        const response = collection.update('dummyItem', {name: 'hans'});
+        const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
@@ -618,7 +619,7 @@ describe('Collection Tests', () => {
       it('should update existing Item with valid changes Object (specific config)', () => {
         const response = collection.update(
           'dummyItem',
-          {name: 'hans'},
+          { name: 'hans' },
           {
             addNewProperties: true,
             background: true,
@@ -642,7 +643,7 @@ describe('Collection Tests', () => {
       it('should update existing placeholder Item with valid changes Object (default config)', () => {
         dummyItem.isPlaceholder = true;
 
-        const response = collection.update('dummyItem', {name: 'hans'});
+        const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
@@ -659,7 +660,7 @@ describe('Collection Tests', () => {
       });
 
       it("shouldn't update not existing Item and should print error", () => {
-        const response = collection.update('notExisting', {name: 'hans'});
+        const response = collection.update('notExisting', { name: 'hans' });
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
@@ -715,12 +716,12 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: 'dummyItem', name: 'frank'});
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
 
-        dummyGroup = new Group(collection, [], {key: 'dummyGroup'});
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -785,7 +786,7 @@ describe('Collection Tests', () => {
       it('should call getGroup and return true if getGroup returns Group (specific config)', () => {
         collection.getGroup = jest.fn(() => dummyGroup as any);
 
-        const response = collection.hasGroup('test', {notExisting: true});
+        const response = collection.hasGroup('test', { notExisting: true });
 
         expect(response).toBeTruthy();
         expect(collection.getGroup).toHaveBeenCalledWith('test', {
@@ -807,7 +808,7 @@ describe('Collection Tests', () => {
       let dummyGroup: Group;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], {key: 'dummyGroup'});
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -858,7 +859,7 @@ describe('Collection Tests', () => {
       let dummyGroup: Group;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], {key: 'dummyGroup'});
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -890,7 +891,7 @@ describe('Collection Tests', () => {
       let dummyGroup: Group;
 
       beforeEach(() => {
-        dummyGroup = new Group(collection, [], {key: 'dummyGroup'});
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -917,7 +918,7 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: 'dummyItem', name: 'frank'});
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
@@ -995,7 +996,7 @@ describe('Collection Tests', () => {
       it('should call getSelector and return true if getSelector returns Selector (specific config)', () => {
         collection.getSelector = jest.fn(() => dummySelector as any);
 
-        const response = collection.hasSelector('test', {notExisting: true});
+        const response = collection.hasSelector('test', { notExisting: true });
 
         expect(response).toBeTruthy();
         expect(collection.getSelector).toHaveBeenCalledWith('test', {
@@ -1139,7 +1140,7 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: '1', name: 'Jeff'});
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
 
         collection.getItem = jest.fn();
       });
@@ -1156,7 +1157,7 @@ describe('Collection Tests', () => {
       it('should call getItem and return true if getItem returns Item (specific config)', () => {
         collection.getItem = jest.fn(() => dummyItem);
 
-        const response = collection.hasItem('test', {notExisting: true});
+        const response = collection.hasItem('test', { notExisting: true });
 
         expect(response).toBeTruthy();
         expect(collection.getItem).toHaveBeenCalledWith('test', {
@@ -1178,7 +1179,7 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: '1', name: 'Jeff'});
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
         collection.data = {
           ['1']: dummyItem,
         };
@@ -1229,7 +1230,7 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: '1', name: 'Jeff'});
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
         collection.data = {
           ['1']: dummyItem,
         };
@@ -1261,7 +1262,7 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: '1', name: 'Jeff'});
+        dummyItem = new Item(collection, { id: '1', name: 'Jeff' });
         collection.data = {
           ['1']: dummyItem,
         };
@@ -1442,11 +1443,11 @@ describe('Collection Tests', () => {
       let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem = new Item(collection, {id: 'dummyItem', name: 'frank'});
+        dummyItem = new Item(collection, { id: 'dummyItem', name: 'frank' });
         collection.data = {
           dummyItem: dummyItem,
         };
-        dummyGroup = new Group(collection, [], {key: 'dummyGroup'});
+        dummyGroup = new Group(collection, [], { key: 'dummyGroup' });
         collection.groups = {
           dummyGroup: dummyGroup,
         };
@@ -1476,8 +1477,8 @@ describe('Collection Tests', () => {
       let dummyGroup2: Group;
 
       beforeEach(() => {
-        dummyGroup1 = new Group(collection, [], {key: 'dummyGroup1'});
-        dummyGroup2 = new Group(collection, [], {key: 'dummyGroup2'});
+        dummyGroup1 = new Group(collection, [], { key: 'dummyGroup1' });
+        dummyGroup2 = new Group(collection, [], { key: 'dummyGroup2' });
         collection.groups = {
           dummyGroup1: dummyGroup1,
           dummyGroup2: dummyGroup2,
@@ -1528,9 +1529,9 @@ describe('Collection Tests', () => {
       let dummyItem2: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item(collection, {id: 'dummyItem1', name: 'Jeff'});
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         dummyItem1.persistent = new StatePersistent(dummyItem1);
-        dummyItem2 = new Item(collection, {id: 'dummyItem2', name: 'Hans'});
+        dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Hans' });
         dummyItem2.persistent = new StatePersistent(dummyItem2);
         collection.data = {
           dummyItem1: dummyItem1,
@@ -1857,9 +1858,9 @@ describe('Collection Tests', () => {
       let dummyItem2: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item(collection, {id: 'dummyItem1', name: 'Jeff'});
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         dummyItem1.persistent = new StatePersistent(dummyItem1);
-        dummyItem2 = new Item(collection, {id: 'dummyItem2', name: 'Hans'});
+        dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Hans' });
         dummyItem2.persistent = new StatePersistent(dummyItem2);
         collection.data = {
           dummyItem1: dummyItem1,
@@ -1948,7 +1949,7 @@ describe('Collection Tests', () => {
       let dummyItem1: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummyItem1 = new Item(collection, {id: 'dummyItem1', name: 'Jeff'});
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         collection.data = {
           dummyItem1: dummyItem1,
         };
@@ -1959,7 +1960,7 @@ describe('Collection Tests', () => {
       });
 
       it('should create new Item out of valid Data, rebuild Groups and increase size (default config)', () => {
-        const response = collection.setData({id: 'dummyItem2', name: 'Hans'});
+        const response = collection.setData({ id: 'dummyItem2', name: 'Hans' });
 
         expect(response).toBeTruthy();
         expect(collection.data).toHaveProperty('dummyItem1');
@@ -1984,7 +1985,7 @@ describe('Collection Tests', () => {
       });
 
       it("shouldn't create new Item if passed Data has no primaryKey", () => {
-        const response = collection.setData({name: 'Frank'} as any);
+        const response = collection.setData({ name: 'Frank' } as any);
 
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: Collection '${collection._key}' Item Data has to contain a primaryKey property called '${collection.config.primaryKey}'!`,
@@ -2007,8 +2008,8 @@ describe('Collection Tests', () => {
         expect(collection.size).toBe(1);
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
-          {id: 'dummyItem1', name: 'Dieter'},
-          {background: false},
+          { id: 'dummyItem1', name: 'Dieter' },
+          { background: false },
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
       });
@@ -2019,7 +2020,7 @@ describe('Collection Tests', () => {
             id: 'dummyItem1',
             name: 'Dieter',
           },
-          {background: true},
+          { background: true },
         );
 
         expect(response).toBeTruthy();
@@ -2029,8 +2030,8 @@ describe('Collection Tests', () => {
         expect(collection.size).toBe(1);
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
-          {id: 'dummyItem1', name: 'Dieter'},
-          {background: true},
+          { id: 'dummyItem1', name: 'Dieter' },
+          { background: true },
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
       });
@@ -2041,7 +2042,7 @@ describe('Collection Tests', () => {
             id: 'dummyItem1',
             name: 'Dieter',
           },
-          {patch: true, background: true},
+          { patch: true, background: true },
         );
 
         expect(response).toBeTruthy();
@@ -2052,8 +2053,8 @@ describe('Collection Tests', () => {
 
         expect(dummyItem1.set).not.toHaveBeenCalled();
         expect(dummyItem1.patch).toHaveBeenCalledWith(
-          {id: 'dummyItem1', name: 'Dieter'},
-          {background: true},
+          { id: 'dummyItem1', name: 'Dieter' },
+          { background: true },
         );
       });
 
@@ -2073,8 +2074,8 @@ describe('Collection Tests', () => {
         expect(collection.size).toBe(1);
 
         expect(dummyItem1.set).toHaveBeenCalledWith(
-          {id: 'dummyItem1', name: 'Dieter'},
-          {background: false},
+          { id: 'dummyItem1', name: 'Dieter' },
+          { background: false },
         );
       });
     });

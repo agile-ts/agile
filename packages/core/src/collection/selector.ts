@@ -42,7 +42,7 @@ export class Selector<DataType = DefaultItem> extends State<
     this.isPlaceholder = true;
 
     // Initial Select
-    if (!config.isPlaceholder) this.select(itemKey, {overwrite: true});
+    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -77,7 +77,7 @@ export class Selector<DataType = DefaultItem> extends State<
     const oldItem = this.collection().getItem(this._itemKey, {
       notExisting: true,
     }); // Because this.item might be outdated
-    let newItem = this.collection().getItemWithReference(itemKey);
+    const newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
       sideEffects: true,
@@ -92,7 +92,7 @@ export class Selector<DataType = DefaultItem> extends State<
     }
 
     // Unselect old Item
-    this.unselect({background: true});
+    this.unselect({ background: true });
 
     this._itemKey = itemKey;
     this.item = newItem;

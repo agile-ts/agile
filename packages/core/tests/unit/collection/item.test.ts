@@ -1,11 +1,11 @@
-import {Item, Collection, Agile, StateObserver, State} from '../../../src';
+import { Item, Collection, Agile, StateObserver, State } from '../../../src';
 
 describe('Item Tests', () => {
   let dummyAgile: Agile;
   let dummyCollection: Collection;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection(dummyAgile);
 
     jest.spyOn(State.prototype, 'setKey');
@@ -16,13 +16,13 @@ describe('Item Tests', () => {
     // Overwrite setKey once to not call it
     jest.spyOn(Item.prototype, 'setKey').mockReturnValueOnce(undefined);
 
-    const dummyData = {id: 'dummyId', name: 'dummyName'};
+    const dummyData = { id: 'dummyId', name: 'dummyName' };
     const item = new Item(dummyCollection, dummyData);
 
     expect(item.collection()).toBe(dummyCollection);
     expect(item.setKey).toHaveBeenCalledWith(
       dummyData[dummyCollection.config.primaryKey],
-      {updateItemValuePrimaryKey: false},
+      { updateItemValuePrimaryKey: false },
     );
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
@@ -50,7 +50,7 @@ describe('Item Tests', () => {
     // Overwrite setKey once to not call it
     jest.spyOn(Item.prototype, 'setKey').mockReturnValueOnce(undefined);
 
-    const dummyData = {id: 'dummyId', name: 'dummyName'};
+    const dummyData = { id: 'dummyId', name: 'dummyName' };
     const item = new Item(dummyCollection, dummyData, {
       isPlaceholder: true,
     });
@@ -58,7 +58,7 @@ describe('Item Tests', () => {
     expect(item.collection()).toBe(dummyCollection);
     expect(item.setKey).toHaveBeenCalledWith(
       dummyData[dummyCollection.config.primaryKey],
-      {updateItemValuePrimaryKey: false},
+      { updateItemValuePrimaryKey: false },
     );
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
@@ -86,7 +86,7 @@ describe('Item Tests', () => {
     let item: Item;
 
     beforeEach(() => {
-      item = new Item(dummyCollection, {id: 'dummyId', name: 'dummyName'});
+      item = new Item(dummyCollection, { id: 'dummyId', name: 'dummyName' });
 
       item.removeSideEffect = jest.fn();
       item.patch = jest.fn();
@@ -195,7 +195,7 @@ describe('Item Tests', () => {
 
           expect(
             dummyCollection.rebuildGroupsThatIncludeItemKey,
-          ).toHaveBeenCalledWith('myNewKey', {dummy: 'property'});
+          ).toHaveBeenCalledWith('myNewKey', { dummy: 'property' });
         });
       });
     });

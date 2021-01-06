@@ -26,7 +26,7 @@ describe('Utils Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     // @ts-ignore | Reset globalThis
     globalThis = {};
@@ -49,35 +49,35 @@ describe('Utils Tests', () => {
     });
 
     it('should copy Object without any reference', () => {
-      const myObject = {id: 1, name: 'jeff'};
+      const myObject = { id: 1, name: 'jeff' };
       const myCopiedObject = copy(myObject);
 
-      expect(myCopiedObject).toStrictEqual({id: 1, name: 'jeff'});
-      expect(myObject).toStrictEqual({id: 1, name: 'jeff'});
+      expect(myCopiedObject).toStrictEqual({ id: 1, name: 'jeff' });
+      expect(myObject).toStrictEqual({ id: 1, name: 'jeff' });
 
       myObject.name = 'hans';
 
-      expect(myObject).toStrictEqual({id: 1, name: 'hans'});
-      expect(myCopiedObject).toStrictEqual({id: 1, name: 'jeff'});
+      expect(myObject).toStrictEqual({ id: 1, name: 'hans' });
+      expect(myCopiedObject).toStrictEqual({ id: 1, name: 'jeff' });
     });
 
     it('should copy deep Object without any reference', () => {
       const myObject = {
         id: 1,
         name: 'jeff',
-        location: {country: 'Germany', state: 'Bayern'},
+        location: { country: 'Germany', state: 'Bayern' },
       };
       const myCopiedObject = copy(myObject);
 
       expect(myCopiedObject).toStrictEqual({
         id: 1,
         name: 'jeff',
-        location: {country: 'Germany', state: 'Bayern'},
+        location: { country: 'Germany', state: 'Bayern' },
       });
       expect(myObject).toStrictEqual({
         id: 1,
         name: 'jeff',
-        location: {country: 'Germany', state: 'Bayern'},
+        location: { country: 'Germany', state: 'Bayern' },
       });
 
       myObject.name = 'hans';
@@ -86,12 +86,12 @@ describe('Utils Tests', () => {
       expect(myObject).toStrictEqual({
         id: 1,
         name: 'hans',
-        location: {country: 'Germany', state: 'Sachsen'},
+        location: { country: 'Germany', state: 'Sachsen' },
       });
       expect(myCopiedObject).toStrictEqual({
         id: 1,
         name: 'jeff',
-        location: {country: 'Germany', state: 'Bayern'},
+        location: { country: 'Germany', state: 'Bayern' },
       });
     });
 
@@ -122,8 +122,10 @@ describe('Utils Tests', () => {
     });
 
     it('should return true if passed instance is valid Object', () => {
-      expect(isValidObject({hello: 'jeff'})).toBe(true);
-      expect(isValidObject({hello: 'jeff', deep: {hello: 'franz'}})).toBe(true);
+      expect(isValidObject({ hello: 'jeff' })).toBe(true);
+      expect(isValidObject({ hello: 'jeff', deep: { hello: 'franz' } })).toBe(
+        true,
+      );
     });
   });
 
@@ -166,7 +168,7 @@ describe('Utils Tests', () => {
 
     it('should normalize undefined (config.createUndefinedArray = true)', () => {
       expect(
-        normalizeArray(undefined, {createUndefinedArray: true}),
+        normalizeArray(undefined, { createUndefinedArray: true }),
       ).toStrictEqual([undefined]);
     });
   });
@@ -220,30 +222,50 @@ describe('Utils Tests', () => {
 
   describe('isFunction function tests', () => {
     it('should return true if passed instance is valid Function', () => {
-      expect(isFunction(() => {})).toBe(true);
+      expect(
+        isFunction(() => {
+          /* empty function */
+        }),
+      ).toBe(true);
     });
 
     it('should return false if passed instance is invalid Function', () => {
       expect(isFunction('hello')).toBe(false);
       expect(isFunction(1)).toBe(false);
       expect(isFunction([1, 2, 3])).toBe(false);
-      expect(isFunction({hello: 'jeff'})).toBe(false);
+      expect(isFunction({ hello: 'jeff' })).toBe(false);
     });
   });
 
   describe('isAsyncFunction function tests', () => {
     it('should return true if passed instance is valid async Function', () => {
-      expect(isAsyncFunction(async () => {})).toBe(true);
-      expect(isAsyncFunction(async function () {})).toBe(true);
+      expect(
+        isAsyncFunction(async () => {
+          /* empty function */
+        }),
+      ).toBe(true);
+      expect(
+        isAsyncFunction(async function () {
+          /* empty function */
+        }),
+      ).toBe(true);
     });
 
     it('should return false if passed instance is invalid async Function', () => {
       expect(isAsyncFunction('hello')).toBe(false);
       expect(isAsyncFunction(1)).toBe(false);
       expect(isAsyncFunction([1, 2, 3])).toBe(false);
-      expect(isAsyncFunction({hello: 'jeff'})).toBe(false);
-      expect(isAsyncFunction(() => {})).toBe(false);
-      expect(isAsyncFunction(function () {})).toBe(false);
+      expect(isAsyncFunction({ hello: 'jeff' })).toBe(false);
+      expect(
+        isAsyncFunction(() => {
+          /* empty function */
+        }),
+      ).toBe(false);
+      expect(
+        isAsyncFunction(function () {
+          /* empty function */
+        }),
+      ).toBe(false);
     });
   });
 
@@ -280,7 +302,7 @@ describe('Utils Tests', () => {
         false,
       );
       expect(isJsonString(10)).toBe(false);
-      expect(isJsonString({name: 'John', age: 31})).toBe(false);
+      expect(isJsonString({ name: 'John', age: 31 })).toBe(false);
     });
   });
 
@@ -388,7 +410,7 @@ describe('Utils Tests', () => {
             size: 177,
             location: 'behind you',
           },
-          {addNewProperties: true},
+          { addNewProperties: true },
         ),
       ).toStrictEqual({
         id: 123,
@@ -425,7 +447,7 @@ describe('Utils Tests', () => {
 
   describe('equal function tests', () => {
     it('should return true if value1 and value2 are equal', () => {
-      expect(equal({id: 123, name: 'jeff'}, {id: 123, name: 'jeff'})).toBe(
+      expect(equal({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' })).toBe(
         true,
       );
       expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
@@ -434,7 +456,7 @@ describe('Utils Tests', () => {
     });
 
     it("should return false if value1 and value2 aren't equal", () => {
-      expect(equal({id: 123, name: 'jeff'}, {id: 123, name: 'hans'})).toBe(
+      expect(equal({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' })).toBe(
         false,
       );
       expect(equal([1, 2], [3, 5])).toBe(false);
@@ -445,18 +467,18 @@ describe('Utils Tests', () => {
 
   describe('notEqual function tests', () => {
     it('should return false if value1 and value2 are equal', () => {
-      expect(notEqual({id: 123, name: 'jeff'}, {id: 123, name: 'jeff'})).toBe(
-        false,
-      );
+      expect(
+        notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' }),
+      ).toBe(false);
       expect(notEqual([1, 2, 3], [1, 2, 3])).toBe(false);
       expect(notEqual(12, 12)).toBe(false);
       expect(equal('hi', 'bye')).toBe(false);
     });
 
     it("should return true if value1 and value2 aren't equal", () => {
-      expect(notEqual({id: 123, name: 'jeff'}, {id: 123, name: 'hans'})).toBe(
-        true,
-      );
+      expect(
+        notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' }),
+      ).toBe(true);
       expect(notEqual([1, 2], [3, 5])).toBe(true);
       expect(notEqual(12, 13)).toBe(true);
       expect(notEqual('hi', 'bye')).toBe(true);
@@ -482,7 +504,7 @@ describe('Utils Tests', () => {
         constructor(
           public id: number,
           public name: string,
-          public location: {country: string; state: string},
+          public location: { country: string; state: string },
         ) {}
       }
       const dummyClass = new DummyClass(10, 'jeff', {

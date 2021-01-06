@@ -12,7 +12,7 @@ export class Logger {
   public isActive: boolean;
   public config: LoggerConfigInterface;
   public allowedTags: string[] = [];
-  public loggerCategories: {[key: string]: LoggerCategoryInterface} = {}; // Holds all registered Logger Categories
+  public loggerCategories: { [key: string]: LoggerCategoryInterface } = {}; // Holds all registered Logger Categories
   public watchers: {
     [key: string]: LoggerWatcherConfigInterface;
   } = {};
@@ -132,13 +132,27 @@ export class Logger {
       };
     }
     return {
-      log: () => {},
-      debug: () => {},
-      info: () => {},
-      warn: () => {},
-      error: () => {},
-      trace: () => {},
-      table: () => {},
+      log: () => {
+        /* do nothing */
+      },
+      debug: () => {
+        /* do nothing */
+      },
+      info: () => {
+        /* do nothing */
+      },
+      warn: () => {
+        /* do nothing */
+      },
+      error: () => {
+        /* do nothing */
+      },
+      trace: () => {
+        /* do nothing */
+      },
+      table: () => {
+        /* do nothing */
+      },
     };
   }
 
@@ -220,7 +234,7 @@ export class Logger {
 
     // Build Prefix of Log
     const buildPrefix = (): string => {
-      let prefix: string = '';
+      let prefix = '';
       if (this.config.prefix) prefix = prefix.concat(this.config.prefix);
       if (loggerCategory.prefix)
         prefix = prefix.concat(' ' + loggerCategory.prefix);
@@ -235,7 +249,7 @@ export class Logger {
     else data.unshift(buildPrefix());
 
     // Call Watcher Callbacks
-    for (let key in this.watchers) {
+    for (const key in this.watchers) {
       const watcher = this.watchers[key];
       if (loggerCategory.level >= (watcher.level || 0)) {
         watcher.callback(loggerCategory, data);
@@ -246,7 +260,7 @@ export class Logger {
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
       let hasStyledString = false; // NOTE: Only one style can be used for one String block!
-      for (let log of data) {
+      for (const log of data) {
         if (!hasStyledString && typeof log === 'string') {
           newLogs.push(`%c${log}`);
           newLogs.push(loggerCategory.customStyle);

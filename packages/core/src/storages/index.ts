@@ -12,7 +12,7 @@ export class Storages {
   public agileInstance: () => Agile;
 
   public defaultStorage?: Storage;
-  public storages: {[key: string]: Storage} = {}; // All registered Storages
+  public storages: { [key: string]: Storage } = {}; // All registered Storages
   public persistentInstances: Set<Persistent> = new Set();
 
   /**
@@ -55,7 +55,7 @@ export class Storages {
         remove: localStorage.removeItem.bind(localStorage),
       },
     });
-    return this.register(_localStorage, {default: true});
+    return this.register(_localStorage, { default: true });
   }
 
   //=========================================================================================================
@@ -74,7 +74,7 @@ export class Storages {
     const hasRegisteredAnyStorage = notEqual(this.storages, {});
 
     // Check if Storage already exists
-    if (this.storages.hasOwnProperty(storage.key)) {
+    if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
       Agile.logger.error(
         `Storage with the key/name '${storage.key}' already exists`,
       );
@@ -190,7 +190,7 @@ export class Storages {
 
     // Call set Method in specific Storages
     if (storageKeys) {
-      for (let storageKey of storageKeys)
+      for (const storageKey of storageKeys)
         this.getStorage(storageKey)?.set(key, value);
       return;
     }
@@ -218,7 +218,7 @@ export class Storages {
 
     // Call remove Method in specific Storages
     if (storageKeys) {
-      for (let storageKey of storageKeys)
+      for (const storageKey of storageKeys)
         this.getStorage(storageKey)?.remove(key);
       return;
     }

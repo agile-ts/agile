@@ -1,4 +1,4 @@
-import {Storage} from '../../../src';
+import { Storage } from '../../../src';
 
 describe('Storage Tests', () => {
   let dummyStorageMethods;
@@ -185,7 +185,7 @@ describe('Storage Tests', () => {
 
         const response = storage.normalGet('myTestKey');
 
-        expect(response).toStrictEqual([{dummy: 'json'}]);
+        expect(response).toStrictEqual([{ dummy: 'json' }]);
         expect(storage.methods.get).toHaveBeenCalledWith(
           storage.getStorageKey('myTestKey'),
         );
@@ -253,7 +253,7 @@ describe('Storage Tests', () => {
 
         const response = await storage.get('myTestKey');
 
-        expect(response).toStrictEqual([{dummy: 'json'}]);
+        expect(response).toStrictEqual([{ dummy: 'json' }]);
         // Couldn't figure out how to create an async mock function
         // expect(storage.methods.get).toHaveBeenCalledWith(
         //  storage.getStorageKey("myTestKey")

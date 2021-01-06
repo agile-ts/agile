@@ -1,6 +1,5 @@
 import {
   Agile,
-  RuntimeJob,
   StateObserver,
   StateRuntimeJob,
   State,
@@ -16,7 +15,7 @@ describe('RuntimeJob Tests', () => {
   let dummyObserver: StateObserver;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({
       key: 'myIntegration',
     });
@@ -86,7 +85,7 @@ describe('RuntimeJob Tests', () => {
   it('should create RuntimeJob and Agile that has integrations (config.background = true)', () => {
     dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver, {background: true});
+    const job = new StateRuntimeJob(dummyObserver, { background: true });
 
     expect(job._key).toBeUndefined();
     expect(job.observer).toBe(dummyObserver);

@@ -14,8 +14,8 @@ describe('StateObserver Tests', () => {
   let dummyState: State;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
-    dummyState = new State(dummyAgile, 'dummyValue', {key: 'dummyState'});
+    dummyAgile = new Agile({ localStorage: false });
+    dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });
   });
 
   it('should create StateObserver (default config)', () => {
@@ -31,8 +31,8 @@ describe('StateObserver Tests', () => {
   });
 
   it('should create StateObserver (specific config)', () => {
-    const dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-    const dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+    const dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+    const dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
     const dummySubscription1 = new SubscriptionContainer();
     const dummySubscription2 = new SubscriptionContainer();
 
@@ -69,9 +69,15 @@ describe('StateObserver Tests', () => {
       let dummyComputed: Computed;
 
       beforeEach(() => {
-        dummyComputed = new Computed(dummyAgile, () => {}, {
-          key: 'dummyComputed',
-        });
+        dummyComputed = new Computed(
+          dummyAgile,
+          () => {
+            /* empty function */
+          },
+          {
+            key: 'dummyComputed',
+          },
+        );
         computedObserver = new StateObserver(dummyComputed, {
           key: 'computedObserverKey',
         });
@@ -205,7 +211,7 @@ describe('StateObserver Tests', () => {
           });
         });
 
-        stateObserver.ingestValue('updatedDummyValue', {force: true});
+        stateObserver.ingestValue('updatedDummyValue', { force: true });
 
         expect(stateObserver.nextStateValue).toBe('updatedDummyValue');
         expect(dummyAgile.runtime.ingest).toHaveBeenCalledWith(

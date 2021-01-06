@@ -11,7 +11,7 @@ describe('SubController Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
   });
 
   it('should create SubController', () => {
@@ -27,8 +27,8 @@ describe('SubController Tests', () => {
     let dummyObserver2: Observer;
 
     beforeEach(() => {
-      dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-      dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+      dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+      dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
       subController = new SubController(dummyAgile);
     });
 
@@ -149,7 +149,9 @@ describe('SubController Tests', () => {
       });
 
       it('should unsubscribe callbackSubscriptionContainer', () => {
-        const dummyIntegration = () => {};
+        const dummyIntegration = () => {
+          /* empty function */
+        };
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
@@ -228,7 +230,9 @@ describe('SubController Tests', () => {
       });
 
       it('should call registerCallbackSubscription if passed integrationInstance is a Function', () => {
-        const dummyIntegration = () => {};
+        const dummyIntegration = () => {
+          /* empty function */
+        };
 
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
@@ -248,7 +252,7 @@ describe('SubController Tests', () => {
       });
 
       it('should call registerComponentSubscription if passed integrationInstance is not a Function', () => {
-        const dummyIntegration = {dummy: 'integration'};
+        const dummyIntegration = { dummy: 'integration' };
 
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
@@ -272,7 +276,7 @@ describe('SubController Tests', () => {
 
     describe('registerComponentSubscription function tests', () => {
       it('should return ready componentSubscriptionContainer and add it to dummyIntegration (agileInstance.config.mount = false)', () => {
-        const dummyIntegration: any = {dummy: 'integration'};
+        const dummyIntegration: any = { dummy: 'integration' };
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
@@ -347,7 +351,9 @@ describe('SubController Tests', () => {
 
     describe('registerCallbackSubscription function tests', () => {
       it('should return callbackSubscriptionContainer', () => {
-        const dummyIntegration = () => {};
+        const dummyIntegration = () => {
+          /* empty function */
+        };
 
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,

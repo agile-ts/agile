@@ -26,5 +26,7 @@ module.exports = {
     'func-names': OFF,
     '@typescript-eslint/no-explicit-any': OFF,
     '@typescript-eslint/explicit-module-boundary-types': OFF,
+    '@typescript-eslint/ban-types': WARNING,
+    '@typescript-eslint/ban-ts-comment': WARNING,
   },
 };

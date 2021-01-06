@@ -178,7 +178,7 @@ export class Runtime {
     if (!subscriptionContainer.isObjectBased) return;
 
     // Find Key of Job Observer in SubscriptionContainer
-    for (let key in subscriptionContainer.subsObject)
+    for (const key in subscriptionContainer.subsObject)
       if (subscriptionContainer.subsObject[key] === job.observer)
         foundKey = key;
 
@@ -195,8 +195,8 @@ export class Runtime {
    */
   public getObjectBasedProps(
     subscriptionContainer: SubscriptionContainer,
-  ): {[key: string]: any} {
-    const props: {[key: string]: any} = {};
+  ): { [key: string]: any } {
+    const props: { [key: string]: any } = {};
 
     // Map trough observerKeysToUpdate and build object out of Observer value
     subscriptionContainer.observerKeysToUpdate.forEach((updatedKey) => {

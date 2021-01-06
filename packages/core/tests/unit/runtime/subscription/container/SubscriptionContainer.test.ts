@@ -1,4 +1,4 @@
-import {Agile, Observer, SubscriptionContainer} from '../../../../../src';
+import { Agile, Observer, SubscriptionContainer } from '../../../../../src';
 
 describe('SubscriptionContainer Tests', () => {
   let dummyAgile: Agile;
@@ -7,8 +7,8 @@ describe('SubscriptionContainer Tests', () => {
 
   beforeEach(() => {
     dummyAgile = new Agile();
-    dummyObserver1 = new Observer(dummyAgile, {key: 'dummyObserver1'});
-    dummyObserver2 = new Observer(dummyAgile, {key: 'dummyObserver2'});
+    dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+    dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
   });
 
   it('should create SubscriptionContainer', () => {

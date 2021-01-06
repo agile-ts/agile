@@ -14,13 +14,14 @@ describe('Group Tests', () => {
     id: string;
     name: string;
   }
+
   let dummyAgile: Agile;
   let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
       key: 'dummyCollection',
     });
@@ -134,8 +135,8 @@ describe('Group Tests', () => {
       group = new Group<ItemInterface>(dummyCollection, [], {
         key: 'groupKey',
       });
-      dummyCollection.collect({id: 'dummyItem1Key', name: 'coolName'});
-      dummyCollection.collect({id: 'dummyItem2Key', name: 'coolName'});
+      dummyCollection.collect({ id: 'dummyItem1Key', name: 'coolName' });
+      dummyCollection.collect({ id: 'dummyItem2Key', name: 'coolName' });
       dummyItem1 = dummyCollection.getItem('dummyItem1Key');
       dummyItem2 = dummyCollection.getItem('dummyItem2Key');
       dummyItem3 = new Item(dummyCollection, {
@@ -151,15 +152,15 @@ describe('Group Tests', () => {
 
       it('should return output of Group and call ComputedTracker.tracked', () => {
         group._output = [
-          {id: '1', name: 'Frank'},
-          {id: '2', name: 'Hans'},
+          { id: '1', name: 'Frank' },
+          { id: '2', name: 'Hans' },
         ];
 
         const response = group.output;
 
         expect(response).toStrictEqual([
-          {id: '1', name: 'Frank'},
-          {id: '2', name: 'Hans'},
+          { id: '1', name: 'Frank' },
+          { id: '2', name: 'Hans' },
         ]);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(group.observer);
       });
@@ -168,13 +169,13 @@ describe('Group Tests', () => {
     describe('output set function tests', () => {
       it('should set output to passed value', () => {
         group.output = [
-          {id: '12', name: 'Hans der 3'},
-          {id: '99', name: 'Frank'},
+          { id: '12', name: 'Hans der 3' },
+          { id: '99', name: 'Frank' },
         ];
 
         expect(group._output).toStrictEqual([
-          {id: '12', name: 'Hans der 3'},
-          {id: '99', name: 'Frank'},
+          { id: '12', name: 'Hans der 3' },
+          { id: '99', name: 'Frank' },
         ]);
       });
     });
@@ -242,17 +243,17 @@ describe('Group Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          {background: false},
+          { background: false },
         );
       });
 
       it('should remove Item from Group in background (config.background = true)', () => {
-        group.remove('dummyItem1Key', {background: true});
+        group.remove('dummyItem1Key', { background: true });
 
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          {background: true},
+          { background: true },
         );
       });
 
@@ -271,7 +272,7 @@ describe('Group Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
-          {background: true},
+          { background: true },
         );
       });
 
@@ -312,25 +313,25 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          {background: false},
+          { background: false },
         );
       });
 
       it("should add Item to Group at the beginning not in background (config.method = 'unshift')", () => {
-        group.add('dummyItem2Key', {method: 'unshift'});
+        group.add('dummyItem2Key', { method: 'unshift' });
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'placeholder', 'dummyItem1Key', 'placeholder'],
-          {background: false},
+          { background: false },
         );
       });
 
       it('should add Item to Group at the end in background (config.background = true)', () => {
-        group.add('dummyItem2Key', {background: true});
+        group.add('dummyItem2Key', { background: true });
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          {background: true},
+          { background: true },
         );
       });
 
@@ -339,7 +340,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-          {background: true},
+          { background: true },
         );
       });
 
@@ -350,11 +351,11 @@ describe('Group Tests', () => {
       });
 
       it('should remove existingItem and add it again at the end to the Group not in background (config.overwrite = true)', () => {
-        group.add('dummyItem1Key', {overwrite: true});
+        group.add('dummyItem1Key', { overwrite: true });
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'placeholder', 'dummyItem1Key'],
-          {background: false},
+          { background: false },
         );
       });
 
@@ -369,7 +370,7 @@ describe('Group Tests', () => {
             'dummyItem2Key',
             'dummyItem3Key',
           ],
-          {background: false},
+          { background: false },
         );
       });
 
@@ -378,7 +379,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-          {background: true},
+          { background: true },
         );
       });
     });
@@ -424,7 +425,7 @@ describe('Group Tests', () => {
       });
 
       it('should persist Group with GroupKey (specific config)', () => {
-        group.persist({instantiate: false, storageKeys: ['test1', 'test2']});
+        group.persist({ instantiate: false, storageKeys: ['test1', 'test2'] });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
           instantiate: false,
@@ -454,7 +455,7 @@ describe('Group Tests', () => {
       });
 
       it('should persist Group with formatted GroupKey (config.followCollectionPersistKeyPattern)', () => {
-        group.persist({followCollectionPersistKeyPattern: true});
+        group.persist({ followCollectionPersistKeyPattern: true });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
@@ -469,7 +470,7 @@ describe('Group Tests', () => {
       });
 
       it('should persist Group with formatted passed Key (config.followCollectionPersistKeyPattern)', () => {
-        group.persist('dummyKey', {followCollectionPersistKeyPattern: true});
+        group.persist('dummyKey', { followCollectionPersistKeyPattern: true });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(

@@ -11,7 +11,7 @@ describe('Computed Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    dummyAgile = new Agile({localStorage: false});
+    dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Computed.prototype, 'recompute');
     console.error = jest.fn();
@@ -177,7 +177,7 @@ describe('Computed Tests', () => {
         computed.updateComputeFunction(
           newComputeFunction,
           [dummyState, dummyObserver],
-          {overwriteDeps: false},
+          { overwriteDeps: false },
         );
 
         expect(computed.hardCodedDeps).toStrictEqual([
@@ -260,7 +260,7 @@ describe('Computed Tests', () => {
           dummyState,
           undefined,
           {},
-          {observer: 'fake'},
+          { observer: 'fake' },
         ]);
 
         expect(response).toStrictEqual([dummyObserver, dummyStateObserver]);

@@ -1,4 +1,4 @@
-import {Agile, Integration} from '../internal';
+import { Agile, Integration } from '../internal';
 
 export class Integrations {
   public agileInstance: () => Agile;

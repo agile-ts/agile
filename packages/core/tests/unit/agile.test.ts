@@ -158,9 +158,15 @@ describe('Agile Tests', () => {
         const storageConfig = {
           prefix: 'test',
           methods: {
-            get: () => {},
-            set: () => {},
-            remove: () => {},
+            get: () => {
+              /* empty function */
+            },
+            set: () => {
+              /* empty function */
+            },
+            remove: () => {
+              /* empty function */
+            },
           },
           key: 'myTestStorage',
         };
@@ -262,9 +268,15 @@ describe('Agile Tests', () => {
         const dummyStorage = new Storage({
           prefix: 'test',
           methods: {
-            get: () => {},
-            set: () => {},
-            remove: () => {},
+            get: () => {
+              /* empty function */
+            },
+            set: () => {
+              /* empty function */
+            },
+            remove: () => {
+              /* empty function */
+            },
           },
           key: 'myTestStorage',
         });

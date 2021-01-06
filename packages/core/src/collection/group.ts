@@ -151,7 +151,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    this.set(newGroupValue, {background: config.background});
+    this.set(newGroupValue, { background: config.background });
 
     return this;
   }
@@ -208,7 +208,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     )
       config.background = true;
 
-    this.set(newGroupValue, {background: config.background});
+    this.set(newGroupValue, { background: config.background });
 
     return this;
   }
@@ -228,7 +228,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     newItemKey: ItemKey,
     config: StateRuntimeJobConfigInterface = {},
   ): this {
-    let newGroupValue = copy(this._value);
+    const newGroupValue = copy(this._value);
     newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
     this.set(newGroupValue, config);
     return this;
@@ -299,7 +299,6 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
   public rebuild() {
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
     const groupItems: Array<Item<DataType>> = [];
-    let groupOutput: Array<DataType>;
 
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
@@ -309,7 +308,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     });
 
     // Create groupOutput out of groupItems
-    groupOutput = groupItems.map((item) => {
+    const groupOutput = groupItems.map((item) => {
       return item.getPublicValue();
     });
 
