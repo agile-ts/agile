@@ -75,7 +75,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly every UI-Framework. Check [here](TODO) if your framework is supported too.
+- Works in nearly every UI-Framework. Check [here](TODO) if the Framework you are using is supported, too.
 - Surly works with the workflow that suits you best.. 
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
@@ -99,9 +99,9 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 <br />
 <img src="static/installation_header.png" alt="Installation">
 
-To use AgileTs in a UI-Framework we have to install 2 packages.
+To use AgileTs properly, in an UI-Framework we have to install 2 packages.
 
-- The Core Package, which is the brain of AgileTs and handles your States, Collections, ..
+- The _Core Package_, which is the brain of AgileTs and handles your States, Collections, ..
   ```
   npm install @agile-ts/core
   ```
@@ -129,7 +129,7 @@ If you have any questions don't mind joining our [Discord Community](https://dis
 <br />
 <img src="static/contribute_header.png" alt="Contribute">
 
-Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md)
+Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 
 <br />
