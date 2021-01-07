@@ -20,7 +20,7 @@ jobs:
 
       # Setup yarn PackageManager
       - node/install-packages:
-          install-yarn: true
+          pkg-manager: yarn
 
       - run: yarn install & npm run package-install
       - run: yarn run lint
