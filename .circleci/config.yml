@@ -33,12 +33,20 @@ jobs:
   test:
     executor: node-executor
     steps:
+      # https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
+      - attach_workspace:
+          at: .
+
       # Test Project
       - run: yarn run test
 
   test-coverage:
     executor: node-executor
     steps:
+      # https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
+      - attach_workspace:
+          at: .
+
       # Run Test Coverage
       - run: yarn run test:coverage
 
