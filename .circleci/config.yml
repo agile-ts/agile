@@ -3,10 +3,10 @@ version: 2.1
 executors:
   node-executor:
     docker:
-      - image: circleci/node:14
+      - image: cimg/base:stable
 
 orbs:
-  node: circleci/node@4.0.1
+  node: circleci/node@4.1.0
 
 jobs:
 
@@ -16,18 +16,15 @@ jobs:
       # Checkout Project
       - checkout
 
+      - run: node --version
+
       # Setup yarn PackageManager
       - node/install-packages:
-          pkg-manager: yarn
+          install-yarn: true
 
-      # Install Deps
-      - run: npm install & npm run package-install
-
-      # Lint Project
-      - run: npm run lint
-
-      # Build Project
-      - run: npm run build
+      - run: yarn install & npm run package-install
+      - run: yarn run lint
+      - run: yarn run build
 
       # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
       - persist_to_workspace:
@@ -41,8 +38,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      # Test Project
-      - run: npm run test
+      - run: yarn run test
 
   test-coverage:
     executor: node-executor
@@ -51,8 +47,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      # Run Test Coverage
-      - run: npm run test:coverage
+      - run: yarn run test:coverage
 
       # https://circleci.com/docs/2.0/configuration-reference/#store_test_results
       - store_test_results:
