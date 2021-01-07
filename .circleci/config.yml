@@ -1,11 +1,9 @@
 version: 2.1
 
 executors:
-  my-executor:
+  node-executor:
     docker:
       - image: circleci/node:14
-        environment:
-         CI: true
 
 orbs:
   node: circleci/node@4.0.1
@@ -13,10 +11,9 @@ orbs:
 jobs:
 
   build:
-    working_directory: ~/agilets # Where the project gets saved in the docker
-    executor: my-executor
+    executor: node-executor
     steps:
-      # Checkout Project (only once because the other jobs are waiting for the build job -> there agileTs is already checked out)
+      # Checkout Project (only once because the other jobs are waiting for the build job -> there AgileTs is already checked out)
       - checkout
 
       # Setup yarn PackageManager (only once because the other jobs are waiting for the build job -> there yarn is already setup)
@@ -30,20 +27,18 @@ jobs:
       - run: yarn run build
 
       - persist_to_workspace:
-          root: /agilets
-          paths:
-            - build
+          root: .
+          paths: [ ./* ]
 
   test:
-    working_directory: ~/agilets # Where the project gets saved in the docker
-    executor: my-executor
+    working_directory: ~/repo # Where the project gets saved in the docker
+    executor: node-executor
     steps:
       # Test Project
       - run: yarn run test
 
   test-coverage:
-    working_directory: ~/agilets # Where the project gets saved in the docker
-    executor: my-executor
+    executor: node-executor
     steps:
       # Run Test Coverage
       - run: yarn test:coverage
@@ -54,9 +49,8 @@ jobs:
 
       # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
       - persist_to_workspace:
-          root: /agilets
-          paths:
-            - coverage
+          root: .
+          paths: [./*]
 
 workflows:
   build-and-test:
@@ -65,8 +59,8 @@ workflows:
       - build # Run Build Job
 
       - test: # Run Test Job if Build Job has finished
-         requires:
-          - build
+          requires:
+            - build
 
       - test-coverage: # Run Test-Coverage Job if Build Job has finished
           requires:
