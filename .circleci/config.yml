@@ -17,10 +17,10 @@ jobs:
       - checkout
 
       # Lint Project
-      - run: yarn run lint
+      - run: npm run lint
 
       # Build Project
-      - run: yarn run build
+      - run: npm run build
 
       - persist_to_workspace:
           root: .
@@ -34,7 +34,7 @@ jobs:
           at: .
 
       # Test Project
-      - run: yarn run test
+      - run: npm run test
 
   test-coverage:
     executor: node-executor
@@ -44,7 +44,7 @@ jobs:
           at: .
 
       # Run Test Coverage
-      - run: yarn run test:coverage
+      - run: npm run test:coverage
 
       # https://circleci.com/docs/2.0/configuration-reference/#store_test_results
       - store_test_results:
