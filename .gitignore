@@ -2,6 +2,7 @@ node_modules/
 dist
 .yalc
 package-lock.json
+coverage
 
 # Differs on each engine
 yalc.lock

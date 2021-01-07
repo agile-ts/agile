@@ -18,6 +18,7 @@
     "build": "lerna run build",
     "watch": "lerna run watch",
     "test": "jest",
+    "test:coverage": "jest -i coverage",
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec yarn install",

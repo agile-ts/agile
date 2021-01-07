@@ -1,0 +1,61 @@
+version: 2.1
+
+executors:
+  my-executor:
+    machine: false
+    macos: false
+    docker:
+      - image: circleci/node:14
+        environment:
+          CI: true
+
+orbs:
+  node: circleci/node@3.0.0
+
+jobs:
+
+  build:
+    working_directory: ~/agilets # Where the project gets saved in the docker
+    executor: my-executor
+    steps:
+      # Checkout Project
+      - checkout
+
+      # Build Project
+      - run: yarn run build
+
+  test:
+    working_directory: ~/agilets # Where the project gets saved in the docker
+    executor: my-executor
+    steps:
+      # Checkout Project
+      - checkout
+
+      # Test Project
+      - run: yarn run test
+
+  test-coverage:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run: yarn test:coverage
+      - store_test_results:
+          path: ./test-results
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./coverage
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+      - test
+
+      - test-coverage:
+          requires:
+            - build
