@@ -7,15 +7,16 @@
  <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
 <a href="https://npm.im/@agile-ts/core">
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"></a>
+<a href="https://github.com/agile-ts/agile/actions?query=workflow%3Abuild">
+   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg?style=flat-square" alt="Build Status"></a>
+<a href="https://github.com/agile-ts/agile/actions?query=workflow%3Abuild">
+   <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"></a>
+<a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg" alt="npm monthly downloads"></a>
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg" alt="npm total downloads"></a>
-<a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"></a>
-<a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/languages/code-size/agile-ts/agile.svg" alt="GitHub Code Size"></a>
-<a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/repo-size/agile-ts/agile.svg" alt="GitHub Repo Size"></a>
+    
 
 
 <br />
