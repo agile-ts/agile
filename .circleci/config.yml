@@ -17,7 +17,7 @@ jobs:
       - checkout
 
       # Install Deps
-      - run: npm install
+      - run: npm install & npm run package-install
 
       # Lint Project
       - run: npm run lint
