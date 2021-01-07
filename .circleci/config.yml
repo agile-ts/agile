@@ -23,12 +23,14 @@ jobs:
           pkg-manager: yarn
 
       - restore_cache:
-         key: dependency-cache-{{ checksum “package.json” }}
+          keys:
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-
 
       - run: yarn install & npm run package-install
 
       - save_cache:
-         key: dependency-cache-{{ checksum “package.json” }}
+         key: v1-dependencies-{{ checksum "yarn.lock" }}
          paths:
            - ./node_modules
 
