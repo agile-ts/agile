@@ -31,7 +31,6 @@ jobs:
           paths: [ ./* ]
 
   test:
-    working_directory: ~/repo # Where the project gets saved in the docker
     executor: node-executor
     steps:
       # Test Project
