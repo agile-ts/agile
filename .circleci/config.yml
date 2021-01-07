@@ -16,6 +16,9 @@ jobs:
       # Checkout Project (only once because the other jobs are waiting for the build job -> there AgileTs is already checked out)
       - checkout
 
+      # Install Deps
+      - run: npm install
+
       # Lint Project
       - run: npm run lint
 
