@@ -13,8 +13,12 @@ jobs:
   build:
     executor: node-executor
     steps:
-      # Checkout Project (only once because the other jobs are waiting for the build job -> there AgileTs is already checked out)
+      # Checkout Project
       - checkout
+
+      # Setup yarn PackageManager
+      - node/install-packages:
+          pkg-manager: yarn
 
       # Install Deps
       - run: npm install & npm run package-install
@@ -25,6 +29,7 @@ jobs:
       # Build Project
       - run: npm run build
 
+      # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
       - persist_to_workspace:
           root: .
           paths: [ ./* ]
