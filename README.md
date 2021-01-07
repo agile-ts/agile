@@ -42,7 +42,7 @@ const myFirstState = useAgile(MY_FIRST_STATE); // returns "Hello Stranger!"
 To find out more checkout our [documentation](https://agile-ts.org/docs).
 
 ### ⛳️ Sandbox
-Test AgileTs yourself in one click. Just select your preferred Framework below.
+Test AgileTs yourself, it's just a click away. Select your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - Vue (coming soon)
 - Angular (coming soon)
@@ -68,7 +68,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   MY_COLLECTION.collect({id: 1, name: "Frank"});
   MY_COLLECTION.collect({id: 2, name: "Dieter"});
   ```
-- Mutate or Check your States with simple Functions
+- Mutate or Check States with simple Functions
   ```ts
   MY_STATE.undo(); // Undo last change
   MY_STATE.is({hello: "jeff"}); // Check if State has the Value {hello: "jeff"}
@@ -76,7 +76,7 @@ Write minimalistic, boilerplate free code that captures your intent.
 
 ### 🤸‍ Flexible
 - Works in nearly every UI-Framework. Check [here](TODO) if the Framework you are using is supported, too.
-- Surly works with the workflow that suits you best.. 
+- Surly behaves with the workflow that suits you best.
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
 
@@ -106,7 +106,7 @@ To use AgileTs properly, in an UI-Framework we have to install 2 packages.
   npm install @agile-ts/core
   ```
 
-- A _fitting integration_ for the UI-Framework are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
+- A _fitting integration_ for the UI-Framework you are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
   ```
   npm install @agile-ts/react
   ```
