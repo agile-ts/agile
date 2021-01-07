@@ -16,10 +16,6 @@ jobs:
       # Checkout Project (only once because the other jobs are waiting for the build job -> there AgileTs is already checked out)
       - checkout
 
-      # Setup yarn PackageManager (only once because the other jobs are waiting for the build job -> there yarn is already setup)
-      - node/install-packages:
-          pkg-manager: yarn
-
       # Lint Project
       - run: yarn run lint
 
