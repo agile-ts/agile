@@ -62,10 +62,6 @@ jobs:
           at: .
 
       - run:
-          name: ⏳ Install
-          command: yarn install
-
-      - run:
           name: 🤔 Test
           command: yarn run test
 
@@ -96,12 +92,14 @@ workflows:
       # Run Build Job
       - build
 
+      # Not working properly yet see https://discuss.circleci.com/t/command-jest-doesnt-get-executed-runs-endless/38731
       # Run Test Job if Build Job has finished
-      - test:
-          requires:
-            - build
+      # - test:
+      #    requires:
+      #      - build
 
+      # Not working properly yet
       # Run Test-Coverage Job if Build Job has finished
-      - test-coverage:
-          requires:
-            - build
+      # - test-coverage:
+      #    requires:
+      #      - build
