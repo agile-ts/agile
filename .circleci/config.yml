@@ -81,9 +81,9 @@ jobs:
           path: ./test-results
 
       # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
-      - persist_to_workspace:
-          root: .
-          paths: [./*]
+      # - persist_to_workspace:
+      #    root: .
+      #   paths: [./*]
 
 workflows:
   build-and-test:
