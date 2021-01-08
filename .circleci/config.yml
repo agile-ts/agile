@@ -13,7 +13,7 @@ jobs:
   build:
     executor: node-executor
     steps:
-      # Checkout Project
+      # Checkout Project from Github
       - checkout
 
       - run: node --version
@@ -22,20 +22,30 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn
 
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
-            - v1-dependencies-
+     # Not necessary because of auto caching of circleci/node@4.1.0
+     # - restore_cache:
+     #     keys:
+     #       - v1-dependencies-{{ checksum "yarn.lock" }}
+     #       # fallback to using the latest cache if no exact match is found
+     #       - v1-dependencies-
 
-      - run: yarn install & npm run package-install
+      - run:
+         name: ⏳ Install
+         command: yarn install & npm run package-install
 
-      - save_cache:
-         key: v1-dependencies-{{ checksum "yarn.lock" }}
-         paths:
-           - ./node_modules
+     # Not necessary because of auto caching of circleci/node@4.1.0
+     # - save_cache:
+     #    key: v1-dependencies-{{ checksum "yarn.lock" }}
+     #    paths:
+     #      - ./node_modules
 
-      - run: yarn run lint
-      - run: yarn run build
+      - run:
+         name: 🤖 Lint Project
+         command: yarn run lint
+
+      - run:
+         name: 🔨 Build Packages
+         command: yarn run build
 
       # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
       - persist_to_workspace:
