@@ -31,22 +31,22 @@
 ```tsx
 // -- core.js ------------------------------------------
 
-// At first we need an Instance of Agile
+// Let's start by creating an Instance of AgileTs
 const App = new Agile();
 
-// Than we can create our first State
+// Than we can build our first State
 const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // -- myComponent.whatever ------------------------------------------
 
-// Now we can bind our State to nearly any UI-Component
+// Now we are able to bind our State to nearly any UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
-const myFirstState = useAgile(MY_FIRST_STATE); // returns "Hello Stranger!"
+const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State "(Hello Stranger!")
 ```
 To find out more checkout our [documentation](https://agile-ts.org/docs).
 
 ### ⛳️ Sandbox
-Test AgileTs yourself, it's just a click away. Select your preferred Framework below.
+Test AgileTs yourself, it's just one click away. Select your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - Vue (coming soon)
 - Angular (coming soon)
@@ -62,11 +62,11 @@ Test AgileTs yourself, it's just a click away. Select your preferred Framework b
 Write minimalistic, boilerplate free code that captures your intent. 
 
 **Some straightforward syntax examples:**
-- Store a State in the Local Storage
+- Store State in the Local Storage
   ```ts
   MY_STATE.persist("storage-key")
   ```
-- Create a reactive Collection of States
+- Create reactive Collection of States
   ```ts
   const MY_COLLECTION = App.Collection();
   MY_COLLECTION.collect({id: 1, name: "Frank"});
@@ -79,7 +79,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly every UI-Framework. Check [here](TODO) if the Framework you are using is supported, too.
+- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/frameworks) if the Framework you are using is supported, too.
 - Surly behaves with the workflow that suits you best.
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
@@ -103,7 +103,7 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 <br />
 <img src="static/installation_header.png" alt="Installation">
 
-To use AgileTs properly, in an UI-Framework we have to install 2 packages.
+To use AgileTs properly, in an UI-Framework we have to install **2** packages.
 
 - The _Core Package_, which is the brain of AgileTs and handles your States, Collections, ..
   ```
@@ -111,6 +111,7 @@ To use AgileTs properly, in an UI-Framework we have to install 2 packages.
   ```
 
 - A _fitting integration_ for the UI-Framework you are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
+  Check [here](https://agile-ts/docs/framework) your Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
@@ -122,8 +123,9 @@ To use AgileTs properly, in an UI-Framework we have to install 2 packages.
 <br />
 <img src="static/documentation_header.png" alt="Documentation">
 
-If AgileTs sounds interesting to you and you want to find out more.
+If AgileTs sounds interesting to you.
 Checkout our **[docs](https://agile-ts.org/docs/)**. 
+And I am sure you will be able to use it in no time.
 If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
