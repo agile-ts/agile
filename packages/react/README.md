@@ -1,33 +1,49 @@
-# React Integration
+<img src="static/header_background.png" alt="Banner">
 
-> Combines Agile with React or React-Native
+> **Use AgileTs with React and React-Native**
 
-<a href="https://npm.im/@agile-ts/react">
-  <img src="https://img.shields.io/npm/v/@agile-ts/react.svg" alt="npm version"></a>
+ <br />
+
  <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
 <a href="https://npm.im/@agile-ts/react">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/react.svg" alt="npm monthly downloads"></a>
-<a href="https://npm.im/@agile-ts/react">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/react.svg" alt="npm total downloads"></a>
+  <img src="https://img.shields.io/npm/v/@agile-ts/react.svg" alt="npm version"></a>
 <a href="https://npm.im/@agile-ts/react">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/react.svg" alt="npm minified size"></a>
+<a href="https://npm.im/@agile-ts/react">
+  <img src="https://img.shields.io/npm/dt/@agile-ts/react.svg" alt="npm total downloads"></a>
 
-## ❓ Why a React Integration
-We need this Integration to bind Agile Instances to Components.
-This is necessary because a Component needs to rerender
-if an Agile Instance mutates otherwise the Application wouldn't be reactive.
-Unfortunately it isn't possible to find out which Agile Instance has been bound to the Component from outside. 
--> Agile wouldn't know which Component has to be rerender when which Agile Instance changes.
 
-  
-## ⬇️ Installation
+<br />
+
+
+<br />
+<img src="static/what_does_this_integration_header.png" alt="What does this Integration?">
+
+Well, this Integration binds AgileTs Instances to React Components.
+Through that binding AgileTs is able to rerender the Component if an Instance mutates.
+
+Here is a simple example how such a binding might look like
+```ts
+// -- myComponent.whatever ------------------------------------------
+
+// Binds MY_FIRST_STATE to myComponent.whatever
+ const myFirstState = useAgile(MY_FIRST_STATE);
+```
+
+
+<br />
+
+
+<br />
+<img src="static/installation_header.png" alt="Installation">
+
 ```
 npm install @agile-ts/react
 ```
 _Be aware that this is no standalone package!_ <br />
-To use Agile with this React-Extension you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
-To find out more take a look into the [docs](https://www.agile-ts.org/docs).
+To use AgileTs with React properly you have to install the [Core Package](https://www.npmjs.com/package/@agile-ts/core) too.
+Take a look into the [docs](https://www.agile-ts.org/docs) to find out more.
     
 ## 🎚 Functional Components: `useAgile`
 `useAgile` is a React Hook that helps you to bind an Agile Instance (State, Collection, ..) to a React Component.

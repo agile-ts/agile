@@ -8,10 +8,15 @@
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
 <a href="https://npm.im/@agile-ts/core">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"></a>
+
+<br />
+
 <a href="https://github.com/agile-ts/agile/actions?query=workflow%3ARelease">
    <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg?style=flat-square" alt="Build Status"></a>
 <a href="https://github.com/agile-ts/agile/actions?query=workflow%3A%22Test+All+Packages%22">
    <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"></a>
+<a href="https://codeclimate.com/github/agile-ts/agile/coverage">
+   <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"></a>
 
 <br />
 
@@ -41,7 +46,7 @@ const MY_FIRST_STATE = App.State("Hello Stranger!");
 
 // Now we are able to bind our State to nearly any UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
-const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State "(Hello Stranger!")
+const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
 To find out more checkout our [documentation](https://agile-ts.org/docs).
 
