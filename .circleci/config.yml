@@ -1,3 +1,5 @@
+# Following this caching concept https://circleci.com/docs/2.0/persist-data/
+
 version: 2.1
 
 orbs:
@@ -57,7 +59,7 @@ jobs:
     steps:
       # https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
       - attach_workspace:
-          at: ./*
+          at: .
 
       - run:
           name: 🤔 Test
@@ -68,7 +70,7 @@ jobs:
     steps:
       # https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
       - attach_workspace:
-          at: ./*
+          at: .
 
       - run:
           name: 🤔 Test Coverage
