@@ -62,6 +62,10 @@ jobs:
           at: .
 
       - run:
+          name: ⏳ Install
+          command: yarn install
+
+      - run:
           name: 🤔 Test
           command: yarn run test
 
