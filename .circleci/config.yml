@@ -1,12 +1,12 @@
 version: 2.1
 
+orbs:
+  node: circleci/node@4.1.0
+
 executors:
   node-executor:
     docker:
       - image: circleci/node:14
-
-orbs:
-  node: circleci/node@4.1.0
 
 jobs:
 
@@ -59,7 +59,9 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn run test
+      - run:
+          name: 🤔 Test
+          command: yarn run test
 
   test-coverage:
     executor: node-executor
@@ -68,7 +70,9 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn run test:coverage
+      - run:
+          name: 🤔 Test Coverage
+          command: yarn run test:coverage
 
       # https://circleci.com/docs/2.0/configuration-reference/#store_test_results
       - store_test_results:
