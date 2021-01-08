@@ -1,19 +1,21 @@
+# Following this caching concept https://circleci.com/docs/2.0/persist-data/
+
 version: 2.1
+
+orbs:
+  node: circleci/node@4.1.0
 
 executors:
   node-executor:
     docker:
       - image: circleci/node:14
 
-orbs:
-  node: circleci/node@4.1.0
-
 jobs:
 
   build:
     executor: node-executor
     steps:
-      # Checkout Project
+      # Checkout Project from Github
       - checkout
 
       - run: node --version
@@ -22,20 +24,30 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn
 
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
-            - v1-dependencies-
+     # Not necessary because of auto caching of circleci/node@4.1.0
+     # - restore_cache:
+     #     keys:
+     #       - v1-dependencies-{{ checksum "yarn.lock" }}
+     #       # fallback to using the latest cache if no exact match is found
+     #       - v1-dependencies-
 
-      - run: yarn install & npm run package-install
+      - run:
+         name: ⏳ Install
+         command: yarn install & npm run package-install
 
-      - save_cache:
-         key: v1-dependencies-{{ checksum "yarn.lock" }}
-         paths:
-           - ./node_modules
+     # Not necessary because of auto caching of circleci/node@4.1.0
+     # - save_cache:
+     #    key: v1-dependencies-{{ checksum "yarn.lock" }}
+     #    paths:
+     #      - ./node_modules
 
-      - run: yarn run lint
-      - run: yarn run build
+      - run:
+         name: 🤖 Lint Project
+         command: yarn run lint
+
+      - run:
+         name: 🔨 Build Packages
+         command: yarn run build
 
       # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
       - persist_to_workspace:
@@ -49,7 +61,9 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn run test
+      - run:
+          name: 🤔 Test
+          command: yarn run test
 
   test-coverage:
     executor: node-executor
@@ -58,16 +72,18 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn run test:coverage
+      - run:
+          name: 🤔 Test Coverage
+          command: yarn run test:coverage
 
       # https://circleci.com/docs/2.0/configuration-reference/#store_test_results
       - store_test_results:
           path: ./test-results
 
       # https://circleci.com/docs/2.0/configuration-reference/#persist_to_workspace
-      - persist_to_workspace:
-          root: .
-          paths: [./*]
+      # - persist_to_workspace:
+      #    root: .
+      #   paths: [./*]
 
 workflows:
   build-and-test:
@@ -76,12 +92,14 @@ workflows:
       # Run Build Job
       - build
 
+      # Not working properly yet see https://discuss.circleci.com/t/command-jest-doesnt-get-executed-runs-endless/38731
       # Run Test Job if Build Job has finished
-      - test:
-          requires:
-            - build
+      # - test:
+      #    requires:
+      #      - build
 
+      # Not working properly yet
       # Run Test-Coverage Job if Build Job has finished
-      - test-coverage:
-          requires:
-            - build
+      # - test-coverage:
+      #    requires:
+      #      - build
