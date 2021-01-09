@@ -131,7 +131,7 @@ To use AgileTs properly, in an UI-Framework we have to install **2** packages.
 If AgileTs sounds interesting to you.
 Checkout our **[docs](https://agile-ts.org/docs/)**. 
 And I am sure you will be able to use it in no time.
-If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
+In case you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
 <br />

@@ -63,8 +63,8 @@ To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 
 
 For [Function Component](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `useAgile` Hook.
-With that Hook you are able to bind an Agile Instance to your Component.
-This ensures that your Component rerender, when the bound AgileInstance mutates.
+With this Hook we are able to bind an Agile Instance to our Component.
+This ensures that it rerender, when the bound AgileInstance mutates.
 `useAgile` returns the current `output` of the passed Agile Instance.
 ```ts
 const myCoolState = useAgile(MY_COOL_STATE); 
@@ -102,7 +102,7 @@ It is also possible to bind more than one Agile Instance to a Component at once.
 ```
 
 ### ⛳️ Sandbox
-Test the `useAgile` yourself, it's only [one click](https://codesandbox.io/s/agilets-first-state-f12cz) away.
+Test the `useAgile` Hook yourself, it's only [one click](https://codesandbox.io/s/agilets-first-state-f12cz) away.
 
 
 <br />
@@ -114,8 +114,8 @@ Test the `useAgile` yourself, it's only [one click](https://codesandbox.io/s/agi
 For [Class Components](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `AgileHOC`.
 At first what is a HOC, well it's a [Higher Order Component](https://reactjs.org/docs/higher-order-components.html)
 that gets wrapped around our Class. 
-By warping our Component into the `AgileHOC`, you are able to bind Agile Instances to it.
-This ensures that your Class Component rerender, when a bound Agile Instance mutates. 
+By wrapping our Component into the `AgileHOC`, we are able to bind Agile Instances to it.
+This ensures that our Class Component rerender, when a bound Agile Instance mutates. 
 The `output` of the Agile Instance gets merged into the `props` of the Class Component.
 ```tsx
 class RandomComponent extends React.Component {
@@ -141,9 +141,9 @@ Test the `AgileHOC` yourself, it's only [one click](TODO) away.
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/documentation_header.png" alt="Documentation">
 
-If you want to find out more about the React Integration.
+If you want to find out more about the AgileTs React Integration.
 Checkout our **[docs](https://agile-ts.org/docs/)**.
-If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
+In case you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
 <br />
