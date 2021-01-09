@@ -1,4 +1,4 @@
-<img src="static/header_background.png" alt="React Integration">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/header_background.png" alt="React Integration">
 
 > **Use AgileTs with React and React-Native**
 
@@ -18,16 +18,16 @@
 
 
 <br />
-<img src="static/what_does_this_integration_header.png" alt="What does this Integration?">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/what_does_this_integration_header.png" alt="What does this Integration?">
 
 Well, this Integration binds AgileTs Instances to React Components.
-Through that binding AgileTs is able to rerender the Component if an Instance mutates.
+Through that AgileTs is able to rerender the Component if a bound Instance mutates.
 
-Here is a simple example how such a binding might look like
+Here is a simple example how such a binding might look like:
 ```ts
-// -- myComponent.whatever ------------------------------------------
+// -- myComponent.jsx ------------------------------------------
 
-// Binds MY_FIRST_STATE to myComponent.whatever
+// Binds MY_FIRST_STATE to myComponent.jsx
  const myFirstState = useAgile(MY_FIRST_STATE);
 ```
 
@@ -36,15 +36,15 @@ Here is a simple example how such a binding might look like
 
 
 <br />
-<img src="static/installation_header.png" alt="Installation">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/installation_header.png" alt="Installation">
 
 ```
 npm install @agile-ts/react
 ```
 _Be aware that this is no standalone package!_ <br />
 To use AgileTs with React properly, we have to install the [Core Package](https://www.npmjs.com/package/@agile-ts/core) too,
-but be aware that we can't combine each version. 
-Below you can find a table which defines which Core Version you should use with which React Version.
+but note that we can't combine each version. 
+Below you can find a table that shows which versions fit together.
 
 | @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
 | --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
@@ -55,8 +55,14 @@ _Other Versions aren't supported anymore_
 To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 
 
-## 🎚 Functional Components: `useAgile`
-For Function Component Users we recommend using the `useAgile` Hook.
+<br />
+
+
+<br />
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/useAgile_header.png" alt="useAgile for Functional Components">
+
+
+For [Function Component](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `useAgile` Hook.
 With that Hook you are able to bind an Agile Instance to your Component.
 This ensures that your Component rerender, when the bound AgileInstance mutates.
 `useAgile` returns the current `output` of the passed Agile Instance.
@@ -99,8 +105,13 @@ It is also possible to bind more than one Agile Instance to a Component at once.
 Test the `useAgile` yourself, it's only [one click](https://codesandbox.io/s/agilets-first-state-f12cz) away.
 
 
-## 🗿 Class Component: `AgileHOC`
-For Class Components Users we recommend using the `AgileHOC`.
+<br />
+
+
+<br />
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/agileHOC_header.png" alt="useAgile for Functional Components">
+
+For [Class Components](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `AgileHOC`.
 At first what is a HOC, well it's a [Higher Order Component](https://reactjs.org/docs/higher-order-components.html)
 that gets wrapped around our Class. 
 By warping our Component into the `AgileHOC`, you are able to bind Agile Instances to it.
@@ -128,11 +139,10 @@ Test the `AgileHOC` yourself, it's only [one click](TODO) away.
 
 
 <br />
-<img src="static/documentation_header.png" alt="Documentation">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/documentation_header.png" alt="Documentation">
 
 If you want to find out more about the React Integration.
 Checkout our **[docs](https://agile-ts.org/docs/)**.
-And I am sure you will be able to use it in no time.
 If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
@@ -140,7 +150,7 @@ If you have any questions don't mind joining our [Discord Community](https://dis
 
 
 <br />
-<img src="static/contribute_header.png" alt="Contribute">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/contribute_header.png" alt="Contribute">
 
 Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md).
 
