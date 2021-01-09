@@ -1,4 +1,4 @@
- <img src="static/header_background.png" alt="Banner">
+ <img src="static/header_background.png" alt="AgileTs">
  
  > **Spacy, Simple, Scalable State Management Framework**
  
@@ -31,7 +31,7 @@
 
 
 <br />
-<img src="static/how_to_create_state_header.png" alt="How to create State Header">
+<img src="static/how_to_create_state_header.png" alt="How to create a State?">
 
 ```tsx
 // -- core.js ------------------------------------------
@@ -51,7 +51,7 @@ const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello
 To find out more checkout our [documentation](https://agile-ts.org/docs).
 
 ### ⛳️ Sandbox
-Test AgileTs yourself, it's just one click away. Select your preferred Framework below.
+Test AgileTs yourself, it's only one click away. Just select your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - Vue (coming soon)
 - Angular (coming soon)
@@ -61,7 +61,7 @@ Test AgileTs yourself, it's just one click away. Select your preferred Framework
 
 
 <br />
-<img src="static/why_should_i_use_agile.png" alt="Why should I use AgileTs">
+<img src="static/why_should_i_use_agile.png" alt="Why should I use AgileTs?">
 
 ### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. 
@@ -161,6 +161,6 @@ Get a part of AgileTs and start contributing. To find out more read the [CONTRIB
 
 
 <br />
-<img src="static/credits_header.png" alt="Packages of Agile">
+<img src="static/credits_header.png" alt="Credits">
 
 AgileTs is inspired by [PulseJs](https://github.com/pulse-framework/pulse)

@@ -1,4 +1,4 @@
-<img src="static/header_background.png" alt="Banner">
+<img src="static/header_background.png" alt="React Integration">
 
 > **Use AgileTs with React and React-Native**
 
@@ -42,29 +42,41 @@ Here is a simple example how such a binding might look like
 npm install @agile-ts/react
 ```
 _Be aware that this is no standalone package!_ <br />
-To use AgileTs with React properly you have to install the [Core Package](https://www.npmjs.com/package/@agile-ts/core) too.
-Take a look into the [docs](https://www.agile-ts.org/docs) to find out more.
-    
+To use AgileTs with React properly, we have to install the [Core Package](https://www.npmjs.com/package/@agile-ts/core) too,
+but be aware that we can't combine each version. 
+Below you can find a table which defines which Core Version you should use with which React Version.
+
+| @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
+| --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
+| v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
+| v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
+_Other Versions aren't supported anymore_
+
+To find out more take a look into the [docs](https://www.agile-ts.org/docs).
+
+
 ## 🎚 Functional Components: `useAgile`
-`useAgile` is a React Hook that helps you to bind an Agile Instance (State, Collection, ..) to a React Component.
-This is necessary to cause rerender on the Component if the bound Instance mutates.
-This Hook does return the current `output` of the subscribed Agile Instance.
+For Function Component Users we recommend using the `useAgile` Hook.
+With that Hook you are able to bind an Agile Instance to your Component.
+This ensures that your Component rerender, when the bound AgileInstance mutates.
+`useAgile` returns the current `output` of the passed Agile Instance.
 ```ts
 const myCoolState = useAgile(MY_COOL_STATE); 
 ```
--> If `MY_COOL_STATE` has the Value _"Frank"_ the `useAgile` Hook returns _"Frank"_.
+For instance if `MY_COOL_STATE` has the Value _"Frank"_ the `useAgile` Hook returns _"Frank"_.
 It is also possible to bind more than one Agile Instance to a Component at once.
 ```ts
   const [myCoolState1, myCoolStat2] = useAgile([MY_COOL_STATE1, MY_COOL_STATE2]);
-  ```
+```
 
-#### 🛠 [Simple Example](https://codesandbox.io/s/agilets-first-state-f12cz?file=/src/RandomComponent.js)
+### 🛠 Straightforward Example
+
 ```tsx
   const App = new Agile();
   const MY_FIRST_STATE = App.State("Hello Stranger!");
   
   const RandomComponent = () => {
-      // With 'useAgile' we bind our State to the 'RandomComponent'
+      // With 'useAgile' we bind our State to our 'RandomComponent'
       const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
                                                                 //       ^
       return (                                                  //       |
@@ -83,28 +95,52 @@ It is also possible to bind more than one Agile Instance to a Component at once.
   }
 ```
 
+### ⛳️ Sandbox
+Test the `useAgile` yourself, it's only [one click](https://codesandbox.io/s/agilets-first-state-f12cz) away.
+
+
 ## 🗿 Class Component: `AgileHOC`
-`AgileHOC` is a class that gets wrapped around a Component Class, to update the props of the Component
-based on the Agile Instances Output (State, Collection, ..) and to cause rerender on it.
+For Class Components Users we recommend using the `AgileHOC`.
+At first what is a HOC, well it's a [Higher Order Component](https://reactjs.org/docs/higher-order-components.html)
+that gets wrapped around our Class. 
+By warping our Component into the `AgileHOC`, you are able to bind Agile Instances to it.
+This ensures that your Class Component rerender, when a bound Agile Instance mutates. 
+The `output` of the Agile Instance gets merged into the `props` of the Class Component.
 ```tsx
-class Component extends React.Component {
+class RandomComponent extends React.Component {
   render() {
     return <h1>Hi {this.props.myCoolState}</h1>;
   }
 }
 
-export default AgileHOC(Component, [MY_COOL_STATE]);
+// Warapping AgileHOC around our Component, and binding MY_COOL_STATE to it
+export default AgileHOC(RandomComponent, [MY_COOL_STATE]);
 ```
-If `MY_COOL_STATE` has a value of _"Frank"_ `this.props.myCoolState` returns the value _"Frank"_.
-The name `myCoolState` is based on the State Key! 
-If an Agile Instance has no `output` it won't be listed in the props!
+For instance if `MY_COOL_STATE` has the Value _"Frank"_ `this.props.myCoolState` returns _"Frank"_.
+This is possible because the output of `MY_COOL_STATE` gets merged into the RandomComponent props.
+The name `myCoolState` is based on the State Key which can be set with `MY_COOL_STATE.setKey("myCoolState")`.
 
-## 🔑 Fitting Versions
-| @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
-| --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
-| v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
-| v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
-_Other Versions aren't supported anymore_
+### ⛳️ Sandbox
+Test the `AgileHOC` yourself, it's only [one click](TODO) away.
 
-## 📄 Documentation
-The React Integration Docs are located [here](https://agile-ts.org/docs/)
+
+<br />
+
+
+<br />
+<img src="static/documentation_header.png" alt="Documentation">
+
+If you want to find out more about the React Integration.
+Checkout our **[docs](https://agile-ts.org/docs/)**.
+And I am sure you will be able to use it in no time.
+If you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
+
+
+<br />
+
+
+<br />
+<img src="static/contribute_header.png" alt="Contribute">
+
+Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md).
+
