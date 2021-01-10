@@ -152,5 +152,5 @@ In case you have any questions don't mind joining our [Discord Community](https:
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/contribute_header.png" alt="Contribute">
 
-Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](./CONTRIBUTING.md).
+Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
