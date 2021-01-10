@@ -5,20 +5,20 @@
  <br />
 
  <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/react">
-  <img src="https://img.shields.io/npm/v/@agile-ts/react.svg" alt="npm version"></a>
+  <img src="https://img.shields.io/npm/v/@agile-ts/react.svg" alt="npm version"/></a>
 <a href="https://npm.im/@agile-ts/react">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/react.svg" alt="npm minified size"></a>
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/react.svg" alt="npm minified size"/></a>
 <a href="https://npm.im/@agile-ts/react">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/react.svg" alt="npm total downloads"></a>
+  <img src="https://img.shields.io/npm/dt/@agile-ts/react.svg" alt="npm total downloads"/></a>
 
 
 <br />
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/what_does_this_integration_header.png" alt="What does this Integration?">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/what_does_this_integration_header.png" alt="What does this Integration?"/>
 
 Well, this Integration binds AgileTs Instances to React Components.
 Through that AgileTs is able to rerender the Component if a bound Instance mutates.
@@ -36,7 +36,7 @@ Here is a simple example how such a binding might look like:
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/installation_header.png" alt="Installation">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/installation_header.png" alt="Installation"/>
 
 ```
 npm install @agile-ts/react
@@ -59,7 +59,7 @@ To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/useAgile_header.png" alt="useAgile for Functional Components">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/useAgile_header.png" alt="useAgile for Functional Components"/>
 
 
 For [Function Component](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `useAgile` Hook.
@@ -109,7 +109,7 @@ Test the `useAgile` Hook yourself, it's only [one click](https://codesandbox.io/
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/agileHOC_header.png" alt="useAgile for Functional Components">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/agileHOC_header.png" alt="useAgile for Functional Components"/>
 
 For [Class Components](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `AgileHOC`.
 At first what is a HOC, well it's a [Higher Order Component](https://reactjs.org/docs/higher-order-components.html)
@@ -139,7 +139,7 @@ Test the `AgileHOC` yourself, it's only [one click](TODO) away.
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/documentation_header.png" alt="Documentation">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/documentation_header.png" alt="Documentation"/>
 
 If you want to find out more about the AgileTs React Integration.
 Checkout our **[docs](https://agile-ts.org/docs/)**.
@@ -150,7 +150,7 @@ In case you have any questions don't mind joining our [Discord Community](https:
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/contribute_header.png" alt="Contribute">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/contribute_header.png" alt="Contribute"/>
 
 Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 

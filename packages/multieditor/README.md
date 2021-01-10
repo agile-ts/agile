@@ -3,15 +3,15 @@
 > Simple Form Manager for UI-Frameworks
 
 <a href="https://npm.im/@agile-ts/multieditor">
-  <img src="https://img.shields.io/npm/v/@agile-ts/multieditor.svg" alt="npm version"></a>
+  <img src="https://img.shields.io/npm/v/@agile-ts/multieditor.svg" alt="npm version"/></a>
  <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/multieditor">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/multieditor.svg" alt="npm monthly downloads"></a>
+  <img src="https://img.shields.io/npm/dm/@agile-ts/multieditor.svg" alt="npm monthly downloads"/></a>
 <a href="https://npm.im/@agile-ts/multieditor">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/multieditor.svg" alt="npm total downloads"></a>
+  <img src="https://img.shields.io/npm/dt/@agile-ts/multieditor.svg" alt="npm total downloads"/></a>
 <a href="https://npm.im/@agile-ts/multieditor">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/multieditor.svg" alt="npm minified size"></a>
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/multieditor.svg" alt="npm minified size"/></a>
   
 ## ⏰ Short Example
 ```ts

@@ -4,26 +4,26 @@
  
  <br />
 
- <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
+<a href="https://github.com/agile-ts/agile">
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"></a>
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"/></a>
 
 <br />
 
 <a href="https://github.com/agile-ts/agile/actions?query=workflow%3ARelease">
-   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg?style=flat-square" alt="Build Status"></a>
+   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg?style=flat-square" alt="Build Status"/></a>
 <a href="https://github.com/agile-ts/agile/actions?query=workflow%3A%22Test+All+Packages%22">
-   <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"></a>
+   <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"/></a>
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage">
-   <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"></a>
+   <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/></a>
 
 <br />
 
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg" alt="npm monthly downloads"></a>
+  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg" alt="npm monthly downloads"/></a>
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg" alt="npm total downloads"></a>
+  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg" alt="npm total downloads"/></a>
     
 
 
@@ -31,7 +31,7 @@
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/how_to_create_state_header.png" alt="How to create a State?">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/how_to_create_state_header.png" alt="How to create a State?"/>
 
 ```tsx
 // -- core.js ------------------------------------------
@@ -61,7 +61,7 @@ Test AgileTs yourself, it's only one click away. Just select your preferred Fram
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
 ### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent. 
@@ -106,7 +106,7 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation"/>
 
 To use AgileTs properly, in an UI-Framework we have to install **2** packages.
 
@@ -126,7 +126,7 @@ To use AgileTs properly, in an UI-Framework we have to install **2** packages.
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/documentation_header.png" alt="Documentation">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/documentation_header.png" alt="Documentation"/>
 
 If AgileTs sounds interesting to you.
 Checkout our **[docs](https://agile-ts.org/docs/)**. 
@@ -138,7 +138,7 @@ In case you have any questions don't mind joining our [Discord Community](https:
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/contribute_header.png" alt="Contribute">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/contribute_header.png" alt="Contribute"/>
 
 Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
@@ -147,7 +147,7 @@ Get a part of AgileTs and start contributing. To find out more read the [CONTRIB
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/packages_of_agile.png" alt="Packages of Agile">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/packages_of_agile.png" alt="Packages of Agile"/>
 
 | Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
@@ -161,6 +161,6 @@ Get a part of AgileTs and start contributing. To find out more read the [CONTRIB
 
 
 <br />
-<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/credits_header.png" alt="Credits">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/credits_header.png" alt="Credits"/>
 
 AgileTs is inspired by [PulseJs](https://github.com/pulse-framework/pulse)
