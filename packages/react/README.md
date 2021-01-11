@@ -132,7 +132,7 @@ This is possible because the output of `MY_COOL_STATE` gets merged into the Rand
 The name `myCoolState` is based on the State Key which can be set with `MY_COOL_STATE.setKey("myCoolState")`.
 
 ### ⛳️ Sandbox
-Test the `AgileHOC` yourself, it's only [one click](TODO) away.
+Test the `AgileHOC` yourself, it's only [one click](https://codesandbox.io/s/agilehoc-example-1qdew) away.
 
 
 <br />
@@ -142,7 +142,7 @@ Test the `AgileHOC` yourself, it's only [one click](TODO) away.
 <img src="https://raw.githubusercontent.com/agile-ts/agile/readme-improvements/packages/react/static/documentation_header.png" alt="Documentation"/>
 
 If you want to find out more about the AgileTs React Integration.
-Checkout our **[docs](https://agile-ts.org/docs/)**.
+Checkout our **[docs](https://agile-ts.org/docs/react)**.
 In case you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
 
 
