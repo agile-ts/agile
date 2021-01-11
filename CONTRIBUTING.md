@@ -50,7 +50,7 @@ AgileTs has two primary branches: `master` and `develop`
 
 `develop` is where development takes place
 
-<img src="static/branch_organization.png" alt="Banner">
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/branch_organization.png" alt="Branch Organisation"/>
 
 The root of all your branches have to be the `develop` branch!
 
