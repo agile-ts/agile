@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.9
+
+### Patch Changes
+
+- c3a8217: Improved ReadMe
+
 ## 0.0.8
 
 ### Patch Changes
