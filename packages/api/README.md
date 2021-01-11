@@ -3,15 +3,15 @@
 > Promise based HTTP request API for Node.js
 
 <a href="https://npm.im/@agile-ts/api">
-  <img src="https://img.shields.io/npm/v/@agile-ts/api.svg" alt="npm version"></a>
+  <img src="https://img.shields.io/npm/v/@agile-ts/api.svg" alt="npm version"/></a>
  <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"></a>
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/api">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/api.svg" alt="npm monthly downloads"></a>
+  <img src="https://img.shields.io/npm/dm/@agile-ts/api.svg" alt="npm monthly downloads"/></a>
 <a href="https://npm.im/@agile-ts/api">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/api.svg" alt="npm total downloads"></a>
+  <img src="https://img.shields.io/npm/dt/@agile-ts/api.svg" alt="npm total downloads"/></a>
 <a href="https://npm.im/@agile-ts/api">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/api.svg" alt="npm minified size"></a>
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/api.svg" alt="npm minified size"/></a>
   
 ## ⏰ Short Example
 ```ts
