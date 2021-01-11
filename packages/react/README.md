@@ -48,7 +48,7 @@ Below you can find a table that shows which versions fit together.
 
 | @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
 | --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
-| v0.0.7          | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
+| v0.0.7+         | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
 | v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
 _Other Versions aren't supported anymore_
 
