@@ -108,15 +108,15 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation"/>
 
-To use AgileTs properly, in an UI-Framework we have to install **2** packages.
+To properly use AgileTs, in an UI-Framework we need **two** packages.
 
-- The _Core Package_, which is the brain of AgileTs and handles your States, Collections, ..
+- The _Core Package_, which acts as the brain of AgileTs and manages all our Agile Instances like States, Collections, ..
   ```
   npm install @agile-ts/core
   ```
 
-- A _fitting integration_ for the UI-Framework you are using.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
-  Check [here](https://agile-ts/docs/framework) your Framework is supported, too.
+- A _fitting Integration_ for our preferd UI-Framework.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
+  Check [here](https://agile-ts/docs/installation) if your Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
