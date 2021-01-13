@@ -84,7 +84,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/frameworks) if the Framework you are using is supported, too.
+- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/installation) if the Framework you are using is supported, too.
 - Surly behaves with the workflow that suits you best.
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
@@ -116,7 +116,7 @@ To properly use AgileTs, in an UI-Framework we need **two** packages.
   ```
 
 - A _fitting Integration_ for our preferd UI-Framework.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
-  Check [here](https://agile-ts/docs/installation) if your Framework is supported, too.
+  Check [here](https://agile-ts.org/docs/installation) if your Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
