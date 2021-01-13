@@ -67,7 +67,7 @@ jobs:
 
       - run:
           name: 🟢 Test
-          command: yarn run test --runInBand
+          command: yarn run test
 
   test-coverage:
     executor: node-executor
