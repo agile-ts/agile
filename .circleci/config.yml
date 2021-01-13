@@ -62,12 +62,12 @@ jobs:
           at: .
 
       - run:
-         name: Clear Test Cache
+         name: 🟡 Clear Test Cache
          command: yarn run test --clearCache
 
       - run:
-          name: 🤔 Test
-          command: yarn run test --runInBand --clearCache
+          name: 🟢 Test
+          command: yarn run test --runInBand
 
   test-coverage:
     executor: node-executor
