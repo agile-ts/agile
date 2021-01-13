@@ -97,9 +97,9 @@ workflows:
       - build
 
        # Run Test Job if Build Job has finished
-     - test:
-        requires:
-          - build
+      - test:
+         requires:
+           - build
 
       # Not working properly yet
       # Run Test-Coverage Job if Build Job has finished
