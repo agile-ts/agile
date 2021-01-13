@@ -67,7 +67,7 @@ jobs:
 
       - run:
           name: 🟢 Test
-          command: yarn run test
+          command: yarn run test --runInBand # Tests somehow only get executed with the '--runInBand' Flag
 
   test-coverage:
     executor: node-executor
