@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentClass } from 'react';
 import {
   State,
   Agile,
@@ -6,52 +6,90 @@ import {
   getAgileInstance,
   normalizeArray,
   Observer,
+  Collection,
+  isValidObject,
 } from '@agile-ts/core';
 
+type DepsType = State | Collection | Observer | undefined;
+
 export function AgileHOC(
-  ReactComponent: any,
-  deps?: Array<State> | { [key: string]: State } | State,
+  ReactComponent: ComponentClass<any, any>,
+  deps?: Array<DepsType> | { [key: string]: DepsType } | DepsType,
   agileInstance?: Agile
-) {
-  let depsArray: Array<Observer>;
-  const depsObject: { [key: string]: Observer } = {};
+): ComponentClass<any, any> {
+  const depsArray: Array<Observer> = []; // Observers that have no key
+  const depsObject: { [key: string]: Observer } = {}; // Observer that have key
+  const areObjectDeps = isValidObject(deps);
 
-  if (deps instanceof State || Array.isArray(deps)) {
-    // Normalize Dependencies
-    depsArray = normalizeArray<State>(deps || []).map((dep) => dep.observer);
+  if (!areObjectDeps) {
+    // Normalize Dependencies and special Agile Instance Types like Collection
+    const tempDepsArray = normalizeArray(deps as any, {
+      createUndefinedArray: true,
+    });
 
-    // Get Agile Instance
-    if (!agileInstance) {
-      if (depsArray.length > 0) {
-        const tempAgileInstance = getAgileInstance(depsArray[0]);
-        agileInstance = tempAgileInstance || undefined;
-      } else {
-        Agile.logger.error("Please don't pass an empty array!");
+    // Build Observer Deps Array
+    for (const dep of tempDepsArray) {
+      // If Dep is Collection
+      if (dep instanceof Collection) {
+        depsArray.push(
+          dep.getGroupWithReference(dep.config.defaultGroupKey).observer
+        );
+      }
+
+      // If Dep has property that is Observer
+      if (dep['observer']) {
+        depsArray.push(dep['observer']);
+      }
+
+      // If Dep is Observer
+      if (dep instanceof Observer) {
+        depsArray.push(dep);
       }
     }
-  } else if (typeof deps === 'object') {
-    for (const dep in deps) depsObject[dep] = deps[dep].observer;
 
-    // Get Agile Instance
-    if (!agileInstance) {
-      const objectKeys = Object.keys(depsObject);
-      if (objectKeys.length > 0) {
-        const tempAgileInstance = getAgileInstance(depsObject[objectKeys[0]]);
-        agileInstance = tempAgileInstance || undefined;
-      } else {
-        Agile.logger.error("Please don't pass an empty object!");
+    // Build Observer Deps Object out of Observers that have an Key
+    for (const dep of depsArray) {
+      if (dep && dep['key']) {
+        depsObject[dep['key']] = dep;
       }
     }
-  } else {
-    Agile.logger.error('No Valid AgileHOC properties');
+  }
+
+  if (areObjectDeps) {
+    // Build Observer Deps Object
+    for (const depKey in deps) {
+      // If Dep is Collection
+      if (deps[depKey] instanceof Collection) {
+        deps[depKey] = deps[depKey].getGroupWithReference(
+          deps[depKey].config.defaultGroupKey
+        ).observer;
+      }
+
+      // If Dep has property that is an Observer
+      if (deps[depKey]['observer']) {
+        depsObject[depKey] = deps[depKey]['observer'];
+      }
+
+      // If Dep is Observer
+      if (deps[depKey] instanceof Observer) {
+        depsObject[depKey] = deps[depKey];
+      }
+    }
+
+    // Build Observer Deps Array
+    for (const dep in depsObject) {
+      depsArray.push(depsObject[dep]);
+    }
+  }
+
+  // Try to get Agile Instance
+  if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
+  if (!agileInstance || !agileInstance.subController) {
+    Agile.logger.error('Failed to subscribe Component with deps', depsArray);
     return ReactComponent;
   }
 
-  // Check if agile Instance exists
-  if (!agileInstance) {
-    Agile.logger.error('Failed to get Agile Instance');
-    return ReactComponent;
-  }
+  // TODO only subscribe with Array the observers that are not represented in object observers
 
   return class extends ReactComponent {
     public agileInstance: () => Agile;
@@ -63,7 +101,7 @@ export function AgileHOC(
       super(props);
       this.agileInstance = (() => agileInstance) as any;
 
-      // Create HOC based Subscription with Array (Rerenders will here be caused via force Update)
+      // Create HOC based Subscription with Array (Rerender will here be caused via force Update)
       if (depsArray)
         this.agileInstance().subController.subscribeWithSubsArray(
           this,
@@ -98,7 +136,7 @@ export function AgileHOC(
     render() {
       return React.createElement(ReactComponent, this.updatedProps);
     }
-  };
+  } as any;
 }
 
 // Just for having a type save base in react.integration

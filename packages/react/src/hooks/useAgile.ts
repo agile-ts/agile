@@ -93,10 +93,10 @@ export function useAgile<
   // Normalize Dependencies and special Agile Instance Types like Collection
   const depsArray = normalizeArray(deps, {
     createUndefinedArray: true,
-  }).map((item) =>
-    item instanceof Collection
-      ? item.getGroupWithReference(item.config.defaultGroupKey)
-      : item
+  }).map((dep) =>
+    dep instanceof Collection
+      ? dep.getGroupWithReference(dep.config.defaultGroupKey)
+      : dep
   );
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
