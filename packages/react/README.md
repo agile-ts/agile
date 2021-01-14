@@ -23,7 +23,7 @@
 Well, this Integration binds AgileTs Instances to React Components.
 Through that AgileTs is able to rerender the Component if a bound Instance mutates.
 
-Here is a simple example how such a binding might look like:
+Here is a quick example how such a binding might look like:
 ```ts
 // -- myComponent.jsx ------------------------------------------
 
@@ -42,9 +42,11 @@ Here is a simple example how such a binding might look like:
 npm install @agile-ts/react
 ```
 _Be aware that this is no standalone package!_ <br />
-To use AgileTs with React properly, we have to install the [Core Package](https://www.npmjs.com/package/@agile-ts/core) too,
-but note that we can't combine each version. 
-Below you can find a table that shows which versions fit together.
+
+The React Integration is only an Extension of AgileTs and doesn't work without the [Core Package](https://www.npmjs.com/package/@agile-ts/core),
+which functions as the brain of AgileTs and is indispensable.
+Unfortunately we can't combine every `core` version with `react` version.
+Therefore, you can find a table that shows which versions fit together below.
 
 | @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
 | --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
@@ -64,7 +66,7 @@ To find out more take a look into the [docs](https://www.agile-ts.org/docs).
 
 For [Function Component](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `useAgile` Hook.
 With this Hook we are able to bind an Agile Instance to our Component.
-This ensures that it rerender, when the bound AgileInstance mutates.
+This ensures that it rerender, when the bound Agile Instance mutates.
 `useAgile` returns the current `output` of the passed Agile Instance.
 ```ts
 const myCoolState = useAgile(MY_COOL_STATE); 
@@ -79,19 +81,19 @@ It is also possible to bind more than one Agile Instance to a Component at once.
 
 ```tsx
   const App = new Agile();
-  const MY_FIRST_STATE = App.State("Hello Stranger!");
+  const MY_STATE = App.State("Hello Stranger!");
   
   const RandomComponent = () => {
       // With 'useAgile' we bind our State to our 'RandomComponent'
-      const myFirstState = useAgile(MY_FIRST_STATE); // Returns "Hello Stranger!"
-                                                                //       ^
-      return (                                                  //       |
-          <div>                                                 //       |  Through the 'set' action the State Value 
-              <p>{myFirstState}</p>                             //       |  gets changed to "Hello Friend!" 
-              <button                                           //       |  and causes a rerender on this Component.
-                  onClick={() => {                              //       |  -> myFirstState has the Value "Hello Friend!"
-                      // Lets's update the State Value          //       |
-                      MY_FIRST_STATE.set("Hello Friend!") // -------------
+      const myFirstState = useAgile(MY_STATE); // Returns "Hello Stranger!"
+                                                          //       ^
+      return (                                            //       |
+          <div>                                           //       |  Through the 'set' action the State Value 
+              <p>{myFirstState}</p>                       //       |  gets changed to "Hello Friend!" 
+              <button                                     //       |  and causes a rerender on this Component.
+                  onClick={() => {                        //       |  -> myFirstState has the Value "Hello Friend!"
+                      // Lets's update the State Value    //       |
+                    MY_STATE.set("Hello Friend!"); // --------------
                   }}
               >
                   Update State
@@ -112,10 +114,10 @@ Test the `useAgile` Hook yourself, it's only [one click](https://codesandbox.io/
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/agileHOC_header.png" alt="useAgile for Functional Components"/>
 
 For [Class Components](https://reactjs.org/docs/components-and-props.html) Users we recommend using the `AgileHOC`.
-At first what is a HOC, well it's a [Higher Order Component](https://reactjs.org/docs/higher-order-components.html)
-that gets wrapped around our Class. 
+At first what is a HOC, well it's a [Higher Order Component](https://reactjs.org/docs/higher-order-components.html),
+that gets wrapped around our React Class. 
 By wrapping our Component into the `AgileHOC`, we are able to bind Agile Instances to it.
-This ensures that our Class Component rerender, when a bound Agile Instance mutates. 
+This ensures that our Class Component rerender, whenever a bound Agile Instance mutates. 
 The `output` of the Agile Instance gets merged into the `props` of the Class Component.
 ```tsx
 class RandomComponent extends React.Component {
@@ -124,7 +126,7 @@ class RandomComponent extends React.Component {
   }
 }
 
-// Warapping AgileHOC around our Component, and binding MY_COOL_STATE to it
+// Wrapping AgileHOC around our Component, and binding MY_COOL_STATE to it
 export default AgileHOC(RandomComponent, [MY_COOL_STATE]);
 ```
 For instance if `MY_COOL_STATE` has the Value _"Frank"_ `this.props.myCoolState` returns _"Frank"_.
