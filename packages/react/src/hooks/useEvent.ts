@@ -13,7 +13,7 @@ export function useEvent<E extends Event<any>>(
   callback: EventCallbackFunction<E['payload']>,
   key?: SubscriptionContainerKeyType,
   agileInstance?: Agile
-) {
+): void {
   // Trigger State used to force the component to rerender
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
