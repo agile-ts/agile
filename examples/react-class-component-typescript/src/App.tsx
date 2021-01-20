@@ -99,7 +99,10 @@ class App extends React.Component<any> {
   }
 }
 
-export default AgileHOC(App, {
+const FinalApp = AgileHOC(App, [MY_STATE, MY_STATE_2, MY_COMPUTED]);
+
+/*
+const FinalApp = AgileHOC(App, {
   myState: MY_STATE,
   myState2: MY_STATE_2,
   item: MY_COLLECTION.getItem('1'),
@@ -110,3 +113,6 @@ export default AgileHOC(App, {
   myCollection: MY_COLLECTION as any,
   myGroup: MY_COLLECTION.getGroupWithReference('myGroup'),
 });
+ */
+
+export default FinalApp;

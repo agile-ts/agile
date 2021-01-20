@@ -127,7 +127,7 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(['core', 'subscription'])
+        .tag(['runtime', 'subscription'])
         .info(
           'Unregistered Callback based Subscription ',
           subscriptionInstance
@@ -142,7 +142,7 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(['core', 'subscription'])
+        .tag(['runtime', 'subscription'])
         .info(
           'Unregistered Component based Subscription ',
           subscriptionInstance
@@ -161,7 +161,7 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(['core', 'subscription'])
+        .tag(['runtime', 'subscription'])
         .info(
           'Unregistered Component based Subscription ',
           subscriptionInstance
@@ -181,7 +181,7 @@ export class SubController {
 
           // Logging
           Agile.logger.if
-            .tag(['core', 'subscription'])
+            .tag(['runtime', 'subscription'])
             .info(
               'Unregistered Component based Subscription ',
               subscriptionInstance
@@ -253,7 +253,7 @@ export class SubController {
 
     // Logging
     Agile.logger.if
-      .tag(['core', 'subscription'])
+      .tag(['runtime', 'subscription'])
       .info(
         'Registered Component based Subscription ',
         componentSubscriptionContainer
@@ -287,7 +287,7 @@ export class SubController {
 
     // Logging
     Agile.logger.if
-      .tag(['core', 'subscription'])
+      .tag(['runtime', 'subscription'])
       .info(
         'Registered Callback based Subscription ',
         callbackSubscriptionContainer
