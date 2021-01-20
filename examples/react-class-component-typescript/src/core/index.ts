@@ -1,7 +1,7 @@
 import { Agile, clone, Logger } from '@agile-ts/core';
 
 export const App = new Agile({
-  logConfig: { level: Logger.level.DEBUG },
+  logConfig: { level: Logger.level.DEBUG, timestamp: true },
 });
 
 export const MY_STATE = App.createState<string>('MyState', { key: 'myState' }); //.persist();

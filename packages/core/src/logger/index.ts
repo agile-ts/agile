@@ -29,10 +29,12 @@ export class Logger {
       canUseCustomStyles: true,
       active: true,
       level: 0,
+      timestamp: false,
     });
     this.isActive = _config.active as any;
     this.allowedTags = _config.allowedTags as any;
     this.config = {
+      timestamp: _config.timestamp as any,
       prefix: _config.prefix as any,
       canUseCustomStyles: _config.canUseCustomStyles as any,
       level: _config.level as any,
@@ -235,6 +237,8 @@ export class Logger {
     // Build Prefix of Log
     const buildPrefix = (): string => {
       let prefix = '';
+      if (this.config.timestamp)
+        prefix = prefix.concat(`[${Date.now().toString()}] `);
       if (this.config.prefix) prefix = prefix.concat(this.config.prefix);
       if (loggerCategory.prefix)
         prefix = prefix.concat(' ' + loggerCategory.prefix);
@@ -418,11 +422,13 @@ export interface LoggerCategoryInterface {
  * @param prefix - Prefix that gets written before each log of this Logger
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
  * @param level - Handles which Logger Categories can be Logged
+ * @param timestamp - Timestamp that ges written before each log of this Logger
  */
 export interface LoggerConfigInterface {
   prefix: string;
   canUseCustomStyles: boolean;
   level: number;
+  timestamp: boolean;
 }
 
 /**
@@ -431,6 +437,7 @@ export interface LoggerConfigInterface {
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
  * @param active - If Logger is active
  * @param level - Handles which Logger Categories can be Logged
+ * @param timestamp - Timestamp that ges written before each log of this Logger
  */
 export interface CreateLoggerConfigInterface {
   prefix?: string;
@@ -438,6 +445,7 @@ export interface CreateLoggerConfigInterface {
   canUseCustomStyles?: boolean;
   active?: boolean;
   level?: number;
+  timestamp?: boolean;
 }
 
 export type LoggerConfig =
