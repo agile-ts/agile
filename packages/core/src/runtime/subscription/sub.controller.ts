@@ -168,6 +168,28 @@ export class SubController {
         );
       return;
     }
+
+    // Unsubscribe component based Subscription with subscriptionInstance that holds componentSubscriptionContainers
+    if (
+      subscriptionInstance.componentSubscriptionContainers &&
+      Array.isArray(subscriptionInstance.componentSubscriptionContainers)
+    ) {
+      subscriptionInstance.componentSubscriptionContainers.forEach(
+        (subContainer) => {
+          unsub(subContainer as ComponentSubscriptionContainer);
+          this.componentSubs.delete(subContainer);
+
+          // Logging
+          Agile.logger.if
+            .tag(['core', 'subscription'])
+            .info(
+              'Unregistered Component based Subscription ',
+              subscriptionInstance
+            );
+        }
+      );
+      return;
+    }
   }
 
   //=========================================================================================================
@@ -218,8 +240,16 @@ export class SubController {
         componentSubscriptionContainer.ready = true;
     } else componentSubscriptionContainer.ready = true;
 
-    // To have an instance of the SubscriptionContainer in the Component (necessary to unsubscribe component later)
-    componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
+    // Add subscriptionContainer to Component, to have an instance of it there (necessary to unsubscribe SubscriptionContainer later)
+    if (
+      componentInstance.componentSubscriptionContainers &&
+      Array.isArray(componentInstance.componentSubscriptionContainers)
+    )
+      componentInstance.componentSubscriptionContainers.push(
+        componentSubscriptionContainer
+      );
+    else
+      componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
 
     // Logging
     Agile.logger.if

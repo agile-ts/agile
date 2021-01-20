@@ -87,7 +87,7 @@ export class Agile {
    * Storage - Handy Interface for storing Items permanently
    * @param config - Config
    */
-  public Storage = (config: CreateStorageConfigInterface) =>
+  public createStorage = (config: CreateStorageConfigInterface) =>
     new Storage(config);
 
   //=========================================================================================================
@@ -99,7 +99,7 @@ export class Agile {
    * @param initialValue - Initial Value of the State
    * @param config - Config
    */
-  public State = <ValueType>(
+  public createState = <ValueType>(
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ) => new State<ValueType>(this, initialValue, config);
@@ -112,7 +112,7 @@ export class Agile {
    * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param config - Config
    */
-  public Collection = <DataType = DefaultItem>(
+  public createCollection = <DataType = DefaultItem>(
     config?: CollectionConfig<DataType>
   ) => new Collection<DataType>(this, config);
 
@@ -125,7 +125,7 @@ export class Agile {
    * @param computeFunction - Function for computing value
    * @param deps - Hard coded dependencies of Computed Function
    */
-  public Computed = <ComputedValueType = any>(
+  public createComputed = <ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     deps?: Array<Observer | State | Event>
   ) =>
@@ -141,7 +141,7 @@ export class Agile {
    * Event - Class that holds a List of Functions which can be triggered at the same time
    * @param config - Config
    */
-  public Event = <PayloadType = DefaultEventPayload>(
+  public createEvent = <PayloadType = DefaultEventPayload>(
     config?: CreateEventConfigInterface
   ) => new Event<PayloadType>(this, config);
 

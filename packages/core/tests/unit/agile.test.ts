@@ -170,7 +170,7 @@ describe('Agile Tests', () => {
           },
           key: 'myTestStorage',
         };
-        const storage = agile.Storage(storageConfig);
+        const storage = agile.createStorage(storageConfig);
 
         expect(storage).toBeInstanceOf(Storage);
         expect(StorageMock).toHaveBeenCalledWith(storageConfig);
@@ -179,7 +179,7 @@ describe('Agile Tests', () => {
 
     describe('state function tests', () => {
       it('should create State', () => {
-        const state = agile.State('testValue', {
+        const state = agile.createState('testValue', {
           key: 'myCoolState',
         });
 
@@ -202,7 +202,7 @@ describe('Agile Tests', () => {
           key: 'myCoolCollection',
         };
 
-        const collection = agile.Collection(collectionConfig);
+        const collection = agile.createCollection(collectionConfig);
 
         expect(collection).toBeInstanceOf(Collection);
         expect(CollectionMock).toHaveBeenCalledWith(agile, collectionConfig);
@@ -221,7 +221,7 @@ describe('Agile Tests', () => {
           // console.log("Hello Jeff");
         };
 
-        const computed = agile.Computed(computedFunction, []);
+        const computed = agile.createComputed(computedFunction, []);
 
         expect(computed).toBeInstanceOf(Computed);
         expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
@@ -245,7 +245,7 @@ describe('Agile Tests', () => {
           key: 'myCoolEvent',
         };
 
-        const event = agile.Event(eventConfig);
+        const event = agile.createEvent(eventConfig);
 
         expect(event).toBeInstanceOf(Event);
         expect(EventMock).toHaveBeenCalledWith(agile, eventConfig);
