@@ -42,13 +42,14 @@ const App = new Agile();
 // Now we are able to build our first State 😃
 const MY_FIRST_STATE = App.createState("Hello Stranger!");
 
+
 // -- myComponent.whatever ------------------------------------------
 
 // Finally, we bind our just created State to our UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
 const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
-To find out more checkout our [documentation](https://agile-ts.org/docs).
+To find out more checkout our [documentation](https://agile-ts.org/docs/installation).
 
 ### ⛳️ Sandbox
 Test AgileTs yourself, it's only one click away. Just select your preferred Framework below.
@@ -84,7 +85,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/installation) if the Framework you are using is supported, too.
+- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/installation) if your desired framework is supported, too.
 - Surly behaves with the workflow that suits you best.
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
@@ -96,6 +97,7 @@ This makes your code more decoupled, portable, and above all, easily testable.
 ### 🎯 Easy to Use
 Learn the powerful tools of AgileTs in a short amount of time.
 A good place to start is in our [documentation](https://agile-ts.org/docs).
+And I'm sure you'll be able to use AgileTs very soon.
 
 ### 🍃 Lightweight
 AgileTs has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
