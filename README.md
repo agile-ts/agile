@@ -45,7 +45,7 @@ const MY_FIRST_STATE = App.createState("Hello Stranger!");
 
 // -- myComponent.whatever ------------------------------------------
 
-// Finally, we bind our just created State to our UI-Component
+// Finally, we bind our just created State to our desired UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
 const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
