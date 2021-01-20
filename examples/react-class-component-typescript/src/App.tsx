@@ -60,8 +60,8 @@ class App extends React.Component<any> {
           <div className={'Container'}>
             <h3 className={'Title'}>My Collection</h3>
             <div>
-              {this.props?.myCollection &&
-                this.props?.myCollection.map((item: any) => <p>{item.name}</p>)}
+              {this.props?.myGroup &&
+                this.props?.myGroup.map((item: any) => <p>{item.name}</p>)}
             </div>
             <button
               onClick={() =>
@@ -108,4 +108,5 @@ export default AgileHOC(App, {
   myUndefined: undefined,
   myComputed: MY_COMPUTED,
   myCollection: MY_COLLECTION as any,
+  myGroup: MY_COLLECTION.getGroupWithReference('myGroup'),
 });
