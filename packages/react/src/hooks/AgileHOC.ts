@@ -29,16 +29,20 @@ export function AgileHOC(
 
     // Build Observer Deps Array
     for (const dep of tempDepsArray) {
+      if (!dep) continue;
+
       // If Dep is Collection
       if (dep instanceof Collection) {
         depsArray.add(
           dep.getGroupWithReference(dep.config.defaultGroupKey).observer
         );
+        continue;
       }
 
       // If Dep has property that is Observer
       if (dep['observer']) {
         depsArray.add(dep['observer']);
+        continue;
       }
 
       // If Dep is Observer
@@ -58,16 +62,20 @@ export function AgileHOC(
   if (areObjectDeps) {
     // Build Observer Deps Object
     for (const depKey in deps) {
+      if (!deps[depKey]) continue;
+
       // If Dep is Collection
       if (deps[depKey] instanceof Collection) {
-        deps[depKey] = deps[depKey].getGroupWithReference(
+        depsObject[depKey] = deps[depKey].getGroupWithReference(
           deps[depKey].config.defaultGroupKey
         ).observer;
+        continue;
       }
 
       // If Dep has property that is an Observer
       if (deps[depKey]['observer']) {
         depsObject[depKey] = deps[depKey]['observer'];
+        continue;
       }
 
       // If Dep is Observer
