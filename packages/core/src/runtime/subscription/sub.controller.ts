@@ -190,6 +190,12 @@ export class SubController {
       );
       return;
     }
+
+    // Logging
+    Agile.logger.if
+      .tag(['runtime', 'subscription'])
+      .warn(`Couldn't find anything to unregister in `, subscriptionInstance);
+    return;
   }
 
   //=========================================================================================================

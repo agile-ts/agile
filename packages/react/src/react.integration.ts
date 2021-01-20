@@ -14,8 +14,8 @@ const reactIntegration = new Integration<typeof React, AgileReactComponent>({
 
     if (Object.keys(updatedData).length !== 0) {
       // Update Props
-      componentInstance.updatedProps = {
-        ...componentInstance.updatedProps,
+      componentInstance.agileProps = {
+        ...componentInstance.agileProps,
         ...updatedData,
       };
 
