@@ -39,12 +39,12 @@
 // Let's start by creating an Instance of AgileTs
 const App = new Agile();
 
-// Than we can build our first State
-const MY_FIRST_STATE = App.State("Hello Stranger!");
+// Now we are able to build our first State 😃
+const MY_FIRST_STATE = App.createState("Hello Stranger!");
 
 // -- myComponent.whatever ------------------------------------------
 
-// Now we are able to bind our State to nearly any UI-Component
+// Finally, we bind our just created State to our UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
 const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
@@ -110,13 +110,13 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
 To properly use AgileTs, in an UI-Framework we need **two** packages.
 
-- The _Core Package_, which acts as the brain of AgileTs and manages all our Agile Instances like States, Collections, ..
+- The _Core Package_, which acts as the brain of AgileTs and manages all our States
   ```
   npm install @agile-ts/core
   ```
 
-- A _fitting Integration_ for our preferd UI-Framework.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
-  Check [here](https://agile-ts.org/docs/installation) if your Framework is supported, too.
+- And a _fitting Integration_ for our preferd UI-Framework.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
+  Check [here](https://agile-ts.org/docs/installation) if your desired Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
@@ -140,7 +140,9 @@ In case you have any questions don't mind joining our [Discord Community](https:
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/contribute_header.png" alt="Contribute"/>
 
-Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+Get a part of AgileTs and start contributing. 
+To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+We welcome any meaningful contribution 😀
 
 
 <br />
