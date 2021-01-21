@@ -11,6 +11,130 @@ import {
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from '../utils/useIsomorphicLayoutEffect';
 
+//=========================================================================================================
+// useAgile
+//=========================================================================================================
+/**
+ * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * @param deps - Agile Instances that will be subscribed to this Component
+ * @param key - Key/Name of SubscriptionContainer that gets created
+ * @param agileInstance - An instance of Agile
+ */
+export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
+  deps: X | [],
+  key?: SubscriptionContainerKeyType,
+  agileInstance?: Agile
+): AgileHookArrayType<X>;
+
+/**
+ * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * @param dep - Agile Instance that will be subscribed to this Component
+ * @param key - Key/Name of SubscriptionContainer that gets created
+ * @param agileInstance - An instance of Agile
+ */
+export function useAgile<X extends SubscribableAgileInstancesType>(
+  dep: X,
+  key?: SubscriptionContainerKeyType,
+  agileInstance?: Agile
+): AgileHookType<X>;
+
+export function useAgile<
+  X extends Array<SubscribableAgileInstancesType>,
+  Y extends SubscribableAgileInstancesType
+>(
+  deps: X | Y,
+  key?: SubscriptionContainerKeyType,
+  agileInstance?: Agile
+): AgileHookArrayType<X> | AgileHookType<Y> {
+  const depsArray = formatDeps(deps);
+
+  // Creates Return Value of Hook, depending if deps are in Array shape or not
+  const getReturnValue = (
+    depsArray: (State | Observer | undefined)[]
+  ): AgileHookArrayType<X> | AgileHookType<Y> => {
+    if (depsArray.length === 1 && !Array.isArray(deps))
+      return depsArray[0]?.value;
+
+    return depsArray.map((dep) => {
+      return dep?.value;
+    }) as AgileHookArrayType<X>;
+  };
+
+  // Trigger State used to force the component to rerender
+  const [, forceRender] = React.useReducer((s) => s + 1, 0);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
+    if (!agileInstance || !agileInstance.subController) {
+      Agile.logger.error('Failed to subscribe Component with deps', depsArray);
+      return;
+    }
+
+    // https://github.com/microsoft/TypeScript/issues/20812
+    const observers: Observer[] = depsArray.filter(
+      (dep): dep is Observer => dep !== undefined
+    );
+
+    // Create Callback based Subscription
+    const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
+      () => {
+        forceRender();
+      },
+      observers,
+      key
+    );
+
+    // Unsubscribe Callback based Subscription on Unmount
+    return () => {
+      agileInstance?.subController.unsubscribe(subscriptionContainer);
+    };
+  }, []);
+
+  return getReturnValue(depsArray);
+}
+
+//=========================================================================================================
+// Format Deps
+//=========================================================================================================
+/**
+ * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * @param deps - Agile Instances that get formatted
+ */
+const formatDeps = (
+  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
+): Array<Observer | undefined> => {
+  const depsArray: Array<Observer | undefined> = [];
+  const tempDepsArray = normalizeArray(deps as any, {
+    createUndefinedArray: true,
+  });
+
+  // Build Observer Deps Array
+  for (const dep of tempDepsArray) {
+    if (!dep) depsArray.push(undefined);
+
+    // If Dep is Collection
+    if (dep instanceof Collection) {
+      depsArray.push(
+        dep.getGroupWithReference(dep.config.defaultGroupKey).observer
+      );
+      continue;
+    }
+
+    // If Dep has property that is Observer
+    if (dep['observer']) {
+      depsArray.push(dep['observer']);
+      continue;
+    }
+
+    // If Dep is Observer
+    if (dep instanceof Observer) {
+      depsArray.push(dep);
+    }
+  }
+
+  return depsArray;
+};
+
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
 type AgileHookArrayType<T> = {
@@ -56,92 +180,4 @@ type AgileHookType<T> = T extends Group<infer U>
   ? U[] | undefined
   : never;
 
-/**
- * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
- * @param deps - Agile Instances that will be subscribed to this Component
- * @param key - Key/Name of SubscriptionContainer that gets created
- * @param agileInstance - An instance of Agile
- */
-export function useAgile<
-  X extends Array<State | Collection | Observer | undefined>
->(
-  deps: X | [],
-  key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
-): AgileHookArrayType<X>;
-
-/**
- * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
- * @param dep - Agile Instance that will be subscribed to this Component
- * @param key - Key/Name of SubscriptionContainer that gets created
- * @param agileInstance - An instance of Agile
- */
-export function useAgile<X extends State | Collection | Observer | undefined>(
-  dep: X,
-  key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
-): AgileHookType<X>;
-
-export function useAgile<
-  X extends Array<State | Collection | Observer | undefined>,
-  Y extends State | Collection | Observer | undefined
->(
-  deps: X | Y,
-  key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
-): AgileHookArrayType<X> | AgileHookType<Y> {
-  // Normalize Dependencies and special Agile Instance Types like Collection
-  const depsArray = normalizeArray(deps, {
-    createUndefinedArray: true,
-  }).map((dep) =>
-    dep instanceof Collection
-      ? dep.getGroupWithReference(dep.config.defaultGroupKey)
-      : dep
-  );
-
-  // Creates Return Value of Hook, depending if deps are in Array shape or not
-  const getReturnValue = (
-    depsArray: (State | Observer | undefined)[]
-  ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    if (depsArray.length === 1 && !Array.isArray(deps))
-      return depsArray[0] instanceof Observer
-        ? depsArray[0]?.value
-        : (depsArray[0]?.getPublicValue() as AgileHookType<Y>);
-
-    return depsArray.map((dep) => {
-      return dep instanceof Observer ? dep?.value : dep?.getPublicValue();
-    }) as AgileHookArrayType<X>;
-  };
-
-  // Trigger State used to force the component to rerender
-  const [, forceRender] = React.useReducer((s) => s + 1, 0);
-
-  useIsomorphicLayoutEffect(() => {
-    if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
-    if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error('Failed to subscribe Component with deps', depsArray);
-      return;
-    }
-
-    // https://github.com/microsoft/TypeScript/issues/20812
-    const observers: Observer[] = depsArray
-      .map((dep) => (dep instanceof Observer ? dep : dep?.observer))
-      .filter((dep): dep is Observer => dep !== undefined);
-
-    // Create Callback based Subscription
-    const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
-      () => {
-        forceRender();
-      },
-      observers,
-      key
-    );
-
-    // Unsubscribe Callback based Subscription on Unmount
-    return () => {
-      agileInstance?.subController.unsubscribe(subscriptionContainer);
-    };
-  }, []);
-
-  return getReturnValue(depsArray);
-}
+type SubscribableAgileInstancesType = State | Collection | Observer | undefined;

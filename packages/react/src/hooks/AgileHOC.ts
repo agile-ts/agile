@@ -33,7 +33,7 @@ export function AgileHOC(
   if (isValidObject(deps)) {
     depsWithIndicator = registerDepsWithIndicator(deps as any);
   } else {
-    const response = registerDepsWithNoSafeIndicator(deps);
+    const response = registerDepsWithNoSafeIndicator(deps as any);
     depsWithIndicator = response.depsWithIndicator;
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
@@ -160,18 +160,16 @@ const createHOC = (
  * @param deps - Deps that have no safe indicator
  */
 const registerDepsWithNoSafeIndicator = (
-  deps: DepsType
+  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
 ): RegisterDepsWithNoSafeIndicatorResponseInterface => {
   const depsWithIndicator: DepsWithIndicatorType = {};
   const depsWithoutIndicator: Set<Observer> = new Set();
-
-  // Normalize Dependencies and special Agile Instance Types like Collection
-  const tempDepsArray = normalizeArray(deps as any, {
+  const depsArray = normalizeArray(deps as any, {
     createUndefinedArray: true,
   });
 
   // Build Observer Deps Array
-  for (const dep of tempDepsArray) {
+  for (const dep of depsArray) {
     if (!dep) continue;
 
     // If Dep is Collection
