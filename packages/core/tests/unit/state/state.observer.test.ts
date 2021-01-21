@@ -281,6 +281,7 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.nextStateValue = 'newValue';
         dummyState.initialStateValue = 'initialValue';
         dummyState._value = 'dummyValue';
+        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -289,7 +290,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState._value).toBe('newValue');
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeTruthy();
-        expect(stateObserver.value).toBe('newValue');
+        expect(stateObserver.value).toBe('newPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -299,6 +300,7 @@ describe('StateObserver Tests', () => {
         dummyState.isPlaceholder = true;
         dummyState.initialStateValue = 'overwriteValue';
         dummyState._value = 'dummyValue';
+        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -308,7 +310,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
         expect(dummyState.isPlaceholder).toBeFalsy();
-        expect(stateObserver.value).toBe('newValue');
+        expect(stateObserver.value).toBe('newPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -316,6 +318,7 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.nextStateValue = 'newValue';
         dummyState.initialStateValue = 'newValue';
         dummyState._value = 'dummyValue';
+        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -324,7 +327,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState._value).toBe('newValue');
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
-        expect(stateObserver.value).toBe('newValue');
+        expect(stateObserver.value).toBe('newPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
     });

@@ -83,6 +83,7 @@ describe('Agile Tests', () => {
       prefix: 'Agile',
       level: Logger.level.WARN,
       canUseCustomStyles: true,
+      timestamp: false,
     });
     expect(Agile.logger.allowedTags).toStrictEqual([
       'runtime',
@@ -104,6 +105,7 @@ describe('Agile Tests', () => {
         level: Logger.level.DEBUG,
         active: false,
         prefix: 'Jeff',
+        timestamp: true,
       },
     });
 
@@ -127,6 +129,7 @@ describe('Agile Tests', () => {
       prefix: 'Jeff',
       level: Logger.level.DEBUG,
       canUseCustomStyles: true,
+      timestamp: true,
     });
     expect(Agile.logger.allowedTags).toStrictEqual([
       'runtime',
