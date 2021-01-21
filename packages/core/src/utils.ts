@@ -237,11 +237,15 @@ export function flatMerge<DataType = Object>(
   changes: Object,
   config: FlatMergeConfigInterface = {}
 ): DataType {
-  // Copy Source to avoid references
+  config = defineConfig(config, {
+    addNewProperties: true,
+  });
+
+  // Copy Source to avoid References
   const _source = copy<DataType>(source);
   if (!_source) return _source;
 
-  // Loop through source object an merge changes into it
+  // Merge Changes Object into Source Object
   const keys = Object.keys(changes);
   keys.forEach((property) => {
     if (!config.addNewProperties && !_source[property]) return;

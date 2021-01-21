@@ -377,12 +377,13 @@ describe('Utils Tests', () => {
       });
     });
 
-    it("shouldn't add new properties to Source Object", () => {
+    it('should add new properties to Source Object', () => {
       const source = {
         id: 123,
         name: 'jeff',
         size: 189,
       };
+
       expect(
         flatMerge(source, {
           name: 'hans',
@@ -393,15 +394,17 @@ describe('Utils Tests', () => {
         id: 123,
         name: 'hans',
         size: 177,
+        location: 'behind you',
       });
     });
 
-    it('should add new properties to source Object (config.addNewProperties = true)', () => {
+    it("shouldn't add new properties to source Object (config.addNewProperties = false)", () => {
       const source = {
         id: 123,
         name: 'jeff',
         size: 189,
       };
+
       expect(
         flatMerge(
           source,
@@ -410,13 +413,12 @@ describe('Utils Tests', () => {
             size: 177,
             location: 'behind you',
           },
-          { addNewProperties: true }
+          { addNewProperties: false }
         )
       ).toStrictEqual({
         id: 123,
         name: 'hans',
         size: 177,
-        location: 'behind you',
       });
     });
 
@@ -441,6 +443,7 @@ describe('Utils Tests', () => {
           place: 'JeffsHome',
           country: 'Germany',
         },
+        place: 'JeffsNewHome',
       });
     });
   });
