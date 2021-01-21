@@ -4,7 +4,7 @@ export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG, timestamp: true },
 });
 
-export const MY_STATE = App.createState<string>('MyState', { key: 'myState' }); //.persist();
+export const MY_STATE = App.createState<string>('MyState'); //.persist();
 export const MY_STATE_2 = App.createState<string>('MyState2', {
   key: 'myState2',
 }).persist();
@@ -19,7 +19,7 @@ MY_STATE.watch('test', (value: any) => {
 
 export const MY_COMPUTED = App.createComputed<string>(() => {
   return 'test' + MY_STATE.value + '_computed_' + MY_STATE_2.value;
-}, []); // .setKey('myComputed');
+}, []).setKey('myComputed');
 
 interface collectionValueInterface {
   id: string;
