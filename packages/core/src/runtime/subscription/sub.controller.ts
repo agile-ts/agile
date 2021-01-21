@@ -223,7 +223,9 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Registers Component based Subscription
+   * Registers Component based Subscription and applies SubscriptionContainer to Component.
+   * If an instance called 'subscriptionContainers' exists in Component it will push the new SubscriptionContainer to this Array,
+   * otherwise it creates a new Instance called 'subscriptionContainer' which holds the new  SubscriptionContainer
    * @param componentInstance - Component that got subscribed by Observer/s
    * @param subs - Initial Subscriptions
    * @param key - Key/Name of SubscriptionContainer

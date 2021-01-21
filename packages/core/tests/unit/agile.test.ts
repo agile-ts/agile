@@ -150,7 +150,7 @@ describe('Agile Tests', () => {
       agile = new Agile();
     });
 
-    describe('storage function tests', () => {
+    describe('createStorage function tests', () => {
       const StorageMock = Storage as jest.MockedClass<typeof Storage>;
 
       beforeEach(() => {
@@ -190,7 +190,7 @@ describe('Agile Tests', () => {
       });
     });
 
-    describe('collection function tests', () => {
+    describe('createCollection function tests', () => {
       const CollectionMock = Collection as jest.MockedClass<typeof Collection>;
 
       beforeEach(() => {
@@ -212,7 +212,7 @@ describe('Agile Tests', () => {
       });
     });
 
-    describe('computed function tests', () => {
+    describe('createComputed function tests', () => {
       const ComputedMock = Computed as jest.MockedClass<typeof Computed>;
 
       beforeEach(() => {
@@ -233,7 +233,7 @@ describe('Agile Tests', () => {
       });
     });
 
-    describe('event function tests', () => {
+    describe('createEvent function tests', () => {
       const EventMock = Event as jest.MockedClass<typeof Event>;
 
       beforeEach(() => {

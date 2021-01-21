@@ -1,4 +1,5 @@
 import { Agile, Observer, SubscriptionContainer } from '../../../../../src';
+import * as Utils from '../../../../../src/utils';
 
 describe('SubscriptionContainer Tests', () => {
   let dummyAgile: Agile;
@@ -11,7 +12,20 @@ describe('SubscriptionContainer Tests', () => {
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
   });
 
-  it('should create SubscriptionContainer', () => {
+  it('should create SubscriptionContainer (default config)', () => {
+    jest.spyOn(Utils, 'generateId').mockReturnValue('generatedId');
+
+    const subscriptionContainer = new SubscriptionContainer();
+
+    expect(subscriptionContainer.key).toBe('generatedId');
+    expect(subscriptionContainer.ready).toBeFalsy();
+    expect(subscriptionContainer.subs.size).toBe(0);
+    expect(subscriptionContainer.isObjectBased).toBeFalsy();
+    expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
+    expect(subscriptionContainer.subsObject).toBeUndefined();
+  });
+
+  it('should create SubscriptionContainer (specific config)', () => {
     const subscriptionContainer = new SubscriptionContainer(
       [dummyObserver1, dummyObserver2],
       'dummyKey'
