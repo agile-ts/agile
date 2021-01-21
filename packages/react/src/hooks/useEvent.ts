@@ -14,7 +14,7 @@ export function useEvent<E extends Event<any>>(
   key?: SubscriptionContainerKeyType,
   agileInstance?: Agile
 ): void {
-  // Trigger State used to force the component to rerender
+  // Trigger State used to force Component to rerender
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
   useIsomorphicLayoutEffect(() => {
