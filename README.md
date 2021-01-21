@@ -5,27 +5,26 @@
  <br />
 
 <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"/></a>
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg" alt="npm minified size"/></a>
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg?label=minified%20size&style=flat&colorA=293140&colorB=4a4872" alt="npm minified size"/></a>
 
 <br />
 
 <a href="https://github.com/agile-ts/agile/actions?query=workflow%3ARelease">
-   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg?style=flat-square" alt="Build Status"/></a>
+   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg" alt="Build Status"/></a>
 <a href="https://github.com/agile-ts/agile/actions?query=workflow%3A%22Test+All+Packages%22">
    <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"/></a>
-<a href="https://codeclimate.com/github/agile-ts/agile/coverage">
+<a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/></a>
 
 <br />
 
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg" alt="npm monthly downloads"/></a>
+  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm monthly downloads"/></a>
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg" alt="npm total downloads"/></a>
+  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm total downloads"/></a>
     
-
 
 <br />
 
@@ -39,16 +38,17 @@
 // Let's start by creating an Instance of AgileTs
 const App = new Agile();
 
-// Than we can build our first State
-const MY_FIRST_STATE = App.State("Hello Stranger!");
+// Now we are able to build our first State 😃
+const MY_FIRST_STATE = App.createState("Hello Stranger!");
+
 
 // -- myComponent.whatever ------------------------------------------
 
-// Now we are able to bind our State to nearly any UI-Component
+// Finally, we bind our just created State to our desired UI-Component
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
 const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
-To find out more checkout our [documentation](https://agile-ts.org/docs).
+To find out more checkout our [documentation](https://agile-ts.org/docs/installation).
 
 ### ⛳️ Sandbox
 Test AgileTs yourself, it's only one click away. Just select your preferred Framework below.
@@ -84,7 +84,7 @@ Write minimalistic, boilerplate free code that captures your intent.
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/installation) if the Framework you are using is supported, too.
+- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/installation) if your desired framework is supported, too.
 - Surly behaves with the workflow that suits you best.
   No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
@@ -96,6 +96,7 @@ This makes your code more decoupled, portable, and above all, easily testable.
 ### 🎯 Easy to Use
 Learn the powerful tools of AgileTs in a short amount of time.
 A good place to start is in our [documentation](https://agile-ts.org/docs).
+And I'm sure you'll be able to use AgileTs very soon.
 
 ### 🍃 Lightweight
 AgileTs has an unpacked size of [52.7kB](https://bundlephobia.com/result?p=@agile-ts/core@0.0.6) 
@@ -110,13 +111,13 @@ and [0 dependencies](https://www.npmjs.com/package/@agile-ts/core).
 
 To properly use AgileTs, in an UI-Framework we need **two** packages.
 
-- The _Core Package_, which acts as the brain of AgileTs and manages all our Agile Instances like States, Collections, ..
+- The _Core Package_, which acts as the brain of AgileTs and manages all our States
   ```
   npm install @agile-ts/core
   ```
 
-- A _fitting Integration_ for our preferd UI-Framework.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
-  Check [here](https://agile-ts.org/docs/installation) if your Framework is supported, too.
+- And a _fitting Integration_ for our preferd UI-Framework.. in my case [React](https://www.npmjs.com/package/@agile-ts/react).
+  Check [here](https://agile-ts.org/docs/installation) if your desired Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
@@ -140,7 +141,9 @@ In case you have any questions don't mind joining our [Discord Community](https:
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/contribute_header.png" alt="Contribute"/>
 
-Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+Get a part of AgileTs and start contributing. 
+To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+We welcome any meaningful contribution 😀
 
 
 <br />
