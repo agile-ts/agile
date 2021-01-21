@@ -110,7 +110,11 @@ const formatDeps = (
 
   // Build Observer Deps Array
   for (const dep of tempDepsArray) {
-    if (!dep) depsArray.push(undefined);
+    // If Dep is undefined
+    if (!dep) {
+      depsArray.push(undefined);
+      continue;
+    }
 
     // If Dep is Collection
     if (dep instanceof Collection) {
