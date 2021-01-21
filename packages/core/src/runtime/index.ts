@@ -201,14 +201,9 @@ export class Runtime {
     const props: { [key: string]: any } = {};
 
     // Map trough observerKeysToUpdate and build object out of Observer value
-    subscriptionContainer.observerKeysToUpdate.forEach((updatedKey) => {
-      if (
-        subscriptionContainer.subsObject &&
-        subscriptionContainer.subsObject[updatedKey]['value']
-      )
-        props[updatedKey] =
-          subscriptionContainer.subsObject[updatedKey]['value'];
-    });
+    if (subscriptionContainer.subsObject)
+      for (const updatedKey of subscriptionContainer.observerKeysToUpdate)
+        props[updatedKey] = subscriptionContainer.subsObject[updatedKey]?.value;
 
     subscriptionContainer.observerKeysToUpdate = [];
     return props;

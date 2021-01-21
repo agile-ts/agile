@@ -314,7 +314,7 @@ export function clone<T = any>(instance: T): T {
   const objectCopy: T = Object.create(Object.getPrototypeOf(instance));
   const objectClone = Object.assign(objectCopy, instance);
 
-  // Copy Properties of Class
+  // Copy Properties of Class to remove flat references
   for (const key in objectClone) objectClone[key] = copy(objectClone[key]);
 
   return objectClone;
