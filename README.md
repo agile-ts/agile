@@ -5,9 +5,9 @@
  <br />
 
 <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=293140" alt="GitHub License"/></a>
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg?label=minified%20size&style=flat&colorA=293140&colorB=293140" alt="npm minified size"/></a>
+  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg?label=minified%20size&style=flat&colorA=293140&colorB=4a4872" alt="npm minified size"/></a>
 
 <br />
 
@@ -21,9 +21,9 @@
 <br />
 
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=293140" alt="npm monthly downloads"/></a>
+  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm monthly downloads"/></a>
 <a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=293140" alt="npm total downloads"/></a>
+  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm total downloads"/></a>
     
 
 <br />
