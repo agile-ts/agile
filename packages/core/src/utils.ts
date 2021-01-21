@@ -226,7 +226,8 @@ export interface FlatMergeConfigInterface {
 
 /**
  * @internal
- * Merges items into object, be aware that the merge will only happen at the top level of the object
+ * Merges items into object, be aware that the merge will only happen at the top level of the object.
+ * Initially it adds new properties of the changes object into the source object.
  * @param source - Source object
  * @param changes - Changes that get merged into the source object
  * @param config - Config
