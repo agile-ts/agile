@@ -15,7 +15,7 @@ import { useIsomorphicLayoutEffect } from '../utils/useIsomorphicLayoutEffect';
 // useAgile
 //=========================================================================================================
 /**
- * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * React Hook that binds Agile Instances like Collections, States, Computeds, .. to a React Functional Component
  * @param deps - Agile Instances that will be subscribed to this Component
  * @param key - Key/Name of SubscriptionContainer that gets created
  * @param agileInstance - An instance of Agile
@@ -27,7 +27,7 @@ export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
 ): AgileHookArrayType<X>;
 
 /**
- * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
+ * React Hook that binds Agile Instance like Collection, State, Computed, .. to a React Functional Component
  * @param dep - Agile Instance that will be subscribed to this Component
  * @param key - Key/Name of SubscriptionContainer that gets created
  * @param agileInstance - An instance of Agile
@@ -60,13 +60,14 @@ export function useAgile<
     }) as AgileHookArrayType<X>;
   };
 
-  // Trigger State used to force the component to rerender
+  // Trigger State used to force Component to rerender
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
   useIsomorphicLayoutEffect(() => {
+    // Try to get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error('Failed to subscribe Component with deps', depsArray);
+      Agile.logger.error('Failed to subscribe Component with deps', deps);
       return;
     }
 
@@ -97,8 +98,9 @@ export function useAgile<
 // Format Deps
 //=========================================================================================================
 /**
- * React Hook that subscribes a React Functional Component to an Agile Instance like Collection, State, Computed, ..
- * @param deps - Agile Instances that get formatted
+ * @private
+ * Formats Deps and gets Observers from them
+ * @param deps - Deps that get formatted
  */
 const formatDeps = (
   deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
@@ -108,9 +110,9 @@ const formatDeps = (
     createUndefinedArray: true,
   });
 
-  // Build Observer Deps Array
+  // Get Observers from Deps
   for (const dep of tempDepsArray) {
-    // If Dep is undefined
+    // If Dep is undefined (We have to add undefined to build a proper return value later)
     if (!dep) {
       depsArray.push(undefined);
       continue;
@@ -124,7 +126,7 @@ const formatDeps = (
       continue;
     }
 
-    // If Dep has property that is Observer
+    // If Dep has property that is an Observer
     if (dep['observer']) {
       depsArray.push(dep['observer']);
       continue;

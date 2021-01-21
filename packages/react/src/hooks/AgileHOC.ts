@@ -16,7 +16,7 @@ import {
 //=========================================================================================================
 /**
  * @public
- * Bind Agile Instances to Class React Component
+ * React HOC that binds Agile Instance like Collection, State, Computed, .. to a React Functional or Class Component
  * @param reactComponent - React Component to which the deps get bound
  * @param deps - Agile Instances that gets bind to the React Component
  * @param agileInstance - Agile Instance
@@ -31,20 +31,23 @@ export function AgileHOC(
 
   // Format Deps
   if (isValidObject(deps)) {
-    depsWithIndicator = registerDepsWithIndicator(deps as any);
+    depsWithIndicator = formatDepsWithIndicator(deps as any);
   } else {
-    const response = registerDepsWithNoSafeIndicator(deps as any);
+    const response = formatDepsWithNoSafeIndicator(deps as any);
     depsWithIndicator = response.depsWithIndicator;
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
 
   // Try to get Agile Instance
   if (!agileInstance) {
+    // From deps without Indicator
     if (depsWithoutIndicator.size > 0) {
       for (const dep of depsWithoutIndicator) {
         if (!agileInstance) agileInstance = getAgileInstance(dep);
       }
     }
+
+    // From deps with Indicator
     if (!agileInstance) {
       for (const depKey in depsWithIndicator) {
         if (!agileInstance)
@@ -52,11 +55,10 @@ export function AgileHOC(
       }
     }
   }
+
+  // If no Agile Instance found drop Error
   if (!agileInstance || !agileInstance.subController) {
-    Agile.logger.error(
-      'Failed to subscribe Component with deps',
-      depsWithoutIndicator
-    );
+    Agile.logger.error('Failed to subscribe Component with deps', deps);
     return reactComponent;
   }
 
@@ -72,8 +74,8 @@ export function AgileHOC(
 // Create HOC
 //=========================================================================================================
 /**
- * @public
- * Creates Higher Order Component based on passed React Component
+ * @private
+ * Creates Higher Order Component based on passed React Component that binds the deps to it
  * @param ReactComponent - React Component
  * @param agileInstance - Instance of Agile
  * @param depsWithoutIndicator - Deps that have no Indicator
@@ -99,35 +101,27 @@ const createHOC = (
     }
 
     // We have to go the 'UNSAFE' way because the constructor of a React Component gets called twice
-    // And because of that the subscriptionContainers get created twice
+    // And because of that the subscriptionContainers get created twice (not clean)
     // We could generate a id for each component but this would also happen in the constructor so idk
     // https://github.com/facebook/react/issues/12906
     UNSAFE_componentWillMount() {
-      // Remove Observer that are already represented in depsObject
-      const finalDepsArray = new Set(depsWithoutIndicator);
-      for (const depKey in depsWithIndicator) {
-        if (finalDepsArray.has(depsWithIndicator[depKey]))
-          finalDepsArray.delete(depsWithIndicator[depKey]);
-      }
-
-      // Create Subscription with Observer in Array shape (Rerender will here be caused via force Update)
-      if (finalDepsArray) {
+      // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
+      if (depsWithoutIndicator) {
         this.agileInstance().subController.subscribeWithSubsArray(
           this,
-          Array.from(finalDepsArray)
+          Array.from(depsWithoutIndicator)
         );
       }
 
-      // Create Subscription with Observer in Object shape (Rerender will here be cause via mutating this.state)
+      // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.state)
       if (depsWithIndicator) {
         const response = this.agileInstance().subController.subscribeWithSubsObject(
           this,
           depsWithIndicator
         );
-        response.subscriptionContainer;
         this.agileProps = response.props;
 
-        // Assign default values to State
+        // Merge depsWith Indicator into this.state
         this.state = flatMerge(this.state || {}, depsWithIndicator);
       }
     }
@@ -142,24 +136,24 @@ const createHOC = (
     }
 
     render() {
-      return React.createElement(ReactComponent, {
-        ...this.agileProps,
-        ...this.props,
-      });
+      return React.createElement(
+        ReactComponent,
+        flatMerge(this.props, this.agileProps)
+      );
     }
-  } as any;
+  };
 };
 
 //=========================================================================================================
-// Register Deps With No Safe Indicator
+// Format Deps With No Safe Indicator
 //=========================================================================================================
 /**
- * @public
- * Registers Deps that have no safe indicator.
- * It tries to use the existing Key of the Dep as Indicator
- * @param deps - Deps that have no safe indicator
+ * @private
+ * Formats Deps that have no safe indicator and gets Observers from them.
+ * It tries to use the existing Key of the Dep as Indicator.
+ * @param deps - Deps that have no safe Indicator and get formatted
  */
-const registerDepsWithNoSafeIndicator = (
+const formatDepsWithNoSafeIndicator = (
   deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
 ): RegisterDepsWithNoSafeIndicatorResponseInterface => {
   const depsWithIndicator: DepsWithIndicatorType = {};
@@ -168,7 +162,7 @@ const registerDepsWithNoSafeIndicator = (
     createUndefinedArray: true,
   });
 
-  // Build Observer Deps Array
+  // Get Observers from Deps
   for (const dep of depsArray) {
     if (!dep) continue;
 
@@ -192,10 +186,11 @@ const registerDepsWithNoSafeIndicator = (
     }
   }
 
-  // Build Observer Deps Object out of Observers that have an Key
+  // Add deps with key to depsWithIndicator and remove them from depsWithoutIndicator
   for (const dep of depsWithoutIndicator) {
     if (dep && dep['key']) {
       depsWithIndicator[dep['key']] = dep;
+      depsWithoutIndicator.delete(dep);
     }
   }
 
@@ -206,23 +201,23 @@ const registerDepsWithNoSafeIndicator = (
 };
 
 //=========================================================================================================
-// Register Deps With Indicator
+// Format Deps With Indicator
 //=========================================================================================================
 /**
- * @public
- * Register Deps that have an Indicator.
- * The property of the object is the indicator.
- * @param deps - Deps that have an Indicator
+ * @private
+ * Format Deps that have an Indicator and gets Observers from them.
+ * The key of a property in the object is the indicator.
+ * @param deps - Deps that have an Indicator and get formatted
  */
-const registerDepsWithIndicator = (deps: {
+const formatDepsWithIndicator = (deps: {
   [key: string]: SubscribableAgileInstancesType;
 }): DepsWithIndicatorType => {
   const depsWithIndicator: DepsWithIndicatorType = {};
 
-  // Build Observer Deps Object
+  // Get Observers from Deps
   for (const depKey in deps) {
     const dep = deps[depKey];
-    if (!dep) continue;
+    if (!dep) continue; // undefined deps won't be represented in props anyway
 
     // If Dep is Collection
     if (dep instanceof Collection) {
@@ -247,7 +242,7 @@ const registerDepsWithIndicator = (deps: {
   return depsWithIndicator;
 };
 
-// Type save 'copy' of the HOC class to have an typesafe base in the react.integration
+// Copy of the HOC class to have an typesafe base in the react.integration
 export class AgileReactComponent extends React.Component {
   // public agileInstance: () => Agile;
   public componentSubscriptionContainers: Array<
