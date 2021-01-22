@@ -16,7 +16,10 @@
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
-    "watch": "lerna run watch",
+    "watch:core": "cd packages/core && yarn run watch",
+    "watch:react": "cd packages/core && yarn run watch",
+    "watch:multieditor": "cd packages/core && yarn run watch",
+    "watch:api": "cd packages/core && yarn run watch",
     "test": "jest --passWithNoTests",
     "test:coverage": "jest -i coverage --passWithNoTests",
     "dev-publish": "lerna run build && lerna run dev-publish",

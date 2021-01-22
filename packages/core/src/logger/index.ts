@@ -83,7 +83,7 @@ export class Logger {
     });
     this.createLoggerCategory({
       key: 'debug',
-      customStyle: 'color: #3c3c3c;',
+      customStyle: 'color: #656565;',
       prefix: 'Debug',
       level: Logger.level.DEBUG,
     });
