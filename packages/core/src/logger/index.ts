@@ -63,6 +63,7 @@ export class Logger {
       LOG: 5,
       TABLE: 5,
       INFO: 10,
+      SUCCESS: 15,
       WARN: 20,
       ERROR: 50,
     };
@@ -91,6 +92,12 @@ export class Logger {
       customStyle: 'color: #6c69a0;',
       prefix: 'Info',
       level: Logger.level.INFO,
+    });
+    this.createLoggerCategory({
+      key: 'success',
+      customStyle: 'color: #00b300;',
+      prefix: 'Success',
+      level: Logger.level.SUCCESS,
     });
     this.createLoggerCategory({
       key: 'warn',
@@ -127,6 +134,7 @@ export class Logger {
         log: (...data: any[]) => this.log(...data),
         debug: (...data: any[]) => this.debug(...data),
         info: (...data: any[]) => this.info(...data),
+        success: (...data: any[]) => this.success(...data),
         warn: (...data: any[]) => this.warn(...data),
         error: (...data: any[]) => this.error(...data),
         trace: (...data: any[]) => this.trace(...data),
@@ -141,6 +149,9 @@ export class Logger {
         /* do nothing */
       },
       info: () => {
+        /* do nothing */
+      },
+      success: () => {
         /* do nothing */
       },
       warn: () => {
@@ -176,6 +187,10 @@ export class Logger {
       'info',
       typeof console.info !== 'undefined' ? 'info' : 'log'
     );
+  }
+
+  public success(...data: any[]) {
+    this.invokeConsole(data, 'success', 'log');
   }
 
   public warn(...data: any[]) {

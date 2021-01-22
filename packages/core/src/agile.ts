@@ -73,7 +73,7 @@ export class Agile {
     Agile.logger = new Logger(config.logConfig);
 
     // Logging
-    Agile.logger.info('Created new AgileInstance ', this, Agile.logger);
+    Agile.logger.success('Created new AgileInstance ', this, Agile.logger);
 
     // Create global instance of Agile
     if (!globalBind('__agile__', this))
