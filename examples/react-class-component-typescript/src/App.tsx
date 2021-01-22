@@ -61,7 +61,9 @@ class App extends React.Component<any> {
             <h3 className={'Title'}>My Collection</h3>
             <div>
               {this.props?.myGroup &&
-                this.props?.myGroup.map((item: any) => <p>{item.name}</p>)}
+                this.props?.myGroup.map((item: any) => (
+                  <p key={item.id}>{item.name}</p>
+                ))}
             </div>
             <button
               onClick={() =>
