@@ -13,6 +13,8 @@ import {
   StateRuntimeJob,
   StateRuntimeJobConfigInterface,
   RuntimeJobKey,
+  SideEffectInterface,
+  createArrayFromObject,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -154,10 +156,17 @@ export class StateObserver<ValueType = any> extends Observer {
         state.watchers[watcherKey](state.getPublicValue());
 
     // Call SideEffect Functions
-    if (job.config?.sideEffects)
-      for (const sideEffectKey in state.sideEffects)
-        if (isFunction(state.sideEffects[sideEffectKey]))
-          state.sideEffects[sideEffectKey](job.config);
+    if (job.config?.sideEffects) {
+      const sideEffectArray = createArrayFromObject<SideEffectInterface>(
+        state.sideEffects
+      );
+      sideEffectArray.sort(function (a, b) {
+        return b.instance.weight - a.instance.weight;
+      });
+      for (const sideEffect of sideEffectArray)
+        if (isFunction(sideEffect.instance.callback))
+          sideEffect.instance.callback(job.config);
+    }
 
     // Ingest Dependencies of Observer into Runtime
     state.observer.deps.forEach(
