@@ -1,4 +1,4 @@
-import { Agile, Integration } from '@agile-ts/core';
+import { Agile, flatMerge, Integration } from '@agile-ts/core';
 import { AgileReactComponent } from './hooks/AgileHOC';
 import React from 'react';
 
@@ -10,17 +10,15 @@ const reactIntegration = new Integration<typeof React, AgileReactComponent>({
     return Promise.resolve(true);
   },
   updateMethod(componentInstance, updatedData: Object) {
-    // UpdatedData will be empty if the AgileHOC doesn't get an object as deps
-
+    // Merge changes into State if some Data updated otherwise force rerender
     if (Object.keys(updatedData).length !== 0) {
-      // Update Props
-      componentInstance.updatedProps = {
-        ...componentInstance.updatedProps,
-        ...updatedData,
-      };
-
-      // Set State
-      componentInstance.setState(updatedData);
+      componentInstance.agileProps = flatMerge(
+        componentInstance.agileProps,
+        updatedData
+      );
+      componentInstance.setState(
+        flatMerge(componentInstance.state, updatedData)
+      );
     } else {
       componentInstance.forceUpdate();
     }

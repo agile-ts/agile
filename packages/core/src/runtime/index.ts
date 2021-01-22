@@ -106,6 +106,8 @@ export class Runtime {
       return false;
 
     // Subscriptions that has to be updated/rerendered
+    // 'Set' to combine several SubscriptionContainers that are equals into one (optimizes rerender)
+    // Better would be to optimize the rerender based on the Component, because a Component can have multiple SubscriptionContainers
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
     // Build final jobsToRerender and reset jobsToRerender Instances
@@ -199,14 +201,9 @@ export class Runtime {
     const props: { [key: string]: any } = {};
 
     // Map trough observerKeysToUpdate and build object out of Observer value
-    subscriptionContainer.observerKeysToUpdate.forEach((updatedKey) => {
-      if (
-        subscriptionContainer.subsObject &&
-        subscriptionContainer.subsObject[updatedKey]['value']
-      )
-        props[updatedKey] =
-          subscriptionContainer.subsObject[updatedKey]['value'];
-    });
+    if (subscriptionContainer.subsObject)
+      for (const updatedKey of subscriptionContainer.observerKeysToUpdate)
+        props[updatedKey] = subscriptionContainer.subsObject[updatedKey]?.value;
 
     subscriptionContainer.observerKeysToUpdate = [];
     return props;

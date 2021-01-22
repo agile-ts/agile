@@ -1,5 +1,5 @@
 {
-  "name": "react-typescript",
+  "name": "react-functional-component-typescript",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -28,7 +28,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "install-agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/api @agile-ts/multieditor & npm install"
+    "install-agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/api @agile-ts/multieditor & yarn install"
   },
   "eslintConfig": {
     "extends": "react-app"

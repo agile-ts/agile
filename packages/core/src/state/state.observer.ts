@@ -119,7 +119,6 @@ export class StateObserver<ValueType = any> extends Observer {
     state.previousStateValue = copy(state._value);
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
-    job.observer.value = copy(job.observer.nextStateValue);
 
     // Overwrite old State Values
     if (job.config.overwrite) {
@@ -131,6 +130,11 @@ export class StateObserver<ValueType = any> extends Observer {
     state.isSet = notEqual(state._value, state.initialStateValue);
 
     this.sideEffects(job);
+
+    // Assign Public Value to Observer after sideEffects like 'rebuildGroup',
+    // because sometimes (for instance in Group) the publicValue is not the value(nextStateValue)
+    // and the observer value is at some point the publicValue because the end user uses it
+    job.observer.value = copy(state.getPublicValue());
   }
 
   //=========================================================================================================
