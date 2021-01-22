@@ -189,7 +189,7 @@ describe('Item Tests', () => {
         it('should call rebuildGroupThatIncludeItemKey', () => {
           item.setKey('myNewKey');
 
-          item.sideEffects[Item.updateGroupSideEffectKey]({
+          item.sideEffects[Item.updateGroupSideEffectKey].callback({
             dummy: 'property',
           });
 

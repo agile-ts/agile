@@ -239,7 +239,7 @@ export class State<ValueType = any> {
    * @param config - Config
    */
   public patch(
-    targetWithChanges: object,
+    targetWithChanges: Object,
     config: PatchConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -546,7 +546,7 @@ export class State<ValueType = any> {
     config: AddSideEffectConfigInterface = {}
   ): this {
     config = defineConfig(config, {
-      weight: 1,
+      weight: 10,
     });
     if (!isFunction(callback)) {
       Agile.logger.error('A sideEffect function has to be a function!');

@@ -567,9 +567,12 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
           followCollectionPersistKeyPattern: true,
         });
-        expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyDefaultGroup.addSideEffect
+        ).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 0 }
         );
 
         expect(dummyItem1.persist).toHaveBeenCalledWith(
@@ -608,9 +611,12 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
           followCollectionPersistKeyPattern: true,
         });
-        expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyDefaultGroup.addSideEffect
+        ).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 0 }
         );
 
         expect(dummyItem1.persist).toHaveBeenCalledWith(
@@ -678,7 +684,7 @@ describe('CollectionPersistent Tests', () => {
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey
-          ]();
+          ].callback();
 
           expect(
             collectionPersistent.rebuildStorageSideEffect
@@ -693,7 +699,7 @@ describe('CollectionPersistent Tests', () => {
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey
-          ]();
+          ].callback();
 
           expect(
             collectionPersistent.rebuildStorageSideEffect

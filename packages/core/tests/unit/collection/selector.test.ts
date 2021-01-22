@@ -334,7 +334,9 @@ describe('Selector Tests', () => {
         it('should call rebuildSelector', () => {
           selector.select('dummyItem1');
 
-          dummyItem1.sideEffects[Selector.rebuildSelectorSideEffectKey]({
+          dummyItem1.sideEffects[
+            Selector.rebuildSelectorSideEffectKey
+          ].callback({
             dummy: 'property',
           });
 
