@@ -106,8 +106,8 @@ export class Runtime {
       return false;
 
     // Subscriptions that has to be updated/rerendered
-    // Set to combine several SubscriptionContainers that are the same into one (optimizes rerender)
-    // Better would be to combine SubscriptionContainer based on the Component -> combine SubscriptionContainer that are on the same Component
+    // 'Set' to combine several SubscriptionContainers that are equals into one (optimizes rerender)
+    // Better would be to optimize the rerender based on the Component, because a Component can have multiple SubscriptionContainers
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
     // Build final jobsToRerender and reset jobsToRerender Instances
