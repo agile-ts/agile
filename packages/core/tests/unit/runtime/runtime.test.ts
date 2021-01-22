@@ -436,6 +436,7 @@ describe('Runtime Tests', () => {
 
         expect(props).toStrictEqual({
           observer1: 'dummyObserverValue1',
+          observer2: undefined,
           observer3: 'dummyObserverValue3',
         });
         expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
