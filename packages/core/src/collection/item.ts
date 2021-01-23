@@ -31,12 +31,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     this.collection = () => collection;
 
     // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
-    this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
-      this.collection().rebuildGroupsThatIncludeItemKey(
-        this._key || 'unknown',
-        config
-      )
-    );
+    this.addRebuildGroupThatIncludeItemKeySideEffect(this._key || 'unknown');
   }
 
   //=========================================================================================================
@@ -66,9 +61,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     this.removeSideEffect(Item.updateGroupSideEffectKey);
 
     // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
-    this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
-      this.collection().rebuildGroupsThatIncludeItemKey(value, config)
-    );
+    this.addRebuildGroupThatIncludeItemKeySideEffect(value);
 
     // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
     this.patch(
@@ -82,6 +75,23 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
       }
     );
     return this;
+  }
+
+  //=========================================================================================================
+  // Add Rebuild Group That Include ItemKey SideEffect
+  //=========================================================================================================
+  /**
+   * @internal
+   * Adds rebuildGroupThatIncludeItemKey to the Item sideEffects
+   * @param itemKey - ItemKey at which the groups has to rebuild
+   */
+  public addRebuildGroupThatIncludeItemKeySideEffect(itemKey: StateKey) {
+    this.addSideEffect(
+      Item.updateGroupSideEffectKey,
+      (config) =>
+        this.collection().rebuildGroupsThatIncludeItemKey(itemKey, config),
+      { weight: 100 }
+    );
   }
 }
 
