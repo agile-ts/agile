@@ -1,6 +1,6 @@
 # cra-template-agile
 
-> **The official AgileTs template for [Create React App](https://github.com/facebook/create-react-app)**
+> **The official AgileTs template for [Create React App](https://github.com/facebook/create-react-app) (Javascript)**
 
  <br />
 
@@ -29,7 +29,7 @@ npx create-react-app my-app --template agile
 
 ## TypeScript
 
-Use [cra-template-agile-typescript](https://github.com/reduxjs/cra-template-agile-typescript), which is based on this template
+Use [cra-template-agile-typescript](https://github.com/agile-ts/packages/cra-template-agile-typescript), which is based on this template
 
 ```sh
 npx create-react-app my-app --template agile-typescript
