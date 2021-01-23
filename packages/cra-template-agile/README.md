@@ -5,7 +5,7 @@
  <br />
 
 <a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/cra-template-agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
+  <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
 
 <br />
 
