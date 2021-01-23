@@ -1015,7 +1015,7 @@ export class Collection<DataType = DefaultItem> {
       item = new Item<DataType>(this, _data);
       this.data[itemKey] = item;
 
-      // Rebuild Groups That include ItemKey after assigning Item to Collection
+      // Rebuild Groups That include ItemKey after assigning Item to Collection (otherwise it can't find Item)
       this.rebuildGroupsThatIncludeItemKey(itemKey, {
         background: config.background,
       });
