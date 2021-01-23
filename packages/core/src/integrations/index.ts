@@ -47,7 +47,7 @@ export class Integrations {
     integration.integrated = true;
 
     // Logging
-    Agile.logger.success(`Successfully integrated '${integration._key}'`);
+    Agile.logger.success(`Integrated '${integration._key}' into AgileTs`);
 
     return true;
   }

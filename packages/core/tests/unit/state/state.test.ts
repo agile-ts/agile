@@ -818,7 +818,7 @@ describe('State Tests', () => {
         /* empty function */
       };
 
-      it('should add passed function to sideEffects at passed key (default config)', () => {
+      it('should add passed callback function to sideEffects at passed key (default config)', () => {
         numberState.addSideEffect('dummyKey', sideEffectFunction);
 
         expect(numberState.sideEffects).toHaveProperty('dummyKey');
@@ -828,7 +828,7 @@ describe('State Tests', () => {
         });
       });
 
-      it('should add passed function to sideEffects at passed key (specific config)', () => {
+      it('should add passed callback function to sideEffects at passed key (specific config)', () => {
         numberState.addSideEffect('dummyKey', sideEffectFunction, {
           weight: 999,
         });

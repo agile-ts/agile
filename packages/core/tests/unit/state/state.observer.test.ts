@@ -347,6 +347,12 @@ describe('StateObserver Tests', () => {
         dummyState.observer.deps.add(dummyStateObserver);
 
         dummyState.watchers['dummyWatcher'] = jest.fn();
+        dummyState.sideEffects['dummySideEffect3'] = {
+          weight: 100,
+          callback: jest.fn(() => {
+            sideEffectCallOrder.push('dummySideEffect3');
+          }),
+        };
         dummyState.sideEffects['dummySideEffect'] = {
           weight: 10,
           callback: jest.fn(() => {
@@ -378,7 +384,11 @@ describe('StateObserver Tests', () => {
         expect(
           dummyState.sideEffects['dummySideEffect2'].callback
         ).toHaveBeenCalledWith(dummyJob.config);
+        expect(
+          dummyState.sideEffects['dummySideEffect3'].callback
+        ).toHaveBeenCalledWith(dummyJob.config);
         expect(sideEffectCallOrder).toStrictEqual([
+          'dummySideEffect3',
           'dummySideEffect2',
           'dummySideEffect',
         ]);
@@ -394,6 +404,12 @@ describe('StateObserver Tests', () => {
         );
         expect(
           dummyState.sideEffects['dummySideEffect'].callback
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyState.sideEffects['dummySideEffect2'].callback
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyState.sideEffects['dummySideEffect3'].callback
         ).not.toHaveBeenCalled();
         expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
           perform: false,
