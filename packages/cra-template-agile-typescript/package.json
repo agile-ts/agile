@@ -26,6 +26,7 @@
   },
   "files": [
     "template",
-    "template.json"
+    "template.json",
+    "README.md"
   ]
 }
