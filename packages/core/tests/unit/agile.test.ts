@@ -214,20 +214,34 @@ describe('Agile Tests', () => {
 
     describe('createComputed function tests', () => {
       const ComputedMock = Computed as jest.MockedClass<typeof Computed>;
+      const computedFunction = () => {
+        // console.log("Hello Jeff");
+      };
 
       beforeEach(() => {
         ComputedMock.mockClear();
       });
 
       it('should create Computed', () => {
-        const computedFunction = () => {
-          // console.log("Hello Jeff");
-        };
-
         const computed = agile.createComputed(computedFunction, []);
 
         expect(computed).toBeInstanceOf(Computed);
         expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
+          computedDeps: [],
+        });
+      });
+
+      it('should create Computed with config', () => {
+        const computed = agile.createComputed(
+          computedFunction,
+          { key: 'jeff', isPlaceholder: false },
+          []
+        );
+
+        expect(computed).toBeInstanceOf(Computed);
+        expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
+          key: 'jeff',
+          isPlaceholder: false,
           computedDeps: [],
         });
       });
