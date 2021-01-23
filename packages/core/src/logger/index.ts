@@ -29,10 +29,12 @@ export class Logger {
       canUseCustomStyles: true,
       active: true,
       level: 0,
+      timestamp: false,
     });
     this.isActive = _config.active as any;
     this.allowedTags = _config.allowedTags as any;
     this.config = {
+      timestamp: _config.timestamp as any,
       prefix: _config.prefix as any,
       canUseCustomStyles: _config.canUseCustomStyles as any,
       level: _config.level as any,
@@ -61,6 +63,7 @@ export class Logger {
       LOG: 5,
       TABLE: 5,
       INFO: 10,
+      SUCCESS: 15,
       WARN: 20,
       ERROR: 50,
     };
@@ -80,7 +83,7 @@ export class Logger {
     });
     this.createLoggerCategory({
       key: 'debug',
-      customStyle: 'color: #3c3c3c;',
+      customStyle: 'color: #656565;',
       prefix: 'Debug',
       level: Logger.level.DEBUG,
     });
@@ -89,6 +92,12 @@ export class Logger {
       customStyle: 'color: #6c69a0;',
       prefix: 'Info',
       level: Logger.level.INFO,
+    });
+    this.createLoggerCategory({
+      key: 'success',
+      customStyle: 'color: #00b300;',
+      prefix: 'Success',
+      level: Logger.level.SUCCESS,
     });
     this.createLoggerCategory({
       key: 'warn',
@@ -125,6 +134,7 @@ export class Logger {
         log: (...data: any[]) => this.log(...data),
         debug: (...data: any[]) => this.debug(...data),
         info: (...data: any[]) => this.info(...data),
+        success: (...data: any[]) => this.success(...data),
         warn: (...data: any[]) => this.warn(...data),
         error: (...data: any[]) => this.error(...data),
         trace: (...data: any[]) => this.trace(...data),
@@ -139,6 +149,9 @@ export class Logger {
         /* do nothing */
       },
       info: () => {
+        /* do nothing */
+      },
+      success: () => {
         /* do nothing */
       },
       warn: () => {
@@ -174,6 +187,10 @@ export class Logger {
       'info',
       typeof console.info !== 'undefined' ? 'info' : 'log'
     );
+  }
+
+  public success(...data: any[]) {
+    this.invokeConsole(data, 'success', 'log');
   }
 
   public warn(...data: any[]) {
@@ -235,6 +252,8 @@ export class Logger {
     // Build Prefix of Log
     const buildPrefix = (): string => {
       let prefix = '';
+      if (this.config.timestamp)
+        prefix = prefix.concat(`[${Date.now().toString()}] `);
       if (this.config.prefix) prefix = prefix.concat(this.config.prefix);
       if (loggerCategory.prefix)
         prefix = prefix.concat(' ' + loggerCategory.prefix);
@@ -418,11 +437,13 @@ export interface LoggerCategoryInterface {
  * @param prefix - Prefix that gets written before each log of this Logger
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
  * @param level - Handles which Logger Categories can be Logged
+ * @param timestamp - Timestamp that ges written before each log of this Logger
  */
 export interface LoggerConfigInterface {
   prefix: string;
   canUseCustomStyles: boolean;
   level: number;
+  timestamp: boolean;
 }
 
 /**
@@ -431,6 +452,7 @@ export interface LoggerConfigInterface {
  * @param canUseCustomStyles - If custom Styles can be applied to the Logs
  * @param active - If Logger is active
  * @param level - Handles which Logger Categories can be Logged
+ * @param timestamp - Timestamp that ges written before each log of this Logger
  */
 export interface CreateLoggerConfigInterface {
   prefix?: string;
@@ -438,6 +460,7 @@ export interface CreateLoggerConfigInterface {
   canUseCustomStyles?: boolean;
   active?: boolean;
   level?: number;
+  timestamp?: boolean;
 }
 
 export type LoggerConfig =

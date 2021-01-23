@@ -226,7 +226,8 @@ export interface FlatMergeConfigInterface {
 
 /**
  * @internal
- * Merges items into object, be aware that the merge will only happen at the top level of the object
+ * Merges items into object, be aware that the merge will only happen at the top level of the object.
+ * Initially it adds new properties of the changes object into the source object.
  * @param source - Source object
  * @param changes - Changes that get merged into the source object
  * @param config - Config
@@ -236,11 +237,15 @@ export function flatMerge<DataType = Object>(
   changes: Object,
   config: FlatMergeConfigInterface = {}
 ): DataType {
-  // Copy Source to avoid references
+  config = defineConfig(config, {
+    addNewProperties: true,
+  });
+
+  // Copy Source to avoid References
   const _source = copy<DataType>(source);
   if (!_source) return _source;
 
-  // Loop through source object an merge changes into it
+  // Merge Changes Object into Source Object
   const keys = Object.keys(changes);
   keys.forEach((property) => {
     if (!config.addNewProperties && !_source[property]) return;
@@ -297,6 +302,27 @@ export function generateId(length?: number): string {
 }
 
 //=========================================================================================================
+// Create Array From Object
+//=========================================================================================================
+/**
+ * @internal
+ * Transforms Object to Array
+ * @param object - Object that gets transformed
+ */
+export function createArrayFromObject<P = any>(object: {
+  [key: string]: P;
+}): Array<{ key: string; instance: P }> {
+  const array: Array<{ key: string; instance: P }> = [];
+  for (const key in object) {
+    array.push({
+      key: key,
+      instance: object[key],
+    });
+  }
+  return array;
+}
+
+//=========================================================================================================
 // Clone
 //=========================================================================================================
 /**
@@ -309,7 +335,7 @@ export function clone<T = any>(instance: T): T {
   const objectCopy: T = Object.create(Object.getPrototypeOf(instance));
   const objectClone = Object.assign(objectCopy, instance);
 
-  // Copy Properties of Class
+  // Copy Properties of Class to remove flat references
   for (const key in objectClone) objectClone[key] = copy(objectClone[key]);
 
   return objectClone;

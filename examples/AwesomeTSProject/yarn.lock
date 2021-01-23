@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@agile-ts/api@file:.yalc/@agile-ts/api":
+  version "0.0.5"
+
+"@agile-ts/core@file:.yalc/@agile-ts/core":
+  version "0.0.5"
+
+"@agile-ts/react@file:.yalc/@agile-ts/react":
+  version "0.0.5"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"

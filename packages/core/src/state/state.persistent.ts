@@ -127,7 +127,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
       StatePersistent.storeValueSideEffectKey,
       (config) => {
         this.rebuildStorageSideEffect(this.state(), _key, config);
-      }
+      },
+      { weight: 0 }
     );
 
     // Rebuild Storage for saving State Value in the Storage

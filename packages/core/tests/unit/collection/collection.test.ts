@@ -25,6 +25,7 @@ describe('Collection Tests', () => {
 
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
+    jest.spyOn(Collection.prototype, 'collect');
     console.error = jest.fn();
     console.warn = jest.fn();
   });
@@ -54,6 +55,7 @@ describe('Collection Tests', () => {
 
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith({});
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith({});
+    expect(Collection.prototype.collect).not.toHaveBeenCalled();
   });
 
   it('should create Collection (specific config)', () => {
@@ -64,6 +66,7 @@ describe('Collection Tests', () => {
     jest
       .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
+    jest.spyOn(Collection.prototype, 'collect').mockReturnValueOnce(undefined);
 
     const collection = new Collection<ItemInterface>(dummyAgile, {
       defaultGroupKey: 'general',
@@ -71,6 +74,7 @@ describe('Collection Tests', () => {
       selectors: ['selector1', 'selector2'],
       key: 'dummyCollectionKey',
       primaryKey: 'key',
+      initialData: [{ id: '1', name: 'jeff' }],
     });
 
     expect(collection.config).toStrictEqual({
@@ -93,6 +97,9 @@ describe('Collection Tests', () => {
       'selector1',
       'selector2',
     ]);
+    expect(Collection.prototype.collect).toHaveBeenCalledWith([
+      { id: '1', name: 'jeff' },
+    ]);
   });
 
   it('should create Collection (specific config in function form)', () => {
@@ -103,6 +110,7 @@ describe('Collection Tests', () => {
     jest
       .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
+    jest.spyOn(Collection.prototype, 'collect').mockReturnValueOnce(undefined);
 
     const collection = new Collection<ItemInterface>(
       dummyAgile,
@@ -116,6 +124,7 @@ describe('Collection Tests', () => {
         },
         key: 'dummyCollectionKey',
         primaryKey: 'key',
+        initialData: [{ id: '1', name: 'jeff' }],
       })
     );
 
@@ -139,6 +148,9 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith({
       selector1: expect.any(Selector),
     });
+    expect(Collection.prototype.collect).toHaveBeenCalledWith([
+      { id: '1', name: 'jeff' },
+    ]);
   });
 
   describe('Collection Function Tests', () => {

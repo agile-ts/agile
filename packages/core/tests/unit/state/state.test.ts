@@ -818,14 +818,29 @@ describe('State Tests', () => {
         /* empty function */
       };
 
-      it('should add passed function to sideEffects at passed key', () => {
+      it('should add passed callback function to sideEffects at passed key (default config)', () => {
         numberState.addSideEffect('dummyKey', sideEffectFunction);
 
         expect(numberState.sideEffects).toHaveProperty('dummyKey');
-        expect(numberState.sideEffects['dummyKey']).toBe(sideEffectFunction);
+        expect(numberState.sideEffects['dummyKey']).toStrictEqual({
+          callback: sideEffectFunction,
+          weight: 10,
+        });
       });
 
-      it("shouldn't add passed invalid function to sideEffects at passed key", () => {
+      it('should add passed callback function to sideEffects at passed key (specific config)', () => {
+        numberState.addSideEffect('dummyKey', sideEffectFunction, {
+          weight: 999,
+        });
+
+        expect(numberState.sideEffects).toHaveProperty('dummyKey');
+        expect(numberState.sideEffects['dummyKey']).toStrictEqual({
+          callback: sideEffectFunction,
+          weight: 999,
+        });
+      });
+
+      it("shouldn't add passed invalid function to sideEffects at passed key (default config)", () => {
         numberState.addSideEffect('dummyKey', 10 as any);
 
         expect(numberState.sideEffects).not.toHaveProperty('dummyKey');
@@ -837,7 +852,10 @@ describe('State Tests', () => {
 
     describe('removeSideEffect function tests', () => {
       beforeEach(() => {
-        numberState.sideEffects['dummyKey'] = jest.fn();
+        numberState.sideEffects['dummyKey'] = {
+          callback: jest.fn(),
+          weight: 0,
+        };
       });
 
       it('should remove sideEffect at key from State', () => {
@@ -849,7 +867,10 @@ describe('State Tests', () => {
 
     describe('hasSideEffect function tests', () => {
       beforeEach(() => {
-        numberState.sideEffects['dummyKey'] = jest.fn();
+        numberState.sideEffects['dummyKey'] = {
+          callback: jest.fn(),
+          weight: 0,
+        };
       });
 
       it('should return true if SideEffect at given Key exists', () => {

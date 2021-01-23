@@ -1,4 +1,4 @@
-import { Observer } from '../../../internal';
+import { generateId, Observer } from '../../../internal';
 
 export class SubscriptionContainer {
   public key?: SubscriptionContainerKeyType;
@@ -19,7 +19,7 @@ export class SubscriptionContainer {
    */
   constructor(subs: Array<Observer> = [], key?: SubscriptionContainerKeyType) {
     this.subs = new Set(subs);
-    this.key = key;
+    this.key = key || generateId();
   }
 }
 

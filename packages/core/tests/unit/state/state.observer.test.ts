@@ -281,6 +281,7 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.nextStateValue = 'newValue';
         dummyState.initialStateValue = 'initialValue';
         dummyState._value = 'dummyValue';
+        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -289,7 +290,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState._value).toBe('newValue');
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeTruthy();
-        expect(stateObserver.value).toBe('newValue');
+        expect(stateObserver.value).toBe('newPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -299,6 +300,7 @@ describe('StateObserver Tests', () => {
         dummyState.isPlaceholder = true;
         dummyState.initialStateValue = 'overwriteValue';
         dummyState._value = 'dummyValue';
+        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -308,7 +310,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
         expect(dummyState.isPlaceholder).toBeFalsy();
-        expect(stateObserver.value).toBe('newValue');
+        expect(stateObserver.value).toBe('newPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -316,6 +318,7 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.nextStateValue = 'newValue';
         dummyState.initialStateValue = 'newValue';
         dummyState._value = 'dummyValue';
+        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -324,7 +327,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState._value).toBe('newValue');
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
-        expect(stateObserver.value).toBe('newValue');
+        expect(stateObserver.value).toBe('newPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
     });
@@ -332,8 +335,10 @@ describe('StateObserver Tests', () => {
     describe('sideEffects function tests', () => {
       let dummyJob: StateRuntimeJob;
       let dummyStateObserver: StateObserver;
+      let sideEffectCallOrder = [];
 
       beforeEach(() => {
+        sideEffectCallOrder = [];
         dummyStateObserver = new StateObserver(new State(dummyAgile, 'test'));
         dummyJob = new StateRuntimeJob(stateObserver, {
           key: 'dummyJob',
@@ -342,7 +347,24 @@ describe('StateObserver Tests', () => {
         dummyState.observer.deps.add(dummyStateObserver);
 
         dummyState.watchers['dummyWatcher'] = jest.fn();
-        dummyState.sideEffects['dummySideEffect'] = jest.fn();
+        dummyState.sideEffects['dummySideEffect3'] = {
+          weight: 100,
+          callback: jest.fn(() => {
+            sideEffectCallOrder.push('dummySideEffect3');
+          }),
+        };
+        dummyState.sideEffects['dummySideEffect'] = {
+          weight: 10,
+          callback: jest.fn(() => {
+            sideEffectCallOrder.push('dummySideEffect');
+          }),
+        };
+        dummyState.sideEffects['dummySideEffect2'] = {
+          weight: 13,
+          callback: jest.fn(() => {
+            sideEffectCallOrder.push('dummySideEffect2');
+          }),
+        };
         dummyStateObserver.ingest = jest.fn();
       });
 
@@ -353,12 +375,23 @@ describe('StateObserver Tests', () => {
         expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
           'dummyValue'
         );
-        expect(dummyState.sideEffects['dummySideEffect']).toHaveBeenCalledWith(
-          dummyJob.config
-        );
         expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
           perform: false,
         });
+        expect(
+          dummyState.sideEffects['dummySideEffect'].callback
+        ).toHaveBeenCalledWith(dummyJob.config);
+        expect(
+          dummyState.sideEffects['dummySideEffect2'].callback
+        ).toHaveBeenCalledWith(dummyJob.config);
+        expect(
+          dummyState.sideEffects['dummySideEffect3'].callback
+        ).toHaveBeenCalledWith(dummyJob.config);
+        expect(sideEffectCallOrder).toStrictEqual([
+          'dummySideEffect3',
+          'dummySideEffect2',
+          'dummySideEffect',
+        ]);
       });
 
       it("should call watchers, ingest dependencies of State and shouldn't call sideEffects (job.config.sideEffects = false)", () => {
@@ -370,7 +403,13 @@ describe('StateObserver Tests', () => {
           'dummyValue'
         );
         expect(
-          dummyState.sideEffects['dummySideEffect']
+          dummyState.sideEffects['dummySideEffect'].callback
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyState.sideEffects['dummySideEffect2'].callback
+        ).not.toHaveBeenCalled();
+        expect(
+          dummyState.sideEffects['dummySideEffect3'].callback
         ).not.toHaveBeenCalled();
         expect(dummyStateObserver.ingest).toHaveBeenCalledWith({
           perform: false,

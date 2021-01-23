@@ -21,6 +21,7 @@ import {
   Logger,
   CreateLoggerConfigInterface,
   StateConfigInterface,
+  flatMerge,
 } from './internal';
 
 export class Agile {
@@ -72,6 +73,9 @@ export class Agile {
     // Assign customized config to Logger
     Agile.logger = new Logger(config.logConfig);
 
+    // Logging
+    Agile.logger.success('Created new AgileInstance ', this, Agile.logger);
+
     // Create global instance of Agile
     if (!globalBind('__agile__', this))
       Agile.logger.warn(
@@ -87,8 +91,9 @@ export class Agile {
    * Storage - Handy Interface for storing Items permanently
    * @param config - Config
    */
-  public Storage = (config: CreateStorageConfigInterface) =>
-    new Storage(config);
+  public createStorage(config: CreateStorageConfigInterface): Storage {
+    return new Storage(config);
+  }
 
   //=========================================================================================================
   // State
@@ -99,10 +104,12 @@ export class Agile {
    * @param initialValue - Initial Value of the State
    * @param config - Config
    */
-  public State = <ValueType>(
+  public createState<ValueType>(
     initialValue: ValueType,
     config: StateConfigInterface = {}
-  ) => new State<ValueType>(this, initialValue, config);
+  ): State<ValueType> {
+    return new State<ValueType>(this, initialValue, config);
+  }
 
   //=========================================================================================================
   // Collection
@@ -112,9 +119,11 @@ export class Agile {
    * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param config - Config
    */
-  public Collection = <DataType = DefaultItem>(
+  public createCollection<DataType = DefaultItem>(
     config?: CollectionConfig<DataType>
-  ) => new Collection<DataType>(this, config);
+  ): Collection<DataType> {
+    return new Collection<DataType>(this, config);
+  }
 
   //=========================================================================================================
   // Computed
@@ -123,15 +132,48 @@ export class Agile {
    * @public
    * Computed - Function that recomputes its value if a dependency changes
    * @param computeFunction - Function for computing value
+   * @param config - Config
    * @param deps - Hard coded dependencies of Computed Function
    */
-  public Computed = <ComputedValueType = any>(
+  public createComputed<ComputedValueType = any>(
+    computeFunction: () => ComputedValueType,
+    config?: StateConfigInterface,
+    deps?: Array<Observer | State | Event>
+  ): Computed<ComputedValueType>;
+  /**
+   * @public
+   * Computed - Function that recomputes its value if a dependency changes
+   * @param computeFunction - Function for computing value
+   * @param deps - Hard coded dependencies of Computed Function
+   */
+  public createComputed<ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     deps?: Array<Observer | State | Event>
-  ) =>
-    new Computed<ComputedValueType>(this, computeFunction, {
-      computedDeps: deps,
-    });
+  ): Computed<ComputedValueType>;
+  public createComputed<ComputedValueType = any>(
+    computeFunction: () => ComputedValueType,
+    configOrDeps?: StateConfigInterface | Array<Observer | State | Event>,
+    deps?: Array<Observer | State | Event>
+  ): Computed<ComputedValueType> {
+    let _deps: Array<Observer | State | Event>;
+    let _config: StateConfigInterface;
+
+    if (Array.isArray(configOrDeps)) {
+      _deps = configOrDeps;
+      _config = {};
+    } else {
+      _config = configOrDeps || {};
+      _deps = deps || [];
+    }
+
+    return new Computed<ComputedValueType>(
+      this,
+      computeFunction,
+      flatMerge(_config, {
+        computedDeps: _deps,
+      })
+    );
+  }
 
   //=========================================================================================================
   // Event
@@ -141,9 +183,11 @@ export class Agile {
    * Event - Class that holds a List of Functions which can be triggered at the same time
    * @param config - Config
    */
-  public Event = <PayloadType = DefaultEventPayload>(
+  public createEvent<PayloadType = DefaultEventPayload>(
     config?: CreateEventConfigInterface
-  ) => new Event<PayloadType>(this, config);
+  ) {
+    return new Event<PayloadType>(this, config);
+  }
 
   //=========================================================================================================
   // Integrate

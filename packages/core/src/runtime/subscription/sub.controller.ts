@@ -127,7 +127,7 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(['core', 'subscription'])
+        .tag(['runtime', 'subscription'])
         .info(
           'Unregistered Callback based Subscription ',
           subscriptionInstance
@@ -142,7 +142,7 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(['core', 'subscription'])
+        .tag(['runtime', 'subscription'])
         .info(
           'Unregistered Component based Subscription ',
           subscriptionInstance
@@ -161,13 +161,41 @@ export class SubController {
 
       // Logging
       Agile.logger.if
-        .tag(['core', 'subscription'])
+        .tag(['runtime', 'subscription'])
         .info(
           'Unregistered Component based Subscription ',
           subscriptionInstance
         );
       return;
     }
+
+    // Unsubscribe component based Subscription with subscriptionInstance that holds componentSubscriptionContainers
+    if (
+      subscriptionInstance.componentSubscriptionContainers &&
+      Array.isArray(subscriptionInstance.componentSubscriptionContainers)
+    ) {
+      subscriptionInstance.componentSubscriptionContainers.forEach(
+        (subContainer) => {
+          unsub(subContainer as ComponentSubscriptionContainer);
+          this.componentSubs.delete(subContainer);
+
+          // Logging
+          Agile.logger.if
+            .tag(['runtime', 'subscription'])
+            .info(
+              'Unregistered Component based Subscription ',
+              subscriptionInstance
+            );
+        }
+      );
+      return;
+    }
+
+    // Logging
+    Agile.logger.if
+      .tag(['runtime', 'subscription'])
+      .warn(`Couldn't find anything to unregister in `, subscriptionInstance);
+    return;
   }
 
   //=========================================================================================================
@@ -195,7 +223,9 @@ export class SubController {
   //=========================================================================================================
   /**
    * @internal
-   * Registers Component based Subscription
+   * Registers Component based Subscription and applies SubscriptionContainer to Component.
+   * If an instance called 'subscriptionContainers' exists in Component it will push the new SubscriptionContainer to this Array,
+   * otherwise it creates a new Instance called 'subscriptionContainer' which holds the new  SubscriptionContainer
    * @param componentInstance - Component that got subscribed by Observer/s
    * @param subs - Initial Subscriptions
    * @param key - Key/Name of SubscriptionContainer
@@ -218,12 +248,20 @@ export class SubController {
         componentSubscriptionContainer.ready = true;
     } else componentSubscriptionContainer.ready = true;
 
-    // To have an instance of the SubscriptionContainer in the Component (necessary to unsubscribe component later)
-    componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
+    // Add subscriptionContainer to Component, to have an instance of it there (necessary to unsubscribe SubscriptionContainer later)
+    if (
+      componentInstance.componentSubscriptionContainers &&
+      Array.isArray(componentInstance.componentSubscriptionContainers)
+    )
+      componentInstance.componentSubscriptionContainers.push(
+        componentSubscriptionContainer
+      );
+    else
+      componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
 
     // Logging
     Agile.logger.if
-      .tag(['core', 'subscription'])
+      .tag(['runtime', 'subscription'])
       .info(
         'Registered Component based Subscription ',
         componentSubscriptionContainer
@@ -257,7 +295,7 @@ export class SubController {
 
     // Logging
     Agile.logger.if
-      .tag(['core', 'subscription'])
+      .tag(['runtime', 'subscription'])
       .info(
         'Registered Callback based Subscription ',
         callbackSubscriptionContainer

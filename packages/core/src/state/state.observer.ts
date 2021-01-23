@@ -13,6 +13,8 @@ import {
   StateRuntimeJob,
   StateRuntimeJobConfigInterface,
   RuntimeJobKey,
+  SideEffectInterface,
+  createArrayFromObject,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -119,7 +121,6 @@ export class StateObserver<ValueType = any> extends Observer {
     state.previousStateValue = copy(state._value);
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
-    job.observer.value = copy(job.observer.nextStateValue);
 
     // Overwrite old State Values
     if (job.config.overwrite) {
@@ -131,6 +132,11 @@ export class StateObserver<ValueType = any> extends Observer {
     state.isSet = notEqual(state._value, state.initialStateValue);
 
     this.sideEffects(job);
+
+    // Assign Public Value to Observer after sideEffects like 'rebuildGroup',
+    // because sometimes (for instance in Group) the publicValue is not the value(nextStateValue)
+    // and the observer value is at some point the publicValue because the end user uses it
+    job.observer.value = copy(state.getPublicValue());
   }
 
   //=========================================================================================================
@@ -150,10 +156,17 @@ export class StateObserver<ValueType = any> extends Observer {
         state.watchers[watcherKey](state.getPublicValue());
 
     // Call SideEffect Functions
-    if (job.config?.sideEffects)
-      for (const sideEffectKey in state.sideEffects)
-        if (isFunction(state.sideEffects[sideEffectKey]))
-          state.sideEffects[sideEffectKey](job.config);
+    if (job.config?.sideEffects) {
+      const sideEffectArray = createArrayFromObject<SideEffectInterface>(
+        state.sideEffects
+      );
+      sideEffectArray.sort(function (a, b) {
+        return b.instance.weight - a.instance.weight;
+      });
+      for (const sideEffect of sideEffectArray)
+        if (isFunction(sideEffect.instance.callback))
+          sideEffect.instance.callback(job.config);
+    }
 
     // Ingest Dependencies of Observer into Runtime
     state.observer.deps.forEach(

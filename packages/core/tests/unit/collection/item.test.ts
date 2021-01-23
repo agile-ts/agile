@@ -8,22 +8,24 @@ describe('Item Tests', () => {
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection(dummyAgile);
 
-    jest.spyOn(State.prototype, 'setKey');
-    jest.spyOn(Item.prototype, 'setKey');
+    jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
+
+    jest.clearAllMocks();
   });
 
   it('should create Item (default config)', () => {
-    // Overwrite setKey once to not call it
-    jest.spyOn(Item.prototype, 'setKey').mockReturnValueOnce(undefined);
+    // Overwrite addRebuildGroupThatIncludeItemKeySideEffect once to not call it
+    jest
+      .spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect')
+      .mockReturnValueOnce(undefined);
 
     const dummyData = { id: 'dummyId', name: 'dummyName' };
     const item = new Item(dummyCollection, dummyData);
 
     expect(item.collection()).toBe(dummyCollection);
-    expect(item.setKey).toHaveBeenCalledWith(
-      dummyData[dummyCollection.config.primaryKey],
-      { updateItemValuePrimaryKey: false }
-    );
+    expect(
+      item.addRebuildGroupThatIncludeItemKeySideEffect
+    ).toHaveBeenCalledWith('dummyId');
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
     expect(item.valueType).toBeUndefined();
@@ -47,8 +49,10 @@ describe('Item Tests', () => {
   });
 
   it('should create Item (specific config)', () => {
-    // Overwrite setKey once to not call it
-    jest.spyOn(Item.prototype, 'setKey').mockReturnValueOnce(undefined);
+    // Overwrite addRebuildGroupThatIncludeItemKeySideEffect once to not call it
+    jest
+      .spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect')
+      .mockReturnValueOnce(undefined);
 
     const dummyData = { id: 'dummyId', name: 'dummyName' };
     const item = new Item(dummyCollection, dummyData, {
@@ -56,10 +60,9 @@ describe('Item Tests', () => {
     });
 
     expect(item.collection()).toBe(dummyCollection);
-    expect(item.setKey).toHaveBeenCalledWith(
-      dummyData[dummyCollection.config.primaryKey],
-      { updateItemValuePrimaryKey: false }
-    );
+    expect(
+      item.addRebuildGroupThatIncludeItemKeySideEffect
+    ).toHaveBeenCalledWith('dummyId');
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
     expect(item.valueType).toBeUndefined();
@@ -87,14 +90,15 @@ describe('Item Tests', () => {
 
     beforeEach(() => {
       item = new Item(dummyCollection, { id: 'dummyId', name: 'dummyName' });
-
-      item.removeSideEffect = jest.fn();
-      item.patch = jest.fn();
-      jest.spyOn(item, 'addSideEffect');
-      dummyCollection.rebuildGroupsThatIncludeItemKey = jest.fn();
     });
 
     describe('setKey function tests', () => {
+      beforeEach(() => {
+        item.removeSideEffect = jest.fn();
+        item.patch = jest.fn();
+        jest.spyOn(State.prototype, 'setKey');
+      });
+
       it('should call State setKey, add rebuildGroup sideEffect to Item and patch newItemKey into Item (default config)', () => {
         item.setKey('myNewKey');
 
@@ -102,10 +106,9 @@ describe('Item Tests', () => {
         expect(item.removeSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey
         );
-        expect(item.addSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey,
-          expect.any(Function)
-        );
+        expect(
+          item.addRebuildGroupThatIncludeItemKeySideEffect
+        ).toHaveBeenCalledWith('myNewKey');
         expect(item.patch).toHaveBeenCalledWith(
           {
             [dummyCollection.config.primaryKey]: 'myNewKey',
@@ -118,10 +121,6 @@ describe('Item Tests', () => {
             overwrite: false,
           }
         );
-
-        expect(
-          dummyCollection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
       });
 
       it('should call State setKey, add rebuildGroup sideEffect to Item and patch newItemKey into Item (specific config)', () => {
@@ -135,10 +134,9 @@ describe('Item Tests', () => {
         expect(item.removeSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey
         );
-        expect(item.addSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey,
-          expect.any(Function)
-        );
+        expect(
+          item.addRebuildGroupThatIncludeItemKeySideEffect
+        ).toHaveBeenCalledWith('myNewKey');
         expect(item.patch).toHaveBeenCalledWith(
           {
             [dummyCollection.config.primaryKey]: 'myNewKey',
@@ -151,34 +149,25 @@ describe('Item Tests', () => {
             overwrite: false,
           }
         );
+      });
+    });
 
-        expect(
-          dummyCollection.rebuildGroupsThatIncludeItemKey
-        ).not.toHaveBeenCalled();
+    describe('addRebuildGroupThatIncludeItemKeySideEffect function tests', () => {
+      beforeEach(() => {
+        dummyCollection.rebuildGroupsThatIncludeItemKey = jest.fn();
+        jest.spyOn(item, 'addSideEffect');
       });
 
-      it('should call State setKey, add rebuildGroup sideEffect to Item and call rebuildGroup once (config.updateItemValuePrimaryKey = false)', () => {
-        item.setKey('myNewKey', {
-          updateItemValuePrimaryKey: false,
-        });
-
-        expect(State.prototype.setKey).toHaveBeenCalledWith('myNewKey');
-        expect(item.removeSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey
-        );
-        expect(item.addSideEffect).toHaveBeenCalledWith(
-          Item.updateGroupSideEffectKey,
-          expect.any(Function)
-        );
-        expect(item.patch).not.toHaveBeenCalled();
+      it('should add rebuildGroupThatIncludeItemKey sideEffect to Item', () => {
+        item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
         expect(
-          dummyCollection.rebuildGroupsThatIncludeItemKey
-        ).toHaveBeenCalledWith('myNewKey', {
-          background: false,
-          force: false,
-          sideEffects: true,
-        });
+          item.addSideEffect
+        ).toHaveBeenCalledWith(
+          Item.updateGroupSideEffectKey,
+          expect.any(Function),
+          { weight: 100 }
+        );
       });
 
       describe('test added sideEffect called Item.updateGroupSideEffectKey', () => {
@@ -187,15 +176,15 @@ describe('Item Tests', () => {
         });
 
         it('should call rebuildGroupThatIncludeItemKey', () => {
-          item.setKey('myNewKey');
+          item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
-          item.sideEffects[Item.updateGroupSideEffectKey]({
+          item.sideEffects[Item.updateGroupSideEffectKey].callback({
             dummy: 'property',
           });
 
           expect(
             dummyCollection.rebuildGroupsThatIncludeItemKey
-          ).toHaveBeenCalledWith('myNewKey', { dummy: 'property' });
+          ).toHaveBeenCalledWith('itemKey', { dummy: 'property' });
         });
       });
     });

@@ -181,7 +181,8 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     defaultGroup.addSideEffect(
       CollectionPersistent.defaultGroupSideEffectKey,
-      () => this.rebuildStorageSideEffect(defaultGroup, _key)
+      () => this.rebuildStorageSideEffect(defaultGroup, _key),
+      { weight: 0 }
     );
 
     // Persist Collection Items

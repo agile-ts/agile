@@ -63,6 +63,8 @@ export class Collection<DataType = DefaultItem> {
 
     this.initGroups(_config.groups as any);
     this.initSelectors(_config.selectors as any);
+
+    if (_config.initialData) this.collect(_config.initialData);
   }
 
   /**
@@ -1011,8 +1013,14 @@ export class Collection<DataType = DefaultItem> {
     if (!createItem && !config.patch)
       item?.set(_data, { background: config.background });
     if (createItem) {
+      // Create and assign Item to Collection
       item = new Item<DataType>(this, _data);
       this.data[itemKey] = item;
+
+      // Rebuild Groups That include ItemKey after assigning Item to Collection (otherwise it can't find Item)
+      this.rebuildGroupsThatIncludeItemKey(itemKey, {
+        background: config.background,
+      });
     }
 
     // Increase size of Collection
@@ -1065,13 +1073,15 @@ export type ItemKey = string | number;
  * @param selectors - Selectors of Collection
  * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
  * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
+ * @param initialData - Initial Data of Collection
  */
-export interface CreateCollectionConfigInterface {
+export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
   groups?: { [key: string]: Group<any> } | string[];
   selectors?: { [key: string]: Selector<any> } | string[];
   key?: CollectionKey;
   primaryKey?: string;
   defaultGroupKey?: ItemKey;
+  initialData?: Array<DataType>;
 }
 
 /**
@@ -1151,5 +1161,7 @@ export interface SetDataConfigInterface {
 }
 
 export type CollectionConfig<DataType = DefaultItem> =
-  | CreateCollectionConfigInterface
-  | ((collection: Collection<DataType>) => CreateCollectionConfigInterface);
+  | CreateCollectionConfigInterface<DataType>
+  | ((
+      collection: Collection<DataType>
+    ) => CreateCollectionConfigInterface<DataType>);

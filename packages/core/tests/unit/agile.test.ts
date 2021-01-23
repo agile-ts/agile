@@ -83,6 +83,7 @@ describe('Agile Tests', () => {
       prefix: 'Agile',
       level: Logger.level.WARN,
       canUseCustomStyles: true,
+      timestamp: false,
     });
     expect(Agile.logger.allowedTags).toStrictEqual([
       'runtime',
@@ -104,6 +105,7 @@ describe('Agile Tests', () => {
         level: Logger.level.DEBUG,
         active: false,
         prefix: 'Jeff',
+        timestamp: true,
       },
     });
 
@@ -127,6 +129,7 @@ describe('Agile Tests', () => {
       prefix: 'Jeff',
       level: Logger.level.DEBUG,
       canUseCustomStyles: true,
+      timestamp: true,
     });
     expect(Agile.logger.allowedTags).toStrictEqual([
       'runtime',
@@ -147,7 +150,7 @@ describe('Agile Tests', () => {
       agile = new Agile();
     });
 
-    describe('storage function tests', () => {
+    describe('createStorage function tests', () => {
       const StorageMock = Storage as jest.MockedClass<typeof Storage>;
 
       beforeEach(() => {
@@ -170,7 +173,7 @@ describe('Agile Tests', () => {
           },
           key: 'myTestStorage',
         };
-        const storage = agile.Storage(storageConfig);
+        const storage = agile.createStorage(storageConfig);
 
         expect(storage).toBeInstanceOf(Storage);
         expect(StorageMock).toHaveBeenCalledWith(storageConfig);
@@ -179,7 +182,7 @@ describe('Agile Tests', () => {
 
     describe('state function tests', () => {
       it('should create State', () => {
-        const state = agile.State('testValue', {
+        const state = agile.createState('testValue', {
           key: 'myCoolState',
         });
 
@@ -187,7 +190,7 @@ describe('Agile Tests', () => {
       });
     });
 
-    describe('collection function tests', () => {
+    describe('createCollection function tests', () => {
       const CollectionMock = Collection as jest.MockedClass<typeof Collection>;
 
       beforeEach(() => {
@@ -202,35 +205,49 @@ describe('Agile Tests', () => {
           key: 'myCoolCollection',
         };
 
-        const collection = agile.Collection(collectionConfig);
+        const collection = agile.createCollection(collectionConfig);
 
         expect(collection).toBeInstanceOf(Collection);
         expect(CollectionMock).toHaveBeenCalledWith(agile, collectionConfig);
       });
     });
 
-    describe('computed function tests', () => {
+    describe('createComputed function tests', () => {
       const ComputedMock = Computed as jest.MockedClass<typeof Computed>;
+      const computedFunction = () => {
+        // console.log("Hello Jeff");
+      };
 
       beforeEach(() => {
         ComputedMock.mockClear();
       });
 
       it('should create Computed', () => {
-        const computedFunction = () => {
-          // console.log("Hello Jeff");
-        };
-
-        const computed = agile.Computed(computedFunction, []);
+        const computed = agile.createComputed(computedFunction, []);
 
         expect(computed).toBeInstanceOf(Computed);
         expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
           computedDeps: [],
         });
       });
+
+      it('should create Computed with config', () => {
+        const computed = agile.createComputed(
+          computedFunction,
+          { key: 'jeff', isPlaceholder: false },
+          []
+        );
+
+        expect(computed).toBeInstanceOf(Computed);
+        expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
+          key: 'jeff',
+          isPlaceholder: false,
+          computedDeps: [],
+        });
+      });
     });
 
-    describe('event function tests', () => {
+    describe('createEvent function tests', () => {
       const EventMock = Event as jest.MockedClass<typeof Event>;
 
       beforeEach(() => {
@@ -245,7 +262,7 @@ describe('Agile Tests', () => {
           key: 'myCoolEvent',
         };
 
-        const event = agile.Event(eventConfig);
+        const event = agile.createEvent(eventConfig);
 
         expect(event).toBeInstanceOf(Event);
         expect(EventMock).toHaveBeenCalledWith(agile, eventConfig);

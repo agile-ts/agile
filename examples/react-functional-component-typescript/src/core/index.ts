@@ -4,37 +4,38 @@ export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG },
 });
 
-export const MY_STATE = App.State<string>('MyState', { key: 'my-state' }); //.persist();
-export const MY_STATE_2 = App.State<string>('MyState2', {
+export const MY_STATE = App.createState<string>('MyState', { key: 'my-state' }); //.persist();
+export const MY_STATE_2 = App.createState<string>('MyState2', {
   key: 'my-state2',
 }).persist();
 MY_STATE_2.onLoad(() => {
-  console.log('On Load');
+  console.log('On Load MY_STATE_2');
 });
-export const MY_STATE_3 = App.State<number>(1); //.persist("my-state2");
+export const MY_STATE_3 = App.createState<number>(1); //.persist("my-state2");
 
 MY_STATE.watch('test', (value: any) => {
   console.log('Watch ' + value);
 });
 
-export const MY_COMPUTED = App.Computed<string>(() => {
+export const MY_COMPUTED = App.createComputed<string>(() => {
   return 'test' + MY_STATE.value + '_computed_' + MY_STATE_2.value;
-}, []);
+}, []).setKey('myComputed');
 
 interface collectionValueInterface {
   id: string;
   name: string;
 }
 
-export const MY_COLLECTION = App.Collection<collectionValueInterface>(
+export const MY_COLLECTION = App.createCollection<collectionValueInterface>(
   (collection) => ({
     key: 'my-collection',
     groups: {
-      myGroup: collection.Group(),
+      myGroup: collection.Group(['id4']),
     },
     selectors: {
       mySelector: collection.Selector('id3'),
     },
+    initialData: [{ id: 'id4', name: 'hans' }],
   })
 ).persist();
 MY_COLLECTION.collect({ id: 'id1', name: 'test' });
@@ -43,10 +44,13 @@ MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
 MY_COLLECTION.getGroup('myGroup')?.persist({
   followCollectionPersistKeyPattern: true,
 });
+MY_COLLECTION.onLoad(() => {
+  console.log('On Load MY_COLLECTION');
+});
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));
 
-export const MY_EVENT = App.Event<{ name: string }>({
+export const MY_EVENT = App.createEvent<{ name: string }>({
   delay: 3000,
   key: 'myEvent',
 });

@@ -20,6 +20,7 @@ import {
   Event,
   Observer,
   Collection,
+  createArrayFromObject,
 } from '../../src';
 
 describe('Utils Tests', () => {
@@ -377,12 +378,13 @@ describe('Utils Tests', () => {
       });
     });
 
-    it("shouldn't add new properties to Source Object", () => {
+    it('should add new properties to Source Object', () => {
       const source = {
         id: 123,
         name: 'jeff',
         size: 189,
       };
+
       expect(
         flatMerge(source, {
           name: 'hans',
@@ -393,15 +395,17 @@ describe('Utils Tests', () => {
         id: 123,
         name: 'hans',
         size: 177,
+        location: 'behind you',
       });
     });
 
-    it('should add new properties to source Object (config.addNewProperties = true)', () => {
+    it("shouldn't add new properties to source Object (config.addNewProperties = false)", () => {
       const source = {
         id: 123,
         name: 'jeff',
         size: 189,
       };
+
       expect(
         flatMerge(
           source,
@@ -410,13 +414,12 @@ describe('Utils Tests', () => {
             size: 177,
             location: 'behind you',
           },
-          { addNewProperties: true }
+          { addNewProperties: false }
         )
       ).toStrictEqual({
         id: 123,
         name: 'hans',
         size: 177,
-        location: 'behind you',
       });
     });
 
@@ -441,6 +444,7 @@ describe('Utils Tests', () => {
           place: 'JeffsHome',
           country: 'Germany',
         },
+        place: 'JeffsNewHome',
       });
     });
   });
@@ -495,6 +499,45 @@ describe('Utils Tests', () => {
       expect(generateId(10).length).toEqual(10);
       expect(generateId(5).length).toEqual(5);
       expect(generateId(-10).length).toEqual(0);
+    });
+  });
+
+  describe('createArrayFromObject function tests', () => {
+    it('should transform Object to Array', () => {
+      const dummyObject = {
+        jeff: {
+          hello: 'there',
+        },
+        frank: {
+          see: 'you',
+        },
+        hans: {
+          how: 'are you',
+        },
+      };
+
+      const generatedArray = createArrayFromObject(dummyObject);
+
+      expect(generatedArray).toStrictEqual([
+        {
+          key: 'jeff',
+          instance: {
+            hello: 'there',
+          },
+        },
+        {
+          key: 'frank',
+          instance: {
+            see: 'you',
+          },
+        },
+        {
+          key: 'hans',
+          instance: {
+            how: 'are you',
+          },
+        },
+      ]);
     });
   });
 

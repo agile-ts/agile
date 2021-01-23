@@ -12,7 +12,7 @@ Contributors and people new to open source will find the following guides especi
 
 ## 👊 [Code of Conduct](https://code.fb.com/codeofconduct)
 
-Please read [the full text](https://code.fb.com/codeofconduct), so that you can understand what interpersonal actions will and will not be tolerated.
+Please read [the full text](https://code.fb.com/codeofconduct), so that you are able to understand what interpersonal actions will and will not be tolerated.
 
 
 ## 😎 Get Involved
@@ -27,20 +27,20 @@ Here are a few ideas to get started:
 ### Join our Discord Server
 Contributions are very welcome and not bound to github. 
 You can also contribute in our [Discord Community](https://discord.gg/FTqeMNCxw7) by helping other people
-which might face a problem you have already solved.
+which might face a problem you already have solved.
 
 ### Improve Issues and Pull Requests
 
-One great way you can contribute without writing _any_ code is to improve open issues and pull requests.
+One great way to contribute without writing _any_ code is to improve open issues and pull requests.
 
 - Ask for more information if you believe the issue does not provide all the details required to solve it
-- Suggest [labels](https://github.com/agile-ts/agile/labels) that can help categorize issues/pull-requests
+- Suggest [labels](https://github.com/agile-ts/agile/labels) that help to categorize issues/pull-requests
 - Flag issues that are stale or that should be closed
 
 ## ⏰ Our Development Process
 
 AgileTs uses Github as it's source of truth. 
-All changes made so far and which will be made in the future are and will remain publicly accessible here.
+All changes made so far and which will be made in future are and will remain publicly accessible here.
 
 ### Branch Organization
 
@@ -57,8 +57,8 @@ The root of all your branches have to be the `develop` branch!
 
 ## 🐞 Bugs
 
-We use [GitHub Issues](https://github.com/agile-ts/agile/issues) for our public bugs. 
-If you would like to report a problem, **take a look around and see if someone already opened an issue about it**. 
+We use [GitHub Issues](https://github.com/agile-ts/agile/issues) to keep track of our bugs. 
+If you would like to report any problem, **take a look around and see if someone already opened an issue about it**. 
 If you are certain this is a new unreported bug, you can submit a [bug report](#reporting-new-issues).
 
 
@@ -96,7 +96,7 @@ So you have also decided to merge code back to the upstream by opening a PR.
 You've invested a good chunk of time, and we appreciate it. 
 We will do our best to work with you and get the PR looked at.
 
-_Working on your first Pull Request?_ You can learn how from this free video series:
+_Working on your first Pull Request?_ You can learn how, from this free video series:
 
 [**How to Contribute to an Open Source Project on GitHub**](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github)
 
