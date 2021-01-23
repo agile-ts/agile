@@ -30,13 +30,15 @@ export const MY_COLLECTION = App.createCollection<collectionValueInterface>(
   (collection) => ({
     key: 'my-collection',
     groups: {
-      myGroup: collection.Group(),
+      myGroup: collection.Group(['id4']),
     },
     selectors: {
       mySelector: collection.Selector('id3'),
     },
+    initialData: [{ id: 'id4', name: 'hans' }],
   })
 ).persist();
+console.log('---');
 MY_COLLECTION.collect({ id: 'id1', name: 'test' });
 MY_COLLECTION.collect({ id: 'id2', name: 'test2' }, 'myGroup');
 MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
