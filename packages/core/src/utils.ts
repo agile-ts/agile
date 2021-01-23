@@ -302,6 +302,27 @@ export function generateId(length?: number): string {
 }
 
 //=========================================================================================================
+// Create Array From Object
+//=========================================================================================================
+/**
+ * @internal
+ * Transforms Object to Array
+ * @param object - Object that gets transformed
+ */
+export function createArrayFromObject<P = any>(object: {
+  [key: string]: P;
+}): Array<{ key: string; instance: P }> {
+  const array: Array<{ key: string; instance: P }> = [];
+  for (const key in object) {
+    array.push({
+      key: key,
+      instance: object[key],
+    });
+  }
+  return array;
+}
+
+//=========================================================================================================
 // Clone
 //=========================================================================================================
 /**

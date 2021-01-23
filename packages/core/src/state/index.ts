@@ -31,9 +31,7 @@ export class State<ValueType = any> {
   public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
   public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
-  public sideEffects: {
-    [key: string]: (properties?: { [key: string]: any }) => void;
-  } = {}; // SideEffects of State (will be executed in Runtime)
+  public sideEffects: { [key: string]: SideEffectInterface } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
@@ -241,7 +239,7 @@ export class State<ValueType = any> {
    * @param config - Config
    */
   public patch(
-    targetWithChanges: object,
+    targetWithChanges: Object,
     config: PatchConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -539,17 +537,25 @@ export class State<ValueType = any> {
    * @internal
    * Adds SideEffect to State
    * @param key - Key/Name of SideEffect
-   * @param sideEffect - Callback Function that gets called on every State Value change
+   * @param callback - Callback Function that gets called on every State Value change
+   * @param config - Config
    */
   public addSideEffect(
     key: string,
-    sideEffect: (properties?: { [key: string]: any }) => void
+    callback: SideEffectFunctionType,
+    config: AddSideEffectConfigInterface = {}
   ): this {
-    if (!isFunction(sideEffect)) {
+    config = defineConfig(config, {
+      weight: 10,
+    });
+    if (!isFunction(callback)) {
       Agile.logger.error('A sideEffect function has to be a function!');
       return this;
     }
-    this.sideEffects[key] = sideEffect;
+    this.sideEffects[key] = {
+      callback: callback,
+      weight: config.weight as any,
+    };
     return this;
   }
 
@@ -650,3 +656,23 @@ export interface StatePersistentConfigInterface {
 
 export type StateWatcherCallback<T = any> = (value: T) => void;
 export type ComputeMethod<T = any> = (value: T) => T;
+
+export type SideEffectFunctionType = (properties?: {
+  [key: string]: any;
+}) => void;
+
+/**
+ * @param callback - Callback Function that gets called on every State Value change
+ * @param weight - When the sideEffect gets executed. The higher, the earlier it gets executed.
+ */
+export interface SideEffectInterface {
+  callback: SideEffectFunctionType;
+  weight: number;
+}
+
+/**
+ * @param weight - When the sideEffect gets executed. The higher, the earlier it gets executed.
+ */
+export interface AddSideEffectConfigInterface {
+  weight?: number;
+}

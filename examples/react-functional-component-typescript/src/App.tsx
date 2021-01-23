@@ -87,8 +87,8 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My Collection</h3>
           <div>
-            {myGroup.map((item: any) => (
-              <p>{item.name}</p>
+            {myGroup.map((item) => (
+              <p key={item.id}>{item.name}</p>
             ))}
           </div>
           <button

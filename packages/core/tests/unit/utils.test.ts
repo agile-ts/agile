@@ -20,6 +20,7 @@ import {
   Event,
   Observer,
   Collection,
+  createArrayFromObject,
 } from '../../src';
 
 describe('Utils Tests', () => {
@@ -498,6 +499,45 @@ describe('Utils Tests', () => {
       expect(generateId(10).length).toEqual(10);
       expect(generateId(5).length).toEqual(5);
       expect(generateId(-10).length).toEqual(0);
+    });
+  });
+
+  describe('createArrayFromObject function tests', () => {
+    it('should transform Object to Array', () => {
+      const dummyObject = {
+        jeff: {
+          hello: 'there',
+        },
+        frank: {
+          see: 'you',
+        },
+        hans: {
+          how: 'are you',
+        },
+      };
+
+      const generatedArray = createArrayFromObject(dummyObject);
+
+      expect(generatedArray).toStrictEqual([
+        {
+          key: 'jeff',
+          instance: {
+            hello: 'there',
+          },
+        },
+        {
+          key: 'frank',
+          instance: {
+            see: 'you',
+          },
+        },
+        {
+          key: 'hans',
+          instance: {
+            how: 'are you',
+          },
+        },
+      ]);
     });
   });
 

@@ -9,7 +9,7 @@ export const MY_STATE_2 = App.createState<string>('MyState2', {
   key: 'my-state2',
 }).persist();
 MY_STATE_2.onLoad(() => {
-  console.log('On Load');
+  console.log('On Load MY_STATE_2');
 });
 export const MY_STATE_3 = App.createState<number>(1); //.persist("my-state2");
 
@@ -19,7 +19,7 @@ MY_STATE.watch('test', (value: any) => {
 
 export const MY_COMPUTED = App.createComputed<string>(() => {
   return 'test' + MY_STATE.value + '_computed_' + MY_STATE_2.value;
-}, []);
+}, []).setKey('myComputed');
 
 interface collectionValueInterface {
   id: string;
@@ -42,6 +42,9 @@ MY_COLLECTION.collect({ id: 'id2', name: 'test2' }, 'myGroup');
 MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
 MY_COLLECTION.getGroup('myGroup')?.persist({
   followCollectionPersistKeyPattern: true,
+});
+MY_COLLECTION.onLoad(() => {
+  console.log('On Load MY_COLLECTION');
 });
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));

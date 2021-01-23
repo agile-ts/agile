@@ -295,9 +295,12 @@ describe('StatePersistent Tests', () => {
         const response = await statePersistent.persistValue();
 
         expect(response).toBeTruthy();
-        expect(dummyState.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyState.addSideEffect
+        ).toHaveBeenCalledWith(
           StatePersistent.storeValueSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 0 }
         );
         expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
           dummyState,
@@ -312,9 +315,12 @@ describe('StatePersistent Tests', () => {
         const response = await statePersistent.persistValue('coolKey');
 
         expect(response).toBeTruthy();
-        expect(dummyState.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyState.addSideEffect
+        ).toHaveBeenCalledWith(
           StatePersistent.storeValueSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 0 }
         );
         expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
           dummyState,
@@ -342,7 +348,9 @@ describe('StatePersistent Tests', () => {
         it('should call rebuildStorageSideEffect', async () => {
           await statePersistent.persistValue();
 
-          dummyState.sideEffects[StatePersistent.storeValueSideEffectKey]({
+          dummyState.sideEffects[
+            StatePersistent.storeValueSideEffectKey
+          ].callback({
             dummy: 'property',
           });
 
