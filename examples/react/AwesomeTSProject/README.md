@@ -1,8 +1,8 @@
-# Functional Component Example
+# React Native Example
 
-This Example represents the basic features of the `core` package in a **functional component** based react environment.
+This Example represents the basic features of the `core` package in a **class component** based react-native environment.
 
-## Setup `functional-component-ts`
+## Setup `AwesomeTSProject`
 
 ### Requirements
 - [nodejs](https://nodejs.org/en/)
@@ -25,7 +25,7 @@ To run the project we have to install the dependencies, too.
 We aren't using `npm install`, because we also want to add the just published AgileTs Packages.
 
 #### 5. Run `npm run dev-push` at the root of Agile
-After 'publishing' the Agile Packages and installing the dependencies of the example, we can push our changes,
+After 'publishing' the Agile Packages and installing the dependencies of the example, we can push our changes, 
 which we might have made for instance in the core package, to yalc by running this command,
 All projects having a dependency of the pushed package will receive the changes immediately.
 
