@@ -1,16 +1,17 @@
 {
-  "name": "cra-template-agile",
+  "name": "cra-template-agile-typescript",
   "version": "0.0.1",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "The official AgileTs template fro Create React App (JavaScript)",
+  "description": "The official AgileTs template fro Create React App (Typescript)",
   "keywords": [
     "react",
     "create-react-app",
     "template",
     "agilets",
-    "agile"
+    "agile",
+    "typescript"
   ],
   "scripts": {},
   "publishConfig": {

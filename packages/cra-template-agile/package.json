@@ -10,7 +10,8 @@
     "create-react-app",
     "template",
     "agilets",
-    "agile"
+    "agile",
+    "javascript"
   ],
   "scripts": {},
   "publishConfig": {
