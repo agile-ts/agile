@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.10
+
+### Patch Changes
+
+- 9a09652: fixted some bugs
+
 ## 0.0.9
 
 ### Patch Changes
