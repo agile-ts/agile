@@ -1,6 +1,6 @@
 # React Native Example
 
-This Example represents the basic features of the `core` package in a **class component** based react-native environment.
+This Example represents the basic features of the `core` package in a **function component** based react-native environment.
 
 ## Setup `AwesomeTSProject`
 
