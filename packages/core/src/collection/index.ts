@@ -1011,8 +1011,14 @@ export class Collection<DataType = DefaultItem> {
     if (!createItem && !config.patch)
       item?.set(_data, { background: config.background });
     if (createItem) {
+      // Create and assign Item to Collection
       item = new Item<DataType>(this, _data);
       this.data[itemKey] = item;
+
+      // Rebuild Groups That include ItemKey after assigning Item to Collection
+      this.rebuildGroupsThatIncludeItemKey(itemKey, {
+        background: config.background,
+      });
     }
 
     // Increase size of Collection

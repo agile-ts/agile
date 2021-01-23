@@ -30,10 +30,13 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
     });
     this.collection = () => collection;
 
-    // Reassign Key to assign sideEffects
-    this.setKey(data[collection.config.primaryKey], {
-      updateItemValuePrimaryKey: false,
-    });
+    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
+    this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
+      this.collection().rebuildGroupsThatIncludeItemKey(
+        this._key || 'unknown',
+        config
+      )
+    );
   }
 
   //=========================================================================================================
@@ -47,7 +50,7 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    */
   public setKey(
     value: StateKey | undefined,
-    config: SetItemKeyConfig = {}
+    config: StateRuntimeJobConfigInterface = {}
   ): this {
     super.setKey(value);
     config = defineConfig(config, {
@@ -56,39 +59,28 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
       force: false,
       storage: true,
       overwrite: false,
-      updateItemValuePrimaryKey: true,
     });
     if (!value) return this;
 
     // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);
 
-    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it changes
+    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
     this.addSideEffect(Item.updateGroupSideEffectKey, (config) =>
       this.collection().rebuildGroupsThatIncludeItemKey(value, config)
     );
 
     // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
-    if (config.updateItemValuePrimaryKey)
-      this.patch(
-        { [this.collection().config.primaryKey]: value },
-        {
-          sideEffects: config.sideEffects,
-          background: config.background,
-          force: config.force,
-          storage: config.storage,
-          overwrite: config.overwrite,
-        }
-      );
-
-    // Initial Rebuild (not necessary if updating primaryKey in ItemValue because a sideEffect of the patch method is to rebuild the Group)
-    if (!config.updateItemValuePrimaryKey)
-      this.collection().rebuildGroupsThatIncludeItemKey(value, {
+    this.patch(
+      { [this.collection().config.primaryKey]: value },
+      {
+        sideEffects: config.sideEffects,
         background: config.background,
         force: config.force,
-        sideEffects: config.sideEffects,
-      });
-
+        storage: config.storage,
+        overwrite: config.overwrite,
+      }
+    );
     return this;
   }
 }
@@ -98,11 +90,4 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
  */
 export interface ItemConfigInterface {
   isPlaceholder?: boolean;
-}
-
-/**
- * @param updateItemValuePrimaryKey - If the primaryKey in ItemValue gets update
- */
-export interface SetItemKeyConfig extends StateRuntimeJobConfigInterface {
-  updateItemValuePrimaryKey?: boolean;
 }
