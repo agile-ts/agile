@@ -183,9 +183,12 @@ describe('Selector Tests', () => {
           storage: true,
         });
 
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyItem2.addSideEffect
+        ).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 100 }
         );
         expect(dummyItem2.isSelected).toBeTruthy();
       });
@@ -215,9 +218,12 @@ describe('Selector Tests', () => {
           storage: true,
         });
 
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyItem2.addSideEffect
+        ).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 100 }
         );
         expect(dummyItem2.isSelected).toBeTruthy();
       });
@@ -265,9 +271,12 @@ describe('Selector Tests', () => {
           storage: true,
         });
 
-        expect(dummyItem1.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyItem1.addSideEffect
+        ).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 100 }
         );
         expect(dummyItem1.isSelected).toBeTruthy();
       });
@@ -292,9 +301,12 @@ describe('Selector Tests', () => {
           storage: true,
         });
 
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyItem2.addSideEffect
+        ).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 100 }
         );
         expect(dummyItem2.isSelected).toBeTruthy();
       });
@@ -319,9 +331,12 @@ describe('Selector Tests', () => {
           storage: true,
         });
 
-        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyItem2.addSideEffect
+        ).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
-          expect.any(Function)
+          expect.any(Function),
+          { weight: 100 }
         );
         expect(dummyItem2.isSelected).toBeTruthy();
       });

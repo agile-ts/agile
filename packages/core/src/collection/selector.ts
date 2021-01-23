@@ -99,8 +99,10 @@ export class Selector<DataType = DefaultItem> extends State<
     newItem.isSelected = true;
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
-    newItem.addSideEffect(Selector.rebuildSelectorSideEffectKey, (config) =>
-      this.rebuildSelector(config)
+    newItem.addSideEffect(
+      Selector.rebuildSelectorSideEffectKey,
+      (config) => this.rebuildSelector(config),
+      { weight: 100 }
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
