@@ -1,5 +1,12 @@
 # @agile-ts/multieditor
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [9a09652]
+  - @agile-ts/core@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
