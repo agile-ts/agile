@@ -7,6 +7,7 @@ This Example represents the basic features of the `multieditor` package in a **f
 ### Requirements
 - [nodejs](https://nodejs.org/en/)
 - [yalc](https://www.npmjs.com/package/yalc)
+- [yarn](https://yarnpkg.com/)
 
 ### Steps
 
@@ -18,15 +19,15 @@ Then we install the dependencies of all AgileTs Packages (core, react, api, ..)
 
 #### 3. Run `npm run dev-publish` at the root of Agile
 As next step we `publish` all AgileTs Packages to our local `yalc` repository,
-to import them later in our examples, like this one.
+to import them later in our examples.
 
 #### 4. Run `npm run install-agile` in this Project
-To run the project we have to install the dependencies, too.
-We aren't using `npm install`, because we also want to add the just published AgileTs Packages.
+To run the example we have to install the dependencies of it, too.
+We aren't using `npm install`, because we want to add the just published AgileTs Packages properly.
 
 #### 5. Run `npm run dev-push` at the root of Agile
-After 'publishing' the Agile Packages and installing the dependencies of the example, we can push our changes,
-which we might have made for instance in the core package, to yalc by running this command,
+After 'publishing' the AgileTs Packages and installing the dependencies of the example, we can push our changes,
+which we might have made for instance in the core package, to yalc by running this command.
 All projects having a dependency of the pushed package will receive the changes immediately.
 
 ## Good To Know
