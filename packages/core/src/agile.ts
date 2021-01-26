@@ -104,7 +104,7 @@ export class Agile {
    * @param initialValue - Initial Value of the State
    * @param config - Config
    */
-  public createState<ValueType>(
+  public createState<ValueType = any>(
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ): State<ValueType> {
