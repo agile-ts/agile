@@ -312,7 +312,8 @@ describe('SubController Tests', () => {
     });
 
     describe('registerComponentSubscription function tests', () => {
-      it('should return ready componentSubscriptionContainer and add it to dummyIntegration (agileInstance.config.mount = false)', () => {
+      it('should return ready componentSubscriptionContainer and add it to dummyIntegration (agileInstance.config.waitForMount = false)', () => {
+        dummyAgile.config.waitForMount = false;
         const dummyIntegration: any = { dummy: 'integration' };
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
@@ -348,7 +349,8 @@ describe('SubController Tests', () => {
         );
       });
 
-      it('should return ready componentSubscriptionContainer and add it to componentSubscriptions in dummyIntegration (agileInstance.config.mount = false)', () => {
+      it('should return ready componentSubscriptionContainer and add it to componentSubscriptions in dummyIntegration (agileInstance.config.waitForMount = false)', () => {
+        dummyAgile.config.waitForMount = false;
         const dummyIntegration: any = {
           dummy: 'integration',
           componentSubscriptionContainers: [],
@@ -389,7 +391,7 @@ describe('SubController Tests', () => {
         expect(dummyIntegration.componentSubscriptionContainer).toBeUndefined();
       });
 
-      it("should return not ready componentSubscriptionContainer if componentInstance isn't mounted (agileInstance.config.mount = true)", () => {
+      it("should return not ready componentSubscriptionContainer if componentInstance isn't mounted (agileInstance.config.waitForMount = true)", () => {
         dummyAgile.config.waitForMount = true;
         const dummyIntegration: any = {
           dummy: 'integration',
@@ -407,7 +409,7 @@ describe('SubController Tests', () => {
         expect(componentSubscriptionContainer.ready).toBeFalsy();
       });
 
-      it('should return ready componentSubscriptionContainer if componentInstance is mounted (agileInstance.config.mount = true)', () => {
+      it('should return ready componentSubscriptionContainer if componentInstance is mounted (agileInstance.config.waitForMount = true)', () => {
         dummyAgile.config.waitForMount = true;
         const dummyIntegration: any = {
           dummy: 'integration',

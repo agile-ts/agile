@@ -167,6 +167,7 @@ describe('Runtime Tests', () => {
           [dummyObserver1, dummyObserver2]
         ) as CallbackSubscriptionContainer;
         rCallbackSubContainer.callback = jest.fn();
+        rCallbackSubContainer.ready = true;
 
         // Create Not Ready Callback Subscription
         nrCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
@@ -184,6 +185,7 @@ describe('Runtime Tests', () => {
             observer4: dummyObserver4,
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
+        rComponentSubContainer.ready = true;
 
         // Create Not Ready Component Subscription
         nrComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
