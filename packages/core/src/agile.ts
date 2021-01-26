@@ -50,7 +50,7 @@ export class Agile {
   constructor(config: CreateAgileConfigInterface = {}) {
     config = defineConfig(config, {
       localStorage: true,
-      waitForMount: false,
+      waitForMount: true,
       logConfig: {},
     });
     config.logConfig = defineConfig(config.logConfig, {
