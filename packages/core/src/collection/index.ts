@@ -1080,7 +1080,7 @@ export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
   selectors?: { [key: string]: Selector<any> } | string[];
   key?: CollectionKey;
   primaryKey?: string;
-  defaultGroupKey?: ItemKey;
+  defaultGroupKey?: GroupKey;
   initialData?: Array<DataType>;
 }
 
