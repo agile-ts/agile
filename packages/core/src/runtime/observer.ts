@@ -12,7 +12,7 @@ export class Observer<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: ObserverKey;
-  public deps: Set<Observer> = new Set(); // Observers that depends on this Observer
+  public dependents: Set<Observer> = new Set(); // Observers that depend on this Observer
   public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer has subscribed
   public value?: ValueType; // Value of Observer
 
@@ -28,13 +28,13 @@ export class Observer<ValueType = any> {
     config: CreateObserverConfigInterface<ValueType> = {}
   ) {
     config = defineConfig(config, {
-      deps: [],
+      dependents: [],
       subs: [],
     });
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.value = config.value;
-    config.deps?.forEach((observer) => this.depend(observer));
+    config.dependents?.forEach((observer) => this.depend(observer));
     config.subs?.forEach((subscriptionContainer) =>
       this.subscribe(subscriptionContainer)
     );
@@ -75,11 +75,11 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Adds Dependency to Observer that will be ingested into the Runtime if this Observer changes
+   * Adds Dependent to Observer that will be ingested into the Runtime if this Observer changes
    * @param observer - Observer that will depend on this Observer
    */
   public depend(observer: Observer) {
-    if (!this.deps.has(observer)) this.deps.add(observer);
+    if (!this.dependents.has(observer)) this.dependents.add(observer);
   }
 
   //=========================================================================================================
@@ -116,13 +116,13 @@ export class Observer<ValueType = any> {
 }
 
 /**
- * @param deps - Initial Dependencies of Observer
+ * @param deps - Initial Dependents of Observer
  * @param subs - Initial Subscriptions of Observer
  * @param key - Key/Name of Observer
  * @param value - Initial Value of Observer
  */
 export interface CreateObserverConfigInterface<ValueType = any> {
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
   value?: ValueType;

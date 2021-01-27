@@ -40,7 +40,7 @@ describe('Selector Tests', () => {
     expect(selector.previousStateValue).toBeUndefined();
     expect(selector.nextStateValue).toBeUndefined();
     expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.deps.size).toBe(0);
+    expect(selector.observer.dependents.size).toBe(0);
     expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeMethod).toBeUndefined();
@@ -73,7 +73,7 @@ describe('Selector Tests', () => {
     expect(selector.previousStateValue).toBeUndefined();
     expect(selector.nextStateValue).toBeUndefined();
     expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.deps.size).toBe(0);
+    expect(selector.observer.dependents.size).toBe(0);
     expect(selector.observer._key).toBe('dummyKey');
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeMethod).toBeUndefined();
@@ -104,7 +104,7 @@ describe('Selector Tests', () => {
     expect(selector.previousStateValue).toBeUndefined();
     expect(selector.nextStateValue).toBeUndefined();
     expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.deps.size).toBe(0);
+    expect(selector.observer.dependents.size).toBe(0);
     expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeMethod).toBeUndefined();

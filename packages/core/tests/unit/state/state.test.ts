@@ -39,7 +39,7 @@ describe('State Tests', () => {
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(0);
+    expect(state.observer.dependents.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
@@ -56,7 +56,7 @@ describe('State Tests', () => {
 
     const state = new State(dummyAgile, 'coolValue', {
       key: 'coolState',
-      deps: [dummyObserver],
+      dependents: [dummyObserver],
     });
 
     expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
@@ -69,8 +69,8 @@ describe('State Tests', () => {
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(1);
-    expect(state.observer.deps.has(dummyObserver)).toBeTruthy();
+    expect(state.observer.dependents.size).toBe(1);
+    expect(state.observer.dependents.has(dummyObserver)).toBeTruthy();
     expect(state.observer._key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
@@ -95,7 +95,7 @@ describe('State Tests', () => {
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(0);
+    expect(state.observer.dependents.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();

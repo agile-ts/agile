@@ -22,6 +22,7 @@ import {
   CreateLoggerConfigInterface,
   StateConfigInterface,
   flatMerge,
+  Group,
 } from './internal';
 
 export class Agile {
@@ -138,7 +139,7 @@ export class Agile {
   public createComputed<ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     config?: StateConfigInterface,
-    deps?: Array<Observer | State | Event>
+    deps?: Array<Observer | State | Event | Group>
   ): Computed<ComputedValueType>;
   /**
    * @public

@@ -6,6 +6,7 @@ import {
   Event,
   StateConfigInterface,
   ComputedTracker,
+  Group,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -31,7 +32,7 @@ export class Computed<ComputedValueType = any> extends State<
   ) {
     super(agileInstance, computeFunction(), {
       key: config.key,
-      deps: config.deps,
+      dependents: config.dependents,
     });
     config = defineConfig(config, {
       computedDeps: [],
@@ -175,7 +176,7 @@ export class Computed<ComputedValueType = any> extends State<
  * @param computedDeps - Hard coded dependencies of Computed Function
  */
 export interface ComputedConfigInterface extends StateConfigInterface {
-  computedDeps?: Array<Observer | State | Event>;
+  computedDeps?: Array<Observer | State | Event | Group>;
 }
 
 /**

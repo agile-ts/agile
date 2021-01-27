@@ -24,7 +24,7 @@ export class EventObserver<PayloadType = any> extends Observer {
     config: CreateEventObserverConfigInterface = {}
   ) {
     super(event.agileInstance(), {
-      deps: config.deps,
+      dependents: config.dependents,
       key: config.key,
       subs: config.subs,
     });
@@ -74,12 +74,12 @@ export class EventObserver<PayloadType = any> extends Observer {
 }
 
 /**
- * @param deps - Initial Dependencies of Event Observer
+ * @param dependents - Initial Dependents of Event Observer
  * @param subs - Initial Subscriptions of Event Observer
  * @param key - Key/Name of Event Observer
  */
 export interface CreateEventObserverConfigInterface {
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
 }

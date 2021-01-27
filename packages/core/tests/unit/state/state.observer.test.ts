@@ -26,7 +26,7 @@ describe('StateObserver Tests', () => {
     expect(stateObserver.state()).toBe(dummyState);
     expect(stateObserver.value).toBe('dummyValue');
     expect(stateObserver._key).toBeUndefined();
-    expect(stateObserver.deps.size).toBe(0);
+    expect(stateObserver.dependents.size).toBe(0);
     expect(stateObserver.subs.size).toBe(0);
   });
 
@@ -38,7 +38,7 @@ describe('StateObserver Tests', () => {
 
     const stateObserver = new StateObserver(dummyState, {
       key: 'testKey',
-      deps: [dummyObserver1, dummyObserver2],
+      dependents: [dummyObserver1, dummyObserver2],
       subs: [dummySubscription1, dummySubscription2],
     });
 
@@ -47,9 +47,9 @@ describe('StateObserver Tests', () => {
     expect(stateObserver.state()).toBe(dummyState);
     expect(stateObserver.value).toBe('dummyValue');
     expect(stateObserver._key).toBe('testKey');
-    expect(stateObserver.deps.size).toBe(2);
-    expect(stateObserver.deps.has(dummyObserver2)).toBeTruthy();
-    expect(stateObserver.deps.has(dummyObserver1)).toBeTruthy();
+    expect(stateObserver.dependents.size).toBe(2);
+    expect(stateObserver.dependents.has(dummyObserver2)).toBeTruthy();
+    expect(stateObserver.dependents.has(dummyObserver1)).toBeTruthy();
     expect(stateObserver.subs.size).toBe(2);
     expect(stateObserver.subs.has(dummySubscription1)).toBeTruthy();
     expect(stateObserver.subs.has(dummySubscription2)).toBeTruthy();
@@ -344,7 +344,7 @@ describe('StateObserver Tests', () => {
           key: 'dummyJob',
         });
 
-        dummyState.observer.deps.add(dummyStateObserver);
+        dummyState.observer.dependents.add(dummyStateObserver);
 
         dummyState.watchers['dummyWatcher'] = jest.fn();
         dummyState.sideEffects['dummySideEffect3'] = {

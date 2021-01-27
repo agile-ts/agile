@@ -52,14 +52,14 @@ export class State<ValueType = any> {
     config: StateConfigInterface = {}
   ) {
     config = defineConfig(config, {
-      deps: [],
+      dependents: [],
       isPlaceholder: false,
     });
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.observer = new StateObserver<ValueType>(this, {
       key: config.key,
-      deps: config.deps,
+      dependents: config.dependents,
     });
     this.initialStateValue = copy(initialValue);
     this._value = copy(initialValue);
@@ -634,7 +634,7 @@ export type StateKey = string | number;
  */
 export interface StateConfigInterface {
   key?: StateKey;
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   isPlaceholder?: boolean;
 }
 

@@ -169,7 +169,7 @@ export class StateObserver<ValueType = any> extends Observer {
     }
 
     // Ingest Dependencies of Observer into Runtime
-    state.observer.deps.forEach(
+    state.observer.dependents.forEach(
       (observer) =>
         observer instanceof StateObserver && observer.ingest({ perform: false })
     );
@@ -177,12 +177,12 @@ export class StateObserver<ValueType = any> extends Observer {
 }
 
 /**
- * @param deps - Initial Dependencies of State Observer
+ * @param dependents - Initial Dependents of State Observer
  * @param subs - Initial Subscriptions of State Observer
  * @param key - Key/Name of State Observer
  */
 export interface CreateStateObserverConfigInterface {
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
 }

@@ -34,7 +34,7 @@ describe('Computed Tests', () => {
     expect(computed.previousStateValue).toBe('computedValue');
     expect(computed.nextStateValue).toBe('computedValue');
     expect(computed.observer).toBeInstanceOf(StateObserver);
-    expect(computed.observer.deps.size).toBe(0);
+    expect(computed.observer.dependents.size).toBe(0);
     expect(computed.observer._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeMethod).toBeUndefined();
@@ -55,7 +55,7 @@ describe('Computed Tests', () => {
 
     const computed = new Computed(dummyAgile, computedFunction, {
       key: 'coolComputed',
-      deps: [dummyObserver1],
+      dependents: [dummyObserver1],
       computedDeps: [dummyObserver2, undefined, dummyState],
     });
 
@@ -74,8 +74,8 @@ describe('Computed Tests', () => {
     expect(computed.previousStateValue).toBe('computedValue');
     expect(computed.nextStateValue).toBe('computedValue');
     expect(computed.observer).toBeInstanceOf(StateObserver);
-    expect(computed.observer.deps.size).toBe(1); // x
-    expect(computed.observer.deps.has(dummyObserver1)).toBeTruthy(); // x
+    expect(computed.observer.dependents.size).toBe(1); // x
+    expect(computed.observer.dependents.has(dummyObserver1)).toBeTruthy(); // x
     expect(computed.observer._key).toBe('coolComputed'); // x
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeMethod).toBeUndefined();

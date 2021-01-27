@@ -36,7 +36,7 @@ describe('Item Tests', () => {
     expect(item.previousStateValue).toStrictEqual(dummyData);
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observer).toBeInstanceOf(StateObserver);
-    expect(item.observer.deps.size).toBe(0);
+    expect(item.observer.dependents.size).toBe(0);
     expect(item.observer._key).toBe(
       dummyData[dummyCollection.config.primaryKey]
     );
@@ -73,7 +73,7 @@ describe('Item Tests', () => {
     expect(item.previousStateValue).toStrictEqual(dummyData);
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observer).toBeInstanceOf(StateObserver);
-    expect(item.observer.deps.size).toBe(0);
+    expect(item.observer.dependents.size).toBe(0);
     expect(item.observer._key).toBe(
       dummyData[dummyCollection.config.primaryKey]
     );

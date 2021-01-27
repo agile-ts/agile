@@ -24,7 +24,7 @@ describe('Event Tests', () => {
     expect(event.callbacks).toStrictEqual({});
     expect(event.enabled).toBeTruthy();
     expect(event.observer).toBeInstanceOf(EventObserver);
-    expect(event.observer.deps.size).toBe(0);
+    expect(event.observer.dependents.size).toBe(0);
     expect(event.observer._key).toBeUndefined();
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
@@ -36,7 +36,7 @@ describe('Event Tests', () => {
 
     const event = new Event(dummyAgile, {
       key: 'coolEvent',
-      deps: [dummyObserver],
+      dependents: [dummyObserver],
       delay: 20,
       maxUses: 40,
       enabled: false,
@@ -54,8 +54,8 @@ describe('Event Tests', () => {
     expect(event.callbacks).toStrictEqual({});
     expect(event.enabled).toBeFalsy();
     expect(event.observer).toBeInstanceOf(EventObserver);
-    expect(event.observer.deps.size).toBe(1);
-    expect(event.observer.deps.has(dummyObserver)).toBeTruthy();
+    expect(event.observer.dependents.size).toBe(1);
+    expect(event.observer.dependents.has(dummyObserver)).toBeTruthy();
     expect(event.observer._key).toBe('coolEvent');
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
