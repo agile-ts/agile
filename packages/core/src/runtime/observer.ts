@@ -4,6 +4,8 @@ import {
   RuntimeJob,
   SubscriptionContainer,
   defineConfig,
+  IngestConfigInterface,
+  CreateRuntimeJobConfigInterface,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -57,6 +59,34 @@ export class Observer<ValueType = any> {
   }
 
   //=========================================================================================================
+  // Ingest
+  //=========================================================================================================
+  /**
+   * @internal
+   * Ingests Observer into Runtime
+   */
+  public ingest(config: ObserverIngestConfigInterface = {}): void {
+    config = defineConfig(config, {
+      perform: true,
+      background: false,
+      sideEffects: true,
+      force: false,
+    });
+
+    // Create Job
+    const job = new RuntimeJob(this, {
+      force: config.force,
+      sideEffects: config.sideEffects,
+      background: config.background,
+      key: config.key || this._key,
+    });
+
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
+  }
+
+  //=========================================================================================================
   // Perform
   //=========================================================================================================
   /**
@@ -64,7 +94,7 @@ export class Observer<ValueType = any> {
    * Performs Job of Runtime
    * @param job - Job that gets performed
    */
-  public perform(job: RuntimeJob) {
+  public perform(job: RuntimeJob): void {
     Agile.logger.warn(
       "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
     );
@@ -75,10 +105,10 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Adds Dependent to Observer that will be ingested into the Runtime if this Observer changes
+   * Adds Dependent to Observer which gets ingested into the Runtime whenever this Observer mutates
    * @param observer - Observer that will depend on this Observer
    */
-  public depend(observer: Observer) {
+  public depend(observer: Observer): void {
     if (!this.dependents.has(observer)) this.dependents.add(observer);
   }
 
@@ -90,7 +120,7 @@ export class Observer<ValueType = any> {
    * Adds Subscription to Observer
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
    */
-  public subscribe(subscriptionContainer: SubscriptionContainer) {
+  public subscribe(subscriptionContainer: SubscriptionContainer): void {
     if (!this.subs.has(subscriptionContainer)) {
       this.subs.add(subscriptionContainer);
 
@@ -107,7 +137,7 @@ export class Observer<ValueType = any> {
    * Removes Subscription from Observer
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
    */
-  public unsubscribe(subscriptionContainer: SubscriptionContainer) {
+  public unsubscribe(subscriptionContainer: SubscriptionContainer): void {
     if (this.subs.has(subscriptionContainer)) {
       this.subs.delete(subscriptionContainer);
       subscriptionContainer.subs.delete(this);
@@ -127,3 +157,7 @@ export interface CreateObserverConfigInterface<ValueType = any> {
   key?: ObserverKey;
   value?: ValueType;
 }
+
+export interface ObserverIngestConfigInterface
+  extends CreateRuntimeJobConfigInterface,
+    IngestConfigInterface {}
