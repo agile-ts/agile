@@ -137,16 +137,14 @@ export class State<ValueType = any> {
    * @param value - new State Value
    * @param config - Config
    */
-  public set(
-    value: ValueType,
-    config: StateRuntimeJobConfigInterface = {}
-  ): this {
+  public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
     config = defineConfig(config, {
       sideEffects: true,
       background: false,
       force: false,
       storage: true,
       overwrite: false,
+      perform: true,
     });
 
     // Check value has correct Type (js)
@@ -210,7 +208,7 @@ export class State<ValueType = any> {
    * Undoes latest State Value change
    * @param config - Config
    */
-  public undo(config: StateRuntimeJobConfigInterface = {}): this {
+  public undo(config: StateIngestConfigInterface = {}): this {
     this.set(this.previousStateValue, config);
     return this;
   }
@@ -223,7 +221,7 @@ export class State<ValueType = any> {
    * Resets State to its initial Value
    * @param config - Config
    */
-  public reset(config: StateRuntimeJobConfigInterface = {}): this {
+  public reset(config: StateIngestConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
     return this;
   }
@@ -641,7 +639,7 @@ export interface StateConfigInterface {
 /**
  * @param addNewProperties - If new Properties gets added to the State Value
  */
-export interface PatchConfigInterface extends StateRuntimeJobConfigInterface {
+export interface PatchConfigInterface extends StateIngestConfigInterface {
   addNewProperties?: boolean;
 }
 
