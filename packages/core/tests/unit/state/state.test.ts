@@ -223,6 +223,7 @@ describe('State Tests', () => {
           sideEffects: true,
           background: false,
           force: false,
+          perform: true,
           storage: true,
           overwrite: false,
         });
@@ -240,6 +241,7 @@ describe('State Tests', () => {
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
           sideEffects: false,
           background: true,
+          perform: true,
           force: false,
           storage: false,
           overwrite: false,
@@ -272,6 +274,7 @@ describe('State Tests', () => {
           {
             sideEffects: true,
             background: false,
+            perform: true,
             force: true,
             storage: true,
             overwrite: false,
@@ -289,6 +292,7 @@ describe('State Tests', () => {
           {
             sideEffects: true,
             background: false,
+            perform: true,
             force: false,
             storage: true,
             overwrite: false,
