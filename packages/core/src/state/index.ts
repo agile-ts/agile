@@ -353,8 +353,8 @@ export class State<ValueType = any> {
    */
   public onInaugurated(callback: StateWatcherCallback<ValueType>) {
     const watcherKey = 'InauguratedWatcherKey';
-    this.watch(watcherKey, (value) => {
-      callback(value);
+    this.watch(watcherKey, (value, key) => {
+      callback(value, key);
       this.removeWatcher(watcherKey);
     });
   }
@@ -652,7 +652,7 @@ export interface StatePersistentConfigInterface {
   storageKeys?: StorageKey[];
 }
 
-export type StateWatcherCallback<T = any> = (value: T) => void;
+export type StateWatcherCallback<T = any> = (value: T, key: string) => void;
 export type ComputeMethod<T = any> = (value: T) => T;
 
 export type SideEffectFunctionType = (properties?: {

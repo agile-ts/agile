@@ -152,7 +152,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // Call Watchers Functions
     for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state.getPublicValue());
+        state.watchers[watcherKey](state.getPublicValue(), watcherKey);
 
     // Call SideEffect Functions
     if (job.config?.sideEffects) {
