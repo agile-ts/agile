@@ -76,6 +76,55 @@ describe('Observer Tests', () => {
       });
     });
 
+    describe('ingest function tests', () => {
+      it('should create RuntimeJob and ingest Observer into the Runtime (default config)', () => {
+        dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
+          expect(job._key).toBe(observer._key);
+          expect(job.observer).toBe(observer);
+          expect(job.config).toStrictEqual({
+            background: false,
+            sideEffects: true,
+            force: false,
+          });
+        });
+
+        observer.ingest();
+
+        expect(dummyAgile.runtime.ingest).toHaveBeenCalledWith(
+          expect.any(RuntimeJob),
+          {
+            perform: true,
+          }
+        );
+      });
+
+      it('should create RuntimeJob and ingest Observer into the Runtime (specific config)', () => {
+        dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
+          expect(job._key).toBe('coolKey');
+          expect(job.observer).toBe(observer);
+          expect(job.config).toStrictEqual({
+            background: true,
+            sideEffects: true,
+            force: true,
+          });
+        });
+
+        observer.ingest({
+          background: true,
+          key: 'coolKey',
+          perform: false,
+          force: true,
+        });
+
+        expect(dummyAgile.runtime.ingest).toHaveBeenCalledWith(
+          expect.any(RuntimeJob),
+          {
+            perform: false,
+          }
+        );
+      });
+    });
+
     describe('perform function tests', () => {
       it('should print warning', () => {
         const dummyJob = new RuntimeJob(observer);

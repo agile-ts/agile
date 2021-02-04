@@ -29,7 +29,7 @@ export class StatusObserver extends Observer {
   ) {
     super(agileInstance, {
       key: config.key,
-      deps: config.deps,
+      dependents: config.dependents,
       value: status._value,
     });
     this.status = () => status;
@@ -96,7 +96,7 @@ export class StatusObserver extends Observer {
  * @param key - Key/Name of Status Observer
  */
 export interface StatusObserverConfigInterface {
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   key?: ObserverKey;
 }
 

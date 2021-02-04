@@ -4,10 +4,6 @@ import {
   ObserverKey,
   Event,
   SubscriptionContainer,
-  IngestConfigInterface,
-  RuntimeJobConfigInterface,
-  defineConfig,
-  RuntimeJobKey,
 } from '../internal';
 
 export class EventObserver<PayloadType = any> extends Observer {
@@ -32,35 +28,6 @@ export class EventObserver<PayloadType = any> extends Observer {
   }
 
   //=========================================================================================================
-  // Ingest
-  //=========================================================================================================
-  /**
-   * @internal
-   * Ingests Event into Runtime and causes Rerender on Components that got subscribed by the Event (Observer)
-   * @param config - Config
-   */
-  public trigger(config: EventIngestConfigInterface = {}): void {
-    config = defineConfig(config, {
-      perform: true,
-      background: false,
-      sideEffects: true,
-      force: false,
-    });
-
-    // Create Job
-    const job = new RuntimeJob(this, {
-      force: config.force,
-      sideEffects: config.sideEffects,
-      background: config.background,
-      key: config.key || this._key,
-    });
-
-    this.agileInstance().runtime.ingest(job, {
-      perform: config.perform,
-    });
-  }
-
-  //=========================================================================================================
   // Perform
   //=========================================================================================================
   /**
@@ -73,6 +40,7 @@ export class EventObserver<PayloadType = any> extends Observer {
   }
 }
 
+// Extra Interface because we don't want a value property in the config of the Event Observer
 /**
  * @param dependents - Initial Dependents of Event Observer
  * @param subs - Initial Subscriptions of Event Observer
@@ -82,13 +50,4 @@ export interface CreateEventObserverConfigInterface {
   dependents?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
-}
-
-/**
- * @param key - Key/Name of Job that gets created
- */
-export interface EventIngestConfigInterface
-  extends RuntimeJobConfigInterface,
-    IngestConfigInterface {
-  key?: RuntimeJobKey;
 }

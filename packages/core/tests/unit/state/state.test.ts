@@ -567,7 +567,7 @@ describe('State Tests', () => {
         dummyCallbackFunction = jest.fn();
       });
 
-      it('should add watcher called InauguratedWatcherKey to State that destroys it self after it got called', () => {
+      it('should add watcher called InauguratedWatcherKey to State', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         expect(numberState.watch).toHaveBeenCalledWith(
@@ -581,9 +581,9 @@ describe('State Tests', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         // Call Inaugurated Watcher
-        numberState.watchers['InauguratedWatcherKey'](10);
+        numberState.watchers['InauguratedWatcherKey'](10, 'testKey');
 
-        expect(dummyCallbackFunction).toHaveBeenCalledWith(10);
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(10, 'testKey');
         expect(numberState.watchers).not.toHaveProperty(
           'InauguratedWatcherKey'
         );

@@ -264,7 +264,7 @@ describe('Event Tests', () => {
         event.callbacks['callback2'] = dummyCallbackFunction2;
         event.callbacks['callback3'] = dummyCallbackFunction3;
 
-        event.observer.trigger = jest.fn();
+        event.observer.ingest = jest.fn();
         event.disable = jest.fn();
       });
 
@@ -277,7 +277,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).not.toHaveBeenCalled();
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.observer.ingest).not.toHaveBeenCalled();
         expect(event.disable).not.toHaveBeenCalled();
         expect(event.uses).toBe(1);
       });
@@ -291,7 +291,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.observer.ingest).not.toHaveBeenCalled();
         expect(event.disable).not.toHaveBeenCalled();
         expect(event.uses).toBe(1);
       });
@@ -305,7 +305,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).toHaveBeenCalled();
+        expect(event.observer.ingest).toHaveBeenCalled();
         expect(event.disable).not.toHaveBeenCalled();
         expect(event.uses).toBe(1);
       });
@@ -321,7 +321,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.observer.ingest).not.toHaveBeenCalled();
         expect(event.disable).toHaveBeenCalled();
         expect(event.uses).toBe(2);
       });

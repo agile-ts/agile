@@ -232,7 +232,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     }
 
     // Cause rerender
-    if (this.config.rerender) this.observer.trigger();
+    if (this.config.rerender) this.observer.ingest();
 
     this.uses++;
 

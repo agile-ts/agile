@@ -351,12 +351,13 @@ export class State<ValueType = any> {
    * Creates a Watcher that gets once called when the State Value changes for the first time and than destroys itself
    * @param callback - Callback Function that gets called if the State Value changes
    */
-  public onInaugurated(callback: StateWatcherCallback<ValueType>) {
+  public onInaugurated(callback: StateWatcherCallback<ValueType>): this {
     const watcherKey = 'InauguratedWatcherKey';
-    this.watch(watcherKey, (value) => {
-      callback(value);
+    this.watch(watcherKey, (value, key) => {
+      callback(value, key);
       this.removeWatcher(watcherKey);
     });
+    return this;
   }
 
   //=========================================================================================================
@@ -652,7 +653,7 @@ export interface StatePersistentConfigInterface {
   storageKeys?: StorageKey[];
 }
 
-export type StateWatcherCallback<T = any> = (value: T) => void;
+export type StateWatcherCallback<T = any> = (value: T, key: string) => void;
 export type ComputeMethod<T = any> = (value: T) => T;
 
 export type SideEffectFunctionType = (properties?: {

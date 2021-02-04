@@ -11,10 +11,9 @@ import {
   SubscriptionContainer,
   IngestConfigInterface,
   StateRuntimeJob,
-  StateRuntimeJobConfigInterface,
-  RuntimeJobKey,
   SideEffectInterface,
   createArrayFromObject,
+  CreateStateRuntimeJobConfigInterface,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -153,7 +152,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // Call Watchers Functions
     for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state.getPublicValue());
+        state.watchers[watcherKey](state.getPublicValue(), watcherKey);
 
     // Call SideEffect Functions
     if (job.config?.sideEffects) {
@@ -167,12 +166,6 @@ export class StateObserver<ValueType = any> extends Observer {
         if (isFunction(sideEffect.instance.callback))
           sideEffect.instance.callback(job.config);
     }
-
-    // Ingest Dependencies of Observer into Runtime
-    state.observer.dependents.forEach(
-      (observer) =>
-        observer instanceof StateObserver && observer.ingest({ perform: false })
-    );
   }
 }
 
@@ -187,11 +180,6 @@ export interface CreateStateObserverConfigInterface {
   key?: ObserverKey;
 }
 
-/**
- * @param key - Key/Name of Job that gets created
- */
 export interface StateIngestConfigInterface
-  extends StateRuntimeJobConfigInterface,
-    IngestConfigInterface {
-  key?: RuntimeJobKey;
-}
+  extends CreateStateRuntimeJobConfigInterface,
+    IngestConfigInterface {}
