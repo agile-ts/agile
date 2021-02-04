@@ -64,6 +64,7 @@ export class Observer<ValueType = any> {
   /**
    * @internal
    * Ingests Observer into Runtime
+   * @param config - Configuration
    */
   public ingest(config: ObserverIngestConfigInterface = {}): void {
     config = defineConfig(config, {
