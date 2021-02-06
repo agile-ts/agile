@@ -1319,6 +1319,87 @@ describe('Collection Tests', () => {
       });
     });
 
+    describe('getAllItems function tests', () => {
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+      let dummyItem3: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem1 = new Item(collection, { id: '1', name: 'Jeff' });
+        dummyItem1.isPlaceholder = false;
+        dummyItem2 = new Item(collection, { id: '2', name: 'Hans' });
+        dummyItem2.isPlaceholder = true;
+        dummyItem3 = new Item(collection, { id: '3', name: 'Frank' });
+        dummyItem3.isPlaceholder = false;
+        collection.data = {
+          ['1']: dummyItem1,
+          ['2']: dummyItem2,
+          ['3']: dummyItem3,
+        };
+      });
+
+      it('should return all existing Items (default config)', () => {
+        const items = collection.getAllItems();
+
+        expect(items.includes(dummyItem1)).toBeTruthy();
+        expect(items.includes(dummyItem2)).toBeFalsy();
+        expect(items.includes(dummyItem3)).toBeTruthy();
+      });
+
+      it('should return all Items (config.notExisting = true)', () => {
+        const items = collection.getAllItems({ notExisting: true });
+
+        expect(items.includes(dummyItem1)).toBeTruthy();
+        expect(items.includes(dummyItem2)).toBeTruthy();
+        expect(items.includes(dummyItem3)).toBeTruthy();
+      });
+    });
+
+    describe('getAllItemValues function tests', () => {
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+      let dummyItem3: Item<ItemInterface>;
+
+      beforeEach(() => {
+        dummyItem1 = new Item(collection, { id: '1', name: 'Jeff' });
+        dummyItem1.isPlaceholder = false;
+        dummyItem2 = new Item(collection, { id: '2', name: 'Hans' });
+        dummyItem2.isPlaceholder = true;
+        dummyItem3 = new Item(collection, { id: '3', name: 'Frank' });
+        dummyItem3.isPlaceholder = false;
+        collection.data = {
+          ['1']: dummyItem1,
+          ['2']: dummyItem2,
+          ['3']: dummyItem3,
+        };
+
+        jest.spyOn(collection, 'getAllItems');
+      });
+
+      it('should return all existing Items (default config)', () => {
+        const itemValues = collection.getAllItemValues();
+
+        expect(collection.getAllItems).toHaveBeenCalledWith({});
+        expect(itemValues).toStrictEqual([
+          { id: '1', name: 'Jeff' },
+          { id: '3', name: 'Frank' },
+        ]);
+      });
+
+      it('should return all Items (config.notExisting = true)', () => {
+        const itemValues = collection.getAllItemValues({ notExisting: true });
+
+        expect(collection.getAllItems).toHaveBeenCalledWith({
+          notExisting: true,
+        });
+        expect(itemValues).toStrictEqual([
+          { id: '1', name: 'Jeff' },
+          { id: '2', name: 'Hans' },
+          { id: '3', name: 'Frank' },
+        ]);
+      });
+    });
+
     describe('persist function tests', () => {
       it('should create persistent with CollectionKey (default config)', () => {
         collection.persist();

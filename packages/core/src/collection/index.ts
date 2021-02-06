@@ -645,6 +645,44 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Get All Items
+  //=========================================================================================================
+  /**
+   * @public
+   * Get all Items of Collection
+   * @param config - Config
+   */
+  public getAllItems(config: HasConfigInterface = {}): Array<Item<DataType>> {
+    config = defineConfig(config, {
+      notExisting: false,
+    });
+
+    // Get Items
+    const items: Array<Item<DataType>> = [];
+    for (const key in this.data) {
+      const item = this.data[key];
+      if ((!config.notExisting && item.exists) || config.notExisting) {
+        items.push(item);
+      }
+    }
+
+    return items;
+  }
+
+  //=========================================================================================================
+  // Get All Item Values
+  //=========================================================================================================
+  /**
+   * @public
+   * Get all Values of Items in a Collection
+   * @param config - Config
+   */
+  public getAllItemValues(config: HasConfigInterface = {}): Array<DataType> {
+    const items = this.getAllItems(config);
+    return items.map((item) => item.value);
+  }
+
+  //=========================================================================================================
   // Persist
   //=========================================================================================================
   /**

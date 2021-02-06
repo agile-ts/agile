@@ -468,7 +468,7 @@ export class State<ValueType = any> {
    * Checks if State exists
    */
   public get exists(): boolean {
-    return this._value !== undefined && !this.isPlaceholder;
+    return !this.isPlaceholder;
   }
 
   //=========================================================================================================

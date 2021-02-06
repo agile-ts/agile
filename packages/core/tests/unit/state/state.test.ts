@@ -719,17 +719,13 @@ describe('State Tests', () => {
     });
 
     describe('exists get function tests', () => {
-      it("should return true if value isn't undefined and State is no placeholder", () => {
+      it('should return true if State is no placeholder', () => {
+        numberState.isPlaceholder = false;
+
         expect(numberState.exists).toBeTruthy();
       });
 
-      it('should return false if value is undefined and State is no placeholder', () => {
-        numberState._value = undefined;
-
-        expect(numberState.exists).toBeFalsy();
-      });
-
-      it("should return false if value isn't undefined and State is placeholder", () => {
+      it('should return false if State is placeholder"', () => {
         numberState.isPlaceholder = true;
 
         expect(numberState.exists).toBeFalsy();
