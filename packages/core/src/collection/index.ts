@@ -14,6 +14,7 @@ import {
   CollectionPersistent,
   GroupAddConfig,
   ComputedTracker,
+  notEqual,
 } from '../internal';
 
 export class Collection<DataType = DefaultItem> {
@@ -30,6 +31,8 @@ export class Collection<DataType = DefaultItem> {
 
   public groups: { [key: string]: Group<any> } = {};
   public selectors: { [key: string]: Selector<any> } = {};
+
+  private collectionGotInstantiated = false;
 
   /**
    * @public
@@ -65,6 +68,8 @@ export class Collection<DataType = DefaultItem> {
     this.initSelectors(_config.selectors as any);
 
     if (_config.initialData) this.collect(_config.initialData);
+
+    this.collectionGotInstantiated = true;
   }
 
   /**
@@ -117,6 +122,17 @@ export class Collection<DataType = DefaultItem> {
     initialItems?: Array<ItemKey>,
     config?: GroupConfigInterface
   ): Group<DataType> {
+    if (this.collectionGotInstantiated) {
+      Agile.logger.warn(
+        "After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'"
+      );
+      if (!config?.key)
+        Agile.logger.error(
+          "Failed to find key for creation of Group. Group 'unknown' got created!"
+        );
+      return this.createGroup(config?.key || 'unknown', initialItems);
+    }
+
     return new Group<DataType>(this, initialItems, config);
   }
 
@@ -133,6 +149,16 @@ export class Collection<DataType = DefaultItem> {
     initialKey: ItemKey,
     config?: { key?: SelectorKey }
   ): Selector<DataType> {
+    if (this.collectionGotInstantiated) {
+      Agile.logger.warn(
+        "After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'"
+      );
+      if (!config?.key)
+        Agile.logger.error(
+          "Failed to find key for creation of Selector. Selector 'unknown' got created!"
+        );
+      return this.createSelector(config?.key || 'unknown', initialKey);
+    }
     return new Selector<DataType>(this, initialKey, config);
   }
 
@@ -165,6 +191,13 @@ export class Collection<DataType = DefaultItem> {
     for (const key in groupsObject)
       if (!groupsObject[key]._key) groupsObject[key].setKey(key);
 
+    // The Group object is filled if the 'createGroup' function got used, because there it automatically adds the Group to the Collection
+    if (notEqual(this.groups, {})) {
+      Agile.logger.warn(
+        "We recommend to use 'MY_COLLECTION.Group' instead of 'MY_COLLECTION.createGroup' in the Collection config!"
+      );
+    }
+
     this.groups = groupsObject;
   }
 
@@ -195,6 +228,13 @@ export class Collection<DataType = DefaultItem> {
     // Set Key/Name of Selector to property Name
     for (const key in selectorsObject)
       if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
+
+    // The Selector object is filled if the 'createSelector' function got used, because there it automatically adds the Selector to the Collection
+    if (notEqual(this.selectors, {})) {
+      Agile.logger.warn(
+        "We recommend to use 'MY_COLLECTION.Selector' instead of 'MY_COLLECTION.createSElector' in the Collection config!"
+      );
+    }
 
     this.selectors = selectorsObject;
   }
