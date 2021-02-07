@@ -125,7 +125,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Add SideEffect to State, that updates the saved State Value depending on the current State Value
     this.state().addSideEffect(
       StatePersistent.storeValueSideEffectKey,
-      (config) => {
+      (instance, config) => {
         this.rebuildStorageSideEffect(this.state(), _key, config);
       },
       { weight: 0 }
@@ -195,7 +195,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public rebuildStorageSideEffect(
     state: State<ValueType>,
     key: PersistentKey,
-    config: any = {}
+    config: { [key: string]: any } = {}
   ) {
     if (config.storage !== undefined && !config.storage) return;
 

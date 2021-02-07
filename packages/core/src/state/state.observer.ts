@@ -156,15 +156,15 @@ export class StateObserver<ValueType = any> extends Observer {
 
     // Call SideEffect Functions
     if (job.config?.sideEffects) {
-      const sideEffectArray = createArrayFromObject<SideEffectInterface>(
-        state.sideEffects
-      );
+      const sideEffectArray = createArrayFromObject<
+        SideEffectInterface<State<ValueType>>
+      >(state.sideEffects);
       sideEffectArray.sort(function (a, b) {
         return b.instance.weight - a.instance.weight;
       });
       for (const sideEffect of sideEffectArray)
         if (isFunction(sideEffect.instance.callback))
-          sideEffect.instance.callback(job.config);
+          sideEffect.instance.callback(job.observer.state(), job.config);
     }
   }
 }

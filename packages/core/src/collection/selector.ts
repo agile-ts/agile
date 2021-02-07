@@ -14,6 +14,7 @@ export class Selector<DataType = DefaultItem> extends State<
 > {
   static dummyItemKey = 'unknown';
   static rebuildSelectorSideEffectKey = 'rebuildSelector';
+  static rebuildItemSideEffectKey = 'rebuildItem';
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
   public _itemKey: ItemKey; // Key of Item the Selector represents
@@ -101,8 +102,14 @@ export class Selector<DataType = DefaultItem> extends State<
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(
       Selector.rebuildSelectorSideEffectKey,
-      (config) => this.rebuildSelector(config),
+      (instance, config) => this.rebuildSelector(config),
       { weight: 100 }
+    );
+
+   // Add sideEffect to Selector, that updates the Item Value if this Value got updated
+    this.addSideEffect<Selector<DataType>>(
+      Selector.rebuildItemSideEffectKey,
+      (instance, config) => instance.item?.set(instance._value as any, config)
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly

@@ -86,10 +86,10 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
    * @param itemKey - ItemKey at which the groups has to rebuild
    */
   public addRebuildGroupThatIncludeItemKeySideEffect(itemKey: StateKey) {
-    this.addSideEffect(
+    this.addSideEffect<Item<DataType>>(
       Item.updateGroupSideEffectKey,
-      (config) =>
-        this.collection().rebuildGroupsThatIncludeItemKey(itemKey, config),
+      (instance, config) =>
+        instance.collection().rebuildGroupsThatIncludeItemKey(itemKey, config),
       { weight: 100 }
     );
   }
