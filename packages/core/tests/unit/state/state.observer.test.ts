@@ -391,13 +391,13 @@ describe('StateObserver Tests', () => {
         );
         expect(
           dummyState.sideEffects['dummySideEffect'].callback
-        ).toHaveBeenCalledWith(dummyJob.config);
+        ).toHaveBeenCalledWith(dummyState, dummyJob.config);
         expect(
           dummyState.sideEffects['dummySideEffect2'].callback
-        ).toHaveBeenCalledWith(dummyJob.config);
+        ).toHaveBeenCalledWith(dummyState, dummyJob.config);
         expect(
           dummyState.sideEffects['dummySideEffect3'].callback
-        ).toHaveBeenCalledWith(dummyJob.config);
+        ).toHaveBeenCalledWith(dummyState, dummyJob.config);
         expect(sideEffectCallOrder).toStrictEqual([
           'dummySideEffect3',
           'dummySideEffect2',
