@@ -194,13 +194,6 @@ export class Collection<DataType = DefaultItem> {
     for (const key in groupsObject)
       if (!groupsObject[key]._key) groupsObject[key].setKey(key);
 
-    // The Group object is filled if the 'createGroup' function got used, because there it automatically adds the Group to the Collection
-    if (notEqual(this.groups, {})) {
-      Agile.logger.warn(
-        "We recommend to use 'MY_COLLECTION.Group' instead of 'MY_COLLECTION.createGroup' in the Collection config!"
-      );
-    }
-
     this.groups = groupsObject;
   }
 
@@ -231,13 +224,6 @@ export class Collection<DataType = DefaultItem> {
     // Set Key/Name of Selector to property Name
     for (const key in selectorsObject)
       if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
-
-    // The Selector object is filled if the 'createSelector' function got used, because there it automatically adds the Selector to the Collection
-    if (notEqual(this.selectors, {})) {
-      Agile.logger.warn(
-        "We recommend to use 'MY_COLLECTION.Selector' instead of 'MY_COLLECTION.createSElector' in the Collection config!"
-      );
-    }
 
     this.selectors = selectorsObject;
   }
@@ -371,6 +357,12 @@ export class Collection<DataType = DefaultItem> {
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
+    if (!this.isInstantiated) {
+      Agile.logger.warn(
+        "We recommend to use 'MY_COLLECTION.Group' instead of 'MY_COLLECTION.createGroup' in the Collection config!"
+      );
+    }
+
     // Check if Group already exists
     if (group) {
       if (!group.isPlaceholder) {
@@ -487,6 +479,12 @@ export class Collection<DataType = DefaultItem> {
     itemKey: ItemKey
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
+
+    if (!this.isInstantiated) {
+      Agile.logger.warn(
+        "We recommend to use 'MY_COLLECTION.Selector' instead of 'MY_COLLECTION.createSelector' in the Collection config!"
+      );
+    }
 
     // Check if Selector already exists
     if (selector) {
