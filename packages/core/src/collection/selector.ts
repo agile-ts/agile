@@ -113,12 +113,16 @@ export class Selector<DataType = DefaultItem> extends State<
     this.addSideEffect<Selector<DataType>>(
       Selector.rebuildItemSideEffectKey,
       (instance, config) => {
-        instance.item?.set(instance._value as any, {
-          sideEffects: {
-            enabled: true,
-            exclude: [Selector.rebuildItemSideEffectKey], // Exclude to avoid endless loops
-          },
-        });
+        if (!instance.item?.isPlaceholder)
+          instance.item?.set(instance._value as any, {
+            ...config,
+            ...{
+              sideEffects: {
+                enabled: true,
+                exclude: [Selector.rebuildItemSideEffectKey], // Exclude to avoid endless loops
+              },
+            },
+          });
       }
     );
 
