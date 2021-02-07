@@ -14,8 +14,8 @@ import {
   CollectionPersistent,
   GroupAddConfig,
   ComputedTracker,
-  notEqual,
   generateId,
+  SideEffectConfigInterface,
 } from '../internal';
 
 export class Collection<DataType = DefaultItem> {
@@ -1123,7 +1123,10 @@ export class Collection<DataType = DefaultItem> {
   ): void {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
     });
 
     // Rebuild Groups that include ItemKey
@@ -1211,7 +1214,7 @@ export interface UpdateItemKeyConfigInterface {
 export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   background?: boolean;
   force?: boolean;
-  sideEffects?: boolean;
+  sideEffects?: SideEffectConfigInterface;
 }
 
 /**

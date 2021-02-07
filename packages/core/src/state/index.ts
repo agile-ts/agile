@@ -141,7 +141,10 @@ export class State<ValueType = any> {
    */
   public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
     config = defineConfig(config, {
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,
@@ -244,7 +247,10 @@ export class State<ValueType = any> {
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,

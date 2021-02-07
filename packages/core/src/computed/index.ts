@@ -7,6 +7,7 @@ import {
   StateConfigInterface,
   ComputedTracker,
   Group,
+  SideEffectConfigInterface,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -185,7 +186,7 @@ export interface ComputedConfigInterface extends StateConfigInterface {
  */
 export interface RecomputeConfigInterface {
   background?: boolean;
-  sideEffects?: boolean;
+  sideEffects?: SideEffectConfigInterface;
 }
 
 /**

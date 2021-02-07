@@ -106,10 +106,17 @@ export class Selector<DataType = DefaultItem> extends State<
       { weight: 100 }
     );
 
-   // Add sideEffect to Selector, that updates the Item Value if this Value got updated
+    // Add sideEffect to Selector, that updates the Item Value if this Value got updated
     this.addSideEffect<Selector<DataType>>(
       Selector.rebuildItemSideEffectKey,
-      (instance, config) => instance.item?.set(instance._value as any, config)
+      (instance, config) => {
+        instance.item?.set(instance._value as any, {
+          sideEffects: {
+            enabled: true,
+            exclude: [Selector.rebuildItemSideEffectKey], // Exclude to avoid endless loops
+          },
+        });
+      }
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
@@ -136,6 +143,7 @@ export class Selector<DataType = DefaultItem> extends State<
     if (item) {
       item.isSelected = false;
       item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
+      item.removeSideEffect(Selector.rebuildItemSideEffectKey);
       if (item.isPlaceholder) delete this.collection().data[this._itemKey];
     }
 

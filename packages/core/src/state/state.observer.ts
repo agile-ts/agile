@@ -155,16 +155,19 @@ export class StateObserver<ValueType = any> extends Observer {
         state.watchers[watcherKey](state.getPublicValue(), watcherKey);
 
     // Call SideEffect Functions
-    if (job.config?.sideEffects) {
+    if (job.config?.sideEffects?.enabled) {
       const sideEffectArray = createArrayFromObject<
         SideEffectInterface<State<ValueType>>
       >(state.sideEffects);
       sideEffectArray.sort(function (a, b) {
         return b.instance.weight - a.instance.weight;
       });
-      for (const sideEffect of sideEffectArray)
-        if (isFunction(sideEffect.instance.callback))
-          sideEffect.instance.callback(job.observer.state(), job.config);
+      for (const sideEffect of sideEffectArray) {
+        if (isFunction(sideEffect.instance.callback)) {
+          if (!job.config.sideEffects.exclude?.includes(sideEffect.key))
+            sideEffect.instance.callback(job.observer.state(), job.config);
+        }
+      }
     }
   }
 }
