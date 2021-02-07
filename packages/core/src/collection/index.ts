@@ -15,6 +15,7 @@ import {
   GroupAddConfig,
   ComputedTracker,
   notEqual,
+  generateId,
 } from '../internal';
 
 export class Collection<DataType = DefaultItem> {
@@ -32,7 +33,7 @@ export class Collection<DataType = DefaultItem> {
   public groups: { [key: string]: Group<any> } = {};
   public selectors: { [key: string]: Selector<any> } = {};
 
-  private collectionGotInstantiated = false;
+  public isInstantiated = false;
 
   /**
    * @public
@@ -69,7 +70,7 @@ export class Collection<DataType = DefaultItem> {
 
     if (_config.initialData) this.collect(_config.initialData);
 
-    this.collectionGotInstantiated = true;
+    this.isInstantiated = true;
   }
 
   /**
@@ -122,15 +123,16 @@ export class Collection<DataType = DefaultItem> {
     initialItems?: Array<ItemKey>,
     config?: GroupConfigInterface
   ): Group<DataType> {
-    if (this.collectionGotInstantiated) {
+    if (this.isInstantiated) {
+      const key = config?.key || generateId();
       Agile.logger.warn(
         "After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'"
       );
       if (!config?.key)
-        Agile.logger.error(
-          "Failed to find key for creation of Group. Group 'unknown' got created!"
+        Agile.logger.warn(
+          `Failed to find key for creation of Group. Group with random key '${key}' got created!`
         );
-      return this.createGroup(config?.key || 'unknown', initialItems);
+      return this.createGroup(key, initialItems);
     }
 
     return new Group<DataType>(this, initialItems, config);
@@ -149,15 +151,16 @@ export class Collection<DataType = DefaultItem> {
     initialKey: ItemKey,
     config?: { key?: SelectorKey }
   ): Selector<DataType> {
-    if (this.collectionGotInstantiated) {
+    if (this.isInstantiated) {
+      const key = config?.key || generateId();
       Agile.logger.warn(
         "After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'"
       );
       if (!config?.key)
-        Agile.logger.error(
-          "Failed to find key for creation of Selector. Selector 'unknown' got created!"
+        Agile.logger.warn(
+          `Failed to find key for creation of Selector. Selector with random key '${key}' got created!`
         );
-      return this.createSelector(config?.key || 'unknown', initialKey);
+      return this.createSelector(key, initialKey);
     }
     return new Selector<DataType>(this, initialKey, config);
   }

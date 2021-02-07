@@ -8,6 +8,7 @@ import {
   ComputedTracker,
   StatePersistent,
 } from '../../../src';
+import * as Utils from '../../../src/utils';
 
 jest.mock('../../../src/collection/collection.persistent');
 
@@ -210,27 +211,125 @@ describe('Collection Tests', () => {
     });
 
     describe('Group function tests', () => {
-      it('should create Group which belongs to Collection', () => {
+      const generatedKey = 'jeff';
+      const warnTextKey = `Agile Warn: Failed to find key for creation of Group. Group with random key '${generatedKey}' got created!`;
+      const warnText =
+        "Agile Warn: After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'";
+
+      beforeEach(() => {
+        jest.spyOn(collection, 'createGroup');
+        console.warn = jest.fn();
+        // @ts-ignore
+        Utils.generateId = jest.fn(() => generatedKey);
+      });
+
+      it('should create Group with key which belongs to Collection before instantiation', () => {
+        collection.isInstantiated = false;
         const response = collection.Group([1, 2], {
           key: 'group1Key',
         });
+
+        expect(collection.createGroup).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalledWith(warnText);
+        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
 
         expect(response).toBeInstanceOf(Group);
         expect(response._key).toBe('group1Key');
         expect(response._value).toStrictEqual([1, 2]);
         expect(response.collection()).toBe(collection);
       });
+
+      it('should create Group with key which belongs to Collection after instantiation and print warning', () => {
+        collection.isInstantiated = true;
+        const response = collection.Group([1, 2], {
+          key: 'group1Key',
+        });
+
+        expect(collection.createGroup).toHaveBeenCalledWith('group1Key', [
+          1,
+          2,
+        ]);
+        expect(console.warn).toHaveBeenCalledWith(warnText);
+        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+
+        expect(response).toBeInstanceOf(Group);
+        expect(response._key).toBe('group1Key');
+        expect(response._value).toStrictEqual([1, 2]);
+        expect(response.collection()).toBe(collection);
+      });
+
+      it('should create Group with no key which belongs to Collection after instantiation and print warning', () => {
+        collection.isInstantiated = true;
+        const response = collection.Group([1, 2]);
+
+        expect(console.warn).toHaveBeenCalledWith(warnText);
+        expect(console.warn).toHaveBeenCalledWith(warnTextKey);
+
+        expect(response).toBeInstanceOf(Group);
+        expect(response._key).toBe(generatedKey);
+        expect(response._value).toStrictEqual([1, 2]);
+        expect(response.collection()).toBe(collection);
+      });
     });
 
     describe('Selector function tests', () => {
-      it('should create Selector which belongs to Collection', () => {
-        const response = collection.Selector('id1', {
-          key: 'selector1Key',
+      const generatedKey = 'hans';
+      const warnTextKey = `Agile Warn: Failed to find key for creation of Selector. Selector with random key '${generatedKey}' got created!`;
+      const warnText =
+        "Agile Warn: After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'";
+
+      beforeEach(() => {
+        jest.spyOn(collection, 'createSelector');
+        console.warn = jest.fn();
+        // @ts-ignore
+        Utils.generateId = jest.fn(() => generatedKey);
+      });
+
+      it('should create Selector with key which belongs to Collection before instantiation', () => {
+        collection.isInstantiated = false;
+        const response = collection.Selector(1, {
+          key: 'selectorKey1',
         });
 
+        expect(collection.createSelector).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalledWith(warnText);
+        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+
         expect(response).toBeInstanceOf(Selector);
-        expect(response._key).toBe('selector1Key');
-        expect(response._itemKey).toBe('id1');
+        expect(response._key).toBe('selectorKey1');
+        expect(response._itemKey).toStrictEqual(1);
+        expect(response.collection()).toBe(collection);
+      });
+
+      it('should create Selector with key which belongs to Collection after instantiation and print warning', () => {
+        collection.isInstantiated = true;
+        const response = collection.Selector(1, {
+          key: 'selectorKey1',
+        });
+
+        expect(collection.createSelector).toHaveBeenCalledWith(
+          'selectorKey1',
+          1
+        );
+        expect(console.warn).toHaveBeenCalledWith(warnText);
+        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+
+        expect(response).toBeInstanceOf(Selector);
+        expect(response._key).toBe('selectorKey1');
+        expect(response._itemKey).toStrictEqual(1);
+        expect(response.collection()).toBe(collection);
+      });
+
+      it('should create Selector with no key which belongs to Collection after instantiation and print warning', () => {
+        collection.isInstantiated = true;
+        const response = collection.Selector(1);
+
+        expect(console.warn).toHaveBeenCalledWith(warnText);
+        expect(console.warn).toHaveBeenCalledWith(warnTextKey);
+
+        expect(response).toBeInstanceOf(Selector);
+        expect(response._key).toBe(generatedKey);
+        expect(response._itemKey).toStrictEqual(1);
         expect(response.collection()).toBe(collection);
       });
     });
