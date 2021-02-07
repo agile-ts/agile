@@ -81,7 +81,10 @@ export class Selector<DataType = DefaultItem> extends State<
     const newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       overwrite: oldItem?.isPlaceholder || false,
       storage: true,

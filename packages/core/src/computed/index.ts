@@ -60,7 +60,10 @@ export class Computed<ComputedValueType = any> extends State<
   public recompute(config: RecomputeConfigInterface = {}) {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
     });
     this.ingest(config);
   }
@@ -82,7 +85,10 @@ export class Computed<ComputedValueType = any> extends State<
   ) {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       overwriteDeps: true,
     });
 

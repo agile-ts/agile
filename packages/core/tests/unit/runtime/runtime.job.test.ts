@@ -22,7 +22,10 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
     });
     expect(job.rerender).toBeTruthy();
@@ -35,7 +38,9 @@ describe('RuntimeJob Tests', () => {
 
     const job = new RuntimeJob(dummyObserver, {
       key: 'dummyJob',
-      sideEffects: false,
+      sideEffects: {
+        enabled: false,
+      },
       force: true,
     });
 
@@ -43,7 +48,9 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
-      sideEffects: false,
+      sideEffects: {
+        enabled: false,
+      },
       force: true,
     });
     expect(job.rerender).toBeTruthy();
@@ -58,7 +65,10 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
     });
     expect(job.rerender).toBeFalsy();
@@ -75,7 +85,10 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: true,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
     });
     expect(job.rerender).toBeFalsy();

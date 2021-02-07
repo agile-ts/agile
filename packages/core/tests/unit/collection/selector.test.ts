@@ -177,7 +177,10 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: false,
           overwrite: false,
           storage: true,
@@ -198,7 +201,9 @@ describe('Selector Tests', () => {
 
         selector.select('dummyItem2', {
           force: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           overwrite: true,
         });
@@ -212,7 +217,9 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           force: true,
           overwrite: true,
           storage: true,
@@ -265,7 +272,10 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: true,
           overwrite: false,
           storage: true,
@@ -295,7 +305,10 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: false,
           overwrite: true,
           storage: true,
@@ -325,7 +338,10 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: false,
           overwrite: false,
           storage: true,
@@ -351,7 +367,7 @@ describe('Selector Tests', () => {
 
           dummyItem1.sideEffects[
             Selector.rebuildSelectorSideEffectKey
-          ].callback({
+          ].callback(dummyItem1, {
             dummy: 'property',
           });
 
@@ -474,13 +490,17 @@ describe('Selector Tests', () => {
         selector.item = dummyItem1;
 
         selector.rebuildSelector({
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           force: true,
         });
 
         expect(selector.set).toHaveBeenCalledWith(selector.item._value, {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           force: true,
         });

@@ -70,7 +70,10 @@ export class StateObserver<ValueType = any> extends Observer {
     config = defineConfig(config, {
       perform: true,
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,

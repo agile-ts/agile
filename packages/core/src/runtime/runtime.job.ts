@@ -21,7 +21,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
     config = defineConfig<RuntimeJobConfigInterface>(config, {
       background: false,
       sideEffects: {
-        enable: true,
+        enabled: true,
         exclude: [],
       },
       force: false,

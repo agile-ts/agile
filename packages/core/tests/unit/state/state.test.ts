@@ -220,7 +220,10 @@ describe('State Tests', () => {
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           background: false,
           force: false,
           perform: true,
@@ -231,7 +234,9 @@ describe('State Tests', () => {
 
       it('should ingestValue if value has correct type (specific config)', () => {
         numberState.set(20, {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           storage: false,
         });
@@ -239,7 +244,9 @@ describe('State Tests', () => {
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           perform: true,
           force: false,
@@ -272,7 +279,10 @@ describe('State Tests', () => {
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
           'coolValue',
           {
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             background: false,
             perform: true,
             force: true,
@@ -290,7 +300,10 @@ describe('State Tests', () => {
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
           'coolValue',
           {
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             background: false,
             perform: true,
             force: false,
@@ -453,7 +466,10 @@ describe('State Tests', () => {
           background: false,
           force: false,
           overwrite: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           storage: true,
         });
       });
@@ -466,7 +482,9 @@ describe('State Tests', () => {
             background: true,
             force: true,
             overwrite: true,
-            sideEffects: false,
+            sideEffects: {
+              enabled: false,
+            },
           }
         );
 
@@ -485,7 +503,9 @@ describe('State Tests', () => {
           background: true,
           force: true,
           overwrite: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           storage: true,
         });
       });

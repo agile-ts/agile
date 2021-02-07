@@ -49,7 +49,10 @@ export class Item<DataType = DefaultItem> extends State<DataType> {
   ): this {
     super.setKey(value);
     config = defineConfig(config, {
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,
