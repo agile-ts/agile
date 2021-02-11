@@ -16,6 +16,7 @@ import {
   ComputedTracker,
   generateId,
   SideEffectConfigInterface,
+  SelectorConfigInterface,
 } from '../internal';
 
 export class Collection<DataType = DefaultItem> {
@@ -149,7 +150,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Selector(
     initialKey: ItemKey,
-    config?: { key?: SelectorKey }
+    config?: SelectorConfigInterface
   ): Selector<DataType> {
     if (this.isInstantiated) {
       const key = config?.key || generateId();
@@ -162,6 +163,7 @@ export class Collection<DataType = DefaultItem> {
         );
       return this.createSelector(key, initialKey);
     }
+
     return new Selector<DataType>(this, initialKey, config);
   }
 
