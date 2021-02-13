@@ -14,8 +14,9 @@ import {
   CollectionPersistent,
   GroupAddConfig,
   ComputedTracker,
-  notEqual,
   generateId,
+  SideEffectConfigInterface,
+  SelectorConfigInterface,
 } from '../internal';
 
 export class Collection<DataType = DefaultItem> {
@@ -149,7 +150,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Selector(
     initialKey: ItemKey,
-    config?: { key?: SelectorKey }
+    config?: SelectorConfigInterface
   ): Selector<DataType> {
     if (this.isInstantiated) {
       const key = config?.key || generateId();
@@ -162,6 +163,7 @@ export class Collection<DataType = DefaultItem> {
         );
       return this.createSelector(key, initialKey);
     }
+
     return new Selector<DataType>(this, initialKey, config);
   }
 
@@ -1123,7 +1125,10 @@ export class Collection<DataType = DefaultItem> {
   ): void {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
     });
 
     // Rebuild Groups that include ItemKey
@@ -1211,7 +1216,7 @@ export interface UpdateItemKeyConfigInterface {
 export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   background?: boolean;
   force?: boolean;
-  sideEffects?: boolean;
+  sideEffects?: SideEffectConfigInterface;
 }
 
 /**

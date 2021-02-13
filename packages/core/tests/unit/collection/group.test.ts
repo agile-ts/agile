@@ -400,12 +400,16 @@ describe('Group Tests', () => {
       it('should replace oldItemKey with new ItemKey (specific config)', () => {
         group.replace(2, 20, {
           storage: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
 
         expect(group.set).toHaveBeenCalledWith([1, 20, 3, 4, 5, 6], {
           storage: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
       });
     });

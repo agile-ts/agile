@@ -14,6 +14,7 @@ export class Selector<DataType = DefaultItem> extends State<
 > {
   static dummyItemKey = 'unknown';
   static rebuildSelectorSideEffectKey = 'rebuildSelector';
+  static rebuildItemSideEffectKey = 'rebuildItem';
   public collection: () => Collection<DataType>;
   public item: Item<DataType> | undefined;
   public _itemKey: ItemKey; // Key of Item the Selector represents
@@ -80,7 +81,10 @@ export class Selector<DataType = DefaultItem> extends State<
     const newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       overwrite: oldItem?.isPlaceholder || false,
       storage: true,
@@ -101,8 +105,26 @@ export class Selector<DataType = DefaultItem> extends State<
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(
       Selector.rebuildSelectorSideEffectKey,
-      (config) => this.rebuildSelector(config),
+      (instance, config) => this.rebuildSelector(config),
       { weight: 100 }
+    );
+
+    // Add sideEffect to Selector, that updates the Item Value if this Value got updated
+    this.addSideEffect<Selector<DataType>>(
+      Selector.rebuildItemSideEffectKey,
+      (instance, config) => {
+        if (!instance.item?.isPlaceholder)
+          instance.item?.set(instance._value as any, {
+            ...config,
+            ...{
+              sideEffects: {
+                enabled: true,
+                exclude: [Selector.rebuildSelectorSideEffectKey], // Exclude to avoid endless loops
+              },
+            },
+          });
+      },
+      { weight: 90 }
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
@@ -129,6 +151,7 @@ export class Selector<DataType = DefaultItem> extends State<
     if (item) {
       item.isSelected = false;
       item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
+      item.removeSideEffect(Selector.rebuildItemSideEffectKey);
       if (item.isPlaceholder) delete this.collection().data[this._itemKey];
     }
 

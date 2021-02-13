@@ -114,7 +114,10 @@ describe('Item Tests', () => {
             [dummyCollection.config.primaryKey]: 'myNewKey',
           },
           {
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             background: false,
             force: false,
             storage: true,
@@ -125,7 +128,9 @@ describe('Item Tests', () => {
 
       it('should call State setKey, add rebuildGroup sideEffect to Item and patch newItemKey into Item (specific config)', () => {
         item.setKey('myNewKey', {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           force: true,
         });
@@ -142,7 +147,9 @@ describe('Item Tests', () => {
             [dummyCollection.config.primaryKey]: 'myNewKey',
           },
           {
-            sideEffects: false,
+            sideEffects: {
+              enabled: false,
+            },
             background: true,
             force: true,
             storage: true,
@@ -178,7 +185,7 @@ describe('Item Tests', () => {
         it('should call rebuildGroupThatIncludeItemKey', () => {
           item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
-          item.sideEffects[Item.updateGroupSideEffectKey].callback({
+          item.sideEffects[Item.updateGroupSideEffectKey].callback(item, {
             dummy: 'property',
           });
 

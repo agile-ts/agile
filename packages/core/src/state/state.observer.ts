@@ -70,7 +70,10 @@ export class StateObserver<ValueType = any> extends Observer {
     config = defineConfig(config, {
       perform: true,
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,
@@ -155,16 +158,19 @@ export class StateObserver<ValueType = any> extends Observer {
         state.watchers[watcherKey](state.getPublicValue(), watcherKey);
 
     // Call SideEffect Functions
-    if (job.config?.sideEffects) {
-      const sideEffectArray = createArrayFromObject<SideEffectInterface>(
-        state.sideEffects
-      );
+    if (job.config?.sideEffects?.enabled) {
+      const sideEffectArray = createArrayFromObject<
+        SideEffectInterface<State<ValueType>>
+      >(state.sideEffects);
       sideEffectArray.sort(function (a, b) {
         return b.instance.weight - a.instance.weight;
       });
-      for (const sideEffect of sideEffectArray)
-        if (isFunction(sideEffect.instance.callback))
-          sideEffect.instance.callback(job.config);
+      for (const sideEffect of sideEffectArray) {
+        if (isFunction(sideEffect.instance.callback)) {
+          if (!job.config.sideEffects.exclude?.includes(sideEffect.key))
+            sideEffect.instance.callback(job.observer.state(), job.config);
+        }
+      }
     }
   }
 }

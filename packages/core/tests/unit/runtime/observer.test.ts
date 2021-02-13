@@ -83,7 +83,10 @@ describe('Observer Tests', () => {
           expect(job.observer).toBe(observer);
           expect(job.config).toStrictEqual({
             background: false,
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             force: false,
           });
         });
@@ -104,7 +107,10 @@ describe('Observer Tests', () => {
           expect(job.observer).toBe(observer);
           expect(job.config).toStrictEqual({
             background: true,
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             force: true,
           });
         });

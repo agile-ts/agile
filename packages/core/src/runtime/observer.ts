@@ -70,7 +70,10 @@ export class Observer<ValueType = any> {
     config = defineConfig(config, {
       perform: true,
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
     });
 

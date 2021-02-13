@@ -161,6 +161,7 @@ describe('Selector Tests', () => {
         selector.unselect = jest.fn();
         dummyItem1.addSideEffect = jest.fn();
         dummyItem2.addSideEffect = jest.fn();
+        selector.addSideEffect = jest.fn();
       });
 
       it('should unselect old selected Item and select new Item (default config)', () => {
@@ -177,11 +178,21 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: false,
           overwrite: false,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -198,7 +209,9 @@ describe('Selector Tests', () => {
 
         selector.select('dummyItem2', {
           force: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           overwrite: true,
         });
@@ -212,11 +225,20 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           force: true,
           overwrite: true,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -244,6 +266,7 @@ describe('Selector Tests', () => {
         expect(selector.item).toBe(dummyItem1);
         expect(selector.unselect).not.toHaveBeenCalled();
         expect(selector.rebuildSelector).not.toHaveBeenCalled();
+        expect(selector.addSideEffect).not.toHaveBeenCalled();
 
         expect(dummyItem1.addSideEffect).not.toHaveBeenCalled();
         expect(dummyItem1.isSelected).toBeTruthy();
@@ -265,11 +288,21 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: true,
           overwrite: false,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem1.addSideEffect
@@ -295,11 +328,21 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: false,
           overwrite: true,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -325,11 +368,21 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           force: false,
           overwrite: false,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -351,13 +404,59 @@ describe('Selector Tests', () => {
 
           dummyItem1.sideEffects[
             Selector.rebuildSelectorSideEffectKey
-          ].callback({
+          ].callback(dummyItem1, {
             dummy: 'property',
           });
 
           expect(selector.rebuildSelector).toHaveBeenCalledWith({
             dummy: 'property',
           });
+        });
+      });
+
+      describe('test added sideEffect called Selector.rebuildItemSideEffectKey', () => {
+        beforeEach(() => {
+          dummyItem1.set = jest.fn();
+        });
+
+        it('should call set on Item if Item is no placeholder', () => {
+          dummyItem1.isPlaceholder = false;
+          selector._value = { id: '1', name: 'jeff' };
+
+          selector.select('dummyItem1');
+
+          selector.sideEffects[Selector.rebuildItemSideEffectKey].callback(
+            selector,
+            {
+              dummy: 'property',
+            }
+          );
+
+          expect(dummyItem1.set).toHaveBeenCalledWith(
+            { id: '1', name: 'jeff' },
+            {
+              dummy: 'property',
+              sideEffects: {
+                enabled: true,
+                exclude: [Selector.rebuildSelectorSideEffectKey],
+              },
+            }
+          );
+        });
+
+        it("shouldn't call set on Item if Item is on placeholder", () => {
+          dummyItem1.isPlaceholder = true;
+
+          selector.select('dummyItem1');
+
+          selector.sideEffects[Selector.rebuildItemSideEffectKey].callback(
+            selector,
+            {
+              dummy: 'property',
+            }
+          );
+
+          expect(dummyItem1.set).not.toHaveBeenCalled();
         });
       });
     });
@@ -474,13 +573,17 @@ describe('Selector Tests', () => {
         selector.item = dummyItem1;
 
         selector.rebuildSelector({
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           force: true,
         });
 
         expect(selector.set).toHaveBeenCalledWith(selector.item._value, {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           force: true,
         });

@@ -31,7 +31,9 @@ export class State<ValueType = any> {
   public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
   public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
-  public sideEffects: { [key: string]: SideEffectInterface } = {}; // SideEffects of State (will be executed in Runtime)
+  public sideEffects: {
+    [key: string]: SideEffectInterface<State<ValueType>>;
+  } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
@@ -139,7 +141,10 @@ export class State<ValueType = any> {
    */
   public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
     config = defineConfig(config, {
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,
@@ -242,7 +247,10 @@ export class State<ValueType = any> {
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,
@@ -539,9 +547,9 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called on every State Value change
    * @param config - Config
    */
-  public addSideEffect(
+  public addSideEffect<Instance extends State<ValueType>>(
     key: string,
-    callback: SideEffectFunctionType,
+    callback: SideEffectFunctionType<Instance>,
     config: AddSideEffectConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -552,7 +560,7 @@ export class State<ValueType = any> {
       return this;
     }
     this.sideEffects[key] = {
-      callback: callback,
+      callback: callback as any,
       weight: config.weight as any,
     };
     return this;
@@ -656,16 +664,19 @@ export interface StatePersistentConfigInterface {
 export type StateWatcherCallback<T = any> = (value: T, key: string) => void;
 export type ComputeMethod<T = any> = (value: T) => T;
 
-export type SideEffectFunctionType = (properties?: {
-  [key: string]: any;
-}) => void;
+export type SideEffectFunctionType<Instance extends State<any>> = (
+  instance: Instance,
+  properties?: {
+    [key: string]: any;
+  }
+) => void;
 
 /**
  * @param callback - Callback Function that gets called on every State Value change
  * @param weight - When the sideEffect gets executed. The higher, the earlier it gets executed.
  */
-export interface SideEffectInterface {
-  callback: SideEffectFunctionType;
+export interface SideEffectInterface<Instance extends State<any>> {
+  callback: SideEffectFunctionType<Instance>;
   weight: number;
 }
 

@@ -350,7 +350,7 @@ describe('StatePersistent Tests', () => {
 
           dummyState.sideEffects[
             StatePersistent.storeValueSideEffectKey
-          ].callback({
+          ].callback(dummyState, {
             dummy: 'property',
           });
 

@@ -65,35 +65,32 @@ MY_EVENT.on('Test', () => {
 
 // LOGGER tests
 
-/*
 const logger = new Logger((l) => ({
-  prefix: "Tests",
-  allowedTags: ["coreWarning", "randomDebug"],
-  level: l.level.DEBUG,
+  prefix: 'Tests',
+  allowedTags: ['coreWarning', 'randomDebug'],
+  level: Logger.level.DEBUG,
+  timestamp: true,
 }));
 logger.watch({
   callback: (loggerCategory, data) => {
-    console.log("--- CALLED WATCHER ", loggerCategory, data);
+    console.log('--- CALLED WATCHER ', loggerCategory, data);
   },
-  level: logger.level.WARN,
+  level: Logger.level.WARN,
 });
 logger.createLoggerCategory({
-  key: "coreLog",
+  key: 'coreLog',
   level: 100,
-  customStyle: "color: purple; font-weight: bold;",
-  prefix: "Core Log",
+  customStyle: 'color: purple; font-weight: bold;',
+  prefix: 'Core Log',
 });
-logger.custom("coreLog", "This is a cool Log", { object: "yeet" });
-logger.log("This is a Log");
-logger.debug("This is a Debug");
-logger.info("This is an Info");
-logger.info("This is an Info with Object", { empty: "object" });
-logger.error("This is an Error");
-logger.warn("This is a Warning");
-logger.trace("This is a Trace");
-logger.if.tag(["coreWarning"]).warn("My core Warning");
-logger.if.tag(["randomDebug"]).debug("My random Debug");
-logger.table("Test Table", { test: "test", test1: "test1" });
-
-
- */
+logger.custom('coreLog', 'This is a cool Log', { object: 'yeet' });
+logger.log('This is a Log');
+logger.debug('This is a Debug');
+logger.info('This is an Info');
+logger.info('This is an Info with Object', { empty: 'object' });
+logger.error('This is an Error');
+logger.warn('This is a Warning');
+logger.trace('This is a Trace');
+logger.if.tag(['coreWarning']).warn('My core Warning');
+logger.if.tag(['randomDebug']).debug('My random Debug');
+logger.table('Test Table', { test: 'test', test1: 'test1' });

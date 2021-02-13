@@ -2298,7 +2298,10 @@ describe('Collection Tests', () => {
         expect(dummyGroup1.ingest).toHaveBeenCalledWith({
           background: false,
           force: true,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           storage: false,
         });
         expect(dummyGroup2.ingest).not.toHaveBeenCalled();
@@ -2307,19 +2310,25 @@ describe('Collection Tests', () => {
       it('should call ingest on each Group that includes the passed ItemKey (specific config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem2', {
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
 
         expect(dummyGroup1.ingest).toHaveBeenCalledWith({
           background: true,
           force: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           storage: false,
         });
         expect(dummyGroup2.ingest).toHaveBeenCalledWith({
           background: true,
           force: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           storage: false,
         });
       });

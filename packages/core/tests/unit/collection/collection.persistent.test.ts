@@ -684,7 +684,7 @@ describe('CollectionPersistent Tests', () => {
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey
-          ].callback();
+          ].callback(dummyDefaultGroup);
 
           expect(
             collectionPersistent.rebuildStorageSideEffect
@@ -699,7 +699,7 @@ describe('CollectionPersistent Tests', () => {
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey
-          ].callback();
+          ].callback(dummyDefaultGroup);
 
           expect(
             collectionPersistent.rebuildStorageSideEffect

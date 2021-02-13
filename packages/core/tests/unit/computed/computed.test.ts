@@ -104,19 +104,26 @@ describe('Computed Tests', () => {
 
         expect(computed.ingest).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
         });
       });
 
       it('should ingest Computed into Runtime (specific config)', () => {
         computed.recompute({
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
 
         expect(computed.ingest).toHaveBeenCalledWith({
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
       });
     });
@@ -154,14 +161,19 @@ describe('Computed Tests', () => {
         expect(computed.computeFunction).toBe(newComputeFunction);
         expect(computed.recompute).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
         });
       });
 
       it('should updated computeFunction and overwrite hardCodedDeps (specific config)', () => {
         computed.updateComputeFunction(newComputeFunction, [], {
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
 
         expect(computed.hardCodedDeps).toStrictEqual([]);
@@ -169,7 +181,9 @@ describe('Computed Tests', () => {
         expect(computed.computeFunction).toBe(newComputeFunction);
         expect(computed.recompute).toHaveBeenCalledWith({
           background: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
       });
 
@@ -193,7 +207,10 @@ describe('Computed Tests', () => {
         expect(computed.computeFunction).toBe(newComputeFunction);
         expect(computed.recompute).toHaveBeenCalledWith({
           background: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
         });
       });
     });

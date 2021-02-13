@@ -20,7 +20,10 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
   ) {
     config = defineConfig<RuntimeJobConfigInterface>(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
     });
     this.config = {
@@ -62,6 +65,15 @@ export interface CreateRuntimeJobConfigInterface
  */
 export interface RuntimeJobConfigInterface {
   background?: boolean;
-  sideEffects?: boolean;
+  sideEffects?: SideEffectConfigInterface;
   force?: boolean;
+}
+
+/**
+ * @param enabled - If SideEffects get executed
+ * @param exclude - SideEffect at Keys that doesn't get executed
+ */
+export interface SideEffectConfigInterface {
+  enabled?: boolean;
+  exclude?: string[];
 }
