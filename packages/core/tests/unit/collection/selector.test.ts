@@ -161,6 +161,7 @@ describe('Selector Tests', () => {
         selector.unselect = jest.fn();
         dummyItem1.addSideEffect = jest.fn();
         dummyItem2.addSideEffect = jest.fn();
+        selector.addSideEffect = jest.fn();
       });
 
       it('should unselect old selected Item and select new Item (default config)', () => {
@@ -185,6 +186,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -224,6 +232,13 @@ describe('Selector Tests', () => {
           overwrite: true,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -251,6 +266,7 @@ describe('Selector Tests', () => {
         expect(selector.item).toBe(dummyItem1);
         expect(selector.unselect).not.toHaveBeenCalled();
         expect(selector.rebuildSelector).not.toHaveBeenCalled();
+        expect(selector.addSideEffect).not.toHaveBeenCalled();
 
         expect(dummyItem1.addSideEffect).not.toHaveBeenCalled();
         expect(dummyItem1.isSelected).toBeTruthy();
@@ -280,6 +296,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem1.addSideEffect
@@ -313,6 +336,13 @@ describe('Selector Tests', () => {
           overwrite: true,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -346,6 +376,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
+        expect(
+          selector.addSideEffect
+        ).toHaveBeenCalledWith(
+          Selector.rebuildItemSideEffectKey,
+          expect.any(Function),
+          { weight: 90 }
+        );
 
         expect(
           dummyItem2.addSideEffect
@@ -374,6 +411,52 @@ describe('Selector Tests', () => {
           expect(selector.rebuildSelector).toHaveBeenCalledWith({
             dummy: 'property',
           });
+        });
+      });
+
+      describe('test added sideEffect called Selector.rebuildItemSideEffectKey', () => {
+        beforeEach(() => {
+          dummyItem1.set = jest.fn();
+        });
+
+        it('should call set on Item if Item is no placeholder', () => {
+          dummyItem1.isPlaceholder = false;
+          selector._value = { id: '1', name: 'jeff' };
+
+          selector.select('dummyItem1');
+
+          selector.sideEffects[Selector.rebuildItemSideEffectKey].callback(
+            selector,
+            {
+              dummy: 'property',
+            }
+          );
+
+          expect(dummyItem1.set).toHaveBeenCalledWith(
+            { id: '1', name: 'jeff' },
+            {
+              dummy: 'property',
+              sideEffects: {
+                enabled: true,
+                exclude: [Selector.rebuildSelectorSideEffectKey],
+              },
+            }
+          );
+        });
+
+        it("shouldn't call set on Item if Item is on placeholder", () => {
+          dummyItem1.isPlaceholder = true;
+
+          selector.select('dummyItem1');
+
+          selector.sideEffects[Selector.rebuildItemSideEffectKey].callback(
+            selector,
+            {
+              dummy: 'property',
+            }
+          );
+
+          expect(dummyItem1.set).not.toHaveBeenCalled();
         });
       });
     });

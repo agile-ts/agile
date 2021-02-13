@@ -119,11 +119,12 @@ export class Selector<DataType = DefaultItem> extends State<
             ...{
               sideEffects: {
                 enabled: true,
-                exclude: [Selector.rebuildItemSideEffectKey], // Exclude to avoid endless loops
+                exclude: [Selector.rebuildSelectorSideEffectKey], // Exclude to avoid endless loops
               },
             },
           });
-      }
+      },
+      { weight: 90 }
     );
 
     // Rebuild Selector for instantiating new 'selected' ItemKey properly
