@@ -28,11 +28,7 @@
 <p align="left">
  <a href="https://twitter.com/intent/tweet?text=hello%20there"><img src="http://randojs.com/images/tweetShield.svg" alt="Tweet" height="20"/>
  </a>
-</p>
-    
-
-<br />
-
+</p> 
 
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/how_to_create_state_header.png" alt="How to create a State?"/>
