@@ -40,12 +40,12 @@ export class Event<PayloadType = DefaultEventPayload> {
       maxUses: undefined,
       delay: undefined,
       overlap: false,
-      deps: [],
+      dependents: [],
     });
     this._key = config.key;
     this.observer = new EventObserver(this, {
       key: config.key,
-      deps: config.deps,
+      dependents: config.dependents,
     });
     this.enabled = config.enabled as any;
     this.config = {
@@ -232,7 +232,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     }
 
     // Cause rerender
-    if (this.config.rerender) this.observer.trigger();
+    if (this.config.rerender) this.observer.ingest();
 
     this.uses++;
 
@@ -297,7 +297,7 @@ export type EventCallbackFunction<PayloadType = DefaultEventPayload> = (
  * @param delay - Delayed call of Event Callback Functions in milliseconds
  * @param overlap - If Events can overlap
  * @param rerender - If triggering an Event should cause a rerender
- * @param deps - Initial deps of State
+ * @param deps - Initial Dependents of Event
  */
 export interface CreateEventConfigInterface {
   key?: EventKey;
@@ -306,7 +306,7 @@ export interface CreateEventConfigInterface {
   delay?: number;
   overlap?: boolean;
   rerender?: boolean;
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
 }
 
 /**

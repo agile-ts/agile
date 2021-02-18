@@ -32,7 +32,10 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,
@@ -47,7 +50,9 @@ describe('RuntimeJob Tests', () => {
 
     const job = new StateRuntimeJob(dummyObserver, {
       key: 'dummyJob',
-      sideEffects: false,
+      sideEffects: {
+        enabled: false,
+      },
       force: true,
     });
 
@@ -55,7 +60,9 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
-      sideEffects: false,
+      sideEffects: {
+        enabled: false,
+      },
       force: true,
       storage: true,
       overwrite: false,
@@ -72,7 +79,10 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,
@@ -91,7 +101,10 @@ describe('RuntimeJob Tests', () => {
     expect(job.observer).toBe(dummyObserver);
     expect(job.config).toStrictEqual({
       background: true,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,

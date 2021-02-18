@@ -14,6 +14,9 @@ import {
   CollectionPersistent,
   GroupAddConfig,
   ComputedTracker,
+  generateId,
+  SideEffectConfigInterface,
+  SelectorConfigInterface,
 } from '../internal';
 
 export class Collection<DataType = DefaultItem> {
@@ -30,6 +33,8 @@ export class Collection<DataType = DefaultItem> {
 
   public groups: { [key: string]: Group<any> } = {};
   public selectors: { [key: string]: Selector<any> } = {};
+
+  public isInstantiated = false;
 
   /**
    * @public
@@ -65,6 +70,8 @@ export class Collection<DataType = DefaultItem> {
     this.initSelectors(_config.selectors as any);
 
     if (_config.initialData) this.collect(_config.initialData);
+
+    this.isInstantiated = true;
   }
 
   /**
@@ -117,6 +124,18 @@ export class Collection<DataType = DefaultItem> {
     initialItems?: Array<ItemKey>,
     config?: GroupConfigInterface
   ): Group<DataType> {
+    if (this.isInstantiated) {
+      const key = config?.key || generateId();
+      Agile.logger.warn(
+        "After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'"
+      );
+      if (!config?.key)
+        Agile.logger.warn(
+          `Failed to find key for creation of Group. Group with random key '${key}' got created!`
+        );
+      return this.createGroup(key, initialItems);
+    }
+
     return new Group<DataType>(this, initialItems, config);
   }
 
@@ -131,8 +150,20 @@ export class Collection<DataType = DefaultItem> {
    */
   public Selector(
     initialKey: ItemKey,
-    config?: { key?: SelectorKey }
+    config?: SelectorConfigInterface
   ): Selector<DataType> {
+    if (this.isInstantiated) {
+      const key = config?.key || generateId();
+      Agile.logger.warn(
+        "After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'"
+      );
+      if (!config?.key)
+        Agile.logger.warn(
+          `Failed to find key for creation of Selector. Selector with random key '${key}' got created!`
+        );
+      return this.createSelector(key, initialKey);
+    }
+
     return new Selector<DataType>(this, initialKey, config);
   }
 
@@ -328,6 +359,12 @@ export class Collection<DataType = DefaultItem> {
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
+    if (!this.isInstantiated) {
+      Agile.logger.warn(
+        "We recommend to use 'MY_COLLECTION.Group' instead of 'MY_COLLECTION.createGroup' in the Collection config!"
+      );
+    }
+
     // Check if Group already exists
     if (group) {
       if (!group.isPlaceholder) {
@@ -444,6 +481,12 @@ export class Collection<DataType = DefaultItem> {
     itemKey: ItemKey
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
+
+    if (!this.isInstantiated) {
+      Agile.logger.warn(
+        "We recommend to use 'MY_COLLECTION.Selector' instead of 'MY_COLLECTION.createSelector' in the Collection config!"
+      );
+    }
 
     // Check if Selector already exists
     if (selector) {
@@ -642,6 +685,44 @@ export class Collection<DataType = DefaultItem> {
     const item = this.getItem(itemKey, config);
     if (!item) return undefined;
     return item.value;
+  }
+
+  //=========================================================================================================
+  // Get All Items
+  //=========================================================================================================
+  /**
+   * @public
+   * Get all Items of Collection
+   * @param config - Config
+   */
+  public getAllItems(config: HasConfigInterface = {}): Array<Item<DataType>> {
+    config = defineConfig(config, {
+      notExisting: false,
+    });
+
+    // Get Items
+    const items: Array<Item<DataType>> = [];
+    for (const key in this.data) {
+      const item = this.data[key];
+      if ((!config.notExisting && item.exists) || config.notExisting) {
+        items.push(item);
+      }
+    }
+
+    return items;
+  }
+
+  //=========================================================================================================
+  // Get All Item Values
+  //=========================================================================================================
+  /**
+   * @public
+   * Get all Values of Items in a Collection
+   * @param config - Config
+   */
+  public getAllItemValues(config: HasConfigInterface = {}): Array<DataType> {
+    const items = this.getAllItems(config);
+    return items.map((item) => item.value);
   }
 
   //=========================================================================================================
@@ -1044,7 +1125,10 @@ export class Collection<DataType = DefaultItem> {
   ): void {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
     });
 
     // Rebuild Groups that include ItemKey
@@ -1080,7 +1164,7 @@ export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
   selectors?: { [key: string]: Selector<any> } | string[];
   key?: CollectionKey;
   primaryKey?: string;
-  defaultGroupKey?: ItemKey;
+  defaultGroupKey?: GroupKey;
   initialData?: Array<DataType>;
 }
 
@@ -1132,7 +1216,7 @@ export interface UpdateItemKeyConfigInterface {
 export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   background?: boolean;
   force?: boolean;
-  sideEffects?: boolean;
+  sideEffects?: SideEffectConfigInterface;
 }
 
 /**

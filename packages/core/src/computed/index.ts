@@ -6,6 +6,8 @@ import {
   Event,
   StateConfigInterface,
   ComputedTracker,
+  Group,
+  SideEffectConfigInterface,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -31,7 +33,7 @@ export class Computed<ComputedValueType = any> extends State<
   ) {
     super(agileInstance, computeFunction(), {
       key: config.key,
-      deps: config.deps,
+      dependents: config.dependents,
     });
     config = defineConfig(config, {
       computedDeps: [],
@@ -58,7 +60,10 @@ export class Computed<ComputedValueType = any> extends State<
   public recompute(config: RecomputeConfigInterface = {}) {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
     });
     this.ingest(config);
   }
@@ -80,7 +85,10 @@ export class Computed<ComputedValueType = any> extends State<
   ) {
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       overwriteDeps: true,
     });
 
@@ -175,7 +183,7 @@ export class Computed<ComputedValueType = any> extends State<
  * @param computedDeps - Hard coded dependencies of Computed Function
  */
 export interface ComputedConfigInterface extends StateConfigInterface {
-  computedDeps?: Array<Observer | State | Event>;
+  computedDeps?: Array<Observer | State | Event | Group>;
 }
 
 /**
@@ -184,7 +192,7 @@ export interface ComputedConfigInterface extends StateConfigInterface {
  */
 export interface RecomputeConfigInterface {
   background?: boolean;
-  sideEffects?: boolean;
+  sideEffects?: SideEffectConfigInterface;
 }
 
 /**

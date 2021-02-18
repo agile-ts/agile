@@ -16,7 +16,10 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
     super(observer, config);
     config = defineConfig(config, {
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,

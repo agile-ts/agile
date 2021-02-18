@@ -81,6 +81,8 @@ describe('Runtime Tests', () => {
         runtime.updateSubscribers = jest.fn();
         jest.spyOn(dummyObserver1, 'perform');
         jest.spyOn(dummyObserver2, 'perform');
+        dummyObserver1.ingest = jest.fn();
+        dummyObserver2.ingest = jest.fn();
       });
 
       it('should perform passed and all in jobQueue remaining Jobs and call updateSubscribers', async () => {
@@ -108,7 +110,26 @@ describe('Runtime Tests', () => {
         expect(runtime.updateSubscribers).toHaveBeenCalledTimes(1);
       });
 
-      it("should perform passed Job and all in jobQueue remaining and shouldn't call updateSubscribes if no job needs to rerender", async () => {
+      it('should perform passed Job and update it dependents', async () => {
+        dummyJob1.observer.dependents.add(dummyObserver2);
+        dummyJob1.observer.dependents.add(dummyObserver1);
+
+        runtime.perform(dummyJob1);
+
+        expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
+        expect(dummyJob1.performed).toBeTruthy();
+
+        expect(dummyObserver1.ingest).toHaveBeenCalledWith({
+          perform: false,
+        });
+        expect(dummyObserver1.ingest).toHaveBeenCalledTimes(1);
+        expect(dummyObserver2.ingest).toHaveBeenCalledWith({
+          perform: false,
+        });
+        expect(dummyObserver2.ingest).toHaveBeenCalledTimes(1);
+      });
+
+      it("should perform passed and all in jobQueue remaining Jobs and shouldn't call updateSubscribes if no job needs to rerender", async () => {
         dummyJob1.rerender = false;
         runtime.jobQueue.push(dummyJob3);
 
@@ -167,6 +188,7 @@ describe('Runtime Tests', () => {
           [dummyObserver1, dummyObserver2]
         ) as CallbackSubscriptionContainer;
         rCallbackSubContainer.callback = jest.fn();
+        rCallbackSubContainer.ready = true;
 
         // Create Not Ready Callback Subscription
         nrCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
@@ -184,6 +206,7 @@ describe('Runtime Tests', () => {
             observer4: dummyObserver4,
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
+        rComponentSubContainer.ready = true;
 
         // Create Not Ready Component Subscription
         nrComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(

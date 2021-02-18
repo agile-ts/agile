@@ -66,6 +66,11 @@ export class Runtime {
     job.observer.perform(job);
     job.performed = true;
 
+    // Ingest Dependents of Observer into Runtime
+    job.observer.dependents.forEach((observer) =>
+      observer.ingest({ perform: false })
+    );
+
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 

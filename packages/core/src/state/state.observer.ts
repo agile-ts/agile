@@ -11,10 +11,9 @@ import {
   SubscriptionContainer,
   IngestConfigInterface,
   StateRuntimeJob,
-  StateRuntimeJobConfigInterface,
-  RuntimeJobKey,
   SideEffectInterface,
   createArrayFromObject,
+  CreateStateRuntimeJobConfigInterface,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -71,7 +70,10 @@ export class StateObserver<ValueType = any> extends Observer {
     config = defineConfig(config, {
       perform: true,
       background: false,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       force: false,
       storage: true,
       overwrite: false,
@@ -153,45 +155,37 @@ export class StateObserver<ValueType = any> extends Observer {
     // Call Watchers Functions
     for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state.getPublicValue());
+        state.watchers[watcherKey](state.getPublicValue(), watcherKey);
 
     // Call SideEffect Functions
-    if (job.config?.sideEffects) {
-      const sideEffectArray = createArrayFromObject<SideEffectInterface>(
-        state.sideEffects
-      );
+    if (job.config?.sideEffects?.enabled) {
+      const sideEffectArray = createArrayFromObject<
+        SideEffectInterface<State<ValueType>>
+      >(state.sideEffects);
       sideEffectArray.sort(function (a, b) {
         return b.instance.weight - a.instance.weight;
       });
-      for (const sideEffect of sideEffectArray)
-        if (isFunction(sideEffect.instance.callback))
-          sideEffect.instance.callback(job.config);
+      for (const sideEffect of sideEffectArray) {
+        if (isFunction(sideEffect.instance.callback)) {
+          if (!job.config.sideEffects.exclude?.includes(sideEffect.key))
+            sideEffect.instance.callback(job.observer.state(), job.config);
+        }
+      }
     }
-
-    // Ingest Dependencies of Observer into Runtime
-    state.observer.deps.forEach(
-      (observer) =>
-        observer instanceof StateObserver && observer.ingest({ perform: false })
-    );
   }
 }
 
 /**
- * @param deps - Initial Dependencies of State Observer
+ * @param dependents - Initial Dependents of State Observer
  * @param subs - Initial Subscriptions of State Observer
  * @param key - Key/Name of State Observer
  */
 export interface CreateStateObserverConfigInterface {
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
 }
 
-/**
- * @param key - Key/Name of Job that gets created
- */
 export interface StateIngestConfigInterface
-  extends StateRuntimeJobConfigInterface,
-    IngestConfigInterface {
-  key?: RuntimeJobKey;
-}
+  extends CreateStateRuntimeJobConfigInterface,
+    IngestConfigInterface {}

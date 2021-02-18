@@ -22,6 +22,7 @@ import {
   CreateLoggerConfigInterface,
   StateConfigInterface,
   flatMerge,
+  Group,
 } from './internal';
 
 export class Agile {
@@ -50,7 +51,7 @@ export class Agile {
   constructor(config: CreateAgileConfigInterface = {}) {
     config = defineConfig(config, {
       localStorage: true,
-      waitForMount: false,
+      waitForMount: true,
       logConfig: {},
     });
     config.logConfig = defineConfig(config.logConfig, {
@@ -104,7 +105,7 @@ export class Agile {
    * @param initialValue - Initial Value of the State
    * @param config - Config
    */
-  public createState<ValueType>(
+  public createState<ValueType = any>(
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ): State<ValueType> {
@@ -138,7 +139,7 @@ export class Agile {
   public createComputed<ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
     config?: StateConfigInterface,
-    deps?: Array<Observer | State | Event>
+    deps?: Array<Observer | State | Event | Group>
   ): Computed<ComputedValueType>;
   /**
    * @public

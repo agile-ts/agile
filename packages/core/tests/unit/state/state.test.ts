@@ -39,7 +39,7 @@ describe('State Tests', () => {
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(0);
+    expect(state.observer.dependents.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
@@ -56,7 +56,7 @@ describe('State Tests', () => {
 
     const state = new State(dummyAgile, 'coolValue', {
       key: 'coolState',
-      deps: [dummyObserver],
+      dependents: [dummyObserver],
     });
 
     expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
@@ -69,8 +69,8 @@ describe('State Tests', () => {
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(1);
-    expect(state.observer.deps.has(dummyObserver)).toBeTruthy();
+    expect(state.observer.dependents.size).toBe(1);
+    expect(state.observer.dependents.has(dummyObserver)).toBeTruthy();
     expect(state.observer._key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
@@ -95,7 +95,7 @@ describe('State Tests', () => {
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.deps.size).toBe(0);
+    expect(state.observer.dependents.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeMethod).toBeUndefined();
@@ -220,9 +220,13 @@ describe('State Tests', () => {
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           background: false,
           force: false,
+          perform: true,
           storage: true,
           overwrite: false,
         });
@@ -230,7 +234,9 @@ describe('State Tests', () => {
 
       it('should ingestValue if value has correct type (specific config)', () => {
         numberState.set(20, {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
           storage: false,
         });
@@ -238,8 +244,11 @@ describe('State Tests', () => {
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           background: true,
+          perform: true,
           force: false,
           storage: false,
           overwrite: false,
@@ -270,8 +279,12 @@ describe('State Tests', () => {
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
           'coolValue',
           {
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             background: false,
+            perform: true,
             force: true,
             storage: true,
             overwrite: false,
@@ -287,8 +300,12 @@ describe('State Tests', () => {
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
           'coolValue',
           {
-            sideEffects: true,
+            sideEffects: {
+              enabled: true,
+              exclude: [],
+            },
             background: false,
+            perform: true,
             force: false,
             storage: true,
             overwrite: false,
@@ -449,7 +466,10 @@ describe('State Tests', () => {
           background: false,
           force: false,
           overwrite: false,
-          sideEffects: true,
+          sideEffects: {
+            enabled: true,
+            exclude: [],
+          },
           storage: true,
         });
       });
@@ -462,7 +482,9 @@ describe('State Tests', () => {
             background: true,
             force: true,
             overwrite: true,
-            sideEffects: false,
+            sideEffects: {
+              enabled: false,
+            },
           }
         );
 
@@ -481,7 +503,9 @@ describe('State Tests', () => {
           background: true,
           force: true,
           overwrite: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
           storage: true,
         });
       });
@@ -563,7 +587,7 @@ describe('State Tests', () => {
         dummyCallbackFunction = jest.fn();
       });
 
-      it('should add watcher called InauguratedWatcherKey to State that destroys it self after it got called', () => {
+      it('should add watcher called InauguratedWatcherKey to State', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         expect(numberState.watch).toHaveBeenCalledWith(
@@ -577,9 +601,9 @@ describe('State Tests', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         // Call Inaugurated Watcher
-        numberState.watchers['InauguratedWatcherKey'](10);
+        numberState.watchers['InauguratedWatcherKey'](10, 'testKey');
 
-        expect(dummyCallbackFunction).toHaveBeenCalledWith(10);
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(10, 'testKey');
         expect(numberState.watchers).not.toHaveProperty(
           'InauguratedWatcherKey'
         );
@@ -715,17 +739,13 @@ describe('State Tests', () => {
     });
 
     describe('exists get function tests', () => {
-      it("should return true if value isn't undefined and State is no placeholder", () => {
+      it('should return true if State is no placeholder', () => {
+        numberState.isPlaceholder = false;
+
         expect(numberState.exists).toBeTruthy();
       });
 
-      it('should return false if value is undefined and State is no placeholder', () => {
-        numberState._value = undefined;
-
-        expect(numberState.exists).toBeFalsy();
-      });
-
-      it("should return false if value isn't undefined and State is placeholder", () => {
+      it('should return false if State is placeholder"', () => {
         numberState.isPlaceholder = true;
 
         expect(numberState.exists).toBeFalsy();

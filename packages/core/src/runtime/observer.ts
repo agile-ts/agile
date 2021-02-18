@@ -4,6 +4,8 @@ import {
   RuntimeJob,
   SubscriptionContainer,
   defineConfig,
+  IngestConfigInterface,
+  CreateRuntimeJobConfigInterface,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -12,7 +14,7 @@ export class Observer<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: ObserverKey;
-  public deps: Set<Observer> = new Set(); // Observers that depends on this Observer
+  public dependents: Set<Observer> = new Set(); // Observers that depend on this Observer
   public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer has subscribed
   public value?: ValueType; // Value of Observer
 
@@ -28,13 +30,13 @@ export class Observer<ValueType = any> {
     config: CreateObserverConfigInterface<ValueType> = {}
   ) {
     config = defineConfig(config, {
-      deps: [],
+      dependents: [],
       subs: [],
     });
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.value = config.value;
-    config.deps?.forEach((observer) => this.depend(observer));
+    config.dependents?.forEach((observer) => this.depend(observer));
     config.subs?.forEach((subscriptionContainer) =>
       this.subscribe(subscriptionContainer)
     );
@@ -57,6 +59,38 @@ export class Observer<ValueType = any> {
   }
 
   //=========================================================================================================
+  // Ingest
+  //=========================================================================================================
+  /**
+   * @internal
+   * Ingests Observer into Runtime
+   * @param config - Configuration
+   */
+  public ingest(config: ObserverIngestConfigInterface = {}): void {
+    config = defineConfig(config, {
+      perform: true,
+      background: false,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
+      force: false,
+    });
+
+    // Create Job
+    const job = new RuntimeJob(this, {
+      force: config.force,
+      sideEffects: config.sideEffects,
+      background: config.background,
+      key: config.key || this._key,
+    });
+
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
+  }
+
+  //=========================================================================================================
   // Perform
   //=========================================================================================================
   /**
@@ -64,7 +98,7 @@ export class Observer<ValueType = any> {
    * Performs Job of Runtime
    * @param job - Job that gets performed
    */
-  public perform(job: RuntimeJob) {
+  public perform(job: RuntimeJob): void {
     Agile.logger.warn(
       "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
     );
@@ -75,11 +109,11 @@ export class Observer<ValueType = any> {
   //=========================================================================================================
   /**
    * @internal
-   * Adds Dependency to Observer that will be ingested into the Runtime if this Observer changes
+   * Adds Dependent to Observer which gets ingested into the Runtime whenever this Observer mutates
    * @param observer - Observer that will depend on this Observer
    */
-  public depend(observer: Observer) {
-    if (!this.deps.has(observer)) this.deps.add(observer);
+  public depend(observer: Observer): void {
+    if (!this.dependents.has(observer)) this.dependents.add(observer);
   }
 
   //=========================================================================================================
@@ -90,7 +124,7 @@ export class Observer<ValueType = any> {
    * Adds Subscription to Observer
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
    */
-  public subscribe(subscriptionContainer: SubscriptionContainer) {
+  public subscribe(subscriptionContainer: SubscriptionContainer): void {
     if (!this.subs.has(subscriptionContainer)) {
       this.subs.add(subscriptionContainer);
 
@@ -107,7 +141,7 @@ export class Observer<ValueType = any> {
    * Removes Subscription from Observer
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
    */
-  public unsubscribe(subscriptionContainer: SubscriptionContainer) {
+  public unsubscribe(subscriptionContainer: SubscriptionContainer): void {
     if (this.subs.has(subscriptionContainer)) {
       this.subs.delete(subscriptionContainer);
       subscriptionContainer.subs.delete(this);
@@ -116,14 +150,18 @@ export class Observer<ValueType = any> {
 }
 
 /**
- * @param deps - Initial Dependencies of Observer
+ * @param deps - Initial Dependents of Observer
  * @param subs - Initial Subscriptions of Observer
  * @param key - Key/Name of Observer
  * @param value - Initial Value of Observer
  */
 export interface CreateObserverConfigInterface<ValueType = any> {
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   subs?: Array<SubscriptionContainer>;
   key?: ObserverKey;
   value?: ValueType;
 }
+
+export interface ObserverIngestConfigInterface
+  extends CreateRuntimeJobConfigInterface,
+    IngestConfigInterface {}

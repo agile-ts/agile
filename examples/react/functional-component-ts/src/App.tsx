@@ -117,6 +117,12 @@ const App = (props: any) => {
         <button onClick={() => MY_COLLECTION.removeSelector('mySelector')}>
           Remove mySelector
         </button>
+        <button
+          onClick={() =>
+            MY_COLLECTION.getSelector('mySelector')?.patch({ name: 'frank' })
+          }>
+          Update mySelector value
+        </button>
         <p>{rerenderCount}</p>
       </header>
     </div>

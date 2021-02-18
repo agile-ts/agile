@@ -65,7 +65,7 @@ describe('Agile Tests', () => {
 
     // Check if Agile properties got instantiated properly
     expect(agile.config).toStrictEqual({
-      waitForMount: false,
+      waitForMount: true,
     });
     expect(IntegrationsMock).toHaveBeenCalledWith(agile);
     expect(agile.integrations).toBeInstanceOf(Integrations);
@@ -99,7 +99,7 @@ describe('Agile Tests', () => {
 
   it('should instantiate Agile with specific config', () => {
     const agile = new Agile({
-      waitForMount: true,
+      waitForMount: false,
       localStorage: false,
       logConfig: {
         level: Logger.level.DEBUG,
@@ -111,7 +111,7 @@ describe('Agile Tests', () => {
 
     // Check if Agile properties got instantiated properly
     expect(agile.config).toStrictEqual({
-      waitForMount: true,
+      waitForMount: false,
     });
     expect(IntegrationsMock).toHaveBeenCalledWith(agile);
     expect(agile.integrations).toBeInstanceOf(Integrations);

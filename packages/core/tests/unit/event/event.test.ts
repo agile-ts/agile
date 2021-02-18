@@ -24,7 +24,7 @@ describe('Event Tests', () => {
     expect(event.callbacks).toStrictEqual({});
     expect(event.enabled).toBeTruthy();
     expect(event.observer).toBeInstanceOf(EventObserver);
-    expect(event.observer.deps.size).toBe(0);
+    expect(event.observer.dependents.size).toBe(0);
     expect(event.observer._key).toBeUndefined();
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
@@ -36,7 +36,7 @@ describe('Event Tests', () => {
 
     const event = new Event(dummyAgile, {
       key: 'coolEvent',
-      deps: [dummyObserver],
+      dependents: [dummyObserver],
       delay: 20,
       maxUses: 40,
       enabled: false,
@@ -54,8 +54,8 @@ describe('Event Tests', () => {
     expect(event.callbacks).toStrictEqual({});
     expect(event.enabled).toBeFalsy();
     expect(event.observer).toBeInstanceOf(EventObserver);
-    expect(event.observer.deps.size).toBe(1);
-    expect(event.observer.deps.has(dummyObserver)).toBeTruthy();
+    expect(event.observer.dependents.size).toBe(1);
+    expect(event.observer.dependents.has(dummyObserver)).toBeTruthy();
     expect(event.observer._key).toBe('coolEvent');
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
@@ -264,7 +264,7 @@ describe('Event Tests', () => {
         event.callbacks['callback2'] = dummyCallbackFunction2;
         event.callbacks['callback3'] = dummyCallbackFunction3;
 
-        event.observer.trigger = jest.fn();
+        event.observer.ingest = jest.fn();
         event.disable = jest.fn();
       });
 
@@ -277,7 +277,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).not.toHaveBeenCalled();
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.observer.ingest).not.toHaveBeenCalled();
         expect(event.disable).not.toHaveBeenCalled();
         expect(event.uses).toBe(1);
       });
@@ -291,7 +291,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.observer.ingest).not.toHaveBeenCalled();
         expect(event.disable).not.toHaveBeenCalled();
         expect(event.uses).toBe(1);
       });
@@ -305,7 +305,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).toHaveBeenCalled();
+        expect(event.observer.ingest).toHaveBeenCalled();
         expect(event.disable).not.toHaveBeenCalled();
         expect(event.uses).toBe(1);
       });
@@ -321,7 +321,7 @@ describe('Event Tests', () => {
         expect(dummyCallbackFunction1).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction2).toHaveBeenCalledWith(dummyPayload);
         expect(dummyCallbackFunction3).toHaveBeenCalledWith(dummyPayload);
-        expect(event.observer.trigger).not.toHaveBeenCalled();
+        expect(event.observer.ingest).not.toHaveBeenCalled();
         expect(event.disable).toHaveBeenCalled();
         expect(event.uses).toBe(2);
       });

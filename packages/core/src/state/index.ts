@@ -31,7 +31,9 @@ export class State<ValueType = any> {
   public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
   public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
-  public sideEffects: { [key: string]: SideEffectInterface } = {}; // SideEffects of State (will be executed in Runtime)
+  public sideEffects: {
+    [key: string]: SideEffectInterface<State<ValueType>>;
+  } = {}; // SideEffects of State (will be executed in Runtime)
   public computeMethod?: ComputeMethod<ValueType>;
 
   public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
@@ -52,14 +54,14 @@ export class State<ValueType = any> {
     config: StateConfigInterface = {}
   ) {
     config = defineConfig(config, {
-      deps: [],
+      dependents: [],
       isPlaceholder: false,
     });
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.observer = new StateObserver<ValueType>(this, {
       key: config.key,
-      deps: config.deps,
+      dependents: config.dependents,
     });
     this.initialStateValue = copy(initialValue);
     this._value = copy(initialValue);
@@ -137,16 +139,17 @@ export class State<ValueType = any> {
    * @param value - new State Value
    * @param config - Config
    */
-  public set(
-    value: ValueType,
-    config: StateRuntimeJobConfigInterface = {}
-  ): this {
+  public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
     config = defineConfig(config, {
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,
       overwrite: false,
+      perform: true,
     });
 
     // Check value has correct Type (js)
@@ -210,7 +213,7 @@ export class State<ValueType = any> {
    * Undoes latest State Value change
    * @param config - Config
    */
-  public undo(config: StateRuntimeJobConfigInterface = {}): this {
+  public undo(config: StateIngestConfigInterface = {}): this {
     this.set(this.previousStateValue, config);
     return this;
   }
@@ -223,7 +226,7 @@ export class State<ValueType = any> {
    * Resets State to its initial Value
    * @param config - Config
    */
-  public reset(config: StateRuntimeJobConfigInterface = {}): this {
+  public reset(config: StateIngestConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
     return this;
   }
@@ -244,7 +247,10 @@ export class State<ValueType = any> {
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
-      sideEffects: true,
+      sideEffects: {
+        enabled: true,
+        exclude: [],
+      },
       background: false,
       force: false,
       storage: true,
@@ -353,12 +359,13 @@ export class State<ValueType = any> {
    * Creates a Watcher that gets once called when the State Value changes for the first time and than destroys itself
    * @param callback - Callback Function that gets called if the State Value changes
    */
-  public onInaugurated(callback: StateWatcherCallback<ValueType>) {
+  public onInaugurated(callback: StateWatcherCallback<ValueType>): this {
     const watcherKey = 'InauguratedWatcherKey';
-    this.watch(watcherKey, (value) => {
-      callback(value);
+    this.watch(watcherKey, (value, key) => {
+      callback(value, key);
       this.removeWatcher(watcherKey);
     });
+    return this;
   }
 
   //=========================================================================================================
@@ -469,7 +476,7 @@ export class State<ValueType = any> {
    * Checks if State exists
    */
   public get exists(): boolean {
-    return this._value !== undefined && !this.isPlaceholder;
+    return !this.isPlaceholder;
   }
 
   //=========================================================================================================
@@ -540,9 +547,9 @@ export class State<ValueType = any> {
    * @param callback - Callback Function that gets called on every State Value change
    * @param config - Config
    */
-  public addSideEffect(
+  public addSideEffect<Instance extends State<ValueType>>(
     key: string,
-    callback: SideEffectFunctionType,
+    callback: SideEffectFunctionType<Instance>,
     config: AddSideEffectConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -553,7 +560,7 @@ export class State<ValueType = any> {
       return this;
     }
     this.sideEffects[key] = {
-      callback: callback,
+      callback: callback as any,
       weight: config.weight as any,
     };
     return this;
@@ -634,14 +641,14 @@ export type StateKey = string | number;
  */
 export interface StateConfigInterface {
   key?: StateKey;
-  deps?: Array<Observer>;
+  dependents?: Array<Observer>;
   isPlaceholder?: boolean;
 }
 
 /**
  * @param addNewProperties - If new Properties gets added to the State Value
  */
-export interface PatchConfigInterface extends StateRuntimeJobConfigInterface {
+export interface PatchConfigInterface extends StateIngestConfigInterface {
   addNewProperties?: boolean;
 }
 
@@ -654,19 +661,22 @@ export interface StatePersistentConfigInterface {
   storageKeys?: StorageKey[];
 }
 
-export type StateWatcherCallback<T = any> = (value: T) => void;
+export type StateWatcherCallback<T = any> = (value: T, key: string) => void;
 export type ComputeMethod<T = any> = (value: T) => T;
 
-export type SideEffectFunctionType = (properties?: {
-  [key: string]: any;
-}) => void;
+export type SideEffectFunctionType<Instance extends State<any>> = (
+  instance: Instance,
+  properties?: {
+    [key: string]: any;
+  }
+) => void;
 
 /**
  * @param callback - Callback Function that gets called on every State Value change
  * @param weight - When the sideEffect gets executed. The higher, the earlier it gets executed.
  */
-export interface SideEffectInterface {
-  callback: SideEffectFunctionType;
+export interface SideEffectInterface<Instance extends State<any>> {
+  callback: SideEffectFunctionType<Instance>;
   weight: number;
 }
 

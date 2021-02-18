@@ -53,7 +53,7 @@ describe('Group Tests', () => {
     expect(group.previousStateValue).toStrictEqual([]);
     expect(group.nextStateValue).toStrictEqual([]);
     expect(group.observer).toBeInstanceOf(StateObserver);
-    expect(group.observer.deps.size).toBe(0);
+    expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeMethod).toBeUndefined();
@@ -86,7 +86,7 @@ describe('Group Tests', () => {
     expect(group.previousStateValue).toStrictEqual([]);
     expect(group.nextStateValue).toStrictEqual([]);
     expect(group.observer).toBeInstanceOf(StateObserver);
-    expect(group.observer.deps.size).toBe(0);
+    expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBe('dummyKey');
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeMethod).toBeUndefined();
@@ -116,7 +116,7 @@ describe('Group Tests', () => {
     expect(group.previousStateValue).toStrictEqual(['test1', 'test2', 'test3']);
     expect(group.nextStateValue).toStrictEqual(['test1', 'test2', 'test3']);
     expect(group.observer).toBeInstanceOf(StateObserver);
-    expect(group.observer.deps.size).toBe(0);
+    expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeMethod).toBeUndefined();
@@ -400,12 +400,16 @@ describe('Group Tests', () => {
       it('should replace oldItemKey with new ItemKey (specific config)', () => {
         group.replace(2, 20, {
           storage: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
 
         expect(group.set).toHaveBeenCalledWith([1, 20, 3, 4, 5, 6], {
           storage: true,
-          sideEffects: false,
+          sideEffects: {
+            enabled: false,
+          },
         });
       });
     });

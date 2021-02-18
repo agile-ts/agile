@@ -3,31 +3,32 @@
  > **Spacy, Simple, Scalable State Management Framework**
  
  <br />
+  
+<p align="left">
+ <a href="https://github.com/agile-ts/agile">
+   <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/>
+ </a>
+ <a href="https://npm.im/@agile-ts/core">
+   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg?label=minified%20size&style=flat&colorA=293140&colorB=4a4872" alt="npm minified size"/>
+ </a>
+ <a href="https://npm.im/@agile-ts/core">
+   <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm total downloads"/>
+ </a>
+</p>
 
-<a href="https://github.com/agile-ts/agile">
-  <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
-<a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/bundlephobia/min/@agile-ts/core.svg?label=minified%20size&style=flat&colorA=293140&colorB=4a4872" alt="npm minified size"/></a>
+<p align="left">
+ <a href="https://github.com/agile-ts/agile/actions?query=workflow%3ARelease">
+   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg" alt="Build Status"/>
+ </a>
+ <a href="https://github.com/agile-ts/agile/actions?query=workflow%3A%22Test+All+Packages%22">
+   <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"/>
+ </a>
+</p>
 
-<br />
-
-<a href="https://github.com/agile-ts/agile/actions?query=workflow%3ARelease">
-   <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg" alt="Build Status"/></a>
-<a href="https://github.com/agile-ts/agile/actions?query=workflow%3A%22Test+All+Packages%22">
-   <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"/></a>
-<a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
-   <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/></a>
-
-<br />
-
-<a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dm/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm monthly downloads"/></a>
-<a href="https://npm.im/@agile-ts/core">
-  <img src="https://img.shields.io/npm/dt/@agile-ts/core.svg?label=downloads&style=flat&colorA=293140&colorB=4a4872" alt="npm total downloads"/></a>
-    
-
-<br />
-
+<p align="left">
+ <a href="https://twitter.com/intent/tweet?text=I%20just%20discovered%20AgileTs%3B%20an%20awesome%2C%20spacy%20and%20overall%20easy%20to%20use%20State%20Manager.%0A%60%60%60ts%0Aconst%20MY_STATE%20%3D%20App.createState(%22Hello%20stranger%22)%3B%0AMY_STATE.set(%22Hello%20friend%22)%3B%0A%60%60%60%0Ahttps%3A%2F%2Fgithub.com%2Fagile-ts%2Fagile%2F"><img src="http://randojs.com/images/tweetShield.svg" alt="Tweet" height="20"/>
+ </a>
+</p> 
 
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/how_to_create_state_header.png" alt="How to create a State?"/>
@@ -144,6 +145,10 @@ In case you have any questions don't mind joining our [Discord Community](https:
 Get a part of AgileTs and start contributing. 
 To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 We welcome any meaningful contribution 😀
+
+<a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
+   <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
+</a>
 
 
 <br />
