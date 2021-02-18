@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.11
+
+### Patch Changes
+
+- 93ead02: Bug fixes and Selector directly mutates item now
+
 ## 0.0.10
 
 ### Patch Changes
