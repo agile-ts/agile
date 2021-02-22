@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.12
+
+### Patch Changes
+
+- e0366b3: fixed building url without path
+
 ## 0.0.11
 
 ### Patch Changes
