@@ -13,7 +13,7 @@ export default class API {
    * @public
    * @param config - Config
    */
-  constructor(config: ApiConfig = { options: {} }) {
+  constructor(config: ApiConfig = {}) {
     this.config = config;
   }
 
@@ -25,7 +25,7 @@ export default class API {
    * Note: Doesn't overwrite this API Class
    * @param config - Config
    */
-  public with(config: ApiConfig): API {
+  public with(config: ApiConfig = {}): API {
     const modifiedApi = clone(this);
     modifiedApi.config = { ...this.config, ...config };
     return modifiedApi;
@@ -117,13 +117,13 @@ export default class API {
     let response: Response | undefined;
     let timedout = false;
 
-    // Confige Config
-    const config: ApiConfig = copy(this.config);
-    config.options = defineConfig(options, config.options);
+    // Configure request Options
+    const config = copy(this.config);
+    config.options = defineConfig(options, config.options || {});
     config.options.method = method;
     if (!config.options.headers) config.options.headers = {};
 
-    // Set Body
+    // Set request Body
     if (isValidObject(payload)) {
       config.options.body = JSON.stringify(payload);
       config.options.headers['content-type'] = 'application/json';
@@ -134,8 +134,8 @@ export default class API {
     // Build Url
     if (endpoint.startsWith('http')) fullUrl = endpoint;
     else
-      fullUrl = `${this.config.baseURL || ''}${
-        '/' + this.config.path || ''
+      fullUrl = `${this.config.baseURL ?? ''}${
+        this.config.path ? '/' + this.config.path : ''
       }/${endpoint}`;
 
     // Warning if fullUrl might be invalid
@@ -211,7 +211,7 @@ export interface AgileResponse<DataType = any> {
  * @param timeout - Timeout if Endpoint didn't Response
  */
 export interface ApiConfig {
-  options: RequestInit;
+  options?: RequestInit;
   baseURL?: string;
   path?: string;
   timeout?: number;
