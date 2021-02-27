@@ -23,6 +23,9 @@
  <a href="https://github.com/agile-ts/agile/actions?query=workflow%3A%22Test+All+Packages%22">
    <img src="https://github.com/agile-ts/agile/workflows/Test%20All%20Packages/badge.svg" alt="Build Status"/>
  </a>
+ <a href="https://coveralls.io/github/agile-ts/agile?branch=master">
+   <img src="https://coveralls.io/repos/github/agile-ts/agile/badge.svg?branch=master" alt="Coverage Badge"/>
+ </a>
 </p>
 
 <p align="left">
