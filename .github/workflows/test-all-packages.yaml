@@ -24,13 +24,23 @@ jobs:
       - name: ⏳ Install
         run: yarn install
 
+        # Run Linter
+      - name: 🤖 Lint
+        run: yarn run lint
+
         # Run Tests
       - name: 🤔 Test
         run: yarn test
 
-        # Run Linter
-      - name: 🤖 Lint
-        run: yarn run lint
+        # Run Test Coverage
+      - name: Test-Coverage
+        run: yarn run test:coverage
+
+        # Push Test Coverage to Coveralls
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
         # Build Packages for Testing
       - name: 🔨 Build Packages
