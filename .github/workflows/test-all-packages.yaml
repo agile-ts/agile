@@ -28,12 +28,8 @@ jobs:
       - name: 🤖 Lint
         run: yarn run lint
 
-        # Run Tests
-      - name: 🤔 Test
-        run: yarn test
-
         # Run Test Coverage
-      - name: Test-Coverage
+      - name: 🤔 Test and Test-Coverage
         run: yarn run test:coverage
 
         # Push Test Coverage to Coveralls
