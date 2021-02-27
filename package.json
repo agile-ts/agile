@@ -21,7 +21,7 @@
     "watch:multieditor": "cd packages/core && yarn run watch",
     "watch:api": "cd packages/core && yarn run watch",
     "test": "jest --passWithNoTests",
-    "test:coverage": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
+    "test:coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
     "package-install": "lerna exec yarn install",
