@@ -16,6 +16,7 @@
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
+    "prepare": "lerna run prepare",
     "watch:core": "cd packages/core && yarn run watch",
     "watch:react": "cd packages/core && yarn run watch",
     "watch:multieditor": "cd packages/core && yarn run watch",
@@ -29,11 +30,11 @@
     "release": "lerna run release && changeset publish",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
     "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\"",
-    "pack": "lerna run build && lerna run preview",
-    "pack:core": "cd packages/core && yarn run build && yarn run preview",
-    "pack:react": "cd packages/core && yarn run build && yarn run preview",
-    "pack:multieditor": "cd packages/core && yarn run build && yarn run preview",
-    "pack:api": "cd packages/core && yarn run build && yarn run preview"
+    "pack": "lerna run prepare && lerna run preview",
+    "pack:core": "cd packages/core && yarn run prepare && yarn run preview",
+    "pack:react": "cd packages/core && yarn run prepare && yarn run preview",
+    "pack:multieditor": "cd packages/core && yarn run prepare && yarn run preview",
+    "pack:api": "cd packages/core && yarn run prepare && yarn run preview"
   },
   "repository": {
     "type": "git",

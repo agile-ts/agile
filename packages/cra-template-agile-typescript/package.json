@@ -15,7 +15,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "release": "yarn run build",
+    "prepare": "tsc",
+    "release": "yarn run prepare",
     "preview": "npm pack"
   },
   "publishConfig": {
