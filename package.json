@@ -29,11 +29,11 @@
     "release": "lerna run release && changeset publish",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
     "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\"",
-    "preview": "lerna run preview",
-    "preview:core": "cd packages/core && yarn run preview",
-    "preview:react": "cd packages/core && yarn run preview",
-    "preview:multieditor": "cd packages/core && yarn run preview",
-    "preview:api": "cd packages/core && yarn run preview"
+    "pack": "lerna run build && lerna run preview",
+    "pack:core": "cd packages/core && yarn run build && yarn run preview",
+    "pack:react": "cd packages/core && yarn run build && yarn run preview",
+    "pack:multieditor": "cd packages/core && yarn run build && yarn run preview",
+    "pack:api": "cd packages/core && yarn run build && yarn run preview"
   },
   "repository": {
     "type": "git",
