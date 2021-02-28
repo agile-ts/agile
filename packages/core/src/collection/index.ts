@@ -305,7 +305,7 @@ export class Collection<DataType = DefaultItem> {
     const item = this.getItem(itemKey, { notExisting: true });
     const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
-      addNewProperties: false,
+      addNewProperties: true,
       background: false,
     });
 
