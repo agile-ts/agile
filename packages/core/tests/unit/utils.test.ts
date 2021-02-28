@@ -39,14 +39,21 @@ describe('Utils Tests', () => {
     it('should copy Array without any reference', () => {
       const myArray = [1, 2, 3, 4, 5];
       const myCopiedArray = copy(myArray);
+      const myDateArray = [new Date(), 2, new Date(), new Date()];
+      const myCopiedDateArray = copy(myDateArray);
 
       expect(myCopiedArray).toStrictEqual([1, 2, 3, 4, 5]);
       expect(myArray).toStrictEqual([1, 2, 3, 4, 5]);
+      expect(myCopiedDateArray).toStrictEqual(myDateArray);
+      expect(myDateArray).toStrictEqual(myDateArray);
 
       myCopiedArray.push(6);
+      myCopiedDateArray.push(1);
 
       expect(myCopiedArray).toStrictEqual([1, 2, 3, 4, 5, 6]);
       expect(myArray).toStrictEqual([1, 2, 3, 4, 5]);
+      expect(myCopiedDateArray).not.toStrictEqual(myDateArray);
+      expect(myDateArray).toStrictEqual(myDateArray);
     });
 
     it('should copy Object without any reference', () => {
@@ -101,11 +108,27 @@ describe('Utils Tests', () => {
       const myCopiedNumber = copy(myNumber);
       const myString = 'frank';
       const myCopiedString = copy(myString);
+      const myNull = null;
+      const myCopiedNull = copy(myNull);
+      const myUndefined = undefined;
+      const myCopiedUndefined = copy(myUndefined);
 
       expect(myCopiedNumber).toBe(5);
       expect(myNumber).toBe(5);
       expect(myCopiedString).toBe('frank');
       expect(myString).toBe('frank');
+      expect(myCopiedNull).toBe(null);
+      expect(myNull).toBe(null);
+      expect(myCopiedUndefined).toBe(undefined);
+      expect(myUndefined).toBe(undefined);
+    });
+
+    it("shouldn't copy classes", () => {
+      const myDate = new Date();
+      const myCopiedDate = copy(myDate);
+
+      expect(myCopiedDate).toBe(myDate);
+      expect(myDate).toBe(myDate);
     });
   });
 

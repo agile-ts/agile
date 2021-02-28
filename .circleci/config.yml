@@ -33,7 +33,7 @@ jobs:
 
       - run:
          name: ⏳ Install
-         command: yarn install & npm run package-install
+         command: yarn install
 
      # Not necessary because of auto caching of circleci/node@4.1.0
      # - save_cache:

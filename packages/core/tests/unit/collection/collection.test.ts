@@ -721,7 +721,7 @@ describe('Collection Tests', () => {
           },
           {
             background: false,
-            addNewProperties: false,
+            addNewProperties: true,
           }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
@@ -764,7 +764,7 @@ describe('Collection Tests', () => {
           },
           {
             background: false,
-            addNewProperties: false,
+            addNewProperties: true,
           }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
@@ -809,7 +809,7 @@ describe('Collection Tests', () => {
           },
           {
             background: false,
-            addNewProperties: false,
+            addNewProperties: true,
           }
         );
         expect(collection.updateItemKey).toHaveBeenCalledWith(

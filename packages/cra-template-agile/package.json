@@ -13,7 +13,9 @@
     "agile",
     "javascript"
   ],
-  "scripts": {},
+  "scripts": {
+    "preview": "npm pack"
+  },
   "publishConfig": {
     "access": "public"
   },

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # Checkout Project
+         # Checkout Project
       - name: 📚 Checkout
         uses: actions/checkout@v2
 
@@ -24,13 +24,19 @@ jobs:
       - name: ⏳ Install
         run: yarn install
 
-        # Run Tests
-      - name: 🤔 Test
-        run: yarn test
-
         # Run Linter
       - name: 🤖 Lint
         run: yarn run lint
+
+        # Run Test and Test Coverage
+      - name: 🤔 Test and Test Coverage
+        run: yarn run test:coverage
+
+        # Push Test Coverage to Coveralls
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
         # Build Packages for Testing
       - name: 🔨 Build Packages

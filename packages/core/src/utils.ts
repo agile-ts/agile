@@ -11,7 +11,13 @@ import { Agile } from './internal';
  */
 export function copy<T = any>(value: T): T {
   // Extra checking '!value' because 'typeof null === object'
-  if (!value || typeof value !== 'object') return value;
+  if (!value) return value;
+
+  // Ignore everything that is no object or array
+  const valConstructorName = Object.getPrototypeOf(value).constructor.name;
+  if (!['object', 'array'].includes(valConstructorName.toLowerCase()))
+    return value;
+
   let temp;
   const newObject: any = Array.isArray(value) ? [] : {};
   for (const property in value) {
