@@ -101,11 +101,27 @@ describe('Utils Tests', () => {
       const myCopiedNumber = copy(myNumber);
       const myString = 'frank';
       const myCopiedString = copy(myString);
+      const myNull = null;
+      const myCopiedNull = copy(myNull);
+      const myUndefined = undefined;
+      const myCopiedUndefined = copy(myUndefined);
 
       expect(myCopiedNumber).toBe(5);
       expect(myNumber).toBe(5);
       expect(myCopiedString).toBe('frank');
       expect(myString).toBe('frank');
+      expect(myCopiedNull).toBe(null);
+      expect(myNull).toBe(null);
+      expect(myCopiedUndefined).toBe(undefined);
+      expect(myUndefined).toBe(undefined);
+    });
+
+    it('should ignore classes', () => {
+      const myDate = new Date();
+      const myCopiedDate = copy(myDate);
+
+      expect(myCopiedDate).toBe(myDate);
+      expect(myDate).toBe(myDate);
     });
   });
 
