@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [9071dd6]
+  - @agile-ts/core@0.0.12
+
 ## 0.0.12
 
 ### Patch Changes

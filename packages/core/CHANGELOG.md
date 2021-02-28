@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.12
+
+### Patch Changes
+
+- 9071dd6: reduced bundle size and fixed copy method
+
 ## 0.0.11
 
 ### Patch Changes
