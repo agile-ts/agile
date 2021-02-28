@@ -25,7 +25,7 @@
     "test:coverage": "jest --coverage",
     "dev-publish": "lerna run build && lerna run dev-publish",
     "dev-push": "lerna run build && lerna run dev-push",
-    "package-install": "lerna exec yarn install",
+    "install:packages": "lerna exec yarn install",
     "bump-version": "changeset",
     "release": "lerna run release && changeset publish",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
