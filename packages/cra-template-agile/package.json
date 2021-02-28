@@ -13,7 +13,11 @@
     "agile",
     "javascript"
   ],
-  "scripts": {},
+  "scripts": {
+    "build": "tsc",
+    "release": "yarn run build",
+    "preview": "npm pack"
+  },
   "publishConfig": {
     "access": "public"
   },

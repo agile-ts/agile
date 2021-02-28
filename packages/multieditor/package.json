@@ -21,7 +21,8 @@
     "dev-publish": "yalc publish",
     "dev-push": "yalc push",
     "watch": "tsc-watch --onSuccess \"yarn run dev-push\"",
-    "release": "yarn run build"
+    "release": "yarn run build",
+    "preview": "npm pack"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core"

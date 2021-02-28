@@ -28,7 +28,12 @@
     "bump-version": "changeset",
     "release": "lerna run release && changeset publish",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
-    "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\""
+    "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\"",
+    "preview": "lerna run preview",
+    "preview:core": "cd packages/core && yarn run preview",
+    "preview:react": "cd packages/core && yarn run preview",
+    "preview:multieditor": "cd packages/core && yarn run preview",
+    "preview:api": "cd packages/core && yarn run preview"
   },
   "repository": {
     "type": "git",
