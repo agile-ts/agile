@@ -32,9 +32,9 @@
     "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\"",
     "pack": "lerna run prepare && lerna run preview",
     "pack:core": "cd packages/core && yarn run prepare && yarn run preview",
-    "pack:react": "cd packages/core && yarn run prepare && yarn run preview",
-    "pack:multieditor": "cd packages/core && yarn run prepare && yarn run preview",
-    "pack:api": "cd packages/core && yarn run prepare && yarn run preview"
+    "pack:react": "cd packages/react && yarn run prepare && yarn run preview",
+    "pack:multieditor": "cd packages/multieditor && yarn run prepare && yarn run preview",
+    "pack:api": "cd packages/api && yarn run prepare && yarn run preview"
   },
   "repository": {
     "type": "git",
