@@ -510,6 +510,18 @@ export class Collection<DataType = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Select
+  //=========================================================================================================
+  /**
+   * @public
+   * Creates new Selector that represents an Item of the Collection
+   * @param itemKey - Key of Item which the Selector represents
+   */
+  public select(itemKey: ItemKey): Selector<DataType> {
+    return this.createSelector(itemKey, itemKey);
+  }
+
+  //=========================================================================================================
   // Has Selector
   //=========================================================================================================
   /**
