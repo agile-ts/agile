@@ -139,8 +139,8 @@ export default class API {
       }/${endpoint}`;
 
     // Warning if fullUrl might be invalid
-    if (!isValidUrl(fullUrl))
-      console.warn(`Url '${fullUrl}' might be invalid!`);
+    // if (!isValidUrl(fullUrl))
+    //   Agile.logger.warn(`Url '${fullUrl}' might be invalid!`);
 
     // Send Request with Timeout
     if (this.config.timeout) {

@@ -1,4 +1,5 @@
 import { Agile, clone, Logger } from '@agile-ts/core';
+import API from '@agile-ts/api';
 
 export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG },
@@ -94,3 +95,24 @@ logger.trace('This is a Trace');
 logger.if.tag(['coreWarning']).warn('My core Warning');
 logger.if.tag(['randomDebug']).debug('My random Debug');
 logger.table('Test Table', { test: 'test', test1: 'test1' });
+
+const api = new API({
+  timeout: 10000,
+  options: {
+    credentials: undefined,
+  },
+});
+
+// testing some urls
+api
+  .with({
+    baseURL: `https://api.npmjs.org/downloads/point/2020-08-24:2020-09-24/@agile-ts/core`,
+  })
+  .get('');
+
+// testing some urls
+api
+  .with({
+    baseURL: `https://api`,
+  })
+  .get('');
