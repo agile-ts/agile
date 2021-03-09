@@ -1,6 +1,6 @@
  <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
  
- > **AgileTs is a spacy, fast, simple State Management Framework**
+ > AgileTs is a global, simple, spacy State and Logic Framework
  
  <br />
   
@@ -29,7 +29,7 @@
 </p>
 
 <p align="left">
- <a href="https://twitter.com/intent/tweet?text=I%20just%20discovered%20AgileTs%3B%20an%20awesome%2C%20spacy%20and%20overall%20easy%20to%20use%20State%20Manager.%0A%60%60%60ts%0Aconst%20MY_STATE%20%3D%20App.createState(%22Hello%20stranger%22)%3B%0AMY_STATE.set(%22Hello%20friend%22)%3B%0A%60%60%60%0Ahttps%3A%2F%2Fgithub.com%2Fagile-ts%2Fagile%2F"><img src="http://randojs.com/images/tweetShield.svg" alt="Tweet" height="20"/>
+ <a href="https://twitter.com/intent/tweet?text=I%20just%20discovered%20AgileTs%3B%20a%20global%2C%20spacy%20and%20overall%20easy%20to%20use%20State%20Manager.%0A%60%60%60ts%0Aconst%20MY_STATE%20%3D%20App.createState(%22Hello%20stranger%22)%3B%0AMY_STATE.set(%22Hello%20friend%22)%3B%0A%60%60%60%0Ahttps%3A%2F%2Fgithub.com%2Fagile-ts%2Fagile%2F%20%0A%0A%40AgileFramework%20%0A%23agilets%20%23statemanagement%20%23webdev%20"><img src="http://randojs.com/images/tweetShield.svg" alt="Tweet" height="20"/>
  </a>
  <a href="https://discord.gg/T9GzreAwPH">
    <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" alt="Join Discord"/>
@@ -72,10 +72,9 @@ More examples can be found in the [Example Section](../examples/Indroduction.md)
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
-AgileTs is a simple, fast and well tested State Management Framework which is implemented in TypeScript.
-It's more flexible and boilerplate free than Redux and has an interesting approach to reducing 
-the size of a codebase through a centralized memory design pattern.
-The philosophy behind AgileTs is simple:
+AgileTs is a global, simple, well-tested State Management Framework implemented in TypeScript. 
+It's more flexible and boilerplate-free than frameworks like Redux and has a powerful approach to reducing the codebase size through a
+centralized memory design pattern. The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
 Write minimalistic, boilerplate free code that captures your intent.
@@ -91,16 +90,15 @@ Write minimalistic, boilerplate free code that captures your intent.
   MY_COLLECTION.collect({id: 1, name: "Frank"});
   MY_COLLECTION.collect({id: 2, name: "Dieter"});
   ```
-- Mutate or Check States with simple Functions
+- Mutate and Check States with simple Functions
   ```ts
   MY_STATE.undo(); // Undo latest change
   MY_STATE.is({hello: "jeff"}); // Check if State has the Value '{hello: "jeff"}'
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly every UI-Framework. Check [here](https://agile-ts.org/docs/frameworks) if your preferred framework is supported too.
-- Surly behaves with the workflow that suits you best.
-  No need for _reducers_, _actions_, ..
+- Works in nearly any UI-Framework. Check [here](https://agile-ts.org/docs/frameworks) if your preferred Framework is supported too.
+- Surly behaves with the workflow which suits you best. No need for _reducers_, _actions_, ..
 - Has **no** external dependencies
 
 ### 🎯 Easy to Use
@@ -115,14 +113,14 @@ or if you are no fan of following any tutorial, checkout your [examples](../exam
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation"/>
 
-To properly use AgileTs, in a UI-Framework we need **two** packages.
+To properly use AgileTs, in a UI-Framework we need to install **two** packages.
 
 - The _Core Package_, which acts as the brain of AgileTs and manages all our States
   ```
   npm install @agile-ts/core
   ```
 
-- and a _fitting Integration_ for our preferd UI-Framework.. in my case the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
+- and a _fitting Integration_ for our preferd UI-Framework. In my case the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
   Check [here](https://agile-ts.org/docs/installation) if your desired Framework is supported, too.
   ```
   npm install @agile-ts/react
@@ -138,7 +136,7 @@ To properly use AgileTs, in a UI-Framework we need **two** packages.
 If AgileTs sounds interesting to you.
 Checkout our **[docs](https://agile-ts.org/docs/)**. 
 And I am sure you will be able to use it in no time.
-In case you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
+In case you have any further questions don't mind joining our [Community Discord](https://discord.gg/FTqeMNCxw7).
 
 
 <br />
@@ -147,9 +145,8 @@ In case you have any questions don't mind joining our [Discord Community](https:
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/contribute_header.png" alt="Contribute"/>
 
-Get a part of AgileTs and start contributing. 
+Get a part of AgileTs and start contributing. We welcome any meaningful contribution 😀
 To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
-We welcome any meaningful contribution 😀
 
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
@@ -176,5 +173,5 @@ We welcome any meaningful contribution 😀
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/credits_header.png" alt="Credits"/>
 
-AgileTs is inspired by MVVM frameworks like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
+AgileTs is inspired by [MVVM Frameworks](https://de.wikipedia.org/wiki/Model_View_ViewModel) like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
 
