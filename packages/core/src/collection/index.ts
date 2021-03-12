@@ -859,7 +859,7 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Resets this Collection
    */
-  public reset() {
+  public reset(): this {
     // Reset Data
     this.data = {};
     this.size = 0;
@@ -869,6 +869,8 @@ export class Collection<DataType = DefaultItem> {
 
     // Reset Selectors
     for (const key in this.selectors) this.getSelector(key)?.reset();
+
+    return this;
   }
 
   //=========================================================================================================
