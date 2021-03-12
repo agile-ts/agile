@@ -732,7 +732,7 @@ describe('Collection Tests', () => {
           'dummyItem',
           { name: 'hans' },
           {
-            addNewProperties: true,
+            patch: true,
             background: true,
           }
         );

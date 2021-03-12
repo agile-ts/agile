@@ -122,7 +122,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Group(
     initialItems?: Array<ItemKey>,
-    config?: GroupConfigInterface
+    config: GroupConfigInterface = {}
   ): Group<DataType> {
     if (this.isInstantiated) {
       const key = config?.key || generateId();
@@ -150,7 +150,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Selector(
     initialKey: ItemKey,
-    config?: SelectorConfigInterface
+    config: SelectorConfigInterface = {}
   ): Selector<DataType> {
     if (this.isInstantiated) {
       const key = config?.key || generateId();
@@ -305,7 +305,7 @@ export class Collection<DataType = DefaultItem> {
     const item = this.getItem(itemKey, { notExisting: true });
     const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
-      addNewProperties: true,
+      patch: true,
       background: false,
     });
 
@@ -335,11 +335,23 @@ export class Collection<DataType = DefaultItem> {
         background: config.background,
       });
 
-    // Apply changes to Item
-    item.patch(changes as any, {
-      background: config.background,
-      addNewProperties: config.addNewProperties,
-    });
+    if (config.patch) {
+      let patchConfig: { addNewProperties?: boolean } =
+        typeof config.patch === 'object' ? config.patch : {};
+      patchConfig = defineConfig(patchConfig, {
+        addNewProperties: true,
+      });
+
+      // Apply changes to Item
+      item.patch(changes as any, {
+        background: config.background,
+        addNewProperties: patchConfig.addNewProperties,
+      });
+    } else {
+      item.set(changes as any, {
+        background: config.background,
+      });
+    }
 
     return item;
   }
@@ -1205,11 +1217,11 @@ export interface CollectConfigInterface<DataType = any> {
 }
 
 /**
- * @param addNewProperties - If properties that doesn't exist in base ItemData get added
+ * @param patch - If Data gets merged into the current Data
  * @param background - If updating an Item happens in the background (-> not causing any rerender)
  */
 export interface UpdateConfigInterface {
-  addNewProperties?: boolean;
+  patch?: boolean | { addNewProperties?: boolean };
   background?: boolean;
 }
 
