@@ -1,6 +1,6 @@
 import {
   Agile,
-  ComputeMethod,
+  ComputeValueMethod,
   copy,
   defineConfig,
   getAgileInstance,
@@ -30,7 +30,7 @@ export class MultiEditor<
   public validateMethods: DataObject<
     ValidationMethodInterface<DataType> | Validator<DataType>
   > = {};
-  public computeMethods: DataObject<ComputeMethod<DataType>> = {};
+  public computeMethods: DataObject<ComputeValueMethod<DataType>> = {};
   public onSubmit: (
     preparedData: DataObject<DataType>,
     config?: OnSubmitConfigType
@@ -514,7 +514,7 @@ export interface CreateEditorConfigInterface<
   validateMethods?: DataObject<
     ValidationMethodInterface<DataType> | Validator<DataType>
   >;
-  computeMethods?: DataObject<ComputeMethod<DataType>>;
+  computeMethods?: DataObject<ComputeValueMethod<DataType>>;
   onSubmit: (
     preparedData: DataObject<DataType>,
     config?: onSubmitConfig
