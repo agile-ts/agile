@@ -109,13 +109,13 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   //=========================================================================================================
-  // Compute Values
+  // Compute
   //=========================================================================================================
   /**
    * @internal
-   * Computes Value and adds missing Dependencies to Computed
+   * Recomputes value and adds missing dependencies to Computed
    */
-  public computeValue(): ComputedValueType {
+  public compute(): ComputedValueType {
     // Auto track Observers the computeFunction might depend on
     ComputedTracker.track();
     const computedValue = this.computeFunction();

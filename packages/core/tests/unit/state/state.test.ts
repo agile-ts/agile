@@ -42,7 +42,8 @@ describe('State Tests', () => {
     expect(state.observer.dependents.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
-    expect(state.computeMethod).toBeUndefined();
+    expect(state.computeValueMethod).toBeUndefined();
+    expect(state.computeExistsMethod).toBeInstanceOf(Function);
     expect(state.isPersisted).toBeFalsy();
     expect(state.persistent).toBeUndefined();
     expect(state.watchers).toStrictEqual({});
@@ -73,7 +74,8 @@ describe('State Tests', () => {
     expect(state.observer.dependents.has(dummyObserver)).toBeTruthy();
     expect(state.observer._key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
-    expect(state.computeMethod).toBeUndefined();
+    expect(state.computeValueMethod).toBeUndefined();
+    expect(state.computeExistsMethod).toBeInstanceOf(Function);
     expect(state.isPersisted).toBeFalsy();
     expect(state.persistent).toBeUndefined();
     expect(state.watchers).toStrictEqual({});
@@ -98,7 +100,8 @@ describe('State Tests', () => {
     expect(state.observer.dependents.size).toBe(0);
     expect(state.observer._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
-    expect(state.computeMethod).toBeUndefined();
+    expect(state.computeValueMethod).toBeUndefined();
+    expect(state.computeExistsMethod).toBeInstanceOf(Function);
     expect(state.isPersisted).toBeFalsy();
     expect(state.persistent).toBeUndefined();
     expect(state.watchers).toStrictEqual({});
@@ -739,16 +742,51 @@ describe('State Tests', () => {
     });
 
     describe('exists get function tests', () => {
-      it('should return true if State is no placeholder', () => {
+      it('should return true if State is no placeholder and computeExistsMethod returns true', () => {
+        numberState.computeExistsMethod = jest.fn().mockReturnValueOnce(true);
         numberState.isPlaceholder = false;
 
         expect(numberState.exists).toBeTruthy();
+        expect(numberState.computeExistsMethod).toHaveBeenCalledWith(
+          numberState.value
+        );
+      });
+
+      it('should return false if State is no placeholder and computeExistsMethod returns false', () => {
+        numberState.computeExistsMethod = jest.fn().mockReturnValueOnce(false);
+        numberState.isPlaceholder = false;
+
+        expect(numberState.exists).toBeFalsy();
+        expect(numberState.computeExistsMethod).toHaveBeenCalledWith(
+          numberState.value
+        );
       });
 
       it('should return false if State is placeholder"', () => {
+        numberState.computeExistsMethod = jest.fn(() => true);
         numberState.isPlaceholder = true;
 
         expect(numberState.exists).toBeFalsy();
+        expect(numberState.computeExistsMethod).not.toHaveBeenCalled(); // since isPlaceholder gets checked first
+      });
+    });
+
+    describe('computeExists function tests', () => {
+      it('should assign passed function to computeExistsMethod', () => {
+        const computeMethod = (value) => value === null;
+
+        numberState.computeExists(computeMethod);
+
+        expect(numberState.computeExistsMethod).toBe(computeMethod);
+      });
+
+      it("shouldn't assign passed invalid function to computeExistsMethod", () => {
+        numberState.computeExists(10 as any);
+
+        expect(numberState.computeExistsMethod).toBeInstanceOf(Function);
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: A 'computeExistsMethod' has to be a function!"
+        );
       });
     });
 
@@ -814,21 +852,27 @@ describe('State Tests', () => {
       });
     });
 
-    describe('compute function tests', () => {
-      it('should assign passed function to computeMethod', () => {
-        const computeMethod = () => 10;
-
-        numberState.compute(computeMethod);
-
-        expect(numberState.computeMethod).toBe(computeMethod);
+    describe('computeValue function tests', () => {
+      beforeEach(() => {
+        numberState.set = jest.fn();
       });
 
-      it("shouldn't assign passed invalid function to computeMethod", () => {
-        numberState.compute(10 as any);
+      it('should assign passed function to computeValueMethod and compute State value initially', () => {
+        const computeMethod = () => 10;
 
-        expect(numberState.computeMethod).toBeUndefined();
+        numberState.computeValue(computeMethod);
+
+        expect(numberState.set).toHaveBeenCalledWith(10);
+        expect(numberState.computeValueMethod).toBe(computeMethod);
+      });
+
+      it("shouldn't assign passed invalid function to computeValueMethod", () => {
+        numberState.computeValue(10 as any);
+
+        expect(numberState.set).not.toHaveBeenCalled();
+        expect(numberState.computeValueMethod).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A computeMethod has to be a function!'
+          "Agile Error: A 'computeValueMethod' has to be a function!"
         );
       });
     });

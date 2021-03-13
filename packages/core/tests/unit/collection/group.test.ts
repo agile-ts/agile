@@ -56,7 +56,8 @@ describe('Group Tests', () => {
     expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
-    expect(group.computeMethod).toBeUndefined();
+    expect(group.computeValueMethod).toBeUndefined();
+    expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
     expect(group.watchers).toStrictEqual({});
@@ -89,7 +90,8 @@ describe('Group Tests', () => {
     expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBe('dummyKey');
     expect(group.sideEffects).toStrictEqual({});
-    expect(group.computeMethod).toBeUndefined();
+    expect(group.computeValueMethod).toBeUndefined();
+    expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
     expect(group.watchers).toStrictEqual({});
@@ -119,7 +121,8 @@ describe('Group Tests', () => {
     expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
-    expect(group.computeMethod).toBeUndefined();
+    expect(group.computeValueMethod).toBeUndefined();
+    expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
     expect(group.watchers).toStrictEqual({});

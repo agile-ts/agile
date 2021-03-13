@@ -41,7 +41,8 @@ describe('Item Tests', () => {
       dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
-    expect(item.computeMethod).toBeUndefined();
+    expect(item.computeValueMethod).toBeUndefined();
+    expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
     expect(item.watchers).toStrictEqual({});
@@ -78,7 +79,8 @@ describe('Item Tests', () => {
       dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
-    expect(item.computeMethod).toBeUndefined();
+    expect(item.computeValueMethod).toBeUndefined();
+    expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
     expect(item.watchers).toStrictEqual({});

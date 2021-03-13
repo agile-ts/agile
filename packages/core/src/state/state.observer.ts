@@ -47,7 +47,7 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = this.state();
     let newStateValue: ValueType;
 
-    if (state instanceof Computed) newStateValue = state.computeValue();
+    if (state instanceof Computed) newStateValue = state.compute();
     else newStateValue = state.nextStateValue;
 
     this.ingestValue(newStateValue, config);
@@ -86,8 +86,8 @@ export class StateObserver<ValueType = any> extends Observer {
     }
 
     // Assign next State Value and compute it if necessary
-    this.nextStateValue = state.computeMethod
-      ? copy(state.computeMethod(newStateValue))
+    this.nextStateValue = state.computeValueMethod
+      ? copy(state.computeValueMethod(newStateValue))
       : copy(newStateValue);
 
     // Check if State Value and new/next Value are equals

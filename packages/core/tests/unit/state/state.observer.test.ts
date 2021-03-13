@@ -121,7 +121,7 @@ describe('StateObserver Tests', () => {
       });
 
       it('should call ingestValue with computedValue if Observer belongs to a ComputedState (default config)', () => {
-        dummyComputed.computeValue = jest.fn(() => 'computedValue');
+        dummyComputed.compute = jest.fn(() => 'computedValue');
 
         computedObserver.ingest();
 
@@ -129,7 +129,7 @@ describe('StateObserver Tests', () => {
           'computedValue',
           {}
         );
-        expect(dummyComputed.computeValue).toHaveBeenCalled();
+        expect(dummyComputed.compute).toHaveBeenCalled();
       });
     });
 
@@ -265,7 +265,7 @@ describe('StateObserver Tests', () => {
       });
 
       it('should ingest State into Runtime and compute newStateValue if State compute Function is set (default config)', () => {
-        dummyState.computeMethod = (value) => `cool value '${value}'`;
+        dummyState.computeValueMethod = (value) => `cool value '${value}'`;
 
         stateObserver.ingestValue('updatedDummyValue');
 
