@@ -86,8 +86,8 @@ export class StateObserver<ValueType = any> extends Observer {
     }
 
     // Assign next State Value and compute it if necessary
-    this.nextStateValue = state.computeMethod
-      ? copy(state.computeMethod(newStateValue))
+    this.nextStateValue = state.computeValueMethod
+      ? copy(state.computeValueMethod(newStateValue))
       : copy(newStateValue);
 
     // Check if State Value and new/next Value are equals

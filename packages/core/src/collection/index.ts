@@ -887,7 +887,7 @@ export class Collection<DataType = DefaultItem> {
     itemKeys: ItemKey | Array<ItemKey>,
     groupKeys: GroupKey | Array<GroupKey>,
     config: GroupAddConfig = {}
-  ) {
+  ): this {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
 
@@ -895,6 +895,8 @@ export class Collection<DataType = DefaultItem> {
     _groupKeys.forEach((groupKey) => {
       this.getGroup(groupKey)?.add(_itemKeys, config);
     });
+
+    return this;
   }
 
   //=========================================================================================================

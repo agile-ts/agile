@@ -37,7 +37,8 @@ describe('Computed Tests', () => {
     expect(computed.observer.dependents.size).toBe(0);
     expect(computed.observer._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeMethod).toBeUndefined();
+    expect(computed.computeValueMethod).toBeUndefined();
+    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
     expect(computed.watchers).toStrictEqual({});
@@ -78,7 +79,8 @@ describe('Computed Tests', () => {
     expect(computed.observer.dependents.has(dummyObserver1)).toBeTruthy(); // x
     expect(computed.observer._key).toBe('coolComputed'); // x
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeMethod).toBeUndefined();
+    expect(computed.computeValueMethod).toBeUndefined();
+    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
     expect(computed.watchers).toStrictEqual({});

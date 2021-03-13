@@ -265,7 +265,7 @@ describe('StateObserver Tests', () => {
       });
 
       it('should ingest State into Runtime and compute newStateValue if State compute Function is set (default config)', () => {
-        dummyState.computeMethod = (value) => `cool value '${value}'`;
+        dummyState.computeValueMethod = (value) => `cool value '${value}'`;
 
         stateObserver.ingestValue('updatedDummyValue');
 
