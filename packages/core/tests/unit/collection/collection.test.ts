@@ -824,9 +824,11 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: By overwriting the Item don't forget passing the primaryKey!"
-          , {id: 'dummyItem', name: 'hans'}
+        expect(
+          console.warn
+        ).toHaveBeenCalledWith(
+          "Agile Warn: By overwriting the whole Item don't forget passing the correct primaryKey!",
+          { id: 'dummyItem', name: 'hans' }
         );
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(dummyItem.set).toHaveBeenCalledWith(
