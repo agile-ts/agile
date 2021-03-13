@@ -85,7 +85,7 @@ export class MultiEditor<
       item.validate();
       if (Object.prototype.hasOwnProperty.call(this.computeMethods, key)) {
         const computeMethod = this.computeMethods[key];
-        item.compute(computeMethod);
+        item.computeValue(computeMethod);
       }
     }
   }
