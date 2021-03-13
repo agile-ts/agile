@@ -110,7 +110,7 @@ describe('Selector Tests', () => {
     expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeValueMethod).toBeUndefined();
-    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
+    expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
     expect(selector.watchers).toStrictEqual({});
