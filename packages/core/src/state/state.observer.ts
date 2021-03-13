@@ -47,7 +47,7 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = this.state();
     let newStateValue: ValueType;
 
-    if (state instanceof Computed) newStateValue = state.computeValue();
+    if (state instanceof Computed) newStateValue = state.compute();
     else newStateValue = state.nextStateValue;
 
     this.ingestValue(newStateValue, config);

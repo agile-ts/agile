@@ -217,7 +217,7 @@ describe('Computed Tests', () => {
       });
     });
 
-    describe('computeValue function tests', () => {
+    describe('compute function tests', () => {
       let dummyObserver1: Observer;
       let dummyObserver2: Observer;
       let dummyObserver3: Observer;
@@ -242,7 +242,7 @@ describe('Computed Tests', () => {
           dummyObserver2,
         ]);
 
-        const response = computed.computeValue();
+        const response = computed.compute();
 
         expect(response).toBe('newComputedValue');
         expect(dummyComputeFunction).toHaveBeenCalled();
