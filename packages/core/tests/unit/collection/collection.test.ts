@@ -707,14 +707,16 @@ describe('Collection Tests', () => {
         };
 
         dummyItem.patch = jest.fn();
+        dummyItem.set = jest.fn();
         collection.updateItemKey = jest.fn();
       });
 
-      it('should update existing Item with valid changes Object (default config)', () => {
+      it('should update existing Item by patching valid changes Object (default config)', () => {
         const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -724,21 +726,22 @@ describe('Collection Tests', () => {
             addNewProperties: true,
           }
         );
+        expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
-      it('should update existing Item with valid changes Object (specific config)', () => {
+      it('should update existing Item by patching valid changes Object (specific config)', () => {
         const response = collection.update(
           'dummyItem',
           { name: 'hans' },
           {
-            patch: true,
             background: true,
           }
         );
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -748,16 +751,18 @@ describe('Collection Tests', () => {
             addNewProperties: true,
           }
         );
+        expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
-      it('should update existing placeholder Item with valid changes Object (default config)', () => {
+      it('should update existing placeholder Item by patching valid changes Object (default config)', () => {
         dummyItem.isPlaceholder = true;
 
         const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -766,6 +771,67 @@ describe('Collection Tests', () => {
             background: false,
             addNewProperties: true,
           }
+        );
+        expect(dummyItem.set).not.toHaveBeenCalled();
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it('should update existing Item by setting valid changes Object (default config)', () => {
+        const response = collection.update(
+          'dummyItem',
+          { id: 'dummyItem', name: 'hans' },
+          { patch: false }
+        );
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(dummyItem.patch).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          { id: 'dummyItem', name: 'hans' },
+          { background: false }
+        );
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it('should update existing Item by setting valid changes Object (specific config)', () => {
+        const response = collection.update(
+          'dummyItem',
+          { id: 'dummyItem', name: 'hans' },
+          {
+            patch: false,
+            background: true,
+          }
+        );
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(dummyItem.patch).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          { id: 'dummyItem', name: 'hans' },
+          { background: true }
+        );
+        expect(collection.updateItemKey).not.toHaveBeenCalled();
+      });
+
+      it('should update existing Item by setting valid changes Object without primaryKey and should print warning (default config)', () => {
+        const response = collection.update(
+          'dummyItem',
+          { name: 'hans' },
+          { patch: false }
+        );
+
+        expect(response).toBe(dummyItem);
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalledWith(
+          "Agile Warn: By overwriting the Item don't forget passing the primaryKey!"
+          , {id: 'dummyItem', name: 'hans'}
+        );
+        expect(dummyItem.patch).not.toHaveBeenCalled();
+        expect(dummyItem.set).toHaveBeenCalledWith(
+          { id: 'dummyItem', name: 'hans' },
+          { background: false }
         );
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
@@ -777,7 +843,9 @@ describe('Collection Tests', () => {
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: Item with key/name 'notExisting' doesn't exist in Collection '${collection._key}'!`
         );
+        expect(console.warn).not.toHaveBeenCalled();
         expect(dummyItem.patch).not.toHaveBeenCalled();
+        expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
@@ -791,7 +859,9 @@ describe('Collection Tests', () => {
         expect(console.error).toHaveBeenCalledWith(
           `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`
         );
+        expect(console.warn).not.toHaveBeenCalled();
         expect(dummyItem.patch).not.toHaveBeenCalled();
+        expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
       });
 
@@ -803,6 +873,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -812,6 +883,7 @@ describe('Collection Tests', () => {
             addNewProperties: true,
           }
         );
+        expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).toHaveBeenCalledWith(
           'dummyItem',
           'newDummyItemKey',

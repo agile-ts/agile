@@ -326,16 +326,17 @@ export class Collection<DataType = DefaultItem> {
     const newItemKey = changes[primaryKey] || oldItemKey;
     const updateItemKey = oldItemKey !== newItemKey;
 
-    // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (below)
-    if (changes[primaryKey]) delete changes[primaryKey];
-
     // Update ItemKey
     if (updateItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
 
+    // Patch changes into Item
     if (config.patch) {
+      // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (see above)
+      if (changes[primaryKey]) delete changes[primaryKey];
+
       let patchConfig: { addNewProperties?: boolean } =
         typeof config.patch === 'object' ? config.patch : {};
       patchConfig = defineConfig(patchConfig, {
@@ -347,7 +348,19 @@ export class Collection<DataType = DefaultItem> {
         background: config.background,
         addNewProperties: patchConfig.addNewProperties,
       });
-    } else {
+    }
+
+    // Set changes into Item
+    if (!config.patch) {
+      // To make sure that the primaryKey doesn't differ from the changes object primaryKey
+      if (changes[this.config.primaryKey] !== itemKey) {
+        changes[this.config.primaryKey] = itemKey;
+        Agile.logger.warn(
+          `By overwriting the whole Item don't forget passing the correct primaryKey!`, changes
+        );
+      }
+
+      // Apply changes to Item
       item.set(changes as any, {
         background: config.background,
       });
