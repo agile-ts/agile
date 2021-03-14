@@ -12,7 +12,7 @@ import {
   normalizeArray,
   copy,
   CollectionPersistent,
-  GroupAddConfig,
+  GroupAddConfigInterface,
   ComputedTracker,
   generateId,
   SideEffectConfigInterface,
@@ -899,7 +899,7 @@ export class Collection<DataType = DefaultItem> {
   public put(
     itemKeys: ItemKey | Array<ItemKey>,
     groupKeys: GroupKey | Array<GroupKey>,
-    config: GroupAddConfig = {}
+    config: GroupAddConfigInterface = {}
   ): this {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
