@@ -55,7 +55,7 @@ const MY_FIRST_STATE = App.createState("Hello Stranger!");
 // And wolla its reactive. Everytime the State mutates the Component gets rerendered
 const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
-To find out more checkout our [documentation](https://agile-ts.org/docs/installation).
+To find out more checkout our [documentation](https://agile-ts.org/docs/introduction).
 
 ### ⛳️ Sandbox
 Test AgileTs yourself, it's only one click away. Just select your preferred Framework below.
@@ -63,7 +63,7 @@ Test AgileTs yourself, it's only one click away. Just select your preferred Fram
 - Vue (coming soon)
 - Angular (coming soon)
 
-More examples can be found in the [Example Section](../examples/Indroduction.md).
+More examples can be found in the [Example Section](https://agile-ts.org/docs/examples).
 
 
 <br />
@@ -103,8 +103,8 @@ Write minimalistic, boilerplate free code that captures your intent.
 
 ### 🎯 Easy to Use
 Learn the powerful tools of AgileTs in a short amount of time.
-A good place to start are our [Quick Starts](./Installation.md) 
-or if you are no fan of following any tutorial, checkout your [examples](../examples).
+A good place to start are our [Quick Starts](https://agile-ts.org/docs/installation) 
+or if you are no fan of following any tutorial, checkout your [examples](https://agile-ts.org/docs/examples).
 
 
 <br />
@@ -133,10 +133,10 @@ To properly use AgileTs, in a UI-Framework we need to install **two** packages.
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/documentation_header.png" alt="Documentation"/>
 
-If AgileTs sounds interesting to you.
-Checkout our **[docs](https://agile-ts.org/docs/)**. 
-And I am sure you will be able to use it in no time.
-In case you have any further questions don't mind joining our [Community Discord](https://discord.gg/FTqeMNCxw7).
+Sounds AgileTs interesting to you?
+Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
+And I promise you, you will be able to use AgileTs in no time.
+In case you have any further questions don't mind joining our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 
 <br />
