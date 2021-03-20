@@ -356,7 +356,8 @@ export class Collection<DataType = DefaultItem> {
       if (changes[this.config.primaryKey] !== itemKey) {
         changes[this.config.primaryKey] = itemKey;
         Agile.logger.warn(
-          `By overwriting the whole Item don't forget passing the correct primaryKey!`, changes
+          `By overwriting the whole Item don't forget passing the correct primaryKey!`,
+          changes
         );
       }
 
@@ -1011,7 +1012,12 @@ export class Collection<DataType = DefaultItem> {
    * Remove Items from Collection
    * @param itemKeys - ItemKey/s that get removed
    */
-  public remove(itemKeys: ItemKey | Array<ItemKey>) {
+  public remove(
+    itemKeys: ItemKey | Array<ItemKey>
+  ): {
+    fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
+    everywhere: () => Collection<DataType>;
+  } {
     return {
       fromGroups: (groups: Array<ItemKey> | ItemKey) =>
         this.removeFromGroups(itemKeys, groups),
@@ -1031,7 +1037,7 @@ export class Collection<DataType = DefaultItem> {
   public removeFromGroups(
     itemKeys: ItemKey | Array<ItemKey>,
     groupKeys: GroupKey | Array<GroupKey>
-  ): void {
+  ): this {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
 
@@ -1053,6 +1059,8 @@ export class Collection<DataType = DefaultItem> {
       )
         this.removeItems(itemKey);
     });
+
+    return this;
   }
 
   //=========================================================================================================
@@ -1063,7 +1071,7 @@ export class Collection<DataType = DefaultItem> {
    * Removes Item completely from Collection
    * @param itemKeys - ItemKey/s of Item/s
    */
-  public removeItems(itemKeys: ItemKey | Array<ItemKey>): void {
+  public removeItems(itemKeys: ItemKey | Array<ItemKey>): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
     _itemKeys.forEach((itemKey) => {
@@ -1091,6 +1099,8 @@ export class Collection<DataType = DefaultItem> {
 
       this.size--;
     });
+
+    return this;
   }
 
   //=========================================================================================================
