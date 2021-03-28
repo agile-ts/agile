@@ -1,6 +1,6 @@
  <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
  
- > AgileTs is a global, simple, spacy State and Logic Framework
+ > Global, simple, spacy State and Logic Framework
  
  <br />
   
