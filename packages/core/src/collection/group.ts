@@ -165,7 +165,10 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * @param itemKeys - ItemKey/s that get added to the Group
    * @param config - Config
    */
-  public add(itemKeys: ItemKey | ItemKey[], config: GroupAddConfigInterface = {}): this {
+  public add(
+    itemKeys: ItemKey | ItemKey[],
+    config: GroupAddConfigInterface = {}
+  ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
@@ -296,7 +299,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * @internal
    * Rebuilds Output and Items of Group
    */
-  public rebuild() {
+  public rebuild(): this {
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
     const groupItems: Array<Item<DataType>> = [];
 
@@ -325,6 +328,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     this.items = groupItems;
     this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
+
+    return this;
   }
 }
 
