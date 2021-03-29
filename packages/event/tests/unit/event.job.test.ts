@@ -1,4 +1,4 @@
-import { EventJob } from '../../../src';
+import { EventJob } from '../../src';
 
 describe('EventJob Tests', () => {
   it('should create EventJob (without keys)', () => {

@@ -5,7 +5,6 @@ import {
   SubController,
   Integrations,
   Storage,
-  Event,
   Computed,
   Collection,
   Logger,
@@ -244,28 +243,6 @@ describe('Agile Tests', () => {
           isPlaceholder: false,
           computedDeps: [],
         });
-      });
-    });
-
-    describe('createEvent function tests', () => {
-      const EventMock = Event as jest.MockedClass<typeof Event>;
-
-      beforeEach(() => {
-        EventMock.mockClear();
-      });
-
-      it('should create Event', () => {
-        const eventConfig = {
-          rerender: true,
-          delay: 1000,
-          enabled: true,
-          key: 'myCoolEvent',
-        };
-
-        const event = agile.createEvent(eventConfig);
-
-        expect(event).toBeInstanceOf(Event);
-        expect(EventMock).toHaveBeenCalledWith(agile, eventConfig);
       });
     });
 

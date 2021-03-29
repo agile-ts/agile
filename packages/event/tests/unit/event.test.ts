@@ -1,5 +1,6 @@
-import { Event, Agile, Observer, EventObserver } from '../../../src';
-import * as Utils from '../../../src/utils';
+import { Event, EventObserver } from '../../src';
+import { Agile, Observer } from '@agile-ts/core';
+import * as Utils from '@agile-ts/core';
 
 describe('Event Tests', () => {
   let dummyAgile: Agile;
