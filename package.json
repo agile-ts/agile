@@ -21,6 +21,7 @@
     "watch:react": "cd packages/core && yarn run watch",
     "watch:multieditor": "cd packages/core && yarn run watch",
     "watch:api": "cd packages/core && yarn run watch",
+    "watch:event": "cd packages/event && yarn run watch",
     "test": "jest --passWithNoTests",
     "test:coverage": "jest --coverage",
     "dev:publish": "lerna run build && lerna run dev:publish",
@@ -34,7 +35,8 @@
     "pack:core": "cd packages/core && yarn run prepare && yarn run preview",
     "pack:react": "cd packages/react && yarn run prepare && yarn run preview",
     "pack:multieditor": "cd packages/multieditor && yarn run prepare && yarn run preview",
-    "pack:api": "cd packages/api && yarn run prepare && yarn run preview"
+    "pack:api": "cd packages/api && yarn run prepare && yarn run preview",
+    "pack:event": "cd packages/event && yarn run prepare && yarn run preview"
   },
   "repository": {
     "type": "git",

@@ -14,6 +14,7 @@
     "@agile-ts/api": "file:.yalc/@agile-ts/api",
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@agile-ts/event": "file:.yalc/@agile-ts/event",
     "react": "16.13.1",
     "react-native": "0.63.3"
   },

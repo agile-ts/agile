@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useAgile, useEvent, useWatcher } from '@agile-ts/react';
+import { useAgile, useWatcher } from '@agile-ts/react';
+import { useEvent } from '@agile-ts/event';
 import {
   MY_COLLECTION,
   MY_COMPUTED,
