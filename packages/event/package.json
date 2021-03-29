@@ -1,17 +1,15 @@
 {
-  "name": "@agile-ts/core",
-  "version": "0.0.12",
+  "name": "@agile-ts/event",
+  "version": "0.0.1",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Spacy, Simple, Scalable State Management Framework",
+  "description": "Handy class for emitting UI updates and passing data with them",
   "keywords": [
     "agile",
     "agile-ts",
-    "state-management",
-    "state",
-    "typescript",
-    "reactive"
+    "event",
+    "ui-event"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,8 +19,14 @@
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch": "tsc-watch --onSuccess \"yarn run dev:push\"",
-    "release": "node ./scripts/prepublish.js && yarn run prepare",
+    "release": "yarn run prepare",
     "preview": "npm pack"
+  },
+  "devDependencies": {
+    "@agile-ts/core": "file:../core"
+  },
+  "peerDependencies": {
+    "@agile-ts/core": "^0.0.12"
   },
   "publishConfig": {
     "access": "public"

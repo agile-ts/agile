@@ -75,17 +75,17 @@ Don't take this personally if this happens, and feel free to open a new issue on
 ## ⏳ Installation
 
 1. Ensure you have [Yarn](https://yarnpkg.com/) installed
-2. After cloning the repository, run `yarn run install-packages` in the root of the repository,
+2. After cloning the repository, run `yarn run install:agile` in the root of the repository,
    which simply runs `yarn install` in each package to ensure all dependencies are installed.
    
 ### Run Example Project's
 
 1. Follow the [Installation](#Installation) steps above
 2. Ensure you have [Yalc](https://www.google.com/search?client=firefox-b-d&q=yalc) installed
-3. Run `yarn run dev-publish` to publish all packages in your local 'npm store'
+3. Run `yarn run dev:publish` to publish all packages in your local 'npm store'
 4. Execute `yarn install` in the Example Project to install its dependencies like AgileTs
-5. If you made your desired changes. Run `yarn run dev-push` to push your updated changes into your local 'npm store' <br />
-   _ProTip:_ To make realtime changes, run `yarn run watch`, which automatically runs `yarn run dev-push` everytime you update a file in a package.
+5. If you made your desired changes. Run `yarn run dev:push` to push your updated changes into your local 'npm store' <br />
+   _ProTip:_ To make realtime changes, run `yarn run watch`, which automatically runs `yarn run dev:push` everytime you update a file in a package.
    
 
 ## ☄️ Pull Request
