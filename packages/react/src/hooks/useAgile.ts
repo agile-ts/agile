@@ -9,7 +9,7 @@ import {
   State,
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
-import { useIsomorphicLayoutEffect } from '../utils/useIsomorphicLayoutEffect';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 //=========================================================================================================
 // useAgile

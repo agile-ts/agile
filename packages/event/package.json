@@ -23,10 +23,15 @@
     "preview": "npm pack"
   },
   "devDependencies": {
-    "@agile-ts/core": "file:../core"
+    "@agile-ts/core": "file:../core",
+    "@agile-ts/react": "file:../react",
+    "@types/react": "^17.0.0",
+    "react": "^17.0.1"
   },
   "peerDependencies": {
-    "@agile-ts/core": "^0.0.12"
+    "react": "^16.13.1",
+    "@agile-ts/core": "^0.0.12",
+    "@agile-ts/react": "^0.0.12"
   },
   "publishConfig": {
     "access": "public"
