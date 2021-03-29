@@ -25,7 +25,7 @@ describe('State Tests', () => {
 
   it('should create State and should call initial set (default config)', () => {
     // Overwrite select once to not call it
-    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
+    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined as any);
 
     const state = new State(dummyAgile, 'coolValue');
 
@@ -51,7 +51,7 @@ describe('State Tests', () => {
 
   it('should create State and should call initial set (specific config)', () => {
     // Overwrite select once to not call it
-    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
+    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined as any);
 
     const dummyObserver = new Observer(dummyAgile);
 
@@ -83,7 +83,7 @@ describe('State Tests', () => {
 
   it("should create State and shouldn't call initial set (config.isPlaceholder = true)", () => {
     // Overwrite select once to not call it
-    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined);
+    jest.spyOn(State.prototype, 'set').mockReturnValueOnce(undefined as any);
 
     const state = new State(dummyAgile, 'coolValue', { isPlaceholder: true });
 
@@ -182,33 +182,35 @@ describe('State Tests', () => {
       });
 
       it('should update existing Key in all instances', () => {
-        numberState.persistent._key = 'numberStateKey';
+        if (numberState.persistent)
+          numberState.persistent._key = 'numberStateKey';
 
         numberState.setKey('newKey');
 
         expect(numberState._key).toBe('newKey');
         expect(numberState.observer._key).toBe('newKey');
-        expect(numberState.persistent.setKey).toHaveBeenCalledWith('newKey');
+        expect(numberState.persistent?.setKey).toHaveBeenCalledWith('newKey');
       });
 
       it("should update existing Key in all instances except persistent if the StateKey and PersistKey aren't equal", () => {
-        numberState.persistent._key = 'randomKey';
+        if (numberState.persistent) numberState.persistent._key = 'randomKey';
 
         numberState.setKey('newKey');
 
         expect(numberState._key).toBe('newKey');
         expect(numberState.observer._key).toBe('newKey');
-        expect(numberState.persistent.setKey).not.toHaveBeenCalled();
+        expect(numberState.persistent?.setKey).not.toHaveBeenCalled();
       });
 
       it('should update existing Key in all instances except persistent if new StateKey is undefined', () => {
-        numberState.persistent._key = 'numberStateKey';
+        if (numberState.persistent)
+          numberState.persistent._key = 'numberStateKey';
 
         numberState.setKey(undefined);
 
         expect(numberState._key).toBeUndefined();
         expect(numberState.observer._key).toBeUndefined();
-        expect(numberState.persistent.setKey).not.toHaveBeenCalled();
+        expect(numberState.persistent?.setKey).not.toHaveBeenCalled();
       });
     });
 

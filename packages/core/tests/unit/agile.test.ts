@@ -19,7 +19,6 @@ jest.mock('../../src/integrations/index');
 jest.mock('../../src/storages/storage');
 jest.mock('../../src/collection/index');
 jest.mock('../../src/computed/index');
-jest.mock('../../src/event/index');
 /* Can't mock Logger because I somehow can't overwrite a static get method
 jest.mock("../../src/logger/index", () => {
   return class {

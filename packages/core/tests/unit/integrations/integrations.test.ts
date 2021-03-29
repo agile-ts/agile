@@ -88,7 +88,7 @@ describe('Integrations Tests', () => {
       });
 
       it("shouldn't integrate Integration that has no valid Key", async () => {
-        dummyIntegration1._key = undefined;
+        dummyIntegration1._key = undefined as any;
 
         const response = await integrations.integrate(dummyIntegration1);
 

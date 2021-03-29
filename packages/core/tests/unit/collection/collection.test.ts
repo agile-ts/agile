@@ -67,7 +67,9 @@ describe('Collection Tests', () => {
     jest
       .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
-    jest.spyOn(Collection.prototype, 'collect').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Collection.prototype, 'collect')
+      .mockReturnValueOnce(undefined as any);
 
     const collection = new Collection<ItemInterface>(dummyAgile, {
       defaultGroupKey: 'general',
@@ -111,7 +113,9 @@ describe('Collection Tests', () => {
     jest
       .spyOn(Collection.prototype, 'initGroups')
       .mockReturnValueOnce(undefined);
-    jest.spyOn(Collection.prototype, 'collect').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Collection.prototype, 'collect')
+      .mockReturnValueOnce(undefined as any);
 
     const collection = new Collection<ItemInterface>(
       dummyAgile,
@@ -183,30 +187,30 @@ describe('Collection Tests', () => {
       });
 
       it('should update existing Key in all instances', () => {
-        collection.persistent._key = 'collectionKey';
+        if (collection.persistent) collection.persistent._key = 'collectionKey';
 
         collection.setKey('newKey');
 
         expect(collection._key).toBe('newKey');
-        expect(collection.persistent.setKey).toHaveBeenCalledWith('newKey');
+        expect(collection.persistent?.setKey).toHaveBeenCalledWith('newKey');
       });
 
       it("should update existing Key in all instances except persistent if the CollectionKey and PersistKey aren't equal", () => {
-        collection.persistent._key = 'randomKey';
+        if (collection.persistent) collection.persistent._key = 'randomKey';
 
         collection.setKey('newKey');
 
         expect(collection._key).toBe('newKey');
-        expect(collection.persistent.setKey).not.toHaveBeenCalled();
+        expect(collection.persistent?.setKey).not.toHaveBeenCalled();
       });
 
       it('should update existing Key in all instances except persistent if new CollectionKey is undefined', () => {
-        collection.persistent._key = 'collectionKey';
+        if (collection.persistent) collection.persistent._key = 'collectionKey';
 
         collection.setKey(undefined);
 
         expect(collection._key).toBeUndefined();
-        expect(collection.persistent.setKey).not.toHaveBeenCalled();
+        expect(collection.persistent?.setKey).not.toHaveBeenCalled();
       });
     });
 
@@ -448,9 +452,9 @@ describe('Collection Tests', () => {
     });
 
     describe('collect function tests', () => {
-      let dummyGroup1: Group;
-      let dummyGroup2: Group;
-      let defaultGroup: Group;
+      let dummyGroup1: Group<ItemInterface>;
+      let dummyGroup2: Group<ItemInterface>;
+      let defaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
         dummyGroup1 = new Group(collection);

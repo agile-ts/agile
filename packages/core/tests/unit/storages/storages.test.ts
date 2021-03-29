@@ -382,7 +382,7 @@ describe('Storages Tests', () => {
       });
 
       it('should return false if no instance of localStorage exits', () => {
-        global.localStorage = undefined;
+        global.localStorage = undefined as any;
 
         expect(Storages.localStorageAvailable()).toBeFalsy();
       });
