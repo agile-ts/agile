@@ -2,9 +2,9 @@ import {
   Observer,
   RuntimeJob,
   ObserverKey,
-  Event,
   SubscriptionContainer,
-} from '../internal';
+} from '@agile-ts/core';
+import { Event } from './internal';
 
 export class EventObserver<PayloadType = any> extends Observer {
   public event: () => Event<PayloadType>;

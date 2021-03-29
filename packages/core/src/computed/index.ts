@@ -3,7 +3,6 @@ import {
   Agile,
   defineConfig,
   Observer,
-  Event,
   StateConfigInterface,
   ComputedTracker,
   Group,
@@ -183,7 +182,7 @@ export class Computed<ComputedValueType = any> extends State<
  * @param computedDeps - Hard coded dependencies of Computed Function
  */
 export interface ComputedConfigInterface extends StateConfigInterface {
-  computedDeps?: Array<Observer | State | Event | Group>;
+  computedDeps?: Array<Observer | State | Group>;
 }
 
 /**
