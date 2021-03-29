@@ -7,5 +7,4 @@
   "include": [
     "./src/**/*" // Only include what is in src (-> dist, tests, .. will be excluded)
   ]
-
 }

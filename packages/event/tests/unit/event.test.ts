@@ -201,7 +201,7 @@ describe('Event Tests', () => {
 
     describe('disable function tests', () => {
       it('should disable Event', () => {
-        event.enabled = undefined;
+        event.enabled = undefined as any;
 
         event.disable();
 
@@ -211,7 +211,7 @@ describe('Event Tests', () => {
 
     describe('enable function tests', () => {
       it('should enable Event', () => {
-        event.enabled = undefined;
+        event.enabled = undefined as any;
 
         event.enable();
 
@@ -227,7 +227,7 @@ describe('Event Tests', () => {
         // @ts-ignore
         // eslint-disable-next-line no-global-assign
         clearTimeout = jest.fn();
-        event.enabled = undefined;
+        event.enabled = undefined as any;
         event.uses = 100;
         event.currentTimeout = timeout;
 
