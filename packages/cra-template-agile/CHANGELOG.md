@@ -1,5 +1,11 @@
 # cra-template-agile
 
+## 0.0.3
+
+### Patch Changes
+
+- 7f29a97: fixed bugs and increased versions
+
 ## 0.0.2
 
 ### Patch Changes
