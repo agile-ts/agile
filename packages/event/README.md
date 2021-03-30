@@ -1,6 +1,6 @@
 # [WIP] Event
 
-> Handy class for emitting UI updates and passing data with them.
+> Handy class for emitting UI Events
 
 <a href="https://npm.im/@agile-ts/api">
   <img src="https://img.shields.io/npm/v/@agile-ts/event.svg" alt="npm version"/></a>
