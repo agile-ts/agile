@@ -26,6 +26,7 @@ describe('StatePersistent Tests', () => {
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = false;
       });
 
@@ -52,6 +53,7 @@ describe('StatePersistent Tests', () => {
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = false;
       });
 
@@ -80,6 +82,7 @@ describe('StatePersistent Tests', () => {
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = true;
       });
 
@@ -93,6 +96,7 @@ describe('StatePersistent Tests', () => {
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = true;
       });
 

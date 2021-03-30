@@ -3,16 +3,19 @@
 
 
 "@agile-ts/api@file:.yalc/@agile-ts/api":
-  version "0.0.11"
+  version "0.0.13"
 
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.0.11"
+  version "0.0.12"
+
+"@agile-ts/event@file:.yalc/@agile-ts/event":
+  version "0.0.1"
 
 "@agile-ts/multieditor@file:.yalc/@agile-ts/multieditor":
-  version "0.0.11"
+  version "0.0.12"
 
 "@agile-ts/react@file:.yalc/@agile-ts/react":
-  version "0.0.11"
+  version "0.0.12"
 
 "@babel/code-frame@7.8.3":
   version "7.8.3"

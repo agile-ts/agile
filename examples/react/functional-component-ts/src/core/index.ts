@@ -1,4 +1,6 @@
 import { Agile, clone, Logger } from '@agile-ts/core';
+import API from '@agile-ts/api';
+import Event from '@agile-ts/event';
 
 export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG },
@@ -50,7 +52,7 @@ MY_COLLECTION.onLoad(() => {
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));
 
-export const MY_EVENT = App.createEvent<{ name: string }>({
+export const MY_EVENT = new Event<{ name: string }>(App, {
   delay: 3000,
   key: 'myEvent',
 });
@@ -94,3 +96,24 @@ logger.trace('This is a Trace');
 logger.if.tag(['coreWarning']).warn('My core Warning');
 logger.if.tag(['randomDebug']).debug('My random Debug');
 logger.table('Test Table', { test: 'test', test1: 'test1' });
+
+const api = new API({
+  timeout: 10000,
+  options: {
+    credentials: undefined,
+  },
+});
+
+// testing some urls
+api
+  .with({
+    baseURL: `https://api.npmjs.org/downloads/point/2020-08-24:2020-09-24/@agile-ts/core`,
+  })
+  .get('');
+
+// testing some urls
+api
+  .with({
+    baseURL: `https://api`,
+  })
+  .get('');

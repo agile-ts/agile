@@ -37,7 +37,8 @@ describe('Computed Tests', () => {
     expect(computed.observer.dependents.size).toBe(0);
     expect(computed.observer._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeMethod).toBeUndefined();
+    expect(computed.computeValueMethod).toBeUndefined();
+    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
     expect(computed.watchers).toStrictEqual({});
@@ -56,7 +57,7 @@ describe('Computed Tests', () => {
     const computed = new Computed(dummyAgile, computedFunction, {
       key: 'coolComputed',
       dependents: [dummyObserver1],
-      computedDeps: [dummyObserver2, undefined, dummyState],
+      computedDeps: [dummyObserver2, undefined as any, dummyState],
     });
 
     expect(computed.computeFunction).toBe(computedFunction);
@@ -78,7 +79,8 @@ describe('Computed Tests', () => {
     expect(computed.observer.dependents.has(dummyObserver1)).toBeTruthy(); // x
     expect(computed.observer._key).toBe('coolComputed'); // x
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeMethod).toBeUndefined();
+    expect(computed.computeValueMethod).toBeUndefined();
+    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
     expect(computed.watchers).toStrictEqual({});
@@ -215,7 +217,7 @@ describe('Computed Tests', () => {
       });
     });
 
-    describe('computeValue function tests', () => {
+    describe('compute function tests', () => {
       let dummyObserver1: Observer;
       let dummyObserver2: Observer;
       let dummyObserver3: Observer;
@@ -240,7 +242,7 @@ describe('Computed Tests', () => {
           dummyObserver2,
         ]);
 
-        const response = computed.computeValue();
+        const response = computed.compute();
 
         expect(response).toBe('newComputedValue');
         expect(dummyComputeFunction).toHaveBeenCalled();

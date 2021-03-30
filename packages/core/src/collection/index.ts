@@ -12,7 +12,7 @@ import {
   normalizeArray,
   copy,
   CollectionPersistent,
-  GroupAddConfig,
+  GroupAddConfigInterface,
   ComputedTracker,
   generateId,
   SideEffectConfigInterface,
@@ -122,7 +122,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Group(
     initialItems?: Array<ItemKey>,
-    config?: GroupConfigInterface
+    config: GroupConfigInterface = {}
   ): Group<DataType> {
     if (this.isInstantiated) {
       const key = config?.key || generateId();
@@ -150,7 +150,7 @@ export class Collection<DataType = DefaultItem> {
    */
   public Selector(
     initialKey: ItemKey,
-    config?: SelectorConfigInterface
+    config: SelectorConfigInterface = {}
   ): Selector<DataType> {
     if (this.isInstantiated) {
       const key = config?.key || generateId();
@@ -305,7 +305,7 @@ export class Collection<DataType = DefaultItem> {
     const item = this.getItem(itemKey, { notExisting: true });
     const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
-      addNewProperties: true,
+      patch: true,
       background: false,
     });
 
@@ -326,20 +326,46 @@ export class Collection<DataType = DefaultItem> {
     const newItemKey = changes[primaryKey] || oldItemKey;
     const updateItemKey = oldItemKey !== newItemKey;
 
-    // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (below)
-    if (changes[primaryKey]) delete changes[primaryKey];
-
     // Update ItemKey
     if (updateItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
 
-    // Apply changes to Item
-    item.patch(changes as any, {
-      background: config.background,
-      addNewProperties: config.addNewProperties,
-    });
+    // Patch changes into Item
+    if (config.patch) {
+      // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (see above)
+      if (changes[primaryKey]) delete changes[primaryKey];
+
+      let patchConfig: { addNewProperties?: boolean } =
+        typeof config.patch === 'object' ? config.patch : {};
+      patchConfig = defineConfig(patchConfig, {
+        addNewProperties: true,
+      });
+
+      // Apply changes to Item
+      item.patch(changes as any, {
+        background: config.background,
+        addNewProperties: patchConfig.addNewProperties,
+      });
+    }
+
+    // Set changes into Item
+    if (!config.patch) {
+      // To make sure that the primaryKey doesn't differ from the changes object primaryKey
+      if (changes[this.config.primaryKey] !== itemKey) {
+        changes[this.config.primaryKey] = itemKey;
+        Agile.logger.warn(
+          `By overwriting the whole Item don't forget passing the correct primaryKey!`,
+          changes
+        );
+      }
+
+      // Apply changes to Item
+      item.set(changes as any, {
+        background: config.background,
+      });
+    }
 
     return item;
   }
@@ -507,6 +533,18 @@ export class Collection<DataType = DefaultItem> {
     this.selectors[selectorKey] = selector;
 
     return selector;
+  }
+
+  //=========================================================================================================
+  // Select
+  //=========================================================================================================
+  /**
+   * @public
+   * Creates new Selector that represents an Item of the Collection
+   * @param itemKey - Key of Item which the Selector represents
+   */
+  public select(itemKey: ItemKey): Selector<DataType> {
+    return this.createSelector(itemKey, itemKey);
   }
 
   //=========================================================================================================
@@ -835,7 +873,7 @@ export class Collection<DataType = DefaultItem> {
    * @public
    * Resets this Collection
    */
-  public reset() {
+  public reset(): this {
     // Reset Data
     this.data = {};
     this.size = 0;
@@ -845,6 +883,8 @@ export class Collection<DataType = DefaultItem> {
 
     // Reset Selectors
     for (const key in this.selectors) this.getSelector(key)?.reset();
+
+    return this;
   }
 
   //=========================================================================================================
@@ -860,8 +900,8 @@ export class Collection<DataType = DefaultItem> {
   public put(
     itemKeys: ItemKey | Array<ItemKey>,
     groupKeys: GroupKey | Array<GroupKey>,
-    config: GroupAddConfig = {}
-  ) {
+    config: GroupAddConfigInterface = {}
+  ): this {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
 
@@ -869,6 +909,8 @@ export class Collection<DataType = DefaultItem> {
     _groupKeys.forEach((groupKey) => {
       this.getGroup(groupKey)?.add(_itemKeys, config);
     });
+
+    return this;
   }
 
   //=========================================================================================================
@@ -970,7 +1012,12 @@ export class Collection<DataType = DefaultItem> {
    * Remove Items from Collection
    * @param itemKeys - ItemKey/s that get removed
    */
-  public remove(itemKeys: ItemKey | Array<ItemKey>) {
+  public remove(
+    itemKeys: ItemKey | Array<ItemKey>
+  ): {
+    fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
+    everywhere: () => Collection<DataType>;
+  } {
     return {
       fromGroups: (groups: Array<ItemKey> | ItemKey) =>
         this.removeFromGroups(itemKeys, groups),
@@ -990,7 +1037,7 @@ export class Collection<DataType = DefaultItem> {
   public removeFromGroups(
     itemKeys: ItemKey | Array<ItemKey>,
     groupKeys: GroupKey | Array<GroupKey>
-  ): void {
+  ): this {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
 
@@ -1012,6 +1059,8 @@ export class Collection<DataType = DefaultItem> {
       )
         this.removeItems(itemKey);
     });
+
+    return this;
   }
 
   //=========================================================================================================
@@ -1022,7 +1071,7 @@ export class Collection<DataType = DefaultItem> {
    * Removes Item completely from Collection
    * @param itemKeys - ItemKey/s of Item/s
    */
-  public removeItems(itemKeys: ItemKey | Array<ItemKey>): void {
+  public removeItems(itemKeys: ItemKey | Array<ItemKey>): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
     _itemKeys.forEach((itemKey) => {
@@ -1050,6 +1099,8 @@ export class Collection<DataType = DefaultItem> {
 
       this.size--;
     });
+
+    return this;
   }
 
   //=========================================================================================================
@@ -1193,11 +1244,11 @@ export interface CollectConfigInterface<DataType = any> {
 }
 
 /**
- * @param addNewProperties - If properties that doesn't exist in base ItemData get added
+ * @param patch - If Data gets merged into the current Data
  * @param background - If updating an Item happens in the background (-> not causing any rerender)
  */
 export interface UpdateConfigInterface {
-  addNewProperties?: boolean;
+  patch?: boolean | { addNewProperties?: boolean };
   background?: boolean;
 }
 

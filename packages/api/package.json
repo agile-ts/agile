@@ -17,9 +17,9 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc && tsc -p ./tsconfig.production.json",
-    "dev-publish": "yalc publish",
-    "dev-push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"yarn run dev-push\"",
+    "dev:publish": "yalc publish",
+    "dev:push": "yalc push",
+    "watch": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "release": "yarn run prepare",
     "preview": "npm pack"
   },

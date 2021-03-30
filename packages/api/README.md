@@ -12,7 +12,8 @@
   <img src="https://img.shields.io/npm/dt/@agile-ts/api.svg" alt="npm total downloads"/></a>
 <a href="https://npm.im/@agile-ts/api">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/api.svg" alt="npm minified size"/></a>
-  
+ 
+
 ## ⏰ Short Example
 ```ts
 // Let't create our API
@@ -36,6 +37,7 @@ console.log(response);
 */
 ```
 
+
 ## ❓ Why Agile Api
 
 #### 🚅 Straightforward
@@ -44,28 +46,31 @@ Write minimalistic, boilerplate free code that captures your intent. <br />
 - Automatic transform for JSON data
 - Configurable Timeout
 
+
 #### 🎯 Easy to Use
 Learn the powerful and simple tools of Agile Api in a short amount of time.
+
 
 #### 🍃 Lightweight
 Agile Api has an unpacked size of [2kB](https://bundlephobia.com/result?p=@agile-ts/api@0.0.6) 
 and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/api).
 
+
 ## ⬇️ Installation
 ```
 npm install @agile-ts/api
 ```
-_Be aware that this is no standalone package!_ <br />
-To use the Agile Api you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
-To find out more take a look into the [docs](https://www.agile-ts.org/docs).
+The `api` package is an extension of AgileTs and doesn't work without the [`core`](https://agile-ts.org/docs/core) package,
+which functions as the brain of AgileTs and is indispensable.
+Unfortunately, we can't combine each `core` with `api` version.
+Therefore, we have created a table which shows which versions fit together without restrictions.
 
-
-## 🔑 Fitting Versions
-| @agile-ts/api   | @agile-ts/core          | NPM Version              | 
-| --------------- | ----------------------- | ------------------------ | 
-| v0.0.7          | v0.0.1+                 | v6+                      | 
-| v0.0.6          | v0.0.1+                 | v6+                      | 
+| @agile-ts/api         | @agile-ts/core          | NPM Version              |
+| ----------------------| ----------------------- | ------------------------ |
+| v0.0.7+               | v0.0.7+                 | v6+                      |
+| v0.0.6                | v0.0.3 - v0.0.6         | v6+                      |
 _Other Versions aren't supported anymore_
+
 
 ## 📄 Documentation
 The Agile Api Docs are located [here](https://agile-ts.org/docs/)

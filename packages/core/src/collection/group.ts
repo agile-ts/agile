@@ -114,7 +114,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    config: GroupRemoveConfig = {}
+    config: GroupRemoveConfigInterface = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
@@ -165,12 +165,15 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * @param itemKeys - ItemKey/s that get added to the Group
    * @param config - Config
    */
-  public add(itemKeys: ItemKey | ItemKey[], config: GroupAddConfig = {}): this {
+  public add(
+    itemKeys: ItemKey | ItemKey[],
+    config: GroupAddConfigInterface = {}
+  ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
-    config = defineConfig<GroupAddConfig>(config, {
+    config = defineConfig<GroupAddConfigInterface>(config, {
       method: 'push',
       overwrite: false,
       background: false,
@@ -296,7 +299,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    * @internal
    * Rebuilds Output and Items of Group
    */
-  public rebuild() {
+  public rebuild(): this {
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
     const groupItems: Array<Item<DataType>> = [];
 
@@ -325,6 +328,8 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     this.items = groupItems;
     this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
+
+    return this;
   }
 }
 
@@ -335,7 +340,7 @@ export type GroupKey = string | number;
  * @param overwrite - If adding ItemKey overwrites old ItemKey (-> otherwise it gets added to the end of the Group)
  * @param background - If adding ItemKey happens in the background (-> not causing any rerender)
  */
-export interface GroupAddConfig {
+export interface GroupAddConfigInterface {
   method?: 'unshift' | 'push';
   overwrite?: boolean;
   background?: boolean;
@@ -344,7 +349,7 @@ export interface GroupAddConfig {
 /**
  * @param background - If removing ItemKey happens in the background (-> not causing any rerender)
  */
-export interface GroupRemoveConfig {
+export interface GroupRemoveConfigInterface {
   background?: boolean;
 }
 

@@ -17,7 +17,6 @@ import {
   getAgileInstance,
   Agile,
   State,
-  Event,
   Observer,
   Collection,
   createArrayFromObject,
@@ -206,12 +205,6 @@ describe('Utils Tests', () => {
       const dummyState = new State(dummyAgile, 'dummyValue');
 
       expect(getAgileInstance(dummyState)).toBe(dummyAgile);
-    });
-
-    it('should get agileInstance from Event', () => {
-      const dummyEvent = new Event(dummyAgile);
-
-      expect(getAgileInstance(dummyEvent)).toBe(dummyAgile);
     });
 
     it('should get agileInstance from Collection', () => {

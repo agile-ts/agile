@@ -1,4 +1,5 @@
 import { Agile } from '@agile-ts/core';
+import { Event } from '@agile-ts/event';
 import { Alert } from 'react-native';
 
 export const App = new Agile({
@@ -42,7 +43,7 @@ MY_COLLECTION.getGroup('myGroup')?.persist({
 
 console.log('Initial: myCollection ', MY_COLLECTION);
 
-export const MY_EVENT = App.createEvent<{ name: string }>();
+export const MY_EVENT = new Event<{ name: string }>(App);
 
 MY_EVENT.on('Test', (payload) => {
   Alert.alert(

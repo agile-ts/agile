@@ -122,7 +122,7 @@ const createHOC = (
         this.agileProps = response.props;
 
         // Merge depsWith Indicator into this.state
-        this.state = flatMerge(this.state || {}, depsWithIndicator);
+        this.setState(flatMerge(this.state || {}, depsWithIndicator));
       }
     }
 

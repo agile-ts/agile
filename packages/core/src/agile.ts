@@ -7,9 +7,6 @@ import {
   CollectionConfig,
   DefaultItem,
   Computed,
-  Event,
-  CreateEventConfigInterface,
-  DefaultEventPayload,
   Integrations,
   Observer,
   SubController,
@@ -174,20 +171,6 @@ export class Agile {
         computedDeps: _deps,
       })
     );
-  }
-
-  //=========================================================================================================
-  // Event
-  //=========================================================================================================
-  /**
-   * @public
-   * Event - Class that holds a List of Functions which can be triggered at the same time
-   * @param config - Config
-   */
-  public createEvent<PayloadType = DefaultEventPayload>(
-    config?: CreateEventConfigInterface
-  ) {
-    return new Event<PayloadType>(this, config);
   }
 
   //=========================================================================================================

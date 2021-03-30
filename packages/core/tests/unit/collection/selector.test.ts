@@ -20,7 +20,9 @@ describe('Selector Tests', () => {
 
   it('should create Selector and call initial select (default config)', () => {
     // Overwrite select once to not call it
-    jest.spyOn(Selector.prototype, 'select').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Selector.prototype, 'select')
+      .mockReturnValueOnce(undefined as any);
 
     const selector = new Selector(dummyCollection, 'dummyItemKey');
 
@@ -43,7 +45,8 @@ describe('Selector Tests', () => {
     expect(selector.observer.dependents.size).toBe(0);
     expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
-    expect(selector.computeMethod).toBeUndefined();
+    expect(selector.computeValueMethod).toBeUndefined();
+    expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
     expect(selector.watchers).toStrictEqual({});
@@ -51,7 +54,9 @@ describe('Selector Tests', () => {
 
   it('should create Selector and call initial select (specific config)', () => {
     // Overwrite select once to not call it
-    jest.spyOn(Selector.prototype, 'select').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Selector.prototype, 'select')
+      .mockReturnValueOnce(undefined as any);
 
     const selector = new Selector(dummyCollection, 'dummyItemKey', {
       key: 'dummyKey',
@@ -76,7 +81,8 @@ describe('Selector Tests', () => {
     expect(selector.observer.dependents.size).toBe(0);
     expect(selector.observer._key).toBe('dummyKey');
     expect(selector.sideEffects).toStrictEqual({});
-    expect(selector.computeMethod).toBeUndefined();
+    expect(selector.computeValueMethod).toBeUndefined();
+    expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
     expect(selector.watchers).toStrictEqual({});
@@ -84,7 +90,9 @@ describe('Selector Tests', () => {
 
   it("should create Selector and shouldn't call initial select (config.isPlaceholder = true)", () => {
     // Overwrite select once to not call it
-    jest.spyOn(Selector.prototype, 'select').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Selector.prototype, 'select')
+      .mockReturnValueOnce(undefined as any);
 
     const selector = new Selector(dummyCollection, 'dummyItemKey', {
       isPlaceholder: true,
@@ -107,7 +115,8 @@ describe('Selector Tests', () => {
     expect(selector.observer.dependents.size).toBe(0);
     expect(selector.observer._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
-    expect(selector.computeMethod).toBeUndefined();
+    expect(selector.computeValueMethod).toBeUndefined();
+    expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
     expect(selector.watchers).toStrictEqual({});
@@ -532,25 +541,25 @@ describe('Selector Tests', () => {
       });
 
       it('should return true if Selector has selected ItemKey and Item isSelected', () => {
-        selector.item.isSelected = true;
+        if (selector.item) selector.item.isSelected = true;
 
         expect(selector.hasSelected('dummyItemKey')).toBeTruthy();
       });
 
       it("should return false if Selector hasn't selected ItemKey and Item isSelected", () => {
-        selector.item.isSelected = true;
+        if (selector.item) selector.item.isSelected = true;
 
         expect(selector.hasSelected('notSelectedItemKey')).toBeFalsy();
       });
 
       it("should return false if Selector has selected ItemKey and Item isn't isSelected", () => {
-        selector.item.isSelected = false;
+        if (selector.item) selector.item.isSelected = false;
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();
       });
 
       it("should return false if Selector hasn't selected ItemKey and Item isn't isSelected", () => {
-        selector.item.isSelected = false;
+        if (selector.item) selector.item.isSelected = false;
 
         expect(selector.hasSelected('notSelectedItemKey')).toBeFalsy();
       });

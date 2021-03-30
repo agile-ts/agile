@@ -34,8 +34,12 @@ describe('Group Tests', () => {
 
   it('should create Group with no initialItems (default config)', () => {
     // Overwrite methods once to not call it
-    jest.spyOn(Group.prototype, 'rebuild').mockReturnValueOnce(undefined);
-    jest.spyOn(Group.prototype, 'addSideEffect').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Group.prototype, 'rebuild')
+      .mockReturnValueOnce(undefined as any);
+    jest
+      .spyOn(Group.prototype, 'addSideEffect')
+      .mockReturnValueOnce(undefined as any);
 
     const group = new Group(dummyCollection);
 
@@ -56,7 +60,8 @@ describe('Group Tests', () => {
     expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
-    expect(group.computeMethod).toBeUndefined();
+    expect(group.computeValueMethod).toBeUndefined();
+    expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
     expect(group.watchers).toStrictEqual({});
@@ -64,8 +69,12 @@ describe('Group Tests', () => {
 
   it('should create Group with no initialItems (specific config)', () => {
     // Overwrite methods once to not call it
-    jest.spyOn(Group.prototype, 'rebuild').mockReturnValueOnce(undefined);
-    jest.spyOn(Group.prototype, 'addSideEffect').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Group.prototype, 'rebuild')
+      .mockReturnValueOnce(undefined as any);
+    jest
+      .spyOn(Group.prototype, 'addSideEffect')
+      .mockReturnValueOnce(undefined as any);
 
     const group = new Group(dummyCollection, [], {
       key: 'dummyKey',
@@ -89,7 +98,8 @@ describe('Group Tests', () => {
     expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBe('dummyKey');
     expect(group.sideEffects).toStrictEqual({});
-    expect(group.computeMethod).toBeUndefined();
+    expect(group.computeValueMethod).toBeUndefined();
+    expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
     expect(group.watchers).toStrictEqual({});
@@ -97,8 +107,12 @@ describe('Group Tests', () => {
 
   it('should create Group with initialItems (default config)', () => {
     // Overwrite methods once to not call it
-    jest.spyOn(Group.prototype, 'rebuild').mockReturnValueOnce(undefined);
-    jest.spyOn(Group.prototype, 'addSideEffect').mockReturnValueOnce(undefined);
+    jest
+      .spyOn(Group.prototype, 'rebuild')
+      .mockReturnValueOnce(undefined as any);
+    jest
+      .spyOn(Group.prototype, 'addSideEffect')
+      .mockReturnValueOnce(undefined as any);
 
     const group = new Group(dummyCollection, ['test1', 'test2', 'test3']);
 
@@ -119,7 +133,8 @@ describe('Group Tests', () => {
     expect(group.observer.dependents.size).toBe(0);
     expect(group.observer._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
-    expect(group.computeMethod).toBeUndefined();
+    expect(group.computeValueMethod).toBeUndefined();
+    expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
     expect(group.watchers).toStrictEqual({});
@@ -137,8 +152,8 @@ describe('Group Tests', () => {
       });
       dummyCollection.collect({ id: 'dummyItem1Key', name: 'coolName' });
       dummyCollection.collect({ id: 'dummyItem2Key', name: 'coolName' });
-      dummyItem1 = dummyCollection.getItem('dummyItem1Key');
-      dummyItem2 = dummyCollection.getItem('dummyItem2Key');
+      dummyItem1 = dummyCollection.getItem('dummyItem1Key') as any;
+      dummyItem2 = dummyCollection.getItem('dummyItem2Key') as any;
       dummyItem3 = new Item(dummyCollection, {
         id: 'dummyItem3Key',
         name: 'coolName',

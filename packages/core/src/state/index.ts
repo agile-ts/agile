@@ -15,7 +15,6 @@ import {
   PersistentKey,
   ComputedTracker,
   StateIngestConfigInterface,
-  StateRuntimeJobConfigInterface,
 } from '../internal';
 
 export class State<ValueType = any> {
@@ -34,7 +33,8 @@ export class State<ValueType = any> {
   public sideEffects: {
     [key: string]: SideEffectInterface<State<ValueType>>;
   } = {}; // SideEffects of State (will be executed in Runtime)
-  public computeMethod?: ComputeMethod<ValueType>;
+  public computeValueMethod?: ComputeValueMethod<ValueType>;
+  public computeExistsMethod: ComputeExistsMethod<ValueType>;
 
   public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
@@ -68,6 +68,9 @@ export class State<ValueType = any> {
     this.previousStateValue = copy(initialValue);
     this.nextStateValue = copy(initialValue);
     this.isPlaceholder = true;
+    this.computeExistsMethod = (v) => {
+      return v != null;
+    };
 
     // Initial Set
     if (!config.isPlaceholder) this.set(initialValue, { overwrite: true });
@@ -476,7 +479,25 @@ export class State<ValueType = any> {
    * Checks if State exists
    */
   public get exists(): boolean {
-    return !this.isPlaceholder;
+    return !this.isPlaceholder && this.computeExistsMethod(this.value);
+  }
+
+  //=========================================================================================================
+  // Compute Exists
+  //=========================================================================================================
+  /**
+   * @public
+   * Function that computes the exists status of the State
+   * @param method - Computed Function
+   */
+  public computeExists(method: ComputeExistsMethod<ValueType>): this {
+    if (!isFunction(method)) {
+      Agile.logger.error(`A 'computeExistsMethod' has to be a function!`);
+      return this;
+    }
+    this.computeExistsMethod = method;
+
+    return this;
   }
 
   //=========================================================================================================
@@ -521,19 +542,23 @@ export class State<ValueType = any> {
   }
 
   //=========================================================================================================
-  // Compute
+  // Compute Value
   //=========================================================================================================
   /**
    * @public
    * Function that recomputes State Value if it changes
    * @param method - Computed Function
    */
-  public compute(method: ComputeMethod<ValueType>): this {
+  public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      Agile.logger.error('A computeMethod has to be a function!');
+      Agile.logger.error(`A 'computeValueMethod' has to be a function!`);
       return this;
     }
-    this.computeMethod = method;
+    this.computeValueMethod = method;
+
+    // Initial compute
+    this.set(method(this.nextStateValue));
+
     return this;
   }
 
@@ -662,7 +687,8 @@ export interface StatePersistentConfigInterface {
 }
 
 export type StateWatcherCallback<T = any> = (value: T, key: string) => void;
-export type ComputeMethod<T = any> = (value: T) => T;
+export type ComputeValueMethod<T = any> = (value: T) => T;
+export type ComputeExistsMethod<T = any> = (value: T) => boolean;
 
 export type SideEffectFunctionType<Instance extends State<any>> = (
   instance: Instance,
