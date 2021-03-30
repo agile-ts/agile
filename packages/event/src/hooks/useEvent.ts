@@ -5,7 +5,7 @@ import {
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
 import { Event, EventCallbackFunction } from '../internal';
-import { useIsomorphicLayoutEffect } from '@agile-ts/react';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export function useEvent<E extends Event<any>>(
   event: E,
