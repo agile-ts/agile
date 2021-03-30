@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.13
+
+### Patch Changes
+
+- 7f29a97: fixed bugs and increased versions
+
 ## 0.0.12
 
 ### Patch Changes
