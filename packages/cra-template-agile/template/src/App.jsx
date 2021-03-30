@@ -1,6 +1,7 @@
-import './App.css';
+import React from 'react';
 import { MY_STATE, MY_STATE_2 } from './core';
 import { useAgile } from '@agile-ts/react';
+import './App.css';
 
 function App() {
   const [myState, myState2] = useAgile([MY_STATE, MY_STATE_2]);
