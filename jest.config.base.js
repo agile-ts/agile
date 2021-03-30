@@ -2,6 +2,7 @@ module.exports = {
   testEnvironment: 'node',
   coveragePathIgnorePatterns: ['(tests/.*.mock).(jsx?|tsx?)$'],
   modulePathIgnorePatterns: ['dist', 'examples', 'node_modules'],
+  collectCoverageFrom: ['**/*.ts', '!**/node_modules/**', '!**/dist/**'],
   testMatch: ['<rootDir>/packages/**/tests/**/*.test.ts'],
   transform: {
     '^.+\\.ts?$': 'ts-jest',
