@@ -13,6 +13,7 @@
 <a href="https://npm.im/@agile-ts/multieditor">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/multieditor.svg" alt="npm minified size"/></a>
   
+
 ## ⏰ Short Example
 ```ts
 // Let's create our MultiEditor
@@ -65,12 +66,15 @@ Write minimalistic, boilerplate free code that captures your intent. <br />
       }
   ```
 
+
 #### 🎯 Easy to Use
 Learn the powerful and simple tools of Agile MultiEditor in a short amount of time.
+
 
 #### 🍃 Lightweight
 Agile Api has an unpacked size of [14.1kB](https://bundlephobia.com/result?p=@agile-ts/multieditor@0.0.6)
 and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multieditor).
+
 
 ## ⬇️ Installation
 ```
@@ -86,3 +90,7 @@ Therefore, we have created a table which shows which versions fit together witho
 | v0.0.7+               | v0.0.7+                 | v6+                      | 16.8+                    |
 | v0.0.6                | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | 
 _Other Versions aren't supported anymore_
+
+
+## 📄 Documentation
+The Agile MultiEditor Docs are located [here](https://agile-ts.org/docs/)

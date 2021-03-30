@@ -13,12 +13,14 @@
 <a href="https://npm.im/@agile-ts/api">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/event.svg" alt="npm minified size"/></a>
   
+
 ## ⏰ Short Example
 ```ts
 const MY_EVENT = App.createEvent();
 MY_EVENT.on((data) => {console.log("hello there " + data.name)}); // Print 'hello there jeff' if Event gets triggered
 MY_EVENT.trigger({name: "jeff"}); // Trigger Event
 ```
+
 
 ## ⬇️ Installation
 ```
@@ -34,3 +36,6 @@ Therefore, we have created a table which shows which versions fit together witho
 | v0.0.1+               | v0.0.10+                | v0.0.10+                 | v6+                      | 16.8+                    |
 _Other Versions aren't supported anymore_
 
+
+## 📄 Documentation
+The Agile Event Docs are located [here](https://agile-ts.org/docs/)
