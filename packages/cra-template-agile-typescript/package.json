@@ -1,6 +1,6 @@
 {
   "name": "cra-template-agile-typescript",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -23,7 +23,7 @@
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
     "@agile-ts/core": "^0.0.13",
-    "@agile-ts/react": "^0.0.13"
+    "@agile-ts/react": "^0.0.14"
   },
   "publishConfig": {
     "access": "public"

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.0.3
+
+### Patch Changes
+
+- b669e3b: fixed bugs
+
 ## 0.0.2
 
 ### Patch Changes
