@@ -26,8 +26,8 @@ MY_EVENT.trigger({name: "jeff"}); // Trigger Event
 ```
 npm install @agile-ts/event
 ```
-The `event` package is an extension of AgileTs for React, which doesn't work without the [`core`](../core/Introduction.md)
-and [`react`](../react/Introduction.md) package.
+The `event` package is an extension of AgileTs for React, which doesn't work without the [`core`](https://agile-ts.org/docs/core)
+and [`react`](https://agile-ts.org/docs/react) package.
 Unfortunately, we can't combine each `core`, `react` with `event` version.
 Therefore, we have created a table which shows which versions fit together without restrictions.
 

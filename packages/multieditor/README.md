@@ -48,6 +48,7 @@ multiEditor.submit();
 ```
 _Do you want to see it in action? Click [here](https://codesandbox.io/s/multieditor-yxt4x)._
 
+
 ## ❓ Why Agile MultiEditor
 
 #### 🚅 Straightforward
@@ -80,7 +81,7 @@ and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multiedito
 ```
 npm install @agile-ts/multieditor
 ```
-The `multieditor` package is an extension of AgileTs and doesn't work without the [`core` package](../core/Introduction.md),
+The `multieditor` package is an extension of AgileTs and doesn't work without the [`core`](https://agile-ts.org/docs/core) package,
 which functions as the brain of AgileTs and is indispensable.
 Unfortunately, we can't combine each `core` with `multieditor` version.
 Therefore, we have created a table which shows which versions fit together without restrictions.

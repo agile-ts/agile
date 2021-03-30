@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/header_background.png" alt="React Integration">
 
-> **Use AgileTs with React and React-Native**
+> **Integrate AgileTs into React or React-Native**
 
  <br />
 
@@ -20,22 +20,40 @@
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/what_does_this_integration_header.png" alt="What does this Integration?"/>
 
-Well, the main task of this Integration is to bind States, Collection, .. to React Components.
-This binding ensures that AgileTs rerender the Component, if a bound Instance mutates.
-It also offers some other useful functions that optimize the workflow of AgileTs in React.
+The `react` package is an Integration of AgileTs into React.
+Its main task is to bind States to React Components.
+This binding ensures that AgileTs rerender the Component, whenever a bound State mutates.
+It also offers some other useful functions that optimize the workflow with AgileTs in a React Environment.
 
-Here is a quick example how such a binding might look like:
+A distinction is made between `Functional` and `Class` Components,
+as we prefer using `React Hooks` in Functional Components.
+But Hooks aren't supported in Class Components, so we came across other solutions,
+to offer the same features there too.
+
+### 🐆 Functional Component
+In Function Components we recommend using AgileTs Hooks like `useAgile`,
+which allows us to bind any State to our React Component
 ```ts
 // -- myComponent.jsx ------------------------------------------
 
-// Binds MY_FIRST_STATE to myComponent.jsx
- const myFirstState = useAgile(MY_FIRST_STATE);
+// Binds MY_FIRST_STATE to myComponent
+const myFirstState = useAgile(MY_FIRST_STATE);
 ```
+To find out more about `useAgile`, and other Hooks provided by AgileTs,
+checkout the AgileTs Hook [docs](https://agile-ts.org/docs/react/hooks).
 
-A distinction is made between `Functional` and `Class` Components, 
-as we prefer using `React Hooks` in Functional Components. 
-But Hooks aren't supported in Class Components, so we came across other solutions,
-to offer the same features there too.
+### 🦖 Class Component
+In Class Component we currently only support the `AgileHOC`,
+which helps us binding States to our Component.
+It is a Higher order Component that gets wrapped around our React Component.
+```ts
+// -- myComponent.jsx ------------------------------------------
+
+// Binds MY_FIRST_STATE to myComponent
+export default AgileHOC(myComponent, [MY_FIRST_STATE]);
+```
+To find out more AgileTs in Class Components,
+checkout the AgileHOC [docs](https://agile-ts.org/docs/react/AgileHOC).
 
 
 <br />
@@ -47,20 +65,16 @@ to offer the same features there too.
 ```
 npm install @agile-ts/react
 ```
-_Be aware that this is no standalone package!_ <br />
-
-The React Integration is only an extension of AgileTs and doesn't work without the [Core Package](https://www.npmjs.com/package/@agile-ts/core),
+The `react` package is an extension of AgileTs and doesn't work without the [`core`](https://agile-ts.org/docs/core) package,
 which functions as the brain of AgileTs and is indispensable.
-Unfortunately, we can't combine every `core` version with `react` version.
-Therefore, you can find a table that shows which versions fit together below.
+Unfortunately, we can't combine each `core` with `react` version.
+Therefore, we have created a table which shows which versions fit together without restrictions.
 
 | @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
 | --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
 | v0.0.7+         | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
 | v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
 _Other Versions aren't supported anymore_
-
-To find out more checkout our [docs](https://www.agile-ts.org/docs).
 
 
 <br />
@@ -69,9 +83,8 @@ To find out more checkout our [docs](https://www.agile-ts.org/docs).
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/documentation_header.png" alt="Documentation"/>
 
-If you want to find out more about the AgileTs React Integration.
-Checkout our **[docs](https://agile-ts.org/docs/react)**.
-In case you have any questions don't mind joining our [Discord Community](https://discord.gg/FTqeMNCxw7).
+Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
+In case you have any further questions don't mind joining our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 
 <br />
@@ -80,5 +93,5 @@ In case you have any questions don't mind joining our [Discord Community](https:
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/contribute_header.png" alt="Contribute"/>
 
-Get a part of AgileTs and start contributing. To find out more read the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
-
+Get a part of AgileTs and start contributing. We welcome any meaningful contribution 😀
+To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
