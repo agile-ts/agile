@@ -76,17 +76,13 @@ and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multiedito
 ```
 npm install @agile-ts/multieditor
 ```
-_Be aware that this is no standalone package!_ <br />
-To use the Agile MultiEditor you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
-To find out more take a look into the [docs](https://www.agile-ts.org/docs).
-  
-  
-## 🔑 Fitting Versions
-| @agile-ts/api   | @agile-ts/core          | NPM Version              | 
-| --------------- | ----------------------- | ------------------------ | 
-| v0.0.7          | v0.0.7+                 | v6+                      | 
-| v0.0.6          | v0.0.6                  | v6+                      | 
-_Other Versions aren't supported anymore_
+The `multieditor` package is an extension of AgileTs and doesn't work without the [`core` package](../core/Introduction.md),
+which functions as the brain of AgileTs and is indispensable.
+Unfortunately, we can't combine each `core` with `multieditor` version.
+Therefore, we have created a table which shows which versions fit together without restrictions.
 
-## 📄 Documentation
-The Agile Api Docs are located [here](https://agile-ts.org/docs/)
+| @agile-ts/multieditor | @agile-ts/core          | NPM Version              | Supported React versions |
+| ----------------------| ----------------------- | ------------------------ | -------------------------|
+| v0.0.7+               | v0.0.7+                 | v6+                      | 16.8+                    |
+| v0.0.6                | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | 
+_Other Versions aren't supported anymore_

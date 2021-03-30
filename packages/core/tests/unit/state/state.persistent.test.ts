@@ -26,7 +26,7 @@ describe('StatePersistent Tests', () => {
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
-        //@ts-ignore
+        // @ts-ignore
         this.ready = false;
       });
 

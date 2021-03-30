@@ -24,17 +24,13 @@ MY_EVENT.trigger({name: "jeff"}); // Trigger Event
 ```
 npm install @agile-ts/event
 ```
-_Be aware that this is no standalone package!_ <br />
-To use the Agile Api you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
-To find out more take a look into the [docs](https://www.agile-ts.org/docs).
+The `event` package is an extension of AgileTs for React, which doesn't work without the [`core`](../core/Introduction.md)
+and [`react`](../react/Introduction.md) package.
+Unfortunately, we can't combine each `core`, `react` with `event` version.
+Therefore, we have created a table which shows which versions fit together without restrictions.
 
-
-## 🔑 Fitting Versions
-| @agile-ts/api   | @agile-ts/core          | NPM Version              | 
-| --------------- | ----------------------- | ------------------------ | 
-| v0.0.7          | v0.0.1+                 | v6+                      | 
-| v0.0.6          | v0.0.1+                 | v6+                      | 
+| @agile-ts/event       | @agile-ts/core          | @agile-ts/event          | NPM Version              | Supported React versions |
+| ----------------------| ----------------------- | ------------------------ | ------------------------ | -------------------------|
+| v0.0.1+               | v0.0.10+                | v0.0.10+                 | v6+                      | 16.8+                    |
 _Other Versions aren't supported anymore_
 
-## 📄 Documentation
-The Agile Api Docs are located [here](https://agile-ts.org/docs/)
