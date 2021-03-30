@@ -13,6 +13,7 @@
 <a href="https://npm.im/@agile-ts/multieditor">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/multieditor.svg" alt="npm minified size"/></a>
   
+
 ## ⏰ Short Example
 ```ts
 // Let's create our MultiEditor
@@ -47,6 +48,7 @@ multiEditor.submit();
 ```
 _Do you want to see it in action? Click [here](https://codesandbox.io/s/multieditor-yxt4x)._
 
+
 ## ❓ Why Agile MultiEditor
 
 #### 🚅 Straightforward
@@ -65,28 +67,31 @@ Write minimalistic, boilerplate free code that captures your intent. <br />
       }
   ```
 
+
 #### 🎯 Easy to Use
 Learn the powerful and simple tools of Agile MultiEditor in a short amount of time.
+
 
 #### 🍃 Lightweight
 Agile Api has an unpacked size of [14.1kB](https://bundlephobia.com/result?p=@agile-ts/multieditor@0.0.6)
 and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multieditor).
 
+
 ## ⬇️ Installation
 ```
 npm install @agile-ts/multieditor
 ```
-_Be aware that this is no standalone package!_ <br />
-To use the Agile MultiEditor you have to install the [Agile Core](https://www.npmjs.com/package/@agile-ts/core). <br />
-To find out more take a look into the [docs](https://www.agile-ts.org/docs).
-  
-  
-## 🔑 Fitting Versions
-| @agile-ts/api   | @agile-ts/core          | NPM Version              | 
-| --------------- | ----------------------- | ------------------------ | 
-| v0.0.7          | v0.0.7+                 | v6+                      | 
-| v0.0.6          | v0.0.6                  | v6+                      | 
+The `multieditor` package is an extension of AgileTs and doesn't work without the [`core`](https://agile-ts.org/docs/core) package,
+which functions as the brain of AgileTs and is indispensable.
+Unfortunately, we can't combine each `core` with `multieditor` version.
+Therefore, we have created a table which shows which versions fit together without restrictions.
+
+| @agile-ts/multieditor | @agile-ts/core          | NPM Version              |
+| ----------------------| ----------------------- | ------------------------ |
+| v0.0.7+               | v0.0.7+                 | v6+                      |
+| v0.0.6                | v0.0.3 - v0.0.6         | v6+                      |
 _Other Versions aren't supported anymore_
 
+
 ## 📄 Documentation
-The Agile Api Docs are located [here](https://agile-ts.org/docs/)
+The Agile MultiEditor Docs are located [here](https://agile-ts.org/docs/)

@@ -139,7 +139,7 @@ describe('Persistent Tests', () => {
         persistent.key = Persistent.placeHolderKey;
         persistent.defaultStorageKey = undefined;
         persistent.storageKeys = [];
-        persistent.ready = undefined;
+        persistent.ready = undefined as any;
       });
 
       it('should return false and print error if no set key and no set StorageKeys', () => {

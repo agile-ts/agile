@@ -129,7 +129,7 @@ describe('Storage Tests', () => {
       });
 
       it("should return false if get method isn't valid", () => {
-        storage.methods.get = undefined;
+        storage.methods.get = undefined as any;
 
         const response = storage.validate();
 
@@ -140,7 +140,7 @@ describe('Storage Tests', () => {
       });
 
       it("should return false if set method isn't valid", () => {
-        storage.methods.set = undefined;
+        storage.methods.set = undefined as any;
 
         const response = storage.validate();
 
@@ -151,7 +151,7 @@ describe('Storage Tests', () => {
       });
 
       it("should return false if remove method isn't valid", () => {
-        storage.methods.remove = undefined;
+        storage.methods.remove = undefined as any;
 
         const response = storage.validate();
 

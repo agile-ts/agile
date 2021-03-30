@@ -351,8 +351,7 @@ describe('StateObserver Tests', () => {
 
     describe('sideEffects function tests', () => {
       let dummyJob: StateRuntimeJob;
-      let dummyStateObserver: StateObserver;
-      let sideEffectCallOrder = [];
+      let sideEffectCallOrder: string[] = [];
 
       beforeEach(() => {
         sideEffectCallOrder = [];

@@ -37,6 +37,7 @@ describe('CollectionPersistent Tests', () => {
     jest
       .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = false;
       });
 
@@ -63,6 +64,7 @@ describe('CollectionPersistent Tests', () => {
     jest
       .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = false;
       });
 
@@ -91,6 +93,7 @@ describe('CollectionPersistent Tests', () => {
     jest
       .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = true;
       });
 
@@ -104,6 +107,7 @@ describe('CollectionPersistent Tests', () => {
     jest
       .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
+        // @ts-ignore
         this.ready = true;
       });
 
@@ -251,19 +255,21 @@ describe('CollectionPersistent Tests', () => {
     });
 
     describe('loadPersistedValue function tests', () => {
-      let dummyDefaultGroup: Group;
+      let dummyDefaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
         collectionPersistent.defaultStorageKey = 'test';
 
         dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3']);
         dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
-        dummyDefaultGroup.persistent.ready = true;
+        if (dummyDefaultGroup.persistent)
+          dummyDefaultGroup.persistent.ready = true;
 
         collectionPersistent.persistValue = jest.fn();
 
         dummyDefaultGroup.persist = jest.fn();
-        dummyDefaultGroup.persistent.initialLoading = jest.fn();
+        if (dummyDefaultGroup.persistent)
+          dummyDefaultGroup.persistent.initialLoading = jest.fn();
 
         dummyCollection.collect = jest.fn();
       });
@@ -316,7 +322,7 @@ describe('CollectionPersistent Tests', () => {
           instantiate: false,
           followCollectionPersistKeyPattern: true,
         });
-        expect(dummyDefaultGroup.persistent.initialLoading).toHaveBeenCalled();
+        expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
         expect(dummyCollection.collect).toHaveBeenCalledWith({
@@ -375,7 +381,7 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.initialLoading
+          dummyDefaultGroup.persistent?.initialLoading
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeFalsy();
 
@@ -425,7 +431,7 @@ describe('CollectionPersistent Tests', () => {
           instantiate: false,
           followCollectionPersistKeyPattern: true,
         });
-        expect(dummyDefaultGroup.persistent.initialLoading).toHaveBeenCalled();
+        expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
         expect(dummyCollection.collect).toHaveBeenCalledWith({
@@ -460,7 +466,7 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.initialLoading
+          dummyDefaultGroup.persistent?.initialLoading
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeFalsy();
 
@@ -513,7 +519,7 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.initialLoading
+          dummyDefaultGroup.persistent?.initialLoading
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.isPersisted).toBeFalsy();
 
@@ -524,11 +530,11 @@ describe('CollectionPersistent Tests', () => {
     });
 
     describe('persistValue function tests', () => {
-      let dummyDefaultGroup: Group;
+      let dummyDefaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
         collectionPersistent.storageKeys = ['test1', 'test2'];
-        collectionPersistent.isPersisted = undefined;
+        collectionPersistent.isPersisted = undefined as any;
 
         dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3']);
         dummyCollection.data = {
@@ -709,11 +715,11 @@ describe('CollectionPersistent Tests', () => {
     });
 
     describe('removePersistedValue function tests', () => {
-      let dummyDefaultGroup: Group;
+      let dummyDefaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
         collectionPersistent.storageKeys = ['test1', 'test2'];
-        collectionPersistent.isPersisted = undefined;
+        collectionPersistent.isPersisted = undefined as any;
 
         dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3']);
         dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
@@ -722,11 +728,14 @@ describe('CollectionPersistent Tests', () => {
           ['3']: dummyItem3,
         };
 
-        dummyDefaultGroup.persistent.removePersistedValue = jest.fn();
+        if (dummyDefaultGroup.persistent)
+          dummyDefaultGroup.persistent.removePersistedValue = jest.fn();
         dummyDefaultGroup.removeSideEffect = jest.fn();
 
-        dummyItem1.persistent.removePersistedValue = jest.fn();
-        dummyItem3.persistent.removePersistedValue = jest.fn();
+        if (dummyItem1.persistent)
+          dummyItem1.persistent.removePersistedValue = jest.fn();
+        if (dummyItem3.persistent)
+          dummyItem3.persistent.removePersistedValue = jest.fn();
 
         dummyAgile.storages.remove = jest.fn();
       });
@@ -748,14 +757,14 @@ describe('CollectionPersistent Tests', () => {
           dummyCollection.config.defaultGroupKey
         );
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue
+          dummyDefaultGroup.persistent?.removePersistedValue
         ).toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey
         );
 
-        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
-        expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem3.persistent?.removePersistedValue).toHaveBeenCalled();
 
         expect(collectionPersistent.isPersisted).toBeFalsy();
       });
@@ -779,14 +788,14 @@ describe('CollectionPersistent Tests', () => {
           dummyCollection.config.defaultGroupKey
         );
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue
+          dummyDefaultGroup.persistent?.removePersistedValue
         ).toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey
         );
 
-        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalled();
-        expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
+        expect(dummyItem3.persistent?.removePersistedValue).toHaveBeenCalled();
 
         expect(collectionPersistent.isPersisted).toBeFalsy();
       });
@@ -803,15 +812,15 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyCollection.getGroup).not.toHaveBeenCalled();
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue
+          dummyDefaultGroup.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue
+          dummyItem1.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue
+          dummyItem3.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(collectionPersistent.isPersisted).toBeUndefined();
@@ -831,15 +840,15 @@ describe('CollectionPersistent Tests', () => {
           dummyCollection.config.defaultGroupKey
         );
         expect(
-          dummyDefaultGroup.persistent.removePersistedValue
+          dummyDefaultGroup.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.removeSideEffect).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue
+          dummyItem1.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue
+          dummyItem3.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
 
         expect(collectionPersistent.isPersisted).toBeUndefined();
@@ -882,7 +891,7 @@ describe('CollectionPersistent Tests', () => {
     });
 
     describe('rebuildStorageSideEffects function tests', () => {
-      let dummyGroup: Group;
+      let dummyGroup: Group<ItemInterface>;
 
       beforeEach(() => {
         dummyGroup = new Group(dummyCollection);
@@ -899,13 +908,19 @@ describe('CollectionPersistent Tests', () => {
         dummyItem3.persist = jest.fn();
         dummyItem4WithoutPersistent.persist = jest.fn();
 
-        dummyItem1.persistent.removePersistedValue = jest.fn();
-        dummyItem2.persistent.removePersistedValue = jest.fn();
-        dummyItem3.persistent.removePersistedValue = jest.fn();
+        if (dummyItem1.persistent)
+          dummyItem1.persistent.removePersistedValue = jest.fn();
+        if (dummyItem2.persistent)
+          dummyItem2.persistent.removePersistedValue = jest.fn();
+        if (dummyItem3.persistent)
+          dummyItem3.persistent.removePersistedValue = jest.fn();
 
-        dummyItem1.persistent.persistValue = jest.fn();
-        dummyItem2.persistent.persistValue = jest.fn();
-        dummyItem3.persistent.persistValue = jest.fn();
+        if (dummyItem1.persistent)
+          dummyItem1.persistent.persistValue = jest.fn();
+        if (dummyItem2.persistent)
+          dummyItem2.persistent.persistValue = jest.fn();
+        if (dummyItem3.persistent)
+          dummyItem3.persistent.persistValue = jest.fn();
       });
 
       it('should return if no Item got added or removed', () => {
@@ -920,18 +935,18 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue
+          dummyItem1.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue
+          dummyItem2.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue
+          dummyItem3.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
 
-        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem1.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent?.persistValue).not.toHaveBeenCalled();
       });
 
       it('should call removePersistedValue on Items that got removed from Group', () => {
@@ -945,19 +960,23 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem3.persist).not.toHaveBeenCalled();
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
-        expect(dummyItem1.persistent.removePersistedValue).toHaveBeenCalledWith(
+        expect(
+          dummyItem1.persistent?.removePersistedValue
+        ).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('1', collectionPersistent._key)
         );
         expect(
-          dummyItem2.persistent.removePersistedValue
+          dummyItem2.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
-        expect(dummyItem3.persistent.removePersistedValue).toHaveBeenCalledWith(
+        expect(
+          dummyItem3.persistent?.removePersistedValue
+        ).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('3', collectionPersistent._key)
         );
 
-        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem1.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent?.persistValue).not.toHaveBeenCalled();
       });
 
       it('should call persistValue on Items that have a persistent and got added to Group', () => {
@@ -972,20 +991,20 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem4WithoutPersistent.persist).not.toHaveBeenCalled();
 
         expect(
-          dummyItem1.persistent.removePersistedValue
+          dummyItem1.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue
+          dummyItem2.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue
+          dummyItem3.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
 
-        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem2.persistent.persistValue).toHaveBeenCalledWith(
+        expect(dummyItem1.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent?.persistValue).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('2', collectionPersistent._key)
         );
-        expect(dummyItem3.persistent.persistValue).toHaveBeenCalledWith(
+        expect(dummyItem3.persistent?.persistValue).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('3', collectionPersistent._key)
         );
       });
@@ -1004,18 +1023,18 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(
-          dummyItem1.persistent.removePersistedValue
+          dummyItem1.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem2.persistent.removePersistedValue
+          dummyItem2.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
         expect(
-          dummyItem3.persistent.removePersistedValue
+          dummyItem3.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
 
-        expect(dummyItem1.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem2.persistent.persistValue).not.toHaveBeenCalled();
-        expect(dummyItem3.persistent.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem1.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem2.persistent?.persistValue).not.toHaveBeenCalled();
+        expect(dummyItem3.persistent?.persistValue).not.toHaveBeenCalled();
       });
     });
 

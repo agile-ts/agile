@@ -1,11 +1,5 @@
-import {
-  EventObserver,
-  Agile,
-  Observer,
-  SubscriptionContainer,
-  Event,
-  RuntimeJob,
-} from '../../../src';
+import { EventObserver, Event } from '../../src';
+import { Agile, Observer, SubscriptionContainer } from '@agile-ts/core';
 
 describe('EventObserver Tests', () => {
   let dummyAgile: Agile;

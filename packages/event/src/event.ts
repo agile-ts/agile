@@ -1,12 +1,11 @@
 import {
   Agile,
   defineConfig,
-  EventJob,
   generateId,
   isFunction,
   Observer,
-} from '../internal';
-import { EventObserver } from './event.observer';
+} from '@agile-ts/core';
+import { EventObserver, EventJob } from './internal';
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;

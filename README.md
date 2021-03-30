@@ -97,14 +97,14 @@ Write minimalistic, boilerplate free code that captures your intent.
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly any UI-Framework. Check [here](https://agile-ts.org/docs/frameworks) if your preferred Framework is supported too.
-- Surly behaves with the workflow which suits you best. No need for _reducers_, _actions_, ..
-- Has **no** external dependencies
+- Works in nearly any UI-Layer. Check [here](https://agile-ts.org/docs/frameworks) if your preferred Framework is supported too.
+- Surly behaves with the workflow which suits you best. No need boilerplate code.
+- Has **0** external dependencies
 
 ### 🎯 Easy to Use
 Learn the powerful tools of AgileTs in a short amount of time.
-A good place to start are our [Quick Starts](https://agile-ts.org/docs/installation) 
-or if you are no fan of following any tutorial, checkout your [examples](https://agile-ts.org/docs/examples).
+A good place to start are our [Quick Start Guides](https://agile-ts.org/docs/installation) 
+or if you are no fan of following any tutorial, checkout your [Examples](https://agile-ts.org/docs/examples).
 
 
 <br />
@@ -121,7 +121,7 @@ To properly use AgileTs, in a UI-Framework we need to install **two** packages.
   ```
 
 - and a _fitting Integration_ for our preferd UI-Framework. In my case the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
-  Check [here](https://agile-ts.org/docs/installation) if your desired Framework is supported, too.
+  Check [here](https://agile-ts.org/docs/frameworks) if your desired Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
@@ -165,6 +165,7 @@ To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agil
 | [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                         |
 | [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based Api                         |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
+| [@agile-ts/event](/packages/event)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/event.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/event)                                 | Handy class for emitting UI Events        |
 
 
 <br />

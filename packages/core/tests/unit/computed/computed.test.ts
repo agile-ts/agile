@@ -57,7 +57,7 @@ describe('Computed Tests', () => {
     const computed = new Computed(dummyAgile, computedFunction, {
       key: 'coolComputed',
       dependents: [dummyObserver1],
-      computedDeps: [dummyObserver2, undefined, dummyState],
+      computedDeps: [dummyObserver2, undefined as any, dummyState],
     });
 
     expect(computed.computeFunction).toBe(computedFunction);

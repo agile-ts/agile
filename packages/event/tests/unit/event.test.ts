@@ -1,5 +1,6 @@
-import { Event, Agile, Observer, EventObserver } from '../../../src';
-import * as Utils from '../../../src/utils';
+import { Event, EventObserver } from '../../src';
+import { Agile, Observer } from '@agile-ts/core';
+import * as Utils from '@agile-ts/core/dist/utils';
 
 describe('Event Tests', () => {
   let dummyAgile: Agile;
@@ -200,7 +201,7 @@ describe('Event Tests', () => {
 
     describe('disable function tests', () => {
       it('should disable Event', () => {
-        event.enabled = undefined;
+        event.enabled = undefined as any;
 
         event.disable();
 
@@ -210,7 +211,7 @@ describe('Event Tests', () => {
 
     describe('enable function tests', () => {
       it('should enable Event', () => {
-        event.enabled = undefined;
+        event.enabled = undefined as any;
 
         event.enable();
 
@@ -226,7 +227,7 @@ describe('Event Tests', () => {
         // @ts-ignore
         // eslint-disable-next-line no-global-assign
         clearTimeout = jest.fn();
-        event.enabled = undefined;
+        event.enabled = undefined as any;
         event.uses = 100;
         event.currentTimeout = timeout;
 

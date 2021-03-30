@@ -1,12 +1,11 @@
 import React from 'react';
 import {
   Agile,
-  Event,
-  EventCallbackFunction,
   getAgileInstance,
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
-import { useIsomorphicLayoutEffect } from '../utils/useIsomorphicLayoutEffect';
+import { Event, EventCallbackFunction } from '../internal';
+import { useIsomorphicLayoutEffect } from '@agile-ts/react';
 
 export function useEvent<E extends Event<any>>(
   event: E,
