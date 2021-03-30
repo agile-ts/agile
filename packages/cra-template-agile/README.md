@@ -29,3 +29,7 @@ Use [cra-template-agile-typescript](https://github.com/agile-ts/packages/cra-tem
 ```sh
 npx create-react-app my-app --template agile-typescript
 ```
+
+## Credits
+
+https://github.com/facebook/create-react-app/tree/master/packages/cra-template
