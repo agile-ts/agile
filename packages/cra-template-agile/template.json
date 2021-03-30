@@ -1,12 +1,12 @@
 {
   "package": {
     "dependencies": {
+      "@agile-ts/core": "^0.0.13",
+      "@agile-ts/react": "^0.0.13",
       "@testing-library/jest-dom": "^5.11.4",
       "@testing-library/react": "^11.1.0",
       "@testing-library/user-event": "^12.1.10",
-      "web-vitals": "^1.0.1",
-      "@agile-ts/core": "^0.0.13",
-      "@agile-ts/react": "^0.0.13"
+      "web-vitals": "^1.0.1"
     },
     "eslintConfig": {
       "extends": ["react-app", "react-app/jest"]

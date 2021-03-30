@@ -2,15 +2,15 @@
 
 > Handy class for emitting UI Events
 
-<a href="https://npm.im/@agile-ts/api">
+<a href="https://npm.im/@agile-ts/event">
   <img src="https://img.shields.io/npm/v/@agile-ts/event.svg" alt="npm version"/></a>
  <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg" alt="GitHub License"/></a>
-<a href="https://npm.im/@agile-ts/api">
+<a href="https://npm.im/@agile-ts/event">
   <img src="https://img.shields.io/npm/dm/@agile-ts/event.svg" alt="npm monthly downloads"/></a>
-<a href="https://npm.im/@agile-ts/api">
+<a href="https://npm.im/@agile-ts/event">
   <img src="https://img.shields.io/npm/dt/@agile-ts/event.svg" alt="npm total downloads"/></a>
-<a href="https://npm.im/@agile-ts/api">
+<a href="https://npm.im/@agile-ts/event">
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/event.svg" alt="npm minified size"/></a>
   
 

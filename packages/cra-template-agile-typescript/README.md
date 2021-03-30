@@ -21,3 +21,7 @@
 ```sh
 npx create-react-app my-app --template agile-typescript
 ```
+
+## Credits
+
+https://github.com/facebook/create-react-app/blob/master/packages/cra-template-typescript
