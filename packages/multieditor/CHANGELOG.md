@@ -1,5 +1,13 @@
 # @agile-ts/multieditor
 
+## 0.0.13
+
+### Patch Changes
+
+- 7f29a97: fixed bugs and increased versions
+- Updated dependencies [7f29a97]
+  - @agile-ts/core@0.0.13
+
 ## 0.0.12
 
 ### Patch Changes
