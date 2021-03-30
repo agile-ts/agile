@@ -86,10 +86,10 @@ which functions as the brain of AgileTs and is indispensable.
 Unfortunately, we can't combine each `core` with `multieditor` version.
 Therefore, we have created a table which shows which versions fit together without restrictions.
 
-| @agile-ts/multieditor | @agile-ts/core          | NPM Version              | Supported React versions |
-| ----------------------| ----------------------- | ------------------------ | -------------------------|
-| v0.0.7+               | v0.0.7+                 | v6+                      | 16.8+                    |
-| v0.0.6                | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | 
+| @agile-ts/multieditor | @agile-ts/core          | NPM Version              |
+| ----------------------| ----------------------- | ------------------------ |
+| v0.0.7+               | v0.0.7+                 | v6+                      |
+| v0.0.6                | v0.0.3 - v0.0.6         | v6+                      |
 _Other Versions aren't supported anymore_
 
 

@@ -16,7 +16,8 @@
 
 ## ⏰ Short Example
 ```ts
-const MY_EVENT = App.createEvent();
+const App = new Agile();
+const MY_EVENT = new Event(App);
 MY_EVENT.on((data) => {console.log("hello there " + data.name)}); // Print 'hello there jeff' if Event gets triggered
 MY_EVENT.trigger({name: "jeff"}); // Trigger Event
 ```
@@ -31,9 +32,9 @@ and [`react`](https://agile-ts.org/docs/react) package.
 Unfortunately, we can't combine each `core`, `react` with `event` version.
 Therefore, we have created a table which shows which versions fit together without restrictions.
 
-| @agile-ts/event       | @agile-ts/core          | @agile-ts/event          | NPM Version              | Supported React versions |
-| ----------------------| ----------------------- | ------------------------ | ------------------------ | -------------------------|
-| v0.0.1+               | v0.0.10+                | v0.0.10+                 | v6+                      | 16.8+                    |
+| @agile-ts/event       | @agile-ts/core          | @agile-ts/event          | NPM Version              | Supported React versions | Supports hook based components    |
+| ----------------------| ----------------------- | ------------------------ | ------------------------ | -------------------------|---------------------------------- |
+| v0.0.1+               | v0.0.10+                | v0.0.10+                 | v6+                      | 16.8+                    | Yes                               |
 _Other Versions aren't supported anymore_
 
 

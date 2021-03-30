@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/header_background.png" alt="React Integration">
 
-> **Integrate AgileTs into React or React-Native**
+> Integrate AgileTs into React or React-Native
 
  <br />
 
