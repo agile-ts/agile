@@ -101,6 +101,10 @@ Write minimalistic, boilerplate free code that captures your intent.
 - Surly behaves with the workflow which suits you best. No need boilerplate code.
 - Has **0** external dependencies
 
+### ⛳️ Centralize
+AgileTs is designed to take all business logic out of UI-Components and put them in a central place often called `core`.
+The benefit of keeping logic separate to UI-Components is to make your code more decoupled, portable and above all easily testable.
+
 ### 🎯 Easy to Use
 Learn the powerful tools of AgileTs in a short amount of time.
 A good place to start are our [Quick Start Guides](https://agile-ts.org/docs/installation) 
