@@ -170,7 +170,7 @@ export class Selector<DataType = DefaultItem> extends State<
   //=========================================================================================================
   /**
    * Checks if Selector has selected passed ItemKey
-   * @param itemKey
+   * @param itemKey - ItemKey
    */
   public hasSelected(itemKey: ItemKey): boolean {
     const isSelected = this._itemKey === itemKey;
@@ -186,15 +186,17 @@ export class Selector<DataType = DefaultItem> extends State<
    * Rebuilds Selector
    * @param config - Config
    */
-  public rebuildSelector(config: StateRuntimeJobConfigInterface = {}) {
+  public rebuildSelector(config: StateRuntimeJobConfigInterface = {}): this {
     // Set Selector Value to undefined if Item doesn't exist
     if (!this.item || this.item.isPlaceholder) {
       this.set(undefined, config);
-      return;
+      return this;
     }
 
     // Set Selector Value to updated Item Value
     this.set(this.item._value, config);
+
+    return this;
   }
 }
 
