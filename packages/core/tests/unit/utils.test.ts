@@ -10,16 +10,17 @@ import {
   isFunction,
   isJsonString,
   isValidObject,
-  isValidUrl,
   normalizeArray,
   notEqual,
   globalBind,
   getAgileInstance,
+  extractObservers,
   Agile,
   State,
   Observer,
   Collection,
   createArrayFromObject,
+  StateObserver,
 } from '../../src';
 
 describe('Utils Tests', () => {
@@ -237,6 +238,52 @@ describe('Utils Tests', () => {
     });
   });
 
+  describe('extractObservers function tests', () => {
+    let dummyObserver: Observer;
+    let dummyObserver2: Observer;
+    let dummyStateObserver: StateObserver;
+    let dummyState: State;
+    let dummyDefaultGroupObserver: StateObserver;
+    let dummyCollection: Collection;
+
+    beforeEach(() => {
+      dummyObserver = new Observer(dummyAgile);
+      dummyObserver2 = new Observer(dummyAgile);
+
+      dummyState = new State(dummyAgile, undefined);
+      dummyStateObserver = new StateObserver(dummyState);
+      dummyState.observer = dummyStateObserver;
+
+      dummyCollection = new Collection(dummyAgile);
+      const defaultGroup =
+        dummyCollection.groups[dummyCollection.config.defaultGroupKey];
+      dummyDefaultGroupObserver = new StateObserver(defaultGroup);
+      defaultGroup.observer = dummyDefaultGroupObserver;
+    });
+
+    it('should extract Observers from passed Instances', () => {
+      const response = extractObservers([
+        dummyObserver,
+        dummyState,
+        undefined,
+        {},
+        { observer: 'fake' },
+        dummyCollection,
+        { observer: dummyObserver2 },
+      ]);
+
+      expect(response).toStrictEqual([
+        dummyObserver,
+        dummyStateObserver,
+        undefined,
+        undefined,
+        undefined,
+        dummyDefaultGroupObserver,
+        dummyObserver2,
+      ]);
+    });
+  });
+
   describe('isFunction function tests', () => {
     it('should return true if passed instance is valid Function', () => {
       expect(
@@ -283,26 +330,6 @@ describe('Utils Tests', () => {
           /* empty function */
         })
       ).toBe(false);
-    });
-  });
-
-  // Note: isValidUrl Function doesn't work to 100% yet!!
-  describe('isValidUrl function tests', () => {
-    it('should return true if passed instance is valid url', () => {
-      expect(isValidUrl('https://www.google.com/')).toBe(true);
-      expect(isValidUrl('www.google.com')).toBe(true);
-      expect(isValidUrl('google.com')).toBe(true);
-      // expect(isValidUrl("https://en.wikipedia.org/wiki/Procter_&_Gamble")).toBe(
-      // true
-      // );
-    });
-
-    it('should return false if passed instance is invalid url', () => {
-      expect(isValidUrl('hello')).toBe(false);
-      expect(isValidUrl('https://sdfasd')).toBe(false);
-      expect(isValidUrl('https://')).toBe(false);
-      expect(isValidUrl('')).toBe(false);
-      // expect(isValidUrl("www.google")).toBe(false);
     });
   });
 

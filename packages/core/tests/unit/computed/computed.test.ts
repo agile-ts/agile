@@ -260,32 +260,6 @@ describe('Computed Tests', () => {
       });
     });
 
-    describe('formatDeps function tests', () => {
-      let dummyObserver: Observer;
-      let dummyStateObserver: StateObserver;
-      let dummyState: State;
-
-      beforeEach(() => {
-        dummyObserver = new Observer(dummyAgile);
-        dummyState = new State(dummyAgile, undefined);
-        dummyStateObserver = new StateObserver(dummyState);
-
-        dummyState.observer = dummyStateObserver;
-      });
-
-      it('should return Observers that could be extracted from the passed Instances', () => {
-        const response = computed.formatDeps([
-          dummyObserver,
-          dummyState,
-          undefined,
-          {},
-          { observer: 'fake' },
-        ]);
-
-        expect(response).toStrictEqual([dummyObserver, dummyStateObserver]);
-      });
-    });
-
     describe('patch function tests', () => {
       it('should print error', () => {
         computed.patch();

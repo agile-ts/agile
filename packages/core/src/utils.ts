@@ -136,15 +136,15 @@ export function extractObservers(instances: any): Array<Observer | undefined> {
     createUndefinedArray: true,
   });
 
-  // Get Observers from Deps
+  // Get Observers from Instances
   for (const instance of tempInstancesArray) {
-    // If Dep is undefined (We have to add undefined to build a proper return value later)
+    // If Instance is undefined (We have to add undefined to build a proper return value in for instance 'useAgile' later)
     if (!instance) {
       instancesArray.push(undefined);
       continue;
     }
 
-    // If Dep is Collection
+    // If Instance is Collection
     if (instance instanceof Collection) {
       instancesArray.push(
         instance.getGroupWithReference(instance.config.defaultGroupKey).observer
@@ -152,16 +152,20 @@ export function extractObservers(instances: any): Array<Observer | undefined> {
       continue;
     }
 
-    // If Dep has property that is an Observer
+    // If Instance has property that is an Observer
     if (instance['observer'] && instance['observer'] instanceof Observer) {
       instancesArray.push(instance['observer']);
       continue;
     }
 
-    // If Dep is Observer
+    // If Instance is Observer
     if (instance instanceof Observer) {
       instancesArray.push(instance);
+      continue;
     }
+
+    // Push undefined if no Observer could be found (We have to add undefined to build a proper return value in for instance 'useAgile' later)
+    instancesArray.push(undefined);
   }
 
   return instancesArray;
