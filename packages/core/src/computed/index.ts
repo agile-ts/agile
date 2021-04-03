@@ -5,8 +5,9 @@ import {
   Observer,
   StateConfigInterface,
   ComputedTracker,
-  Group,
   SideEffectConfigInterface,
+  Collection,
+  extractObservers,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -41,7 +42,9 @@ export class Computed<ComputedValueType = any> extends State<
     this.computeFunction = computeFunction;
 
     // Format hardCodedDeps
-    this.hardCodedDeps = this.formatDeps(config.computedDeps as any);
+    this.hardCodedDeps = extractObservers(config.computedDeps).filter(
+      (dep): dep is Observer => dep !== undefined
+    );
     this.deps = this.hardCodedDeps;
 
     // Recompute for setting initial value and adding missing dependencies
@@ -79,7 +82,7 @@ export class Computed<ComputedValueType = any> extends State<
    */
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
-    deps: Array<Observer | State | Event> = [],
+    deps: Array<SubscribableAgileInstancesType> = [],
     config: UpdateComputeFunctionInterface = {}
   ) {
     config = defineConfig(config, {
@@ -92,7 +95,9 @@ export class Computed<ComputedValueType = any> extends State<
     });
 
     // Update deps
-    const newDeps = this.formatDeps(deps as any);
+    const newDeps = extractObservers(deps).filter(
+      (dep): dep is Observer => dep !== undefined
+    );
     if (config.overwriteDeps) this.hardCodedDeps = newDeps;
     else this.hardCodedDeps = this.hardCodedDeps.concat(newDeps);
     this.deps = this.hardCodedDeps;
@@ -134,31 +139,6 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   //=========================================================================================================
-  // Format Deps
-  //=========================================================================================================
-  /**
-   * @internal
-   * Gets Observer out of passed Instances
-   * @param instances - Instances that hold an Observer
-   */
-  public formatDeps(instances: Array<any>): Array<Observer> {
-    const finalInstances: Array<Observer> = [];
-    for (const instance of instances) {
-      if (instance instanceof Observer) {
-        finalInstances.push(instance);
-        continue;
-      }
-      if (
-        instance !== undefined &&
-        instance['observer'] !== undefined &&
-        instance['observer'] instanceof Observer
-      )
-        finalInstances.push(instance['observer']);
-    }
-    return finalInstances;
-  }
-
-  //=========================================================================================================
   // Overwriting some functions which aren't allowed to use in Computed
   //=========================================================================================================
 
@@ -182,7 +162,7 @@ export class Computed<ComputedValueType = any> extends State<
  * @param computedDeps - Hard coded dependencies of Computed Function
  */
 export interface ComputedConfigInterface extends StateConfigInterface {
-  computedDeps?: Array<Observer | State | Group>;
+  computedDeps?: Array<SubscribableAgileInstancesType>;
 }
 
 /**
@@ -201,3 +181,5 @@ export interface UpdateComputeFunctionInterface
   extends RecomputeConfigInterface {
   overwriteDeps?: boolean;
 }
+
+type SubscribableAgileInstancesType = State | Collection | Observer;

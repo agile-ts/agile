@@ -1,4 +1,4 @@
-import { Agile } from './internal';
+import { Agile, Observer, Collection } from './internal';
 
 //=========================================================================================================
 // Copy
@@ -123,6 +123,51 @@ export function getAgileInstance(instance: any): Agile | undefined {
 }
 
 //=========================================================================================================
+// Extract Observers
+//=========================================================================================================
+/**
+ * @private
+ * Extract Observers from specific Instances
+ * @param instances - Instances that will be formatted
+ */
+export function extractObservers(instances: any): Array<Observer | undefined> {
+  const instancesArray: Array<Observer | undefined> = [];
+  const tempInstancesArray = normalizeArray(instances, {
+    createUndefinedArray: true,
+  });
+
+  // Get Observers from Deps
+  for (const instance of tempInstancesArray) {
+    // If Dep is undefined (We have to add undefined to build a proper return value later)
+    if (!instance) {
+      instancesArray.push(undefined);
+      continue;
+    }
+
+    // If Dep is Collection
+    if (instance instanceof Collection) {
+      instancesArray.push(
+        instance.getGroupWithReference(instance.config.defaultGroupKey).observer
+      );
+      continue;
+    }
+
+    // If Dep has property that is an Observer
+    if (instance['observer'] && instance['observer'] instanceof Observer) {
+      instancesArray.push(instance['observer']);
+      continue;
+    }
+
+    // If Dep is Observer
+    if (instance instanceof Observer) {
+      instancesArray.push(instance);
+    }
+  }
+
+  return instancesArray;
+}
+
+//=========================================================================================================
 // Is Function
 //=========================================================================================================
 /**
@@ -149,28 +194,6 @@ export function isAsyncFunction(value: any): boolean {
     (value.constructor.name === 'AsyncFunction' ||
       valueString.includes('__awaiter'))
   );
-}
-
-//=========================================================================================================
-// Is Valid Url
-//=========================================================================================================
-/**
- * @internal
- * Checks the correctness of an url
- * Resource: https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
- * @param url - Url that gets tested for its correctness
- */
-export function isValidUrl(url: string): boolean {
-  const pattern = new RegExp(
-    '^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-      '(\\#[-a-z\\d_]*)?$',
-    'i'
-  );
-  return pattern.test(url);
 }
 
 //=========================================================================================================

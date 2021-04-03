@@ -4,7 +4,7 @@ import {
   Collection,
   getAgileInstance,
   Group,
-  normalizeArray,
+  extractObservers,
   Observer,
   State,
   SubscriptionContainerKeyType,
@@ -46,7 +46,7 @@ export function useAgile<
   key?: SubscriptionContainerKeyType,
   agileInstance?: Agile
 ): AgileHookArrayType<X> | AgileHookType<Y> {
-  const depsArray = formatDeps(deps);
+  const depsArray = extractObservers(deps);
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
@@ -93,53 +93,6 @@ export function useAgile<
 
   return getReturnValue(depsArray);
 }
-
-//=========================================================================================================
-// Format Deps
-//=========================================================================================================
-/**
- * @private
- * Formats Deps and gets Observers from them
- * @param deps - Deps that get formatted
- */
-const formatDeps = (
-  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
-): Array<Observer | undefined> => {
-  const depsArray: Array<Observer | undefined> = [];
-  const tempDepsArray = normalizeArray(deps as any, {
-    createUndefinedArray: true,
-  });
-
-  // Get Observers from Deps
-  for (const dep of tempDepsArray) {
-    // If Dep is undefined (We have to add undefined to build a proper return value later)
-    if (!dep) {
-      depsArray.push(undefined);
-      continue;
-    }
-
-    // If Dep is Collection
-    if (dep instanceof Collection) {
-      depsArray.push(
-        dep.getGroupWithReference(dep.config.defaultGroupKey).observer
-      );
-      continue;
-    }
-
-    // If Dep has property that is an Observer
-    if (dep['observer']) {
-      depsArray.push(dep['observer']);
-      continue;
-    }
-
-    // If Dep is Observer
-    if (dep instanceof Observer) {
-      depsArray.push(dep);
-    }
-  }
-
-  return depsArray;
-};
 
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
