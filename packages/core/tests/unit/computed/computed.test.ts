@@ -104,13 +104,7 @@ describe('Computed Tests', () => {
       it('should ingest Computed into Runtime (default config)', () => {
         computed.recompute();
 
-        expect(computed.ingest).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-        });
+        expect(computed.ingest).toHaveBeenCalledWith({});
       });
 
       it('should ingest Computed into Runtime (specific config)', () => {
@@ -119,6 +113,8 @@ describe('Computed Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          force: false,
+          key: 'jeff',
         });
 
         expect(computed.ingest).toHaveBeenCalledWith({
@@ -126,6 +122,8 @@ describe('Computed Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          force: false,
+          key: 'jeff',
         });
       });
     });
@@ -161,13 +159,7 @@ describe('Computed Tests', () => {
           dummyObserver,
         ]);
         expect(computed.computeFunction).toBe(newComputeFunction);
-        expect(computed.recompute).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-        });
+        expect(computed.recompute).toHaveBeenCalledWith({});
       });
 
       it('should updated computeFunction and overwrite hardCodedDeps (specific config)', () => {
@@ -176,6 +168,8 @@ describe('Computed Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          key: 'jeff',
+          force: true,
         });
 
         expect(computed.hardCodedDeps).toStrictEqual([]);
@@ -186,6 +180,8 @@ describe('Computed Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          key: 'jeff',
+          force: true,
         });
       });
 
@@ -207,13 +203,7 @@ describe('Computed Tests', () => {
           dummyObserver,
         ]);
         expect(computed.computeFunction).toBe(newComputeFunction);
-        expect(computed.recompute).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-        });
+        expect(computed.recompute).toHaveBeenCalledWith({});
       });
     });
 

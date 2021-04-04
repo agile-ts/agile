@@ -375,6 +375,24 @@ export function clone<T = any>(instance: T): T {
 }
 
 //=========================================================================================================
+// Remove Properties
+//=========================================================================================================
+/**
+ * @internal
+ * Removes properties from Object
+ * @param object - Object from which the properties get removed
+ * @param properties - Properties that get removed from the object
+ */
+export function removeProperties<T = Object>(
+  object: T,
+  properties: Array<string>
+): T {
+  const copiedObject = copy(object);
+  properties.map((property) => delete copiedObject[property]);
+  return copiedObject;
+}
+
+//=========================================================================================================
 // Global Bind
 //=========================================================================================================
 /**

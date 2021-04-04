@@ -258,7 +258,7 @@ describe('Group Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          { background: false }
+          {}
         );
       });
 
@@ -297,9 +297,7 @@ describe('Group Tests', () => {
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
         );
-        expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {
-          background: false,
-        });
+        expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {});
       });
 
       it("should remove Items from Group in background if passing not existing Item and Item that doesn't exist in Collection (default config)", () => {
@@ -310,9 +308,7 @@ describe('Group Tests', () => {
         );
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
-          {
-            background: true,
-          }
+          { background: true }
         );
       });
     });
@@ -328,7 +324,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          { background: false }
+          {}
         );
       });
 
@@ -337,7 +333,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'placeholder', 'dummyItem1Key', 'placeholder'],
-          { background: false }
+          {}
         );
       });
 
@@ -370,7 +366,7 @@ describe('Group Tests', () => {
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'placeholder', 'dummyItem1Key'],
-          { background: false }
+          {}
         );
       });
 
@@ -385,7 +381,7 @@ describe('Group Tests', () => {
             'dummyItem2Key',
             'dummyItem3Key',
           ],
-          { background: false }
+          {}
         );
       });
 

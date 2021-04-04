@@ -21,6 +21,7 @@ import {
   Collection,
   createArrayFromObject,
   StateObserver,
+  removeProperties,
 } from '../../src';
 
 describe('Utils Tests', () => {
@@ -629,6 +630,22 @@ describe('Utils Tests', () => {
         country: 'USA',
         state: 'California',
       });
+    });
+  });
+
+  describe('removeProperties function tests', () => {
+    it('should remove properties from object and remove reference', () => {
+      const myObject = { id: 20, name: 'jeff', age: 10, location: 'Germany' };
+      const newObject = removeProperties(myObject, ['location', 'age']);
+      newObject['size'] = 100.2;
+
+      expect(myObject).toStrictEqual({
+        id: 20,
+        name: 'jeff',
+        age: 10,
+        location: 'Germany',
+      });
+      expect(newObject).toStrictEqual({ id: 20, name: 'jeff', size: 100.2 });
     });
   });
 

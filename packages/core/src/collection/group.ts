@@ -14,6 +14,8 @@ import {
   PersistentKey,
   ComputedTracker,
   StateRuntimeJobConfigInterface,
+  StateIngestConfigInterface,
+  removeProperties,
 } from '../internal';
 
 export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
@@ -114,15 +116,12 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    config: GroupRemoveConfigInterface = {}
+    config: StateIngestConfigInterface = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const notExistingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
-    config = defineConfig(config, {
-      background: false,
-    });
 
     // Remove ItemKeys from Group
     _itemKeys.forEach((itemKey) => {
@@ -151,7 +150,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    this.set(newGroupValue, { background: config.background });
+    this.set(newGroupValue, config);
 
     return this;
   }
@@ -176,7 +175,6 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     config = defineConfig<GroupAddConfigInterface>(config, {
       method: 'push',
       overwrite: false,
-      background: false,
     });
 
     // Add ItemKeys to Group
@@ -211,7 +209,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     )
       config.background = true;
 
-    this.set(newGroupValue, { background: config.background });
+    this.set(newGroupValue, removeProperties(config, ['method', 'overwrite']));
 
     return this;
   }
@@ -340,10 +338,9 @@ export type GroupKey = string | number;
  * @param overwrite - If adding ItemKey overwrites old ItemKey (-> otherwise it gets added to the end of the Group)
  * @param background - If adding ItemKey happens in the background (-> not causing any rerender)
  */
-export interface GroupAddConfigInterface {
+export interface GroupAddConfigInterface extends StateIngestConfigInterface {
   method?: 'unshift' | 'push';
   overwrite?: boolean;
-  background?: boolean;
 }
 
 /**

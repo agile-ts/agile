@@ -5,9 +5,10 @@ import {
   Observer,
   StateConfigInterface,
   ComputedTracker,
-  SideEffectConfigInterface,
   Collection,
   extractObservers,
+  StateIngestConfigInterface,
+  removeProperties,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -59,14 +60,7 @@ export class Computed<ComputedValueType = any> extends State<
    * Recomputes Value of Computed
    * @param config - Config
    */
-  public recompute(config: RecomputeConfigInterface = {}) {
-    config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-    });
+  public recompute(config: StateIngestConfigInterface = {}) {
     this.ingest(config);
   }
 
@@ -86,11 +80,6 @@ export class Computed<ComputedValueType = any> extends State<
     config: UpdateComputeFunctionInterface = {}
   ) {
     config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
       overwriteDeps: true,
     });
 
@@ -106,10 +95,7 @@ export class Computed<ComputedValueType = any> extends State<
     this.computeFunction = computeFunction;
 
     // Recompute for setting initial Computed Function Value and adding missing Dependencies
-    this.recompute({
-      background: config.background,
-      sideEffects: config.sideEffects,
-    });
+    this.recompute(removeProperties(config, ['overwriteDeps']));
   }
 
   //=========================================================================================================
@@ -166,19 +152,10 @@ export interface ComputedConfigInterface extends StateConfigInterface {
 }
 
 /**
- * @param background - If recomputing value happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of Computed get executed
- */
-export interface RecomputeConfigInterface {
-  background?: boolean;
-  sideEffects?: SideEffectConfigInterface;
-}
-
-/**
  * @param overwriteDeps - If old hardCoded deps get overwritten
  */
 export interface UpdateComputeFunctionInterface
-  extends RecomputeConfigInterface {
+  extends StateIngestConfigInterface {
   overwriteDeps?: boolean;
 }
 

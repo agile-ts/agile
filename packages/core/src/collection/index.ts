@@ -634,6 +634,7 @@ export class Collection<DataType = DefaultItem> {
     }
     this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
     delete this.selectors[selectorKey];
+
     return this;
   }
 
