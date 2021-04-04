@@ -49,7 +49,7 @@ export class Computed<ComputedValueType = any> extends State<
     this.deps = this.hardCodedDeps;
 
     // Recompute for setting initial value and adding missing dependencies
-    this.recompute();
+    this.recompute({ autodetect: true });
   }
 
   //=========================================================================================================
@@ -60,8 +60,15 @@ export class Computed<ComputedValueType = any> extends State<
    * Recomputes Value of Computed
    * @param config - Config
    */
-  public recompute(config: StateIngestConfigInterface = {}) {
-    this.ingest(config);
+  public recompute(config: RecomputeConfigInterface = {}): this {
+    config = defineConfig(config, {
+      autodetect: false,
+    });
+    this.observer.ingestValue(
+      this.compute({ autodetect: config.autodetect }),
+      removeProperties(config, ['autodetect'])
+    );
+    return this;
   }
 
   //=========================================================================================================
@@ -77,10 +84,11 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<SubscribableAgileInstancesType> = [],
-    config: UpdateComputeFunctionInterface = {}
-  ) {
+    config: UpdateComputeFunctionConfigInterface = {}
+  ): this {
     config = defineConfig(config, {
       overwriteDeps: true,
+      autodetect: true,
     });
 
     // Update deps
@@ -96,6 +104,8 @@ export class Computed<ComputedValueType = any> extends State<
 
     // Recompute for setting initial Computed Function Value and adding missing Dependencies
     this.recompute(removeProperties(config, ['overwriteDeps']));
+
+    return this;
   }
 
   //=========================================================================================================
@@ -105,22 +115,32 @@ export class Computed<ComputedValueType = any> extends State<
    * @internal
    * Recomputes value and adds missing dependencies to Computed
    */
-  public compute(): ComputedValueType {
-    // Auto track Observers the computeFunction might depend on
-    ComputedTracker.track();
-    const computedValue = this.computeFunction();
-    const foundDeps = ComputedTracker.getTrackedObservers();
-
-    // Handle foundDeps and hardCodedDeps
-    const newDeps: Array<Observer> = [];
-    this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
-      newDeps.push(observer);
-
-      // Make this Observer depending on foundDep Observer
-      observer.depend(this.observer);
+  public compute(config: ComputeConfigInterface = {}): ComputedValueType {
+    config = defineConfig(config, {
+      autodetect: true,
     });
 
-    this.deps = newDeps;
+    // Start auto tracking Observers the computeFunction might depend on
+    if (config.autodetect) ComputedTracker.track();
+
+    const computedValue = this.computeFunction();
+
+    // Handle auto tracked Observers
+    if (config.autodetect) {
+      const foundDeps = ComputedTracker.getTrackedObservers();
+
+      // Handle foundDeps and hardCodedDeps
+      const newDeps: Array<Observer> = [];
+      this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
+        newDeps.push(observer);
+
+        // Make this Observer depend on foundDep Observer
+        observer.depend(this.observer);
+      });
+
+      this.deps = newDeps;
+    }
+
     return computedValue;
   }
 
@@ -152,11 +172,22 @@ export interface ComputedConfigInterface extends StateConfigInterface {
 }
 
 /**
+ * @param autodetect - If dependencies get autodetected
+ */
+export interface ComputeConfigInterface {
+  autodetect?: boolean;
+}
+
+/**
  * @param overwriteDeps - If old hardCoded deps get overwritten
  */
-export interface UpdateComputeFunctionInterface
-  extends StateIngestConfigInterface {
+export interface UpdateComputeFunctionConfigInterface
+  extends RecomputeConfigInterface {
   overwriteDeps?: boolean;
 }
+
+export interface RecomputeConfigInterface
+  extends StateIngestConfigInterface,
+    ComputeConfigInterface {}
 
 type SubscribableAgileInstancesType = State | Collection | Observer;
