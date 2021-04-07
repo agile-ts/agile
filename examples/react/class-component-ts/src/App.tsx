@@ -111,7 +111,7 @@ const FinalApp = AgileHOC(App, {
   myState3: MY_STATE_3,
   myUndefined: undefined,
   myComputed: MY_COMPUTED,
-  myCollection: MY_COLLECTION as any,
+  myCollection: MY_COLLECTION,
   myGroup: MY_COLLECTION.getGroupWithReference('myGroup'),
 });
 

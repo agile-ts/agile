@@ -255,7 +255,11 @@ export class AgileReactComponent extends React.Component {
   }
 }
 
-type SubscribableAgileInstancesType = State | Collection | Observer | undefined;
+type SubscribableAgileInstancesType =
+  | State
+  | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
+  | Observer
+  | undefined;
 type DepsType =
   | Array<SubscribableAgileInstancesType>
   | { [key: string]: SubscribableAgileInstancesType }
