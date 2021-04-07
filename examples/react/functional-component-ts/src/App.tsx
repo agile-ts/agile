@@ -35,7 +35,7 @@ const App = (props: any) => {
     MY_COLLECTION.getSelector('mySelector'),
     MY_STATE_3,
     undefined,
-    MY_COLLECTION as any,
+    MY_COLLECTION,
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
 
