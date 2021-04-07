@@ -1199,7 +1199,7 @@ export class Collection<DataType = DefaultItem> {
   }
 }
 
-export type DefaultItem = { [key: string]: any };
+export type DefaultItem = Record<string, any>; // same as { [key: string]: any };
 export type CollectionKey = string | number;
 export type ItemKey = string | number;
 
