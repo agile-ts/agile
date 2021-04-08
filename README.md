@@ -52,7 +52,7 @@ const MY_FIRST_STATE = App.createState("Hello Stranger!");
 // -- myComponent.whatever ------------------------------------------
 
 // Finally, we bind our just created State to our desired UI-Component
-// And wolla its reactive. Everytime the State mutates the Component gets rerendered
+// And wolla its reactive. Everytime the State mutates the Component rerenders
 const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
 ```
 To find out more checkout our [documentation](https://agile-ts.org/docs/introduction).
@@ -73,14 +73,22 @@ More examples can be found in the [Example Section](https://agile-ts.org/docs/ex
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
-AgileTs is a global, simple, well-tested State Management Framework implemented in TypeScript. 
-It's more flexible and boilerplate-free than frameworks like Redux and has a powerful approach to reducing the codebase size through a
-centralized memory design pattern. The philosophy behind AgileTs is simple:
+AgileTs is a global, simple, well-tested State Management Framework implemented in Typescript.
+It offers a reimagined API that focus on **developer experience** and allows you to **quickly** and **easily** manage your States.
+Besides, States AgileTs offers other powerful classes which make your life easier.
+The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
-Write minimalistic, boilerplate free code that captures your intent.
+Write minimalistic, boilerplate-free code that captures your intent.
 
 **Some straightforward syntax examples:**
+
+- Mutate and Check States with simple Functions
+  ```ts
+  MY_STATE.undo(); // Undo latest change
+  MY_STATE.is({hello: "jeff"}); // Check if State has the Value '{hello: "jeff"}'
+  MY_STATE.watch((value) => {console.log(value);}); // Watch on State changes
+  ```
 - Store State in any Storage, like [Local Storage](https://www.w3schools.com/html/html5_webstorage.asp)
   ```ts
   MY_STATE.persist("storage-key")
@@ -91,25 +99,29 @@ Write minimalistic, boilerplate free code that captures your intent.
   MY_COLLECTION.collect({id: 1, name: "Frank"});
   MY_COLLECTION.collect({id: 2, name: "Dieter"});
   ```
-- Mutate and Check States with simple Functions
+- Compute State depending on other States
   ```ts
-  MY_STATE.undo(); // Undo latest change
-  MY_STATE.is({hello: "jeff"}); // Check if State has the Value '{hello: "jeff"}'
+  const MY_INTRODUCTION = App.createComputed(() => {
+     return `Hello I am '${MY_NAME.vale}' and I use ${MY_STATE_MANAGER.value} for State Management.`;
+  });
   ```
 
 ### 🤸‍ Flexible
-- Works in nearly any UI-Layer. Check [here](https://agile-ts.org/docs/frameworks) if your preferred Framework is supported too.
-- Surly behaves with the workflow which suits you best. No need boilerplate code.
+
+- Works in nearly any UI-Layer. Check [here](Frameworks.md) if your preferred Framework is supported too.
+- Surly behaves with the workflow which suits you best. No need for _reducers_, _actions_, ..
 - Has **0** external dependencies
 
 ### ⛳️ Centralize
+
 AgileTs is designed to take all business logic out of UI-Components and put them in a central place often called `core`.
 The benefit of keeping logic separate to UI-Components is to make your code more decoupled, portable and above all easily testable.
 
 ### 🎯 Easy to Use
-Learn the powerful tools of AgileTs in a short amount of time.
-A good place to start are our [Quick Start Guides](https://agile-ts.org/docs/installation) 
-or if you are no fan of following any tutorial, checkout your [Examples](https://agile-ts.org/docs/examples).
+
+Learn the powerful tools of AgileTs in a short amount of time. An excellent place to start are
+our [Quick Start](./Installation.md) Guides, or if you don't like following any tutorial, 
+jump straight into our [Example](../examples) section.
 
 
 <br />
