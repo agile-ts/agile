@@ -75,7 +75,7 @@ More examples can be found in the [Example Section](https://agile-ts.org/docs/ex
 
 AgileTs is a global, simple, well-tested State Management Framework implemented in Typescript.
 It offers a reimagined API that focus on **developer experience** and allows you to **quickly** and **easily** manage your States.
-Besides, States AgileTs offers other powerful classes which make your life easier.
+Besides States, AgileTs offers other powerful classes which make your life easier.
 The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
@@ -132,12 +132,12 @@ jump straight into our [Example](../examples) section.
 
 To properly use AgileTs, in a UI-Framework we need to install **two** packages.
 
-- The _Core Package_, which acts as the brain of AgileTs and manages all our States
+- The _Core Package_, which acts as the brain of AgileTs and manages all your States
   ```
   npm install @agile-ts/core
   ```
 
-- and a _fitting Integration_ for our preferd UI-Framework. In my case the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
+- and a _fitting Integration_ for your preferd UI-Framework. In my case the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
   Check [here](https://agile-ts.org/docs/frameworks) if your desired Framework is supported, too.
   ```
   npm install @agile-ts/react
