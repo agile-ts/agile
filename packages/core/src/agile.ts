@@ -40,6 +40,9 @@ export class Agile {
     level: Logger.level.WARN,
   });
 
+  // Key which is used to globally bind AgileTs
+  static globalKey = '__agile__';
+
   /**
    * @public
    * Agile - Global state and logic framework for reactive Typescript & Javascript applications
@@ -50,6 +53,7 @@ export class Agile {
       localStorage: true,
       waitForMount: true,
       logConfig: {},
+      bindGlobal: false,
     });
     config.logConfig = defineConfig(config.logConfig, {
       prefix: 'Agile',
@@ -75,10 +79,13 @@ export class Agile {
     Agile.logger.success('Created new AgileInstance ', this, Agile.logger);
 
     // Create global instance of Agile
-    if (!globalBind('__agile__', this))
-      Agile.logger.warn(
-        'Be careful with multiple Agile Instances in one Application!'
-      );
+    // Why? getAgileInstance() returns the global AgileInstance if it couldn't find the Agile Instance in the passed Instance
+    if (config.bindGlobal) {
+      if (!globalBind(Agile.globalKey, this))
+        Agile.logger.warn(
+          'Be careful with binding multiple Agile Instances global in one Application!'
+        );
+    }
   }
 
   //=========================================================================================================
@@ -230,11 +237,13 @@ export class Agile {
  * @param logJobs - Allow Agile Logs
  * @param waitForMount - If Agile should wait until the component mounts
  * @param storageConfig - To configure Agile Storage
+ * @param bindGlobal - Binds Agile Instance Global
  */
 export interface CreateAgileConfigInterface {
   logConfig?: CreateLoggerConfigInterface;
   waitForMount?: boolean;
   localStorage?: boolean;
+  bindGlobal?: boolean;
 }
 
 /**

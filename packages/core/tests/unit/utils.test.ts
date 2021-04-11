@@ -200,7 +200,7 @@ describe('Utils Tests', () => {
 
   describe('getAgileInstance function tests', () => {
     beforeEach(() => {
-      globalThis['__agile__'] = dummyAgile;
+      globalThis[Agile.globalKey] = dummyAgile;
     });
 
     it('should get agileInstance from State', () => {

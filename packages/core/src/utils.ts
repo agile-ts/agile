@@ -114,7 +114,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
     }
 
     // Return global bound agileInstance
-    return globalThis['__agile__'];
+    return globalThis[Agile.globalKey];
   } catch (e) {
     Agile.logger.error('Failed to get Agile Instance from ', instance);
   }
@@ -415,7 +415,7 @@ export function globalBind(
       return true;
     }
 
-    if (!globalThis[key]) {
+    if (globalThis[key] == null) {
       globalThis[key] = instance;
       return true;
     }
