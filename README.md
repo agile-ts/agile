@@ -42,23 +42,25 @@
 ```tsx
 // -- core.js ------------------------------------------
 
-// Let's start by creating an Instance of AgileTs
+// 1️⃣ Create Instance of AgileTs
 const App = new Agile();
 
-// Now we are able to build our first State 😃
-const MY_FIRST_STATE = App.createState("Hello Stranger!");
+// 2️⃣ Create State with help of before defined Agile Instance
+const MY_FIRST_STATE = App.createState("Hello Friend!");
 
 
 // -- myComponent.whatever ------------------------------------------
 
-// Finally, we bind our just created State to our desired UI-Component
-// And wolla its reactive. Everytime the State mutates the Component rerenders
-const myFirstState = useAgile(MY_FIRST_STATE); // returns value of State ("Hello Stranger!")
+// 3️⃣ Bind initialized State to desired UI-Component
+// And wolla, it's reactive. Everytime the State mutates the Component rerenders
+const myFirstState = useAgile(MY_FIRST_STATE); // Returns value of State ("Hello Friend!")
 ```
-To find out more checkout our [documentation](https://agile-ts.org/docs/introduction).
+To find out more, check out our [Quick Start Guides](https://agile-ts.org/docs/Installation.md).
 
 ### ⛳️ Sandbox
-Test AgileTs yourself, it's only one click away. Just select your preferred Framework below.
+Test AgileTs yourself in a [codesandbox](https://codesandbox.io/s/agilets-first-state-f12cz). 
+It's only one click away. Just select your preferred Framework below.
+
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - [React-Native](https://snack.expo.io/@bennodev/agilets-first-state)  
 - Vue (coming soon)
@@ -91,7 +93,7 @@ Write minimalistic, boilerplate-free code that captures your intent.
   ```
 - Store State in any Storage, like [Local Storage](https://www.w3schools.com/html/html5_webstorage.asp)
   ```ts
-  MY_STATE.persist("storage-key")
+  MY_STATE.persist("storage-key");
   ```
 - Create a reactive Array of States
   ```ts
@@ -178,7 +180,7 @@ To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agil
 
 | Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | Brain of Agile                            |
+| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | State Manager                            |
 | [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                         |
 | [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based Api                         |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
