@@ -1,7 +1,5 @@
-// Note: This is no optimized Test!
-//       It was manly used to see if the collection persistent works during the development
-
 import { Agile, Item } from '../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Collection Persist Function Tests', () => {
   const myStorage: any = {};
@@ -21,7 +19,7 @@ describe('Collection Persist Function Tests', () => {
   };
 
   // Define Agile with Storage
-  const App = new Agile();
+  const App = new Agile({ localStorage: false });
   App.registerStorage(
     App.createStorage({
       key: 'testStorage',
@@ -34,6 +32,11 @@ describe('Collection Persist Function Tests', () => {
     id: number;
     name: string;
   }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+  });
 
   describe('Collection', () => {
     it('Can persist Collection', async () => {
