@@ -1,6 +1,12 @@
 import { Integration } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Integration Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+  });
+
   it('should create Integration', () => {
     const methods = {
       bind: () => Promise.resolve(true),

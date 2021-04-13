@@ -6,11 +6,15 @@ import {
   SubController,
   SubscriptionContainer,
 } from '../../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('SubController Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
   });
 

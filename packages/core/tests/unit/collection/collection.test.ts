@@ -9,6 +9,7 @@ import {
   StatePersistent,
 } from '../../../src';
 import * as Utils from '../../../src/utils';
+import mockConsole from 'jest-mock-console';
 
 jest.mock('../../../src/collection/collection.persistent');
 
@@ -22,13 +23,13 @@ describe('Collection Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
     jest.spyOn(Collection.prototype, 'collect');
-    console.error = jest.fn();
-    console.warn = jest.fn();
   });
 
   it('should create Collection (default config)', () => {

@@ -8,12 +8,16 @@ import {
   StatePersistent,
   SubscriptionContainer,
 } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('StateObserver Tests', () => {
   let dummyAgile: Agile;
   let dummyState: State;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
     dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });
   });

@@ -1,4 +1,5 @@
 import { Selector, Agile, Collection, StateObserver, Item } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Selector Tests', () => {
   interface ItemInterface {
@@ -11,6 +12,8 @@ describe('Selector Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 

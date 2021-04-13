@@ -11,6 +11,7 @@ import {
   Storages,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
+import mockConsole from 'jest-mock-console';
 
 jest.mock('../../src/runtime/index');
 jest.mock('../../src/runtime/subscription/sub.controller');
@@ -49,6 +50,9 @@ describe('Agile Tests', () => {
   >;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     RuntimeMock.mockClear();
     SubControllerMock.mockClear();
     StoragesMock.mockClear();

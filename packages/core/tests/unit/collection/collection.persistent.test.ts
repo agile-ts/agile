@@ -8,6 +8,7 @@ import {
   Group,
   Item,
 } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('CollectionPersistent Tests', () => {
   interface ItemInterface {
@@ -20,6 +21,7 @@ describe('CollectionPersistent Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
@@ -28,8 +30,6 @@ describe('CollectionPersistent Tests', () => {
 
     jest.spyOn(CollectionPersistent.prototype, 'instantiatePersistent');
     jest.spyOn(CollectionPersistent.prototype, 'initialLoading');
-    console.error = jest.fn();
-    console.warn = jest.fn();
   });
 
   it("should create CollectionPersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {

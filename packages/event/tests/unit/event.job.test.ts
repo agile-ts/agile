@@ -1,6 +1,12 @@
 import { EventJob } from '../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('EventJob Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+  });
+
   it('should create EventJob (without keys)', () => {
     const eventJob = new EventJob('myPayload');
 

@@ -1,15 +1,16 @@
 import { Agile, Persistent, Storage } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Persistent Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
-    console.error = jest.fn();
   });
 
   it('should create Persistent (default config)', () => {

@@ -1,14 +1,16 @@
 import { Storages, Agile, Storage, Persistent } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Storages Tests', () => {
   let dummyAgile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Storages.prototype, 'instantiateLocalStorage');
-    console.error = jest.fn();
-    console.warn = jest.fn();
   });
 
   it('should create Storages (default config)', () => {

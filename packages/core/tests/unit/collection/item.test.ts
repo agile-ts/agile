@@ -1,16 +1,18 @@
 import { Item, Collection, Agile, StateObserver, State } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Item Tests', () => {
   let dummyAgile: Agile;
   let dummyCollection: Collection;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection(dummyAgile);
 
     jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
-
-    jest.clearAllMocks();
   });
 
   it('should create Item (default config)', () => {

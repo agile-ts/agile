@@ -23,17 +23,19 @@ import {
   StateObserver,
   removeProperties,
 } from '../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Utils Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     // @ts-ignore | Reset globalThis
     globalThis = {};
-
-    console.error = jest.fn();
   });
 
   describe('copy function tests', () => {

@@ -7,6 +7,7 @@ import {
   ComputedTracker,
 } from '../../../src';
 import * as Utils from '../../../src/utils';
+import mockConsole from 'jest-mock-console';
 
 jest.mock('../../../src/state/state.persistent');
 
@@ -15,12 +16,11 @@ describe('State Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(State.prototype, 'set');
-    console.error = jest.fn();
-    console.warn = jest.fn();
   });
 
   it('should create State and should call initial set (default config)', () => {

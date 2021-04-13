@@ -6,15 +6,18 @@ import {
   State,
   ComputedTracker,
 } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Computed Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Computed.prototype, 'recompute');
-    console.error = jest.fn();
   });
 
   it('should create Computed (default config)', () => {
