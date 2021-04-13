@@ -55,14 +55,14 @@ const MY_FIRST_STATE = App.createState("Hello Friend!");
 // And wolla, it's reactive. Everytime the State mutates the Component rerenders
 const myFirstState = useAgile(MY_FIRST_STATE); // Returns value of State ("Hello Friend!")
 ```
-To find out more, check out our [Quick Start Guides](https://agile-ts.org/docs/Installation.md).
+To learn out more, check out our [Quick Start Guides](https://agile-ts.org/docs/Installation.md).
 
 ### ⛳️ Sandbox
-Test AgileTs yourself in a [codesandbox](https://codesandbox.io/s/agilets-first-state-f12cz). 
+Test AgileTs yourself in a [codesandbox](https://codesandbox.io/s/agilets-first-state-f12cz).
 It's only one click away. Just select your preferred Framework below.
 
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
-- [React-Native](https://snack.expo.io/@bennodev/agilets-first-state)  
+- [React-Native](https://snack.expo.io/@bennodev/agilets-first-state)
 - Vue (coming soon)
 - Angular (coming soon)
 
@@ -77,7 +77,7 @@ More examples can be found in the [Example Section](https://agile-ts.org/docs/ex
 
 AgileTs is a global, simple, well-tested State Management Framework implemented in Typescript.
 It offers a reimagined API that focus on **developer experience** and allows you to **quickly** and **easily** manage your States.
-Besides States, AgileTs offers other powerful classes which make your life easier.
+Besides States, AgileTs offers some other powerful apis that make your life easier.
 The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
@@ -110,7 +110,7 @@ Write minimalistic, boilerplate-free code that captures your intent.
 
 ### 🤸‍ Flexible
 
-- Works in nearly any UI-Layer. Check [here](Frameworks.md) if your preferred Framework is supported too.
+- Works in nearly any UI-Layer. Check [here](https://agile-ts.org/docs/Frameworks) if your preferred Framework is supported too.
 - Surly behaves with the workflow which suits you best. No need for _reducers_, _actions_, ..
 - Has **0** external dependencies
 
@@ -122,8 +122,8 @@ The benefit of keeping logic separate to UI-Components is to make your code more
 ### 🎯 Easy to Use
 
 Learn the powerful tools of AgileTs in a short amount of time. An excellent place to start are
-our [Quick Start](./Installation.md) Guides, or if you don't like following any tutorial, 
-jump straight into our [Example](../examples) section.
+our [Quick Start](https://agile-ts.org/docs/Installation) Guides, or if you don't like to follow any tutorials,
+you can jump straight into our [Example](https://agile-ts.org/docs/examples/Introduction) Section.
 
 
 <br />
@@ -155,7 +155,7 @@ To properly use AgileTs, in a UI-Framework we need to install **two** packages.
 Sounds AgileTs interesting to you?
 Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
 And I promise you, you will be able to use AgileTs in no time.
-In case you have any further questions don't mind joining our [Community Discord](https://discord.gg/T9GzreAwPH).
+In case you have any further questions don't hesitate joining our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 
 <br />
@@ -180,9 +180,9 @@ To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agil
 
 | Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | State Manager                            |
+| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | State Manager                             |
 | [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                         |
-| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based Api                         |
+| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based API                         |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
 | [@agile-ts/event](/packages/event)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/event.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/event)                                 | Handy class for emitting UI Events        |
 
