@@ -2,6 +2,6 @@ dist
 node_modules
 .eslintrc.js
 jest.config.js
-jest.config.base.js
+jest.base.config.js
 scripts/
 examples/
