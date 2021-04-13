@@ -40,7 +40,7 @@ export class Agile {
     level: Logger.level.WARN,
   });
 
-  // Key which is used to globally bind AgileTs
+  // Key used to bind AgileTs globally
   static globalKey = '__agile__';
 
   /**

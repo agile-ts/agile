@@ -6,13 +6,21 @@
   "homepage": "https://agile-ts.org/",
   "description": "Extension to combine Agile with React or React-Native",
   "keywords": [
-    "agile",
-    "agile-ts",
-    "react-component",
     "react",
+    "state management",
+    "state",
+    "management",
+    "react-native",
     "reactjs",
+    "typescript",
+    "javascript",
+    "hook",
+    "hooks",
+    "hoc",
+    "react-component",
     "reactive",
-    "react-native"
+    "agile",
+    "agile-ts"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,7 +31,10 @@
     "dev:push": "yalc push",
     "watch": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "release": "yarn run prepare",
-    "preview": "npm pack"
+    "preview": "npm pack",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core",
@@ -41,9 +52,13 @@
     "type": "git",
     "url": "https://github.com/agile-ts/agile.git"
   },
+  "bugs": {
+    "url": "https://github.com/agile-ts/agile/issues"
+  },
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ]
 }

@@ -6,13 +6,14 @@
   "homepage": "https://agile-ts.org/",
   "description": "Simple Form Manager for UI-Frameworks",
   "keywords": [
-    "agile",
-    "agile-ts",
-    "multi-editor",
     "form",
-    "form-editor",
-    "form-manager",
-    "form-validator"
+    "form manager",
+    "form editor",
+    "form validator",
+    "react",
+    "multi-editor",
+    "agile",
+    "agile-ts"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,7 +24,10 @@
     "dev:push": "yalc push",
     "watch": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "release": "yarn run prepare",
-    "preview": "npm pack"
+    "preview": "npm pack",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core"
@@ -38,9 +42,13 @@
     "type": "git",
     "url": "https://github.com/agile-ts/agile.git"
   },
+  "bugs": {
+    "url": "https://github.com/agile-ts/agile/issues"
+  },
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ]
 }

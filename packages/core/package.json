@@ -6,12 +6,22 @@
   "homepage": "https://agile-ts.org/",
   "description": "Spacy, Simple, Scalable State Management Framework",
   "keywords": [
-    "agile",
-    "agile-ts",
-    "state-management",
+    "state management",
+    "react",
+    "vue",
     "state",
+    "management",
     "typescript",
-    "reactive"
+    "javascript",
+    "reactive",
+    "modular",
+    "simple",
+    "redux",
+    "replace redux",
+    "state-machine",
+    "functional-reactive-programming",
+    "agile",
+    "agile-ts"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +32,10 @@
     "dev:push": "yalc push",
     "watch": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "release": "node ./scripts/prepublish.js && yarn run prepare",
-    "preview": "npm pack"
+    "preview": "npm pack",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*"
   },
   "publishConfig": {
     "access": "public"
@@ -31,9 +44,13 @@
     "type": "git",
     "url": "https://github.com/agile-ts/agile.git"
   },
+  "bugs": {
+    "url": "https://github.com/agile-ts/agile/issues"
+  },
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ]
 }
