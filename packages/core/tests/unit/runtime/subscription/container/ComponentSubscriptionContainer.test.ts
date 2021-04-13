@@ -3,6 +3,7 @@ import {
   ComponentSubscriptionContainer,
   Observer,
 } from '../../../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('ComponentSubscriptionContainer Tests', () => {
   let dummyAgile: Agile;
@@ -10,6 +11,9 @@ describe('ComponentSubscriptionContainer Tests', () => {
   let dummyObserver2: Observer;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });

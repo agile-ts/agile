@@ -4,6 +4,7 @@ import {
   SubscriptionContainer,
   RuntimeJob,
 } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Observer Tests', () => {
   let dummyAgile: Agile;
@@ -13,6 +14,9 @@ describe('Observer Tests', () => {
   let dummySubscription2: SubscriptionContainer;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });

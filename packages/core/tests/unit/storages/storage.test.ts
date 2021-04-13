@@ -1,10 +1,12 @@
 import { Storage } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Storage Tests', () => {
   let dummyStorageMethods;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
 
     dummyStorageMethods = {
       get: jest.fn(),
@@ -14,8 +16,6 @@ describe('Storage Tests', () => {
 
     // https://codewithhugo.com/jest-stub-mock-spy-set-clear/
     jest.spyOn(Storage.prototype, 'validate');
-    console.warn = jest.fn();
-    console.error = jest.fn();
   });
 
   it('should create not async Storage with normal Storage Methods (default config)', () => {

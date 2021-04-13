@@ -11,6 +11,7 @@ import {
   Storages,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
+import mockConsole from 'jest-mock-console';
 
 jest.mock('../../src/runtime/index');
 jest.mock('../../src/runtime/subscription/sub.controller');
@@ -49,13 +50,16 @@ describe('Agile Tests', () => {
   >;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     RuntimeMock.mockClear();
     SubControllerMock.mockClear();
     StoragesMock.mockClear();
     IntegrationsMock.mockClear();
 
     // Reset Global This
-    globalThis['__agile__'] = undefined;
+    globalThis[Agile.globalKey] = undefined;
   });
 
   it('should instantiate Agile (default config)', () => {
@@ -92,7 +96,7 @@ describe('Agile Tests', () => {
     expect(Agile.logger.isActive).toBeTruthy();
 
     // Check if global Agile Instance got created
-    expect(globalThis['__agile__']).toBe(agile);
+    expect(globalThis[Agile.globalKey]).toBeUndefined();
   });
 
   it('should instantiate Agile with specific config', () => {
@@ -105,6 +109,7 @@ describe('Agile Tests', () => {
         prefix: 'Jeff',
         timestamp: true,
       },
+      bindGlobal: true,
     });
 
     // Check if Agile properties got instantiated properly
@@ -138,7 +143,7 @@ describe('Agile Tests', () => {
     expect(Agile.logger.isActive).toBeFalsy();
 
     // Check if global Agile Instance got created
-    expect(globalThis['__agile__']).toBe(agile);
+    expect(globalThis[Agile.globalKey]).toBe(agile);
   });
 
   describe('Agile Function Tests', () => {

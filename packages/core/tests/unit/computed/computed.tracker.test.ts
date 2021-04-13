@@ -1,9 +1,13 @@
 import { ComputedTracker, Observer, Agile } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('ComputedTracker Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     // Reset ComputedTracker (because it works static)

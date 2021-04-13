@@ -31,8 +31,8 @@ export class Collection<DataType = DefaultItem> {
   public isPersisted = false; // If Collection can be stored in Agile Storage (-> successfully integrated persistent)
   public persistent: CollectionPersistent | undefined; // Manages storing Collection Value into Storage
 
-  public groups: { [key: string]: Group<any> } = {};
-  public selectors: { [key: string]: Selector<any> } = {};
+  public groups: { [key: string]: Group<DataType> } = {};
+  public selectors: { [key: string]: Selector<DataType> } = {};
 
   public isInstantiated = false;
 
@@ -634,6 +634,7 @@ export class Collection<DataType = DefaultItem> {
     }
     this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
     delete this.selectors[selectorKey];
+
     return this;
   }
 
@@ -1198,7 +1199,7 @@ export class Collection<DataType = DefaultItem> {
   }
 }
 
-export type DefaultItem = { [key: string]: any };
+export type DefaultItem = Record<string, any>; // same as { [key: string]: any };
 export type CollectionKey = string | number;
 export type ItemKey = string | number;
 

@@ -7,6 +7,7 @@ import {
   ComputedTracker,
 } from '../../../src';
 import * as Utils from '../../../src/utils';
+import mockConsole from 'jest-mock-console';
 
 jest.mock('../../../src/state/state.persistent');
 
@@ -15,12 +16,11 @@ describe('State Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(State.prototype, 'set');
-    console.error = jest.fn();
-    console.warn = jest.fn();
   });
 
   it('should create State and should call initial set (default config)', () => {
@@ -225,15 +225,7 @@ describe('State Tests', () => {
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-          background: false,
           force: false,
-          perform: true,
-          storage: true,
-          overwrite: false,
         });
       });
 
@@ -253,10 +245,8 @@ describe('State Tests', () => {
             enabled: false,
           },
           background: true,
-          perform: true,
-          force: false,
           storage: false,
-          overwrite: false,
+          force: false,
         });
       });
 
@@ -281,20 +271,9 @@ describe('State Tests', () => {
           'Agile Warn: Incorrect type (string) was provided.'
         );
         expect(console.error).not.toHaveBeenCalled();
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
-          'coolValue',
-          {
-            sideEffects: {
-              enabled: true,
-              exclude: [],
-            },
-            background: false,
-            perform: true,
-            force: true,
-            storage: true,
-            overwrite: false,
-          }
-        );
+        expect(
+          numberState.observer.ingestValue
+        ).toHaveBeenCalledWith('coolValue', { force: true });
       });
 
       it("should ingestValue if value hasn't correct type but the type isn't explicit defined (default config)", () => {
@@ -302,20 +281,9 @@ describe('State Tests', () => {
 
         expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(
-          'coolValue',
-          {
-            sideEffects: {
-              enabled: true,
-              exclude: [],
-            },
-            background: false,
-            perform: true,
-            force: false,
-            storage: true,
-            overwrite: false,
-          }
-        );
+        expect(
+          numberState.observer.ingestValue
+        ).toHaveBeenCalledWith('coolValue', { force: false });
       });
     });
 
@@ -459,24 +427,13 @@ describe('State Tests', () => {
         expect(Utils.flatMerge).toHaveBeenCalledWith(
           { age: 10, name: 'jeff' },
           { name: 'frank' },
-          {
-            addNewProperties: true,
-          }
+          { addNewProperties: true }
         );
         expect(objectState.nextStateValue).toStrictEqual({
           age: 10,
           name: 'frank',
         });
-        expect(objectState.ingest).toHaveBeenCalledWith({
-          background: false,
-          force: false,
-          overwrite: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-          storage: true,
-        });
+        expect(objectState.ingest).toHaveBeenCalledWith({});
       });
 
       it('should patch and ingest passed object based value into a object based State (specific config)', () => {
@@ -496,9 +453,7 @@ describe('State Tests', () => {
         expect(Utils.flatMerge).toHaveBeenCalledWith(
           { age: 10, name: 'jeff' },
           { name: 'frank' },
-          {
-            addNewProperties: false,
-          }
+          { addNewProperties: false }
         );
         expect(objectState.nextStateValue).toStrictEqual({
           age: 10,
@@ -511,7 +466,6 @@ describe('State Tests', () => {
           sideEffects: {
             enabled: false,
           },
-          storage: true,
         });
       });
     });

@@ -1,19 +1,17 @@
 {
-  "name": "@agile-ts/multieditor",
-  "version": "0.0.13",
+  "name": "@agile-ts/vue",
+  "version": "0.0.1",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Simple Form Manager for UI-Frameworks",
+  "description": "Extension to combine Agile with Vue",
   "keywords": [
-    "form",
-    "form manager",
-    "form editor",
-    "form validator",
-    "react",
-    "multi-editor",
     "agile",
-    "agile-ts"
+    "agile-ts",
+    "vue-component",
+    "vue",
+    "vuejs",
+    "reactive"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,9 +28,12 @@
     "lint": "eslint src/**/*"
   },
   "devDependencies": {
-    "@agile-ts/core": "file:../core"
+    "@agile-ts/core": "file:../core",
+    "@vue/cli": "^4.5.12",
+    "vue": "^2.6.12"
   },
   "peerDependencies": {
+    "vue": "^2.6.12",
     "@agile-ts/core": "^0.0.13"
   },
   "publishConfig": {

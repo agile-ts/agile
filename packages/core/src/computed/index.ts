@@ -5,8 +5,10 @@ import {
   Observer,
   StateConfigInterface,
   ComputedTracker,
-  Group,
-  SideEffectConfigInterface,
+  Collection,
+  extractObservers,
+  StateIngestConfigInterface,
+  removeProperties,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -41,11 +43,13 @@ export class Computed<ComputedValueType = any> extends State<
     this.computeFunction = computeFunction;
 
     // Format hardCodedDeps
-    this.hardCodedDeps = this.formatDeps(config.computedDeps as any);
+    this.hardCodedDeps = extractObservers(config.computedDeps).filter(
+      (dep): dep is Observer => dep !== undefined
+    );
     this.deps = this.hardCodedDeps;
 
     // Recompute for setting initial value and adding missing dependencies
-    this.recompute();
+    this.recompute({ autodetect: true });
   }
 
   //=========================================================================================================
@@ -56,15 +60,15 @@ export class Computed<ComputedValueType = any> extends State<
    * Recomputes Value of Computed
    * @param config - Config
    */
-  public recompute(config: RecomputeConfigInterface = {}) {
+  public recompute(config: RecomputeConfigInterface = {}): this {
     config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
+      autodetect: false,
     });
-    this.ingest(config);
+    this.observer.ingestValue(
+      this.compute({ autodetect: config.autodetect }),
+      removeProperties(config, ['autodetect'])
+    );
+    return this;
   }
 
   //=========================================================================================================
@@ -79,20 +83,18 @@ export class Computed<ComputedValueType = any> extends State<
    */
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
-    deps: Array<Observer | State | Event> = [],
-    config: UpdateComputeFunctionInterface = {}
-  ) {
+    deps: Array<SubscribableAgileInstancesType> = [],
+    config: UpdateComputeFunctionConfigInterface = {}
+  ): this {
     config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
       overwriteDeps: true,
+      autodetect: true,
     });
 
     // Update deps
-    const newDeps = this.formatDeps(deps as any);
+    const newDeps = extractObservers(deps).filter(
+      (dep): dep is Observer => dep !== undefined
+    );
     if (config.overwriteDeps) this.hardCodedDeps = newDeps;
     else this.hardCodedDeps = this.hardCodedDeps.concat(newDeps);
     this.deps = this.hardCodedDeps;
@@ -101,10 +103,9 @@ export class Computed<ComputedValueType = any> extends State<
     this.computeFunction = computeFunction;
 
     // Recompute for setting initial Computed Function Value and adding missing Dependencies
-    this.recompute({
-      background: config.background,
-      sideEffects: config.sideEffects,
-    });
+    this.recompute(removeProperties(config, ['overwriteDeps']));
+
+    return this;
   }
 
   //=========================================================================================================
@@ -114,48 +115,33 @@ export class Computed<ComputedValueType = any> extends State<
    * @internal
    * Recomputes value and adds missing dependencies to Computed
    */
-  public compute(): ComputedValueType {
-    // Auto track Observers the computeFunction might depend on
-    ComputedTracker.track();
-    const computedValue = this.computeFunction();
-    const foundDeps = ComputedTracker.getTrackedObservers();
-
-    // Handle foundDeps and hardCodedDeps
-    const newDeps: Array<Observer> = [];
-    this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
-      newDeps.push(observer);
-
-      // Make this Observer depending on foundDep Observer
-      observer.depend(this.observer);
+  public compute(config: ComputeConfigInterface = {}): ComputedValueType {
+    config = defineConfig(config, {
+      autodetect: true,
     });
 
-    this.deps = newDeps;
-    return computedValue;
-  }
+    // Start auto tracking Observers the computeFunction might depend on
+    if (config.autodetect) ComputedTracker.track();
 
-  //=========================================================================================================
-  // Format Deps
-  //=========================================================================================================
-  /**
-   * @internal
-   * Gets Observer out of passed Instances
-   * @param instances - Instances that hold an Observer
-   */
-  public formatDeps(instances: Array<any>): Array<Observer> {
-    const finalInstances: Array<Observer> = [];
-    for (const instance of instances) {
-      if (instance instanceof Observer) {
-        finalInstances.push(instance);
-        continue;
-      }
-      if (
-        instance !== undefined &&
-        instance['observer'] !== undefined &&
-        instance['observer'] instanceof Observer
-      )
-        finalInstances.push(instance['observer']);
+    const computedValue = this.computeFunction();
+
+    // Handle auto tracked Observers
+    if (config.autodetect) {
+      const foundDeps = ComputedTracker.getTrackedObservers();
+
+      // Handle foundDeps and hardCodedDeps
+      const newDeps: Array<Observer> = [];
+      this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
+        newDeps.push(observer);
+
+        // Make this Observer depend on foundDep Observer
+        observer.depend(this.observer);
+      });
+
+      this.deps = newDeps;
     }
-    return finalInstances;
+
+    return computedValue;
   }
 
   //=========================================================================================================
@@ -182,22 +168,26 @@ export class Computed<ComputedValueType = any> extends State<
  * @param computedDeps - Hard coded dependencies of Computed Function
  */
 export interface ComputedConfigInterface extends StateConfigInterface {
-  computedDeps?: Array<Observer | State | Group>;
+  computedDeps?: Array<SubscribableAgileInstancesType>;
 }
 
 /**
- * @param background - If recomputing value happens in the background (-> not causing any rerender)
- * @param sideEffects - If Side Effects of Computed get executed
+ * @param autodetect - If dependencies get autodetected
  */
-export interface RecomputeConfigInterface {
-  background?: boolean;
-  sideEffects?: SideEffectConfigInterface;
+export interface ComputeConfigInterface {
+  autodetect?: boolean;
 }
 
 /**
  * @param overwriteDeps - If old hardCoded deps get overwritten
  */
-export interface UpdateComputeFunctionInterface
+export interface UpdateComputeFunctionConfigInterface
   extends RecomputeConfigInterface {
   overwriteDeps?: boolean;
 }
+
+export interface RecomputeConfigInterface
+  extends StateIngestConfigInterface,
+    ComputeConfigInterface {}
+
+type SubscribableAgileInstancesType = State | Collection | Observer;

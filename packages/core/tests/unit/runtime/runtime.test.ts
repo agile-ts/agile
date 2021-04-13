@@ -8,11 +8,15 @@ import {
   SubscriptionContainer,
 } from '../../../src';
 import testIntegration from '../../helper/test.integration';
+import mockConsole from 'jest-mock-console';
 
 describe('Runtime Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     console.warn = jest.fn();

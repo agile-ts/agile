@@ -1,14 +1,16 @@
 import { Agile, Integration, Integrations } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Integrations Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
     Agile.initialIntegrations = [];
 
-    console.error = jest.fn();
-    console.warn = jest.fn();
     jest.spyOn(Integrations.prototype, 'integrate');
   });
 

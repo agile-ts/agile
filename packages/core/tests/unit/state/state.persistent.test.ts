@@ -5,6 +5,7 @@ import {
   Storage,
   Persistent,
 } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('StatePersistent Tests', () => {
   let dummyAgile: Agile;
@@ -12,13 +13,13 @@ describe('StatePersistent Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
 
     dummyAgile = new Agile({ localStorage: false });
     dummyState = new State(dummyAgile, 'dummyValue');
 
     jest.spyOn(StatePersistent.prototype, 'instantiatePersistent');
     jest.spyOn(StatePersistent.prototype, 'initialLoading');
-    console.error = jest.fn();
   });
 
   it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {

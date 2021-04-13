@@ -1,4 +1,4 @@
-import { Agile } from './internal';
+import { Agile, Observer, Collection } from './internal';
 
 //=========================================================================================================
 // Copy
@@ -114,12 +114,61 @@ export function getAgileInstance(instance: any): Agile | undefined {
     }
 
     // Return global bound agileInstance
-    return globalThis['__agile__'];
+    return globalThis[Agile.globalKey];
   } catch (e) {
     Agile.logger.error('Failed to get Agile Instance from ', instance);
   }
 
   return undefined;
+}
+
+//=========================================================================================================
+// Extract Observers
+//=========================================================================================================
+/**
+ * @private
+ * Extract Observers from specific Instances
+ * @param instances - Instances that will be formatted
+ */
+export function extractObservers(instances: any): Array<Observer | undefined> {
+  const instancesArray: Array<Observer | undefined> = [];
+  const tempInstancesArray = normalizeArray(instances, {
+    createUndefinedArray: true,
+  });
+
+  // Get Observers from Instances
+  for (const instance of tempInstancesArray) {
+    // If Instance is undefined (We have to add undefined to build a proper return value in for instance 'useAgile' later)
+    if (!instance) {
+      instancesArray.push(undefined);
+      continue;
+    }
+
+    // If Instance is Collection
+    if (instance instanceof Collection) {
+      instancesArray.push(
+        instance.getGroupWithReference(instance.config.defaultGroupKey).observer
+      );
+      continue;
+    }
+
+    // If Instance has property that is an Observer
+    if (instance['observer'] && instance['observer'] instanceof Observer) {
+      instancesArray.push(instance['observer']);
+      continue;
+    }
+
+    // If Instance is Observer
+    if (instance instanceof Observer) {
+      instancesArray.push(instance);
+      continue;
+    }
+
+    // Push undefined if no Observer could be found (We have to add undefined to build a proper return value in for instance 'useAgile' later)
+    instancesArray.push(undefined);
+  }
+
+  return instancesArray;
 }
 
 //=========================================================================================================
@@ -149,28 +198,6 @@ export function isAsyncFunction(value: any): boolean {
     (value.constructor.name === 'AsyncFunction' ||
       valueString.includes('__awaiter'))
   );
-}
-
-//=========================================================================================================
-// Is Valid Url
-//=========================================================================================================
-/**
- * @internal
- * Checks the correctness of an url
- * Resource: https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
- * @param url - Url that gets tested for its correctness
- */
-export function isValidUrl(url: string): boolean {
-  const pattern = new RegExp(
-    '^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-      '(\\#[-a-z\\d_]*)?$',
-    'i'
-  );
-  return pattern.test(url);
 }
 
 //=========================================================================================================
@@ -348,6 +375,24 @@ export function clone<T = any>(instance: T): T {
 }
 
 //=========================================================================================================
+// Remove Properties
+//=========================================================================================================
+/**
+ * @internal
+ * Removes properties from Object
+ * @param object - Object from which the properties get removed
+ * @param properties - Properties that get removed from the object
+ */
+export function removeProperties<T = Object>(
+  object: T,
+  properties: Array<string>
+): T {
+  const copiedObject = copy(object);
+  properties.map((property) => delete copiedObject[property]);
+  return copiedObject;
+}
+
+//=========================================================================================================
 // Global Bind
 //=========================================================================================================
 /**
@@ -370,7 +415,7 @@ export function globalBind(
       return true;
     }
 
-    if (!globalThis[key]) {
+    if (globalThis[key] == null) {
       globalThis[key] = instance;
       return true;
     }

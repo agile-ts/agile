@@ -10,28 +10,32 @@ import {
   isFunction,
   isJsonString,
   isValidObject,
-  isValidUrl,
   normalizeArray,
   notEqual,
   globalBind,
   getAgileInstance,
+  extractObservers,
   Agile,
   State,
   Observer,
   Collection,
   createArrayFromObject,
+  StateObserver,
+  removeProperties,
 } from '../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Utils Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     // @ts-ignore | Reset globalThis
     globalThis = {};
-
-    console.error = jest.fn();
   });
 
   describe('copy function tests', () => {
@@ -198,7 +202,7 @@ describe('Utils Tests', () => {
 
   describe('getAgileInstance function tests', () => {
     beforeEach(() => {
-      globalThis['__agile__'] = dummyAgile;
+      globalThis[Agile.globalKey] = dummyAgile;
     });
 
     it('should get agileInstance from State', () => {
@@ -234,6 +238,52 @@ describe('Utils Tests', () => {
         'Agile Error: Failed to get Agile Instance from ',
         'weiredInstance'
       );
+    });
+  });
+
+  describe('extractObservers function tests', () => {
+    let dummyObserver: Observer;
+    let dummyObserver2: Observer;
+    let dummyStateObserver: StateObserver;
+    let dummyState: State;
+    let dummyDefaultGroupObserver: StateObserver;
+    let dummyCollection: Collection;
+
+    beforeEach(() => {
+      dummyObserver = new Observer(dummyAgile);
+      dummyObserver2 = new Observer(dummyAgile);
+
+      dummyState = new State(dummyAgile, undefined);
+      dummyStateObserver = new StateObserver(dummyState);
+      dummyState.observer = dummyStateObserver;
+
+      dummyCollection = new Collection(dummyAgile);
+      const defaultGroup =
+        dummyCollection.groups[dummyCollection.config.defaultGroupKey];
+      dummyDefaultGroupObserver = new StateObserver(defaultGroup);
+      defaultGroup.observer = dummyDefaultGroupObserver;
+    });
+
+    it('should extract Observers from passed Instances', () => {
+      const response = extractObservers([
+        dummyObserver,
+        dummyState,
+        undefined,
+        {},
+        { observer: 'fake' },
+        dummyCollection,
+        { observer: dummyObserver2 },
+      ]);
+
+      expect(response).toStrictEqual([
+        dummyObserver,
+        dummyStateObserver,
+        undefined,
+        undefined,
+        undefined,
+        dummyDefaultGroupObserver,
+        dummyObserver2,
+      ]);
     });
   });
 
@@ -283,26 +333,6 @@ describe('Utils Tests', () => {
           /* empty function */
         })
       ).toBe(false);
-    });
-  });
-
-  // Note: isValidUrl Function doesn't work to 100% yet!!
-  describe('isValidUrl function tests', () => {
-    it('should return true if passed instance is valid url', () => {
-      expect(isValidUrl('https://www.google.com/')).toBe(true);
-      expect(isValidUrl('www.google.com')).toBe(true);
-      expect(isValidUrl('google.com')).toBe(true);
-      // expect(isValidUrl("https://en.wikipedia.org/wiki/Procter_&_Gamble")).toBe(
-      // true
-      // );
-    });
-
-    it('should return false if passed instance is invalid url', () => {
-      expect(isValidUrl('hello')).toBe(false);
-      expect(isValidUrl('https://sdfasd')).toBe(false);
-      expect(isValidUrl('https://')).toBe(false);
-      expect(isValidUrl('')).toBe(false);
-      // expect(isValidUrl("www.google")).toBe(false);
     });
   });
 
@@ -602,6 +632,22 @@ describe('Utils Tests', () => {
         country: 'USA',
         state: 'California',
       });
+    });
+  });
+
+  describe('removeProperties function tests', () => {
+    it('should remove properties from object and remove reference', () => {
+      const myObject = { id: 20, name: 'jeff', age: 10, location: 'Germany' };
+      const newObject = removeProperties(myObject, ['location', 'age']);
+      newObject['size'] = 100.2;
+
+      expect(myObject).toStrictEqual({
+        id: 20,
+        name: 'jeff',
+        age: 10,
+        location: 'Germany',
+      });
+      expect(newObject).toStrictEqual({ id: 20, name: 'jeff', size: 100.2 });
     });
   });
 

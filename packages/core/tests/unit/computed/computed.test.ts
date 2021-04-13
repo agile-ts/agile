@@ -6,15 +6,18 @@ import {
   State,
   ComputedTracker,
 } from '../../../src';
+import mockConsole from 'jest-mock-console';
 
 describe('Computed Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    mockConsole(['error', 'warn']);
+
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Computed.prototype, 'recompute');
-    console.error = jest.fn();
   });
 
   it('should create Computed (default config)', () => {
@@ -43,7 +46,7 @@ describe('Computed Tests', () => {
     expect(computed.persistent).toBeUndefined();
     expect(computed.watchers).toStrictEqual({});
 
-    expect(computed.recompute).toHaveBeenCalled();
+    expect(computed.recompute).toHaveBeenCalledWith({ autodetect: true });
   });
 
   it('should create Computed (specific config)', () => {
@@ -85,7 +88,7 @@ describe('Computed Tests', () => {
     expect(computed.persistent).toBeUndefined();
     expect(computed.watchers).toStrictEqual({});
 
-    expect(computed.recompute).toHaveBeenCalled();
+    expect(computed.recompute).toHaveBeenCalledWith({ autodetect: true });
   });
 
   describe('Computed Function Tests', () => {
@@ -98,34 +101,39 @@ describe('Computed Tests', () => {
 
     describe('recompute function tests', () => {
       beforeEach(() => {
-        computed.ingest = jest.fn();
+        computed.observer.ingestValue = jest.fn();
       });
 
       it('should ingest Computed into Runtime (default config)', () => {
+        computed.compute = jest.fn(() => 'jeff');
+
         computed.recompute();
 
-        expect(computed.ingest).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-        });
+        expect(computed.compute).toHaveBeenCalledWith({ autodetect: false });
+        expect(computed.observer.ingestValue).toHaveBeenCalledWith('jeff', {});
       });
 
       it('should ingest Computed into Runtime (specific config)', () => {
+        computed.compute = jest.fn(() => 'jeff');
+
         computed.recompute({
+          autodetect: true,
           background: true,
           sideEffects: {
             enabled: false,
           },
+          force: false,
+          key: 'jeff',
         });
 
-        expect(computed.ingest).toHaveBeenCalledWith({
+        expect(computed.compute).toHaveBeenCalledWith({ autodetect: true });
+        expect(computed.observer.ingestValue).toHaveBeenCalledWith('jeff', {
           background: true,
           sideEffects: {
             enabled: false,
           },
+          force: false,
+          key: 'jeff',
         });
       });
     });
@@ -161,13 +169,7 @@ describe('Computed Tests', () => {
           dummyObserver,
         ]);
         expect(computed.computeFunction).toBe(newComputeFunction);
-        expect(computed.recompute).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-        });
+        expect(computed.recompute).toHaveBeenCalledWith({ autodetect: true });
       });
 
       it('should updated computeFunction and overwrite hardCodedDeps (specific config)', () => {
@@ -176,6 +178,9 @@ describe('Computed Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          key: 'jeff',
+          force: true,
+          autodetect: false,
         });
 
         expect(computed.hardCodedDeps).toStrictEqual([]);
@@ -186,6 +191,9 @@ describe('Computed Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          key: 'jeff',
+          force: true,
+          autodetect: false,
         });
       });
 
@@ -207,13 +215,7 @@ describe('Computed Tests', () => {
           dummyObserver,
         ]);
         expect(computed.computeFunction).toBe(newComputeFunction);
-        expect(computed.recompute).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-        });
+        expect(computed.recompute).toHaveBeenCalledWith({ autodetect: true });
       });
     });
 
@@ -228,19 +230,20 @@ describe('Computed Tests', () => {
         dummyObserver3 = new Observer(dummyAgile);
 
         computed.hardCodedDeps = [dummyObserver3];
+        computed.deps = [dummyObserver3]; // normally the hardCodedDeps get automatically added to the deps.. but this time we set the hardCodedProperty after the instantiation
 
         dummyObserver1.depend = jest.fn();
         dummyObserver2.depend = jest.fn();
         dummyObserver3.depend = jest.fn();
-        ComputedTracker.track = jest.fn();
+        jest.spyOn(ComputedTracker, 'track').mockClear(); // mockClear because otherwise the static mock doesn't get reset after each 'it' test
+        jest.spyOn(ComputedTracker, 'getTrackedObservers').mockClear();
       });
 
-      it('should call computeFunction and track dependencies the computeFunction depends on', () => {
+      it('should call computeFunction and track dependencies the computeFunction depends on (default config)', () => {
+        jest
+          .spyOn(ComputedTracker, 'getTrackedObservers')
+          .mockReturnValueOnce([dummyObserver1, dummyObserver2]);
         computed.computeFunction = jest.fn(() => 'newComputedValue');
-        ComputedTracker.getTrackedObservers = jest.fn(() => [
-          dummyObserver1,
-          dummyObserver2,
-        ]);
 
         const response = computed.compute();
 
@@ -258,31 +261,21 @@ describe('Computed Tests', () => {
         expect(dummyObserver2.depend).toHaveBeenCalledWith(computed.observer);
         expect(dummyObserver3.depend).toHaveBeenCalledWith(computed.observer);
       });
-    });
 
-    describe('formatDeps function tests', () => {
-      let dummyObserver: Observer;
-      let dummyStateObserver: StateObserver;
-      let dummyState: State;
+      it("should call computeFunction and shouldn't track dependencies the computeFunction depends on (autodetect false)", () => {
+        computed.computeFunction = jest.fn(() => 'newComputedValue');
 
-      beforeEach(() => {
-        dummyObserver = new Observer(dummyAgile);
-        dummyState = new State(dummyAgile, undefined);
-        dummyStateObserver = new StateObserver(dummyState);
+        const response = computed.compute({ autodetect: false });
 
-        dummyState.observer = dummyStateObserver;
-      });
-
-      it('should return Observers that could be extracted from the passed Instances', () => {
-        const response = computed.formatDeps([
-          dummyObserver,
-          dummyState,
-          undefined,
-          {},
-          { observer: 'fake' },
-        ]);
-
-        expect(response).toStrictEqual([dummyObserver, dummyStateObserver]);
+        expect(response).toBe('newComputedValue');
+        expect(dummyComputeFunction).toHaveBeenCalled();
+        expect(ComputedTracker.track).not.toHaveBeenCalled();
+        expect(ComputedTracker.getTrackedObservers).not.toHaveBeenCalled();
+        expect(computed.hardCodedDeps).toStrictEqual([dummyObserver3]);
+        expect(computed.deps).toStrictEqual([dummyObserver3]);
+        expect(dummyObserver1.depend).not.toHaveBeenCalled();
+        expect(dummyObserver2.depend).not.toHaveBeenCalled();
+        expect(dummyObserver3.depend).not.toHaveBeenCalled();
       });
     });
 

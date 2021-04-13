@@ -15,6 +15,7 @@ import {
   PersistentKey,
   ComputedTracker,
   StateIngestConfigInterface,
+  removeProperties,
 } from '../internal';
 
 export class State<ValueType = any> {
@@ -144,15 +145,7 @@ export class State<ValueType = any> {
    */
   public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
     config = defineConfig(config, {
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      background: false,
       force: false,
-      storage: true,
-      overwrite: false,
-      perform: true,
     });
 
     // Check value has correct Type (js)
@@ -250,14 +243,6 @@ export class State<ValueType = any> {
   ): this {
     config = defineConfig(config, {
       addNewProperties: true,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      background: false,
-      force: false,
-      storage: true,
-      overwrite: false,
     });
 
     if (!isValidObject(this.nextStateValue)) {
@@ -280,13 +265,7 @@ export class State<ValueType = any> {
     );
 
     // Ingest updated nextStateValue into Runtime
-    this.ingest({
-      background: config.background,
-      force: config.force,
-      overwrite: config.overwrite,
-      sideEffects: config.sideEffects,
-      storage: config.storage,
-    });
+    this.ingest(removeProperties(config, ['addNewProperties']));
 
     return this;
   }
