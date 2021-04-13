@@ -1,5 +1,15 @@
 # cra-template-agile-typescript
 
+## 0.0.5
+
+### Patch Changes
+
+- 63b8760: - extracted fromatDeps
+  - made globalBind optional
+  - optimized internal classes
+  - optimized packages.json for better npm ranking score
+  - fixed collection type issue
+
 ## 0.0.4
 
 ### Patch Changes

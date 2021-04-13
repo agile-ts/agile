@@ -1,5 +1,17 @@
 # @agile-ts/multieditor
 
+## 0.0.14
+
+### Patch Changes
+
+- 63b8760: - extracted fromatDeps
+  - made globalBind optional
+  - optimized internal classes
+  - optimized packages.json for better npm ranking score
+  - fixed collection type issue
+- Updated dependencies [63b8760]
+  - @agile-ts/core@0.0.14
+
 ## 0.0.13
 
 ### Patch Changes
