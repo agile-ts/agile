@@ -1,4 +1,4 @@
-const baseConfig = require('../../jest.base.config');
+const baseConfig = require('../../jest.base.config.js');
 const packageJson = require('./package.json');
 const packageName = packageJson.name.split('@agile-ts/').pop();
 
