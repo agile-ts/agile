@@ -1594,7 +1594,7 @@ describe('Collection Tests', () => {
       it('should create persistent with CollectionKey (specific config)', () => {
         collection.persist({
           storageKeys: ['test1', 'test2'],
-          instantiate: false,
+          loadValue: false,
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
@@ -1619,7 +1619,7 @@ describe('Collection Tests', () => {
       it('should create persistent with passed Key (specific config)', () => {
         collection.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
-          instantiate: false,
+          loadValue: false,
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);

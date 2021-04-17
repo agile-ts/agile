@@ -326,7 +326,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
-          instantiate: false,
+          loadValue: false,
           followCollectionPersistKeyPattern: true,
         });
         expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
@@ -435,7 +435,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
-          instantiate: false,
+          loadValue: false,
           followCollectionPersistKeyPattern: true,
         });
         expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();

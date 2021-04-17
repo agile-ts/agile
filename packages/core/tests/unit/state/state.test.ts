@@ -600,7 +600,7 @@ describe('State Tests', () => {
       it('should create persistent with StateKey (specific config)', () => {
         numberState.persist({
           storageKeys: ['test1', 'test2'],
-          instantiate: false,
+          loadValue: false,
         });
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
@@ -625,7 +625,7 @@ describe('State Tests', () => {
       it('should create persistent with passed Key (specific config)', () => {
         numberState.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
-          instantiate: false,
+          loadValue: false,
         });
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);

@@ -121,7 +121,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
       // Persist Default Group and load its Value manually to be 100% sure it got loaded
       defaultGroup.persist({
-        instantiate: false,
+        loadValue: false,
         followCollectionPersistKeyPattern: true,
       });
       if (defaultGroup.persistent?.ready) {
