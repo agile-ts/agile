@@ -16,7 +16,7 @@ describe('Storages Tests', () => {
   it('should create Storages (default config)', () => {
     const storages = new Storages(dummyAgile);
 
-    expect(storages.config).toStrictEqual({ defaultStorage: null });
+    expect(storages.config).toStrictEqual({ defaultStorageKey: null });
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
     expect(storages.instantiateLocalStorage).not.toHaveBeenCalled();
@@ -28,7 +28,7 @@ describe('Storages Tests', () => {
       localStorage: true,
     });
 
-    expect(storages.config).toStrictEqual({ defaultStorage: 'jeff' });
+    expect(storages.config).toStrictEqual({ defaultStorageKey: 'jeff' });
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
     expect(storages.instantiateLocalStorage).toHaveBeenCalled();
@@ -180,9 +180,9 @@ describe('Storages Tests', () => {
 
       it('should reassignStorageKeys, revalidate and initialLoad Persistents that have no defined defaultStorage', () => {
         const dummyPersistent1 = new Persistent(dummyAgile);
-        dummyPersistent1.defaultStorageKey = undefined;
+        dummyPersistent1.config = { defaultStorageKey: null };
         const dummyPersistent2 = new Persistent(dummyAgile);
-        dummyPersistent2.defaultStorageKey = 'unknown';
+        dummyPersistent2.config = { defaultStorageKey: 'unknown' };
         jest.spyOn(dummyPersistent1, 'assignStorageKeys');
         jest
           .spyOn(dummyPersistent1, 'validatePersistent')

@@ -87,7 +87,6 @@ export class Persistent {
     config: InstantiatePersistentConfigInterface = {}
   ) {
     this._key = this.formatKey(config.key) || Persistent.placeHolderKey;
-    console.log(config.storageKeys, config.defaultStorageKey);
     this.assignStorageKeys(config.storageKeys, config.defaultStorageKey);
     this.validatePersistent();
   }
@@ -134,12 +133,12 @@ export class Persistent {
   public assignStorageKeys(
     storageKeys: StorageKey[] = [],
     defaultStorageKey?: StorageKey
-  ) {
+  ): void {
     const storages = this.agileInstance().storages;
     const _storageKeys = copy(storageKeys);
 
     // Print warning if default StorageKey passed, but it isn't in stoargeKeys
-    if (defaultStorageKey && _storageKeys.includes(defaultStorageKey)) {
+    if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey)) {
       Agile.logger.warn(
         `Default Storage Key '${defaultStorageKey}' isn't contained in storageKeys!`,
         _storageKeys
@@ -149,17 +148,13 @@ export class Persistent {
 
     // Add default Storage of AgileTs if no storageKey provided
     if (_storageKeys.length <= 0) {
-      const _defaultStorageKey =
-        defaultStorageKey || storages.config.defaultStorageKey;
-      if (_defaultStorageKey) {
-        this.config.defaultStorageKey = _defaultStorageKey;
-        this.storageKeys.push(_defaultStorageKey);
-      }
-      return;
+      this.config.defaultStorageKey = storages.config.defaultStorageKey as any;
+      _storageKeys.push(storages.config.defaultStorageKey as any);
+    } else {
+      this.config.defaultStorageKey = defaultStorageKey || _storageKeys[0];
     }
 
     this.storageKeys = _storageKeys;
-    this.config.defaultStorageKey = defaultStorageKey || _storageKeys[0];
   }
 
   //=========================================================================================================
@@ -169,7 +164,7 @@ export class Persistent {
    * @internal
    * Loads/Saves Storage Value for the first Time
    */
-  public async initialLoading() {
+  public async initialLoading(): Promise<void> {
     const success = await this.loadPersistedValue();
     if (this.onLoad) this.onLoad(success);
     if (!success) await this.persistValue();

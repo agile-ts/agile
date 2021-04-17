@@ -35,11 +35,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     config = defineConfig(config, {
       instantiate: true,
       storageKeys: [],
+      defaultStorageKey: null,
     });
     this.collection = () => collection;
     this.instantiatePersistent({
       key: config.key,
       storageKeys: config.storageKeys,
+      defaultStorageKey: config.defaultStorageKey,
     });
 
     // Load/Store persisted Value/s for the first Time

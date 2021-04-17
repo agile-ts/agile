@@ -197,7 +197,7 @@ describe('Persistent Tests', () => {
     });
 
     describe('assignStorageKeys function tests', () => {
-      it('should assign passed StorageKeys and set first one as default StorageKey', () => {
+      it('should assign passed StorageKeys and set first one as default StorageKey if no default Storage Key passed', () => {
         persistent.assignStorageKeys(['test1', 'test2', 'test3']);
 
         expect(persistent.storageKeys).toStrictEqual([
@@ -209,7 +209,7 @@ describe('Persistent Tests', () => {
         expect(console.warn).not.toHaveBeenCalled();
       });
 
-      it('should assign passed StorageKeys and set defaultStorageKey as default StorageKey', () => {
+      it('should assign passed StorageKeys and set passed defaultStorageKey as default StorageKey', () => {
         persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test3');
 
         expect(persistent.storageKeys).toStrictEqual([
@@ -231,10 +231,15 @@ describe('Persistent Tests', () => {
           'test4',
         ]);
         expect(persistent.config.defaultStorageKey).toBe('test4');
-        expect(console.warn).toHaveBeenCalledWith('todo');
+        expect(
+          console.warn
+        ).toHaveBeenCalledWith(
+          "Agile Warn: Default Storage Key 'test4' isn't contained in storageKeys!",
+          ['test1', 'test2', 'test3', 'test4']
+        );
       });
 
-      it('should try to get default StorageKey from Agile if no StorageKeys passed', () => {
+      it('should try to get default StorageKey from Agile if no StorageKey got passed', () => {
         dummyAgile.storages.register(
           new Storage({
             key: 'storage1',
