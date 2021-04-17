@@ -16,16 +16,19 @@ describe('Storages Tests', () => {
   it('should create Storages (default config)', () => {
     const storages = new Storages(dummyAgile);
 
-    expect(storages.defaultStorage).toBeUndefined();
+    expect(storages.config).toStrictEqual({ defaultStorage: null });
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
     expect(storages.instantiateLocalStorage).not.toHaveBeenCalled();
   });
 
-  it('should create Storages and should get a warning (config.localStorage = true)', () => {
-    const storages = new Storages(dummyAgile, { localStorage: true });
+  it('should create Storages (specific config)', () => {
+    const storages = new Storages(dummyAgile, {
+      defaultStorageKey: 'jeff',
+      localStorage: true,
+    });
 
-    expect(storages.defaultStorage).toBeUndefined();
+    expect(storages.config).toStrictEqual({ defaultStorage: 'jeff' });
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
     expect(storages.instantiateLocalStorage).toHaveBeenCalled();
@@ -101,7 +104,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage1');
         expect(storages.storages['storage1']).toBe(dummyStorage1);
-        expect(storages.defaultStorage).toBe(dummyStorage1);
+        expect(storages.config.defaultStorageKey).toBe('storage1');
         expect(response).toBeTruthy();
       });
 
@@ -114,7 +117,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage1');
         expect(storages.storages['storage1']).toBe(dummyStorage1);
-        expect(storages.defaultStorage).toBe(dummyStorage1);
+        expect(storages.config.defaultStorageKey).toBe('storage1');
         expect(response).toBeTruthy();
       });
 
@@ -125,7 +128,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage2');
         expect(storages.storages['storage2']).toBe(dummyStorage2);
-        expect(storages.defaultStorage).toBe(dummyStorage1);
+        expect(storages.config.defaultStorageKey).toBe('storage1');
         expect(response).toBeTruthy();
       });
 
@@ -136,7 +139,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage2');
         expect(storages.storages['storage2']).toBe(dummyStorage2);
-        expect(storages.defaultStorage).toBe(dummyStorage2);
+        expect(storages.config.defaultStorageKey).toBe('storage2');
         expect(response).toBeTruthy();
       });
 
@@ -212,6 +215,14 @@ describe('Storages Tests', () => {
         const response = storages.getStorage('storage1');
 
         expect(response).toBe(dummyStorage1);
+        expect(console.error).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't get Storage with undefined key", () => {
+        const response = storages.getStorage(null);
+
+        expect(response).toBeUndefined();
+        expect(console.error).not.toHaveBeenCalled();
       });
 
       it("shouldn't get not existing Storage", () => {
@@ -219,7 +230,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist"
+          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist!"
         );
       });
 
@@ -230,7 +241,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'storage1' isn't ready"
+          "Agile Error: Storage with the key/name 'storage1' isn't ready yet!"
         );
       });
     });
@@ -266,7 +277,7 @@ describe('Storages Tests', () => {
         expect(response).toBe('dummyStorage1Response');
         expect(dummyStorage1.get).toHaveBeenCalledWith('value1');
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist"
+          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist!"
         );
       });
 

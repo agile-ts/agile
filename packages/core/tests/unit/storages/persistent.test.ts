@@ -25,6 +25,7 @@ describe('Persistent Tests', () => {
     expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
       storageKeys: [],
       key: undefined,
+      defaultStorageKey: null,
     });
     expect(
       dummyAgile.storages.persistentInstances.has(persistent)
@@ -35,7 +36,7 @@ describe('Persistent Tests', () => {
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBeUndefined();
+    expect(persistent.config).toStrictEqual({ defaultStorageKey: null });
   });
 
   it('should create Persistent (specific config)', () => {
@@ -47,12 +48,14 @@ describe('Persistent Tests', () => {
     const persistent = new Persistent(dummyAgile, {
       storageKeys: ['test1', 'test2'],
       key: 'persistentKey',
+      defaultStorageKey: 'test1',
     });
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.instantiatePersistent).toHaveBeenCalledWith({
       storageKeys: ['test1', 'test2'],
       key: 'persistentKey',
+      defaultStorageKey: 'test1',
     });
     expect(
       dummyAgile.storages.persistentInstances.has(persistent)
@@ -63,7 +66,7 @@ describe('Persistent Tests', () => {
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBeUndefined();
+    expect(persistent.config).toStrictEqual({ defaultStorageKey: 'test1' });
   });
 
   it('should create Persistent (config.instantiate = false)', () => {
@@ -85,7 +88,7 @@ describe('Persistent Tests', () => {
     expect(persistent.isPersisted).toBeFalsy();
     expect(persistent.onLoad).toBeUndefined();
     expect(persistent.storageKeys).toStrictEqual([]);
-    expect(persistent.defaultStorageKey).toBeUndefined();
+    expect(persistent.config).toStrictEqual({ defaultStorageKey: null });
   });
 
   describe('Persistent Function Tests', () => {
@@ -122,15 +125,15 @@ describe('Persistent Tests', () => {
         persistent.instantiatePersistent({
           key: 'persistentKey',
           storageKeys: ['myName', 'is', 'jeff'],
+          defaultStorageKey: 'jeff',
         });
 
         expect(persistent._key).toBe('persistentKey');
         expect(persistent.formatKey).toHaveBeenCalledWith('persistentKey');
-        expect(persistent.assignStorageKeys).toHaveBeenCalledWith([
-          'myName',
-          'is',
-          'jeff',
-        ]);
+        expect(persistent.assignStorageKeys).toHaveBeenCalledWith(
+          ['myName', 'is', 'jeff'],
+          'jeff'
+        );
         expect(persistent.validatePersistent).toHaveBeenCalled();
       });
     });
@@ -138,7 +141,7 @@ describe('Persistent Tests', () => {
     describe('validatePersistent function tests', () => {
       beforeEach(() => {
         persistent.key = Persistent.placeHolderKey;
-        persistent.defaultStorageKey = undefined;
+        persistent.config.defaultStorageKey = null;
         persistent.storageKeys = [];
         persistent.ready = undefined as any;
       });
@@ -168,7 +171,7 @@ describe('Persistent Tests', () => {
       });
 
       it('should return false if no set key and set StorageKeys', () => {
-        persistent.defaultStorageKey = 'test';
+        persistent.config.defaultStorageKey = 'test';
         persistent.storageKeys = ['test'];
 
         const isValid = persistent.validatePersistent();
@@ -183,7 +186,7 @@ describe('Persistent Tests', () => {
 
       it('should return true if set key and set StorageKeys', () => {
         persistent._key = 'persistentKey';
-        persistent.defaultStorageKey = 'test';
+        persistent.config.defaultStorageKey = 'test';
         persistent.storageKeys = ['test'];
 
         const isValid = persistent.validatePersistent();
@@ -202,7 +205,33 @@ describe('Persistent Tests', () => {
           'test2',
           'test3',
         ]);
-        expect(persistent.defaultStorageKey).toBe('test1');
+        expect(persistent.config.defaultStorageKey).toBe('test1');
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      it('should assign passed StorageKeys and set defaultStorageKey as default StorageKey', () => {
+        persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test3');
+
+        expect(persistent.storageKeys).toStrictEqual([
+          'test1',
+          'test2',
+          'test3',
+        ]);
+        expect(persistent.config.defaultStorageKey).toBe('test3');
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      it('should assign passed StorageKeys and set not existing defaultStorageKey as default StorageKey, push it into storageKeys and print warning', () => {
+        persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test4');
+
+        expect(persistent.storageKeys).toStrictEqual([
+          'test1',
+          'test2',
+          'test3',
+          'test4',
+        ]);
+        expect(persistent.config.defaultStorageKey).toBe('test4');
+        expect(console.warn).toHaveBeenCalledWith('todo');
       });
 
       it('should try to get default StorageKey from Agile if no StorageKeys passed', () => {
@@ -227,7 +256,8 @@ describe('Persistent Tests', () => {
         persistent.assignStorageKeys();
 
         expect(persistent.storageKeys).toStrictEqual(['storage1']);
-        expect(persistent.defaultStorageKey).toBe('storage1');
+        expect(persistent.config.defaultStorageKey).toBe('storage1');
+        expect(console.warn).not.toHaveBeenCalled();
       });
     });
 

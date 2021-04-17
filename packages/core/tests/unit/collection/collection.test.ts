@@ -1032,7 +1032,7 @@ describe('Collection Tests', () => {
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
       });
 
-      it('should return and track  existing placeholder Group (config.notExisting = true)', () => {
+      it('should return and track existing placeholder Group (config.notExisting = true)', () => {
         dummyGroup.isPlaceholder = true;
 
         const response = collection.getGroup('dummyGroup', {
