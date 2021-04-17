@@ -164,9 +164,11 @@ describe('Storages Tests', () => {
       it('should call updateValue method on all persistent Instances that have the newly registered StorageKey', () => {
         const dummyPersistent1 = new Persistent(dummyAgile, {
           storageKeys: ['storage1'],
+          key: 'dummyPersistent1',
         });
         const dummyPersistent2 = new Persistent(dummyAgile, {
           storageKeys: ['notExistingStorage'],
+          key: 'dummyPersistent2',
         });
         jest.spyOn(dummyPersistent1, 'persistValue');
         jest.spyOn(dummyPersistent2, 'persistValue');
@@ -179,10 +181,14 @@ describe('Storages Tests', () => {
       });
 
       it('should reassignStorageKeys, revalidate and initialLoad Persistents that have no defined defaultStorage', () => {
-        const dummyPersistent1 = new Persistent(dummyAgile);
-        dummyPersistent1.config = { defaultStorageKey: null };
-        const dummyPersistent2 = new Persistent(dummyAgile);
-        dummyPersistent2.config = { defaultStorageKey: 'unknown' };
+        const dummyPersistent1 = new Persistent(dummyAgile, {
+          key: 'dummyPersistent1',
+        });
+        const dummyPersistent2 = new Persistent(dummyAgile, {
+          storageKeys: ['dummy'],
+          defaultStorageKey: 'dummy',
+          key: 'dummyPersistent2',
+        });
         jest.spyOn(dummyPersistent1, 'assignStorageKeys');
         jest
           .spyOn(dummyPersistent1, 'validatePersistent')

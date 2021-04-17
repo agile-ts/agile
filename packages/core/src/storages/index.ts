@@ -99,7 +99,7 @@ export class Storages {
     if (config.default) this.config.defaultStorageKey = storage.key;
 
     this.persistentInstances.forEach((persistent) => {
-      // If Persistent isn't ready and has no default StorageKey.. reassignStorageKeys and try to load it
+      // If Persistent isn't ready (try to reassign StorageKeys)
       if (!persistent.ready) {
         persistent.assignStorageKeys();
         const isValid = persistent.validatePersistent();
