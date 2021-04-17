@@ -106,7 +106,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Check if Collection is Persisted
     const isPersisted = await this.agileInstance().storages.get<DataType>(
       _key,
-      this.defaultStorageKey
+      this.config.defaultStorageKey as any
     );
     if (!isPersisted) return false;
 
@@ -137,7 +137,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
         // Get Storage Value
         const storageValue = await this.agileInstance().storages.get<DataType>(
           itemStorageKey,
-          this.defaultStorageKey
+          this.config.defaultStorageKey as any
         );
         if (!storageValue) continue;
 

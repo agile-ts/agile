@@ -1,9 +1,10 @@
-import { Agile, defineConfig, StorageKey } from '../internal';
+import { Agile, copy, defineConfig, StorageKey } from '../internal';
 
 export class Persistent {
   public agileInstance: () => Agile;
 
   public static placeHolderKey = '__THIS_IS_A_PLACEHOLDER__';
+  public config: PersistentConfigInterface;
 
   public _key: PersistentKey;
   public ready = false;
@@ -12,7 +13,6 @@ export class Persistent {
 
   // StorageKeys of Storages in that the Persisted Value gets saved
   public storageKeys: StorageKey[] = [];
-  public defaultStorageKey: StorageKey | undefined;
 
   /**
    * @internal
@@ -30,13 +30,19 @@ export class Persistent {
     config = defineConfig(config, {
       instantiate: true,
       storageKeys: [],
+      defaultStorageKey: null,
     });
     this.agileInstance().storages.persistentInstances.add(this);
-    if (config.instantiate)
+    this.config = { defaultStorageKey: config.defaultStorageKey as any };
+
+    // Instantiate Persistent
+    if (config.instantiate) {
       this.instantiatePersistent({
         storageKeys: config.storageKeys,
         key: config.key,
+        defaultStorageKey: config.defaultStorageKey,
       });
+    }
   }
 
   /**
@@ -77,9 +83,12 @@ export class Persistent {
    * have to define some stuff before being able to instantiate the parent (this)
    * @param config - Config
    */
-  public instantiatePersistent(config: PersistentConfigInterface = {}) {
+  public instantiatePersistent(
+    config: InstantiatePersistentConfigInterface = {}
+  ) {
     this._key = this.formatKey(config.key) || Persistent.placeHolderKey;
-    this.assignStorageKeys(config.storageKeys);
+    console.log(config.storageKeys, config.defaultStorageKey);
+    this.assignStorageKeys(config.storageKeys, config.defaultStorageKey);
     this.validatePersistent();
   }
 
@@ -102,7 +111,7 @@ export class Persistent {
     }
 
     // Validate StorageKeys
-    if (!this.defaultStorageKey || this.storageKeys.length <= 0) {
+    if (!this.config.defaultStorageKey || this.storageKeys.length <= 0) {
       Agile.logger.error(
         'No persist Storage Key found! Please provide at least one Storage Key.'
       );
@@ -120,23 +129,37 @@ export class Persistent {
    * @internal
    * Assign new StorageKeys to Persistent and overwrite the old ones
    * @param storageKeys - New Storage Keys
+   * @param defaultStorageKey - Key of default Storage
    */
-  public assignStorageKeys(storageKeys: StorageKey[] = []) {
+  public assignStorageKeys(
+    storageKeys: StorageKey[] = [],
+    defaultStorageKey?: StorageKey
+  ) {
     const storages = this.agileInstance().storages;
+    const _storageKeys = copy(storageKeys);
 
-    // Set default Agile Storage to defaultStorage if no storageKey provided
-    if (storageKeys.length <= 0) {
-      this.storageKeys = [];
-      if (storages.defaultStorage) {
-        const key = storages.defaultStorage.key;
-        this.defaultStorageKey = key;
-        this.storageKeys.push(key);
+    // Print warning if default StorageKey passed, but it isn't in stoargeKeys
+    if (defaultStorageKey && _storageKeys.includes(defaultStorageKey)) {
+      Agile.logger.warn(
+        `Default Storage Key '${defaultStorageKey}' isn't contained in storageKeys!`,
+        _storageKeys
+      );
+      _storageKeys.push(defaultStorageKey);
+    }
+
+    // Add default Storage of AgileTs if no storageKey provided
+    if (_storageKeys.length <= 0) {
+      const _defaultStorageKey =
+        defaultStorageKey || storages.config.defaultStorageKey;
+      if (_defaultStorageKey) {
+        this.config.defaultStorageKey = _defaultStorageKey;
+        this.storageKeys.push(_defaultStorageKey);
       }
       return;
     }
 
-    this.storageKeys = storageKeys;
-    this.defaultStorageKey = storageKeys[0];
+    this.storageKeys = _storageKeys;
+    this.config.defaultStorageKey = defaultStorageKey || _storageKeys[0];
   }
 
   //=========================================================================================================
@@ -215,19 +238,30 @@ export type PersistentKey = string | number;
 /**
  * @param key - Key/Name of Persistent
  * @param storageKeys - Keys of Storages in that the persisted Value gets saved
+ * @param defaultStorage - Default Storage Key
  * @param instantiate - If Persistent gets Instantiated immediately
  */
 export interface CreatePersistentConfigInterface {
   key?: PersistentKey;
   storageKeys?: StorageKey[];
+  defaultStorageKey?: StorageKey;
   instantiate?: boolean;
+}
+
+/**
+ * @param defaultStorage - Default Storage Key
+ */
+export interface PersistentConfigInterface {
+  defaultStorageKey: StorageKey | null;
 }
 
 /**
  * @param key - Key/Name of Persistent
  * @param storageKeys - Keys of Storages in that the persisted Value gets saved
+ * @param defaultStorage - Default Storage Key
  */
-export interface PersistentConfigInterface {
+export interface InstantiatePersistentConfigInterface {
   key?: PersistentKey;
   storageKeys?: StorageKey[];
+  defaultStorageKey?: StorageKey;
 }

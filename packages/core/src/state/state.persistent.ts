@@ -97,7 +97,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Load Value from default Storage
     const loadedValue = await this.agileInstance().storages.get<ValueType>(
       _key,
-      this.defaultStorageKey
+      this.config.defaultStorageKey as any
     );
     if (!loadedValue) return false;
 
