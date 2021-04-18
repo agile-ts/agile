@@ -799,8 +799,9 @@ export class Collection<DataType = DefaultItem> {
     }
 
     _config = defineConfig(_config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
+      defaultStorageKey: null,
     });
 
     if (this.persistent)
@@ -810,9 +811,10 @@ export class Collection<DataType = DefaultItem> {
 
     // Create persistent -> Persist Value
     this.persistent = new CollectionPersistent<DataType>(this, {
-      instantiate: _config.instantiate,
+      instantiate: _config.loadValue,
       storageKeys: _config.storageKeys,
       key: key,
+      defaultStorageKey: _config.defaultStorageKey,
     });
 
     return this;
@@ -1279,12 +1281,14 @@ export interface HasConfigInterface {
 }
 
 /**
- * @param instantiate - If Persistent gets instantiated
+ * @param loadValue - If Persistent loads the persisted value into the Collection
  * @param storageKeys - Key/Name of Storages which gets used to persist the Collection Value (NOTE: If not passed the default Storage will be used)
+ * @param defaultStorageKey - Default Storage Key (if not provided it takes the first index of storageKeys or the AgileTs default Storage)
  */
 export interface CollectionPersistentConfigInterface {
-  instantiate?: boolean;
+  loadValue?: boolean;
   storageKeys?: StorageKey[];
+  defaultStorageKey?: StorageKey;
 }
 
 /**

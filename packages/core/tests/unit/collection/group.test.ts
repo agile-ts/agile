@@ -434,17 +434,23 @@ describe('Group Tests', () => {
         group.persist();
 
         expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          instantiate: true,
+          loadValue: true,
           storageKeys: [],
+          defaultStorageKey: null,
         });
       });
 
       it('should persist Group with GroupKey (specific config)', () => {
-        group.persist({ instantiate: false, storageKeys: ['test1', 'test2'] });
+        group.persist({
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -452,20 +458,23 @@ describe('Group Tests', () => {
         group.persist('dummyKey');
 
         expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          instantiate: true,
+          loadValue: true,
           storageKeys: [],
+          defaultStorageKey: null,
         });
       });
 
       it('should persist Group with passed Key (specific config)', () => {
         group.persist('dummyKey', {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
         });
 
         expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -478,8 +487,9 @@ describe('Group Tests', () => {
             dummyCollection._key
           ),
           {
-            instantiate: true,
+            loadValue: true,
             storageKeys: [],
+            defaultStorageKey: null,
           }
         );
       });
@@ -493,8 +503,9 @@ describe('Group Tests', () => {
             dummyCollection._key
           ),
           {
-            instantiate: true,
+            loadValue: true,
             storageKeys: [],
+            defaultStorageKey: null,
           }
         );
       });

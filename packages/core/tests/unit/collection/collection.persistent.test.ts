@@ -48,6 +48,7 @@ describe('CollectionPersistent Tests', () => {
     expect(collectionPersistent.instantiatePersistent).toHaveBeenCalledWith({
       key: undefined,
       storageKeys: [],
+      defaultStorageKey: null,
     });
     expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
 
@@ -56,7 +57,9 @@ describe('CollectionPersistent Tests', () => {
     expect(collectionPersistent.isPersisted).toBeFalsy();
     expect(collectionPersistent.onLoad).toBeUndefined();
     expect(collectionPersistent.storageKeys).toStrictEqual([]);
-    expect(collectionPersistent.defaultStorageKey).toBeUndefined();
+    expect(collectionPersistent.config).toStrictEqual({
+      defaultStorageKey: null,
+    });
   });
 
   it("should create CollectionPersistent and shouldn't call initialLoading if Persistent isn't ready (specific config)", () => {
@@ -71,12 +74,14 @@ describe('CollectionPersistent Tests', () => {
     const collectionPersistent = new CollectionPersistent(dummyCollection, {
       key: 'collectionPersistentKey',
       storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
     });
 
     expect(collectionPersistent).toBeInstanceOf(CollectionPersistent);
     expect(collectionPersistent.instantiatePersistent).toHaveBeenCalledWith({
       key: 'collectionPersistentKey',
       storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
     });
     expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
 
@@ -85,7 +90,9 @@ describe('CollectionPersistent Tests', () => {
     expect(collectionPersistent.isPersisted).toBeFalsy();
     expect(collectionPersistent.onLoad).toBeUndefined();
     expect(collectionPersistent.storageKeys).toStrictEqual([]);
-    expect(collectionPersistent.defaultStorageKey).toBeUndefined();
+    expect(collectionPersistent.config).toStrictEqual({
+      defaultStorageKey: null, // gets set in 'instantiatePersistent' which is mocked
+    });
   });
 
   it('should create CollectionPersistent and should call initialLoading if Persistent is ready (default config)', () => {
@@ -258,7 +265,7 @@ describe('CollectionPersistent Tests', () => {
       let dummyDefaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
-        collectionPersistent.defaultStorageKey = 'test';
+        collectionPersistent.config.defaultStorageKey = 'test';
 
         dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3']);
         dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
@@ -294,32 +301,32 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '1',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '2',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '3',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
-          instantiate: false,
+          loadValue: false,
           followCollectionPersistKeyPattern: true,
         });
         expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
@@ -355,28 +362,28 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '1',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '2',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '3',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
@@ -412,23 +419,23 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           'dummyKey',
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('1', 'dummyKey'),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('2', 'dummyKey'),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey('3', 'dummyKey'),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
-          instantiate: false,
+          loadValue: false,
           followCollectionPersistKeyPattern: true,
         });
         expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
@@ -493,28 +500,28 @@ describe('CollectionPersistent Tests', () => {
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '1',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '2',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
         expect(dummyAgile.storages.get).not.toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             '3',
             collectionPersistent._key
           ),
-          collectionPersistent.defaultStorageKey
+          collectionPersistent.config.defaultStorageKey
         );
 
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();

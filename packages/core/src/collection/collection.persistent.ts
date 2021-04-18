@@ -35,11 +35,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     config = defineConfig(config, {
       instantiate: true,
       storageKeys: [],
+      defaultStorageKey: null,
     });
     this.collection = () => collection;
     this.instantiatePersistent({
       key: config.key,
       storageKeys: config.storageKeys,
+      defaultStorageKey: config.defaultStorageKey,
     });
 
     // Load/Store persisted Value/s for the first Time
@@ -96,17 +98,19 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Loads Collection from Storage
-   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
+   * @param storageKey - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
-  public async loadPersistedValue(key?: PersistentKey): Promise<boolean> {
+  public async loadPersistedValue(
+    storageKey?: PersistentKey
+  ): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this._key;
+    const _storageKey = storageKey || this._key;
 
     // Check if Collection is Persisted
     const isPersisted = await this.agileInstance().storages.get<DataType>(
-      _key,
-      this.defaultStorageKey
+      _storageKey,
+      this.config.defaultStorageKey as any
     );
     if (!isPersisted) return false;
 
@@ -119,7 +123,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
 
       // Persist Default Group and load its Value manually to be 100% sure it got loaded
       defaultGroup.persist({
-        instantiate: false,
+        loadValue: false,
         followCollectionPersistKeyPattern: true,
       });
       if (defaultGroup.persistent?.ready) {
@@ -131,13 +135,13 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       for (const itemKey of defaultGroup._value) {
         const itemStorageKey = CollectionPersistent.getItemStorageKey(
           itemKey,
-          _key
+          _storageKey
         );
 
         // Get Storage Value
         const storageValue = await this.agileInstance().storages.get<DataType>(
           itemStorageKey,
-          this.defaultStorageKey
+          this.config.defaultStorageKey as any
         );
         if (!storageValue) continue;
 
@@ -149,7 +153,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     const success = await loadValuesIntoCollection();
 
     // Persist Collection, so that the Storage Value updates dynamically if the Collection updates
-    if (success) await this.persistValue(_key);
+    if (success) await this.persistValue(_storageKey);
 
     return success;
   }
@@ -160,19 +164,19 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Sets everything up so that the Collection gets saved in the Storage
-   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
+   * @param storageKey - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
-  public async persistValue(key?: PersistentKey): Promise<boolean> {
+  public async persistValue(storageKey?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this._key;
+    const _storageKey = storageKey || this._key;
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
 
     // Set Collection to Persisted (in Storage)
-    this.agileInstance().storages.set(_key, true, this.storageKeys);
+    this.agileInstance().storages.set(_storageKey, true, this.storageKeys);
 
     // Persist default Group
     if (!defaultGroup.isPersisted)
@@ -181,7 +185,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
     // Add sideEffect to default Group which adds and removes Items from the Storage depending on the Group Value
     defaultGroup.addSideEffect(
       CollectionPersistent.defaultGroupSideEffectKey,
-      () => this.rebuildStorageSideEffect(defaultGroup, _key),
+      () => this.rebuildStorageSideEffect(defaultGroup, _storageKey),
       { weight: 0 }
     );
 
@@ -190,7 +194,7 @@ export class CollectionPersistent<DataType = any> extends Persistent {
       const item = this.collection().getItem(itemKey);
       const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
-        _key
+        _storageKey
       );
       item?.persist(itemStorageKey);
     }
@@ -205,19 +209,21 @@ export class CollectionPersistent<DataType = any> extends Persistent {
   /**
    * @internal
    * Removes Collection from the Storage
-   * @param key - Prefix Key of Persisted Instances (default PersistentKey)
+   * @param storageKey - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
-  public async removePersistedValue(key?: PersistentKey): Promise<boolean> {
+  public async removePersistedValue(
+    storageKey?: PersistentKey
+  ): Promise<boolean> {
     if (!this.ready) return false;
-    const _key = key || this._key;
+    const _storageKey = storageKey || this._key;
     const defaultGroup = this.collection().getGroup(
       this.collection().config.defaultGroupKey
     );
     if (!defaultGroup) return false;
 
     // Set Collection to not Persisted
-    this.agileInstance().storages.remove(_key, this.storageKeys);
+    this.agileInstance().storages.remove(_storageKey, this.storageKeys);
 
     // Remove default Group from Storage
     defaultGroup.persistent?.removePersistedValue();

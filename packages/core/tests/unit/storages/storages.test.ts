@@ -16,16 +16,19 @@ describe('Storages Tests', () => {
   it('should create Storages (default config)', () => {
     const storages = new Storages(dummyAgile);
 
-    expect(storages.defaultStorage).toBeUndefined();
+    expect(storages.config).toStrictEqual({ defaultStorageKey: null });
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
     expect(storages.instantiateLocalStorage).not.toHaveBeenCalled();
   });
 
-  it('should create Storages and should get a warning (config.localStorage = true)', () => {
-    const storages = new Storages(dummyAgile, { localStorage: true });
+  it('should create Storages (specific config)', () => {
+    const storages = new Storages(dummyAgile, {
+      defaultStorageKey: 'jeff',
+      localStorage: true,
+    });
 
-    expect(storages.defaultStorage).toBeUndefined();
+    expect(storages.config).toStrictEqual({ defaultStorageKey: 'jeff' });
     expect(storages.storages).toStrictEqual({});
     expect(storages.persistentInstances.size).toBe(0);
     expect(storages.instantiateLocalStorage).toHaveBeenCalled();
@@ -101,7 +104,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage1');
         expect(storages.storages['storage1']).toBe(dummyStorage1);
-        expect(storages.defaultStorage).toBe(dummyStorage1);
+        expect(storages.config.defaultStorageKey).toBe('storage1');
         expect(response).toBeTruthy();
       });
 
@@ -114,7 +117,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage1');
         expect(storages.storages['storage1']).toBe(dummyStorage1);
-        expect(storages.defaultStorage).toBe(dummyStorage1);
+        expect(storages.config.defaultStorageKey).toBe('storage1');
         expect(response).toBeTruthy();
       });
 
@@ -125,7 +128,7 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage2');
         expect(storages.storages['storage2']).toBe(dummyStorage2);
-        expect(storages.defaultStorage).toBe(dummyStorage1);
+        expect(storages.config.defaultStorageKey).toBe('storage1');
         expect(response).toBeTruthy();
       });
 
@@ -136,11 +139,11 @@ describe('Storages Tests', () => {
 
         expect(storages.storages).toHaveProperty('storage2');
         expect(storages.storages['storage2']).toBe(dummyStorage2);
-        expect(storages.defaultStorage).toBe(dummyStorage2);
+        expect(storages.config.defaultStorageKey).toBe('storage2');
         expect(response).toBeTruthy();
       });
 
-      it("shouldn't register Storage with the same key twice", () => {
+      it("shouldn't register Storage with the same key twice and print error", () => {
         const dummyStorage = new Storage({
           key: 'storage1',
           methods: dummyStorageMethods,
@@ -158,28 +161,38 @@ describe('Storages Tests', () => {
         expect(response).toBeFalsy();
       });
 
-      it('should call updateValue method on all persistent Instances that have the newly registered StorageKey', () => {
+      it('should revalidate and initialLoad value on all persistent Instances that have the newly registered StorageKey', () => {
         const dummyPersistent1 = new Persistent(dummyAgile, {
           storageKeys: ['storage1'],
+          key: 'dummyPersistent1',
         });
         const dummyPersistent2 = new Persistent(dummyAgile, {
           storageKeys: ['notExistingStorage'],
+          key: 'dummyPersistent2',
         });
-        jest.spyOn(dummyPersistent1, 'persistValue');
-        jest.spyOn(dummyPersistent2, 'persistValue');
+        jest.spyOn(dummyPersistent1, 'validatePersistent');
+        jest.spyOn(dummyPersistent1, 'initialLoading');
+        jest.spyOn(dummyPersistent2, 'validatePersistent');
+        jest.spyOn(dummyPersistent2, 'initialLoading');
 
         const response = storages.register(dummyStorage1);
 
-        expect(dummyPersistent1.persistValue).toHaveBeenCalled();
-        expect(dummyPersistent2.persistValue).not.toHaveBeenCalled();
+        expect(dummyPersistent1.validatePersistent).toHaveBeenCalled();
+        expect(dummyPersistent1.initialLoading).toHaveBeenCalled();
+        expect(dummyPersistent2.validatePersistent).not.toHaveBeenCalled();
+        expect(dummyPersistent2.initialLoading).not.toHaveBeenCalled();
         expect(response).toBeTruthy();
       });
 
-      it('should reassignStorageKeys, revalidate and initialLoad Persistents that have no defined defaultStorage', () => {
-        const dummyPersistent1 = new Persistent(dummyAgile);
-        dummyPersistent1.defaultStorageKey = undefined;
-        const dummyPersistent2 = new Persistent(dummyAgile);
-        dummyPersistent2.defaultStorageKey = 'unknown';
+      it('should revalidate and initial load Persistents that have no defined defaultStorage', () => {
+        const dummyPersistent1 = new Persistent(dummyAgile, {
+          key: 'dummyPersistent1',
+        });
+        const dummyPersistent2 = new Persistent(dummyAgile, {
+          storageKeys: ['dummy'],
+          defaultStorageKey: 'dummy',
+          key: 'dummyPersistent2',
+        });
         jest.spyOn(dummyPersistent1, 'assignStorageKeys');
         jest
           .spyOn(dummyPersistent1, 'validatePersistent')
@@ -212,6 +225,14 @@ describe('Storages Tests', () => {
         const response = storages.getStorage('storage1');
 
         expect(response).toBe(dummyStorage1);
+        expect(console.error).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't get Storage with undefined key", () => {
+        const response = storages.getStorage(null);
+
+        expect(response).toBeUndefined();
+        expect(console.error).not.toHaveBeenCalled();
       });
 
       it("shouldn't get not existing Storage", () => {
@@ -219,7 +240,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist"
+          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist!"
         );
       });
 
@@ -230,7 +251,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBeUndefined();
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'storage1' isn't ready"
+          "Agile Error: Storage with the key/name 'storage1' isn't ready yet!"
         );
       });
     });
@@ -266,7 +287,7 @@ describe('Storages Tests', () => {
         expect(response).toBe('dummyStorage1Response');
         expect(dummyStorage1.get).toHaveBeenCalledWith('value1');
         expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist"
+          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist!"
         );
       });
 
