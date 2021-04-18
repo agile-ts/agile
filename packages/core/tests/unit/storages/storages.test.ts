@@ -161,7 +161,7 @@ describe('Storages Tests', () => {
         expect(response).toBeFalsy();
       });
 
-      it('should call updateValue method on all persistent Instances that have the newly registered StorageKey', () => {
+      it('should revalidate and initialLoad value on all persistent Instances that have the newly registered StorageKey', () => {
         const dummyPersistent1 = new Persistent(dummyAgile, {
           storageKeys: ['storage1'],
           key: 'dummyPersistent1',
@@ -170,30 +170,7 @@ describe('Storages Tests', () => {
           storageKeys: ['notExistingStorage'],
           key: 'dummyPersistent2',
         });
-        jest.spyOn(dummyPersistent1, 'persistValue');
-        jest.spyOn(dummyPersistent2, 'persistValue');
-
-        console.log(dummyPersistent1, dummyPersistent2);
-
-        const response = storages.register(dummyStorage1);
-
-        expect(dummyPersistent1.persistValue).toHaveBeenCalled();
-        expect(dummyPersistent2.persistValue).not.toHaveBeenCalled();
-        expect(response).toBeTruthy();
-      });
-
-      it('should revalidate and initialLoad Persistents that have no defined defaultStorage', () => {
-        const dummyPersistent1 = new Persistent(dummyAgile, {
-          key: 'dummyPersistent1',
-        });
-        const dummyPersistent2 = new Persistent(dummyAgile, {
-          storageKeys: ['dummy'],
-          defaultStorageKey: 'dummy',
-          key: 'dummyPersistent2',
-        });
-        jest
-          .spyOn(dummyPersistent1, 'validatePersistent')
-          .mockReturnValue(true);
+        jest.spyOn(dummyPersistent1, 'validatePersistent');
         jest.spyOn(dummyPersistent1, 'initialLoading');
         jest.spyOn(dummyPersistent2, 'validatePersistent');
         jest.spyOn(dummyPersistent2, 'initialLoading');
@@ -202,7 +179,36 @@ describe('Storages Tests', () => {
 
         expect(dummyPersistent1.validatePersistent).toHaveBeenCalled();
         expect(dummyPersistent1.initialLoading).toHaveBeenCalled();
+        expect(dummyPersistent2.validatePersistent).not.toHaveBeenCalled();
+        expect(dummyPersistent2.initialLoading).not.toHaveBeenCalled();
+        expect(response).toBeTruthy();
+      });
 
+      it('should revalidate and initial load Persistents that have no defined defaultStorage', () => {
+        const dummyPersistent1 = new Persistent(dummyAgile, {
+          key: 'dummyPersistent1',
+        });
+        const dummyPersistent2 = new Persistent(dummyAgile, {
+          storageKeys: ['dummy'],
+          defaultStorageKey: 'dummy',
+          key: 'dummyPersistent2',
+        });
+        jest.spyOn(dummyPersistent1, 'assignStorageKeys');
+        jest
+          .spyOn(dummyPersistent1, 'validatePersistent')
+          .mockReturnValue(true);
+        jest.spyOn(dummyPersistent1, 'initialLoading');
+        jest.spyOn(dummyPersistent2, 'assignStorageKeys');
+        jest.spyOn(dummyPersistent2, 'validatePersistent');
+        jest.spyOn(dummyPersistent2, 'initialLoading');
+
+        const response = storages.register(dummyStorage1);
+
+        expect(dummyPersistent1.assignStorageKeys).toHaveBeenCalled();
+        expect(dummyPersistent1.validatePersistent).toHaveBeenCalled();
+        expect(dummyPersistent1.initialLoading).toHaveBeenCalled();
+
+        expect(dummyPersistent2.assignStorageKeys).not.toHaveBeenCalled();
         expect(dummyPersistent2.validatePersistent).not.toHaveBeenCalled();
         expect(dummyPersistent2.initialLoading).not.toHaveBeenCalled();
 
