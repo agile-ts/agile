@@ -143,7 +143,7 @@ describe('Storages Tests', () => {
         expect(response).toBeTruthy();
       });
 
-      it("shouldn't register Storage with the same key twice", () => {
+      it("shouldn't register Storage with the same key twice and print error", () => {
         const dummyStorage = new Storage({
           key: 'storage1',
           methods: dummyStorageMethods,
@@ -173,6 +173,8 @@ describe('Storages Tests', () => {
         jest.spyOn(dummyPersistent1, 'persistValue');
         jest.spyOn(dummyPersistent2, 'persistValue');
 
+        console.log(dummyPersistent1, dummyPersistent2);
+
         const response = storages.register(dummyStorage1);
 
         expect(dummyPersistent1.persistValue).toHaveBeenCalled();
@@ -180,7 +182,7 @@ describe('Storages Tests', () => {
         expect(response).toBeTruthy();
       });
 
-      it('should reassignStorageKeys, revalidate and initialLoad Persistents that have no defined defaultStorage', () => {
+      it('should revalidate and initialLoad Persistents that have no defined defaultStorage', () => {
         const dummyPersistent1 = new Persistent(dummyAgile, {
           key: 'dummyPersistent1',
         });
@@ -189,22 +191,18 @@ describe('Storages Tests', () => {
           defaultStorageKey: 'dummy',
           key: 'dummyPersistent2',
         });
-        jest.spyOn(dummyPersistent1, 'assignStorageKeys');
         jest
           .spyOn(dummyPersistent1, 'validatePersistent')
           .mockReturnValue(true);
         jest.spyOn(dummyPersistent1, 'initialLoading');
-        jest.spyOn(dummyPersistent2, 'assignStorageKeys');
         jest.spyOn(dummyPersistent2, 'validatePersistent');
         jest.spyOn(dummyPersistent2, 'initialLoading');
 
         const response = storages.register(dummyStorage1);
 
-        expect(dummyPersistent1.assignStorageKeys).toHaveBeenCalled();
         expect(dummyPersistent1.validatePersistent).toHaveBeenCalled();
         expect(dummyPersistent1.initialLoading).toHaveBeenCalled();
 
-        expect(dummyPersistent2.assignStorageKeys).not.toHaveBeenCalled();
         expect(dummyPersistent2.validatePersistent).not.toHaveBeenCalled();
         expect(dummyPersistent2.initialLoading).not.toHaveBeenCalled();
 

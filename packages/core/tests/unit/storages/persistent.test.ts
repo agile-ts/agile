@@ -170,7 +170,7 @@ describe('Persistent Tests', () => {
         );
       });
 
-      it('should return false if no set key and set StorageKeys', () => {
+      it('should return false and print error if no set key and set StorageKeys', () => {
         persistent.config.defaultStorageKey = 'test';
         persistent.storageKeys = ['test'];
 
@@ -184,7 +184,38 @@ describe('Persistent Tests', () => {
         );
       });
 
+      it('should return false and print error if set key and set StorageKeys but no existing Storage at storageKeys', () => {
+        persistent.config.defaultStorageKey = 'test';
+        persistent.storageKeys = ['test'];
+
+        const isValid = persistent.validatePersistent();
+
+        expect(isValid).toBeFalsy();
+        expect(persistent.ready).toBeFalsy();
+
+        expect(console.error).toHaveBeenCalledWith(
+          "Agile Error: Storage 'test' doesn't exist yet. Please provide only existing StorageKeys!"
+        );
+      });
+
       it('should return true if set key and set StorageKeys', () => {
+        dummyAgile.storages.register(
+          dummyAgile.createStorage({
+            key: 'test',
+            methods: {
+              get: () => {
+                /* empty */
+              },
+              set: () => {
+                /* empty */
+              },
+              remove: () => {
+                /* empty */
+              },
+            },
+          })
+        );
+
         persistent._key = 'persistentKey';
         persistent.config.defaultStorageKey = 'test';
         persistent.storageKeys = ['test'];

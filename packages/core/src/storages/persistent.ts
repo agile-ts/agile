@@ -117,6 +117,16 @@ export class Persistent {
       isValid = false;
     }
 
+    // Check if Storages exist
+    this.storageKeys.map((key) => {
+      if (!this.agileInstance().storages.storages[key]) {
+        Agile.logger.error(
+          `Storage '${key}' doesn't exist yet. Please provide only existing StorageKeys!`
+        );
+        isValid = false;
+      }
+    });
+
     this.ready = isValid;
     return isValid;
   }
@@ -137,7 +147,7 @@ export class Persistent {
     const storages = this.agileInstance().storages;
     const _storageKeys = copy(storageKeys);
 
-    // Print warning if default StorageKey passed, but it isn't in stoargeKeys
+    // Print warning if default StorageKey passed, but it isn't in storageKeys
     if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey)) {
       Agile.logger.warn(
         `Default Storage Key '${defaultStorageKey}' isn't contained in storageKeys!`,
@@ -146,7 +156,7 @@ export class Persistent {
       _storageKeys.push(defaultStorageKey);
     }
 
-    // Add default Storage of AgileTs if no storageKey provided
+    // Add default Storage of AgileTs to storageKeys if no storageKey provided
     if (_storageKeys.length <= 0) {
       this.config.defaultStorageKey = storages.config.defaultStorageKey as any;
       _storageKeys.push(storages.config.defaultStorageKey as any);

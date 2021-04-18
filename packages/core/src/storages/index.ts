@@ -99,17 +99,17 @@ export class Storages {
     if (config.default) this.config.defaultStorageKey = storage.key;
 
     this.persistentInstances.forEach((persistent) => {
-      // If Persistent isn't ready (try to reassign StorageKeys)
-      if (!persistent.ready) {
-        persistent.assignStorageKeys();
-        const isValid = persistent.validatePersistent();
-        if (isValid) persistent.initialLoading();
-        return;
-      }
+      if (persistent.storageKeys.includes(storage.key)) {
+        // If Persistent isn't ready (try to revalidate and load it)
+        if (!persistent.ready) {
+          const isValid = persistent.validatePersistent();
+          if (isValid) persistent.initialLoading();
+          return;
+        }
 
-      // Add Value of Persistent to newly registered Storage
-      if (persistent.storageKeys.includes(storage.key))
+        // Add Value of Persistent to newly registered Storage
         persistent.persistValue();
+      }
     });
 
     return true;
