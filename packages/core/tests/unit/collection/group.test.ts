@@ -436,15 +436,21 @@ describe('Group Tests', () => {
         expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
           loadValue: true,
           storageKeys: [],
+          defaultStorageKey: null,
         });
       });
 
       it('should persist Group with GroupKey (specific config)', () => {
-        group.persist({ loadValue: false, storageKeys: ['test1', 'test2'] });
+        group.persist({
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -454,6 +460,7 @@ describe('Group Tests', () => {
         expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
           loadValue: true,
           storageKeys: [],
+          defaultStorageKey: null,
         });
       });
 
@@ -461,11 +468,13 @@ describe('Group Tests', () => {
         group.persist('dummyKey', {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
         });
 
         expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -480,6 +489,7 @@ describe('Group Tests', () => {
           {
             loadValue: true,
             storageKeys: [],
+            defaultStorageKey: null,
           }
         );
       });
@@ -495,6 +505,7 @@ describe('Group Tests', () => {
           {
             loadValue: true,
             storageKeys: [],
+            defaultStorageKey: null,
           }
         );
       });

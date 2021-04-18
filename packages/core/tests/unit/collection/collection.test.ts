@@ -1588,6 +1588,7 @@ describe('Collection Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: collection._key,
+          defaultStorageKey: null,
         });
       });
 
@@ -1595,6 +1596,7 @@ describe('Collection Tests', () => {
         collection.persist({
           storageKeys: ['test1', 'test2'],
           loadValue: false,
+          defaultStorageKey: 'test1',
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
@@ -1602,6 +1604,7 @@ describe('Collection Tests', () => {
           instantiate: false,
           storageKeys: ['test1', 'test2'],
           key: collection._key,
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -1613,6 +1616,7 @@ describe('Collection Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: 'passedKey',
+          defaultStorageKey: null,
         });
       });
 
@@ -1620,6 +1624,7 @@ describe('Collection Tests', () => {
         collection.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
           loadValue: false,
+          defaultStorageKey: 'test1',
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
@@ -1627,6 +1632,7 @@ describe('Collection Tests', () => {
           instantiate: false,
           storageKeys: ['test1', 'test2'],
           key: 'passedKey',
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -1641,6 +1647,7 @@ describe('Collection Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: 'newPersistentKey',
+          defaultStorageKey: null,
         });
         expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`

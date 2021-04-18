@@ -594,6 +594,7 @@ describe('State Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: numberState._key,
+          defaultStorageKey: null,
         });
       });
 
@@ -601,6 +602,7 @@ describe('State Tests', () => {
         numberState.persist({
           storageKeys: ['test1', 'test2'],
           loadValue: false,
+          defaultStorageKey: 'test1',
         });
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
@@ -608,6 +610,7 @@ describe('State Tests', () => {
           instantiate: false,
           storageKeys: ['test1', 'test2'],
           key: numberState._key,
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -619,6 +622,7 @@ describe('State Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: 'passedKey',
+          defaultStorageKey: null,
         });
       });
 
@@ -626,6 +630,7 @@ describe('State Tests', () => {
         numberState.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
           loadValue: false,
+          defaultStorageKey: 'test1',
         });
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
@@ -633,6 +638,7 @@ describe('State Tests', () => {
           instantiate: false,
           storageKeys: ['test1', 'test2'],
           key: 'passedKey',
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -647,6 +653,7 @@ describe('State Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: 'newPersistentKey',
+          defaultStorageKey: null,
         });
         expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`
