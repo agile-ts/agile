@@ -263,7 +263,7 @@ export interface PersistentConfigInterface {
 /**
  * @param key - Key/Name of Persistent
  * @param storageKeys - Keys of Storages in that the persisted Value gets saved
- * @param defaultStorageKey - Default Storage Key
+ * @param defaultStorageKey - Default Storage Key (if not provided it takes the first index of storageKeys or the AgileTs default Storage)
  */
 export interface InstantiatePersistentConfigInterface {
   key?: PersistentKey;

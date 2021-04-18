@@ -273,6 +273,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
       loadValue: true,
       followCollectionPattern: false,
       storageKeys: [],
+      defaultStorageKey: null,
     });
 
     if (_config.followCollectionPersistKeyPattern) {
@@ -285,6 +286,7 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     super.persist(key, {
       loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
+      defaultStorageKey: _config.defaultStorageKey,
     });
 
     return this;

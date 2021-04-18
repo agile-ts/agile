@@ -2,14 +2,41 @@ import { Agile, clone, Logger } from '@agile-ts/core';
 import API from '@agile-ts/api';
 import Event from '@agile-ts/event';
 
+export const myStorage: any = {};
+
 export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG },
+  localStorage: true,
 });
+
+// Register custom second Storage
+App.registerStorage(
+  App.createStorage({
+    key: 'myStorage',
+    methods: {
+      get: (key: string) => {
+        console.log(`GET '${key}'`);
+        return myStorage[key];
+      },
+      set: (key: string, value: any) => {
+        console.log(`SET '${key}'`, value);
+        myStorage[key] = value;
+      },
+      remove: (key: string) => {
+        console.log(`DELETE '${key}'`);
+        delete myStorage[key];
+      },
+    },
+  })
+);
 
 export const MY_STATE = App.createState<string>('MyState', { key: 'my-state' }); //.persist();
 export const MY_STATE_2 = App.createState<string>('MyState2', {
   key: 'my-state2',
-}).persist();
+}).persist({
+  storageKeys: ['myStorage', 'localStorage'],
+  defaultStorageKey: 'localStorage', // where the persisted value gets loaded from (saved is it in all provided Storages (storageKeys))
+});
 MY_STATE_2.onLoad(() => {
   console.log('On Load MY_STATE_2');
 });
