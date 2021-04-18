@@ -254,7 +254,7 @@ export interface CreatePersistentConfigInterface {
 }
 
 /**
- * @param defaultStorage - Default Storage Key
+ * @param defaultStorageKey - Default Storage Key
  */
 export interface PersistentConfigInterface {
   defaultStorageKey: StorageKey | null;
@@ -263,7 +263,7 @@ export interface PersistentConfigInterface {
 /**
  * @param key - Key/Name of Persistent
  * @param storageKeys - Keys of Storages in that the persisted Value gets saved
- * @param defaultStorage - Default Storage Key
+ * @param defaultStorageKey - Default Storage Key
  */
 export interface InstantiatePersistentConfigInterface {
   key?: PersistentKey;
