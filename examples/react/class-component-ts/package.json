@@ -5,6 +5,7 @@
   "dependencies": {
     "@agile-ts/api": "file:.yalc/@agile-ts/api",
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/event": "file:.yalc/@agile-ts/event",
     "@agile-ts/multieditor": "file:.yalc/@agile-ts/multieditor",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
     "react": "^16.13.1",

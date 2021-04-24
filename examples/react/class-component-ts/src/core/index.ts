@@ -1,7 +1,9 @@
 import { Agile, clone, Logger } from '@agile-ts/core';
+import { Event } from '@agile-ts/event';
 
 export const App = new Agile({
   logConfig: { level: Logger.level.DEBUG, timestamp: true },
+  waitForMount: false,
 });
 
 export const MY_STATE = App.createState<string>('MyState'); //.persist();
@@ -46,7 +48,7 @@ MY_COLLECTION.getGroup('myGroup')?.persist({
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));
 
-export const MY_EVENT = App.createEvent<{ name: string }>({
+export const MY_EVENT = new Event<{ name: string }>(App, {
   delay: 3000,
   key: 'myEvent',
 });
