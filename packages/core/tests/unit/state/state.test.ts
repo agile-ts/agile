@@ -643,7 +643,8 @@ describe('State Tests', () => {
       });
 
       it('should overwrite existing persistent with a warning', () => {
-        numberState.persistent = new StatePersistent(numberState);
+        const oldPersistent = new StatePersistent(numberState);
+        numberState.persistent = oldPersistent;
 
         numberState.persist('newPersistentKey');
 
@@ -656,7 +657,8 @@ describe('State Tests', () => {
           defaultStorageKey: null,
         });
         expect(console.warn).toHaveBeenCalledWith(
-          `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`
+          `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`,
+          oldPersistent
         );
       });
     });
@@ -691,6 +693,112 @@ describe('State Tests', () => {
         expect(console.error).toHaveBeenCalledWith(
           "Agile Error: Please make sure you persist the State 'numberStateKey' before using the 'onLoad' function!"
         );
+      });
+    });
+
+    describe('interval function tests', () => {
+      const dummyCallbackFunction = jest.fn();
+      const dummyCallbackFunction2 = jest.fn();
+
+      beforeEach(() => {
+        jest.useFakeTimers();
+        numberState.set = jest.fn();
+      });
+
+      afterEach(() => {
+        jest.clearAllTimers();
+      });
+
+      it('should create an interval (without custom milliseconds)', () => {
+        dummyCallbackFunction.mockReturnValueOnce(10);
+
+        numberState.interval(dummyCallbackFunction);
+
+        jest.runTimersToTime(1000); // travel 1000s in time -> execute interval
+
+        expect(setInterval).toHaveBeenCalledTimes(1);
+        expect(setInterval).toHaveBeenLastCalledWith(
+          expect.any(Function),
+          1000
+        );
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(numberState._value);
+        expect(numberState.set).toHaveBeenCalledWith(10);
+        expect(numberState.currentInterval).toEqual({
+          id: expect.anything(),
+          ref: expect.anything(),
+          unref: expect.anything(),
+        });
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      it('should create an interval (with custom milliseconds)', () => {
+        dummyCallbackFunction.mockReturnValueOnce(10);
+
+        numberState.interval(dummyCallbackFunction, 2000);
+
+        jest.runTimersToTime(2000); // travel 2000 in time -> execute interval
+
+        expect(setInterval).toHaveBeenCalledTimes(1);
+        expect(setInterval).toHaveBeenLastCalledWith(
+          expect.any(Function),
+          2000
+        );
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(numberState._value);
+        expect(numberState.set).toHaveBeenCalledWith(10);
+        expect(numberState.currentInterval).toEqual({
+          id: expect.anything(),
+          ref: expect.anything(),
+          unref: expect.anything(),
+        });
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't be able to create second interval and print warning", () => {
+        numberState.interval(dummyCallbackFunction, 3000);
+        const currentInterval = numberState.currentInterval;
+        numberState.interval(dummyCallbackFunction2);
+
+        expect(setInterval).toHaveBeenCalledTimes(1);
+        expect(setInterval).toHaveBeenLastCalledWith(
+          expect.any(Function),
+          3000
+        );
+        expect(numberState.currentInterval).toStrictEqual(currentInterval);
+        expect(console.warn).toHaveBeenCalledWith(
+          'Agile Warn: You can only have one interval active!',
+          numberState.currentInterval
+        );
+      });
+    });
+
+    describe('clearInterval function tests', () => {
+      const dummyCallbackFunction = jest.fn();
+
+      beforeEach(() => {
+        jest.useFakeTimers();
+        numberState.set = jest.fn();
+      });
+
+      afterEach(() => {
+        jest.clearAllTimers();
+      });
+
+      it('should clear existing interval', () => {
+        numberState.interval(dummyCallbackFunction);
+        const currentInterval = numberState.currentInterval;
+
+        numberState.clearInterval();
+
+        expect(clearInterval).toHaveBeenCalledTimes(1);
+        expect(clearInterval).toHaveBeenLastCalledWith(currentInterval);
+        expect(numberState.currentInterval).toBeUndefined();
+      });
+
+      it("shouldn't clear not existing interval", () => {
+        numberState.clearInterval();
+
+        expect(clearInterval).not.toHaveBeenCalled();
+        expect(numberState.currentInterval).toBeUndefined();
       });
     });
 

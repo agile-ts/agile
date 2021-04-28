@@ -18,7 +18,6 @@ describe('Selector Tests', () => {
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Selector.prototype, 'select');
-    console.warn = jest.fn();
   });
 
   it('should create Selector and call initial select (default config)', () => {
