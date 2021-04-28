@@ -42,6 +42,8 @@ export class State<ValueType = any> {
 
   public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
 
+  public currentInterval?: NodeJS.Timer | number;
+
   /**
    * @public
    * State - Class that holds one Value and causes rerender on subscribed Components
@@ -402,10 +404,12 @@ export class State<ValueType = any> {
       defaultStorageKey: null,
     });
 
-    if (this.persistent)
+    if (this.persistent) {
       Agile.logger.warn(
-        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`
+        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`,
+        this.persistent
       );
+    }
 
     // Create persistent -> Persist Value
     this.persistent = new StatePersistent<ValueType>(this, {
@@ -428,17 +432,61 @@ export class State<ValueType = any> {
    * @param callback - Callback Function
    */
   public onLoad(callback: (success: boolean) => void): this {
-    if (this.persistent) {
-      this.persistent.onLoad = callback;
-
-      // If State is already 'isPersisted' the loading was successful -> callback can be called
-      if (this.isPersisted) callback(true);
-    } else {
+    if (!this.persistent) {
       Agile.logger.error(
         `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`
       );
+      return this;
     }
+
+    this.persistent.onLoad = callback;
+
+    // If State is already 'isPersisted' the loading was successful -> callback can be called
+    if (this.isPersisted) callback(true);
+
     return this;
+  }
+
+  //=========================================================================================================
+  // Interval
+  //=========================================================================================================
+  /**
+   * @public
+   * Calls callback at certain intervals in milliseconds and assigns the callback return value to the State
+   * @param callback- Callback that is called on each interval and should return the new State value
+   * @param ms - The intervals in milliseconds
+   */
+  public interval(
+    callback: (value: ValueType) => ValueType,
+    ms?: number
+  ): this {
+    if (this.currentInterval) {
+      Agile.logger.warn(
+        `You can only have one interval active!`,
+        this.currentInterval
+      );
+      return this;
+    }
+
+    this.currentInterval = setInterval(() => {
+      this.set(callback(this._value));
+    }, ms ?? 1000);
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Clear Interval
+  //=========================================================================================================
+  /**
+   * @public
+   * Clears the current Interval
+   */
+  public clearInterval(): void {
+    if (this.currentInterval) {
+      clearInterval(this.currentInterval as number);
+      delete this.currentInterval;
+    }
   }
 
   //=========================================================================================================

@@ -3,6 +3,7 @@ import './App.css';
 import { useAgile, useWatcher } from '@agile-ts/react';
 import { useEvent } from '@agile-ts/event';
 import {
+  COUNTUP,
   MY_COLLECTION,
   MY_COMPUTED,
   MY_EVENT,
@@ -13,6 +14,7 @@ import {
 import { globalBind } from '@agile-ts/core';
 
 let rerenderCount = 0;
+let rerenderCountInCountupView = 0;
 
 const App = (props: any) => {
   // Note: Rerenders twice because of React Strickt Mode (also useState does trigger a rerender twice)
@@ -55,6 +57,19 @@ const App = (props: any) => {
   useEffect(() => {
     globalBind('__core__', { ...require('./core') });
   }, []);
+
+  const CountupView = () => {
+    const countup = useAgile(COUNTUP);
+    rerenderCountInCountupView++;
+    return (
+      <div style={{ backgroundColor: 'white', padding: 10 }}>
+        <p style={{ color: 'black' }}>Countup: {countup}</p>
+        <p style={{ color: 'black' }}>
+          Rerender Count of count up View: {rerenderCountInCountupView}
+        </p>
+      </div>
+    );
+  };
 
   return (
     <div className="App">
@@ -124,7 +139,8 @@ const App = (props: any) => {
           }>
           Update mySelector value
         </button>
-        <p>{rerenderCount}</p>
+        <p>Rerender Count: {rerenderCount}</p>
+        <CountupView />
       </header>
     </div>
   );
