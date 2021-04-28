@@ -30,6 +30,7 @@ App.registerStorage(
   })
 );
 
+export const COUNTUP = App.createState(1).interval((value) => value + 1, 1000);
 export const MY_STATE = App.createState<string>('MyState', { key: 'my-state' }); //.persist();
 export const MY_STATE_2 = App.createState<string>('MyState2', {
   key: 'my-state2',
