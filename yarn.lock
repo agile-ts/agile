@@ -3,7 +3,7 @@
 
 
 "@agile-ts/core@file:packages/core":
-  version "0.0.13"
+  version "0.0.14"
 
 "@akryum/winattr@^3.0.0":
   version "3.0.0"
