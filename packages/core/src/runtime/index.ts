@@ -5,6 +5,7 @@ import {
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
   defineConfig,
+  notEqual,
 } from '../internal';
 
 export class Runtime {
@@ -140,8 +141,35 @@ export class Runtime {
         if (subscriptionContainer.isObjectBased)
           this.handleObjectBasedSubscription(subscriptionContainer, job);
 
-        subscriptionsToUpdate.add(subscriptionContainer);
-        job.subscriptionContainersToUpdate.delete(subscriptionContainer);
+        // Check if proxy property has changed
+        if (subscriptionContainer.proxyBased && job.observer._key) {
+          const paths = subscriptionContainer.proxyBased[job.observer._key];
+          if (paths) {
+            for (const path of paths) {
+              let newValue = undefined;
+              for (const branch of path) {
+                newValue = job.observer.value[branch];
+              }
+
+              let previousValue = undefined;
+              for (const branch of path) {
+                previousValue = job.observer.previousValue[branch];
+              }
+
+              // Check if value has changed, if so add it to the rerender queue
+              if (notEqual(newValue, previousValue)) {
+                subscriptionsToUpdate.add(subscriptionContainer);
+                job.subscriptionContainersToUpdate.delete(
+                  subscriptionContainer
+                );
+                break;
+              }
+            }
+          }
+        } else {
+          subscriptionsToUpdate.add(subscriptionContainer);
+          job.subscriptionContainersToUpdate.delete(subscriptionContainer);
+        }
       });
     });
 

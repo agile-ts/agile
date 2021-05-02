@@ -118,6 +118,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public perform(job: StateRuntimeJob) {
     const state = job.observer.state();
+    const previousValue = copy(state._value);
 
     // Assign new State Values
     state.previousStateValue = copy(state._value);
@@ -136,9 +137,10 @@ export class StateObserver<ValueType = any> extends Observer {
     this.sideEffects(job);
 
     // Assign Public Value to Observer after sideEffects like 'rebuildGroup',
-    // because sometimes (for instance in Group) the publicValue is not the value(nextStateValue)
+    // because sometimes (for instance in Group) the publicValue is not the value (nextStateValue)
     // and the observer value is at some point the publicValue because the end user uses it
     job.observer.value = copy(state.getPublicValue());
+    job.observer.previousValue = previousValue;
   }
 
   //=========================================================================================================

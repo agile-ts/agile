@@ -1,7 +1,7 @@
 import {
   Observer,
   SubscriptionContainer,
-  SubscriptionContainerKeyType,
+  SubscriptionContainerConfigInterface,
 } from '../../../internal';
 
 export class ComponentSubscriptionContainer extends SubscriptionContainer {
@@ -12,14 +12,14 @@ export class ComponentSubscriptionContainer extends SubscriptionContainer {
    * ComponentSubscriptionContainer - SubscriptionContainer for Component based Subscription
    * @param component - Component that is subscribed by Agile
    * @param  subs - Initial Subscriptions
-   * @param key - Key/Name of Component Subscription Container
+   * @param config - Config
    */
   constructor(
     component: any,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ) {
-    super(subs, key);
+    super(subs, config);
     this.component = component;
   }
 }
