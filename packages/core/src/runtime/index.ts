@@ -152,25 +152,33 @@ export class Runtime {
           if (paths) {
             for (const path of paths) {
               let newValue = job.observer.value;
+              let newValueDeepness = 0;
               for (const branch of path) {
                 if (!isValidObject(newValue)) break;
                 newValue = newValue[branch];
+                newValueDeepness++;
               }
 
               let previousValue = job.observer.previousValue;
+              let previousValueDeepness = 0;
               for (const branch of path) {
                 if (!isValidObject(previousValue)) break;
                 previousValue = previousValue[branch];
+                previousValueDeepness++;
               }
 
+              Agile.logger.debug('NewValue: ', newValue, newValueDeepness);
               Agile.logger.debug(
-                'NewValue vs previousValue',
-                newValue,
-                previousValue
+                'PreviousValue: ',
+                previousValue,
+                previousValueDeepness
               );
 
               // Check if value has changed, if so add it to the rerender queue
-              if (notEqual(newValue, previousValue)) {
+              if (
+                notEqual(newValue, previousValue) ||
+                newValueDeepness !== previousValueDeepness
+              ) {
                 Agile.logger.debug(
                   'Rerender Subscription Container (Proxy)',
                   subscriptionContainer
