@@ -6,6 +6,7 @@ import {
   ComponentSubscriptionContainer,
   defineConfig,
   notEqual,
+  isValidObject,
 } from '../internal';
 
 export class Runtime {
@@ -143,21 +144,37 @@ export class Runtime {
 
         // Check if proxy property has changed
         if (subscriptionContainer.proxyBased && job.observer._key) {
-          const paths = subscriptionContainer.proxyBased[job.observer._key];
+          const paths =
+            subscriptionContainer.proxyKeyMap[job.observer._key].paths;
+
+          Agile.logger.debug('Paths', paths);
+
           if (paths) {
             for (const path of paths) {
-              let newValue = undefined;
+              let newValue = job.observer.value;
               for (const branch of path) {
-                newValue = job.observer.value[branch];
+                if (!isValidObject(newValue)) break;
+                newValue = newValue[branch];
               }
 
-              let previousValue = undefined;
+              let previousValue = job.observer.previousValue;
               for (const branch of path) {
-                previousValue = job.observer.previousValue[branch];
+                if (!isValidObject(previousValue)) break;
+                previousValue = previousValue[branch];
               }
+
+              Agile.logger.debug(
+                'NewValue vs previousValue',
+                newValue,
+                previousValue
+              );
 
               // Check if value has changed, if so add it to the rerender queue
               if (notEqual(newValue, previousValue)) {
+                Agile.logger.debug(
+                  'Rerender Subscription Container (Proxy)',
+                  subscriptionContainer
+                );
                 subscriptionsToUpdate.add(subscriptionContainer);
                 job.subscriptionContainersToUpdate.delete(
                   subscriptionContainer

@@ -11,7 +11,7 @@ export class SubscriptionContainer {
   public subs: Set<Observer>; // Observers that are Subscribed to this SubscriptionContainer (Component)
 
   // Represents the paths to the properties used in the Component of States
-  public proxyKeyMap: ProxyMapInterface;
+  public proxyKeyMap: ProxyKeyMapInterface;
   public proxyBased = false;
 
   // For Object based Subscription
@@ -45,10 +45,10 @@ export class SubscriptionContainer {
 export type SubscriptionContainerKeyType = string | number;
 
 export interface SubscriptionContainerConfigInterface {
-  proxyKeyMap?: ProxyMapInterface;
+  proxyKeyMap?: ProxyKeyMapInterface;
   key?: SubscriptionContainerKeyType;
 }
 
-export interface ProxyMapInterface {
+export interface ProxyKeyMapInterface {
   [key: string]: { paths: string[][] };
 }

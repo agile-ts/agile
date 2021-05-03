@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useAgile, useWatcher } from '@agile-ts/react';
+import { useAgile, useWatcher, useProxy } from '@agile-ts/react';
 import { useEvent } from '@agile-ts/event';
 import {
   COUNTUP,
@@ -10,8 +10,9 @@ import {
   MY_STATE,
   MY_STATE_2,
   MY_STATE_3,
+  STATE_OBJECT,
 } from './core';
-import { globalBind } from '@agile-ts/core';
+import { generateId, globalBind } from '@agile-ts/core';
 
 let rerenderCount = 0;
 let rerenderCountInCountupView = 0;
@@ -40,6 +41,8 @@ const App = (props: any) => {
     MY_COLLECTION,
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
+
+  const stateObject = useProxy(STATE_OBJECT);
 
   // const myCollection2 = useAgile(MY_COLLECTION);
 
@@ -91,6 +94,23 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My Computed</h3>
           <p>{myComputed}</p>
+        </div>
+
+        <div className={'Container'}>
+          <h3 className={'Title'}>My State Object</h3>
+          <p>Deep Name: {stateObject.friends.hans.name}</p>
+          <button
+            onClick={() => {
+              STATE_OBJECT.patch({ friends: { hans: { name: generateId() } } });
+            }}>
+            Change deep name
+          </button>
+          <button
+            onClick={() => {
+              STATE_OBJECT.patch({ name: generateId() });
+            }}>
+            Change shallow name
+          </button>
         </div>
 
         <div className={'Container'}>
