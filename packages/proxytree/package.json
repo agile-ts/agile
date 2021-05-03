@@ -1,0 +1,46 @@
+{
+  "name": "@agile-ts/proxytree",
+  "version": "0.0.1",
+  "author": "BennoDev",
+  "license": "MIT",
+  "homepage": "https://agile-ts.org/",
+  "description": "Creates a Proxy Tree to hang between object mutations",
+  "keywords": [
+    "api",
+    "promise-api",
+    "http-request",
+    "agile",
+    "agile-ts"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc && tsc -p ./tsconfig.production.json",
+    "dev:publish": "yalc publish",
+    "dev:push": "yalc push",
+    "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
+    "watch": "tsc -w",
+    "release": "yarn run prepare",
+    "preview": "npm pack",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agile-ts/agile.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agile-ts/agile/issues"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ]
+}
