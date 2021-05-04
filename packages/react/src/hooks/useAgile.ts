@@ -8,8 +8,12 @@ import {
   Observer,
   State,
   SubscriptionContainerKeyType,
+  defineConfig,
+  isValidObject,
+  ProxyKeyMapInterface,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { ProxyTree } from '@agile-ts/proxytree';
 
 //=========================================================================================================
 // useAgile
@@ -17,25 +21,21 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 /**
  * React Hook that binds Agile Instances like Collections, States, Computeds, .. to a React Functional Component
  * @param deps - Agile Instances that will be subscribed to this Component
- * @param key - Key/Name of SubscriptionContainer that gets created
- * @param agileInstance - An instance of Agile
+ * @param config - Config
  */
 export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
-  key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
+  config?: AgileHookConfigInterface
 ): AgileHookArrayType<X>;
 
 /**
  * React Hook that binds Agile Instance like Collection, State, Computed, .. to a React Functional Component
  * @param dep - Agile Instance that will be subscribed to this Component
- * @param key - Key/Name of SubscriptionContainer that gets created
- * @param agileInstance - An instance of Agile
+ * @param config - Config
  */
 export function useAgile<X extends SubscribableAgileInstancesType>(
   dep: X,
-  key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
+  config?: AgileHookConfigInterface
 ): AgileHookType<X>;
 
 export function useAgile<
@@ -43,27 +43,51 @@ export function useAgile<
   Y extends SubscribableAgileInstancesType
 >(
   deps: X | Y,
-  key?: SubscriptionContainerKeyType,
-  agileInstance?: Agile
+  config: AgileHookConfigInterface = {}
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   const depsArray = extractObservers(deps);
+  const proxyTreeMap: ProxyTreeMapInterface = {};
+  config = defineConfig(config, {
+    proxyBased: false,
+  });
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
     depsArray: (State | Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    if (depsArray.length === 1 && !Array.isArray(deps))
-      return depsArray[0]?.value;
+    const handleReturn = (
+      dep: State | Observer | undefined
+    ): AgileHookType<Y> => {
+      const value = dep?.value;
+      const depKey = dep?.key;
 
-    return depsArray.map((dep) => {
+      // If value is object wrap proxytree around it to track used properties
+      if (config.proxyBased && isValidObject(value) && depKey) {
+        const proxyTree = new ProxyTree(value);
+        proxyTreeMap[depKey] = proxyTree;
+        return proxyTree.proxy;
+      }
+
       return dep?.value;
+    };
+
+    // Handle single dep
+    if (depsArray.length === 1 && !Array.isArray(deps)) {
+      return handleReturn(depsArray[0]);
+    }
+
+    // Handle dep array
+    return depsArray.map((dep) => {
+      return handleReturn(dep);
     }) as AgileHookArrayType<X>;
   };
 
-  // Trigger State used to force Component to rerender
+  // Trigger State, used to force Component to rerender
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
   useIsomorphicLayoutEffect(() => {
+    let agileInstance = config.agileInstance;
+
     // Try to get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
     if (!agileInstance || !agileInstance.subController) {
@@ -76,13 +100,24 @@ export function useAgile<
       (dep): dep is Observer => dep !== undefined
     );
 
+    // Build Proxy Key Map
+    const proxyMap: ProxyKeyMapInterface = {};
+    if (config.proxyBased) {
+      for (const proxyTreeKey in proxyTreeMap) {
+        const proxyTree = proxyTreeMap[proxyTreeKey];
+        proxyMap[proxyTreeKey] = {
+          paths: proxyTree.getUsedRoutes() as any,
+        };
+      }
+    }
+
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
       () => {
         forceRender();
       },
       observers,
-      { key }
+      { key: config.key, proxyKeyMap: proxyMap }
     );
 
     // Unsubscribe Callback based Subscription on Unmount
@@ -96,7 +131,7 @@ export function useAgile<
 
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
-type AgileHookArrayType<T> = {
+export type AgileHookArrayType<T> = {
   [K in keyof T]: T[K] extends Collection<infer U> | Group<infer U>
     ? U[]
     : T[K] extends State<infer U> | Observer<infer U>
@@ -111,7 +146,7 @@ type AgileHookArrayType<T> = {
 };
 
 // No Array Type
-type AgileHookType<T> = T extends Collection<infer U> | Group<infer U>
+export type AgileHookType<T> = T extends Collection<infer U> | Group<infer U>
   ? U[]
   : T extends State<infer U> | Observer<infer U>
   ? U
@@ -123,8 +158,23 @@ type AgileHookType<T> = T extends Collection<infer U> | Group<infer U>
   ? U | undefined
   : never;
 
-type SubscribableAgileInstancesType =
+export type SubscribableAgileInstancesType =
   | State
   | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
+
+/**
+ * @param key - Key/Name of SubscriptionContainer that gets created
+ * @param agileInstance - An instance of Agile
+ * @param proxyBased - If AgileTs should only rerender the Component when a used property mutates
+ */
+interface AgileHookConfigInterface {
+  key?: SubscriptionContainerKeyType;
+  agileInstance?: Agile;
+  proxyBased?: boolean;
+}
+
+interface ProxyTreeMapInterface {
+  [key: string]: ProxyTree;
+}

@@ -25,17 +25,17 @@ describe('Proxy Tree Tests', () => {
 
     expect(proxyTree.transformTreeToBranchObject()).toStrictEqual({
       key: 'root',
-      timesUsed: 3,
+      timesAccessed: 3,
       branches: [
         {
           key: 'a',
-          timesUsed: 2,
-          branches: [{ key: '0', timesUsed: 1, branches: [] }],
+          timesAccessed: 2,
+          branches: [{ key: '0', timesAccessed: 1, branches: [] }],
         },
         {
           key: 'c',
-          timesUsed: 1,
-          branches: [{ key: 'a', timesUsed: 1, branches: [] }],
+          timesAccessed: 1,
+          branches: [{ key: 'a', timesAccessed: 1, branches: [] }],
         },
       ],
     });
@@ -66,27 +66,27 @@ describe('Proxy Tree Tests', () => {
 
     expect(proxyTree.transformTreeToBranchObject()).toStrictEqual({
       key: 'root',
-      timesUsed: 4,
+      timesAccessed: 4,
       branches: [
         {
           key: 'a',
-          timesUsed: 2,
+          timesAccessed: 2,
           branches: [
             {
               key: '0',
-              timesUsed: 1,
-              branches: [{ key: 'b', timesUsed: 1, branches: [] }],
+              timesAccessed: 1,
+              branches: [{ key: 'b', timesAccessed: 1, branches: [] }],
             },
           ],
         },
         {
           key: 'c',
-          timesUsed: 1,
-          branches: [{ key: 'a', timesUsed: 1, branches: [] }],
+          timesAccessed: 1,
+          branches: [{ key: 'a', timesAccessed: 1, branches: [] }],
         },
         {
           key: 'b',
-          timesUsed: 1,
+          timesAccessed: 1,
           branches: [],
         },
       ],
