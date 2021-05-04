@@ -23,5 +23,11 @@ describe('Proxy Tree Tests', () => {
 
     console.log(proxyTree.rootBranch);
     console.log(proxyTree.transformTreeToArray());
+
+    expect(proxyTree.transformTreeToArray()).toStrictEqual([
+      ['a'],
+      ['a', '0'],
+      ['c', 'a'],
+    ]);
   });
 });
