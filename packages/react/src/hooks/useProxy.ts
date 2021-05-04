@@ -9,9 +9,10 @@ import {
   State,
   SubscriptionContainerKeyType,
   isValidObject,
+  ProxyKeyMapInterface,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { DeepProxy } from '../DeepProxy';
+import { ProxyTree } from '@agile-ts/proxytree';
 
 //=========================================================================================================
 // useAgile
@@ -50,44 +51,36 @@ export function useProxy<
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   console.log('useProxy');
   const depsArray = extractObservers(deps);
-  const proxyMap: ProxyMapInterface = {};
+  const proxyTreeMap: ProxyTreeMapInterface = {};
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
     depsArray: (State | Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    if (depsArray.length === 1 && !Array.isArray(deps)) {
-      const value = depsArray[0]?.value;
-      const depKey = depsArray[0]?.key;
+    const handleReturn = (
+      dep: State | Observer | undefined
+    ): AgileHookType<Y> => {
+      const value = dep?.value;
+      const depKey = dep?.key;
 
+      // If value is object wrap proxytree around it to track used properties
       if (isValidObject(value) && depKey) {
-        return DeepProxy(
-          value,
-          {
-            get(target, property) {
-              console.log('Get Handler', target, property, this.path);
-              // TODO deep tracking so if its a deep object and only a deep property got used than track this property and not just the top object property
-              // Add property to proxyMap
-              // proxyMap[depKey] = target[property];
-
-              if (property in target) {
-                if (isValidObject(target[property]))
-                  return this.nest(target[property]);
-                else target[property];
-              }
-
-              return undefined;
-            },
-          },
-          {}
-        ) as any;
+        const proxyTree = new ProxyTree(value);
+        proxyTreeMap[depKey] = proxyTree;
+        return proxyTree.proxy;
       }
 
-      return value;
+      return dep?.value;
+    };
+
+    // Handle single dep
+    if (depsArray.length === 1 && !Array.isArray(deps)) {
+      return handleReturn(depsArray[0]);
     }
 
+    // Handle dep array
     return depsArray.map((dep) => {
-      return dep?.value;
+      return handleReturn(dep);
     }) as AgileHookArrayType<X>;
   };
 
@@ -107,7 +100,15 @@ export function useProxy<
       (dep): dep is Observer => dep !== undefined
     );
 
-    console.log('ProxyMap:', proxyMap);
+    // Build Proxy Key Map
+    const proxyMap: ProxyKeyMapInterface = {};
+    for (const proxyTreeKey in proxyTreeMap) {
+      const proxyTree = proxyTreeMap[proxyTreeKey];
+      proxyMap[proxyTreeKey] = {
+        paths: proxyTree.transformTreeToArray() as any,
+      };
+    }
+
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
       () => {
@@ -116,9 +117,7 @@ export function useProxy<
       observers,
       {
         key,
-        proxyKeyMap: {
-          ['state-object']: { paths: [['friends', 'hans', 'name']] },
-        },
+        proxyKeyMap: proxyMap,
       }
     );
 
@@ -166,6 +165,6 @@ type SubscribableAgileInstancesType =
   | Observer
   | undefined;
 
-interface ProxyMapInterface {
-  [key: string]: { paths: string[][] };
+interface ProxyTreeMapInterface {
+  [key: string]: ProxyTree;
 }

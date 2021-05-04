@@ -98,7 +98,9 @@ const App = (props: any) => {
 
         <div className={'Container'}>
           <h3 className={'Title'}>My State Object</h3>
-          <p>Deep Name: {stateObject.friends.hans.name}</p>
+          <p>
+            Deep Name: {stateObject.friends.hans.name} {stateObject.location}
+          </p>
           <button
             onClick={() => {
               STATE_OBJECT.patch({ friends: { hans: { name: generateId() } } });

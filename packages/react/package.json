@@ -39,12 +39,14 @@
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core",
+    "@agile-ts/proxytree": "file:../proxytree",
     "@types/react": "^17.0.0",
     "react": "^17.0.1"
   },
   "peerDependencies": {
     "react": "^16.13.1",
-    "@agile-ts/core": "^0.0.14"
+    "@agile-ts/core": "^0.0.14",
+    "@agile-ts/proxytree": "0.0.1"
   },
   "publishConfig": {
     "access": "public"

@@ -1,5 +1,4 @@
 import { Agile, clone, Logger } from '@agile-ts/core';
-import API from '@agile-ts/api';
 import Event from '@agile-ts/event';
 
 export const myStorage: any = {};
