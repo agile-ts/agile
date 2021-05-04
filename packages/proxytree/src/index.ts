@@ -1,45 +1,104 @@
+// TODO REFACTOR
+
 export class ProxyTree<T = DefaultObject> {
   public rootBranch: Branch<T>;
   public proxy: T;
 
   constructor(target: T) {
-    this.rootBranch = this.createBranch(target, null);
+    this.rootBranch = this.createBranch(target);
     this.proxy = this.rootBranch.proxy;
   }
 
-  public createBranch(target: DefaultObject, parentBranch: Branch | null) {
-    const branch = new Branch(this, target, parentBranch);
-
-    return branch;
+  public createBranch(target: DefaultObject) {
+    return new Branch(this, target);
   }
 
-  public transformTreeToArray() {
-    const tree: BranchKey[][] = [];
+  public transformTreeToBranchObject() {
+    let rootBranchUses = 0;
 
-    const walk = (branch: Branch<any>, path?: BranchKey[]) => {
+    // Calculate rootBranch uses
+    this.rootBranch.childBranches.forEach(
+      (childBranch) => (rootBranchUses += childBranch.timesUsed)
+    );
+
+    const rootBranch: BranchObject = {
+      key: 'root',
+      timesUsed: rootBranchUses,
+      branches: [],
+    };
+
+    const walk = (branch: Branch<any>, currentBranchObject: BranchObject) => {
       const childBranches = branch.childBranches;
 
       // Check if branch has any sub Branches
       if (childBranches.size > 0) {
         childBranches.forEach((branchRoute) => {
-          const newPath = path ? [...path, branchRoute.key] : [branchRoute.key];
+          const newBranchObject: BranchObject = {
+            key: branchRoute.key,
+            timesUsed: branchRoute.timesUsed,
+            branches: [],
+          };
 
-          // Check if route has an Branch (is object) or the end (is value)
-          // If End, push path to tree, otherwise walk deeper into the Tree
+          // Add Sub Branch to parent Branch 'branches' array
+          currentBranchObject.branches.push(newBranchObject);
+
+          // Check if route has an Branch (is sub object)
+          // If null the Branch end is reached (is value)
           if (branchRoute.branch) {
-            walk(branchRoute.branch, newPath);
-          } else {
-            tree.push(newPath);
+            walk(branchRoute.branch, newBranchObject);
           }
         });
-      } else {
-        if (path) tree.push(path);
       }
     };
 
-    walk(this.rootBranch);
+    // Start walking through the Tree
+    walk(this.rootBranch, rootBranch);
 
-    return tree;
+    return rootBranch;
+  }
+
+  public getUsedRoutes() {
+    const usedRoutes: BranchKey[][] = [];
+    const rootBranchObject = this.transformTreeToBranchObject();
+
+    const walk = (branchObject: BranchObject, path?: BranchKey[]) => {
+      // Check if branch children where used because otherwise here is an end -> push path
+      let branchChildRoutesTimesUsed = 0;
+      branchObject.branches.forEach(
+        (childBranch) => (branchChildRoutesTimesUsed += childBranch.timesUsed)
+      );
+
+      // Check if branch has any sub Branches
+      if (
+        branchObject.branches.length > 0 &&
+        branchObject.timesUsed > 0 &&
+        branchChildRoutesTimesUsed > 0
+      ) {
+        // Walk into Children and update path
+        branchObject.branches.forEach((branchChildObject) => {
+          const newPath = path
+            ? [...path, branchChildObject.key]
+            : [branchChildObject.key];
+
+          // Go only in sub branch if it is used
+          if (branchChildObject.timesUsed > 0) walk(branchChildObject, newPath);
+
+          // Decrease times used
+          branchObject.timesUsed -= 1;
+        });
+      } else {
+        if (path) usedRoutes.push(path);
+
+        // Decrease times used
+        branchObject.timesUsed -= 1;
+      }
+    };
+
+    while (rootBranchObject.timesUsed > 0) {
+      walk(rootBranchObject);
+    }
+
+    return usedRoutes;
   }
 }
 
@@ -49,39 +108,34 @@ class Branch<T = DefaultObject> {
 
   public proxyTree: ProxyTree;
   public childBranches: Set<BranchRoutes> = new Set([]);
-  public parentBranch: Branch | null;
 
-  constructor(proxyTree: ProxyTree, target: T, parentBranch: Branch | null) {
+  constructor(proxyTree: ProxyTree, target: T) {
     this.proxyTree = proxyTree;
     this.target = target;
-    this.parentBranch = parentBranch;
 
+    // Wrap proxy around target object
     this.proxy = new Proxy(target as any, {
       get: (target, key) => {
-        console.log('Get: ', key, target);
-
         if (key in target) {
+          console.log('Get: ', key, target); // TODO ANALYSE WHEN GET GETS CALLED
           const isObject = typeof target[key] === 'object';
 
           // Search for existing Route
           const branchRoute = this.getBranchRouteAtKey(key);
 
-          // Count used in existing Branch Route
+          // If Route exists, count 'used' in existing Branch Route
           if (branchRoute) {
-            branchRoute.used += 1;
-            console.log('Count used: ', branchRoute.key, branchRoute.used);
+            branchRoute.timesUsed += 1;
             return branchRoute.branch?.proxy || target[key];
           }
 
           // Create new Branch Route
-          const newRoute = {
+          const newRoute: BranchRoutes = {
             key,
-            used: 1,
-            branch:
-              isObject && proxyTree.createBranch(target[key] || null, this),
+            timesUsed: 1,
+            branch: isObject && proxyTree.createBranch(target[key] || null),
           };
           this.childBranches.add(newRoute);
-
           return newRoute.branch?.proxy || target[key];
         }
 
@@ -102,74 +156,16 @@ class Branch<T = DefaultObject> {
 
 interface BranchRoutes<T = DefaultObject> {
   key: BranchKey; // Route to the Branch in object
-  used: number; // How often the Route was used
+  timesUsed: number; // How often the Route was used
   branch: Branch<T> | null; // Branch to which the route goes
+}
+
+interface BranchObject {
+  key: BranchKey;
+  timesUsed: number;
+  branches: BranchObject[];
 }
 
 type BranchKey = string | number | symbol;
 
 type DefaultObject = Record<string, any>; // same as { [key: string]: any };
-
-/*
-class ProxyTree<T extends object = {}> {
-  public cache: ProxyCache<T> = new WeakMap();
-  constructor(target: T) {}
-
-  public createProxyHandler(target: T): ProxyHandler2<T> {
-    return new ProxyHandler2<T>(this, target);
-  }
-
-  public createProxy(target: T, affected: WeakMap<object, unknown>) {}
-}
-
-class ProxyHandler2<T extends object = {}> {
-  public proxy: T;
-  public target: T;
-  public affected: Affected = new WeakMap();
-  public methods: proxyMethods<T>;
-  public proxyTree: ProxyTree<T>;
-
-  constructor(proxyTree: ProxyTree<T>, target: T) {
-    this.proxyTree = proxyTree;
-    this.target = target;
-    this.methods = {
-      get: (target, key) => {
-        this.recordUsage(key);
-        return proxyTree.createProxy((target as any)[key], this.affected);
-      },
-    };
-
-    this.proxy = new Proxy(target, this.methods);
-  }
-
-  public recordUsage(key: string | number | symbol) {
-    let used = this.affected.get(this.target);
-    let timesUsed = 1;
-    if (!used) {
-      used = new Set();
-      this.affected.set(this.target, used);
-    } else {
-      used.forEach((item) => {
-        if (item.key === key) {
-          timesUsed += item.used;
-        }
-      });
-    }
-    used.add({ key, used: timesUsed });
-  }
-}
-
-type Affected = WeakMap<
-  object,
-  Set<{ key: string | number | symbol; used: number }>
->;
-type ProxyCache<T extends object> = WeakMap<object, ProxyHandler<T>>;
-
-interface proxyMethods<T extends object> {
-  get(target: T, key: string | number | symbol): unknown;
-  has?(target: T, key: string | number | symbol): boolean;
-  ownKeys?(target: T): (string | number | symbol)[];
-  set?(target: T, key: string | number | symbol, value: unknown): boolean;
-  deleteProperty?(target: T, key: string | number | symbol): boolean;
-}
- */
