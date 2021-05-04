@@ -17,9 +17,11 @@ describe('Proxy Tree Tests', () => {
     const proxyTree = new ProxyTree(original);
 
     proxyTree.proxy.a;
-    proxyTree.proxy.a;
+    // proxyTree.proxy.a;
     proxyTree.proxy.a[0];
+    proxyTree.proxy.c.a;
 
     console.log(proxyTree.rootBranch);
+    console.log(proxyTree.transformTreeToArray());
   });
 });
