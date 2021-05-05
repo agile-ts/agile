@@ -18,7 +18,9 @@ import {
   removeProperties,
 } from '../internal';
 
-export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
+export class Group<DataType extends object = DefaultItem> extends State<
+  Array<ItemKey>
+> {
   static rebuildGroupSideEffectKey = 'rebuildGroup';
   collection: () => Collection<DataType>;
 

@@ -42,7 +42,7 @@ describe('ProxyTree Tests', () => {
 
     jest.spyOn(ProxyTree.prototype, 'createBranch');
 
-    const proxyTree = new ProxyTree(dummyString);
+    const proxyTree = new ProxyTree(dummyString as any);
 
     expect(proxyTree.proxy).toBe(null);
     expect(proxyTree.createBranch).toHaveBeenCalledWith(dummyString);
@@ -60,7 +60,7 @@ describe('ProxyTree Tests', () => {
 
     jest.spyOn(ProxyTree.prototype, 'createBranch');
 
-    const proxyTree = new ProxyTree(dummyNumber);
+    const proxyTree = new ProxyTree(dummyNumber as any);
 
     expect(proxyTree.proxy).toBe(null);
     expect(proxyTree.createBranch).toHaveBeenCalledWith(dummyNumber);
@@ -257,6 +257,26 @@ describe('ProxyTree Tests', () => {
 
         expect(proxyTree.getUsedRoutes()).toStrictEqual([
           ['a', '0', 'b'],
+          ['c', 'a'],
+          ['b'],
+          ['a'],
+        ]);
+        expect(proxyTree.transformTreeToBranchObject).toHaveBeenCalledTimes(1);
+      });
+
+      it('should track 5 layer deep accessed object properties', () => {
+        const proxyfiedOrginal = proxyTree.proxy;
+
+        // Access Properties
+        proxyfiedOrginal.a;
+        proxyfiedOrginal.a[0]['b'];
+        proxyfiedOrginal.a[1][1000]['a']['b'];
+        proxyfiedOrginal.c.a;
+        proxyfiedOrginal.b;
+
+        expect(proxyTree.getUsedRoutes()).toStrictEqual([
+          ['a', '0', 'b'],
+          ['a', '1', '1000', 'a', 'b'],
           ['c', 'a'],
           ['b'],
           ['a'],

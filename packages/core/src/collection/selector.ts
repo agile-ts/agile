@@ -9,7 +9,7 @@ import {
   StateRuntimeJobConfigInterface,
 } from '../internal';
 
-export class Selector<DataType = DefaultItem> extends State<
+export class Selector<DataType extends object = DefaultItem> extends State<
   DataType | undefined
 > {
   static dummyItemKey = 'unknown';

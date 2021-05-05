@@ -19,7 +19,7 @@ import {
   SelectorConfigInterface,
 } from '../internal';
 
-export class Collection<DataType = DefaultItem> {
+export class Collection<DataType extends object = DefaultItem> {
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
@@ -1300,7 +1300,7 @@ export interface SetDataConfigInterface {
   background?: boolean;
 }
 
-export type CollectionConfig<DataType = DefaultItem> =
+export type CollectionConfig<DataType extends object = DefaultItem> =
   | CreateCollectionConfigInterface<DataType>
   | ((
       collection: Collection<DataType>
