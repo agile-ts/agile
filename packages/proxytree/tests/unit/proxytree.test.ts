@@ -1,5 +1,5 @@
 import mockConsole from 'jest-mock-console';
-import { ProxyTree, Branch } from '../../src';
+import { ProxyTree } from '../../src';
 
 describe('ProxyTree Tests', () => {
   beforeEach(() => {

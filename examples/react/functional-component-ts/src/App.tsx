@@ -34,7 +34,7 @@ const App = (props: any) => {
   ] = useAgile([
     MY_STATE,
     MY_STATE_2,
-    MY_COLLECTION.getItem('1'),
+    MY_COLLECTION.getItem('id1'),
     MY_COLLECTION.getSelector('mySelector'),
     MY_STATE_3,
     undefined,
@@ -42,7 +42,14 @@ const App = (props: any) => {
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
 
-  const stateObject = useProxy(STATE_OBJECT);
+  const [stateObject, item2, collection2] = useProxy([
+    STATE_OBJECT,
+    MY_COLLECTION.getItem('id2'),
+    MY_COLLECTION,
+  ]);
+
+  console.log('Item1: ', item2?.name);
+  console.log('Collection: ', collection2.slice(0, 2));
 
   // const myCollection2 = useAgile(MY_COLLECTION);
 

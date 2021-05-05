@@ -124,7 +124,7 @@ export class Agile {
    * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param config - Config
    */
-  public createCollection<DataType = DefaultItem>(
+  public createCollection<DataType extends object = DefaultItem>(
     config?: CollectionConfig<DataType>
   ): Collection<DataType> {
     return new Collection<DataType>(this, config);

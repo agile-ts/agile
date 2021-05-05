@@ -62,7 +62,7 @@ export function useAgile<
       const depKey = dep?.key;
 
       // If value is object wrap proxytree around it to track used properties
-      if (config.proxyBased && isValidObject(value) && depKey) {
+      if (config.proxyBased && isValidObject(value, true) && depKey) {
         const proxyTree = new ProxyTree(value);
         proxyTreeMap[depKey] = proxyTree;
         return proxyTree.proxy;

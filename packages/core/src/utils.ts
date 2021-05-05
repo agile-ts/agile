@@ -35,8 +35,9 @@ export function copy<T = any>(value: T): T {
  * Checks if an value is a valid Object
  * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
  * @param value - Value that is tested for its correctness
+ * @param considerArray - Whether Arrays should be considered as object
  */
-export function isValidObject(value: any): boolean {
+export function isValidObject(value: any, considerArray = false): boolean {
   function isHTMLElement(obj: any) {
     try {
       return obj instanceof HTMLElement;
@@ -54,7 +55,7 @@ export function isValidObject(value: any): boolean {
     value !== null &&
     typeof value === 'object' &&
     !isHTMLElement(value) &&
-    !Array.isArray(value)
+    (considerArray ? true : !Array.isArray(value))
   );
 }
 
