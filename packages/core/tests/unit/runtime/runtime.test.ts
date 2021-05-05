@@ -176,6 +176,7 @@ describe('Runtime Tests', () => {
       const nrComponentSubContainerComponent = {
         my: 'second cool component',
       };
+      const dummyProxyKeyMap = { myState: { paths: [['a', 'b']] } };
 
       beforeEach(() => {
         dummyAgile.integrate(testIntegration);
@@ -232,6 +233,7 @@ describe('Runtime Tests', () => {
 
         jest.spyOn(dummyAgile.integrations, 'update');
         jest.spyOn(runtime, 'handleObjectBasedSubscription');
+        jest.spyOn(runtime, 'handleProxyBasedSubscription');
       });
 
       it('should return false if agile has no integration', () => {
@@ -267,6 +269,7 @@ describe('Runtime Tests', () => {
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(runtime.handleProxyBasedSubscription).not.toHaveBeenCalled();
 
         expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
         expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
@@ -291,6 +294,30 @@ describe('Runtime Tests', () => {
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(runtime.handleProxyBasedSubscription).not.toHaveBeenCalled();
+
+        expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
+        expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
+        expect(dummyObserver1.subs.size).toBe(1);
+      });
+
+      it('should update ready callback and proxy based Subscription and call handleProxyBasedSubscriptions()', () => {
+        rCallbackSubJob.subscriptionContainersToUpdate.forEach((container) => {
+          container.proxyBased = true;
+          container.proxyKeyMap = dummyProxyKeyMap;
+        });
+
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        runtime.jobsToRerender.push(rCallbackSubJob);
+
+        runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(runtime.handleProxyBasedSubscription).toHaveBeenCalledWith(
+          rCallbackSubContainer,
+          rCallbackSubJob
+        );
 
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);

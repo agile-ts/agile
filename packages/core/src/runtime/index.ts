@@ -239,7 +239,11 @@ export class Runtime {
     subscriptionContainer: SubscriptionContainer,
     job: RuntimeJob
   ): boolean {
-    if (!job.observer._key) return true;
+    if (
+      !job.observer._key ||
+      !subscriptionContainer.proxyKeyMap[job.observer._key]
+    )
+      return true;
 
     const paths = subscriptionContainer.proxyKeyMap[job.observer._key].paths;
 
