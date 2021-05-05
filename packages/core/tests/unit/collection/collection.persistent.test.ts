@@ -126,7 +126,7 @@ describe('CollectionPersistent Tests', () => {
   });
 
   describe('CollectionPersistent Function Tests', () => {
-    let collectionPersistent: CollectionPersistent;
+    let collectionPersistent: CollectionPersistent<ItemInterface>;
     let dummyItem1: Item<ItemInterface>;
     let dummyItem2: Item<ItemInterface>;
     let dummyItem3: Item<ItemInterface>;

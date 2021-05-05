@@ -113,18 +113,19 @@ export class Runtime {
       return false;
 
     // Subscriptions that has to be updated/rerendered
-    // 'Set' to combine several SubscriptionContainers that are equals into one (optimizes rerender)
-    // Better would be to optimize the rerender based on the Component, because a Component can have multiple SubscriptionContainers
+    // A Set() to combine several equal SubscriptionContainers into one (optimizes rerender)
+    // (Event better would be to combine equal SubscriptionContainer based on the Component,
+    // since a Component can have multiple SubscriptionContainers)
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
-    // Build final jobsToRerender and reset jobsToRerender Instances
+    // Build final jobsToRerender array based on new jobsToRerender and not ready jobsToRerender
     const jobsToRerender = this.jobsToRerender.concat(
       Array.from(this.notReadyJobsToRerender)
     );
     this.notReadyJobsToRerender = new Set();
     this.jobsToRerender = [];
 
-    // Check if Job Subscriptions are ready and add them to subscriptionsToUpdate
+    // Check if Job SubscriptionContainers should be updated and if so add them to the subscriptionsToUpdate array
     jobsToRerender.forEach((job) => {
       job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
         if (!subscriptionContainer.ready) {
@@ -142,62 +143,19 @@ export class Runtime {
         if (subscriptionContainer.isObjectBased)
           this.handleObjectBasedSubscription(subscriptionContainer, job);
 
-        // Check if proxy property has changed
-        if (subscriptionContainer.proxyBased && job.observer._key) {
-          const paths =
-            subscriptionContainer.proxyKeyMap[job.observer._key].paths;
+        // Check if subscriptionContainer should be updated
+        const updateSubscriptionContainer = subscriptionContainer.proxyBased
+          ? this.handleProxyBasedSubscription(subscriptionContainer, job)
+          : true;
 
-          Agile.logger.debug('Paths', paths);
-
-          if (paths) {
-            for (const path of paths) {
-              let newValue = job.observer.value;
-              let newValueDeepness = 0;
-              for (const branch of path) {
-                if (!isValidObject(newValue)) break;
-                newValue = newValue[branch];
-                newValueDeepness++;
-              }
-
-              let previousValue = job.observer.previousValue;
-              let previousValueDeepness = 0;
-              for (const branch of path) {
-                if (!isValidObject(previousValue)) break;
-                previousValue = previousValue[branch];
-                previousValueDeepness++;
-              }
-
-              Agile.logger.debug('NewValue: ', newValue, newValueDeepness);
-              Agile.logger.debug(
-                'PreviousValue: ',
-                previousValue,
-                previousValueDeepness
-              );
-
-              // Check if value has changed, if so add it to the rerender queue
-              if (
-                notEqual(newValue, previousValue) ||
-                newValueDeepness !== previousValueDeepness
-              ) {
-                Agile.logger.debug(
-                  'Rerender Subscription Container (Proxy)',
-                  subscriptionContainer
-                );
-                subscriptionsToUpdate.add(subscriptionContainer);
-                job.subscriptionContainersToUpdate.delete(
-                  subscriptionContainer
-                );
-                break;
-              }
-            }
-          }
-        } else {
+        if (updateSubscriptionContainer) {
           subscriptionsToUpdate.add(subscriptionContainer);
           job.subscriptionContainersToUpdate.delete(subscriptionContainer);
         }
       });
     });
 
+    // Update Subscription Containers (trigger rerender on subscribed Component)
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
@@ -265,6 +223,57 @@ export class Runtime {
 
     subscriptionContainer.observerKeysToUpdate = [];
     return props;
+  }
+
+  //=========================================================================================================
+  // Handle Proxy Based Subscription
+  //=========================================================================================================
+  /**
+   * @internal
+   * Finds key of Observer (Job) in subsObject and adds it to 'changedObjectKeys'
+   * @param subscriptionContainer - Object based SubscriptionContainer
+   * @param job - Job that holds
+   * @return {boolean} If the subscriptionContainer should be updated
+   */
+  public handleProxyBasedSubscription(
+    subscriptionContainer: SubscriptionContainer,
+    job: RuntimeJob
+  ): boolean {
+    if (!job.observer._key) return true;
+
+    const paths = subscriptionContainer.proxyKeyMap[job.observer._key].paths;
+
+    if (paths) {
+      for (const path of paths) {
+        // Get new Value located at path
+        let newValue = job.observer.value;
+        let newValueDeepness = 0;
+        for (const branch of path) {
+          if (!isValidObject(newValue)) break;
+          newValue = newValue[branch];
+          newValueDeepness++;
+        }
+
+        // Get previous Value located at path
+        let previousValue = job.observer.previousValue;
+        let previousValueDeepness = 0;
+        for (const branch of path) {
+          if (!isValidObject(previousValue)) break;
+          previousValue = previousValue[branch];
+          previousValueDeepness++;
+        }
+
+        // Check if value has changed
+        if (
+          notEqual(newValue, previousValue) ||
+          newValueDeepness !== previousValueDeepness
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }
 

@@ -25,7 +25,7 @@ describe('ComponentSubscriptionContainer Tests', () => {
     const subscriptionContainer = new ComponentSubscriptionContainer(
       dummyIntegration,
       [dummyObserver1, dummyObserver2],
-      'dummyKey'
+      { key: 'dummyKey', proxyKeyMap: { myState: { paths: [['hi']] } } }
     );
 
     expect(subscriptionContainer.component).toStrictEqual(dummyIntegration);
@@ -38,5 +38,9 @@ describe('ComponentSubscriptionContainer Tests', () => {
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
     expect(subscriptionContainer.subsObject).toBeUndefined();
+    expect(subscriptionContainer.proxyKeyMap).toStrictEqual({
+      myState: { paths: [['hi']] },
+    });
+    expect(subscriptionContainer.proxyBased).toBeTruthy();
   });
 });

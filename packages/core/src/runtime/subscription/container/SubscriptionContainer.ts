@@ -30,13 +30,13 @@ export class SubscriptionContainer {
     subs: Array<Observer> = [],
     config: SubscriptionContainerConfigInterface = {}
   ) {
-    const _config = defineConfig(config, {
-      proxyKeymap: {},
+    config = defineConfig(config, {
+      proxyKeyMap: {},
       key: generateId(),
     });
 
     this.subs = new Set(subs);
-    this.key = _config.key;
+    this.key = config.key;
     this.proxyKeyMap = config.proxyKeyMap as any;
     this.proxyBased = notEqual(this.proxyKeyMap, {});
   }
