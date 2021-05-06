@@ -51,10 +51,21 @@ proxyfiedOrginal.a;
 proxyfiedOrginal.a[0];
 proxyfiedOrginal.c.a;
 
-// Then the Proxy Tree would be constructed this way
+// Proxy Tree would look like that
 Branch({
   a: Branch([Branch({ b: 1 }), { 1000: { a: { b: 1 } } }, '3rd']),
   b: { c: { d: 'hi' } },
+  c: Branch({ a: Branch('hi') }),
+});
+
+// Access more Properties
+proxyfiedOrginal.b;
+proxyfiedOrginal.a[2];
+
+// Proxy Tree would look like that
+Branch({
+  a: Branch([Branch({ b: 1 }), { 1000: { a: { b: 1 } } }, Branch('3rd')]),
+  b: Branch({ c: { d: 'hi' } }),
   c: Branch({ a: Branch('hi') }),
 });
 ```
