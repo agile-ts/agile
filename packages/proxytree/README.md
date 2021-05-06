@@ -1,10 +1,10 @@
-# ProxyTree
+# [WIP] ProxyTree
 
 > Create Proxy Tree based on the accessed properties
 
  <br />
 
- <a href="https://github.com/agile-ts/agile">
+<a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/proxytree">
   <img src="https://img.shields.io/npm/v/@agile-ts/proxytree.svg?label=npm&style=flat&colorA=293140&colorB=4a4872" alt="npm version"/></a>
@@ -119,7 +119,9 @@ console.log(proxyTree.getUsedRoutes()); // Returns (see below)
 ```
 The algorithm behind reconstructing the used routes/paths is pretty simple.
 It may not be very efficient, but it works, and that is what counts for now.
-![Image](./static/pathTrackingImage.jpg)
+
+<img src="./static/pathTrackingImage.jpg" alt="pathTrackingImage" width="200"/>
+
 In the above image, each blue-circled property was the end accessed property (so b and x).
 Each time a property was accessed, 
 the Proxy Tree counted the `used` property of this Route/Node. 
@@ -131,8 +133,40 @@ with the simple algorithm you can see in the above image.
 
 ### `transformTreeToBranchObject()`
 
-Transforms the Proxy Tree into an easily processable object.
-Therefore, it goes through each Branch (starting at the root Branch) and transforms them into `BranchObjects`.
+Transforms Proxy Tree into an easily processable object.
+Therefore, it goes through each Branch (starting at the root Branch) and transforms them into a `BranchObjects`.
 ```ts
-TODO
+// Orginal Object with sub Objects
+const original = {
+  a: [{ b: 1 }, { 1000: { a: { b: 1 } } }, '3rd'],
+  b: { c: { d: 'hi' } },
+  c: { a: 'hi' },
+};
+
+// Create Proxy Tree
+const proxyTree = new ProxyTree(original);
+const proxyfiedOrginal = proxyTree.proxy;
+
+// Access Properties
+proxyfiedOrginal.a;
+proxyfiedOrginal.a[0];
+proxyfiedOrginal.c.a;
+
+console.log(proxyTree.transformTreeToBranchObject()); // Returns (see below)
+// {
+//   key: 'root',
+//   timesAccessed: 3,
+//   branches: [
+//     {
+//       key: 'a',
+//       timesAccessed: 2,
+//       branches: [{ key: '0', timesAccessed: 1, branches: [] }],
+//     },
+//     {
+//       key: 'c',
+//       timesAccessed: 1,
+//       branches: [{ key: 'a', timesAccessed: 1, branches: [] }],
+//     },
+//   ],
+// }
 ```

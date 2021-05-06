@@ -1,5 +1,5 @@
 import mockConsole from 'jest-mock-console';
-import { ProxyTree } from '../../src';
+import { ProxyTree, Branch } from '../../src';
 
 describe('ProxyTree Tests', () => {
   beforeEach(() => {
@@ -49,7 +49,7 @@ describe('ProxyTree Tests', () => {
     expect(proxyTree.rootBranch).toBe(null);
 
     expect(console.error).toHaveBeenCalledWith(
-      "ProxyTree: The ProxyTree accepts only values from type 'object' and 'array'! " +
+      "ProxyTree: The ProxyTree accepts only values from the type 'object' and 'array'! " +
         "The passed type was 'string'! " +
         'Learn more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy'
     );
@@ -67,7 +67,7 @@ describe('ProxyTree Tests', () => {
     expect(proxyTree.rootBranch).toBe(null);
 
     expect(console.error).toHaveBeenCalledWith(
-      "ProxyTree: The ProxyTree accepts only values from type 'object' and 'array'! " +
+      "ProxyTree: The ProxyTree accepts only values from the type 'object' and 'array'! " +
         "The passed type was 'number'! " +
         'Learn more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy'
     );
@@ -83,6 +83,28 @@ describe('ProxyTree Tests', () => {
 
     beforeEach(() => {
       proxyTree = new ProxyTree(original);
+    });
+
+    describe('createBranch function tests', () => {
+      it('should create a Branch with a valid object', () => {
+        const branch = proxyTree.createBranch(original);
+
+        expect(branch).toBeInstanceOf(Branch);
+        expect(branch?.target).toStrictEqual(original);
+        expect(branch?.proxyTree).toBe(proxyTree);
+        expect(console.error).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't create a Branch with a not valid object", () => {
+        const branch = proxyTree.createBranch('not valid object' as any);
+
+        expect(branch).toBe(null);
+        expect(console.error).toHaveBeenCalledWith(
+          "ProxyTree: The ProxyTree accepts only values from the type 'object' and 'array'! " +
+            "The passed type was 'string'! " +
+            'Learn more here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy'
+        );
+      });
     });
 
     describe('transformTreeToBranchObject function tests', () => {
