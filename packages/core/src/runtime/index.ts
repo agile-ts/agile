@@ -132,7 +132,7 @@ export class Runtime {
         if (!subscriptionContainer.ready) {
           if (
             !job.config.numberOfTriesToUpdate ||
-            job.config.numberOfTriesToUpdate < job.triesToUpdate
+            job.triesToUpdate < job.config.numberOfTriesToUpdate
           ) {
             job.triesToUpdate++;
             this.notReadyJobsToRerender.add(job);
@@ -251,12 +251,15 @@ export class Runtime {
    * @param subscriptionContainer - Object based SubscriptionContainer
    * @param job - Job that holds
    * @return {boolean} If the subscriptionContainer should be updated
+   * -> a from proxy detected property differs from the previous value
    */
   public handleProxyBasedSubscription(
     subscriptionContainer: SubscriptionContainer,
     job: RuntimeJob
   ): boolean {
+    // Return true because in this cases the subscriptionContainer isn't properly proxyBased
     if (
+      !subscriptionContainer.proxyBased ||
       !job.observer._key ||
       !subscriptionContainer.proxyKeyMap[job.observer._key]
     )

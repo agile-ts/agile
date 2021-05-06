@@ -32,6 +32,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       background: config.background,
       force: config.force,
       sideEffects: config.sideEffects,
+      numberOfTriesToUpdate: config.numberOfTriesToUpdate,
     };
     this.observer = observer;
     this.rerender =
