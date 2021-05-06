@@ -265,7 +265,7 @@ describe('Runtime Tests', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         runtime.jobsToRerender.push(rComponentSubJob);
 
-        runtime.updateSubscribers();
+        const response = runtime.updateSubscribers();
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
@@ -284,13 +284,15 @@ describe('Runtime Tests', () => {
         );
         expect(rComponentSubJob.subscriptionContainersToUpdate.size).toBe(0);
         expect(dummyObserver3.subs.size).toBe(1);
+
+        expect(response).toBeTruthy();
       });
 
       it('should update ready callback based Subscription', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         runtime.jobsToRerender.push(rCallbackSubJob);
 
-        runtime.updateSubscribers();
+        const response = runtime.updateSubscribers();
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
@@ -299,18 +301,20 @@ describe('Runtime Tests', () => {
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
         expect(dummyObserver1.subs.size).toBe(1);
+
+        expect(response).toBeTruthy();
       });
 
-      it('should update ready callback and proxy based Subscription and call handleProxyBasedSubscriptions()', () => {
-        rCallbackSubJob.subscriptionContainersToUpdate.forEach((container) => {
-          container.proxyBased = true;
-          container.proxyKeyMap = dummyProxyKeyMap;
-        });
-
+      it('should update ready proxy, callback based Subscription if handleProxyBasedSubscriptions() returns true', () => {
+        jest
+          .spyOn(runtime, 'handleProxyBasedSubscription')
+          .mockReturnValueOnce(true);
         dummyAgile.hasIntegration = jest.fn(() => true);
+        rCallbackSubContainer.proxyBased = true;
+        rCallbackSubContainer.proxyKeyMap = dummyProxyKeyMap;
         runtime.jobsToRerender.push(rCallbackSubJob);
 
-        runtime.updateSubscribers();
+        const response = runtime.updateSubscribers();
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
@@ -322,6 +326,33 @@ describe('Runtime Tests', () => {
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
         expect(dummyObserver1.subs.size).toBe(1);
+
+        expect(response).toBeTruthy();
+      });
+
+      it("shouldn't update ready proxy, callback based Subscription if handleProxyBasedSubscriptions() returns false", () => {
+        jest
+          .spyOn(runtime, 'handleProxyBasedSubscription')
+          .mockReturnValueOnce(false);
+        dummyAgile.hasIntegration = jest.fn(() => true);
+        rCallbackSubContainer.proxyBased = true;
+        rCallbackSubContainer.proxyKeyMap = dummyProxyKeyMap;
+        runtime.jobsToRerender.push(rCallbackSubJob);
+
+        const response = runtime.updateSubscribers();
+
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(runtime.handleProxyBasedSubscription).toHaveBeenCalledWith(
+          rCallbackSubContainer,
+          rCallbackSubJob
+        );
+
+        expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
+        expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
+        expect(dummyObserver1.subs.size).toBe(1);
+
+        expect(response).toBeFalsy();
       });
 
       it("shouldn't update not ready Subscriptions", () => {
@@ -329,7 +360,7 @@ describe('Runtime Tests', () => {
         runtime.jobsToRerender.push(nrArCallbackSubJob);
         runtime.jobsToRerender.push(nrArComponentSubJob);
 
-        runtime.updateSubscribers();
+        const response = runtime.updateSubscribers();
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(2);
@@ -382,6 +413,9 @@ describe('Runtime Tests', () => {
           nrArComponentSubJob
         );
 
+        expect(nrArComponentSubJob.triesToUpdate).toBe(1);
+        expect(nrArCallbackSubJob.triesToUpdate).toBe(1);
+
         expect(console.warn).toHaveBeenCalledWith(
           "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
           nrCallbackSubContainer
@@ -390,9 +424,11 @@ describe('Runtime Tests', () => {
           "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
           nrComponentSubContainer
         );
+
+        expect(response).toBeTruthy();
       });
 
-      it('should update in the past not ready Subscriptions in notReadyJobsToUpdate', () => {
+      it('should try to update in the past not ready Subscriptions in the notReadyJobsToUpdate queue', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         runtime.notReadyJobsToRerender.add(rCallbackSubJob);
 
@@ -405,6 +441,37 @@ describe('Runtime Tests', () => {
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
         expect(dummyObserver1.subs.size).toBe(1);
       });
+
+      it(
+        'should try to update in the past not ready Subscriptions in the notReadyJobsToUpdate queue ' +
+          'and completely remove them from the runtime when they exceeded numberOfTriesToUpdate',
+        () => {
+          dummyAgile.hasIntegration = jest.fn(() => true);
+          rCallbackSubJob.config.numberOfTriesToUpdate = 2;
+          rCallbackSubJob.triesToUpdate = 2;
+          rCallbackSubContainer.ready = false;
+          runtime.notReadyJobsToRerender.add(rCallbackSubJob);
+
+          runtime.updateSubscribers();
+
+          expect(runtime.jobsToRerender).toStrictEqual([]);
+          expect(runtime.notReadyJobsToRerender.size).toBe(0);
+
+          expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
+          expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(1);
+          expect(
+            rCallbackSubJob.subscriptionContainersToUpdate.has(
+              rCallbackSubContainer
+            )
+          ).toBeTruthy();
+          expect(dummyObserver1.subs.size).toBe(1);
+
+          expect(console.warn).toHaveBeenCalledWith(
+            'Agile Warn: Job with not ready SubscriptionContainer/Component was removed after 2 tries from the runtime to avoid and overflow.',
+            rCallbackSubContainer
+          );
+        }
+      );
     });
 
     describe('handleObjectBasedSubscription function tests', () => {

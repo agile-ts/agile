@@ -99,6 +99,7 @@ export class Runtime {
   /**
    * @internal
    * Updates/Rerenders all Subscribed Components of the Job (Observer)
+   * @return If any subscriber got updated
    */
   public updateSubscribers(): boolean {
     if (!this.agileInstance().hasIntegration()) {
@@ -129,13 +130,25 @@ export class Runtime {
     jobsToRerender.forEach((job) => {
       job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
         if (!subscriptionContainer.ready) {
-          this.notReadyJobsToRerender.add(job);
+          if (
+            !job.config.numberOfTriesToUpdate ||
+            job.config.numberOfTriesToUpdate < job.triesToUpdate
+          ) {
+            job.triesToUpdate++;
+            this.notReadyJobsToRerender.add(job);
 
-          // Logging
-          Agile.logger.warn(
-            "SubscriptionContainer/Component isn't ready to rerender!",
-            subscriptionContainer
-          );
+            // Logging
+            Agile.logger.warn(
+              "SubscriptionContainer/Component isn't ready to rerender!",
+              subscriptionContainer
+            );
+          } else {
+            // Logging
+            Agile.logger.warn(
+              `Job with not ready SubscriptionContainer/Component was removed after ${job.config.numberOfTriesToUpdate} tries from the runtime to avoid and overflow.`,
+              subscriptionContainer
+            );
+          }
           return;
         }
 
@@ -148,12 +161,14 @@ export class Runtime {
           ? this.handleProxyBasedSubscription(subscriptionContainer, job)
           : true;
 
-        if (updateSubscriptionContainer) {
+        if (updateSubscriptionContainer)
           subscriptionsToUpdate.add(subscriptionContainer);
-          job.subscriptionContainersToUpdate.delete(subscriptionContainer);
-        }
+
+        job.subscriptionContainersToUpdate.delete(subscriptionContainer);
       });
     });
+
+    if (subscriptionsToUpdate.size <= 0) return false;
 
     // Update Subscription Containers (trigger rerender on subscribed Component)
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
@@ -230,7 +245,9 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Finds key of Observer (Job) in subsObject and adds it to 'changedObjectKeys'
+   * Checks if the subscriptionContainer should be updated.
+   * Therefore it reviews the .value and the .previousValue property at the proxy paths
+   * If one property at path differ the subscriptionContainer is allowed to update
    * @param subscriptionContainer - Object based SubscriptionContainer
    * @param job - Job that holds
    * @return {boolean} If the subscriptionContainer should be updated
@@ -267,7 +284,7 @@ export class Runtime {
           previousValueDeepness++;
         }
 
-        // Check if value has changed
+        // Check if found values differ
         if (
           notEqual(newValue, previousValue) ||
           newValueDeepness !== previousValueDeepness
