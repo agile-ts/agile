@@ -99,7 +99,8 @@ export class Runtime {
   /**
    * @internal
    * Updates/Rerenders all Subscribed Components of the Job (Observer)
-   * @return If any subscriber got updated
+   * @return If any subscriptionContainer got updated
+   * -> triggered a rerender on the Component it represents
    */
   public updateSubscribers(): boolean {
     if (!this.agileInstance().hasIntegration()) {
@@ -246,12 +247,13 @@ export class Runtime {
   /**
    * @internal
    * Checks if the subscriptionContainer should be updated.
-   * Therefore it reviews the .value and the .previousValue property at the proxy paths
-   * If one property at path differ the subscriptionContainer is allowed to update
-   * @param subscriptionContainer - Object based SubscriptionContainer
-   * @param job - Job that holds
+   * Therefore it reviews the .value and the .previousValue property of observer the Job represents
+   * If one property at the proxy detected path differs the subscriptionContainer is allowed to update.
+   * @param subscriptionContainer - SubscriptionContainer
+   * @param job - Job
    * @return {boolean} If the subscriptionContainer should be updated
-   * -> a from proxy detected property differs from the previous value
+   * -> A from the proxy tree detected property differs from the previous value
+   * or the passed subscriptionContainer isn't properly proxy based
    */
   public handleProxyBasedSubscription(
     subscriptionContainer: SubscriptionContainer,

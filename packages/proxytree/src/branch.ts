@@ -34,8 +34,8 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
 
   /**
    * @private
-   * Record usage of an accessed key in a target object
-   * @param target - Target Object in which a key got accessed
+   * Record usage of an accessed key in the target object
+   * @param target - Target Object in which a property at key got accessed
    * @param key - Key that got accessed in the target Object
    */
   private recordUsage(target: T, key: BranchKey): T | undefined {
@@ -45,13 +45,13 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
       // Check if property was accessed before and therefore has an existing Route to a Branch or value
       const branchRoute = this.getBranchRouteAtKey(key);
 
-      // If Branch exists, increment the 'timesUsed' property in order to keep track of how often it was accessed
+      // If Branch exists, increment the 'timesAccessed' property in order to keep track of how often it was accessed
       if (branchRoute) {
         branchRoute.timesAccessed += 1;
         return branchRoute.branch?.proxy || target[key];
       }
 
-      // If Branch doesn't exist, create new Route and a sub Branch if no final value got reached
+      // If Branch doesn't exist, create new Route and a sub Branch if no final primitive value got reached
       const newRoute: BranchRoute = {
         key,
         timesAccessed: 1,
@@ -62,7 +62,7 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
       };
       this.childBranches.add(newRoute);
 
-      // Return proxyfied object of created Branch or the final value if the Route doesn't lead to a sub Branch
+      // Return proxyfied object of created Branch or the final primitive value if the Route doesn't lead to a sub Branch (object)
       return newRoute.branch?.proxy || target[key];
     }
 
@@ -71,7 +71,7 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
 
   /**
    * @public
-   * Checks if a Route with a specific key already exists
+   * Checks if a Route to a particular key already exists in the sub Branches of this Branch
    * @param key - Key of the Route
    */
   public getBranchRouteAtKey(key: BranchKey): BranchRoute | null {
@@ -85,7 +85,7 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
 }
 
 /**
- * @param key - Property leading to the this Sub Branch in the parent Branch (object)
+ * @param key - Property key leading to this Sub Branch in the parent Branch (object)
  * @param timesAccessed - How often the Route was used/accessed
  * @param branch - Branch to which the Route leads
  */
