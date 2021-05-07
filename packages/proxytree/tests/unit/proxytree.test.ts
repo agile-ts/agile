@@ -86,7 +86,7 @@ describe('ProxyTree Tests', () => {
     });
 
     describe('createBranch function tests', () => {
-      it('should create a Branch with a valid object', () => {
+      it('should create Branch with a valid object', () => {
         const branch = proxyTree.createBranch(original);
 
         expect(branch).toBeInstanceOf(Branch);
@@ -95,7 +95,7 @@ describe('ProxyTree Tests', () => {
         expect(console.error).not.toHaveBeenCalled();
       });
 
-      it("shouldn't create a Branch with a not valid object", () => {
+      it("shouldn't create Branch with a not valid object", () => {
         const branch = proxyTree.createBranch('not valid object' as any);
 
         expect(branch).toBe(null);
@@ -246,7 +246,7 @@ describe('ProxyTree Tests', () => {
         });
       });
 
-      it("should track often accessed object properties multiple times", () => {
+      it('should track often accessed object properties', () => {
         const proxyfiedOrginal = proxyTree.proxy;
 
         // Access Properties
@@ -328,7 +328,7 @@ describe('ProxyTree Tests', () => {
         expect(proxyTree.transformTreeToBranchObject).toHaveBeenCalledTimes(1);
       });
 
-      it("should track often accessed object properties multiple times and combine them.", () => {
+      it('should track often accessed object properties multiple times and combine them', () => {
         const proxyfiedOrginal = proxyTree.proxy;
 
         // Access Properties

@@ -4,11 +4,10 @@
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Creates a Proxy Tree to hang between object mutations",
+  "description": "Create Proxy Tree based on the accessed properties",
   "keywords": [
-    "api",
-    "promise-api",
-    "http-request",
+    "proxy",
+    "proxy-tree",
     "agile",
     "agile-ts"
   ],

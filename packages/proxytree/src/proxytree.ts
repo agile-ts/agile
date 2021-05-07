@@ -7,8 +7,8 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
 
   /**
    * @public
-   * ProxyTree - Class that wraps around the passed target object and each of its sub objects a Proxy.
-   * This allows it to track which properties have been used in the target object.
+   * ProxyTree - Class that wraps around a target object, and its nested objects as you access them
+   * in order to keep track of which properties were accessed via get/has proxy handlers.
    * @param target - Target Object
    */
   constructor(target: T) {
@@ -18,7 +18,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
 
   /**
    * @public
-   * Creates a new Branch of the ProxyTree
+   * Creates a new Branch of the ProxyTree which represents the passed target object.
    * @param target - Target Object
    */
   public createBranch<X extends object = DefaultProxyTreeObject>(
@@ -37,7 +37,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
 
   /**
    * @public
-   * Transforms the ProxyTree into a simple more readable object format
+   * Transforms Proxy Tree into an easily processable object.
    */
   public transformTreeToBranchObject(): BranchObject {
     let rootBranchUses = 0;
@@ -54,12 +54,13 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
       branches: [],
     };
 
+    // Method that walks deeper into the Proxy Tree
     const walk = (branch: Branch<any>, currentBranchObject: BranchObject) => {
       const childBranches = branch.childBranches;
 
       // Check if Branch has any sub Branches
       if (childBranches.size > 0) {
-        // Go through sub Branches and transform them to a BranchObject
+        // Go through sub Branches and transform them to BranchObjects
         childBranches.forEach((branchRoute) => {
           const newBranchObject: BranchObject = {
             key: branchRoute.key,
@@ -71,9 +72,9 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
           currentBranchObject.branches.push(newBranchObject);
 
           // Check if Route leads to any sub Branch.
-          // If so the Tree doesn't end here (-> sub object)
-          // Otherwise the Tree ends here so the route leads into a primitive value like a number
-          // If the Route has any sub Branch walk deeper and transform the deeper Branches into BranchObjects
+          // If so the Tree doesn't end here (-> sub object).
+          // So walk deeper and transform the deeper Branches into BranchObjects.
+          // Otherwise the Tree ends here and the Route leads to a primitive value like a number.
           if (branchRoute.branch) {
             walk(branchRoute.branch, newBranchObject);
           }
@@ -81,7 +82,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
       }
     };
 
-    // Start walking through the ProxyTree
+    // Start walking through the Proxy Tree
     walk(this.rootBranch, rootBranch);
 
     return rootBranch;
@@ -89,7 +90,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
 
   /**
    * @public
-   * Returns the path to the tracked properties in array shape.
+   * Returns the Paths to the accessed properties in array shape.
    * For example, an object `{ a: [{ b: 'c' }, { 1000: 'value' }, 'b'] }`,
    * has got the following paths pointing to existing properties:
    *
@@ -102,7 +103,8 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
    * - `['a', 2]`
    *
    * Be aware that this path points are only tracked if the accordingly property was actually accessed.
-   * -> The Proxy Tree isn't aware of not accessed properties and thereby doesn't know the path to them.
+   * The Proxy Tree isn't aware of not accessed properties and thereby doesn't know the path to them
+   * as they aren't relevant yet.
    */
   public getUsedRoutes(): Path[] {
     const usedRoutes: Path[] = [];
@@ -120,16 +122,16 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
 
     const walk = (branchObject: BranchObject, path?: BranchKey[]) => {
       // Check if Branch Children where accessed.
-      // Otherwise here is an end, because whatever is behind this Branch got already tracked or never accessed
+      // Otherwise here is an end, because whatever is behind this Branch got already tracked or was never accessed
       let branchChildRoutesTimesUsed = 0;
       branchObject.branches.forEach(
         (childBranch) =>
           (branchChildRoutesTimesUsed += childBranch.timesAccessed)
       );
 
-      // Check if Branch has any sub Branches and got accessed
-      // If so walk deeper into the ProxyTree
-      // Otherwise push the path into the 'usedRoutes' array since this particular Path/Route ends here
+      // Check if Branch has any sub Branches and got accessed.
+      // If so walk deeper into the Proxy Tree.
+      // Otherwise push the path into the 'usedRoutes' array because this particular Path/Route ends here
       if (
         branchObject.branches.length > 0 &&
         branchObject.timesAccessed > 0 &&
@@ -144,7 +146,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
             );
           }
 
-          // Decrease times accessed
+          // Decrease times accessed (because we passed this Branch in order to get to the child Branch)
           branchObject.timesAccessed -= 1;
         });
       } else {
@@ -156,10 +158,10 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
       }
     };
 
-    // Start walking through the ProxyTree.
-    // Therefore walk through the tree until the root Branch 'timesAccessed' = 0.
-    // Everytime it passes the Branch it decreases the 'timesAccessed' property.
-    // This way it is able to reconstruct each used route to a acceded properties.
+    // Start walking through the Proxy Tree.
+    // Therefore walk through the Tree until the root Branch property 'timesAccessed' = 0.
+    // Everytime it passes a Branch it decreases the 'timesAccessed' property.
+    // This way it is able to reconstruct each used route to the acceded properties.
     while (rootBranchObject.timesAccessed > 0) {
       walk(rootBranchObject);
     }
@@ -169,7 +171,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
 }
 
 /**
- * @param key - Property leading to the this Sub Branch in the parent Branch (object)
+ * @param key - Property key leading to this Sub Branch in the parent Branch (object)
  * @param timesAccessed - How often the Branch was accessed
  * @param branch - Sub Branches of this Branch
  */

@@ -11,6 +11,7 @@ import {
   defineConfig,
   isValidObject,
   ProxyKeyMapInterface,
+  generateId,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
@@ -49,6 +50,8 @@ export function useAgile<
   const proxyTreeMap: ProxyTreeMapInterface = {};
   config = defineConfig(config, {
     proxyBased: false,
+    key: generateId(),
+    agileInstance: null,
   });
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
@@ -61,7 +64,7 @@ export function useAgile<
       const value = dep?.value;
       const depKey = dep?.key;
 
-      // If value is object wrap proxytree around it to track used properties
+      // If proxyBased and value is object wrap Proxy around it to track used properties
       if (config.proxyBased && isValidObject(value, true) && depKey) {
         const proxyTree = new ProxyTree(value);
         proxyTreeMap[depKey] = proxyTree;
@@ -91,7 +94,10 @@ export function useAgile<
     // Try to get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error('Failed to subscribe Component with deps', deps);
+      Agile.logger.error(
+        'Failed to subscribe Component with deps because of missing valid Agile Instance.',
+        deps
+      );
       return;
     }
 
@@ -101,11 +107,11 @@ export function useAgile<
     );
 
     // Build Proxy Key Map
-    const proxyMap: ProxyKeyMapInterface = {};
+    const proxyKeyMap: ProxyKeyMapInterface = {};
     if (config.proxyBased) {
       for (const proxyTreeKey in proxyTreeMap) {
         const proxyTree = proxyTreeMap[proxyTreeKey];
-        proxyMap[proxyTreeKey] = {
+        proxyKeyMap[proxyTreeKey] = {
           paths: proxyTree.getUsedRoutes() as any,
         };
       }
@@ -117,7 +123,7 @@ export function useAgile<
         forceRender();
       },
       observers,
-      { key: config.key, proxyKeyMap: proxyMap }
+      { key: config.key, proxyKeyMap }
     );
 
     // Unsubscribe Callback based Subscription on Unmount
@@ -165,9 +171,9 @@ export type SubscribableAgileInstancesType =
   | undefined;
 
 /**
- * @param key - Key/Name of SubscriptionContainer that gets created
- * @param agileInstance - An instance of Agile
- * @param proxyBased - If AgileTs should only rerender the Component when a used property mutates
+ * @param key - Key/Name of SubscriptionContainer that is created
+ * @param agileInstance - Instance of Agile
+ * @param proxyBased - If useAgile() should only rerender the Component when a used property mutates
  */
 interface AgileHookConfigInterface {
   key?: SubscriptionContainerKeyType;
