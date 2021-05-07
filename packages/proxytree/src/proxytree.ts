@@ -107,6 +107,14 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
   public getUsedRoutes(): Path[] {
     const usedRoutes: Path[] = [];
 
+    // Checks if path/route already exists in 'usedRoutes'
+    const inRoutes = (path: Path): boolean => {
+      for (const route of usedRoutes) {
+        if (JSON.stringify(route) === JSON.stringify(path)) return true;
+      }
+      return false;
+    };
+
     // Transform Proxy Tree into simple accessible object
     const rootBranchObject = this.transformTreeToBranchObject();
 
@@ -141,7 +149,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
         });
       } else {
         // Push discovered Path into 'usedRoutes'
-        if (path) usedRoutes.push(path);
+        if (path && !inRoutes(path)) usedRoutes.push(path);
 
         // Decrease times accessed
         if (branchObject.timesAccessed > 0) branchObject.timesAccessed -= 1;

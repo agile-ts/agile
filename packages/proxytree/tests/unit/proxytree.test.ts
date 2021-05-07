@@ -171,79 +171,101 @@ describe('ProxyTree Tests', () => {
           ],
         });
       });
-    });
 
-    it('should transform 5 layer deep accessed object properties', () => {
-      const proxyfiedOrginal = proxyTree.proxy;
+      it('should transform 5 layer deep accessed object properties', () => {
+        const proxyfiedOrginal = proxyTree.proxy;
 
-      // Access Properties
-      proxyfiedOrginal.a;
-      proxyfiedOrginal.a[0]['b'];
-      proxyfiedOrginal.a[1][1000]['a']['b'];
-      proxyfiedOrginal.c.a;
-      proxyfiedOrginal.b;
+        // Access Properties
+        proxyfiedOrginal.a;
+        proxyfiedOrginal.a[0]['b'];
+        proxyfiedOrginal.a[1][1000]['a']['b'];
+        proxyfiedOrginal.c.a;
+        proxyfiedOrginal.b;
 
-      expect(proxyTree.transformTreeToBranchObject()).toStrictEqual({
-        branches: [
-          {
-            branches: [
-              {
-                branches: [
-                  {
-                    branches: [],
-                    key: 'b',
-                    timesAccessed: 1,
-                  },
-                ],
-                key: '0',
-                timesAccessed: 1,
-              },
-              {
-                branches: [
-                  {
-                    branches: [
-                      {
-                        branches: [
-                          {
-                            branches: [],
-                            key: 'b',
-                            timesAccessed: 1,
-                          },
-                        ],
-                        key: 'a',
-                        timesAccessed: 1,
-                      },
-                    ],
-                    key: '1000',
-                    timesAccessed: 1,
-                  },
-                ],
-                key: '1',
-                timesAccessed: 1,
-              },
-            ],
-            key: 'a',
-            timesAccessed: 3,
-          },
-          {
-            branches: [
-              {
-                branches: [],
-                key: 'a',
-                timesAccessed: 1,
-              },
-            ],
-            key: 'c',
-            timesAccessed: 1,
-          },
-          {
-            branches: [],
-            key: 'b',
-            timesAccessed: 1,
-          },
-        ],
-        key: 'root',
-        timesAccessed: 5,
+        expect(proxyTree.transformTreeToBranchObject()).toStrictEqual({
+          branches: [
+            {
+              branches: [
+                {
+                  branches: [
+                    {
+                      branches: [],
+                      key: 'b',
+                      timesAccessed: 1,
+                    },
+                  ],
+                  key: '0',
+                  timesAccessed: 1,
+                },
+                {
+                  branches: [
+                    {
+                      branches: [
+                        {
+                          branches: [
+                            {
+                              branches: [],
+                              key: 'b',
+                              timesAccessed: 1,
+                            },
+                          ],
+                          key: 'a',
+                          timesAccessed: 1,
+                        },
+                      ],
+                      key: '1000',
+                      timesAccessed: 1,
+                    },
+                  ],
+                  key: '1',
+                  timesAccessed: 1,
+                },
+              ],
+              key: 'a',
+              timesAccessed: 3,
+            },
+            {
+              branches: [
+                {
+                  branches: [],
+                  key: 'a',
+                  timesAccessed: 1,
+                },
+              ],
+              key: 'c',
+              timesAccessed: 1,
+            },
+            {
+              branches: [],
+              key: 'b',
+              timesAccessed: 1,
+            },
+          ],
+          key: 'root',
+          timesAccessed: 5,
+        });
+      });
+
+      it("should track often accessed object properties multiple times", () => {
+        const proxyfiedOrginal = proxyTree.proxy;
+
+        // Access Properties
+        proxyfiedOrginal.a;
+        proxyfiedOrginal.a;
+        proxyfiedOrginal.a[0];
+        proxyfiedOrginal.a;
+
+        expect(proxyTree.transformTreeToBranchObject()).toStrictEqual({
+          key: 'root',
+          timesAccessed: 4,
+          branches: [
+            {
+              key: 'a',
+              timesAccessed: 4,
+              branches: [{ key: '0', timesAccessed: 1, branches: [] }],
+            },
+          ],
+        });
       });
     });
 
@@ -303,6 +325,18 @@ describe('ProxyTree Tests', () => {
           ['b'],
           ['a'],
         ]);
+        expect(proxyTree.transformTreeToBranchObject).toHaveBeenCalledTimes(1);
+      });
+
+      it("should track often accessed object properties multiple times and combine them.", () => {
+        const proxyfiedOrginal = proxyTree.proxy;
+
+        // Access Properties
+        proxyfiedOrginal.a;
+        proxyfiedOrginal.a;
+        proxyfiedOrginal.a;
+
+        expect(proxyTree.getUsedRoutes()).toStrictEqual([['a']]);
         expect(proxyTree.transformTreeToBranchObject).toHaveBeenCalledTimes(1);
       });
     });
