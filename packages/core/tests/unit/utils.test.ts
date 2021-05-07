@@ -155,7 +155,7 @@ describe('Utils Tests', () => {
       ).toBeTruthy();
     });
 
-    it('should return true if passed array (considerArray = true)', () => {
+    it('should return true if passed instance is array (considerArray = true)', () => {
       expect(isValidObject([1, 2], true)).toBeTruthy();
     });
   });

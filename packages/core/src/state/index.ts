@@ -96,19 +96,6 @@ export class State<ValueType = any> {
     return this._value;
   }
 
-  public get proxy(): ValueType {
-    if (isValidObject(this._value)) {
-      return new Proxy(this._value as any, {
-        get: (object, property) => {
-          console.log(object, property);
-
-          return property in object ? object[property] : undefined;
-        },
-      }) as any;
-    }
-    return this._value;
-  }
-
   /**
    * @public
    * Set Key/Name of State

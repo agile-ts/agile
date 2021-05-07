@@ -7,7 +7,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
   public rerender: boolean; // If Job will cause rerender on subscriptionContainer in Observer
   public performed = false; // If Job has been performed by Runtime
   public subscriptionContainersToUpdate = new Set<SubscriptionContainer>(); // SubscriptionContainer (from Observer) that have to be updated/rerendered
-  public triesToUpdate = 0; // How often not ready subscriptionContainers of this Job have been tried to be updated
+  public triesToUpdate = 0; // How often not ready subscriptionContainers of this Job have been tried to update
 
   /**
    * @internal
@@ -65,9 +65,9 @@ export interface CreateRuntimeJobConfigInterface
  * @param background - If Job gets executed in the background -> not causing any rerender
  * @param sideEffects - If SideEffects get executed
  * @param force - Force performing Job
- * @param numberOfTriesToUpdate - How often the runtime should try to update not ready SubscriptionContainer
- * If null the runtime tries to update the not ready SubscriptionContainer until they are ready.
- * Note: After some time, this can lead to an overflow of the runtime and affect performance.
+ * @param numberOfTriesToUpdate - How often the runtime should try to update not ready SubscriptionContainers of this Job
+ * If 'null' the runtime tries to update the not ready SubscriptionContainer until they are ready (infinite).
+ * But be aware that this can lead to an overflow of 'old' Jobs after some time. (affects performance)
  */
 export interface RuntimeJobConfigInterface {
   background?: boolean;

@@ -83,7 +83,7 @@ export class Agile {
     if (config.bindGlobal) {
       if (!globalBind(Agile.globalKey, this))
         Agile.logger.warn(
-          'Be careful with binding multiple Agile Instances global in one Application!'
+          'Be careful with binding multiple Agile Instances globally in one Application!'
         );
     }
   }

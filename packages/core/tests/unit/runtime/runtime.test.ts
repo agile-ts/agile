@@ -471,7 +471,7 @@ describe('Runtime Tests', () => {
           expect(rCallbackSubJob.triesToUpdate).toBe(2);
 
           expect(console.warn).toHaveBeenCalledWith(
-            'Agile Warn: Job with not ready SubscriptionContainer/Component was removed after 2 tries from the runtime to avoid and overflow.',
+            'Agile Warn: Job with not ready SubscriptionContainer/Component was removed from the runtime after 2 tries to avoid an overflow.',
             rCallbackSubContainer
           );
 
@@ -489,7 +489,7 @@ describe('Runtime Tests', () => {
           rCallbackSubContainer.ready = false;
           runtime.notReadyJobsToRerender.add(rCallbackSubJob);
 
-          runtime.updateSubscribers();
+          const response = runtime.updateSubscribers();
 
           expect(runtime.jobsToRerender).toStrictEqual([]);
           expect(runtime.notReadyJobsToRerender.size).toBe(1);
@@ -511,6 +511,8 @@ describe('Runtime Tests', () => {
             "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
             rCallbackSubContainer
           );
+
+          expect(response).toBeFalsy();
         }
       );
     });

@@ -32,7 +32,7 @@ export function copy<T = any>(value: T): T {
 //=========================================================================================================
 /**
  * @internal
- * Checks if an value is a valid Object
+ * Checks if passed value is a valid Object
  * https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
  * @param value - Value that is tested for its correctness
  * @param considerArray - Whether Arrays should be considered as object

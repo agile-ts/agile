@@ -98,9 +98,8 @@ export class Runtime {
   //=========================================================================================================
   /**
    * @internal
-   * Updates/Rerenders all Subscribed Components of the Job (Observer)
-   * @return If any subscriptionContainer got updated
-   * -> triggered a rerender on the Component it represents
+   * Updates/Rerenders all Subscribed Components (SubscriptionContainer) of the Job (Observer)
+   * @return If any subscriptionContainer got updated (-> triggered a rerender on the Component it represents)
    */
   public updateSubscribers(): boolean {
     if (!this.agileInstance().hasIntegration()) {
@@ -116,7 +115,7 @@ export class Runtime {
 
     // Subscriptions that has to be updated/rerendered
     // A Set() to combine several equal SubscriptionContainers into one (optimizes rerender)
-    // (Event better would be to combine equal SubscriptionContainer based on the Component,
+    // (Even better would be to combine SubscriptionContainer based on the Component,
     // since a Component can have multiple SubscriptionContainers)
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
@@ -146,7 +145,7 @@ export class Runtime {
           } else {
             // Logging
             Agile.logger.warn(
-              `Job with not ready SubscriptionContainer/Component was removed after ${job.config.numberOfTriesToUpdate} tries from the runtime to avoid and overflow.`,
+              `Job with not ready SubscriptionContainer/Component was removed from the runtime after ${job.config.numberOfTriesToUpdate} tries to avoid an overflow.`,
               subscriptionContainer
             );
           }
@@ -247,12 +246,12 @@ export class Runtime {
   /**
    * @internal
    * Checks if the subscriptionContainer should be updated.
-   * Therefore it reviews the .value and the .previousValue property of observer the Job represents
-   * If one property at the proxy detected path differs the subscriptionContainer is allowed to update.
+   * Therefore it reviews the '.value' and the '.previousValue' property of the Observer the Job represents.
+   * If a property at the proxy detected path differs, the subscriptionContainer is allowed to update.
    * @param subscriptionContainer - SubscriptionContainer
    * @param job - Job
    * @return {boolean} If the subscriptionContainer should be updated
-   * -> A from the proxy tree detected property differs from the previous value
+   * -> If a from the Proxy Tree detected property differs from the same property in the previous value
    * or the passed subscriptionContainer isn't properly proxy based
    */
   public handleProxyBasedSubscription(
@@ -271,7 +270,7 @@ export class Runtime {
 
     if (paths) {
       for (const path of paths) {
-        // Get new Value located at path
+        // Get property in new Value located at path
         let newValue = job.observer.value;
         let newValueDeepness = 0;
         for (const branch of path) {
@@ -280,7 +279,7 @@ export class Runtime {
           newValueDeepness++;
         }
 
-        // Get previous Value located at path
+        // Get property in previous Value located at path
         let previousValue = job.observer.previousValue;
         let previousValueDeepness = 0;
         for (const branch of path) {
