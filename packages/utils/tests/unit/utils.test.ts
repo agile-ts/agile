@@ -178,6 +178,10 @@ describe('Utils Tests', () => {
       expect(normalizeArray(1)).toStrictEqual([1]);
     });
 
+    it('should normalize single 0 Item (default config)', () => {
+      expect(normalizeArray(0)).toStrictEqual([0]);
+    });
+
     it("shouldn't normalize undefined (default config)", () => {
       expect(normalizeArray(undefined)).toStrictEqual([]);
     });
