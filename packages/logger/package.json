@@ -1,14 +1,13 @@
 {
-  "name": "@agile-ts/api",
-  "version": "0.0.15",
+  "name": "@agile-ts/logger",
+  "version": "0.0.1",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Promise based HTTP request API for Node.js",
+  "description": "Simple Logger",
   "keywords": [
-    "api",
-    "promise-api",
-    "http-request",
+    "logger",
+    "console.log",
     "agile",
     "agile-ts"
   ],
