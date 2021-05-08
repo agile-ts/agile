@@ -38,6 +38,14 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*"
   },
+  "devDependencies": {
+    "@agile-ts/utils": "file:../utils",
+    "@agile-ts/logger": "file:../logger"
+  },
+  "dependencies": {
+    "@agile-ts/utils": "^0.0.1",
+    "@agile-ts/logger": "^0.0.1"
+  },
   "publishConfig": {
     "access": "public"
   },
