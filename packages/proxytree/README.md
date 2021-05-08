@@ -1,4 +1,4 @@
-# [WIP] ProxyTree
+# [INTERNAL] ProxyTree
 
 > Create Proxy Tree based on the accessed properties
 

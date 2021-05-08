@@ -229,6 +229,16 @@ describe('State Tests', () => {
         });
       });
 
+      it('should ingestValue if passed function returns value with correct type (default config)', () => {
+        numberState.set((value) => value + 20);
+
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
+        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(30, {
+          force: false,
+        });
+      });
+
       it('should ingestValue if value has correct type (specific config)', () => {
         numberState.set(20, {
           sideEffects: {

@@ -145,14 +145,20 @@ export class State<ValueType = any> {
    * @param value - new State Value
    * @param config - Config
    */
-  public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
+  public set(
+    value: ValueType | ((value: ValueType) => ValueType),
+    config: StateIngestConfigInterface = {}
+  ): this {
     config = defineConfig(config, {
       force: false,
     });
+    const _value = isFunction(value)
+      ? (value as any)(copy(this._value))
+      : value;
 
     // Check value has correct Type (js)
-    if (!this.hasCorrectType(value)) {
-      const message = `Incorrect type (${typeof value}) was provided.`;
+    if (!this.hasCorrectType(_value)) {
+      const message = `Incorrect type (${typeof _value}) was provided.`;
       if (!config.force) {
         Agile.logger.error(message);
         return this;
@@ -161,7 +167,7 @@ export class State<ValueType = any> {
     }
 
     // Ingest new value into Runtime
-    this.observer.ingestValue(value, config);
+    this.observer.ingestValue(_value, config);
 
     return this;
   }
