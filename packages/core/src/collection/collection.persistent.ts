@@ -3,6 +3,7 @@ import {
   Collection,
   CollectionKey,
   CreatePersistentConfigInterface,
+  DefaultItem,
   defineConfig,
   Group,
   GroupKey,
@@ -12,7 +13,9 @@ import {
   StorageKey,
 } from '../internal';
 
-export class CollectionPersistent<DataType = any> extends Persistent {
+export class CollectionPersistent<
+  DataType extends object = DefaultItem
+> extends Persistent {
   public collection: () => Collection<DataType>;
 
   static defaultGroupSideEffectKey = 'rebuildGroupStorageValue';

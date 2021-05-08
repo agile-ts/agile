@@ -83,7 +83,7 @@ export class Agile {
     if (config.bindGlobal) {
       if (!globalBind(Agile.globalKey, this))
         Agile.logger.warn(
-          'Be careful with binding multiple Agile Instances global in one Application!'
+          'Be careful with binding multiple Agile Instances globally in one Application!'
         );
     }
   }
@@ -124,7 +124,7 @@ export class Agile {
    * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param config - Config
    */
-  public createCollection<DataType = DefaultItem>(
+  public createCollection<DataType extends object = DefaultItem>(
     config?: CollectionConfig<DataType>
   ): Collection<DataType> {
     return new Collection<DataType>(this, config);

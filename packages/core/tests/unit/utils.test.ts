@@ -138,39 +138,43 @@ describe('Utils Tests', () => {
   describe('isValidObject function tests', () => {
     // Can't be Tested in not Web-Environment
     // it("should return false if passing HTML Element", () => {
-    //   expect(isValidObject(HTMLElement)).toBe(false);
+    //   expect(isValidObject(HTMLElement)).toBeFalsy();
     // });
 
-    it('should return false if passed instance is  invalid Object', () => {
-      expect(isValidObject(null)).toBe(false);
-      expect(isValidObject('Hello')).toBe(false);
-      expect(isValidObject([1, 2])).toBe(false);
-      expect(isValidObject(123)).toBe(false);
+    it('should return false if passed instance is invalid Object (default config)', () => {
+      expect(isValidObject(null)).toBeFalsy();
+      expect(isValidObject('Hello')).toBeFalsy();
+      expect(isValidObject([1, 2])).toBeFalsy();
+      expect(isValidObject(123)).toBeFalsy();
     });
 
-    it('should return true if passed instance is valid Object', () => {
-      expect(isValidObject({ hello: 'jeff' })).toBe(true);
-      expect(isValidObject({ hello: 'jeff', deep: { hello: 'franz' } })).toBe(
-        true
-      );
+    it('should return true if passed instance is valid Object (default config)', () => {
+      expect(isValidObject({ hello: 'jeff' })).toBeTruthy();
+      expect(
+        isValidObject({ hello: 'jeff', deep: { hello: 'franz' } })
+      ).toBeTruthy();
+    });
+
+    it('should return true if passed instance is array (considerArray = true)', () => {
+      expect(isValidObject([1, 2], true)).toBeTruthy();
     });
   });
 
   describe('includesArray function tests', () => {
     it("should return false if Array1 doesn't include Array2", () => {
-      expect(includesArray([1, 2], [5, 6])).toBe(false);
+      expect(includesArray([1, 2], [5, 6])).toBeFalsy();
     });
 
     it('should return false if Array1 does only include parts of Array2', () => {
-      expect(includesArray([1, 2], [2, 6])).toBe(false);
+      expect(includesArray([1, 2], [2, 6])).toBeFalsy();
     });
 
     it('should return true if Array1 includes Array2', () => {
-      expect(includesArray([1, 4, 2, 3], [1, 2])).toBe(true);
+      expect(includesArray([1, 4, 2, 3], [1, 2])).toBeTruthy();
     });
 
     it('should return true if Array1 is equal to Array2', () => {
-      expect(includesArray([1, 2], [1, 2])).toBe(true);
+      expect(includesArray([1, 2], [1, 2])).toBeTruthy();
     });
   });
 
@@ -293,14 +297,14 @@ describe('Utils Tests', () => {
         isFunction(() => {
           /* empty function */
         })
-      ).toBe(true);
+      ).toBeTruthy();
     });
 
     it('should return false if passed instance is invalid Function', () => {
-      expect(isFunction('hello')).toBe(false);
-      expect(isFunction(1)).toBe(false);
-      expect(isFunction([1, 2, 3])).toBe(false);
-      expect(isFunction({ hello: 'jeff' })).toBe(false);
+      expect(isFunction('hello')).toBeFalsy();
+      expect(isFunction(1)).toBeFalsy();
+      expect(isFunction([1, 2, 3])).toBeFalsy();
+      expect(isFunction({ hello: 'jeff' })).toBeFalsy();
     });
   });
 
@@ -310,29 +314,29 @@ describe('Utils Tests', () => {
         isAsyncFunction(async () => {
           /* empty function */
         })
-      ).toBe(true);
+      ).toBeTruthy();
       expect(
         isAsyncFunction(async function () {
           /* empty function */
         })
-      ).toBe(true);
+      ).toBeTruthy();
     });
 
     it('should return false if passed instance is invalid async Function', () => {
-      expect(isAsyncFunction('hello')).toBe(false);
-      expect(isAsyncFunction(1)).toBe(false);
-      expect(isAsyncFunction([1, 2, 3])).toBe(false);
-      expect(isAsyncFunction({ hello: 'jeff' })).toBe(false);
+      expect(isAsyncFunction('hello')).toBeFalsy();
+      expect(isAsyncFunction(1)).toBeFalsy();
+      expect(isAsyncFunction([1, 2, 3])).toBeFalsy();
+      expect(isAsyncFunction({ hello: 'jeff' })).toBeFalsy();
       expect(
         isAsyncFunction(() => {
           /* empty function */
         })
-      ).toBe(false);
+      ).toBeFalsy();
       expect(
         isAsyncFunction(function () {
           /* empty function */
         })
-      ).toBe(false);
+      ).toBeFalsy();
     });
   });
 
@@ -344,12 +348,12 @@ describe('Utils Tests', () => {
     });
 
     it('should return false if passed instance is invalid Json String', () => {
-      expect(isJsonString('frank')).toBe(false);
+      expect(isJsonString('frank')).toBeFalsy();
       expect(isJsonString('{name":"John", "age":31, "city":"New York"}')).toBe(
         false
       );
-      expect(isJsonString(10)).toBe(false);
-      expect(isJsonString({ name: 'John', age: 31 })).toBe(false);
+      expect(isJsonString(10)).toBeFalsy();
+      expect(isJsonString({ name: 'John', age: 31 })).toBeFalsy();
     });
   });
 
@@ -500,18 +504,18 @@ describe('Utils Tests', () => {
       expect(equal({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' })).toBe(
         true
       );
-      expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
-      expect(equal(12, 12)).toBe(true);
-      expect(equal('hi', 'hi')).toBe(true);
+      expect(equal([1, 2, 3], [1, 2, 3])).toBeTruthy();
+      expect(equal(12, 12)).toBeTruthy();
+      expect(equal('hi', 'hi')).toBeTruthy();
     });
 
     it("should return false if value1 and value2 aren't equal", () => {
       expect(equal({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' })).toBe(
         false
       );
-      expect(equal([1, 2], [3, 5])).toBe(false);
-      expect(equal(12, 13)).toBe(false);
-      expect(equal('hi', 'bye')).toBe(false);
+      expect(equal([1, 2], [3, 5])).toBeFalsy();
+      expect(equal(12, 13)).toBeFalsy();
+      expect(equal('hi', 'bye')).toBeFalsy();
     });
   });
 
@@ -519,19 +523,19 @@ describe('Utils Tests', () => {
     it('should return false if value1 and value2 are equal', () => {
       expect(
         notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'jeff' })
-      ).toBe(false);
-      expect(notEqual([1, 2, 3], [1, 2, 3])).toBe(false);
-      expect(notEqual(12, 12)).toBe(false);
-      expect(equal('hi', 'bye')).toBe(false);
+      ).toBeFalsy();
+      expect(notEqual([1, 2, 3], [1, 2, 3])).toBeFalsy();
+      expect(notEqual(12, 12)).toBeFalsy();
+      expect(equal('hi', 'bye')).toBeFalsy();
     });
 
     it("should return true if value1 and value2 aren't equal", () => {
       expect(
         notEqual({ id: 123, name: 'jeff' }, { id: 123, name: 'hans' })
-      ).toBe(true);
-      expect(notEqual([1, 2], [3, 5])).toBe(true);
-      expect(notEqual(12, 13)).toBe(true);
-      expect(notEqual('hi', 'bye')).toBe(true);
+      ).toBeTruthy();
+      expect(notEqual([1, 2], [3, 5])).toBeTruthy();
+      expect(notEqual(12, 13)).toBeTruthy();
+      expect(notEqual('hi', 'bye')).toBeTruthy();
     });
   });
 

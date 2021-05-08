@@ -19,7 +19,7 @@ import {
   SelectorConfigInterface,
 } from '../internal';
 
-export class Collection<DataType = DefaultItem> {
+export class Collection<DataType extends object = DefaultItem> {
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
@@ -29,7 +29,7 @@ export class Collection<DataType = DefaultItem> {
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
   public isPersisted = false; // If Collection can be stored in Agile Storage (-> successfully integrated persistent)
-  public persistent: CollectionPersistent | undefined; // Manages storing Collection Value into Storage
+  public persistent: CollectionPersistent<DataType> | undefined; // Manages storing Collection Value into Storage
 
   public groups: { [key: string]: Group<DataType> } = {};
   public selectors: { [key: string]: Selector<DataType> } = {};
@@ -1300,7 +1300,7 @@ export interface SetDataConfigInterface {
   background?: boolean;
 }
 
-export type CollectionConfig<DataType = DefaultItem> =
+export type CollectionConfig<DataType extends object = DefaultItem> =
   | CreateCollectionConfigInterface<DataType>
   | ((
       collection: Collection<DataType>

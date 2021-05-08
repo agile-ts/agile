@@ -17,6 +17,7 @@ export class Observer<ValueType = any> {
   public dependents: Set<Observer> = new Set(); // Observers that depend on this Observer
   public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer has subscribed
   public value?: ValueType; // Value of Observer
+  public previousValue?: ValueType; // Previous Value of Observer
 
   /**
    * @internal
@@ -36,6 +37,7 @@ export class Observer<ValueType = any> {
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.value = config.value;
+    this.previousValue = config.value;
     config.dependents?.forEach((observer) => this.depend(observer));
     config.subs?.forEach((subscriptionContainer) =>
       this.subscribe(subscriptionContainer)

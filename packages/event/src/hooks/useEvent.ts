@@ -32,7 +32,7 @@ export function useEvent<E extends Event<any>>(
         forceRender();
       },
       [event.observer],
-      key
+      { key }
     );
 
     // Unsubscribe Callback based Subscription and Event on Unmount

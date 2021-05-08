@@ -6,6 +6,7 @@ import {
   CallbackSubscriptionContainer,
   isFunction,
   SubscriptionContainerKeyType,
+  SubscriptionContainerConfigInterface,
 } from '../../internal';
 
 export class SubController {
@@ -33,12 +34,12 @@ export class SubController {
    * Subscribe with Object shaped Subscriptions
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscription Object
-   * @param key - Key/Name of SubscriptionContainer
+   * @param config - Config
    */
   public subscribeWithSubsObject(
     integrationInstance: any,
     subs: { [key: string]: Observer } = {},
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ): {
     subscriptionContainer: SubscriptionContainer;
     props: { [key: string]: Observer['value'] };
@@ -53,7 +54,7 @@ export class SubController {
     const subscriptionContainer = this.registerSubscription(
       integrationInstance,
       subsArray,
-      key
+      config
     );
 
     // Set SubscriptionContainer to Object based
@@ -81,18 +82,18 @@ export class SubController {
    * Subscribe with Array shaped Subscriptions
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscription Array
-   * @param key - Key/Name of SubscriptionContainer
+   * @param config - Config
    */
   public subscribeWithSubsArray(
     integrationInstance: any,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ): SubscriptionContainer {
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
       integrationInstance,
       subs,
-      key
+      config
     );
 
     // Register subs
@@ -206,16 +207,24 @@ export class SubController {
    * Registers SubscriptionContainer and decides weather integrationInstance is a callback or component based Subscription
    * @param integrationInstance - Callback Function or Component
    * @param subs - Initial Subscriptions
-   * @param key - Key/Name of SubscriptionContainer
+   * @param config - Config
    */
   public registerSubscription(
     integrationInstance: any,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ): SubscriptionContainer {
     if (isFunction(integrationInstance))
-      return this.registerCallbackSubscription(integrationInstance, subs, key);
-    return this.registerComponentSubscription(integrationInstance, subs, key);
+      return this.registerCallbackSubscription(
+        integrationInstance,
+        subs,
+        config
+      );
+    return this.registerComponentSubscription(
+      integrationInstance,
+      subs,
+      config
+    );
   }
 
   //=========================================================================================================
@@ -228,17 +237,17 @@ export class SubController {
    * otherwise it creates a new Instance called 'subscriptionContainer' which holds the new  SubscriptionContainer
    * @param componentInstance - Component that got subscribed by Observer/s
    * @param subs - Initial Subscriptions
-   * @param key - Key/Name of SubscriptionContainer
+   * @param config - Config
    */
   public registerComponentSubscription(
     componentInstance: any,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ): ComponentSubscriptionContainer {
     const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
       subs,
-      key
+      config
     );
     this.componentSubs.add(componentSubscriptionContainer);
 
@@ -278,17 +287,17 @@ export class SubController {
    * Registers Callback based Subscription
    * @param callbackFunction - Callback Function that causes rerender on Component which got subscribed by Observer/s
    * @param subs - Initial Subscriptions
-   * @param key - Key/Name of SubscriptionContainer
+   * @param config - Config
    */
   public registerCallbackSubscription(
     callbackFunction: () => void,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ): CallbackSubscriptionContainer {
     const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
       callbackFunction,
       subs,
-      key
+      config
     );
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;

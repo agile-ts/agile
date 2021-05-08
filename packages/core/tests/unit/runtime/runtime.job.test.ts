@@ -31,10 +31,12 @@ describe('RuntimeJob Tests', () => {
         exclude: [],
       },
       force: false,
+      numberOfTriesToUpdate: 3,
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
+    expect(job.triesToUpdate).toBe(0);
   });
 
   it('should create RuntimeJob with Agile that has integrations (specific config)', () => {
@@ -46,6 +48,7 @@ describe('RuntimeJob Tests', () => {
         enabled: false,
       },
       force: true,
+      numberOfTriesToUpdate: 10,
     });
 
     expect(job._key).toBe('dummyJob');
@@ -56,6 +59,7 @@ describe('RuntimeJob Tests', () => {
         enabled: false,
       },
       force: true,
+      numberOfTriesToUpdate: 10,
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
@@ -74,6 +78,7 @@ describe('RuntimeJob Tests', () => {
         exclude: [],
       },
       force: false,
+      numberOfTriesToUpdate: 3,
     });
     expect(job.rerender).toBeFalsy();
     expect(job.performed).toBeFalsy();
@@ -94,6 +99,7 @@ describe('RuntimeJob Tests', () => {
         exclude: [],
       },
       force: false,
+      numberOfTriesToUpdate: 3,
     });
     expect(job.rerender).toBeFalsy();
     expect(job.performed).toBeFalsy();
