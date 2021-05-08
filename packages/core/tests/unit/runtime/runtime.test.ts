@@ -7,7 +7,7 @@ import {
   Runtime,
   SubscriptionContainer,
 } from '../../../src';
-import * as Utils from '../../../src/utils';
+import * as Utils from '@agile-ts/utils';
 import testIntegration from '../../helper/test.integration';
 import mockConsole from 'jest-mock-console';
 

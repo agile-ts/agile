@@ -1,10 +1,10 @@
 import {
   defineConfig,
-  includesArray,
-  isValidObject,
   generateId,
+  includesArray,
   isFunction,
-} from '../internal';
+  isValidObject,
+} from '@agile-ts/utils';
 
 export class Logger {
   public key?: LoggerKey;

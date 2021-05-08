@@ -1,14 +1,12 @@
 {
-  "name": "@agile-ts/api",
-  "version": "0.0.15",
+  "name": "@agile-ts/utils",
+  "version": "0.0.1",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Promise based HTTP request API for Node.js",
+  "description": "Util methods of AgileTs",
   "keywords": [
-    "api",
-    "promise-api",
-    "http-request",
+    "utils",
     "agile",
     "agile-ts"
   ],
@@ -26,12 +24,6 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*"
-  },
-  "devDependencies": {
-    "@agile-ts/utils": "file:../utils"
-  },
-  "dependencies": {
-    "@agile-ts/utils": "^0.0.1"
   },
   "publishConfig": {
     "access": "public"

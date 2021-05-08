@@ -1,4 +1,4 @@
-import { clone, copy, defineConfig, isValidObject } from '@agile-ts/core';
+import { clone, copy, defineConfig, isValidObject } from '@agile-ts/utils';
 
 export default class API {
   public config: ApiConfig;

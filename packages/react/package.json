@@ -45,8 +45,10 @@
   },
   "peerDependencies": {
     "react": "^16.13.1",
-    "@agile-ts/core": "^0.0.14",
-    "@agile-ts/proxytree": "0.0.1"
+    "@agile-ts/core": "^0.0.14"
+  },
+  "dependencies": {
+    "@agile-ts/proxytree": "^0.0.1"
   },
   "publishConfig": {
     "access": "public"

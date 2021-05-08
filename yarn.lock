@@ -4,9 +4,9 @@
 
 "@agile-ts/core@file:packages/core":
   version "0.0.14"
-
-"@agile-ts/proxytree@file:packages/proxytree":
-  version "0.0.1"
+  dependencies:
+    "@agile-ts/logger" "^0.0.1"
+    "@agile-ts/utils" "^0.0.1"
 
 "@akryum/winattr@^3.0.0":
   version "3.0.0"

@@ -1,5 +1,5 @@
 import { Agile, Observer, SubscriptionContainer } from '../../../../../src';
-import * as Utils from '../../../../../src/utils';
+import * as Utils from '@agile-ts/utils';
 import mockConsole from 'jest-mock-console';
 
 describe('SubscriptionContainer Tests', () => {
