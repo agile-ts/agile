@@ -308,7 +308,7 @@ export class Group<DataType extends object = DefaultItem> extends State<
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
-      if (item) groupItems.push(item);
+      if (item != null) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
