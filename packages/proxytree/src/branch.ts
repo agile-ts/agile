@@ -25,6 +25,17 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
     const handler = {
       // get() handler intercepts an attempt to access a property of the target object (object this branch represents)
       get: (target: T, key: BranchKey) => {
+        // If array.length, don't track it
+        if (Array.isArray(target) && key === 'length') return target.length;
+
+        // If key doesn't exists in target, don't track it
+        if (!(key in target)) return undefined;
+
+        // If object has no own property at key, don't track it
+        // This does the same as (key in target) but also filters method calls like (object.toString(), array.slice(), array.filter(), ..)
+        if (!Object.prototype.hasOwnProperty.call(target, key))
+          return target[key];
+
         return this.recordUsage(target, key);
       },
     };

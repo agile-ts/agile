@@ -339,6 +339,19 @@ describe('ProxyTree Tests', () => {
         expect(proxyTree.getUsedRoutes()).toStrictEqual([['a']]);
         expect(proxyTree.transformTreeToBranchObject).toHaveBeenCalledTimes(1);
       });
+
+      it("shouldn't track properties not directly belonging to the object", () => {
+        const proxyfiedOrginal = proxyTree.proxy;
+
+        // Access Properties
+        proxyfiedOrginal.a.length;
+        proxyfiedOrginal.a.slice(1, 2);
+        proxyfiedOrginal.toString();
+        proxyfiedOrginal.x;
+
+        expect(proxyTree.getUsedRoutes()).toStrictEqual([['a', '1'], ['a']]);
+        expect(proxyTree.transformTreeToBranchObject).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });
