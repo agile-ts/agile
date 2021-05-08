@@ -42,6 +42,8 @@ export class State<ValueType = any> {
 
   public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
 
+  public currentInterval?: NodeJS.Timer | number;
+
   /**
    * @public
    * State - Class that holds one Value and causes rerender on subscribed Components
@@ -143,14 +145,20 @@ export class State<ValueType = any> {
    * @param value - new State Value
    * @param config - Config
    */
-  public set(value: ValueType, config: StateIngestConfigInterface = {}): this {
+  public set(
+    value: ValueType | ((value: ValueType) => ValueType),
+    config: StateIngestConfigInterface = {}
+  ): this {
     config = defineConfig(config, {
       force: false,
     });
+    const _value = isFunction(value)
+      ? (value as any)(copy(this._value))
+      : value;
 
     // Check value has correct Type (js)
-    if (!this.hasCorrectType(value)) {
-      const message = `Incorrect type (${typeof value}) was provided.`;
+    if (!this.hasCorrectType(_value)) {
+      const message = `Incorrect type (${typeof _value}) was provided.`;
       if (!config.force) {
         Agile.logger.error(message);
         return this;
@@ -159,7 +167,7 @@ export class State<ValueType = any> {
     }
 
     // Ingest new value into Runtime
-    this.observer.ingestValue(value, config);
+    this.observer.ingestValue(_value, config);
 
     return this;
   }
@@ -397,20 +405,24 @@ export class State<ValueType = any> {
     }
 
     _config = defineConfig(_config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
+      defaultStorageKey: null,
     });
 
-    if (this.persistent)
+    if (this.persistent) {
       Agile.logger.warn(
-        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`
+        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`,
+        this.persistent
       );
+    }
 
     // Create persistent -> Persist Value
     this.persistent = new StatePersistent<ValueType>(this, {
-      instantiate: _config.instantiate,
+      instantiate: _config.loadValue,
       storageKeys: _config.storageKeys,
       key: key,
+      defaultStorageKey: _config.defaultStorageKey,
     });
 
     return this;
@@ -426,17 +438,61 @@ export class State<ValueType = any> {
    * @param callback - Callback Function
    */
   public onLoad(callback: (success: boolean) => void): this {
-    if (this.persistent) {
-      this.persistent.onLoad = callback;
-
-      // If State is already 'isPersisted' the loading was successful -> callback can be called
-      if (this.isPersisted) callback(true);
-    } else {
+    if (!this.persistent) {
       Agile.logger.error(
         `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`
       );
+      return this;
     }
+
+    this.persistent.onLoad = callback;
+
+    // If State is already 'isPersisted' the loading was successful -> callback can be called
+    if (this.isPersisted) callback(true);
+
     return this;
+  }
+
+  //=========================================================================================================
+  // Interval
+  //=========================================================================================================
+  /**
+   * @public
+   * Calls callback at certain intervals in milliseconds and assigns the callback return value to the State
+   * @param callback- Callback that is called on each interval and should return the new State value
+   * @param ms - The intervals in milliseconds
+   */
+  public interval(
+    callback: (value: ValueType) => ValueType,
+    ms?: number
+  ): this {
+    if (this.currentInterval) {
+      Agile.logger.warn(
+        `You can only have one interval active!`,
+        this.currentInterval
+      );
+      return this;
+    }
+
+    this.currentInterval = setInterval(() => {
+      this.set(callback(this._value));
+    }, ms ?? 1000);
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Clear Interval
+  //=========================================================================================================
+  /**
+   * @public
+   * Clears the current Interval
+   */
+  public clearInterval(): void {
+    if (this.currentInterval) {
+      clearInterval(this.currentInterval as number);
+      delete this.currentInterval;
+    }
   }
 
   //=========================================================================================================
@@ -657,12 +713,14 @@ export interface PatchConfigInterface extends StateIngestConfigInterface {
 }
 
 /**
- * @param instantiate - If Persistent gets instantiated
+ * @param loadValue - If Persistent loads the persisted value into the State
  * @param storageKeys - Key/Name of Storages which gets used to persist the State Value (NOTE: If not passed the default Storage will be used)
+ * @param defaultStorageKey - Default Storage Key (if not provided it takes the first index of storageKeys or the AgileTs default Storage)
  */
 export interface StatePersistentConfigInterface {
-  instantiate?: boolean;
+  loadValue?: boolean;
   storageKeys?: StorageKey[];
+  defaultStorageKey?: StorageKey;
 }
 
 export type StateWatcherCallback<T = any> = (value: T, key: string) => void;

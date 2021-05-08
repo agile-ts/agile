@@ -29,7 +29,8 @@
     "prepare": "tsc && tsc -p ./tsconfig.production.json",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
-    "watch": "tsc-watch --onSuccess \"yarn run dev:push\"",
+    "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
+    "watch": "tsc -w",
     "release": "yarn run prepare",
     "preview": "npm pack",
     "test": "jest",
@@ -38,12 +39,16 @@
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core",
+    "@agile-ts/proxytree": "file:../proxytree",
     "@types/react": "^17.0.0",
     "react": "^17.0.1"
   },
   "peerDependencies": {
     "react": "^16.13.1",
     "@agile-ts/core": "^0.0.14"
+  },
+  "dependencies": {
+    "@agile-ts/proxytree": "^0.0.1"
   },
   "publishConfig": {
     "access": "public"

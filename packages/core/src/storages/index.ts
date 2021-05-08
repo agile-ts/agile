@@ -11,7 +11,7 @@ import {
 export class Storages {
   public agileInstance: () => Agile;
 
-  public defaultStorage?: Storage;
+  public config: StoragesConfigInterface;
   public storages: { [key: string]: Storage } = {}; // All registered Storages
   public persistentInstances: Set<Persistent> = new Set();
 
@@ -21,11 +21,16 @@ export class Storages {
    * @param agileInstance - An Instance of Agile
    * @param config - Config
    */
-  constructor(agileInstance: Agile, config: StoragesConfigInterface = {}) {
+  constructor(
+    agileInstance: Agile,
+    config: CreateStoragesConfigInterface = {}
+  ) {
     this.agileInstance = () => agileInstance;
     config = defineConfig(config, {
       localStorage: false,
+      defaultStorageKey: null,
     });
+    this.config = { defaultStorageKey: config.defaultStorageKey as any };
     if (config.localStorage) this.instantiateLocalStorage();
   }
 
@@ -91,20 +96,22 @@ export class Storages {
 
     // Register Storage
     this.storages[storage.key] = storage;
-    if (config.default) this.defaultStorage = storage;
+    if (config.default) this.config.defaultStorageKey = storage.key;
 
     this.persistentInstances.forEach((persistent) => {
-      // If Persistent isn't ready and has no default StorageKey.. reassignStorageKeys and try to load it
-      if (!persistent.defaultStorageKey) {
-        persistent.assignStorageKeys();
+      // Revalidate Persistent that includes the newly registered StorageKey
+      if (persistent.storageKeys.includes(storage.key)) {
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
         return;
       }
 
-      // Add Value of Persistent to newly registered Storage
-      if (persistent.storageKeys.includes(storage.key))
-        persistent.persistValue();
+      // If persistent has no default StorageKey (reassign StorageKeys since this registered Storage might be tagged as default Storage)
+      if (!persistent.config.defaultStorageKey) {
+        persistent.assignStorageKeys();
+        const isValid = persistent.validatePersistent();
+        if (isValid) persistent.initialLoading();
+      }
     });
 
     return true;
@@ -116,20 +123,27 @@ export class Storages {
   /**
    * @internal
    * Get Storage at Key/Name
-   * @param key - Key/Name of Storage
+   * @param storageKey - Key/Name of Storage
    */
-  public getStorage(key: StorageKey): Storage | undefined {
-    const storage = this.storages[key];
+  public getStorage(
+    storageKey: StorageKey | undefined | null
+  ): Storage | undefined {
+    if (!storageKey) return undefined;
+    const storage = this.storages[storageKey];
 
     // Check if Storage exists
     if (!storage) {
-      Agile.logger.error(`Storage with the key/name '${key}' doesn't exist`);
+      Agile.logger.error(
+        `Storage with the key/name '${storageKey}' doesn't exist!`
+      );
       return undefined;
     }
 
     // Check if Storage is ready
     if (!storage.ready) {
-      Agile.logger.error(`Storage with the key/name '${key}' isn't ready`);
+      Agile.logger.error(
+        `Storage with the key/name '${storageKey}' isn't ready yet!`
+      );
       return undefined;
     }
 
@@ -163,7 +177,8 @@ export class Storages {
     }
 
     // Call get Method in default Storage
-    return this.defaultStorage?.get<GetType>(key) || Promise.resolve(undefined);
+    const defaultStorage = this.getStorage(this.config.defaultStorageKey);
+    return defaultStorage?.get<GetType>(key) || Promise.resolve(undefined);
   }
 
   //=========================================================================================================
@@ -196,7 +211,8 @@ export class Storages {
     }
 
     // Call set Method in default Storage
-    this.defaultStorage?.set(key, value);
+    const defaultStorage = this.getStorage(this.config.defaultStorageKey);
+    defaultStorage?.set(key, value);
   }
 
   //=========================================================================================================
@@ -224,7 +240,8 @@ export class Storages {
     }
 
     // Call remove Method in default Storage
-    this.defaultStorage?.remove(key);
+    const defaultStorage = this.getStorage(this.config.defaultStorageKey);
+    defaultStorage?.remove(key);
   }
 
   //=========================================================================================================
@@ -258,9 +275,18 @@ export class Storages {
 
 /**
  * @param localStorage - If Local Storage should be instantiated
+ * @param defaultStorage - Default Storage Key
+ */
+export interface CreateStoragesConfigInterface {
+  localStorage?: boolean;
+  defaultStorageKey?: StorageKey;
+}
+
+/**
+ * @param defaultStorage - Default Storage Key
  */
 export interface StoragesConfigInterface {
-  localStorage?: boolean;
+  defaultStorageKey: StorageKey | null;
 }
 
 /**

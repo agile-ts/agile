@@ -1,6 +1,6 @@
 import { Event, EventObserver } from '../../src';
 import { Agile, Observer } from '@agile-ts/core';
-import * as Utils from '@agile-ts/core/dist/utils';
+import * as Utils from '@agile-ts/utils';
 import mockConsole from 'jest-mock-console';
 
 describe('Event Tests', () => {

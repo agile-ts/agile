@@ -1,5 +1,5 @@
 import { Agile, Observer, SubscriptionContainer } from '../../../../../src';
-import * as Utils from '../../../../../src/utils';
+import * as Utils from '@agile-ts/utils';
 import mockConsole from 'jest-mock-console';
 
 describe('SubscriptionContainer Tests', () => {
@@ -27,12 +27,14 @@ describe('SubscriptionContainer Tests', () => {
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
     expect(subscriptionContainer.subsObject).toBeUndefined();
+    expect(subscriptionContainer.proxyKeyMap).toStrictEqual({});
+    expect(subscriptionContainer.proxyBased).toBeFalsy();
   });
 
   it('should create SubscriptionContainer (specific config)', () => {
     const subscriptionContainer = new SubscriptionContainer(
       [dummyObserver1, dummyObserver2],
-      'dummyKey'
+      { key: 'dummyKey', proxyKeyMap: { myState: { paths: [['a', 'b']] } } }
     );
 
     expect(subscriptionContainer.key).toBe('dummyKey');
@@ -43,5 +45,9 @@ describe('SubscriptionContainer Tests', () => {
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
     expect(subscriptionContainer.subsObject).toBeUndefined();
+    expect(subscriptionContainer.proxyKeyMap).toStrictEqual({
+      myState: { paths: [['a', 'b']] },
+    });
+    expect(subscriptionContainer.proxyBased).toBeTruthy();
   });
 });

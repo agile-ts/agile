@@ -38,6 +38,7 @@ describe('StatePersistent Tests', () => {
     expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
       key: undefined,
       storageKeys: [],
+      defaultStorageKey: null,
     });
     expect(statePersistent.initialLoading).not.toHaveBeenCalled();
 
@@ -46,7 +47,7 @@ describe('StatePersistent Tests', () => {
     expect(statePersistent.isPersisted).toBeFalsy();
     expect(statePersistent.onLoad).toBeUndefined();
     expect(statePersistent.storageKeys).toStrictEqual([]);
-    expect(statePersistent.defaultStorageKey).toBeUndefined();
+    expect(statePersistent.config).toStrictEqual({ defaultStorageKey: null });
   });
 
   it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (specific config)", () => {
@@ -61,12 +62,14 @@ describe('StatePersistent Tests', () => {
     const statePersistent = new StatePersistent(dummyState, {
       key: 'statePersistentKey',
       storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
     });
 
     expect(statePersistent).toBeInstanceOf(StatePersistent);
     expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
       key: 'statePersistentKey',
       storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
     });
     expect(statePersistent.initialLoading).not.toHaveBeenCalled();
 
@@ -75,7 +78,9 @@ describe('StatePersistent Tests', () => {
     expect(statePersistent.isPersisted).toBeFalsy();
     expect(statePersistent.onLoad).toBeUndefined();
     expect(statePersistent.storageKeys).toStrictEqual([]);
-    expect(statePersistent.defaultStorageKey).toBeUndefined();
+    expect(statePersistent.config).toStrictEqual({
+      defaultStorageKey: null, // gets set in 'instantiatePersistent' which is mocked
+    });
   });
 
   it('should create StatePersistent and should call initialLoading if Persistent is ready (default config)', () => {
@@ -225,7 +230,7 @@ describe('StatePersistent Tests', () => {
         expect(response).toBeTruthy();
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           statePersistent._key,
-          statePersistent.defaultStorageKey
+          statePersistent.config.defaultStorageKey
         );
         expect(dummyState.set).toHaveBeenCalledWith('dummyValue', {
           storage: false,
@@ -246,7 +251,7 @@ describe('StatePersistent Tests', () => {
         expect(response).toBeFalsy();
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           statePersistent._key,
-          statePersistent.defaultStorageKey
+          statePersistent.config.defaultStorageKey
         );
         expect(dummyState.set).not.toHaveBeenCalled();
         expect(statePersistent.persistValue).not.toHaveBeenCalled();
@@ -263,7 +268,7 @@ describe('StatePersistent Tests', () => {
         expect(response).toBeTruthy();
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           'coolKey',
-          statePersistent.defaultStorageKey
+          statePersistent.config.defaultStorageKey
         );
         expect(dummyState.set).toHaveBeenCalledWith('dummyValue', {
           storage: false,

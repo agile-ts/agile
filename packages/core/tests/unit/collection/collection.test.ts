@@ -8,7 +8,7 @@ import {
   ComputedTracker,
   StatePersistent,
 } from '../../../src';
-import * as Utils from '../../../src/utils';
+import * as Utils from '@agile-ts/utils';
 import mockConsole from 'jest-mock-console';
 
 jest.mock('../../../src/collection/collection.persistent');
@@ -1032,7 +1032,7 @@ describe('Collection Tests', () => {
         expect(ComputedTracker.tracked).not.toHaveBeenCalled();
       });
 
-      it('should return and track  existing placeholder Group (config.notExisting = true)', () => {
+      it('should return and track existing placeholder Group (config.notExisting = true)', () => {
         dummyGroup.isPlaceholder = true;
 
         const response = collection.getGroup('dummyGroup', {
@@ -1588,13 +1588,15 @@ describe('Collection Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: collection._key,
+          defaultStorageKey: null,
         });
       });
 
       it('should create persistent with CollectionKey (specific config)', () => {
         collection.persist({
           storageKeys: ['test1', 'test2'],
-          instantiate: false,
+          loadValue: false,
+          defaultStorageKey: 'test1',
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
@@ -1602,6 +1604,7 @@ describe('Collection Tests', () => {
           instantiate: false,
           storageKeys: ['test1', 'test2'],
           key: collection._key,
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -1613,13 +1616,15 @@ describe('Collection Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: 'passedKey',
+          defaultStorageKey: null,
         });
       });
 
       it('should create persistent with passed Key (specific config)', () => {
         collection.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
-          instantiate: false,
+          loadValue: false,
+          defaultStorageKey: 'test1',
         });
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
@@ -1627,6 +1632,7 @@ describe('Collection Tests', () => {
           instantiate: false,
           storageKeys: ['test1', 'test2'],
           key: 'passedKey',
+          defaultStorageKey: 'test1',
         });
       });
 
@@ -1641,6 +1647,7 @@ describe('Collection Tests', () => {
           instantiate: true,
           storageKeys: [],
           key: 'newPersistentKey',
+          defaultStorageKey: null,
         });
         expect(console.warn).toHaveBeenCalledWith(
           `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`

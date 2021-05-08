@@ -29,6 +29,7 @@ describe('StateObserver Tests', () => {
     expect(stateObserver.nextStateValue).toBe('dummyValue');
     expect(stateObserver.state()).toBe(dummyState);
     expect(stateObserver.value).toBe('dummyValue');
+    expect(stateObserver.previousValue).toBe('dummyValue');
     expect(stateObserver._key).toBeUndefined();
     expect(stateObserver.dependents.size).toBe(0);
     expect(stateObserver.subs.size).toBe(0);
@@ -50,6 +51,7 @@ describe('StateObserver Tests', () => {
     expect(stateObserver.nextStateValue).toBe('dummyValue');
     expect(stateObserver.state()).toBe(dummyState);
     expect(stateObserver.value).toBe('dummyValue');
+    expect(stateObserver.previousValue).toBe('dummyValue');
     expect(stateObserver._key).toBe('testKey');
     expect(stateObserver.dependents.size).toBe(2);
     expect(stateObserver.dependents.has(dummyObserver2)).toBeTruthy();
@@ -302,7 +304,10 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.nextStateValue = 'newValue';
         dummyState.initialStateValue = 'initialValue';
         dummyState._value = 'dummyValue';
-        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
+        dummyState.getPublicValue = jest
+          .fn()
+          .mockReturnValueOnce('previousPublicValue')
+          .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -312,6 +317,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeTruthy();
         expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.previousValue).toBe('previousPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -321,7 +327,10 @@ describe('StateObserver Tests', () => {
         dummyState.isPlaceholder = true;
         dummyState.initialStateValue = 'overwriteValue';
         dummyState._value = 'dummyValue';
-        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
+        dummyState.getPublicValue = jest
+          .fn()
+          .mockReturnValueOnce('previousPublicValue')
+          .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -332,6 +341,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.isSet).toBeFalsy();
         expect(dummyState.isPlaceholder).toBeFalsy();
         expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.previousValue).toBe('previousPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -339,7 +349,10 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.nextStateValue = 'newValue';
         dummyState.initialStateValue = 'newValue';
         dummyState._value = 'dummyValue';
-        dummyState.getPublicValue = jest.fn(() => 'newPublicValue');
+        dummyState.getPublicValue = jest
+          .fn()
+          .mockReturnValueOnce('previousPublicValue')
+          .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -349,6 +362,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
         expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.previousValue).toBe('previousPublicValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
     });

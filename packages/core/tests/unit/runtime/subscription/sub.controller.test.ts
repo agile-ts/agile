@@ -58,7 +58,7 @@ describe('SubController Tests', () => {
             dummyObserver1: dummyObserver1,
             dummyObserver2: dummyObserver2,
           },
-          'subscribeWithSubsObjectKey'
+          { key: 'subscribeWithSubsObjectKey', proxyKeyMap: {} }
         );
 
         expect(subscribeWithSubsResponse).toStrictEqual({
@@ -68,10 +68,12 @@ describe('SubController Tests', () => {
           subscriptionContainer: dummySubscriptionContainer,
         });
 
-        expect(subController.registerSubscription).toHaveBeenCalledWith(
+        expect(
+          subController.registerSubscription
+        ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'subscribeWithSubsObjectKey'
+          { key: 'subscribeWithSubsObjectKey', proxyKeyMap: {} }
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeTruthy();
@@ -115,15 +117,17 @@ describe('SubController Tests', () => {
         const subscribeWithSubsArrayResponse = subController.subscribeWithSubsArray(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'subscribeWithSubsArrayKey'
+          { key: 'subscribeWithSubsArrayKey', proxyKeyMap: {} }
         );
 
         expect(subscribeWithSubsArrayResponse).toBe(dummySubscriptionContainer);
 
-        expect(subController.registerSubscription).toHaveBeenCalledWith(
+        expect(
+          subController.registerSubscription
+        ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'subscribeWithSubsArrayKey'
+          { key: 'subscribeWithSubsArrayKey', proxyKeyMap: {} }
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeFalsy();
@@ -158,8 +162,7 @@ describe('SubController Tests', () => {
         };
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         subController.unsubscribe(callbackSubscriptionContainer);
@@ -180,8 +183,7 @@ describe('SubController Tests', () => {
         };
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         subController.unsubscribe(componentSubscriptionContainer);
@@ -202,8 +204,7 @@ describe('SubController Tests', () => {
         };
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         subController.unsubscribe(dummyIntegration);
@@ -225,13 +226,11 @@ describe('SubController Tests', () => {
         };
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
         const componentSubscriptionContainer2 = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         subController.unsubscribe(dummyIntegration);
@@ -278,14 +277,16 @@ describe('SubController Tests', () => {
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey'
+          { key: 'niceKey', proxyKeyMap: {} }
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
-        expect(subController.registerCallbackSubscription).toHaveBeenCalledWith(
+        expect(
+          subController.registerCallbackSubscription
+        ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey'
+          { key: 'niceKey', proxyKeyMap: {} }
         );
         expect(
           subController.registerComponentSubscription
@@ -298,7 +299,7 @@ describe('SubController Tests', () => {
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey'
+          { key: 'niceKey', proxyKeyMap: {} }
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
@@ -307,7 +308,7 @@ describe('SubController Tests', () => {
         ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          'niceKey'
+          { key: 'niceKey', proxyKeyMap: {} }
         );
         expect(
           subController.registerCallbackSubscription
@@ -322,14 +323,12 @@ describe('SubController Tests', () => {
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
           ComponentSubscriptionContainer
         );
-        expect(componentSubscriptionContainer.key).toBe('myKey');
         expect(componentSubscriptionContainer.component).toStrictEqual(
           dummyIntegration
         );
@@ -362,14 +361,12 @@ describe('SubController Tests', () => {
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
           ComponentSubscriptionContainer
         );
-        expect(componentSubscriptionContainer.key).toBe('myKey');
         expect(componentSubscriptionContainer.component).toStrictEqual(
           dummyIntegration
         );
@@ -403,8 +400,7 @@ describe('SubController Tests', () => {
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
@@ -422,8 +418,7 @@ describe('SubController Tests', () => {
 
         const componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
@@ -441,14 +436,12 @@ describe('SubController Tests', () => {
 
         const callbackSubscriptionContainer = subController.registerCallbackSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(callbackSubscriptionContainer).toBeInstanceOf(
           CallbackSubscriptionContainer
         );
-        expect(callbackSubscriptionContainer.key).toBe('myKey');
         expect(callbackSubscriptionContainer.callback).toBe(dummyIntegration);
         expect(callbackSubscriptionContainer.ready).toBeTruthy();
 
@@ -477,8 +470,7 @@ describe('SubController Tests', () => {
         dummyAgile.config.waitForMount = true;
         componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
       });
 
@@ -503,8 +495,7 @@ describe('SubController Tests', () => {
         dummyAgile.config.waitForMount = true;
         componentSubscriptionContainer = subController.registerComponentSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          'myKey'
+          [dummyObserver1, dummyObserver2]
         );
         subController.mount(dummyIntegration);
       });

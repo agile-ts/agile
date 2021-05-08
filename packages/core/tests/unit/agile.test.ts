@@ -99,7 +99,7 @@ describe('Agile Tests', () => {
     expect(globalThis[Agile.globalKey]).toBeUndefined();
   });
 
-  it('should instantiate Agile with specific config', () => {
+  it('should instantiate Agile with (specific config)', () => {
     const agile = new Agile({
       waitForMount: false,
       localStorage: false,
@@ -144,6 +144,21 @@ describe('Agile Tests', () => {
 
     // Check if global Agile Instance got created
     expect(globalThis[Agile.globalKey]).toBe(agile);
+  });
+
+  it('should instantiate second Agile Instance and print warning if config.bindGlobal is set both times to true', () => {
+    const agile1 = new Agile({
+      bindGlobal: true,
+    });
+
+    const agile2 = new Agile({
+      bindGlobal: true,
+    });
+
+    expect(globalThis[Agile.globalKey]).toBe(agile1);
+    expect(console.warn).toHaveBeenCalledWith(
+      'Agile Warn: Be careful with binding multiple Agile Instances globally in one Application!'
+    );
   });
 
   describe('Agile Function Tests', () => {

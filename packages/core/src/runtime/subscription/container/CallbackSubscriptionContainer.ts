@@ -1,7 +1,7 @@
 import {
   Observer,
   SubscriptionContainer,
-  SubscriptionContainerKeyType,
+  SubscriptionContainerConfigInterface,
 } from '../../../internal';
 
 export class CallbackSubscriptionContainer extends SubscriptionContainer {
@@ -12,14 +12,14 @@ export class CallbackSubscriptionContainer extends SubscriptionContainer {
    * CallbackSubscriptionContainer - Subscription Container for Callback based Subscriptions
    * @param callback - Callback Function that causes rerender on Component that is subscribed by Agile
    * @param subs - Initial Subscriptions
-   * @param key - Key/Name of Callback Subscription Container
+   * @param config - Config
    */
   constructor(
     callback: Function,
     subs: Array<Observer> = [],
-    key?: SubscriptionContainerKeyType
+    config: SubscriptionContainerConfigInterface = {}
   ) {
-    super(subs, key);
+    super(subs, config);
     this.callback = callback;
   }
 }

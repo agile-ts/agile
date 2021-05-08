@@ -27,7 +27,7 @@ describe('CallbackSubscriptionContainer Tests', () => {
     const subscriptionContainer = new CallbackSubscriptionContainer(
       dummyIntegration,
       [dummyObserver1, dummyObserver2],
-      'dummyKey'
+      { key: 'dummyKey', proxyKeyMap: { myState: { paths: [['hi']] } } }
     );
 
     expect(subscriptionContainer.callback).toBe(dummyIntegration);
@@ -40,5 +40,9 @@ describe('CallbackSubscriptionContainer Tests', () => {
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
     expect(subscriptionContainer.subsObject).toBeUndefined();
+    expect(subscriptionContainer.proxyKeyMap).toStrictEqual({
+      myState: { paths: [['hi']] },
+    });
+    expect(subscriptionContainer.proxyBased).toBeTruthy();
   });
 });

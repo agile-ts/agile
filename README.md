@@ -1,9 +1,9 @@
  <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
- 
- > Global, simple, spacy State and Logic Framework
- 
+
+> Global, simple, spacy State and Logic Framework
+
  <br />
-  
+
 <p align="left">
  <a href="https://github.com/agile-ts/agile">
    <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/>
@@ -76,8 +76,8 @@ More examples can be found in the [Example Section](https://agile-ts.org/docs/ex
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
 AgileTs is a global, simple, well-tested State Management Framework implemented in Typescript.
-It offers a reimagined API that focus on **developer experience** and allows you to **quickly** and **easily** manage your States.
-Besides States, AgileTs offers some other powerful apis that make your life easier.
+It offers a reimagined API that focuses on **developer experience** and allows you to **quickly** and **easily** manage your States.
+Besides States, AgileTs offers some other powerful APIs that make your life easier.
 The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
@@ -116,8 +116,8 @@ Write minimalistic, boilerplate-free code that captures your intent.
 
 ### ⛳️ Centralize
 
-AgileTs is designed to take all business logic out of UI-Components and put them in a central place often called `core`.
-The benefit of keeping logic separate to UI-Components is to make your code more decoupled, portable and above all easily testable.
+AgileTs is designed to take all business logic out of UI-Components and put them in a central place, often called `core`.
+The benefit of keeping logic separate to UI-Components is to make your code more decoupled, portable, and above all, easily testable.
 
 ### 🎯 Easy to Use
 
@@ -132,19 +132,19 @@ you can jump straight into our [Example](https://agile-ts.org/docs/examples/Intr
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation"/>
 
-To properly use AgileTs, in a UI-Framework we need to install **two** packages.
+To properly use AgileTs, in a UI-Framework, we need to install **two** packages.
 
 - The _Core Package_, which acts as the brain of AgileTs and manages all your States
   ```
   npm install @agile-ts/core
   ```
 
-- and a _fitting Integration_ for your preferd UI-Framework. In my case the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
+- and a _fitting Integration_ for your preferred UI-Framework. In my case, the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
   Check [here](https://agile-ts.org/docs/frameworks) if your desired Framework is supported, too.
   ```
   npm install @agile-ts/react
   ```
-  
+
 
 <br />
 
@@ -154,8 +154,8 @@ To properly use AgileTs, in a UI-Framework we need to install **two** packages.
 
 Sounds AgileTs interesting to you?
 Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
-And I promise you, you will be able to use AgileTs in no time.
-In case you have any further questions don't hesitate joining our [Community Discord](https://discord.gg/T9GzreAwPH).
+And I promise you. You will be able to use AgileTs in no time.
+In case you have any further questions, don't hesitate to join our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 
 <br />
@@ -164,8 +164,8 @@ In case you have any further questions don't hesitate joining our [Community Dis
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/contribute_header.png" alt="Contribute"/>
 
-Get a part of AgileTs and start contributing. We welcome any meaningful contribution 😀
-To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+Get a part of AgileTs and start contributing. We welcome any meaningful contribution. 😀
+To find out more, check out the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
@@ -194,4 +194,3 @@ To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agil
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/credits_header.png" alt="Credits"/>
 
 AgileTs is inspired by [MVVM Frameworks](https://de.wikipedia.org/wiki/Model_View_ViewModel) like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
-

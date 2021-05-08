@@ -118,6 +118,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public perform(job: StateRuntimeJob) {
     const state = job.observer.state();
+    const previousValue = copy(state.getPublicValue());
 
     // Assign new State Values
     state.previousStateValue = copy(state._value);
@@ -133,12 +134,15 @@ export class StateObserver<ValueType = any> extends Observer {
 
     state.isSet = notEqual(state._value, state.initialStateValue);
 
+    // Execute sideEffects like 'rebuildGroup' or 'rebuildStateStorageValue'
     this.sideEffects(job);
 
     // Assign Public Value to Observer after sideEffects like 'rebuildGroup',
-    // because sometimes (for instance in Group) the publicValue is not the value(nextStateValue)
-    // and the observer value is at some point the publicValue because the end user uses it
+    // because sometimes (for instance in a Group State) the publicValue() is not the .value (nextStateValue) property.
+    // The Observer value is at some point the public Value because Integrations like React are using it as return value.
+    // For example 'useAgile()' returns the Observer.value and not the State.value.
     job.observer.value = copy(state.getPublicValue());
+    job.observer.previousValue = previousValue;
   }
 
   //=========================================================================================================

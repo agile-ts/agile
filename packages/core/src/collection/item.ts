@@ -7,7 +7,9 @@ import {
   defineConfig,
 } from '../internal';
 
-export class Item<DataType = DefaultItem> extends State<DataType> {
+export class Item<DataType extends object = DefaultItem> extends State<
+  DataType
+> {
   static updateGroupSideEffectKey = 'rebuildGroup';
   public isSelected = false; // If Item is selected by a Selector
   public collection: () => Collection<DataType>;

@@ -18,7 +18,9 @@ import {
   removeProperties,
 } from '../internal';
 
-export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
+export class Group<DataType extends object = DefaultItem> extends State<
+  Array<ItemKey>
+> {
   static rebuildGroupSideEffectKey = 'rebuildGroup';
   collection: () => Collection<DataType>;
 
@@ -270,9 +272,10 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     }
 
     _config = defineConfig(_config, {
-      instantiate: true,
+      loadValue: true,
       followCollectionPattern: false,
       storageKeys: [],
+      defaultStorageKey: null,
     });
 
     if (_config.followCollectionPersistKeyPattern) {
@@ -283,8 +286,9 @@ export class Group<DataType = DefaultItem> extends State<Array<ItemKey>> {
     }
 
     super.persist(key, {
-      instantiate: _config.instantiate,
+      loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
+      defaultStorageKey: _config.defaultStorageKey,
     });
 
     return this;

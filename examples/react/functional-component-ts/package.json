@@ -8,6 +8,7 @@
     "@agile-ts/multieditor": "file:.yalc/@agile-ts/multieditor",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
     "@agile-ts/event": "file:.yalc/@agile-ts/event",
+    "@agile-ts/proxytree": "file:.yalc/@agile-ts/proxytree",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",

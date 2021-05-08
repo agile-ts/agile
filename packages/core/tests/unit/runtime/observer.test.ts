@@ -32,6 +32,7 @@ describe('Observer Tests', () => {
 
     expect(observer._key).toBeUndefined();
     expect(observer.value).toBeUndefined();
+    expect(observer.previousValue).toBeUndefined();
     expect(observer.dependents.size).toBe(0);
     expect(observer.subs.size).toBe(0);
   });
@@ -46,6 +47,7 @@ describe('Observer Tests', () => {
 
     expect(observer._key).toBe('testKey');
     expect(observer.value).toBe('coolValue');
+    expect(observer.previousValue).toBe('coolValue');
     expect(observer.dependents.size).toBe(2);
     expect(observer.dependents.has(dummyObserver2)).toBeTruthy();
     expect(observer.dependents.has(dummyObserver1)).toBeTruthy();
@@ -92,6 +94,7 @@ describe('Observer Tests', () => {
               exclude: [],
             },
             force: false,
+            numberOfTriesToUpdate: 3,
           });
         });
 
@@ -116,6 +119,7 @@ describe('Observer Tests', () => {
               exclude: [],
             },
             force: true,
+            numberOfTriesToUpdate: 3,
           });
         });
 
