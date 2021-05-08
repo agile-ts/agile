@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/api",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -31,7 +31,7 @@
     "@agile-ts/utils": "file:../utils"
   },
   "dependencies": {
-    "@agile-ts/utils": "^0.0.1"
+    "@agile-ts/utils": "^0.0.2"
   },
   "publishConfig": {
     "access": "public"
