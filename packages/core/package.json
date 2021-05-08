@@ -39,8 +39,8 @@
     "lint": "eslint src/**/*"
   },
   "devDependencies": {
-    "@agile-ts/utils": "file:../utils",
-    "@agile-ts/logger": "file:../logger"
+    "@agile-ts/logger": "file:../logger",
+    "@agile-ts/utils": "file:../utils"
   },
   "dependencies": {
     "@agile-ts/utils": "^0.0.1",

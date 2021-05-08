@@ -48,7 +48,7 @@
     "@agile-ts/core": "^0.0.14"
   },
   "dependencies": {
-    "@agile-ts/proxytree": "0.0.1"
+    "@agile-ts/proxytree": "^0.0.1"
   },
   "publishConfig": {
     "access": "public"
