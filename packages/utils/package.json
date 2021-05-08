@@ -4,7 +4,7 @@
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Create Proxy Tree based on the accessed properties",
+  "description": "Util methods of AgileTs",
   "keywords": [
     "utils",
     "agile",
