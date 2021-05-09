@@ -274,7 +274,7 @@ export class Runtime {
         let newValue = job.observer.value;
         let newValueDeepness = 0;
         for (const branch of path) {
-          if (!isValidObject(newValue)) break;
+          if (!isValidObject(newValue, true)) break;
           newValue = newValue[branch];
           newValueDeepness++;
         }
@@ -283,7 +283,7 @@ export class Runtime {
         let previousValue = job.observer.previousValue;
         let previousValueDeepness = 0;
         for (const branch of path) {
-          if (!isValidObject(previousValue)) break;
+          if (!isValidObject(previousValue, true)) break;
           previousValue = previousValue[branch];
           previousValueDeepness++;
         }

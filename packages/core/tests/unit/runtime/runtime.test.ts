@@ -608,14 +608,21 @@ describe('Runtime Tests', () => {
     });
 
     describe('handleProxyBasedSubscription function tests', () => {
-      let subscriptionContainer: SubscriptionContainer;
+      let objectSubscriptionContainer: SubscriptionContainer;
       const dummyFunction = () => {
         /* empty function */
       };
-      let dummyJob: RuntimeJob;
+      let objectJob: RuntimeJob;
+
+      let arraySubscriptionContainer: SubscriptionContainer;
+      const dummyFunction2 = () => {
+        /* empty function */
+      };
+      let arrayJob: RuntimeJob;
 
       beforeEach(() => {
-        subscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+        // Create Job with Object value
+        objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
           dummyFunction,
           { observer1: dummyObserver1 }
         ).subscriptionContainer;
@@ -627,12 +634,46 @@ describe('Runtime Tests', () => {
           key: 'dummyObserverValue1',
           data: { name: 'jeff' },
         };
-        subscriptionContainer.proxyBased = true;
-        subscriptionContainer.proxyKeyMap = {
+        objectSubscriptionContainer.proxyBased = true;
+        objectSubscriptionContainer.proxyKeyMap = {
           [dummyObserver1._key || 'unknown']: { paths: [['data', 'name']] },
         };
 
-        dummyJob = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
+        objectJob = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
+
+        // Create Job with Array value
+        arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+          dummyFunction2,
+          { observer2: dummyObserver2 }
+        ).subscriptionContainer;
+        dummyObserver2.value = [
+          {
+            key: 'dummyObserver2Value1',
+            data: { name: 'jeff' },
+          },
+          {
+            key: 'dummyObserver2Value2',
+            data: { name: 'hans' },
+          },
+        ];
+        dummyObserver2.previousValue = [
+          {
+            key: 'dummyObserver2Value1',
+            data: { name: 'jeff' },
+          },
+          {
+            key: 'dummyObserver2Value2',
+            data: { name: 'hans' },
+          },
+        ];
+        arraySubscriptionContainer.proxyBased = true;
+        arraySubscriptionContainer.proxyKeyMap = {
+          [dummyObserver2._key || 'unknown']: {
+            paths: [['0', 'data', 'name']],
+          },
+        };
+
+        arrayJob = new RuntimeJob(dummyObserver2, { key: 'dummyObjectJob2' });
 
         jest.spyOn(Utils, 'notEqual');
 
@@ -641,11 +682,11 @@ describe('Runtime Tests', () => {
       });
 
       it("should return true if subscriptionContainer isn't proxy based", () => {
-        subscriptionContainer.proxyBased = false;
+        objectSubscriptionContainer.proxyBased = false;
 
         const response = runtime.handleProxyBasedSubscription(
-          subscriptionContainer,
-          dummyJob
+          objectSubscriptionContainer,
+          objectJob
         );
 
         expect(response).toBeTruthy();
@@ -653,11 +694,11 @@ describe('Runtime Tests', () => {
       });
 
       it('should return true if observer the job represents has no key', () => {
-        dummyJob.observer._key = undefined;
+        objectJob.observer._key = undefined;
 
         const response = runtime.handleProxyBasedSubscription(
-          subscriptionContainer,
-          dummyJob
+          objectSubscriptionContainer,
+          objectJob
         );
 
         expect(response).toBeTruthy();
@@ -665,28 +706,28 @@ describe('Runtime Tests', () => {
       });
 
       it("should return true if the observer key isn't represented in the proxyKeyMap", () => {
-        subscriptionContainer.proxyKeyMap = {
+        objectSubscriptionContainer.proxyKeyMap = {
           unknownKey: { paths: [['a', 'b']] },
         };
 
         const response = runtime.handleProxyBasedSubscription(
-          subscriptionContainer,
-          dummyJob
+          objectSubscriptionContainer,
+          objectJob
         );
 
         expect(response).toBeTruthy();
         expect(Utils.notEqual).not.toHaveBeenCalled();
       });
 
-      it('should return true if used property has changed', () => {
+      it('should return true if used property has changed (object value)', () => {
         dummyObserver1.value = {
           key: 'dummyObserverValue1',
           data: { name: 'hans' },
         };
 
         const response = runtime.handleProxyBasedSubscription(
-          subscriptionContainer,
-          dummyJob
+          objectSubscriptionContainer,
+          objectJob
         );
 
         expect(response).toBeTruthy();
@@ -696,10 +737,10 @@ describe('Runtime Tests', () => {
         );
       });
 
-      it("should return false if used property hasn't changed", () => {
+      it("should return false if used property hasn't changed (object value)", () => {
         const response = runtime.handleProxyBasedSubscription(
-          subscriptionContainer,
-          dummyJob
+          objectSubscriptionContainer,
+          objectJob
         );
 
         expect(response).toBeFalsy();
@@ -709,7 +750,7 @@ describe('Runtime Tests', () => {
         );
       });
 
-      it('should return true if used property has changed in the deepness', () => {
+      it('should return true if used property has changed in the deepness (object value)', () => {
         dummyObserver1.value = {
           key: 'dummyObserverValue1',
         };
@@ -719,12 +760,49 @@ describe('Runtime Tests', () => {
         };
 
         const response = runtime.handleProxyBasedSubscription(
-          subscriptionContainer,
-          dummyJob
+          objectSubscriptionContainer,
+          objectJob
         );
 
         expect(response).toBeTruthy();
         expect(Utils.notEqual).toHaveBeenCalledWith(undefined, undefined);
+      });
+
+      it('should return true if used property has changed (array value)', () => {
+        dummyObserver2.value = [
+          {
+            key: 'dummyObserver2Value1',
+            data: { name: 'frank' },
+          },
+          {
+            key: 'dummyObserver2Value2',
+            data: { name: 'hans' },
+          },
+        ];
+
+        const response = runtime.handleProxyBasedSubscription(
+          arraySubscriptionContainer,
+          arrayJob
+        );
+
+        expect(response).toBeTruthy();
+        expect(Utils.notEqual).toHaveBeenCalledWith(
+          dummyObserver2.value['0'].data.name,
+          dummyObserver2.previousValue['0'].data.name
+        );
+      });
+
+      it("should return false if used property hasn't changed (array value)", () => {
+        const response = runtime.handleProxyBasedSubscription(
+          arraySubscriptionContainer,
+          arrayJob
+        );
+
+        expect(response).toBeFalsy();
+        expect(Utils.notEqual).toHaveBeenCalledWith(
+          dummyObserver2.value['0'].data.name,
+          dummyObserver2.previousValue['0'].data.name
+        );
       });
     });
   });
