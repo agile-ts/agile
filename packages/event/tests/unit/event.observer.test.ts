@@ -22,7 +22,7 @@ describe('EventObserver Tests', () => {
     expect(eventObserver.value).toBeUndefined();
     expect(eventObserver._key).toBeUndefined();
     expect(eventObserver.dependents.size).toBe(0);
-    expect(eventObserver.subs.size).toBe(0);
+    expect(eventObserver.subscribedTo.size).toBe(0);
   });
 
   it('should create EventObserver (specific config)', () => {
@@ -44,9 +44,9 @@ describe('EventObserver Tests', () => {
     expect(eventObserver.dependents.size).toBe(2);
     expect(eventObserver.dependents.has(dummyObserver2)).toBeTruthy();
     expect(eventObserver.dependents.has(dummyObserver1)).toBeTruthy();
-    expect(eventObserver.subs.size).toBe(2);
-    expect(eventObserver.subs.has(dummySubscription1)).toBeTruthy();
-    expect(eventObserver.subs.has(dummySubscription2)).toBeTruthy();
+    expect(eventObserver.subscribedTo.size).toBe(2);
+    expect(eventObserver.subscribedTo.has(dummySubscription1)).toBeTruthy();
+    expect(eventObserver.subscribedTo.has(dummySubscription2)).toBeTruthy();
   });
 
   describe('EventObserver Function Tests', () => {
