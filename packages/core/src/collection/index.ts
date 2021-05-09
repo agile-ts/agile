@@ -129,7 +129,7 @@ export class Collection<DataType extends object = DefaultItem> {
       Agile.logger.warn(
         "After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'"
       );
-      if (!config?.key)
+      if (config?.key == null)
         Agile.logger.warn(
           `Failed to find key for creation of Group. Group with random key '${key}' got created!`
         );
@@ -157,7 +157,7 @@ export class Collection<DataType extends object = DefaultItem> {
       Agile.logger.warn(
         "After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'"
       );
-      if (!config?.key)
+      if (config?.key == null)
         Agile.logger.warn(
           `Failed to find key for creation of Selector. Selector with random key '${key}' got created!`
         );
@@ -194,7 +194,7 @@ export class Collection<DataType extends object = DefaultItem> {
 
     // Set Key/Name of Group to property Name
     for (const key in groupsObject)
-      if (!groupsObject[key]._key) groupsObject[key].setKey(key);
+      if (groupsObject[key]._key == null) groupsObject[key].setKey(key);
 
     this.groups = groupsObject;
   }
@@ -225,7 +225,7 @@ export class Collection<DataType extends object = DefaultItem> {
 
     // Set Key/Name of Selector to property Name
     for (const key in selectorsObject)
-      if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
+      if (selectorsObject[key]._key == null) selectorsObject[key].setKey(key);
 
     this.selectors = selectorsObject;
   }
@@ -672,7 +672,7 @@ export class Collection<DataType extends object = DefaultItem> {
     });
 
     // Get Item
-    const item = itemKey ? this.data[itemKey] : undefined;
+    const item = itemKey != null ? this.data[itemKey] : undefined;
 
     // Check if Item exists
     if (!item || (!config.notExisting && !item.exists)) return undefined;
