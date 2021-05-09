@@ -32,7 +32,7 @@ describe('StateObserver Tests', () => {
     expect(stateObserver.previousValue).toBe('dummyValue');
     expect(stateObserver._key).toBeUndefined();
     expect(stateObserver.dependents.size).toBe(0);
-    expect(stateObserver.subs.size).toBe(0);
+    expect(stateObserver.subscribedTo.size).toBe(0);
   });
 
   it('should create StateObserver (specific config)', () => {
@@ -56,9 +56,9 @@ describe('StateObserver Tests', () => {
     expect(stateObserver.dependents.size).toBe(2);
     expect(stateObserver.dependents.has(dummyObserver2)).toBeTruthy();
     expect(stateObserver.dependents.has(dummyObserver1)).toBeTruthy();
-    expect(stateObserver.subs.size).toBe(2);
-    expect(stateObserver.subs.has(dummySubscription1)).toBeTruthy();
-    expect(stateObserver.subs.has(dummySubscription2)).toBeTruthy();
+    expect(stateObserver.subscribedTo.size).toBe(2);
+    expect(stateObserver.subscribedTo.has(dummySubscription1)).toBeTruthy();
+    expect(stateObserver.subscribedTo.has(dummySubscription2)).toBeTruthy();
   });
 
   describe('StateObserver Function Tests', () => {

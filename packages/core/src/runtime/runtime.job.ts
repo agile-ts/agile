@@ -39,7 +39,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       !config.background &&
       this.observer.agileInstance().integrations.hasIntegration();
     this._key = config.key;
-    this.subscriptionContainersToUpdate = new Set(observer.subs);
+    this.subscriptionContainersToUpdate = new Set(observer.subscribedTo);
   }
 
   public get key(): RuntimeJobKey | undefined {

@@ -284,7 +284,7 @@ describe('Runtime Tests', () => {
           rComponentSubJob
         );
         expect(rComponentSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver3.subs.size).toBe(1);
+        expect(dummyObserver3.subscribedTo.size).toBe(1);
 
         expect(response).toBeTruthy();
       });
@@ -301,7 +301,7 @@ describe('Runtime Tests', () => {
 
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subs.size).toBe(1);
+        expect(dummyObserver1.subscribedTo.size).toBe(1);
 
         expect(response).toBeTruthy();
       });
@@ -326,7 +326,7 @@ describe('Runtime Tests', () => {
 
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subs.size).toBe(1);
+        expect(dummyObserver1.subscribedTo.size).toBe(1);
 
         expect(response).toBeTruthy();
       });
@@ -351,7 +351,7 @@ describe('Runtime Tests', () => {
 
         expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subs.size).toBe(1);
+        expect(dummyObserver1.subscribedTo.size).toBe(1);
 
         expect(response).toBeFalsy();
       });
@@ -402,8 +402,8 @@ describe('Runtime Tests', () => {
           }
         );
 
-        expect(dummyObserver2.subs.size).toBe(2);
-        expect(dummyObserver4.subs.size).toBe(2);
+        expect(dummyObserver2.subscribedTo.size).toBe(2);
+        expect(dummyObserver4.subscribedTo.size).toBe(2);
 
         expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
           rComponentSubContainer,
@@ -440,7 +440,7 @@ describe('Runtime Tests', () => {
 
         expect(rCallbackSubContainer.callback).toHaveBeenCalled();
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subs.size).toBe(1);
+        expect(dummyObserver1.subscribedTo.size).toBe(1);
 
         expect(response).toBeTruthy();
       });
@@ -467,7 +467,7 @@ describe('Runtime Tests', () => {
               rCallbackSubContainer
             )
           ).toBeTruthy();
-          expect(dummyObserver1.subs.size).toBe(1);
+          expect(dummyObserver1.subscribedTo.size).toBe(1);
           expect(rCallbackSubJob.triesToUpdate).toBe(2);
 
           expect(console.warn).toHaveBeenCalledWith(
@@ -504,7 +504,7 @@ describe('Runtime Tests', () => {
               rCallbackSubContainer
             )
           ).toBeTruthy();
-          expect(dummyObserver1.subs.size).toBe(1);
+          expect(dummyObserver1.subscribedTo.size).toBe(1);
           expect(rCallbackSubJob.triesToUpdate).toBe(3);
 
           expect(console.warn).toHaveBeenCalledWith(

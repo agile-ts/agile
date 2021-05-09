@@ -22,7 +22,7 @@ export class Group<DataType extends object = DefaultItem> extends State<
   Array<ItemKey>
 > {
   static rebuildGroupSideEffectKey = 'rebuildGroup';
-  collection: () => Collection<DataType>;
+  collection: () => Collection<DataType>; // Collection the Group belongs to
 
   _output: Array<DataType> = []; // Output of Group
   _items: Array<() => Item<DataType>> = []; // Items of Group
@@ -308,7 +308,7 @@ export class Group<DataType extends object = DefaultItem> extends State<
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
-      if (item != null) groupItems.push(item);
+      if (item) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
