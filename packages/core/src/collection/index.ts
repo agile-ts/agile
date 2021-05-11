@@ -17,6 +17,7 @@ import {
   generateId,
   SideEffectConfigInterface,
   SelectorConfigInterface,
+  removeProperties,
 } from '../internal';
 
 export class Collection<DataType extends object = DefaultItem> {
@@ -912,6 +913,37 @@ export class Collection<DataType extends object = DefaultItem> {
     _groupKeys.forEach((groupKey) => {
       this.getGroup(groupKey)?.add(_itemKeys, config);
     });
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Move
+  //=========================================================================================================
+  /**
+   * @public
+   * Move ItemKey/s from one Group to another
+   * @param itemKeys - ItemKey/s that are moved
+   * @param oldGroupKey - GroupKey of the Group that currently keeps the Items
+   * @param newGroupKey - GroupKey of the Group into which the Items should be moved
+   * @param config - Config
+   */
+  public move(
+    itemKeys: ItemKey | Array<ItemKey>,
+    oldGroupKey: GroupKey,
+    newGroupKey: GroupKey,
+    config: GroupAddConfigInterface = {}
+  ): this {
+    const _itemKeys = normalizeArray(itemKeys);
+
+    // Remove itemKeys from old Group
+    this.getGroup(oldGroupKey)?.remove(
+      _itemKeys,
+      removeProperties(config, ['method', 'overwrite'])
+    );
+
+    // Add itemKeys to new Group
+    this.getGroup(newGroupKey)?.add(_itemKeys, config);
 
     return this;
   }

@@ -1798,6 +1798,55 @@ describe('Collection Tests', () => {
       });
     });
 
+    describe('move function tests', () => {
+      let dummyGroup1: Group<ItemInterface>;
+      let dummyGroup2: Group<ItemInterface>;
+
+      beforeEach(() => {
+        dummyGroup1 = new Group(collection, [], { key: 'dummyGroup1' });
+        dummyGroup2 = new Group(collection, ['1', '2', '3'], {
+          key: 'dummyGroup2',
+        });
+        collection.groups = {
+          dummyGroup1: dummyGroup1,
+          dummyGroup2: dummyGroup2,
+        };
+
+        dummyGroup1.add = jest.fn();
+        dummyGroup1.remove = jest.fn();
+        dummyGroup2.add = jest.fn();
+        dummyGroup2.remove = jest.fn();
+      });
+
+      it('should remove passed itemKey/s from old Group and add it to the new one (default config)', () => {
+        collection.move('1', 'dummyGroup2', 'dummyGroup1');
+
+        expect(dummyGroup1.add).toHaveBeenCalledWith(['1'], {});
+        expect(dummyGroup1.remove).not.toHaveBeenCalled();
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+        expect(dummyGroup2.remove).toHaveBeenCalledWith(['1'], {});
+      });
+
+      it('should remove passed itemKey/s from old Group and add it to the new one (specific config)', () => {
+        collection.move('1', 'dummyGroup2', 'dummyGroup1', {
+          background: true,
+          overwrite: true,
+          method: 'push',
+        });
+
+        expect(dummyGroup1.add).toHaveBeenCalledWith(['1'], {
+          background: true,
+          overwrite: true,
+          method: 'push',
+        });
+        expect(dummyGroup1.remove).not.toHaveBeenCalled();
+        expect(dummyGroup2.add).not.toHaveBeenCalled();
+        expect(dummyGroup2.remove).toHaveBeenCalledWith(['1'], {
+          background: true,
+        });
+      });
+    });
+
     describe('updateItemKey function tests', () => {
       let dummySelector1: Selector<ItemInterface>;
       let dummySelector2: Selector<ItemInterface>;
