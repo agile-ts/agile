@@ -674,7 +674,7 @@ export class State<ValueType = any> {
    * Returns public Value of State
    */
   public getPublicValue(): ValueType {
-    // If State Value is used internal and output represents the real state value (for instance in Group)
+    // If State Value is used internally and output represents the real state value (for instance in Group)
     if (this['output'] !== undefined) return this['output'];
 
     return this._value;

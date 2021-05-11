@@ -454,6 +454,17 @@ export class Collection<DataType extends object = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Get Default Group
+  //=========================================================================================================
+  /**
+   * @public
+   * Get default Group of Collection
+   */
+  public getDefaultGroup(): Group<DataType> | undefined {
+    return this.getGroup(this.config.defaultGroupKey);
+  }
+
+  //=========================================================================================================
   // Get Group With Reference
   //=========================================================================================================
   /**
@@ -740,13 +751,17 @@ export class Collection<DataType extends object = DefaultItem> {
       notExisting: false,
     });
 
-    // Get Items
-    const items: Array<Item<DataType>> = [];
-    for (const key in this.data) {
-      const item = this.data[key];
-      if ((!config.notExisting && item.exists) || config.notExisting) {
-        items.push(item);
-      }
+    const defaultGroup = this.getDefaultGroup();
+    let items: Array<Item<DataType>> = [];
+
+    // If config.notExisting transform this.data into array, otherwise return the default Group items
+    if (config.notExisting) {
+      for (const key in this.data) items.push(this.data[key]);
+    } else {
+      // Why defaultGroup Items and not all .exists === true Items?
+      // Because the default Group keeps track of all existing Items
+      // It also does control the Collection output in useAgile() and should do it here too
+      items = defaultGroup?.items || [];
     }
 
     return items;

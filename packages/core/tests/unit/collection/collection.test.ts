@@ -1046,6 +1046,20 @@ describe('Collection Tests', () => {
       });
     });
 
+    describe('getDefaultGroup function tests', () => {
+      it('should return default Group', () => {
+        jest
+          .spyOn(collection, 'getGroup')
+          .mockReturnValueOnce('fakeGroup' as any);
+        const response = collection.getDefaultGroup();
+
+        expect(collection.getGroup).toHaveBeenCalledWith(
+          collection.config.defaultGroupKey
+        );
+        expect(response).toBe('fakeGroup');
+      });
+    });
+
     describe('getGroupWithReference function tests', () => {
       let dummyGroup: Group<ItemInterface>;
 
@@ -1515,6 +1529,8 @@ describe('Collection Tests', () => {
           ['2']: dummyItem2,
           ['3']: dummyItem3,
         };
+
+        collection.getDefaultGroup()?.add(['1', '2', '3']);
       });
 
       it('should return all existing Items (default config)', () => {
@@ -1551,6 +1567,8 @@ describe('Collection Tests', () => {
           ['2']: dummyItem2,
           ['3']: dummyItem3,
         };
+
+        collection.getDefaultGroup()?.add(['1', '2', '3']);
 
         jest.spyOn(collection, 'getAllItems');
       });
