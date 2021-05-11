@@ -185,7 +185,9 @@ To find out more, check out the [CONTRIBUTING.md](https://github.com/agile-ts/ag
 | [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based API                         |
 | [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
 | [@agile-ts/event](/packages/event)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/event.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/event)                                 | Handy class for emitting UI Events        |
-
+| [@agile-ts/logger](/packages/logger)                                     |               [![badge](https://img.shields.io/npm/v/@agile-ts/logger.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/logger)                               | Manages the logging of AgileTs            |
+| [@agile-ts/utils](/packages/utils)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/utils.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/utils)                                 | Util functions of AgileTs                 |
+| [@agile-ts/proxytree](/packages/proxytree)                               |               [![badge](https://img.shields.io/npm/v/@agile-ts/proxytree.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/proxytree)                         | Create Proxy Tree                         |
 
 <br />
 

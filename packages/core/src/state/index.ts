@@ -253,14 +253,14 @@ export class State<ValueType = any> {
       addNewProperties: true,
     });
 
-    if (!isValidObject(this.nextStateValue)) {
+    if (!isValidObject(this.nextStateValue, true)) {
       Agile.logger.error(
         "You can't use the patch method on a non object based States!"
       );
       return this;
     }
 
-    if (!isValidObject(targetWithChanges)) {
+    if (!isValidObject(targetWithChanges, true)) {
       Agile.logger.error('TargetWithChanges has to be an Object!');
       return this;
     }
