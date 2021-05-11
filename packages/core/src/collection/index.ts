@@ -17,6 +17,7 @@ import {
   generateId,
   SideEffectConfigInterface,
   SelectorConfigInterface,
+  removeProperties,
 } from '../internal';
 
 export class Collection<DataType extends object = DefaultItem> {
@@ -129,7 +130,7 @@ export class Collection<DataType extends object = DefaultItem> {
       Agile.logger.warn(
         "After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'"
       );
-      if (!config?.key)
+      if (config?.key == null)
         Agile.logger.warn(
           `Failed to find key for creation of Group. Group with random key '${key}' got created!`
         );
@@ -157,7 +158,7 @@ export class Collection<DataType extends object = DefaultItem> {
       Agile.logger.warn(
         "After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'"
       );
-      if (!config?.key)
+      if (config?.key == null)
         Agile.logger.warn(
           `Failed to find key for creation of Selector. Selector with random key '${key}' got created!`
         );
@@ -194,7 +195,7 @@ export class Collection<DataType extends object = DefaultItem> {
 
     // Set Key/Name of Group to property Name
     for (const key in groupsObject)
-      if (!groupsObject[key]._key) groupsObject[key].setKey(key);
+      if (groupsObject[key]._key == null) groupsObject[key].setKey(key);
 
     this.groups = groupsObject;
   }
@@ -225,7 +226,7 @@ export class Collection<DataType extends object = DefaultItem> {
 
     // Set Key/Name of Selector to property Name
     for (const key in selectorsObject)
-      if (!selectorsObject[key]._key) selectorsObject[key].setKey(key);
+      if (selectorsObject[key]._key == null) selectorsObject[key].setKey(key);
 
     this.selectors = selectorsObject;
   }
@@ -453,6 +454,17 @@ export class Collection<DataType extends object = DefaultItem> {
   }
 
   //=========================================================================================================
+  // Get Default Group
+  //=========================================================================================================
+  /**
+   * @public
+   * Get default Group of Collection
+   */
+  public getDefaultGroup(): Group<DataType> | undefined {
+    return this.getGroup(this.config.defaultGroupKey);
+  }
+
+  //=========================================================================================================
   // Get Group With Reference
   //=========================================================================================================
   /**
@@ -672,7 +684,7 @@ export class Collection<DataType extends object = DefaultItem> {
     });
 
     // Get Item
-    const item = itemKey ? this.data[itemKey] : undefined;
+    const item = itemKey != null ? this.data[itemKey] : undefined;
 
     // Check if Item exists
     if (!item || (!config.notExisting && !item.exists)) return undefined;
@@ -739,13 +751,17 @@ export class Collection<DataType extends object = DefaultItem> {
       notExisting: false,
     });
 
-    // Get Items
-    const items: Array<Item<DataType>> = [];
-    for (const key in this.data) {
-      const item = this.data[key];
-      if ((!config.notExisting && item.exists) || config.notExisting) {
-        items.push(item);
-      }
+    const defaultGroup = this.getDefaultGroup();
+    let items: Array<Item<DataType>> = [];
+
+    // If config.notExisting transform this.data into array, otherwise return the default Group items
+    if (config.notExisting) {
+      for (const key in this.data) items.push(this.data[key]);
+    } else {
+      // Why defaultGroup Items and not all .exists === true Items?
+      // Because the default Group keeps track of all existing Items
+      // It also does control the Collection output in useAgile() and should do it here too
+      items = defaultGroup?.items || [];
     }
 
     return items;
@@ -912,6 +928,37 @@ export class Collection<DataType extends object = DefaultItem> {
     _groupKeys.forEach((groupKey) => {
       this.getGroup(groupKey)?.add(_itemKeys, config);
     });
+
+    return this;
+  }
+
+  //=========================================================================================================
+  // Move
+  //=========================================================================================================
+  /**
+   * @public
+   * Move ItemKey/s from one Group to another
+   * @param itemKeys - ItemKey/s that are moved
+   * @param oldGroupKey - GroupKey of the Group that currently keeps the Items
+   * @param newGroupKey - GroupKey of the Group into which the Items should be moved
+   * @param config - Config
+   */
+  public move(
+    itemKeys: ItemKey | Array<ItemKey>,
+    oldGroupKey: GroupKey,
+    newGroupKey: GroupKey,
+    config: GroupAddConfigInterface = {}
+  ): this {
+    const _itemKeys = normalizeArray(itemKeys);
+
+    // Remove itemKeys from old Group
+    this.getGroup(oldGroupKey)?.remove(
+      _itemKeys,
+      removeProperties(config, ['method', 'overwrite'])
+    );
+
+    // Add itemKeys to new Group
+    this.getGroup(newGroupKey)?.add(_itemKeys, config);
 
     return this;
   }

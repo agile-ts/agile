@@ -8,7 +8,8 @@ import {
 export class SubscriptionContainer {
   public key?: SubscriptionContainerKeyType;
   public ready = false;
-  public subs: Set<Observer>; // Observers that are Subscribed to this SubscriptionContainer (Component)
+
+  public subscribers: Set<Observer>; // Observers that are Subscribed to this SubscriptionContainer (Component)
 
   // Represents the paths to the accessed properties of the State/s this SubscriptionContainer represents
   public proxyKeyMap: ProxyKeyMapInterface;
@@ -35,7 +36,7 @@ export class SubscriptionContainer {
       key: generateId(),
     });
 
-    this.subs = new Set(subs);
+    this.subscribers = new Set(subs);
     this.key = config.key;
     this.proxyKeyMap = config.proxyKeyMap as any;
     this.proxyBased = notEqual(this.proxyKeyMap, {});

@@ -258,12 +258,12 @@ export class CollectionPersistent<
     const collection = this.collection();
 
     // Get key from Collection
-    if (!key && collection._key) return collection._key;
+    if (key == null && collection._key) return collection._key;
 
-    if (!key) return;
+    if (key == null) return;
 
     // Set Storage Key to Collection Key if Collection has no key
-    if (!collection._key) collection._key = key;
+    if (collection._key == null) collection._key = key;
 
     return key;
   }
@@ -322,10 +322,10 @@ export class CollectionPersistent<
     itemKey?: ItemKey,
     collectionKey?: CollectionKey
   ): string {
-    if (!itemKey || !collectionKey)
+    if (itemKey == null || collectionKey == null)
       Agile.logger.warn('Failed to build unique Item StorageKey!');
-    if (!itemKey) itemKey = 'unknown';
-    if (!collectionKey) collectionKey = 'unknown';
+    if (itemKey == null) itemKey = 'unknown';
+    if (collectionKey == null) collectionKey = 'unknown';
     return this.storageItemKeyPattern
       .replace('${collectionKey}', collectionKey.toString())
       .replace('${itemKey}', itemKey.toString());
@@ -344,10 +344,10 @@ export class CollectionPersistent<
     groupKey?: GroupKey,
     collectionKey?: CollectionKey
   ): string {
-    if (!groupKey || !collectionKey)
+    if (groupKey == null || collectionKey == null)
       Agile.logger.warn('Failed to build unique Group StorageKey!');
-    if (!groupKey) groupKey = 'unknown';
-    if (!collectionKey) collectionKey = 'unknown';
+    if (groupKey == null) groupKey = 'unknown';
+    if (collectionKey == null) collectionKey = 'unknown';
 
     return this.storageGroupKeyPattern
       .replace('${collectionKey}', collectionKey.toString())

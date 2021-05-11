@@ -65,10 +65,16 @@ export function useAgile<
       const depKey = dep?.key;
 
       // If proxyBased and value is object wrap Proxy around it to track used properties
-      if (config.proxyBased && isValidObject(value, true) && depKey) {
-        const proxyTree = new ProxyTree(value);
-        proxyTreeMap[depKey] = proxyTree;
-        return proxyTree.proxy;
+      if (config.proxyBased && isValidObject(value, true)) {
+        if (depKey) {
+          const proxyTree = new ProxyTree(value);
+          proxyTreeMap[depKey] = proxyTree;
+          return proxyTree.proxy;
+        }
+        Agile.logger.warn(
+          'Keep in mind that without a key no Proxy can be wrapped around the dependency value!',
+          dep
+        );
       }
 
       return dep?.value;

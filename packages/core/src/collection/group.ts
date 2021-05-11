@@ -22,7 +22,7 @@ export class Group<DataType extends object = DefaultItem> extends State<
   Array<ItemKey>
 > {
   static rebuildGroupSideEffectKey = 'rebuildGroup';
-  collection: () => Collection<DataType>;
+  collection: () => Collection<DataType>; // Collection the Group belongs to
 
   _output: Array<DataType> = []; // Output of Group
   _items: Array<() => Item<DataType>> = []; // Items of Group

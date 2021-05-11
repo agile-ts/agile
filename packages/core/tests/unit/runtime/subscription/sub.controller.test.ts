@@ -82,12 +82,12 @@ describe('SubController Tests', () => {
           dummyObserver2: dummyObserver2,
         });
 
-        expect(dummySubscriptionContainer.subs.size).toBe(2);
+        expect(dummySubscriptionContainer.subscribers.size).toBe(2);
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver1)
+          dummySubscriptionContainer.subscribers.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver2)
+          dummySubscriptionContainer.subscribers.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
@@ -133,12 +133,12 @@ describe('SubController Tests', () => {
         expect(dummySubscriptionContainer.isObjectBased).toBeFalsy();
         expect(dummySubscriptionContainer.subsObject).toBeUndefined();
 
-        expect(dummySubscriptionContainer.subs.size).toBe(2);
+        expect(dummySubscriptionContainer.subscribers.size).toBe(2);
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver1)
+          dummySubscriptionContainer.subscribers.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          dummySubscriptionContainer.subs.has(dummyObserver2)
+          dummySubscriptionContainer.subscribers.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
@@ -334,12 +334,12 @@ describe('SubController Tests', () => {
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
 
-        expect(componentSubscriptionContainer.subs.size).toBe(2);
+        expect(componentSubscriptionContainer.subscribers.size).toBe(2);
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver1)
+          componentSubscriptionContainer.subscribers.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver2)
+          componentSubscriptionContainer.subscribers.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(subController.componentSubs.size).toBe(1);
@@ -372,12 +372,12 @@ describe('SubController Tests', () => {
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
 
-        expect(componentSubscriptionContainer.subs.size).toBe(2);
+        expect(componentSubscriptionContainer.subscribers.size).toBe(2);
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver1)
+          componentSubscriptionContainer.subscribers.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          componentSubscriptionContainer.subs.has(dummyObserver2)
+          componentSubscriptionContainer.subscribers.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(subController.componentSubs.size).toBe(1);
@@ -445,12 +445,12 @@ describe('SubController Tests', () => {
         expect(callbackSubscriptionContainer.callback).toBe(dummyIntegration);
         expect(callbackSubscriptionContainer.ready).toBeTruthy();
 
-        expect(callbackSubscriptionContainer.subs.size).toBe(2);
+        expect(callbackSubscriptionContainer.subscribers.size).toBe(2);
         expect(
-          callbackSubscriptionContainer.subs.has(dummyObserver1)
+          callbackSubscriptionContainer.subscribers.has(dummyObserver1)
         ).toBeTruthy();
         expect(
-          callbackSubscriptionContainer.subs.has(dummyObserver2)
+          callbackSubscriptionContainer.subscribers.has(dummyObserver2)
         ).toBeTruthy();
 
         expect(subController.callbackSubs.size).toBe(1);

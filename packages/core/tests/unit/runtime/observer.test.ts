@@ -34,7 +34,7 @@ describe('Observer Tests', () => {
     expect(observer.value).toBeUndefined();
     expect(observer.previousValue).toBeUndefined();
     expect(observer.dependents.size).toBe(0);
-    expect(observer.subs.size).toBe(0);
+    expect(observer.subscribedTo.size).toBe(0);
   });
 
   it('should create Observer (specific config)', () => {
@@ -51,9 +51,9 @@ describe('Observer Tests', () => {
     expect(observer.dependents.size).toBe(2);
     expect(observer.dependents.has(dummyObserver2)).toBeTruthy();
     expect(observer.dependents.has(dummyObserver1)).toBeTruthy();
-    expect(observer.subs.size).toBe(2);
-    expect(observer.subs.has(dummySubscription1)).toBeTruthy();
-    expect(observer.subs.has(dummySubscription2)).toBeTruthy();
+    expect(observer.subscribedTo.size).toBe(2);
+    expect(observer.subscribedTo.has(dummySubscription1)).toBeTruthy();
+    expect(observer.subscribedTo.has(dummySubscription2)).toBeTruthy();
 
     expect(observer.subscribe).toHaveBeenCalledWith(dummySubscription1);
     expect(observer.subscribe).toHaveBeenCalledWith(dummySubscription2);
@@ -187,10 +187,12 @@ describe('Observer Tests', () => {
       it('should add subscriptionContainer to subs and this(Observer) to SubscriptionContainer subs', () => {
         observer.subscribe(dummySubscriptionContainer1);
 
-        expect(observer.subs.size).toBe(1);
-        expect(observer.subs.has(dummySubscriptionContainer1));
-        expect(dummySubscriptionContainer1.subs.size).toBe(1);
-        expect(dummySubscriptionContainer1.subs.has(observer)).toBeTruthy();
+        expect(observer.subscribedTo.size).toBe(1);
+        expect(observer.subscribedTo.has(dummySubscriptionContainer1));
+        expect(dummySubscriptionContainer1.subscribers.size).toBe(1);
+        expect(
+          dummySubscriptionContainer1.subscribers.has(observer)
+        ).toBeTruthy();
       });
 
       it("shouldn't add same subscriptionContainer twice to subs", () => {
@@ -198,10 +200,12 @@ describe('Observer Tests', () => {
 
         observer.subscribe(dummySubscriptionContainer1);
 
-        expect(observer.subs.size).toBe(1);
-        expect(observer.subs.has(dummySubscriptionContainer1));
-        expect(dummySubscriptionContainer1.subs.size).toBe(1);
-        expect(dummySubscriptionContainer1.subs.has(observer)).toBeTruthy();
+        expect(observer.subscribedTo.size).toBe(1);
+        expect(observer.subscribedTo.has(dummySubscriptionContainer1));
+        expect(dummySubscriptionContainer1.subscribers.size).toBe(1);
+        expect(
+          dummySubscriptionContainer1.subscribers.has(observer)
+        ).toBeTruthy();
       });
     });
 
@@ -219,11 +223,13 @@ describe('Observer Tests', () => {
       it('should remove subscriptionContainer from subs and this(Observer) from SubscriptionContainer subs', () => {
         observer.unsubscribe(dummySubscriptionContainer1);
 
-        expect(observer.subs.size).toBe(1);
-        expect(observer.subs.has(dummySubscriptionContainer1));
-        expect(dummySubscriptionContainer1.subs.size).toBe(0);
-        expect(dummySubscriptionContainer2.subs.size).toBe(1);
-        expect(dummySubscriptionContainer2.subs.has(observer)).toBeTruthy();
+        expect(observer.subscribedTo.size).toBe(1);
+        expect(observer.subscribedTo.has(dummySubscriptionContainer1));
+        expect(dummySubscriptionContainer1.subscribers.size).toBe(0);
+        expect(dummySubscriptionContainer2.subscribers.size).toBe(1);
+        expect(
+          dummySubscriptionContainer2.subscribers.has(observer)
+        ).toBeTruthy();
       });
     });
   });

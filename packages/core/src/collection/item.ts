@@ -33,7 +33,9 @@ export class Item<DataType extends object = DefaultItem> extends State<
     this.collection = () => collection;
 
     // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
-    this.addRebuildGroupThatIncludeItemKeySideEffect(this._key || 'unknown');
+    this.addRebuildGroupThatIncludeItemKeySideEffect(
+      this._key != null ? this._key : 'unknown'
+    );
   }
 
   //=========================================================================================================
@@ -60,7 +62,7 @@ export class Item<DataType extends object = DefaultItem> extends State<
       storage: true,
       overwrite: false,
     });
-    if (!value) return this;
+    if (value == null) return this;
 
     // Remove old rebuildGroupsThatIncludeItemKey sideEffect
     this.removeSideEffect(Item.updateGroupSideEffectKey);

@@ -15,7 +15,7 @@ export class Observer<ValueType = any> {
 
   public _key?: ObserverKey;
   public dependents: Set<Observer> = new Set(); // Observers that depend on this Observer
-  public subs: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer has subscribed
+  public subscribedTo: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer is subscribed to
   public value?: ValueType; // Value of Observer
   public previousValue?: ValueType; // Previous Value of Observer
 
@@ -127,11 +127,11 @@ export class Observer<ValueType = any> {
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
    */
   public subscribe(subscriptionContainer: SubscriptionContainer): void {
-    if (!this.subs.has(subscriptionContainer)) {
-      this.subs.add(subscriptionContainer);
+    if (!this.subscribedTo.has(subscriptionContainer)) {
+      this.subscribedTo.add(subscriptionContainer);
 
       // Add this to subscriptionContainer to keep track of the Observers the subscriptionContainer hold
-      subscriptionContainer.subs.add(this);
+      subscriptionContainer.subscribers.add(this);
     }
   }
 
@@ -144,9 +144,9 @@ export class Observer<ValueType = any> {
    * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
    */
   public unsubscribe(subscriptionContainer: SubscriptionContainer): void {
-    if (this.subs.has(subscriptionContainer)) {
-      this.subs.delete(subscriptionContainer);
-      subscriptionContainer.subs.delete(this);
+    if (this.subscribedTo.has(subscriptionContainer)) {
+      this.subscribedTo.delete(subscriptionContainer);
+      subscriptionContainer.subscribers.delete(this);
     }
   }
 }

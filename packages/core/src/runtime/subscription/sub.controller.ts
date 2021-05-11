@@ -116,7 +116,7 @@ export class SubController {
       subscriptionContainer.ready = false;
 
       // Remove SubscriptionContainers from Observer
-      subscriptionContainer.subs.forEach((observer) => {
+      subscriptionContainer.subscribers.forEach((observer) => {
         observer.unsubscribe(subscriptionContainer);
       });
     };

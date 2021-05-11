@@ -32,9 +32,9 @@ describe('ComponentSubscriptionContainer Tests', () => {
 
     expect(subscriptionContainer.key).toBe('dummyKey');
     expect(subscriptionContainer.ready).toBeFalsy();
-    expect(subscriptionContainer.subs.size).toBe(2);
-    expect(subscriptionContainer.subs.has(dummyObserver1)).toBeTruthy();
-    expect(subscriptionContainer.subs.has(dummyObserver2)).toBeTruthy();
+    expect(subscriptionContainer.subscribers.size).toBe(2);
+    expect(subscriptionContainer.subscribers.has(dummyObserver1)).toBeTruthy();
+    expect(subscriptionContainer.subscribers.has(dummyObserver2)).toBeTruthy();
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
     expect(subscriptionContainer.subsObject).toBeUndefined();

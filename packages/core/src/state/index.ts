@@ -253,14 +253,14 @@ export class State<ValueType = any> {
       addNewProperties: true,
     });
 
-    if (!isValidObject(this.nextStateValue)) {
+    if (!isValidObject(this.nextStateValue, true)) {
       Agile.logger.error(
         "You can't use the patch method on a non object based States!"
       );
       return this;
     }
 
-    if (!isValidObject(targetWithChanges)) {
+    if (!isValidObject(targetWithChanges, true)) {
       Agile.logger.error('TargetWithChanges has to be an Object!');
       return this;
     }
@@ -674,7 +674,7 @@ export class State<ValueType = any> {
    * Returns public Value of State
    */
   public getPublicValue(): ValueType {
-    // If State Value is used internal and output represents the real state value (for instance in Group)
+    // If State Value is used internally and output represents the real state value (for instance in Group)
     if (this['output'] !== undefined) return this['output'];
 
     return this._value;

@@ -89,7 +89,7 @@ export function normalizeArray<DataType = any>(
   config = defineConfig(config, {
     createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
   });
-  if (!items && !config.createUndefinedArray) return [];
+  if (items == null && !config.createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 
