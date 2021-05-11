@@ -1,6 +1,14 @@
 # @agile-ts/logger
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [f561c34]
+  - @agile-ts/utils@0.0.3
+
 ## 0.0.2
+
 ### Patch Changes
 
 - 616681d: - Outsourced Logger and Utils from the `core` package.

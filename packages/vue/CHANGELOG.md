@@ -1,5 +1,12 @@
 # @agile-ts/vue
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [f561c34]
+  - @agile-ts/core@0.0.16
+
 ## 0.0.3
 
 ### Patch Changes

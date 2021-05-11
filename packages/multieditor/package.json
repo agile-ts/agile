@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/multieditor",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -34,7 +34,7 @@
     "@agile-ts/core": "file:../core"
   },
   "peerDependencies": {
-    "@agile-ts/core": "^0.0.15"
+    "@agile-ts/core": "^0.0.16"
   },
   "publishConfig": {
     "access": "public"

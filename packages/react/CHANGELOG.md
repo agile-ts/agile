@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.0.17
+
+### Patch Changes
+
+- f561c34: - added move method
+  - fixed 0 as itemKey issue
+  - fixed computed tracking
+- Updated dependencies [f561c34]
+  - @agile-ts/core@0.0.16
+
 ## 0.0.16
 
 ### Patch Changes
