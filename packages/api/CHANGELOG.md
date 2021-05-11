@@ -1,5 +1,12 @@
 # @agile-ts/api
 
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies [f561c34]
+  - @agile-ts/utils@0.0.3
+
 ## 0.0.16
 
 ### Patch Changes
