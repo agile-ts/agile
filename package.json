@@ -17,6 +17,7 @@
   "scripts": {
     "build": "lerna run build",
     "prepare": "lerna run prepare",
+    "changelog": "lerna-changelog",
     "bootstrap": "lerna bootstrap",
     "watch:core": "cd packages/core && yarn run watch",
     "watch:react": "cd packages/react && yarn run watch",
@@ -58,6 +59,7 @@
     "jest": "^26.6.3",
     "jest-mock-console": "^1.0.1",
     "lerna": "^3.22.1",
+    "lerna-changelog": "^1.0.1",
     "nodemon": "^2.0.6",
     "prettier": "2.1.2",
     "ts-jest": "^26.4.4",
