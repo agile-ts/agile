@@ -939,8 +939,8 @@ export class Collection<DataType extends object = DefaultItem> {
    * @public
    * Move ItemKey/s from one Group to another
    * @param itemKeys - ItemKey/s that are moved
-   * @param oldGroupKey - GroupKey of the Group that currently keeps the Items
-   * @param newGroupKey - GroupKey of the Group into which the Items should be moved
+   * @param oldGroupKey - GroupKey of the Group that currently keeps the Items at itemKey/s
+   * @param newGroupKey - GroupKey of the Group into which the Items at itemKey/s are moved
    * @param config - Config
    */
   public move(
