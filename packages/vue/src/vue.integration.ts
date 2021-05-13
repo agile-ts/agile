@@ -14,23 +14,19 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
   key: 'vue',
   frameworkInstance: Vue,
   updateMethod: (componentInstance, updatedData) => {
-    // Merge changes into sharedState if some Data updated otherwise force rerender
-    if (Object.keys(updatedData).length !== 0) {
-      // https://vuejs.org/v2/guide/state-management.html
-      componentInstance.$root.$data.sharedState = {
-        ...updatedData,
-        ...componentInstance.$root.$data.sharedState,
-      };
-    } else {
-      componentInstance.$forceUpdate();
-    }
+    const componentData = componentInstance.$data;
 
-    // TODO REMOVE
-    console.log(
-      'updateMethod()',
-      componentInstance,
-      componentInstance.$root.$data.sharedState
-    );
+    // Update existing Data or if a new one got created set it via Vue
+    // Note: Not merging 'updateData' into 'componentData'
+    // because Vue tracks the local State changes via Proxy
+    // and by merging it, Vue couldn't detect the changes
+    for (const key of Object.keys(updatedData)) {
+      if (Object.prototype.hasOwnProperty.call(componentData, key)) {
+        componentData.sharedState[key] = updatedData[key];
+      } else {
+        Vue.set(componentData.sharedState, key, updatedData[key]);
+      }
+    }
   },
   bind: (agile) => {
     // https://vuejs.org/v2/guide/plugins.html
@@ -43,7 +39,9 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
             this.$agile = agile;
           },
           methods: {
-            bindAgileInstances: function (deps: DepsType) {
+            bindAgileInstances: function (
+              deps: DepsType
+            ): { sharedState: { [key: string]: any } } {
               return {
                 sharedState: {
                   ...(this.$root.$data.sharedState || {}),

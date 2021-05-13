@@ -20,15 +20,15 @@ export default {
   data: function () {
     return {
       ...this.bindAgileInstances({
-        myState: MY_STATE
+        myState: MY_STATE,
       }),
     };
   },
   methods: {
-    changeMyState: function(){
+    changeMyState: function () {
       MY_STATE.set(generateId());
-    }
-  }
+    },
+  },
 };
 </script>
 
