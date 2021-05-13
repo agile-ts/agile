@@ -4,7 +4,7 @@ We are open and grateful for any contribution made by the community.
 If you're interested in contributing to AgileTs, this document might make the process for you easier.
 
 The [Open Source Guides](https://opensource.guide/) website has a collection of resources for individuals,
-communities, and companies who want to learn how to run and contribute to an open source project.
+communities, and companies who want to learn how to run and contribute to an open-source project.
 Contributors and people new to open source will find the following guides especially useful:
 
 - [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
@@ -87,8 +87,8 @@ Don't take this personally if this happens, and feel free to open a new issue on
 2. Ensure you have [Yalc](https://www.google.com/search?client=firefox-b-d&q=yalc) installed
 3. Run `yarn run dev:publish` to publish all packages in your local 'yalc/(npm)' store
 4. Execute `yarn install:agile` in the Example Project in order to install its dependencies correctly
-5. If you made your desired changes. Run `yarn run dev:push` to push your updated changes into your local 'npm store' <br />
-   _ProTip:_ To make real-time changes, run `yarn run watch`, which automatically runs `yarn run dev:push` every time you update a file in a package.
+5. When you have made the desired changes. Run `yarn run dev:push` to push your updated changes to your local 'npm store'<br />.
+   _ProTip:_ To make changes in real-time, run `yarn run watch`, which will automatically run `yarn run dev:push` whenever you updated a file in the corresponding package.
 
 
 ## ☄️ Pull Request
@@ -146,7 +146,7 @@ When adding a new [breaking change](https://stackoverflow.com/questions/21703216
 
 ### What Happens Next?
 
-The core Team of AgileTs is constantly monitoring pull requests and merges them if they seem correct.
+The Core Team of AgileTs is constantly monitoring pull requests and merges them if they seem correct.
 Help us to keep pull requests consistent by following the guidelines above.
 
 
@@ -158,11 +158,11 @@ You can check the status of your code styling by simply running `yarn prettier`.
 **Most important:** Look around. Match the style you see used in the rest of the project(formatting, naming, ..).
 
 
-## 🚀 Release [Admin]
+## 🚀 Releasing Process [Admin]
 
-AgileTs is published as an `npm` package in the `npm` store.
+AgileTs is published in the [`npm` store](https://www.npmjs.com/).
 
-### Check publish rights
+### 🔐 Check publish rights
 
 Get access from the AgileTs npm admins ([@bennodev19](https://github.com/bennodev19)).
 
@@ -170,43 +170,57 @@ Get access from the AgileTs npm admins ([@bennodev19](https://github.com/bennode
 
 You need publish access to the **main AgileTs repository** (not a fork).
 
-### Steps
+#### NPM
+
+For publishing a package in the below [workflow](#workflow), you need no npm publishing rights.
+It is published via a Github action that handles the publishing process for us and saves us work.
+
+If you, for whatever reason, need to publish a package **manually**,
+publishing will only work if you are logged in to npm with an account with publishing rights to the `@agile-ts/` team/packages.
+
+If you are not currently logged in to npm on your CLI, do the following:
+
+1. `npm login`
+2. Enter username, password, and associated email address
+3. **Enable 2FA** on your account (required for publishing process)
+
+### 🏃 Workflow
 
 #### 1. Git setup
 
-Ensure that each release changes are merged into the `develop` branch
-and check the `develop` branch out.
-Only the `develop` branch is allowed to be merged into the master!!
+Checkout the [`develop`](https://github.com/agile-ts/agile/blob/develop/) branch and
+make sure that each release change is merged into it.
+Only the `develop` branch is allowed to be merged into the master
+and thus be the next release! See ['Our Development Process'](#-our-development-process).
 ```ts
 git fetch origin develop
 git checkout origin/develop
-git fetch --tags // To generate correct changelog
+git fetch --tags // To generate the correct changelog later
 ```
 
 #### 2. Test and build packages
 
 - Run `yarn test` in the `root` of the project and ensure that all tests run green
 - Run [`yarn pack`](https://docs.npmjs.com/cli/v6/commands/npm-pack) in the `root` of the project,
-  which simply builds and packs the packages as they will be released.
+  which simply builds and packs the packages with the files as they will be released.
     - Check if all packages could be built
-    - Check if each package contains the files that should be shipped
+    - Check that each package built contains the files to be delivered
 
 #### 3. Create Pull Request to `master`
 
-Now that we know each package builds correctly and works as expected,
-we can create a pull request into the `master`.
+Now that we know each package can be built correctly and works as expected,
+we create a pull request to the `master` branch.
 ```ts
 master <-- develop
 ```
-- `Pull Request Title` should be something like 'New Release 🎉'.
+- `Pull Request Title` = 'New Release 🎉'.
 - `Pull Request Description` is generated in the next step ([Step 4](#4-create-changelog))
-  and will be the changelog based on the previously merged pull requests.
+  and will be a changelog based on the previous (in the `develop` branch) merged pull requests.
 
 #### 4. Create Changelog
 
 The changelog uses GitHub labels to classify each pull request.
-Use the GitHub interface to assign each newly merged pull request to a GitHub label starting with `tag:`,
-otherwise, the PR won't appear in the changelog.
+Use the GitHub interface to assign each newly merged pull request to a GitHub label starting with `tag:`. Otherwise, the PR won't appear in the changelog.
 
 [Check tags of all recently merged Pull-Requests](https://github.com/agile-ts/agile/pulls?q=is%3Apr+sort%3Aupdated-desc+is%3Amerged+)
 
@@ -221,16 +235,16 @@ Generate the changelog in the `root` of the project with:
 ```sh
 GITHUB_AUTH=<Your GitHub auth token> yarn changelog
 ```
-Copy the generated content and paste it into the in [Step 3](#3-create-pull-request-to-the-master)
-created pull request description. Save the changelog somewhere in between because we need it again in the next step ([Step 5](#5-bump-version)).
+Copy the generated content and paste it as a description into the in [Step 3](#3-create-pull-request-to-master)
+created `Pull Request`. Save the changelog somewhere in between because we need it again in the next step ([Step 5](#5-bump-version)).
 
 #### 5. Bump Version
 
-We don't increase the versions of the single packages manually.
+We don't manually increase the versions of the packages to be released.
 Instead, we run `yarn version:bump` in the `root` of the project.
 This will trigger [Changeset](https://github.com/atlassian/changesets).
 Changeset is a handy tool to manage versioning and changelogs with a focus on multi-package repositories.
-In order to bump the versions correctly, we have to pass 3 questions of Changeset:
+In order for Changeset to bump the versions correctly, we need to pass 3 questions from it:
 ```ts
 �  Which packages would you like to include? ...
 √ changed packages
@@ -242,7 +256,7 @@ In order to bump the versions correctly, we have to pass 3 questions of Changese
   √ @agile-ts/logger
 ```
 Select the packages where something has changed,
-and the version needs to be incremented.
+and thus, the version needs to be incremented.
 ```ts
 �  Which packages should have a major bump? ...
 √ all packages
@@ -263,28 +277,29 @@ and it will ask the same question based on `minor` version bumps, ..
 �  Please enter a summary for this change (this will be in the changelogs). Submit empty line to open external editor
 �  Summary »
 ```
-Here we pass the in [Step 4](#4-create-changelog) generated changelog.
+Here we pass the changelog generated in [Step 4](#4-create-changelog).
 
-#### 6. Commit changes and merge `develop -> master`
+#### 6. Commit changes and merge `master <- develop`
 
-Now we are nearly done with the manual part and commit the file generated in the `.changeset` folder.
-After the commit, we wait for each github/circleci action to complete successfully.
+Now we are nearly done with the manual part.
+Commit the file generated in the `.changeset` folder to the `develop` branch.
+After committing, we wait for each github/circleci action to complete successfully.
 - If they `fail`, we have to figure out why and fix the issue
-- If they `succeed`, we can merge
+- If they `succeed`, we merge the previously (in [Step3](#3-create-pull-request-to-master)) created pull request (`master <- develop`)
 
-#### 7. Merge `Next Release -> master`
+#### 7. Merge `master <- 'Next Release'`
 
-After a successful merge, Changeset created a new `Pull Request` from `changeset-release/master` into the `master`.
-It has incremented the versions and adjusted the changelogs.
-Before merging, we should check if the versions got increased correctly 
-and if everything else seems correct.
-Because after we have merged, there is no back.
-Then it automatically releases the changed packages to npm 
-and creates the corresponding tags.
+If the merge was successful, Changeset created a new `Pull Request` called 'Next Release'
+from the branch `changeset-release/master` to the `master` branch.
+In doing so, Changeset automatically incremented the versions and adjusted the changelogs.
+Before we merge, we should double-check if the versions have been increased correctly and that everything else seems correct.
+Because after we have merged, there is no going back.
+After the merge, the changed packages are automatically built and sent to `npm`.
+In addition, Changeset creates the appropriate tags and releases in GitHub.
 
 #### 8. Merge `master -> develop`
 
-So that the `devlop` branch is not outdated,
+So that the `devlop` branch does not become obsolete,
 we merge the `master` into the `develop` branch at the end.
 
 
