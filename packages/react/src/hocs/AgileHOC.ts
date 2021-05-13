@@ -260,6 +260,7 @@ type SubscribableAgileInstancesType =
   | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
+
 type DepsType =
   | Array<SubscribableAgileInstancesType>
   | { [key: string]: SubscribableAgileInstancesType }

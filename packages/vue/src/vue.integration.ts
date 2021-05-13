@@ -1,5 +1,6 @@
 import Agile, { Integration } from '@agile-ts/core';
 import Vue from 'vue';
+import { getBindAgileInstanceMethod } from './bindAgileInstances';
 
 const vueIntegration = new Integration({
   key: 'vue',
@@ -11,7 +12,10 @@ const vueIntegration = new Integration({
         // https://vuejs.org/v2/guide/mixins.html
         vue.mixin({
           created: function () {
-            agile.subController.registerSubscription(this);
+            // @ts-ignore
+            this.bindAgileInstances = getBindAgileInstanceMethod(agile, this);
+            // @ts-ignore
+            this.test = (value: string) => ({ test: value });
           },
         });
       },
