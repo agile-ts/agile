@@ -4,7 +4,6 @@ import {
   Agile,
   ComponentSubscriptionContainer,
   getAgileInstance,
-  normalizeArray,
   Observer,
   Collection,
   isValidObject,
@@ -90,6 +89,7 @@ const createHOC = (
 ): ComponentClass<any, any> => {
   return class extends ReactComponent {
     public agileInstance: Agile;
+    public waitForMount: boolean;
 
     public componentSubscriptionContainers: Array<
       ComponentSubscriptionContainer
@@ -99,6 +99,7 @@ const createHOC = (
     constructor(props: any) {
       super(props);
       this.agileInstance = (() => agileInstance) as any;
+      this.waitForMount = agileInstance.config.waitForMount;
     }
 
     // We have to go the 'UNSAFE' way because the constructor of a React Component gets called twice
@@ -106,11 +107,12 @@ const createHOC = (
     // We could generate a id for each component but this would also happen in the constructor so idk
     // https://github.com/facebook/react/issues/12906
     UNSAFE_componentWillMount() {
-      // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
+      // Create Subscription with Observer that have no Indicator and can't be merged into this.state (Rerender will be caused via force Update)
       if (depsWithoutIndicator.length > 0) {
         this.agileInstance.subController.subscribeWithSubsArray(
           this,
-          depsWithoutIndicator
+          depsWithoutIndicator,
+          { waitForMount: this.waitForMount }
         );
       }
 
@@ -118,7 +120,8 @@ const createHOC = (
       if (depsWithIndicator) {
         const response = this.agileInstance.subController.subscribeWithSubsObject(
           this,
-          depsWithIndicator
+          depsWithIndicator,
+          { waitForMount: this.waitForMount }
         );
         this.agileProps = response.props;
 
@@ -128,8 +131,7 @@ const createHOC = (
     }
 
     componentDidMount() {
-      if (this.agileInstance.config.waitForMount)
-        this.agileInstance.subController.mount(this);
+      if (this.waitForMount) this.agileInstance.subController.mount(this);
     }
 
     componentWillUnmount() {

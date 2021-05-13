@@ -24,6 +24,7 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
       if (Object.prototype.hasOwnProperty.call(componentData, key)) {
         componentData.sharedState[key] = updatedData[key];
       } else {
+        // https://vuejs.org/v2/guide/reactivity.html
         Vue.set(componentData.sharedState, key, updatedData[key]);
       }
     }

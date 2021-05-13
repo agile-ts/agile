@@ -25,15 +25,12 @@ export function bindAgileInstances(
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
 
-  // TODO REMOVE
-  console.log('deps', depsWithoutIndicator, depsWithIndicator);
-
-  // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
+  // Create Subscription with Observer that have no Indicator and can't be merged into the sharedState (Rerender will be caused via force Update)
   if (depsWithoutIndicator.length > 0) {
     agile.subController.subscribeWithSubsArray(
       vueComponent,
-      depsWithoutIndicator
-      // { waitForMount: false } // TODO
+      depsWithoutIndicator,
+      { waitForMount: false }
     );
   }
 
@@ -41,8 +38,8 @@ export function bindAgileInstances(
   if (depsWithIndicator) {
     return agile.subController.subscribeWithSubsObject(
       vueComponent,
-      depsWithIndicator
-      // { waitForMount: false } // TODO
+      depsWithIndicator,
+      { waitForMount: false }
     ).props;
   }
 

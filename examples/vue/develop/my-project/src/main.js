@@ -7,7 +7,6 @@ Vue.config.productionTip = false;
 
 const AgileApp = new Agile({
   logConfig: { level: Logger.level.DEBUG },
-  waitForMount: false,
 }).integrate(vueIntegration);
 
 export const MY_STATE = AgileApp.createState('Hello World');
