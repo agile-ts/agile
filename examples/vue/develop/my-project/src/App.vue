@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
-    <p>myState: {{ myState }}</p>
+    <p>myState: {{ sharedState.myState }}</p>
     <button v-on:click="changeMyState">Change State</button>
     <HelloWorld msg="Welcome to Your Vue.js App!" />
   </div>
@@ -20,7 +20,7 @@ export default {
   data: function () {
     return {
       ...this.bindAgileInstances({
-        myState: MY_STATE,
+        myState: MY_STATE
       }),
     };
   },
