@@ -1,6 +1,13 @@
 import Agile, { Integration } from '@agile-ts/core';
 import Vue from 'vue';
-import { getBindAgileInstanceMethod } from './bindAgileInstances';
+import { bindAgileInstances, DepsType } from './bindAgileInstances';
+
+declare module 'vue/types/vue' {
+  interface VueConstructor {
+    bindAgileInstances: (deps: DepsType) => { [key: string]: any };
+    $agile: Agile;
+  }
+}
 
 const vueIntegration = new Integration({
   key: 'vue',
@@ -16,9 +23,8 @@ const vueIntegration = new Integration({
             this.$agile = agile;
           },
           methods: {
-            bindAgileInstances: function () {
-              // @ts-ignore
-              getBindAgileInstanceMethod(this.$agile, this);
+            bindAgileInstances: function (deps: DepsType) {
+              return bindAgileInstances(deps, agile, this);
             },
           },
         });

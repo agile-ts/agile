@@ -106,7 +106,7 @@ const createHOC = (
     // https://github.com/facebook/react/issues/12906
     UNSAFE_componentWillMount() {
       // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
-      if (depsWithoutIndicator) {
+      if (depsWithoutIndicator.size > 0) {
         this.agileInstance.subController.subscribeWithSubsArray(
           this,
           Array.from(depsWithoutIndicator)

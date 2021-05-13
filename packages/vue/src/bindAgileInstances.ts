@@ -1,46 +1,42 @@
+import Vue from 'vue';
 import { Agile, Collection, Observer, State } from '@agile-ts/core';
 import { isValidObject, normalizeArray } from '@agile-ts/utils';
 
-export const getBindAgileInstanceMethod = (
+export function bindAgileInstances(
+  deps: DepsType,
   agile: Agile,
-  vueComponent: any
-): ((deps: DepsType) => { [key: string]: any }) => {
-  return (deps: DepsType) => {
-    let depsWithoutIndicator: Set<Observer> = new Set();
-    let depsWithIndicator: DepsWithIndicatorType;
+  vueComponent: Vue
+) {
+  let depsWithoutIndicator: Set<Observer> = new Set();
+  let depsWithIndicator: DepsWithIndicatorType;
 
-    // Format Deps
-    if (isValidObject(deps)) {
-      depsWithIndicator = formatDepsWithIndicator(deps as any);
-    } else {
-      const response = formatDepsWithNoSafeIndicator(deps as any);
-      depsWithIndicator = response.depsWithIndicator;
-      depsWithoutIndicator = response.depsWithoutIndicator;
-    }
+  // Format Deps
+  if (isValidObject(deps)) {
+    depsWithIndicator = formatDepsWithIndicator(deps as any);
+  } else {
+    const response = formatDepsWithNoSafeIndicator(deps as any);
+    depsWithIndicator = response.depsWithIndicator;
+    depsWithoutIndicator = response.depsWithoutIndicator;
+  }
 
-    console.log(deps);
+  // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
+  if (depsWithoutIndicator.size > 0) {
+    agile.subController.subscribeWithSubsArray(
+      vueComponent,
+      Array.from(depsWithoutIndicator)
+    );
+  }
 
-    // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
-    if (depsWithoutIndicator) {
-      agile.subController.subscribeWithSubsArray(
-        vueComponent,
-        Array.from(depsWithoutIndicator)
-      );
+  // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.state)
+  if (depsWithIndicator) {
+    return agile.subController.subscribeWithSubsObject(
+      vueComponent,
+      depsWithIndicator
+    ).props;
+  }
 
-      return {};
-    }
-
-    // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.state)
-    if (depsWithIndicator) {
-      return agile.subController.subscribeWithSubsObject(
-        vueComponent,
-        depsWithIndicator
-      ).props;
-    }
-
-    return {};
-  };
-};
+  return {};
+}
 
 //=========================================================================================================
 // Format Deps With No Safe Indicator
@@ -146,7 +142,7 @@ type SubscribableAgileInstancesType =
   | Observer
   | undefined;
 
-type DepsType =
+export type DepsType =
   | Array<SubscribableAgileInstancesType>
   | { [key: string]: SubscribableAgileInstancesType }
   | SubscribableAgileInstancesType;
