@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
     <p>myState: {{ myState }}</p>
-    <p>Test: {{ test }}</p>
+    <p>Test: {{ myTest }}</p>
     <HelloWorld msg="Welcome to Your Vue.js App!" />
   </div>
 </template>
@@ -17,12 +17,18 @@ export default {
     HelloWorld,
   },
   data: function () {
-    console.log(this);
+    const props = this.bindAgileInstances({
+      myState: MY_STATE,
+    });
+
+    console.log({
+      ...props,
+      ...{myTest: 'hi'},
+    })
+
     return {
-      ...this.test('hi'),
-      ...this.bindAgileInstances({
-        myState: MY_STATE,
-      }),
+      ...props,
+      ...{myTest: 'hi'},
     };
   },
 };

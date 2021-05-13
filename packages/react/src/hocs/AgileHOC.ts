@@ -88,7 +88,7 @@ const createHOC = (
   depsWithIndicator: DepsWithIndicatorType
 ): ComponentClass<any, any> => {
   return class extends ReactComponent {
-    public agileInstance: () => Agile;
+    public agileInstance: Agile;
 
     public componentSubscriptionContainers: Array<
       ComponentSubscriptionContainer
@@ -107,7 +107,7 @@ const createHOC = (
     UNSAFE_componentWillMount() {
       // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
       if (depsWithoutIndicator) {
-        this.agileInstance().subController.subscribeWithSubsArray(
+        this.agileInstance.subController.subscribeWithSubsArray(
           this,
           Array.from(depsWithoutIndicator)
         );
@@ -115,7 +115,7 @@ const createHOC = (
 
       // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.state)
       if (depsWithIndicator) {
-        const response = this.agileInstance().subController.subscribeWithSubsObject(
+        const response = this.agileInstance.subController.subscribeWithSubsObject(
           this,
           depsWithIndicator
         );
@@ -127,12 +127,12 @@ const createHOC = (
     }
 
     componentDidMount() {
-      if (this.agileInstance().config.waitForMount)
-        this.agileInstance().subController.mount(this);
+      if (this.agileInstance.config.waitForMount)
+        this.agileInstance.subController.mount(this);
     }
 
     componentWillUnmount() {
-      this.agileInstance().subController.unsubscribe(this);
+      this.agileInstance.subController.unsubscribe(this);
     }
 
     render() {

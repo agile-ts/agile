@@ -13,9 +13,13 @@ const vueIntegration = new Integration({
         vue.mixin({
           created: function () {
             // @ts-ignore
-            this.bindAgileInstances = getBindAgileInstanceMethod(agile, this);
-            // @ts-ignore
-            this.test = (value: string) => ({ test: value });
+            this.$agile = agile;
+          },
+          methods: {
+            bindAgileInstances: function () {
+              // @ts-ignore
+              getBindAgileInstanceMethod(this.$agile, this);
+            },
           },
         });
       },
