@@ -3,13 +3,13 @@
     <img alt="Vue logo" src="./assets/logo.png" />
     <p>myState: {{ sharedState.myState }}</p>
     <button v-on:click="changeMyState">Change State</button>
-    <HelloWorld msg="Welcome to Your Vue.js App!" />
+    <HelloWorld msg="Welcome to Your Vue.js App with AgileTs!" />
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue';
-import { MY_STATE } from '@/main';
+import { MY_STATE } from '@/core';
 import { generateId } from '@agile-ts/core';
 
 export default {
