@@ -1,5 +1,27 @@
 # Change Log
 
+## 0.0.7
+
+### Patch Changes
+
+- 7aeadd5: #### :rocket: New Feature
+
+  - `core`, `react`, `vue`
+    - [#144](https://github.com/agile-ts/agile/pull/144) Vue integration ([@bennodev19](https://github.com/bennodev19))
+
+  #### :nail_care: Polish
+
+  - `core`, `react`, `vue`
+    - [#144](https://github.com/agile-ts/agile/pull/144) Vue integration ([@bennodev19](https://github.com/bennodev19))
+  - Fixed typos in ReadMe's
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+- Updated dependencies [7aeadd5]
+  - @agile-ts/core@0.0.17
+
 ## 0.0.6
 
 ### Patch Changes
