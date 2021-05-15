@@ -71,10 +71,10 @@ which functions as the brain of AgileTs and is indispensable.
 Unfortunately, we can't combine each `core` with `react` version.
 Therefore, we have created a table that shows which versions fit together without restrictions.
 
-| @agile-ts/react | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
-| --------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
-| v0.0.7+         | v0.0.7+                 | v6+                      | 16.8+                    | Yes                               |
-| v0.0.6          | v0.0.3 - v0.0.6         | v6+                      | 16.8+                    | Yes                               | 
+| @agile-ts/react  | @agile-ts/core          | NPM Version              | Supported React versions | Supports hook based components    |
+| ---------------- | ----------------------- | ------------------------ | -------------------------|---------------------------------- |
+| v0.0.15+         | v0.0.16+                | v6+                      | 16.8+                    | Yes                               |
+| v0.0.7 - v0.0.14 | v0.0.7 - v0.0.15        | v6+                      | 16.8+                    | Yes                               | 
 
 _Older Versions aren't supported anymore_
 
@@ -86,7 +86,7 @@ _Older Versions aren't supported anymore_
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/documentation_header.png" alt="Documentation"/>
 
 Sounds AgileTs interesting to you?
-Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
+Checkout our **[documentation](https://agile-ts.org/docs/react)**, to learn more.
 And I promise you, you will be able to use AgileTs in no time.
 In case you have any further questions don't hesitate joining our [Community Discord](https://discord.gg/T9GzreAwPH).
 
