@@ -42,7 +42,6 @@ describe('SubController Tests', () => {
       let dummySubscriptionContainer: SubscriptionContainer;
 
       beforeEach(() => {
-        dummyAgile.config.waitForMount = 'dummyWaitForMount' as any;
         dummySubscriptionContainer = new SubscriptionContainer();
         dummyObserver1.value = 'myCoolValue';
 
@@ -112,7 +111,6 @@ describe('SubController Tests', () => {
       let dummySubscriptionContainer: SubscriptionContainer;
 
       beforeEach(() => {
-        dummyAgile.config.waitForMount = 'dummyWaitForMount' as any;
         dummySubscriptionContainer = new SubscriptionContainer();
 
         subController.registerSubscription = jest.fn(
@@ -275,6 +273,7 @@ describe('SubController Tests', () => {
 
       beforeEach(() => {
         dummySubscriptionContainer = new SubscriptionContainer();
+        dummyAgile.config.waitForMount = 'dummyWaitForMount' as any;
 
         subController.registerCallbackSubscription = jest.fn(
           () => dummySubscriptionContainer as CallbackSubscriptionContainer
