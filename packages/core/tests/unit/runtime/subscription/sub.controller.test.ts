@@ -53,53 +53,7 @@ describe('SubController Tests', () => {
         jest.spyOn(dummyObserver2, 'subscribe');
       });
 
-      it('should create subscriptionContainer and add in Object shape passed Observers to it (default config)', () => {
-        const subscribeWithSubsResponse = subController.subscribeWithSubsObject(
-          dummyIntegration,
-          {
-            dummyObserver1: dummyObserver1,
-            dummyObserver2: dummyObserver2,
-          }
-        );
-
-        expect(subscribeWithSubsResponse).toStrictEqual({
-          props: {
-            dummyObserver1: 'myCoolValue',
-          },
-          subscriptionContainer: dummySubscriptionContainer,
-        });
-
-        expect(
-          subController.registerSubscription
-        ).toHaveBeenCalledWith(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          { waitForMount: dummyAgile.config.waitForMount }
-        );
-
-        expect(dummySubscriptionContainer.isObjectBased).toBeTruthy();
-        expect(dummySubscriptionContainer.subsObject).toStrictEqual({
-          dummyObserver1: dummyObserver1,
-          dummyObserver2: dummyObserver2,
-        });
-
-        expect(dummySubscriptionContainer.subscribers.size).toBe(2);
-        expect(
-          dummySubscriptionContainer.subscribers.has(dummyObserver1)
-        ).toBeTruthy();
-        expect(
-          dummySubscriptionContainer.subscribers.has(dummyObserver2)
-        ).toBeTruthy();
-
-        expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
-        );
-        expect(dummyObserver2.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
-        );
-      });
-
-      it('should create subscriptionContainer and add in Object shape passed Observers to it (specific config)', () => {
+      it('should create subscriptionContainer and add in Object shape passed Observers to it', () => {
         const subscribeWithSubsResponse = subController.subscribeWithSubsObject(
           dummyIntegration,
           {
@@ -168,42 +122,7 @@ describe('SubController Tests', () => {
         jest.spyOn(dummyObserver2, 'subscribe');
       });
 
-      it('should create subscriptionContainer and add in Array Shape passed Observers to it (default config)', () => {
-        const subscribeWithSubsArrayResponse = subController.subscribeWithSubsArray(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2]
-        );
-
-        expect(subscribeWithSubsArrayResponse).toBe(dummySubscriptionContainer);
-
-        expect(
-          subController.registerSubscription
-        ).toHaveBeenCalledWith(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          { waitForMount: dummyAgile.config.waitForMount }
-        );
-
-        expect(dummySubscriptionContainer.isObjectBased).toBeFalsy();
-        expect(dummySubscriptionContainer.subsObject).toBeUndefined();
-
-        expect(dummySubscriptionContainer.subscribers.size).toBe(2);
-        expect(
-          dummySubscriptionContainer.subscribers.has(dummyObserver1)
-        ).toBeTruthy();
-        expect(
-          dummySubscriptionContainer.subscribers.has(dummyObserver2)
-        ).toBeTruthy();
-
-        expect(dummyObserver1.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
-        );
-        expect(dummyObserver2.subscribe).toHaveBeenCalledWith(
-          dummySubscriptionContainer
-        );
-      });
-
-      it('should create subscriptionContainer and add in Array Shape passed Observers to it (specific config)', () => {
+      it('should create subscriptionContainer and add in Array Shape passed Observers to it', () => {
         const subscribeWithSubsArrayResponse = subController.subscribeWithSubsArray(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
@@ -365,15 +284,14 @@ describe('SubController Tests', () => {
         );
       });
 
-      it('should call registerCallbackSubscription if passed integrationInstance is a Function', () => {
+      it('should call registerCallbackSubscription if passed integrationInstance is a Function (default config)', () => {
         const dummyIntegration = () => {
           /* empty function */
         };
 
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          { key: 'niceKey', proxyKeyMap: {} }
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
@@ -382,20 +300,43 @@ describe('SubController Tests', () => {
         ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          { key: 'niceKey', proxyKeyMap: {} }
+          { waitForMount: dummyAgile.config.waitForMount }
         );
         expect(
           subController.registerComponentSubscription
         ).not.toHaveBeenCalled();
       });
 
-      it('should call registerComponentSubscription if passed integrationInstance is not a Function', () => {
-        const dummyIntegration = { dummy: 'integration' };
+      it('should call registerCallbackSubscription if passed integrationInstance is a Function (specific config)', () => {
+        const dummyIntegration = () => {
+          /* empty function */
+        };
 
         const subscriptionContainer = subController.registerSubscription(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          { key: 'niceKey', proxyKeyMap: {} }
+          { key: 'niceKey', proxyKeyMap: {}, waitForMount: false }
+        );
+
+        expect(subscriptionContainer).toBe(dummySubscriptionContainer);
+        expect(
+          subController.registerCallbackSubscription
+        ).toHaveBeenCalledWith(
+          dummyIntegration,
+          [dummyObserver1, dummyObserver2],
+          { key: 'niceKey', proxyKeyMap: {}, waitForMount: false }
+        );
+        expect(
+          subController.registerComponentSubscription
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should call registerComponentSubscription if passed integrationInstance is not a Function (default config)', () => {
+        const dummyIntegration = { dummy: 'integration' };
+
+        const subscriptionContainer = subController.registerSubscription(
+          dummyIntegration,
+          [dummyObserver1, dummyObserver2]
         );
 
         expect(subscriptionContainer).toBe(dummySubscriptionContainer);
@@ -404,7 +345,29 @@ describe('SubController Tests', () => {
         ).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
-          { key: 'niceKey', proxyKeyMap: {} }
+          { waitForMount: dummyAgile.config.waitForMount }
+        );
+        expect(
+          subController.registerCallbackSubscription
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should call registerComponentSubscription if passed integrationInstance is not a Function (specific config)', () => {
+        const dummyIntegration = { dummy: 'integration' };
+
+        const subscriptionContainer = subController.registerSubscription(
+          dummyIntegration,
+          [dummyObserver1, dummyObserver2],
+          { key: 'niceKey', proxyKeyMap: {}, waitForMount: false }
+        );
+
+        expect(subscriptionContainer).toBe(dummySubscriptionContainer);
+        expect(
+          subController.registerComponentSubscription
+        ).toHaveBeenCalledWith(
+          dummyIntegration,
+          [dummyObserver1, dummyObserver2],
+          { key: 'niceKey', proxyKeyMap: {}, waitForMount: false }
         );
         expect(
           subController.registerCallbackSubscription

@@ -46,9 +46,6 @@ export class SubController {
     props: { [key: string]: Observer['value'] };
   } {
     const props: { [key: string]: Observer['value'] } = {};
-    config = defineConfig(config, {
-      waitForMount: this.agileInstance().config.waitForMount,
-    });
 
     // Create subsArray
     const subsArray: Observer[] = [];
@@ -93,10 +90,6 @@ export class SubController {
     subs: Array<Observer> = [],
     config: RegisterSubscriptionConfigInterface = {}
   ): SubscriptionContainer {
-    config = defineConfig(config, {
-      waitForMount: this.agileInstance().config.waitForMount,
-    });
-
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
       integrationInstance,
@@ -222,6 +215,9 @@ export class SubController {
     subs: Array<Observer> = [],
     config: RegisterSubscriptionConfigInterface = {}
   ): SubscriptionContainer {
+    config = defineConfig(config, {
+      waitForMount: this.agileInstance().config.waitForMount,
+    });
     if (isFunction(integrationInstance))
       return this.registerCallbackSubscription(
         integrationInstance,
