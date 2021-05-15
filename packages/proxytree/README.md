@@ -179,13 +179,12 @@ console.log(proxyTree.transformTreeToBranchObject()); // Returns (see below)
 Sounds AgileTs interesting to you?
 Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
 And I promise you, you will be able to use AgileTs in no time.
-In case you have any further questions don't hesitate joining our [Community Discord](https://discord.gg/T9GzreAwPH).
-
+If you have any further questions, don't hesitate to join our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 ## ⭐️ Contribute
 
 Get a part of AgileTs and start contributing. We welcome any meaningful contribution 😀
-To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+To find out more about contributing, check out the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
