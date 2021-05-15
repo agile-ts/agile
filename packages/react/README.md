@@ -32,8 +32,9 @@ but Hooks aren't supported in Class Components.
 Therefore, we have created alternatives for Class Components in order to offer the same functionalities there as well.
 
 ### 🐆 Functional Component
-In Functional Components we recommend using AgileTs Hooks like [`useAgile()`](./features/Hooks.md#useagile).
-The `useAgile()` Hook binds [Agile Sub Instances](https://agile-ts.org/docs/introduction#agile-sub-instance) (like States or Collections) to React Components.
+In Functional Components we recommend using AgileTs Hooks like [`useAgile()`](https://agile-ts.org/docs/react/hooks/#useagile).
+The `useAgile()` Hook binds [Agile Sub Instances](https://agile-ts.org/docs/introduction#agile-sub-instance) 
+(like States or Collections) to React Components.
 ```ts
 // -- myComponent.jsx ------------------------------------------
 
@@ -46,7 +47,8 @@ checkout the [AgileTs Hook documentation](https://agile-ts.org/docs/react/hooks)
 ### 🦖 Class Component
 For Class Components, we provide the `AgileHOC`.
 The `AgileHOC` is a Higher Order Component that is wrapped around a React Component.
-It takes care of binding [Agile Sub Instances](https://agile-ts.org/docs/introduction#agile-sub-instance) (like States or Collections) to the wrapped React Component.
+It takes care of binding [Agile Sub Instances](https://agile-ts.org/docs/introduction#agile-sub-instance) 
+(like States or Collections) to the wrapped React Component.
 ```ts
 // -- myComponent.jsx ------------------------------------------
 
@@ -97,7 +99,7 @@ If you have any further questions, don't hesitate to join our [Community Discord
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/react/static/contribute_header.png" alt="Contribute"/>
 
-Get a part of AgileTs and start contributing. We welcome any meaningful contribution 😀
+Get a part of AgileTs and start contributing. We welcome any meaningful contribution. 😀
 To find out more about contributing, check out the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">

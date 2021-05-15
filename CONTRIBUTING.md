@@ -233,7 +233,7 @@ Generate a GitHub auth token by going to https://github.com/settings/tokens
 
 Generate the changelog in the `root` of the project with:
 ```sh
-GITHUB_AUTH=<Your GitHub auth token> yarn changelog
+GITHUB_AUTH=<Your GitHub auth token> yarn run changelog
 ```
 Copy the generated content and paste it as a description into the in [Step 3](#3-create-pull-request-to-master)
 created `Pull Request`. Save the changelog somewhere in between because we need it again in the next step ([Step 5](#5-bump-version)).
