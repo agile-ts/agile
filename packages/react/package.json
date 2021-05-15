@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/react",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -45,10 +45,10 @@
   },
   "peerDependencies": {
     "react": "^16.13.1",
-    "@agile-ts/core": "^0.0.16"
+    "@agile-ts/core": "^0.0.17"
   },
   "dependencies": {
-    "@agile-ts/proxytree": "^0.0.2"
+    "@agile-ts/proxytree": "^0.0.3"
   },
   "publishConfig": {
     "access": "public"

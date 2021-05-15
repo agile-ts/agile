@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/vue",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -34,7 +34,7 @@
     "vue": "^2.6.12"
   },
   "peerDependencies": {
-    "@agile-ts/core": "^0.0.16",
+    "@agile-ts/core": "^0.0.17",
     "vue": "^2.6.12"
   },
   "publishConfig": {
