@@ -535,6 +535,13 @@ describe('SubController Tests', () => {
         );
         expect(callbackSubscriptionContainer.callback).toBe(dummyIntegration);
         expect(callbackSubscriptionContainer.ready).toBeTruthy();
+
+        // TODO find a way to spy on a class constructor without overwriting it
+        // https://stackoverflow.com/questions/48219267/how-to-spy-on-a-class-constructor-jest/48486214
+        // Because the below tests are not really related to this test,
+        // they are checking if the CallbackSubscriptionContainer got called with the right parameters
+        // by checking if CallbackSubscriptionContainer has set its properties correctly
+        // Note:This 'issue' happens in multiple parts of the AgileTs test
         expect(callbackSubscriptionContainer.key).toBe('randomKey');
         expect(callbackSubscriptionContainer.proxyKeyMap).toStrictEqual({});
         expect(callbackSubscriptionContainer.proxyBased).toBeFalsy();

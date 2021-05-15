@@ -12,7 +12,7 @@ export function bindAgileInstances(
   deps: DepsType,
   agile: Agile,
   vueComponent: Vue
-) {
+): { [key: string]: any } {
   let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
 
@@ -25,7 +25,7 @@ export function bindAgileInstances(
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
 
-  // Create Subscription with Observer that have no Indicator and can't be merged into the sharedState (Rerender will be caused via force Update)
+  // Create Subscription with Observer that have no Indicator and can't be merged into the 'sharedState' (Rerender will be caused via force Update)
   if (depsWithoutIndicator.length > 0) {
     agile.subController.subscribeWithSubsArray(
       vueComponent,
@@ -34,7 +34,7 @@ export function bindAgileInstances(
     );
   }
 
-  // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.$data.sharedState)
+  // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.$data.sharedState')
   if (depsWithIndicator) {
     return agile.subController.subscribeWithSubsObject(
       vueComponent,
@@ -51,7 +51,7 @@ export function bindAgileInstances(
 //=========================================================================================================
 /**
  * @private
- * Extract Observers of dependencies which might not have an indicator.
+ * Extract Observers from dependencies which might not have an indicator.
  * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
  * @param deps - Dependencies to be formatted
  */
@@ -87,7 +87,7 @@ const formatDepsWithNoSafeIndicator = (
 //=========================================================================================================
 /**
  * @private
- * Extract Observers of dependencies which have an indicator through the object property key.
+ * Extract Observers from dependencies which have an indicator through the object property key.
  * @param deps - Dependencies to be formatted
  */
 const formatDepsWithIndicator = (deps: {

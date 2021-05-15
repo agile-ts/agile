@@ -98,7 +98,7 @@ const createHOC = (
 
     constructor(props: any) {
       super(props);
-      this.agileInstance = (() => agileInstance) as any;
+      this.agileInstance = agileInstance;
       this.waitForMount = agileInstance.config.waitForMount;
     }
 
@@ -107,7 +107,7 @@ const createHOC = (
     // We could generate a id for each component but this would also happen in the constructor so idk
     // https://github.com/facebook/react/issues/12906
     UNSAFE_componentWillMount() {
-      // Create Subscription with Observer that have no Indicator and can't be merged into this.state (Rerender will be caused via force Update)
+      // Create Subscription with Observer that have no Indicator and can't be merged into 'this.state' (Rerender will be caused via force Update)
       if (depsWithoutIndicator.length > 0) {
         this.agileInstance.subController.subscribeWithSubsArray(
           this,
@@ -116,7 +116,7 @@ const createHOC = (
         );
       }
 
-      // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.state)
+      // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.state')
       if (depsWithIndicator) {
         const response = this.agileInstance.subController.subscribeWithSubsObject(
           this,
@@ -152,7 +152,7 @@ const createHOC = (
 //=========================================================================================================
 /**
  * @private
- * Extract Observers of dependencies which might not have an indicator.
+ * Extract Observers from dependencies which might not have an indicator.
  * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
  * @param deps - Dependencies to be formatted
  */
@@ -188,7 +188,7 @@ const formatDepsWithNoSafeIndicator = (
 //=========================================================================================================
 /**
  * @private
- * Extract Observers of dependencies which have an indicator through the object property key.
+ * Extract Observers from dependencies which have an indicator through the object property key.
  * @param deps - Dependencies to be formatted
  */
 const formatDepsWithIndicator = (deps: {
