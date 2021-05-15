@@ -4,11 +4,11 @@ import {
   Agile,
   ComponentSubscriptionContainer,
   getAgileInstance,
-  normalizeArray,
   Observer,
   Collection,
   isValidObject,
   flatMerge,
+  extractObservers,
 } from '@agile-ts/core';
 
 //=========================================================================================================
@@ -26,7 +26,7 @@ export function AgileHOC(
   deps: DepsType,
   agileInstance?: Agile
 ): ComponentClass<any, any> {
-  let depsWithoutIndicator: Set<Observer> = new Set();
+  let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
 
   // Format Deps
@@ -41,7 +41,7 @@ export function AgileHOC(
   // Try to get Agile Instance
   if (!agileInstance) {
     // From deps without Indicator
-    if (depsWithoutIndicator.size > 0) {
+    if (depsWithoutIndicator.length > 0) {
       for (const dep of depsWithoutIndicator) {
         if (!agileInstance) agileInstance = getAgileInstance(dep);
       }
@@ -84,11 +84,12 @@ export function AgileHOC(
 const createHOC = (
   ReactComponent: ComponentClass<any, any>,
   agileInstance: Agile,
-  depsWithoutIndicator: Set<Observer>,
+  depsWithoutIndicator: Array<Observer>,
   depsWithIndicator: DepsWithIndicatorType
 ): ComponentClass<any, any> => {
   return class extends ReactComponent {
-    public agileInstance: () => Agile;
+    public agileInstance: Agile;
+    public waitForMount: boolean;
 
     public componentSubscriptionContainers: Array<
       ComponentSubscriptionContainer
@@ -97,7 +98,8 @@ const createHOC = (
 
     constructor(props: any) {
       super(props);
-      this.agileInstance = (() => agileInstance) as any;
+      this.agileInstance = agileInstance;
+      this.waitForMount = agileInstance.config.waitForMount;
     }
 
     // We have to go the 'UNSAFE' way because the constructor of a React Component gets called twice
@@ -105,19 +107,21 @@ const createHOC = (
     // We could generate a id for each component but this would also happen in the constructor so idk
     // https://github.com/facebook/react/issues/12906
     UNSAFE_componentWillMount() {
-      // Create Subscription with Observer that have no Indicator and can't passed into this.state (Rerender will be caused via force Update)
-      if (depsWithoutIndicator) {
-        this.agileInstance().subController.subscribeWithSubsArray(
+      // Create Subscription with Observer that have no Indicator and can't be merged into 'this.state' (Rerender will be caused via force Update)
+      if (depsWithoutIndicator.length > 0) {
+        this.agileInstance.subController.subscribeWithSubsArray(
           this,
-          Array.from(depsWithoutIndicator)
+          depsWithoutIndicator,
+          { waitForMount: this.waitForMount }
         );
       }
 
-      // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating this.state)
+      // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.state')
       if (depsWithIndicator) {
-        const response = this.agileInstance().subController.subscribeWithSubsObject(
+        const response = this.agileInstance.subController.subscribeWithSubsObject(
           this,
-          depsWithIndicator
+          depsWithIndicator,
+          { waitForMount: this.waitForMount }
         );
         this.agileProps = response.props;
 
@@ -127,12 +131,11 @@ const createHOC = (
     }
 
     componentDidMount() {
-      if (this.agileInstance().config.waitForMount)
-        this.agileInstance().subController.mount(this);
+      if (this.waitForMount) this.agileInstance.subController.mount(this);
     }
 
     componentWillUnmount() {
-      this.agileInstance().subController.unsubscribe(this);
+      this.agileInstance.subController.unsubscribe(this);
     }
 
     render() {
@@ -149,50 +152,30 @@ const createHOC = (
 //=========================================================================================================
 /**
  * @private
- * Formats Deps that have no safe indicator and gets Observers from them.
- * It tries to use the existing Key of the Dep as Indicator.
- * @param deps - Deps that have no safe Indicator and get formatted
+ * Extract Observers from dependencies which might not have an indicator.
+ * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
+ * @param deps - Dependencies to be formatted
  */
 const formatDepsWithNoSafeIndicator = (
   deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
-): RegisterDepsWithNoSafeIndicatorResponseInterface => {
+): {
+  depsWithoutIndicator: Observer[];
+  depsWithIndicator: DepsWithIndicatorType;
+} => {
+  const depsArray = extractObservers(deps);
   const depsWithIndicator: DepsWithIndicatorType = {};
-  const depsWithoutIndicator: Set<Observer> = new Set();
-  const depsArray = normalizeArray(deps as any, {
-    createUndefinedArray: true,
-  });
+  let depsWithoutIndicator: Observer[] = depsArray.filter(
+    (dep): dep is Observer => dep !== undefined
+  );
 
-  // Get Observers from Deps
-  for (const dep of depsArray) {
-    if (!dep) continue;
-
-    // If Dep is Collection
-    if (dep instanceof Collection) {
-      depsWithoutIndicator.add(
-        dep.getGroupWithReference(dep.config.defaultGroupKey).observer
-      );
-      continue;
-    }
-
-    // If Dep has property that is Observer
-    if (dep['observer']) {
-      depsWithoutIndicator.add(dep['observer']);
-      continue;
-    }
-
-    // If Dep is Observer
-    if (dep instanceof Observer) {
-      depsWithoutIndicator.add(dep);
-    }
-  }
-
-  // Add deps with key to depsWithIndicator and remove them from depsWithoutIndicator
-  for (const dep of depsWithoutIndicator) {
+  // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
+  depsWithoutIndicator = depsWithoutIndicator.filter((dep) => {
     if (dep && dep['key']) {
       depsWithIndicator[dep['key']] = dep;
-      depsWithoutIndicator.delete(dep);
+      return false;
     }
-  }
+    return true;
+  });
 
   return {
     depsWithIndicator,
@@ -205,38 +188,18 @@ const formatDepsWithNoSafeIndicator = (
 //=========================================================================================================
 /**
  * @private
- * Format Deps that have an Indicator and gets Observers from them.
- * The key of a property in the object is the indicator.
- * @param deps - Deps that have an Indicator and get formatted
+ * Extract Observers from dependencies which have an indicator through the object property key.
+ * @param deps - Dependencies to be formatted
  */
 const formatDepsWithIndicator = (deps: {
   [key: string]: SubscribableAgileInstancesType;
 }): DepsWithIndicatorType => {
   const depsWithIndicator: DepsWithIndicatorType = {};
 
-  // Get Observers from Deps
+  // Extract Observers from Deps
   for (const depKey in deps) {
-    const dep = deps[depKey];
-    if (!dep) continue; // undefined deps won't be represented in props anyway
-
-    // If Dep is Collection
-    if (dep instanceof Collection) {
-      depsWithIndicator[depKey] = dep.getGroupWithReference(
-        dep.config.defaultGroupKey
-      ).observer;
-      continue;
-    }
-
-    // If Dep has property that is an Observer
-    if (dep['observer']) {
-      depsWithIndicator[depKey] = dep['observer'];
-      continue;
-    }
-
-    // If Dep is Observer
-    if (dep instanceof Observer) {
-      depsWithIndicator[depKey] = dep;
-    }
+    const observer = extractObservers(deps[depKey])[0];
+    if (observer) depsWithIndicator[depKey] = observer;
   }
 
   return depsWithIndicator;
@@ -260,14 +223,10 @@ type SubscribableAgileInstancesType =
   | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
-type DepsType =
+
+export type DepsType =
   | Array<SubscribableAgileInstancesType>
-  | { [key: string]: SubscribableAgileInstancesType }
-  | SubscribableAgileInstancesType;
+  | { [key: string]: SubscribableAgileInstancesType };
+//  | SubscribableAgileInstancesType; // Not allowed because each passed Agile Instance is detect as object and will run through 'formatDepsWithIndicator'
 
 type DepsWithIndicatorType = { [key: string]: Observer };
-
-interface RegisterDepsWithNoSafeIndicatorResponseInterface {
-  depsWithoutIndicator: Set<Observer>;
-  depsWithIndicator: DepsWithIndicatorType;
-}

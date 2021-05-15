@@ -129,7 +129,7 @@ export function useAgile<
         forceRender();
       },
       observers,
-      { key: config.key, proxyKeyMap }
+      { key: config.key, proxyKeyMap, waitForMount: false }
     );
 
     // Unsubscribe Callback based Subscription on Unmount

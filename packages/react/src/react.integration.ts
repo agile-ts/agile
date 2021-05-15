@@ -9,7 +9,7 @@ const reactIntegration = new Integration<typeof React, AgileReactComponent>({
     // Nothing to bind ;D
     return Promise.resolve(true);
   },
-  updateMethod(componentInstance, updatedData: Object) {
+  updateMethod(componentInstance, updatedData: { [key: string]: any }) {
     // Merge changes into State if some Data updated otherwise force rerender
     if (Object.keys(updatedData).length !== 0) {
       componentInstance.agileProps = flatMerge(
