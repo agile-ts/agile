@@ -5,8 +5,9 @@ import {
   ComponentSubscriptionContainer,
   CallbackSubscriptionContainer,
   isFunction,
-  SubscriptionContainerKeyType,
   SubscriptionContainerConfigInterface,
+  defineConfig,
+  removeProperties,
 } from '../../internal';
 
 export class SubController {
@@ -39,7 +40,7 @@ export class SubController {
   public subscribeWithSubsObject(
     integrationInstance: any,
     subs: { [key: string]: Observer } = {},
-    config: SubscriptionContainerConfigInterface = {}
+    config: RegisterSubscriptionConfigInterface = {}
   ): {
     subscriptionContainer: SubscriptionContainer;
     props: { [key: string]: Observer['value'] };
@@ -87,7 +88,7 @@ export class SubController {
   public subscribeWithSubsArray(
     integrationInstance: any,
     subs: Array<Observer> = [],
-    config: SubscriptionContainerConfigInterface = {}
+    config: RegisterSubscriptionConfigInterface = {}
   ): SubscriptionContainer {
     // Register Subscription -> decide weather subscriptionInstance is callback or component based
     const subscriptionContainer = this.registerSubscription(
@@ -212,8 +213,11 @@ export class SubController {
   public registerSubscription(
     integrationInstance: any,
     subs: Array<Observer> = [],
-    config: SubscriptionContainerConfigInterface = {}
+    config: RegisterSubscriptionConfigInterface = {}
   ): SubscriptionContainer {
+    config = defineConfig(config, {
+      waitForMount: this.agileInstance().config.waitForMount,
+    });
     if (isFunction(integrationInstance))
       return this.registerCallbackSubscription(
         integrationInstance,
@@ -242,17 +246,17 @@ export class SubController {
   public registerComponentSubscription(
     componentInstance: any,
     subs: Array<Observer> = [],
-    config: SubscriptionContainerConfigInterface = {}
+    config: RegisterSubscriptionConfigInterface = {}
   ): ComponentSubscriptionContainer {
     const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
       subs,
-      config
+      removeProperties(config, ['waitForMount'])
     );
     this.componentSubs.add(componentSubscriptionContainer);
 
     // Set to ready if not waiting for component to mount
-    if (this.agileInstance().config.waitForMount) {
+    if (config.waitForMount) {
       if (this.mountedComponents.has(componentInstance))
         componentSubscriptionContainer.ready = true;
     } else componentSubscriptionContainer.ready = true;
@@ -292,12 +296,12 @@ export class SubController {
   public registerCallbackSubscription(
     callbackFunction: () => void,
     subs: Array<Observer> = [],
-    config: SubscriptionContainerConfigInterface = {}
+    config: RegisterSubscriptionConfigInterface = {}
   ): CallbackSubscriptionContainer {
     const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
       callbackFunction,
       subs,
-      config
+      removeProperties(config, ['waitForMount'])
     );
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;
@@ -342,4 +346,13 @@ export class SubController {
 
     this.mountedComponents.delete(componentInstance);
   }
+}
+
+/**
+ * @param waitForMount - Whether the subscriptionContainer should only become ready
+ * when the Component has been mounted. (default = agileInstance.config.waitForMount)
+ */
+interface RegisterSubscriptionConfigInterface
+  extends SubscriptionContainerConfigInterface {
+  waitForMount?: boolean;
 }

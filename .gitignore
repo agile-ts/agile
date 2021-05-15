@@ -4,6 +4,7 @@ dist
 package-lock.json
 coverage
 .tgz
+.changelog
 
 # Differs on each engine
 yalc.lock

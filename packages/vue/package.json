@@ -34,8 +34,8 @@
     "vue": "^2.6.12"
   },
   "peerDependencies": {
-    "vue": "^2.6.12",
-    "@agile-ts/core": "^0.0.16"
+    "@agile-ts/core": "^0.0.16",
+    "vue": "^2.6.12"
   },
   "publishConfig": {
     "access": "public"

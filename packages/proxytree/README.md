@@ -27,12 +27,12 @@ by only rendering them when an (in the Component) accessed property mutates.
 ### ▶️ Use case in `AgileTs`
 
 For example, this functionality is used in the `useProxy()` hook,
-which is used to subscribe a State to a Component.
+which is used to subscribe a State to a React Component.
 ```ts
 // MyComponent.whatever
 const myObject = useProxy(MY_OBJECT);
 
-<p>{myObject.data.adressData.street}</p>;
+return <p>{myObject.data.adressData.street}</p>;
 ```
 The Component (represented in the above example) is only rerendered by AgileTs if `myObject.data.adressData.street` mutates
 and no longer when anything in the object changes. (like it is in `useAgile()`)
@@ -123,9 +123,9 @@ console.log(proxyTree.getUsedRoutes()); // Returns (see below)
 The algorithm behind reconstructing the used routes/paths is pretty straightforward and simple.
 It may not be very efficient, but it works, and that is what counts for now.
 
-<img src="./static/pathTrackingImage.jpg" alt="pathTrackingImage" width="200"/>
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/packages/proxytree/static/pathTrackingImage.jpg" alt="pathTrackingImage" width="200"/>
 
-In the above image, each blue-circled property is the end accessed property (so b and x).
+In the above image, each blue-circled property is an end accessed property (so b and x).
 Each time a property was accessed, 
 the Proxy Tree counted the `used` property of this Route/Node. 
 Also, between Routes like 'a' or 'c' were accessed and thus incremented.
@@ -179,13 +179,12 @@ console.log(proxyTree.transformTreeToBranchObject()); // Returns (see below)
 Sounds AgileTs interesting to you?
 Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
 And I promise you, you will be able to use AgileTs in no time.
-In case you have any further questions don't hesitate joining our [Community Discord](https://discord.gg/T9GzreAwPH).
-
+If you have any further questions, don't hesitate to join our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 ## ⭐️ Contribute
 
-Get a part of AgileTs and start contributing. We welcome any meaningful contribution 😀
-To find out more checkout the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+Get a part of AgileTs and start contributing. We welcome any meaningful contribution. 😀
+To find out more about contributing, check out the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
