@@ -1178,10 +1178,10 @@ export class Collection<DataType extends object = DefaultItem> {
     }
 
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
-      Agile.logger.error(
-        `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`
+      Agile.logger.warn(
+        `Collection '${this._key}' Item Data should contain a primaryKey property called '${this.config.primaryKey}'!`
       );
-      return false;
+      _data[this.config.primaryKey] = generateId();
     }
 
     const itemKey = _data[primaryKey];

@@ -49,7 +49,7 @@ const App = new Agile();
 const MY_FIRST_STATE = App.createState("Hello Friend!");
 
 
-// -- myComponent.whatever ------------------------------------------
+// -- MyComponent.whatever ------------------------------------------
 
 // 3️⃣ Bind initialized State to desired UI-Component
 // And wolla, it's reactive. Everytime the State mutates the Component rerenders
@@ -82,8 +82,10 @@ Besides States, AgileTs offers some other powerful APIs that make your life easi
 The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
+
 Write minimalistic, boilerplate-free code that captures your intent.
 ```ts
+const MY_STATE = App.createState('frank'); // Create State
 MY_STATE.set('jeff'); // Update State value
 MY_STATE.undo(); // Undo latest State value change
 MY_STATE.is({hello: "jeff"}); // Check if State has the value '{hello: "jeff"}'
@@ -101,6 +103,7 @@ MY_STATE.watch((value) => {console.log(value);}); // Watch on State changes
   const MY_COLLECTION = App.createCollection();
   MY_COLLECTION.collect({id: 1, name: "Frank"});
   MY_COLLECTION.collect({id: 2, name: "Dieter"});
+  MY_COLLECTION.update(1, {name: "Jeff"});
   ```
 - Compute State depending on other States
   ```ts

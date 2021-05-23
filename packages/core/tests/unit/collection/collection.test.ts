@@ -2330,15 +2330,25 @@ describe('Collection Tests', () => {
         expect(collection.size).toBe(1);
       });
 
-      it("shouldn't create new Item if passed Data has no primaryKey", () => {
+      it('should create new Item with random primaryKey if passed Data has no primaryKey', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValueOnce('randomDummyId');
+
         const response = collection.setData({ name: 'Frank' } as any);
 
-        expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: Collection '${collection._key}' Item Data has to contain a primaryKey property called '${collection.config.primaryKey}'!`
+        expect(console.warn).toHaveBeenCalledWith(
+          `Agile Warn: Collection '${collection._key}' Item Data should contain a primaryKey property called '${collection.config.primaryKey}'!`
         );
 
-        expect(response).toBeFalsy();
-        expect(collection.size).toBe(1);
+        expect(response).toBeTruthy();
+        expect(response).toBeTruthy();
+        expect(collection.data).toHaveProperty('dummyItem1');
+        expect(collection.data).toHaveProperty('randomDummyId');
+        expect(collection.data['randomDummyId']).toBeInstanceOf(Item);
+        expect(collection.data['randomDummyId']._value).toStrictEqual({
+          id: 'randomDummyId',
+          name: 'Frank',
+        });
+        expect(collection.size).toBe(2);
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (default config)", () => {
