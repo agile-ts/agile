@@ -50,15 +50,15 @@ export class Storage {
    */
   public validate(): boolean {
     if (!isFunction(this.methods?.get)) {
-      LoggingHandler.logs.noValidStorageMethodError('get');
+      Agile.logger.error(`Invalid Storage 'get()' method provided!`);
       return false;
     }
     if (!isFunction(this.methods?.set)) {
-      LoggingHandler.logs.noValidStorageMethodError('set');
+      Agile.logger.error(`Invalid Storage 'set()' method provided!`);
       return false;
     }
     if (!isFunction(this.methods?.remove)) {
-      LoggingHandler.logs.noValidStorageMethodError('remove');
+      Agile.logger.error(`Invalid Storage 'remove()' method provided!`);
       return false;
     }
     return true;
@@ -76,7 +76,10 @@ export class Storage {
   public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
     if (!this.ready || !this.methods.get) return;
     if (isAsyncFunction(this.methods.get))
-      LoggingHandler.logs.normalGetInAsyncStorageWarning();
+      Agile.logger.warn(
+        'Using normalGet() in a async-based Storage might result in an unexpected return value. ' +
+          'Instead of a resolved value a Promise is returned!'
+      );
 
     // Get Value
     const res = this.methods.get(this.getStorageKey(key));

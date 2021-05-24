@@ -109,13 +109,17 @@ export class Persistent {
 
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
-      LoggingHandler.logs.noPersistKeyFoundError();
+      Agile.logger.error(
+        'No valid persist Key found! Provide a valid key or assign one to the parent instance.'
+      );
       isValid = false;
     }
 
     // Validate StorageKeys
     if (!this.config.defaultStorageKey || this.storageKeys.length <= 0) {
-      LoggingHandler.logs.noPersistStorageKeyFoundError();
+      Agile.logger.error(
+        'No persist Storage Key found! Please specify at least one Storage Key.'
+      );
       isValid = false;
     }
 

@@ -45,7 +45,10 @@ export class Storages {
   public instantiateLocalStorage(): boolean {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
-      LoggingHandler.logs.localStorageNotAvailableWarning();
+      Agile.logger.warn(
+        `The 'Local Storage' is not available in your current environment. 
+        To use the '.persist()' functionality, please provide a custom Storage!`
+      );
       return false;
     }
 
@@ -85,7 +88,9 @@ export class Storages {
 
     // Set first added Storage as default Storage
     if (!hasRegisteredAnyStorage && config.default === false)
-      LoggingHandler.logs.firstAssignedStorageHasToBeDefaultStorageWarning();
+      Agile.logger.warn(
+        'The first allocated Storage for AgileTs must be set as the default Storage!'
+      );
     if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
@@ -133,7 +138,9 @@ export class Storages {
 
     // Check if Storage is ready
     if (!storage.ready) {
-      LoggingHandler.logs.storageAtKeyNotReadyError(storageKey);
+      Agile.logger.error(
+        `Storage with the key/name '${storageKey}' isn't ready yet!`
+      );
       return undefined;
     }
 
@@ -154,7 +161,9 @@ export class Storages {
     storageKey?: StorageKey
   ): Promise<GetType | undefined> {
     if (!this.hasStorage()) {
-      LoggingHandler.logs.noStorageFoundError();
+      Agile.logger.error(
+        'No Storage found to get a value from! Please specify at least one Storage.'
+      );
       return Promise.resolve(undefined);
     }
 
@@ -187,7 +196,9 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      LoggingHandler.logs.noStorageFoundError();
+      Agile.logger.error(
+        'No Storage found to store a value in! Please specify at least one Storage.'
+      );
       return;
     }
 
@@ -217,7 +228,9 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      LoggingHandler.logs.noStorageFoundError();
+      Agile.logger.error(
+        'No Storage found to remove a value from! Please specify at least one Storage.'
+      );
       return;
     }
 

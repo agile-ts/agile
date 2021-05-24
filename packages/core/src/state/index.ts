@@ -159,9 +159,10 @@ export class State<ValueType = any> {
 
     // Check value has correct Type (js)
     if (!this.hasCorrectType(_value)) {
-      LoggingHandler.logs.incorrectTypeProvided(
-        typeof _value,
-        config.force ? 'warn' : 'error'
+      Agile.logger[config.force ? 'warn' : 'error'](
+        `Incorrect type '${typeof _value}' was provided! Requires type of ${
+          this.valueType
+        }.`
       );
       if (!config.force) return this;
     }
@@ -199,7 +200,9 @@ export class State<ValueType = any> {
 
     // Check if type is a supported Type
     if (!supportedTypes.includes(type.name)) {
-      LoggingHandler.logs.notSupportedTypeError(type);
+      Agile.logger.error(
+        `'${type}' is no supported type! Supported types are: String, Boolean, Array, Object, Number.`
+      );
       return this;
     }
 
@@ -252,7 +255,9 @@ export class State<ValueType = any> {
     });
 
     if (!isValidObject(this.nextStateValue, true)) {
-      LoggingHandler.logs.noPatchMethodOnNonObjectStateError();
+      Agile.logger.error(
+        `The 'patch()' method works only in object based States!`
+      );
       return this;
     }
 
@@ -469,7 +474,7 @@ export class State<ValueType = any> {
       return this;
     }
     if (this.currentInterval) {
-      LoggingHandler.logs.onlyOneIntervalAtOnceError();
+      Agile.logger.error(`Only one Interval can be active at once!`);
       return this;
     }
 
@@ -573,7 +578,9 @@ export class State<ValueType = any> {
     if (typeof this._value === 'boolean') {
       this.set(!this._value as any);
     } else {
-      LoggingHandler.logs.onlyInvertBooleanBasedStatesError();
+      Agile.logger.error(
+        `The 'invert()' method works only in boolean based States!`
+      );
     }
     return this;
   }

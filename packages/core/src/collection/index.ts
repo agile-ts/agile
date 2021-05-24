@@ -129,7 +129,9 @@ export class Collection<DataType extends Object = DefaultItem> {
   ): Group<DataType> {
     if (this.isInstantiated) {
       const key = config.key ?? generateId();
-      LoggingHandler.logs.useCreateGroupAfterInstantiationWarning();
+      Agile.logger.warn(
+        `We recommend using 'createGroup()' instead of 'Group()' inside the Collection configuration object.`
+      );
       return this.createGroup(key, initialItems);
     }
 
@@ -151,7 +153,9 @@ export class Collection<DataType extends Object = DefaultItem> {
   ): Selector<DataType> {
     if (this.isInstantiated) {
       const key = config.key ?? generateId();
-      LoggingHandler.logs.useCreateSelectorAfterInstantiationWarning();
+      Agile.logger.warn(
+        "We recommend using 'createSelector()' instead of 'Selector()' outside the Collection configuration object."
+      );
       return this.createSelector(key, initialKey);
     }
 
@@ -300,17 +304,15 @@ export class Collection<DataType extends Object = DefaultItem> {
       background: false,
     });
 
-    if (!item) {
-      LoggingHandler.logs.itemAtKeyDoesNotExistInCollectionError(
-        itemKey,
-        this._key
+    if (item == null) {
+      Agile.logger.error(
+        `Couldn't update Item with the key/name '${itemKey}' because it doesn't exist in Collection '${this._key}'!`
       );
       return undefined;
     }
     if (!isValidObject(changes)) {
-      LoggingHandler.logs.validObjectRequiredToUpdateCollectionItemError(
-        itemKey,
-        this._key
+      Agile.logger.error(
+        `Valid object required to update Item value '${itemKey}' in Collection '${this._key}'!`
       );
       return undefined;
     }
@@ -348,7 +350,10 @@ export class Collection<DataType extends Object = DefaultItem> {
       // To make sure that the primaryKey doesn't differ from the changes object primaryKey
       if (changes[this.config.primaryKey] !== itemKey) {
         changes[this.config.primaryKey] = itemKey;
-        LoggingHandler.logs.overwriteWholeItemWarning(changes);
+        Agile.logger.warn(
+          `By overwriting the whole Item you have to pass the correct itemKey into the changes object!`,
+          changes
+        );
       }
 
       // Apply changes to Item
@@ -376,7 +381,9 @@ export class Collection<DataType extends Object = DefaultItem> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
     if (!this.isInstantiated)
-      LoggingHandler.logs.useGroupMethodBeforeInstantiationWarning();
+      Agile.logger.warn(
+        "We recommend using 'Group()' instead of 'createGroup()' after the Collection instantiation!"
+      );
 
     // Check if Group already exists
     if (group) {
@@ -507,7 +514,9 @@ export class Collection<DataType extends Object = DefaultItem> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
 
     if (!this.isInstantiated)
-      LoggingHandler.logs.useSelectorMethodBeforeInstantiationWarning();
+      Agile.logger.warn(
+        "We recommend using 'Selector()' instead of 'createSelector()' inside the Collection configuration object."
+      );
 
     // Check if Selector already exists
     if (selector) {
@@ -967,9 +976,8 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Check if Item with newItemKey already exists
     if (this.hasItem(newItemKey)) {
-      LoggingHandler.logs.couldNotUpdateItemKeyBecauseItemKeyAlreadyExistsError(
-        oldItemKey,
-        newItemKey
+      Agile.logger.error(
+        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`
       );
       return false;
     }
@@ -1152,14 +1160,15 @@ export class Collection<DataType extends Object = DefaultItem> {
     });
 
     if (!isValidObject(_data)) {
-      LoggingHandler.logs.itemDataHasToBeValidObjectError(this._key);
+      Agile.logger.error(
+        `Item Data of Collection '${this._key}' has to be a valid object!`
+      );
       return false;
     }
 
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
-      LoggingHandler.logs.itemDataHasToContainPrimaryKeyWarning(
-        this._key,
-        this.config.primaryKey
+      Agile.logger.warn(
+        `Collection '${this._key}' Item Data has to contain a primaryKey property called '${this.config.primaryKey}'!`
       );
       _data[this.config.primaryKey] = generateId();
     }

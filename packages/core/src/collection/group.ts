@@ -322,9 +322,10 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
     // Logging
     if (notFoundItemKeys.length > 0) {
-      LoggingHandler.logs.couldNotFindItemsInCollectionWarning(
-        this.collection()._key,
-        this._key,
+      Agile.logger.warn(
+        `Couldn't find some Items in the Collection '${
+          this.collection()._key
+        }' during the rebuild of the Group '${this._key}' output`,
         notFoundItemKeys
       );
     }

@@ -30,7 +30,10 @@ export class Integrations {
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
     if (!integration._key) {
-      LoggingHandler.logs.failedToIntegrateFrameworkError(integration);
+      Agile.logger.error(
+        `Failed to integrate Framework '${integration._key}'!`,
+        integration
+      );
       return false;
     }
 
@@ -43,7 +46,10 @@ export class Integrations {
     this.integrations.add(integration);
     integration.integrated = true;
 
-    LoggingHandler.logs.integratedFrameworkSuccess(integration);
+    Agile.logger.success(
+      `Integrated '${integration._key}' into AgileTs`,
+      integration
+    );
 
     return true;
   }
@@ -61,7 +67,9 @@ export class Integrations {
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
       if (!integration.ready) {
-        LoggingHandler.logs.notReadyIntegrationWarning(integration);
+        Agile.logger.warn(
+          `Can't call 'update()' on a not ready Integration '${integration.key}'!`
+        );
         return;
       }
       if (integration.methods.updateMethod)
