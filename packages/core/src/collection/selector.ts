@@ -32,18 +32,14 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     config: SelectorConfigInterface = {}
   ) {
     super(collection.agileInstance(), undefined, config);
-    config = defineConfig(config, {
-      isPlaceholder: false,
-    });
-
     this.collection = () => collection;
     this.item = undefined;
-    this._itemKey = Selector.dummyItemKey;
+    this._itemKey = itemKey;
     this._key = config?.key;
-    this.isPlaceholder = true;
+    this.isPlaceholder = true; // Because hasn't selected any Item yet
 
     // Initial Select
-    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
+    this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -75,9 +71,10 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     itemKey: ItemKey,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
-    const oldItem = this.collection().getItem(this._itemKey, {
-      notExisting: true,
-    }); // Because this.item might be outdated
+    // Don't select Item if Collection is not properly instantiated
+    // because only after successful instantiation the Collection contains Items which are essential for a proper selection
+    if (!this.collection().isInstantiated) return this;
+
     const newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
@@ -86,18 +83,21 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
         exclude: [],
       },
       force: false,
-      overwrite: oldItem?.isPlaceholder || false,
+      overwrite: this.item?.isPlaceholder || false,
       storage: true,
     });
 
     if (this.hasSelected(itemKey) && !config.force) return this;
 
     // Unselect old Item
-    this.unselect({ background: true });
+    // But only if the new itemKey differs from the current itemKey
+    // because otherwise we would deselect the new Item
+    // that was never really selected properly
+    if (itemKey !== this._itemKey) this.unselect({ background: true });
 
     this._itemKey = itemKey;
     this.item = newItem;
-    newItem.isSelected = true;
+    newItem.selectedBy.add(this._key as any);
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(
@@ -146,7 +146,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
 
     // Unselect Item
     if (item) {
-      item.isSelected = false;
+      item.selectedBy.delete(this._key as any);
       item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
       item.removeSideEffect(Selector.rebuildItemSideEffectKey);
       if (item.isPlaceholder) delete this.collection().data[this._itemKey];
@@ -166,13 +166,15 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   // Has Selected
   //=========================================================================================================
   /**
-   * Checks if Selector has selected passed ItemKey
+   * Checks if Selector has correctly selected the passed itemKey
    * @param itemKey - ItemKey
    */
   public hasSelected(itemKey: ItemKey): boolean {
-    const isSelected = this._itemKey === itemKey;
-    if (!this.item) return isSelected;
-    return isSelected && this.item.isSelected;
+    return (
+      this._itemKey === itemKey &&
+      this.item != null &&
+      this.item.selectedBy.has(this._key as any)
+    );
   }
 
   //=========================================================================================================

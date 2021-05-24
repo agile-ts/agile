@@ -47,14 +47,6 @@ export class Collection<DataType extends Object = DefaultItem> {
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
-
-    // Set temp Config for creating proper Placeholder Items (of Selector)
-    this.config = {
-      defaultGroupKey: 'default',
-      primaryKey: 'id',
-    };
-
-    // Assign Properties
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
       primaryKey: 'id',
@@ -75,6 +67,14 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (_config.initialData) this.collect(_config.initialData);
 
     this.isInstantiated = true;
+
+    // Reselect Selectors
+    // Necessary because a selection of an Item didn't work before
+    // without a 'instantiated' Collection
+    for (const key in this.selectors) {
+      const selector = this.selectors[key];
+      selector.select(selector.itemKey, { overwrite: true });
+    }
   }
 
   /**
@@ -128,15 +128,10 @@ export class Collection<DataType extends Object = DefaultItem> {
     config: GroupConfigInterface = {}
   ): Group<DataType> {
     if (this.isInstantiated) {
-      const key = config?.key ?? generateId();
+      const key = config.key ?? generateId();
       LoggingHandler.logs.useCreateGroupAfterInstantiationWarning();
       return this.createGroup(key, initialItems);
     }
-
-    // Set 'initialRebuild' to false
-    // since the Group can't properly rebuilt its value
-    // because no Items are added to the Collection yet
-    config.initialRebuild = false;
 
     return new Group<DataType>(this, initialItems, config);
   }
@@ -155,7 +150,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     config: SelectorConfigInterface = {}
   ): Selector<DataType> {
     if (this.isInstantiated) {
-      const key = config?.key ?? generateId();
+      const key = config.key ?? generateId();
       LoggingHandler.logs.useCreateSelectorAfterInstantiationWarning();
       return this.createSelector(key, initialKey);
     }

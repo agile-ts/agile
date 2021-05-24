@@ -41,21 +41,14 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     initialItems?: Array<ItemKey>,
     config: GroupConfigInterface = {}
   ) {
-    super(
-      collection.agileInstance(),
-      initialItems || [],
-      removeProperties(config, ['initialRebuild'])
-    );
+    super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
-    config = defineConfig(config, {
-      initialRebuild: true,
-    });
 
     // Add rebuild to sideEffects to rebuild Group on Value Change
     this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
     // Initial Rebuild
-    if (config.initialRebuild) this.rebuild();
+    this.rebuild();
   }
 
   /**
@@ -311,6 +304,10 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
     const groupItems: Array<Item<DataType>> = [];
 
+    // Don't rebuild Group if Collection is not properly instantiated
+    // because only after a successful instantiation the Collection contains Items which are essential for a proper rebuild
+    if (!this.collection().isInstantiated) return this;
+
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
@@ -367,7 +364,6 @@ export interface GroupRemoveConfigInterface {
 export interface GroupConfigInterface {
   key?: GroupKey;
   isPlaceholder?: boolean;
-  initialRebuild?: boolean;
 }
 
 /**
