@@ -431,6 +431,15 @@ export class State<ValueType = any> {
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
 
+    // Check if Callback is valid Function
+    if (!isFunction(callback)) {
+      LoggingHandler.logs.xHasToBeOfTheTypeYError(
+        'onLoad Callback',
+        'function'
+      );
+      return this;
+    }
+
     this.persistent.onLoad = callback;
 
     // If State is already 'isPersisted' the loading was successful -> callback can be called

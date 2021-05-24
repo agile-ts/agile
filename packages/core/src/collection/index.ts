@@ -19,6 +19,7 @@ import {
   SelectorConfigInterface,
   removeProperties,
   LoggingHandler,
+  isFunction,
 } from '../internal';
 
 export class Collection<DataType extends Object = DefaultItem> {
@@ -131,6 +132,11 @@ export class Collection<DataType extends Object = DefaultItem> {
       LoggingHandler.logs.useCreateGroupAfterInstantiationWarning();
       return this.createGroup(key, initialItems);
     }
+
+    // Set 'initialRebuild' to false
+    // since the Group can't properly rebuilt its value
+    // because no Items are added to the Collection yet
+    config.initialRebuild = false;
 
     return new Group<DataType>(this, initialItems, config);
   }
@@ -619,9 +625,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    */
   public removeSelector(selectorKey: SelectorKey): this {
     if (!this.selectors[selectorKey]) {
-      Agile.logger.warn(
-        `Selector with the key/name '${selectorKey}' doesn't exist!`
-      );
+      LoggingHandler.logs.xDoesNotExistsAtKeyYError('Selector', selectorKey);
       return this;
     }
     this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
@@ -800,11 +804,6 @@ export class Collection<DataType extends Object = DefaultItem> {
       defaultStorageKey: null,
     });
 
-    if (this.persistent)
-      Agile.logger.warn(
-        `By persisting the Collection '${this._key}' twice you overwrite the old Persistent Instance!`
-      );
-
     // Create persistent -> Persist Value
     this.persistent = new CollectionPersistent<DataType>(this, {
       instantiate: _config.loadValue,
@@ -826,16 +825,22 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param callback - Callback Function
    */
   public onLoad(callback: (success: boolean) => void): this {
-    if (this.persistent) {
-      this.persistent.onLoad = callback;
+    if (!this.persistent) return this;
 
-      // If Collection is already 'isPersisted' the loading was successful -> callback can be called
-      if (this.isPersisted) callback(true);
-    } else {
-      Agile.logger.error(
-        `Please make sure you persist the Collection '${this._key}' before using the 'onLoad' function!`
+    // Check if Callback is valid Function
+    if (!isFunction(callback)) {
+      LoggingHandler.logs.xHasToBeOfTheTypeYError(
+        'onLoad Callback',
+        'function'
       );
+      return this;
     }
+
+    this.persistent.onLoad = callback;
+
+    // If Collection is already 'isPersisted' the loading was successful -> callback can be called
+    if (this.isPersisted) callback(true);
+
     return this;
   }
 
@@ -967,8 +972,9 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Check if Item with newItemKey already exists
     if (this.hasItem(newItemKey)) {
-      Agile.logger.warn(
-        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`
+      LoggingHandler.logs.couldNotUpdateItemKeyBecauseItemKeyAlreadyExistsError(
+        oldItemKey,
+        newItemKey
       );
       return false;
     }
@@ -1151,15 +1157,14 @@ export class Collection<DataType extends Object = DefaultItem> {
     });
 
     if (!isValidObject(_data)) {
-      Agile.logger.error(
-        `Item Data of Collection '${this._key}' has to be an valid Object!`
-      );
+      LoggingHandler.logs.itemDataHasToBeValidObjectError(this._key);
       return false;
     }
 
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
-      Agile.logger.warn(
-        `Collection '${this._key}' Item Data should contain a primaryKey property called '${this.config.primaryKey}'!`
+      LoggingHandler.logs.itemDataHasToContainPrimaryKeyWarning(
+        this._key,
+        this.config.primaryKey
       );
       _data[this.config.primaryKey] = generateId();
     }

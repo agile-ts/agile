@@ -90,10 +90,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
       storage: true,
     });
 
-    if (this.hasSelected(itemKey) && !config.force) {
-      Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
-      return this;
-    }
+    if (this.hasSelected(itemKey) && !config.force) return this;
 
     // Unselect old Item
     this.unselect({ background: true });

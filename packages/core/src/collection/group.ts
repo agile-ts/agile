@@ -16,6 +16,7 @@ import {
   StateRuntimeJobConfigInterface,
   StateIngestConfigInterface,
   removeProperties,
+  LoggingHandler,
 } from '../internal';
 
 export class Group<DataType extends Object = DefaultItem> extends State<
@@ -40,14 +41,21 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     initialItems?: Array<ItemKey>,
     config: GroupConfigInterface = {}
   ) {
-    super(collection.agileInstance(), initialItems || [], config);
+    super(
+      collection.agileInstance(),
+      initialItems || [],
+      removeProperties(config, ['initialRebuild'])
+    );
     this.collection = () => collection;
+    config = defineConfig(config, {
+      initialRebuild: true,
+    });
 
     // Add rebuild to sideEffects to rebuild Group on Value Change
     this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
     // Initial Rebuild
-    this.rebuild();
+    if (config.initialRebuild) this.rebuild();
   }
 
   /**
@@ -129,9 +137,6 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     _itemKeys.forEach((itemKey) => {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
-        Agile.logger.error(
-          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`
-        );
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
         return;
@@ -278,6 +283,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       defaultStorageKey: null,
     });
 
+    // Create storageItemKey based on Collection Name
     if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this._key,
@@ -308,7 +314,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
-      if (item) groupItems.push(item);
+      if (item != null) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
@@ -319,10 +325,9 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
     // Logging
     if (notFoundItemKeys.length > 0) {
-      Agile.logger.warn(
-        `Couldn't find some Items in Collection '${this.collection()._key}' (${
-          this._key
-        })`,
+      LoggingHandler.logs.couldNotFindItemsInCollectionWarning(
+        this.collection()._key,
+        this._key,
         notFoundItemKeys
       );
     }
@@ -357,10 +362,12 @@ export interface GroupRemoveConfigInterface {
 /**
  * @param key - Key/Name of Group
  * @param isPlaceholder - If Group is initially a Placeholder
+ * @param initialRebuild - If the Group is rebuilt shortly after the instantiation
  */
 export interface GroupConfigInterface {
   key?: GroupKey;
   isPlaceholder?: boolean;
+  initialRebuild?: boolean;
 }
 
 /**
