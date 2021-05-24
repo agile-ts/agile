@@ -1,4 +1,4 @@
-import { Agile, Integration } from '../internal';
+import { Agile, Integration, LoggingHandler } from '../internal';
 
 export class Integrations {
   public agileInstance: () => Agile;
@@ -30,10 +30,7 @@ export class Integrations {
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
     if (!integration._key) {
-      Agile.logger.error(
-        'Failed to integrate framework! Invalid Integration!',
-        integration._key
-      );
+      LoggingHandler.logs.failedToIntegrateFrameworkError(integration);
       return false;
     }
 
@@ -46,8 +43,7 @@ export class Integrations {
     this.integrations.add(integration);
     integration.integrated = true;
 
-    // Logging
-    Agile.logger.success(`Integrated '${integration._key}' into AgileTs`);
+    LoggingHandler.logs.integratedFrameworkSuccess(integration);
 
     return true;
   }
@@ -65,7 +61,7 @@ export class Integrations {
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
       if (!integration.ready) {
-        Agile.logger.warn(`Integration '${integration.key}' isn't ready yet!`);
+        LoggingHandler.logs.notReadyIntegrationWarning(integration);
         return;
       }
       if (integration.methods.updateMethod)

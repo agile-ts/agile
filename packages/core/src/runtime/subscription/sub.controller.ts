@@ -8,6 +8,7 @@ import {
   SubscriptionContainerConfigInterface,
   defineConfig,
   removeProperties,
+  LoggingHandler,
 } from '../../internal';
 
 export class SubController {
@@ -127,13 +128,10 @@ export class SubController {
       unsub(subscriptionInstance);
       this.callbackSubs.delete(subscriptionInstance);
 
-      // Logging
-      Agile.logger.if
-        .tag(['runtime', 'subscription'])
-        .info(
-          'Unregistered Callback based Subscription ',
-          subscriptionInstance
-        );
+      LoggingHandler.logs.unregisteredSubscriptionInfo(
+        subscriptionInstance,
+        'Callback'
+      );
       return;
     }
 
@@ -142,13 +140,10 @@ export class SubController {
       unsub(subscriptionInstance);
       this.componentSubs.delete(subscriptionInstance);
 
-      // Logging
-      Agile.logger.if
-        .tag(['runtime', 'subscription'])
-        .info(
-          'Unregistered Component based Subscription ',
-          subscriptionInstance
-        );
+      LoggingHandler.logs.unregisteredSubscriptionInfo(
+        subscriptionInstance,
+        'Component'
+      );
       return;
     }
 
@@ -161,13 +156,10 @@ export class SubController {
         subscriptionInstance.componentSubscriptionContainer
       );
 
-      // Logging
-      Agile.logger.if
-        .tag(['runtime', 'subscription'])
-        .info(
-          'Unregistered Component based Subscription ',
-          subscriptionInstance
-        );
+      LoggingHandler.logs.unregisteredSubscriptionInfo(
+        subscriptionInstance,
+        'Component'
+      );
       return;
     }
 
@@ -181,23 +173,14 @@ export class SubController {
           unsub(subContainer as ComponentSubscriptionContainer);
           this.componentSubs.delete(subContainer);
 
-          // Logging
-          Agile.logger.if
-            .tag(['runtime', 'subscription'])
-            .info(
-              'Unregistered Component based Subscription ',
-              subscriptionInstance
-            );
+          LoggingHandler.logs.unregisteredSubscriptionInfo(
+            subscriptionInstance,
+            'Component'
+          );
         }
       );
       return;
     }
-
-    // Logging
-    Agile.logger.if
-      .tag(['runtime', 'subscription'])
-      .warn(`Couldn't find anything to unregister in `, subscriptionInstance);
-    return;
   }
 
   //=========================================================================================================
@@ -272,13 +255,10 @@ export class SubController {
     else
       componentInstance.componentSubscriptionContainer = componentSubscriptionContainer;
 
-    // Logging
-    Agile.logger.if
-      .tag(['runtime', 'subscription'])
-      .info(
-        'Registered Component based Subscription ',
-        componentSubscriptionContainer
-      );
+    LoggingHandler.logs.registeredSubscriptionInfo(
+      componentSubscriptionContainer,
+      'Component'
+    );
 
     return componentSubscriptionContainer;
   }
@@ -306,13 +286,10 @@ export class SubController {
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;
 
-    // Logging
-    Agile.logger.if
-      .tag(['runtime', 'subscription'])
-      .info(
-        'Registered Callback based Subscription ',
-        callbackSubscriptionContainer
-      );
+    LoggingHandler.logs.registeredSubscriptionInfo(
+      callbackSubscriptionContainer,
+      'Callback'
+    );
 
     return callbackSubscriptionContainer;
   }

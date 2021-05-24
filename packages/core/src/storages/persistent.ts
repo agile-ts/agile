@@ -1,4 +1,10 @@
-import { Agile, copy, defineConfig, StorageKey } from '../internal';
+import {
+  Agile,
+  copy,
+  defineConfig,
+  LoggingHandler,
+  StorageKey,
+} from '../internal';
 
 export class Persistent {
   public agileInstance: () => Agile;
@@ -11,7 +17,7 @@ export class Persistent {
   public isPersisted = false; // If Value is stored in Agile Storage
   public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
 
-  // StorageKeys of Storages in that the Persisted Value gets saved
+  // Storages in which the Persisted Value is saved
   public storageKeys: StorageKey[] = [];
 
   /**
@@ -103,26 +109,20 @@ export class Persistent {
 
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
-      Agile.logger.error(
-        'No valid persist Key found! Please provide a Key or assign one to the parent instance.'
-      );
+      LoggingHandler.logs.noPersistKeyFoundError();
       isValid = false;
     }
 
     // Validate StorageKeys
     if (!this.config.defaultStorageKey || this.storageKeys.length <= 0) {
-      Agile.logger.error(
-        'No persist Storage Key found! Please provide at least one Storage Key.'
-      );
+      LoggingHandler.logs.noPersistStorageKeyFoundError();
       isValid = false;
     }
 
     // Check if Storages exist
     this.storageKeys.map((key) => {
       if (!this.agileInstance().storages.storages[key]) {
-        Agile.logger.error(
-          `Storage '${key}' doesn't exist yet. Please provide only existing StorageKeys!`
-        );
+        LoggingHandler.logs.xDoesNotExistsAtKeyYError('Storage', key);
         isValid = false;
       }
     });
@@ -147,16 +147,12 @@ export class Persistent {
     const storages = this.agileInstance().storages;
     const _storageKeys = copy(storageKeys);
 
-    // Print warning if default StorageKey passed, but it isn't in storageKeys
+    // Add passed default Storage Key to 'storageKeys'
     if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey)) {
-      Agile.logger.warn(
-        `Default Storage Key '${defaultStorageKey}' isn't contained in storageKeys!`,
-        _storageKeys
-      );
       _storageKeys.push(defaultStorageKey);
     }
 
-    // Add default Storage of AgileTs to storageKeys if no storageKey provided
+    // Add default Storage of AgileTs to storageKeys and assign it as default Storage Key of Persistent if no storageKeys provided
     if (_storageKeys.length <= 0) {
       this.config.defaultStorageKey = storages.config.defaultStorageKey as any;
       _storageKeys.push(storages.config.defaultStorageKey as any);
@@ -189,9 +185,7 @@ export class Persistent {
    * @return Success?
    */
   public async loadPersistedValue(): Promise<boolean> {
-    Agile.logger.error(
-      `'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
-    );
+    LoggingHandler.logs.classMethodXNotSet('loadPersistedValue', 'Persistent');
     return false;
   }
 
@@ -204,9 +198,7 @@ export class Persistent {
    * @return Success?
    */
   public async persistValue(): Promise<boolean> {
-    Agile.logger.error(
-      `'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
-    );
+    LoggingHandler.logs.classMethodXNotSet('persistValue', 'Persistent');
     return false;
   }
 
@@ -219,8 +211,9 @@ export class Persistent {
    * @return Success?
    */
   public async removePersistedValue(): Promise<boolean> {
-    Agile.logger.error(
-      `'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!`
+    LoggingHandler.logs.classMethodXNotSet(
+      'removePersistedValue',
+      'Persistent'
     );
     return false;
   }

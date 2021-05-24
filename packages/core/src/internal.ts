@@ -6,6 +6,7 @@
 
 // Logger
 export * from '@agile-ts/logger';
+export * from './loggingHandler';
 
 // Utils
 export * from './utils';

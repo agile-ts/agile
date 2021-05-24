@@ -7,6 +7,7 @@ import {
   defineConfig,
   notEqual,
   isValidObject,
+  LoggingHandler,
 } from '../internal';
 
 export class Runtime {
@@ -43,8 +44,7 @@ export class Runtime {
 
     this.jobQueue.push(job);
 
-    // Logging
-    Agile.logger.if.tag(['runtime']).info(`Created Job '${job._key}'`, job);
+    LoggingHandler.logs.createdRuntimeJobInfo(job);
 
     // Perform Job
     if (config.perform) {
@@ -76,8 +76,7 @@ export class Runtime {
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 
-    // Logging
-    Agile.logger.if.tag(['runtime']).info(`Completed Job '${job._key}'`, job);
+    LoggingHandler.logs.completedRuntimeJobInfo(job);
 
     // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
     if (this.jobQueue.length > 0) {
@@ -137,16 +136,13 @@ export class Runtime {
             job.triesToUpdate++;
             this.notReadyJobsToRerender.add(job);
 
-            // Logging
-            Agile.logger.warn(
-              "SubscriptionContainer/Component isn't ready to rerender!",
+            LoggingHandler.logs.notReadySubscriptionContainerWarning(
               subscriptionContainer
             );
           } else {
-            // Logging
-            Agile.logger.warn(
-              `Job with not ready SubscriptionContainer/Component was removed from the runtime after ${job.config.numberOfTriesToUpdate} tries to avoid an overflow.`,
-              subscriptionContainer
+            LoggingHandler.logs.removedJobExpiredJobFromRuntimeWarning(
+              subscriptionContainer,
+              job.config.numberOfTriesToUpdate
             );
           }
           return;
@@ -184,10 +180,7 @@ export class Runtime {
         );
     });
 
-    // Logging
-    Agile.logger.if
-      .tag(['runtime'])
-      .info('Updated/Rerendered Subscriptions', subscriptionsToUpdate);
+    LoggingHandler.logs.updatedSubscriptionsInfo(subscriptionsToUpdate);
 
     return true;
   }

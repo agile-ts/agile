@@ -9,6 +9,7 @@ import {
   extractObservers,
   StateIngestConfigInterface,
   removeProperties,
+  LoggingHandler,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -149,17 +150,29 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
 
   public patch() {
-    Agile.logger.error("You can't use patch method on ComputedState!");
+    LoggingHandler.logs.canNotUseMethodXOnClassX(
+      'patch',
+      'Computed',
+      "The Computed has a dynamic value which shouldn't be changed manually."
+    );
     return this;
   }
 
   public persist(): this {
-    Agile.logger.error("You can't use persist method on ComputedState!");
+    LoggingHandler.logs.canNotUseMethodXOnClassX(
+      'persist',
+      'Computed',
+      "Dynamic values shouldn't be persisted. Consider persisting the values the Computed depends on."
+    );
     return this;
   }
 
   public invert(): this {
-    Agile.logger.error("You can't use invert method on ComputedState!");
+    LoggingHandler.logs.canNotUseMethodXOnClassX(
+      'invert',
+      'Computed',
+      "The Computed has a dynamic value which shouldn't be changed manually."
+    );
     return this;
   }
 }

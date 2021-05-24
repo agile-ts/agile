@@ -7,7 +7,7 @@ import {
   defineConfig,
 } from '../internal';
 
-export class Item<DataType extends object = DefaultItem> extends State<
+export class Item<DataType extends Object = DefaultItem> extends State<
   DataType
 > {
   static updateGroupSideEffectKey = 'rebuildGroup';
