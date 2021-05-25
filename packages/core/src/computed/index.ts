@@ -150,28 +150,26 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
 
   public patch() {
-    LoggingHandler.logs.canNotUseMethodXOnClassX(
-      'patch',
-      'Computed',
-      "The Computed has a dynamic value which shouldn't be changed manually."
+    Agile.logger.error(
+      `The 'patch()' method can't be used in the Computed Class! 
+      The Computed Class has a dynamic value which shouldn't be changed manually.`
     );
     return this;
   }
 
   public persist(): this {
-    LoggingHandler.logs.canNotUseMethodXOnClassX(
-      'persist',
-      'Computed',
-      "Dynamic values shouldn't be persisted. Consider persisting the values the Computed depends on."
+    Agile.logger.error(
+      `The 'persist()' method can't be used in the Computed Class! 
+      The Computed Class has a dynamic value which shouldn't be persisted. 
+      Consider persisting the values the Computed depends on`
     );
     return this;
   }
 
   public invert(): this {
-    LoggingHandler.logs.canNotUseMethodXOnClassX(
-      'invert',
-      'Computed',
-      "The Computed has a dynamic value which shouldn't be changed manually."
+    Agile.logger.error(
+      `The 'invert()' method can't be used in the Computed Class! 
+      The Computed Class has a dynamic value which shouldn't be changed manually.`
     );
     return this;
   }

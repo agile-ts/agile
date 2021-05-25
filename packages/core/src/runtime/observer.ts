@@ -102,7 +102,9 @@ export class Observer<ValueType = any> {
    * @param job - Job that gets performed
    */
   public perform(job: RuntimeJob): void {
-    LoggingHandler.logs.classMethodXNotSet('perform', 'Observer');
+    Agile.logger.error(
+      `The 'perform()' method isn't set in Observer but need to be set! Observer is no stand alone class.`
+    );
   }
 
   //=========================================================================================================

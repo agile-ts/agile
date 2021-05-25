@@ -82,7 +82,9 @@ export class Storages {
 
     // Check if Storage already exists
     if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
-      LoggingHandler.logs.xAlreadyExistsAtKeyYError('Storage', storage.key);
+      Agile.logger.error(
+        `Storage with the key/name '${storage.key}' already exists!`
+      );
       return false;
     }
 
@@ -132,7 +134,8 @@ export class Storages {
 
     // Check if Storage exists
     if (!storage) {
-      LoggingHandler.logs.xDoesNotExistsAtKeyYError('Storage', storageKey);
+      Agile.logger.error(`Couldn't find Storage '${storageKey}'. 
+      The Storage with the key/name '${storageKey}' doesn't exists!`);
       return undefined;
     }
 

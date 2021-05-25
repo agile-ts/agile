@@ -126,7 +126,8 @@ export class Persistent {
     // Check if Storages exist
     this.storageKeys.map((key) => {
       if (!this.agileInstance().storages.storages[key]) {
-        LoggingHandler.logs.xDoesNotExistsAtKeyYError('Storage', key);
+        Agile.logger.error(`Couldn't validate Persistent '${this._key}'. 
+      The Storage with the key/name '${key}' doesn't exists!`);
         isValid = false;
       }
     });
@@ -189,7 +190,9 @@ export class Persistent {
    * @return Success?
    */
   public async loadPersistedValue(): Promise<boolean> {
-    LoggingHandler.logs.classMethodXNotSet('loadPersistedValue', 'Persistent');
+    Agile.logger.error(
+      `The 'loadPersistedValue()' method isn't set in Persistent but need to be set! Persistent is no stand alone class.`
+    );
     return false;
   }
 
@@ -202,7 +205,9 @@ export class Persistent {
    * @return Success?
    */
   public async persistValue(): Promise<boolean> {
-    LoggingHandler.logs.classMethodXNotSet('persistValue', 'Persistent');
+    Agile.logger.error(
+      `The 'persistValue()' method isn't set in Persistent but need to be set! Persistent is no stand alone class.`
+    );
     return false;
   }
 
@@ -215,9 +220,8 @@ export class Persistent {
    * @return Success?
    */
   public async removePersistedValue(): Promise<boolean> {
-    LoggingHandler.logs.classMethodXNotSet(
-      'removePersistedValue',
-      'Persistent'
+    Agile.logger.error(
+      `The 'removePersistedValue()' method isn't set in Persistent but need to be set! Persistent is no stand alone class.`
     );
     return false;
   }

@@ -388,7 +388,9 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Check if Group already exists
     if (group) {
       if (!group.isPlaceholder) {
-        LoggingHandler.logs.xAlreadyExistsAtKeyYError('Group', groupKey);
+        Agile.logger.error(
+          `Group with the key/name '${groupKey}' already exists!`
+        );
         return group;
       }
       group.set(initialItems, { overwrite: true });
@@ -491,7 +493,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    */
   public removeGroup(groupKey: GroupKey): this {
     if (!this.groups[groupKey]) {
-      LoggingHandler.logs.xDoesNotExistsAtKeyYError('Group', groupKey);
+      Agile.logger.error(`Couldn't remove Group '${groupKey}'. 
+      The Group with the key/name '${groupKey}' doesn't exists!`);
       return this;
     }
     delete this.groups[groupKey];
@@ -521,7 +524,9 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Check if Selector already exists
     if (selector) {
       if (!selector.isPlaceholder) {
-        LoggingHandler.logs.xAlreadyExistsAtKeyYError('Selector', selectorKey);
+        Agile.logger.error(
+          `Selector with the key/name '${selectorKey}' already exists!`
+        );
         return selector;
       }
       selector.select(itemKey, { overwrite: true });
@@ -629,7 +634,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    */
   public removeSelector(selectorKey: SelectorKey): this {
     if (!this.selectors[selectorKey]) {
-      LoggingHandler.logs.xDoesNotExistsAtKeyYError('Selector', selectorKey);
+      Agile.logger.error(`Couldn't remove Selector '${selectorKey}'. 
+      The Selector with the key/name '${selectorKey}' doesn't exists!`);
       return this;
     }
     this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
@@ -833,10 +839,7 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Check if Callback is valid Function
     if (!isFunction(callback)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'onLoad Callback',
-        'function'
-      );
+      Agile.logger.error(`'onLoad Callback' has to be of the type function!`);
       return this;
     }
 

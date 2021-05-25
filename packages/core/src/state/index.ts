@@ -262,10 +262,7 @@ export class State<ValueType = any> {
     }
 
     if (!isValidObject(targetWithChanges, true)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'TargetWithChanges',
-        'object'
-      );
+      Agile.logger.error(`'TargetWithChanges' has to be of the type object!`);
       return this;
     }
 
@@ -317,16 +314,15 @@ export class State<ValueType = any> {
 
     // Check if Callback is valid Function
     if (!isFunction(_callback)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'Watcher Callback',
-        'function'
-      );
+      Agile.logger.error(`'Watcher Callback' has to be of the type function!`);
       return this;
     }
 
     // Check if watcherKey is already occupied
     if (this.watchers[key]) {
-      LoggingHandler.logs.xAlreadyExistsAtKeyYError('Watcher Callback', key);
+      Agile.logger.error(
+        `Watcher Callback with the key/name '${key}' already exists!`
+      );
       return this;
     }
 
@@ -438,10 +434,7 @@ export class State<ValueType = any> {
 
     // Check if Callback is valid Function
     if (!isFunction(callback)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'onLoad Callback',
-        'function'
-      );
+      Agile.logger.error(`'onLoad Callback' has to be of the type function!`);
       return this;
     }
 
@@ -467,10 +460,7 @@ export class State<ValueType = any> {
     ms?: number
   ): this {
     if (!isFunction(callback)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'A Interval Callback',
-        'function'
-      );
+      Agile.logger.error(`'Interval Callback' has to be of the type function!`);
       return this;
     }
     if (this.currentInterval) {
@@ -531,9 +521,8 @@ export class State<ValueType = any> {
    */
   public computeExists(method: ComputeExistsMethod<ValueType>): this {
     if (!isFunction(method)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'A ComputeExists Method',
-        'function'
+      Agile.logger.error(
+        `'Compute Exists Method' has to be of the type function!`
       );
       return this;
     }
@@ -595,9 +584,8 @@ export class State<ValueType = any> {
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'A ComputeValue Method',
-        'function'
+      Agile.logger.error(
+        `'Compute Value Method' has to be of the type function!`
       );
       return this;
     }
@@ -628,9 +616,8 @@ export class State<ValueType = any> {
       weight: 10,
     });
     if (!isFunction(callback)) {
-      LoggingHandler.logs.xHasToBeOfTheTypeYError(
-        'A Side Effect Function',
-        'function'
+      Agile.logger.error(
+        `'Side Effect Callback' has to be of the type function!`
       );
       return this;
     }

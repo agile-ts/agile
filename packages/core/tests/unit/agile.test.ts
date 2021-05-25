@@ -9,6 +9,7 @@ import {
   Collection,
   Logger,
   Storages,
+  logCodes,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
 import mockConsole from 'jest-mock-console';
@@ -157,7 +158,7 @@ describe('Agile Tests', () => {
 
     expect(globalThis[Agile.globalKey]).toBe(agile1);
     expect(console.warn).toHaveBeenCalledWith(
-      'Agile Warn: Be careful with binding multiple Agile Instances globally in one Application!'
+      'Agile Warn: ' + logCodes['00:01:00']
     );
   });
 
