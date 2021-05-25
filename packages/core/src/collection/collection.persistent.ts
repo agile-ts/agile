@@ -8,6 +8,7 @@ import {
   Group,
   GroupKey,
   ItemKey,
+  LogCodeManager,
   Persistent,
   PersistentKey,
   StorageKey,
@@ -323,7 +324,7 @@ export class CollectionPersistent<
     collectionKey?: CollectionKey
   ): string {
     if (itemKey == null || collectionKey == null)
-      Agile.logger.warn('Failed to build unique Item StorageKey!');
+      LogCodeManager.log('1A:02:00');
     if (itemKey == null) itemKey = 'unknown';
     if (collectionKey == null) collectionKey = 'unknown';
     return this.storageItemKeyPattern
@@ -345,7 +346,7 @@ export class CollectionPersistent<
     collectionKey?: CollectionKey
   ): string {
     if (groupKey == null || collectionKey == null)
-      Agile.logger.warn('Failed to build unique Group StorageKey!');
+      LogCodeManager.log('1A:02:01');
     if (groupKey == null) groupKey = 'unknown';
     if (collectionKey == null) collectionKey = 'unknown';
 

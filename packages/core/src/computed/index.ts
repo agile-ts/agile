@@ -9,7 +9,7 @@ import {
   extractObservers,
   StateIngestConfigInterface,
   removeProperties,
-  LoggingHandler,
+  LogCodeManager,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -150,27 +150,17 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
 
   public patch() {
-    Agile.logger.error(
-      `The 'patch()' method can't be used in the Computed Class! 
-      The Computed Class has a dynamic value which shouldn't be changed manually.`
-    );
+    LogCodeManager.log('19:03:00');
     return this;
   }
 
   public persist(): this {
-    Agile.logger.error(
-      `The 'persist()' method can't be used in the Computed Class! 
-      The Computed Class has a dynamic value which shouldn't be persisted. 
-      Consider persisting the values the Computed depends on`
-    );
+    LogCodeManager.log('19:03:01');
     return this;
   }
 
   public invert(): this {
-    Agile.logger.error(
-      `The 'invert()' method can't be used in the Computed Class! 
-      The Computed Class has a dynamic value which shouldn't be changed manually.`
-    );
+    LogCodeManager.log('19:03:02');
     return this;
   }
 }

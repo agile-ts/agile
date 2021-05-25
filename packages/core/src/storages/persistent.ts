@@ -2,7 +2,7 @@ import {
   Agile,
   copy,
   defineConfig,
-  LoggingHandler,
+  LogCodeManager,
   StorageKey,
 } from '../internal';
 
@@ -109,25 +109,20 @@ export class Persistent {
 
     // Validate Key
     if (this._key === Persistent.placeHolderKey) {
-      Agile.logger.error(
-        'No valid persist Key found! Provide a valid key or assign one to the parent instance.'
-      );
+      LogCodeManager.log('12:03:00');
       isValid = false;
     }
 
     // Validate StorageKeys
     if (!this.config.defaultStorageKey || this.storageKeys.length <= 0) {
-      Agile.logger.error(
-        'No persist Storage Key found! Please specify at least one Storage Key.'
-      );
+      LogCodeManager.log('12:03:01');
       isValid = false;
     }
 
     // Check if Storages exist
     this.storageKeys.map((key) => {
       if (!this.agileInstance().storages.storages[key]) {
-        Agile.logger.error(`Couldn't validate Persistent '${this._key}'. 
-      The Storage with the key/name '${key}' doesn't exists!`);
+        LogCodeManager.log('12:03:02', [this._key, key]);
         isValid = false;
       }
     });
@@ -153,9 +148,8 @@ export class Persistent {
     const _storageKeys = copy(storageKeys);
 
     // Add passed default Storage Key to 'storageKeys'
-    if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey)) {
+    if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey))
       _storageKeys.push(defaultStorageKey);
-    }
 
     // Add default Storage of AgileTs to storageKeys and assign it as default Storage Key of Persistent if no storageKeys provided
     if (_storageKeys.length <= 0) {
@@ -190,9 +184,7 @@ export class Persistent {
    * @return Success?
    */
   public async loadPersistedValue(): Promise<boolean> {
-    Agile.logger.error(
-      `The 'loadPersistedValue()' method isn't set in Persistent but need to be set! Persistent is no stand alone class.`
-    );
+    LogCodeManager.log('00:03:00', ['loadPersistedValue', 'Persistent']);
     return false;
   }
 
@@ -205,9 +197,7 @@ export class Persistent {
    * @return Success?
    */
   public async persistValue(): Promise<boolean> {
-    Agile.logger.error(
-      `The 'persistValue()' method isn't set in Persistent but need to be set! Persistent is no stand alone class.`
-    );
+    LogCodeManager.log('00:03:00', ['persistValue', 'Persistent']);
     return false;
   }
 
@@ -220,9 +210,7 @@ export class Persistent {
    * @return Success?
    */
   public async removePersistedValue(): Promise<boolean> {
-    Agile.logger.error(
-      `The 'removePersistedValue()' method isn't set in Persistent but need to be set! Persistent is no stand alone class.`
-    );
+    LogCodeManager.log('00:03:00', ['removePersistedValue', 'Persistent']);
     return false;
   }
 

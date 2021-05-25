@@ -5,7 +5,7 @@ import {
   State,
   Integration,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 // jest.mock("../../../src/runtime/runtime.job"); // Can't mock RuntimeJob because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
@@ -17,7 +17,7 @@ describe('RuntimeJob Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({

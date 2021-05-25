@@ -8,14 +8,14 @@ import {
   Collection,
   StateObserver,
 } from '../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../helper/logMock';
 
 describe('Utils Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
@@ -57,10 +57,7 @@ describe('Utils Tests', () => {
       const response = getAgileInstance('weiredInstance');
 
       expect(response).toBeUndefined();
-      expect(console.error).toHaveBeenCalledWith(
-        'Agile Error: Failed to get Agile Instance from ',
-        'weiredInstance'
-      );
+      LogMock.hasLoggedCode('20:03:00', [], 'weiredInstance');
     });
   });
 
@@ -145,9 +142,7 @@ describe('Utils Tests', () => {
 
       globalBind(dummyKey, 'dummyInstance');
 
-      expect(console.error).toHaveBeenCalledWith(
-        `Agile Error: Failed to create global Instance called '${dummyKey}'`
-      );
+      LogMock.hasLoggedCode('20:03:01', [dummyKey]);
     });
   });
 });

@@ -9,7 +9,7 @@ import {
   StatePersistent,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 jest.mock('../../../src/collection/collection.persistent');
 
@@ -23,7 +23,7 @@ describe('Collection Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
@@ -220,10 +220,9 @@ describe('Collection Tests', () => {
       const warnTextKey = `Agile Warn: Failed to find key for creation of Group. Group with random key '${generatedKey}' got created!`;
       const warnText =
         "Agile Warn: After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'";
-
+      // TODO STOPPED here
       beforeEach(() => {
         jest.spyOn(collection, 'createGroup');
-        console.warn = jest.fn();
         // @ts-ignore
         Utils.generateId = jest.fn(() => generatedKey);
       });
@@ -1696,13 +1695,20 @@ describe('Collection Tests', () => {
         expect(dummyCallbackFunction).toHaveBeenCalledWith(true);
       });
 
-      it("shouldn't set onLoad function if Collection isn't persisted and should drop a error", () => {
+      it("shouldn't set onLoad function if Collection isn't persisted", () => {
         collection.onLoad(dummyCallbackFunction);
 
+        expect(collection?.persistent?.onLoad).toBeUndefined();
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Please make sure you persist the Collection 'collectionKey' before using the 'onLoad' function!"
-        );
+      });
+
+      it("shouldn't set invalid onLoad callback function", () => {
+        collection.persistent = new CollectionPersistent(collection);
+        collection.isPersisted = true;
+
+        collection.onLoad(10 as any);
+
+        LogMock.hasLoggedCode('00:03:01', ['OnLoad Callback', 'function']);
       });
     });
 

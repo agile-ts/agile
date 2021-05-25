@@ -7,6 +7,7 @@ import {
   ComputedTracker,
 } from '../../../src';
 import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Computed Tests', () => {
   let dummyAgile: Agile;
@@ -283,9 +284,7 @@ describe('Computed Tests', () => {
       it('should print error', () => {
         computed.patch();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use patch method on ComputedState!"
-        );
+        LogMock.hasLoggedCode('19:03:00');
       });
     });
 
@@ -293,9 +292,7 @@ describe('Computed Tests', () => {
       it('should print error', () => {
         computed.persist();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use persist method on ComputedState!"
-        );
+        LogMock.hasLoggedCode('19:03:01');
       });
     });
 
@@ -303,9 +300,7 @@ describe('Computed Tests', () => {
       it('should print error', () => {
         computed.invert();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use invert method on ComputedState!"
-        );
+        LogMock.hasLoggedCode('19:03:02');
       });
     });
   });

@@ -16,7 +16,7 @@ import {
   StateRuntimeJobConfigInterface,
   StateIngestConfigInterface,
   removeProperties,
-  LoggingHandler,
+  LogCodeManager,
 } from '../internal';
 
 export class Group<DataType extends Object = DefaultItem> extends State<
@@ -322,10 +322,9 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
     // Logging
     if (notFoundItemKeys.length > 0) {
-      Agile.logger.warn(
-        `Couldn't find some Items in the Collection '${
-          this.collection()._key
-        }' during the rebuild of the Group '${this._key}' output`,
+      LogCodeManager.log(
+        '1C:02:00',
+        [this.collection()._key, this._key],
         notFoundItemKeys
       );
     }

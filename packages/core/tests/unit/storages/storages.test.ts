@@ -1,12 +1,12 @@
 import { Storages, Agile, Storage, Persistent } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Storages Tests', () => {
   let dummyAgile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
@@ -62,6 +62,8 @@ describe('Storages Tests', () => {
         key: 'storage3',
         methods: dummyStorageMethods,
       });
+
+      jest.clearAllMocks(); // Because creating Storage executes some mocks
     });
 
     describe('instantiateLocalStorage function tests', () => {
@@ -111,9 +113,7 @@ describe('Storages Tests', () => {
       it('should register Storage and assign it as default Storage with a warning (config.default = false)', () => {
         const response = storages.register(dummyStorage1, { default: false });
 
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Be aware that Agile has to assign the first added Storage as default Storage!'
-        );
+        LogMock.hasLoggedCode('11:02:01');
 
         expect(storages.storages).toHaveProperty('storage1');
         expect(storages.storages['storage1']).toBe(dummyStorage1);
@@ -152,9 +152,7 @@ describe('Storages Tests', () => {
 
         const response = storages.register(dummyStorage1);
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'storage1' already exists"
-        );
+        LogMock.hasLoggedCode('11:03:00', ['storage1']);
 
         expect(storages.storages).toHaveProperty('storage1');
         expect(storages.storages['storage1']).toBe(dummyStorage);
@@ -225,23 +223,21 @@ describe('Storages Tests', () => {
         const response = storages.getStorage('storage1');
 
         expect(response).toBe(dummyStorage1);
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLoggedCode('11:03:01');
       });
 
       it("shouldn't get Storage with undefined key", () => {
         const response = storages.getStorage(null);
 
         expect(response).toBeUndefined();
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLoggedCode('11:03:01');
       });
 
       it("shouldn't get not existing Storage", () => {
         const response = storages.getStorage('notExistingStorage');
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist!"
-        );
+        LogMock.hasLoggedCode('11:03:01', ['notExistingStorage']);
       });
 
       it("shouldn't get existing and not ready Storage", () => {
@@ -250,9 +246,7 @@ describe('Storages Tests', () => {
         const response = storages.getStorage('storage1');
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'storage1' isn't ready yet!"
-        );
+        LogMock.hasLoggedCode('11:03:02', ['storage1']);
       });
     });
 
@@ -286,9 +280,7 @@ describe('Storages Tests', () => {
 
         expect(response).toBe('dummyStorage1Response');
         expect(dummyStorage1.get).toHaveBeenCalledWith('value1');
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage with the key/name 'notExistingStorage' doesn't exist!"
-        );
+        LogMock.hasLoggedCode('11:03:01', ['notExistingStorage']);
       });
 
       it('should print error if no storage found', async () => {
@@ -297,9 +289,7 @@ describe('Storages Tests', () => {
         const response = await storages2.get('value1');
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No Storage found! Please provide at least one Storage.'
-        );
+        LogMock.hasLoggedCode('11:03:03');
       });
     });
 
@@ -336,9 +326,7 @@ describe('Storages Tests', () => {
         const response = storages2.set('value1', 'testValue');
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No Storage found! Please provide at least one Storage.'
-        );
+        LogMock.hasLoggedCode('11:03:04');
       });
     });
 
@@ -375,9 +363,7 @@ describe('Storages Tests', () => {
         const response = storages2.remove('value1');
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No Storage found! Please provide at least one Storage.'
-        );
+        LogMock.hasLoggedCode('11:03:05');
       });
     });
 

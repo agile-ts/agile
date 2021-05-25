@@ -8,7 +8,7 @@ import {
   SubscriptionContainerConfigInterface,
   defineConfig,
   removeProperties,
-  LoggingHandler,
+  LogCodeManager,
 } from '../../internal';
 
 export class SubController {
@@ -130,10 +130,7 @@ export class SubController {
 
       Agile.logger.if
         .tag(['runtime', 'subscription'])
-        .info(
-          `Unregistered 'Callback' based Subscription.`,
-          subscriptionInstance
-        );
+        .info(LogCodeManager.getLog('15:01:00'), subscriptionInstance);
       return;
     }
 
@@ -144,10 +141,7 @@ export class SubController {
 
       Agile.logger.if
         .tag(['runtime', 'subscription'])
-        .info(
-          `Unregistered 'Component' based Subscription.`,
-          subscriptionInstance
-        );
+        .info(LogCodeManager.getLog('15:01:01'), subscriptionInstance);
       return;
     }
 
@@ -162,10 +156,7 @@ export class SubController {
 
       Agile.logger.if
         .tag(['runtime', 'subscription'])
-        .info(
-          `Unregistered 'Component' based Subscription.`,
-          subscriptionInstance
-        );
+        .info(LogCodeManager.getLog('15:01:01'), subscriptionInstance);
       return;
     }
 
@@ -181,10 +172,7 @@ export class SubController {
 
           Agile.logger.if
             .tag(['runtime', 'subscription'])
-            .info(
-              `Unregistered 'Component' based Subscription.`,
-              subscriptionInstance
-            );
+            .info(LogCodeManager.getLog('15:01:01'), subscriptionInstance);
         }
       );
       return;
@@ -265,10 +253,7 @@ export class SubController {
 
     Agile.logger.if
       .tag(['runtime', 'subscription'])
-      .info(
-        `Registered 'Component' based Subscription.`,
-        componentSubscriptionContainer
-      );
+      .info(LogCodeManager.getLog('15:01:02'), componentSubscriptionContainer);
 
     return componentSubscriptionContainer;
   }
@@ -298,10 +283,7 @@ export class SubController {
 
     Agile.logger.if
       .tag(['runtime', 'subscription'])
-      .info(
-        `Registered 'Callback' based Subscription.`,
-        callbackSubscriptionContainer
-      );
+      .info('15:01:03', callbackSubscriptionContainer);
 
     return callbackSubscriptionContainer;
   }

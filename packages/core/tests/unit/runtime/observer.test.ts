@@ -4,7 +4,7 @@ import {
   SubscriptionContainer,
   RuntimeJob,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Observer Tests', () => {
   let dummyAgile: Agile;
@@ -15,7 +15,7 @@ describe('Observer Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
@@ -23,7 +23,6 @@ describe('Observer Tests', () => {
     dummySubscription1 = new SubscriptionContainer();
     dummySubscription2 = new SubscriptionContainer();
 
-    console.warn = jest.fn();
     jest.spyOn(Observer.prototype, 'subscribe');
   });
 
@@ -145,9 +144,7 @@ describe('Observer Tests', () => {
 
         observer.perform(dummyJob);
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
-        );
+        LogMock.hasLoggedCode('17:03:00');
       });
     });
 

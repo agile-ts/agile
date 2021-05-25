@@ -20,8 +20,8 @@ import {
   StateConfigInterface,
   flatMerge,
   Group,
+  LogCodeManager,
 } from './internal';
-import { logCodes } from './logCode';
 
 export class Agile {
   public config: AgileConfigInterface;
@@ -77,13 +77,12 @@ export class Agile {
     Agile.logger = new Logger(config.logConfig);
 
     // Logging
-    Agile.logger.success(logCodes['00:00:00'], this, Agile.logger);
+    LogCodeManager.log('10:00:00', [], this, Agile.logger);
 
     // Create global instance of Agile
     // Why? getAgileInstance() returns the global AgileInstance if it couldn't find the Agile Instance in the passed Instance
     if (config.bindGlobal) {
-      if (!globalBind(Agile.globalKey, this))
-        Agile.logger.warn(logCodes['00:01:00']);
+      if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
     }
   }
 

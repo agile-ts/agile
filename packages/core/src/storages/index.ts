@@ -6,8 +6,7 @@ import {
   StorageKey,
   StorageItemKey,
   notEqual,
-  logCodes,
-  replace,
+  LogCodeManager,
 } from '../internal';
 
 export class Storages {
@@ -46,7 +45,7 @@ export class Storages {
   public instantiateLocalStorage(): boolean {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
-      Agile.logger.warn(logCodes['01:02:00']);
+      LogCodeManager.log('11:02:00');
       return false;
     }
 
@@ -80,13 +79,13 @@ export class Storages {
 
     // Check if Storage already exists
     if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
-      Agile.logger.error(replace('01:03:00', [storage.key]));
+      LogCodeManager.log('11:03:00', [storage.key]);
       return false;
     }
 
     // Set first added Storage as default Storage
     if (!hasRegisteredAnyStorage && config.default === false)
-      Agile.logger.warn(logCodes['01:02:01']);
+      LogCodeManager.log('11:02:01');
     if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
@@ -128,16 +127,13 @@ export class Storages {
 
     // Check if Storage exists
     if (!storage) {
-      Agile.logger.error(`Couldn't find Storage '${storageKey}'. 
-      The Storage with the key/name '${storageKey}' doesn't exists!`);
+      LogCodeManager.log('11:03:01', [storageKey]);
       return undefined;
     }
 
     // Check if Storage is ready
     if (!storage.ready) {
-      Agile.logger.error(
-        `Storage with the key/name '${storageKey}' isn't ready yet!`
-      );
+      LogCodeManager.log('11:03:02', [storageKey]);
       return undefined;
     }
 
@@ -158,9 +154,7 @@ export class Storages {
     storageKey?: StorageKey
   ): Promise<GetType | undefined> {
     if (!this.hasStorage()) {
-      Agile.logger.error(
-        'No Storage found to get a value from! Please specify at least one Storage.'
-      );
+      LogCodeManager.log('11:03:03');
       return Promise.resolve(undefined);
     }
 
@@ -193,9 +187,7 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      Agile.logger.error(
-        'No Storage found to store a value in! Please specify at least one Storage.'
-      );
+      LogCodeManager.log('11:03:04');
       return;
     }
 
@@ -225,9 +217,7 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      Agile.logger.error(
-        'No Storage found to remove a value from! Please specify at least one Storage.'
-      );
+      LogCodeManager.log('11:03:05');
       return;
     }
 

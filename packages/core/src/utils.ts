@@ -4,6 +4,7 @@ import {
   Collection,
   normalizeArray,
   isFunction,
+  LogCodeManager,
 } from './internal';
 
 //=========================================================================================================
@@ -28,7 +29,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
     // Return global bound agileInstance
     return globalThis[Agile.globalKey];
   } catch (e) {
-    Agile.logger.error('Failed to get Agile Instance from ', instance);
+    LogCodeManager.log('20:03:00', [], instance);
   }
 
   return undefined;
@@ -111,7 +112,7 @@ export function globalBind(
       return true;
     }
   } catch (e) {
-    Agile.logger.error(`Failed to create global Instance called '${key}'`);
+    LogCodeManager.log('20:03:01', [key]);
   }
   return false;
 }
