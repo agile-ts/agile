@@ -17,9 +17,9 @@ const logCodeTypes = {
 
 const logCodeManager = {
   // Agile
-  '10:00:00': 'Created new AgileInstance. [logCode: 10:00:00]',
+  '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
-    'Be careful when binding multiple Agile Instances globally in one application! [logCode: 10:02:00]',
+    'Be careful when binding multiple Agile Instances globally in one application!',
 
   // Storage
   '11:02:00':
