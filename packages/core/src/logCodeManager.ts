@@ -109,7 +109,7 @@ const logCodeManager = {
   // Collection
   '1B:02:00':
     "We recommend using 'createGroup()' " +
-    "instead of 'Group()' inside the Collection configuration object.",
+    "instead of 'Group()' outside the Collection configuration object.",
   '1B:02:01':
     "We recommend using 'createSelector()' " +
     "instead of 'Selector()' outside the Collection configuration object.",

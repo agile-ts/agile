@@ -30,6 +30,7 @@ describe('Collection Tests', () => {
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
     jest.spyOn(Collection.prototype, 'collect');
+    jest.spyOn(Selector.prototype, 'select');
   });
 
   it('should create Collection (default config)', () => {
@@ -58,6 +59,8 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith({});
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith({});
     expect(Collection.prototype.collect).not.toHaveBeenCalled();
+
+    expect(Selector.prototype.select).toHaveBeenCalledTimes(0);
   });
 
   it('should create Collection (specific config)', () => {
@@ -104,6 +107,8 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.collect).toHaveBeenCalledWith([
       { id: '1', name: 'jeff' },
     ]);
+
+    expect(Selector.prototype.select).toHaveBeenCalledTimes(0);
   });
 
   it('should create Collection (specific config in function form)', () => {
@@ -139,9 +144,7 @@ describe('Collection Tests', () => {
       defaultGroupKey: 'general',
     });
     expect(collection.size).toBe(0);
-    expect(collection.data).toStrictEqual({
-      id1: expect.any(Item), // Placeholder Item created by Selector
-    });
+    expect(collection.data).toStrictEqual({});
     expect(collection._key).toBe('dummyCollectionKey');
     expect(collection.isPersisted).toBeFalsy();
     expect(collection.persistent).toBeUndefined();
@@ -157,6 +160,11 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.collect).toHaveBeenCalledWith([
       { id: '1', name: 'jeff' },
     ]);
+
+    expect(Selector.prototype.select).toHaveBeenCalledTimes(1);
+    expect(Selector.prototype.select).toHaveBeenCalledWith('id1', {
+      overwrite: true,
+    });
   });
 
   describe('Collection Function Tests', () => {
@@ -216,15 +224,8 @@ describe('Collection Tests', () => {
     });
 
     describe('Group function tests', () => {
-      const generatedKey = 'jeff';
-      const warnTextKey = `Agile Warn: Failed to find key for creation of Group. Group with random key '${generatedKey}' got created!`;
-      const warnText =
-        "Agile Warn: After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'";
-      // TODO STOPPED here
       beforeEach(() => {
         jest.spyOn(collection, 'createGroup');
-        // @ts-ignore
-        Utils.generateId = jest.fn(() => generatedKey);
       });
 
       it('should create Group with key which belongs to Collection before instantiation', () => {
@@ -234,8 +235,7 @@ describe('Collection Tests', () => {
         });
 
         expect(collection.createGroup).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalledWith(warnText);
-        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+        LogMock.hasNotLogged('warn');
 
         expect(response).toBeInstanceOf(Group);
         expect(response._key).toBe('group1Key');
@@ -253,8 +253,7 @@ describe('Collection Tests', () => {
           1,
           2,
         ]);
-        expect(console.warn).toHaveBeenCalledWith(warnText);
-        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+        LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
         expect(response._key).toBe('group1Key');
@@ -263,30 +262,23 @@ describe('Collection Tests', () => {
       });
 
       it('should create Group with no key which belongs to Collection after instantiation and print warning', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValueOnce('randomId');
+
         collection.isInstantiated = true;
         const response = collection.Group([1, 2]);
 
-        expect(console.warn).toHaveBeenCalledWith(warnText);
-        expect(console.warn).toHaveBeenCalledWith(warnTextKey);
+        LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
-        expect(response._key).toBe(generatedKey);
+        expect(response._key).toBe('randomId');
         expect(response._value).toStrictEqual([1, 2]);
         expect(response.collection()).toBe(collection);
       });
     });
 
     describe('Selector function tests', () => {
-      const generatedKey = 'hans';
-      const warnTextKey = `Agile Warn: Failed to find key for creation of Selector. Selector with random key '${generatedKey}' got created!`;
-      const warnText =
-        "Agile Warn: After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'";
-
       beforeEach(() => {
         jest.spyOn(collection, 'createSelector');
-        console.warn = jest.fn();
-        // @ts-ignore
-        Utils.generateId = jest.fn(() => generatedKey);
       });
 
       it('should create Selector with key which belongs to Collection before instantiation', () => {
@@ -296,8 +288,7 @@ describe('Collection Tests', () => {
         });
 
         expect(collection.createSelector).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalledWith(warnText);
-        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+        LogMock.hasNotLogged('warn');
 
         expect(response).toBeInstanceOf(Selector);
         expect(response._key).toBe('selectorKey1');
@@ -315,8 +306,7 @@ describe('Collection Tests', () => {
           'selectorKey1',
           1
         );
-        expect(console.warn).toHaveBeenCalledWith(warnText);
-        expect(console.warn).not.toHaveBeenCalledWith(warnTextKey);
+        LogMock.hasLoggedCode('1B:02:01');
 
         expect(response).toBeInstanceOf(Selector);
         expect(response._key).toBe('selectorKey1');
@@ -325,14 +315,15 @@ describe('Collection Tests', () => {
       });
 
       it('should create Selector with no key which belongs to Collection after instantiation and print warning', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValueOnce('randomId');
+
         collection.isInstantiated = true;
         const response = collection.Selector(1);
 
-        expect(console.warn).toHaveBeenCalledWith(warnText);
-        expect(console.warn).toHaveBeenCalledWith(warnTextKey);
+        LogMock.hasLoggedCode('1B:02:01');
 
         expect(response).toBeInstanceOf(Selector);
-        expect(response._key).toBe(generatedKey);
+        expect(response._key).toBe('randomId');
         expect(response._itemKey).toStrictEqual(1);
         expect(response.collection()).toBe(collection);
       });
@@ -720,8 +711,8 @@ describe('Collection Tests', () => {
         const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -745,8 +736,8 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -766,8 +757,8 @@ describe('Collection Tests', () => {
         const response = collection.update('dummyItem', { name: 'hans' });
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -789,8 +780,8 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(dummyItem.set).toHaveBeenCalledWith(
           { id: 'dummyItem', name: 'hans' },
@@ -810,8 +801,8 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(dummyItem.set).toHaveBeenCalledWith(
           { id: 'dummyItem', name: 'hans' },
@@ -828,13 +819,11 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(
-          console.warn
-        ).toHaveBeenCalledWith(
-          "Agile Warn: By overwriting the whole Item don't forget passing the correct primaryKey!",
-          { id: 'dummyItem', name: 'hans' }
-        );
+        LogMock.hasNotLogged('error');
+        LogMock.hasLoggedCode('1B:02:02', [], {
+          id: 'dummyItem',
+          name: 'hans',
+        });
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(dummyItem.set).toHaveBeenCalledWith(
           { id: 'dummyItem', name: 'hans' },
@@ -847,10 +836,8 @@ describe('Collection Tests', () => {
         const response = collection.update('notExisting', { name: 'hans' });
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: Item with key/name 'notExisting' doesn't exist in Collection '${collection._key}'!`
-        );
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasLoggedCode('1B:03:00', ['notExisting', collection._key]);
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
@@ -863,10 +850,8 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: You have to pass an valid Changes Object to update 'dummyItem' in '${collection._key}'!`
-        );
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasLoggedCode('1B:03:01', ['dummyItem', collection._key]);
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).not.toHaveBeenCalled();
         expect(dummyItem.set).not.toHaveBeenCalled();
         expect(collection.updateItemKey).not.toHaveBeenCalled();
@@ -879,8 +864,8 @@ describe('Collection Tests', () => {
         });
 
         expect(response).toBe(dummyItem);
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
         expect(dummyItem.patch).toHaveBeenCalledWith(
           {
             name: 'hans',
@@ -922,7 +907,7 @@ describe('Collection Tests', () => {
       it('should create and add not existing Group to Collection', () => {
         const response = collection.createGroup('newGroup', ['dummyItem']);
 
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
         expect(response).toBeInstanceOf(Group);
         expect(response._key).toBe('newGroup');
         expect(response.isPlaceholder).toBeFalsy();
@@ -933,9 +918,7 @@ describe('Collection Tests', () => {
       it("shouldn't create and add existing Group to Collection", () => {
         const response = collection.createGroup('dummyGroup', ['dummyItem']);
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Group with the name 'dummyGroup' already exists!"
-        );
+        LogMock.hasLoggedCode('1B:03:02', ['dummyGroup']);
         expect(response).toBe(dummyGroup);
         expect(collection.groups['dummyGroup']).toBe(dummyGroup);
         expect(dummyGroup.set).not.toHaveBeenCalled();
@@ -946,7 +929,7 @@ describe('Collection Tests', () => {
 
         const response = collection.createGroup('dummyGroup', ['dummyItem']);
 
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
         expect(response).toBe(dummyGroup);
         expect(collection.groups['dummyGroup']).toBe(dummyGroup);
         expect(dummyGroup.set).toHaveBeenCalledWith(['dummyItem'], {
@@ -1104,16 +1087,13 @@ describe('Collection Tests', () => {
       it('should remove existing Group', () => {
         collection.removeGroup('dummyGroup');
 
-        expect(console.warn).not.toHaveBeenCalled();
         expect(collection.groups['dummyGroup']).toBeUndefined();
       });
 
       it("shouldn't remove not existing Group and print warning", () => {
         collection.removeGroup('notExistingGroup');
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Group with the key/name 'notExistingGroup' doesn't exist!"
-        );
+        expect(collection.groups).toHaveProperty('dummyGroup');
       });
     });
 
@@ -1140,7 +1120,7 @@ describe('Collection Tests', () => {
       it('should create and add not existing Selector to Collection', () => {
         const response = collection.createSelector('newSelector', 'dummyItem');
 
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
         expect(response).toBeInstanceOf(Selector);
         expect(response._key).toBe('newSelector');
         expect(response.isPlaceholder).toBeFalsy();
@@ -1154,9 +1134,7 @@ describe('Collection Tests', () => {
           'dummyItem'
         );
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Selector with the name 'dummySelector' already exists!"
-        );
+        LogMock.hasLoggedCode('1B:03:03', ['dummySelector']);
         expect(response).toBe(dummySelector);
         expect(collection.selectors['dummySelector']).toBe(dummySelector);
         expect(dummySelector.select).not.toHaveBeenCalled();
@@ -1170,7 +1148,7 @@ describe('Collection Tests', () => {
           'dummyItem'
         );
 
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
         expect(response).toBe(dummySelector);
         expect(collection.selectors['dummySelector']).toBe(dummySelector);
         expect(dummySelector.select).toHaveBeenCalledWith('dummyItem', {
@@ -1324,7 +1302,6 @@ describe('Collection Tests', () => {
       it('should remove existing Selector', () => {
         collection.removeSelector('dummySelector');
 
-        expect(console.warn).not.toHaveBeenCalled();
         expect(collection.selectors).not.toHaveProperty('dummySelector');
         expect(dummySelector.unselect).toHaveBeenCalled();
       });
@@ -1332,9 +1309,6 @@ describe('Collection Tests', () => {
       it("shouldn't remove not existing Selector and print warning", () => {
         collection.removeSelector('notExistingSelector');
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Selector with the key/name 'notExistingSelector' doesn't exist!"
-        );
         expect(collection.selectors).toHaveProperty('dummySelector');
         expect(dummySelector.unselect).not.toHaveBeenCalled();
       });
@@ -1666,9 +1640,6 @@ describe('Collection Tests', () => {
           key: 'newPersistentKey',
           defaultStorageKey: null,
         });
-        expect(console.warn).toHaveBeenCalledWith(
-          `Agile Warn: By persisting the Collection '${collection._key}' twice you overwrite the old Persistent Instance!`
-        );
       });
     });
 
@@ -1963,6 +1934,8 @@ describe('Collection Tests', () => {
           force: true,
           background: false,
         });
+
+        LogMock.hasNotLogged('warn');
       });
 
       it('should update ItemKey in Collection, Selectors and Groups (specific config)', () => {
@@ -2001,6 +1974,8 @@ describe('Collection Tests', () => {
           force: true,
           background: true,
         });
+
+        LogMock.hasNotLogged('warn');
       });
 
       it('should update ItemKey in Collection, dummy Selectors and dummy Groups (default config)', () => {
@@ -2036,6 +2011,8 @@ describe('Collection Tests', () => {
           force: true,
           background: false,
         });
+
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't update ItemKey of Item that doesn't exist (default config)", () => {
@@ -2045,21 +2022,25 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBeFalsy();
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't update ItemKey if it stayed the same (default config)", () => {
         const response = collection.updateItemKey('dummyItem1', 'dummyItem1');
 
         expect(response).toBeFalsy();
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't update ItemKey if ItemKey called after the newItemKey already exists and should print warning (default config)", () => {
         const response = collection.updateItemKey('dummyItem1', 'dummyItem2');
 
         expect(response).toBeFalsy();
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Couldn't update ItemKey from 'dummyItem1' to 'dummyItem2' because an Item with the key/name 'dummyItem2' already exists!"
-        );
+        LogMock.hasLoggedCode('1B:03:04', [
+          'dummyItem1',
+          'dummyItem2',
+          collection._key,
+        ]);
       });
     });
 
@@ -2323,27 +2304,25 @@ describe('Collection Tests', () => {
           name: 'Hans',
         });
         expect(collection.size).toBe(2);
+
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't create new Item if passed Data is no valid Object", () => {
         const response = collection.setData('noObject' as any);
 
-        expect(console.error).toHaveBeenCalledWith(
-          `Agile Error: Item Data of Collection '${collection._key}' has to be an valid Object!`
-        );
-
         expect(response).toBeFalsy();
         expect(collection.size).toBe(1);
+
+        LogMock.hasLoggedCode('1B:03:05', [collection._key]);
+        LogMock.hasNotLogged('warn');
       });
 
       it('should create new Item with random primaryKey if passed Data has no primaryKey', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValueOnce('randomDummyId');
 
         const response = collection.setData({ name: 'Frank' } as any);
-
-        expect(console.warn).toHaveBeenCalledWith(
-          `Agile Warn: Collection '${collection._key}' Item Data should contain a primaryKey property called '${collection.config.primaryKey}'!`
-        );
 
         expect(response).toBeTruthy();
         expect(response).toBeTruthy();
@@ -2355,6 +2334,12 @@ describe('Collection Tests', () => {
           name: 'Frank',
         });
         expect(collection.size).toBe(2);
+
+        LogMock.hasNotLogged('error');
+        LogMock.hasLoggedCode('1B:02:05', [
+          collection._key,
+          collection.config.primaryKey,
+        ]);
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (default config)", () => {
@@ -2374,6 +2359,9 @@ describe('Collection Tests', () => {
           { background: false }
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
+
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.background = true)", () => {
@@ -2396,6 +2384,9 @@ describe('Collection Tests', () => {
           { background: true }
         );
         expect(dummyItem1.patch).not.toHaveBeenCalled();
+
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true, background: true)", () => {
@@ -2418,6 +2409,9 @@ describe('Collection Tests', () => {
           { id: 'dummyItem1', name: 'Dieter' },
           { background: true }
         );
+
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
       });
 
       it("should update placeholder Item with valid Data, shouldn't rebuild Groups and should increase size (default config)", () => {
@@ -2439,6 +2433,9 @@ describe('Collection Tests', () => {
           { id: 'dummyItem1', name: 'Dieter' },
           { background: false }
         );
+
+        LogMock.hasNotLogged('error');
+        LogMock.hasNotLogged('warn');
       });
     });
 

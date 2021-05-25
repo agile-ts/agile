@@ -611,7 +611,6 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (!this.selectors[selectorKey]) return this;
     this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
     delete this.selectors[selectorKey];
-
     return this;
   }
 
