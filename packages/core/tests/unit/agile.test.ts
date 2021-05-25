@@ -158,7 +158,7 @@ describe('Agile Tests', () => {
 
     expect(globalThis[Agile.globalKey]).toBe(agile1);
     expect(console.warn).toHaveBeenCalledWith(
-      'Agile Warn: ' + logCodes['00:01:00']
+      'Agile Warn: ' + logCodes['00:02:00']
     );
   });
 

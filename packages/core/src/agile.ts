@@ -20,7 +20,6 @@ import {
   StateConfigInterface,
   flatMerge,
   Group,
-  LoggingHandler,
 } from './internal';
 import { logCodes } from './logCode';
 

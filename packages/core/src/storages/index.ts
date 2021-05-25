@@ -6,7 +6,8 @@ import {
   StorageKey,
   StorageItemKey,
   notEqual,
-  LoggingHandler,
+  logCodes,
+  replace,
 } from '../internal';
 
 export class Storages {
@@ -45,10 +46,7 @@ export class Storages {
   public instantiateLocalStorage(): boolean {
     // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
-      Agile.logger.warn(
-        `The 'Local Storage' is not available in your current environment. 
-        To use the '.persist()' functionality, please provide a custom Storage!`
-      );
+      Agile.logger.warn(logCodes['01:02:00']);
       return false;
     }
 
@@ -82,17 +80,13 @@ export class Storages {
 
     // Check if Storage already exists
     if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
-      Agile.logger.error(
-        `Storage with the key/name '${storage.key}' already exists!`
-      );
+      Agile.logger.error(replace('01:03:00', [storage.key]));
       return false;
     }
 
     // Set first added Storage as default Storage
     if (!hasRegisteredAnyStorage && config.default === false)
-      Agile.logger.warn(
-        'The first allocated Storage for AgileTs must be set as the default Storage!'
-      );
+      Agile.logger.warn(logCodes['01:02:01']);
     if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
