@@ -30,7 +30,6 @@ describe('Collection Tests', () => {
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
     jest.spyOn(Collection.prototype, 'collect');
-    jest.spyOn(Selector.prototype, 'select');
   });
 
   it('should create Collection (default config)', () => {
@@ -59,8 +58,6 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith({});
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith({});
     expect(Collection.prototype.collect).not.toHaveBeenCalled();
-
-    expect(Selector.prototype.select).toHaveBeenCalledTimes(0);
   });
 
   it('should create Collection (specific config)', () => {
@@ -107,8 +104,6 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.collect).toHaveBeenCalledWith([
       { id: '1', name: 'jeff' },
     ]);
-
-    expect(Selector.prototype.select).toHaveBeenCalledTimes(0);
   });
 
   it('should create Collection (specific config in function form)', () => {
@@ -160,11 +155,27 @@ describe('Collection Tests', () => {
     expect(Collection.prototype.collect).toHaveBeenCalledWith([
       { id: '1', name: 'jeff' },
     ]);
+  });
 
-    expect(Selector.prototype.select).toHaveBeenCalledTimes(1);
-    expect(Selector.prototype.select).toHaveBeenCalledWith('id1', {
-      overwrite: true,
-    });
+  it('should call reselect on Selectors but not rebuild on Groups after the Collection instantiation (specific config in function form)', () => {
+    jest
+      .spyOn(Selector.prototype, 'reselect')
+      .mockReturnValueOnce(undefined as any);
+    jest
+      .spyOn(Group.prototype, 'rebuild')
+      .mockReturnValueOnce(undefined as any);
+
+    new Collection<ItemInterface>(dummyAgile, (collection) => ({
+      groups: {
+        group1: collection.Group(),
+      },
+      selectors: {
+        selector1: collection.Selector('id1'),
+      },
+    }));
+
+    expect(Selector.prototype.reselect).toHaveBeenCalledTimes(1);
+    expect(Group.prototype.rebuild).toHaveBeenCalledTimes(2); // +1 in the creation of 'group1' Group and +1 in the creation of default Group
   });
 
   describe('Collection Function Tests', () => {

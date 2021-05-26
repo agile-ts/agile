@@ -30,7 +30,7 @@ describe('Selector Tests', () => {
 
     expect(selector.collection()).toBe(dummyCollection);
     expect(selector.item).toBeUndefined();
-    expect(selector._itemKey).toBe(Selector.dummyItemKey);
+    expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
     expect(selector.select).toHaveBeenCalledWith('dummyItemKey', {
       overwrite: true,
     });
@@ -66,7 +66,7 @@ describe('Selector Tests', () => {
 
     expect(selector.collection()).toBe(dummyCollection);
     expect(selector.item).toBeUndefined();
-    expect(selector._itemKey).toBe(Selector.dummyItemKey);
+    expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
     expect(selector.select).toHaveBeenCalledWith('dummyItemKey', {
       overwrite: true,
     });
@@ -102,7 +102,7 @@ describe('Selector Tests', () => {
 
     expect(selector.collection()).toBe(dummyCollection);
     expect(selector.item).toBeUndefined();
-    expect(selector._itemKey).toBe(Selector.dummyItemKey);
+    expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
     expect(selector.select).not.toHaveBeenCalled();
 
     expect(selector._key).toBeUndefined();
@@ -487,7 +487,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector.item).toBeUndefined();
-        expect(selector._itemKey).toBe(Selector.dummyItemKey);
+        expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
         expect(selector.isPlaceholder).toBeTruthy();
         expect(selector.rebuildSelector).toHaveBeenCalledWith({});
 
@@ -507,7 +507,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector.item).toBeUndefined();
-        expect(selector._itemKey).toBe(Selector.dummyItemKey);
+        expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
         expect(selector.isPlaceholder).toBeTruthy();
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: true,
@@ -529,7 +529,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector.item).toBeUndefined();
-        expect(selector._itemKey).toBe(Selector.dummyItemKey);
+        expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
         expect(selector.isPlaceholder).toBeTruthy();
         expect(selector.rebuildSelector).toHaveBeenCalledWith({});
 

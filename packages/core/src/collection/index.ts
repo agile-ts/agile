@@ -68,13 +68,15 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     this.isInstantiated = true;
 
-    // Reselect Selectors
-    // Necessary because a selection of an Item didn't work before
-    // without a 'instantiated' Collection
-    for (const key in this.selectors) {
-      const selector = this.selectors[key];
-      selector.select(selector.itemKey, { overwrite: true });
-    }
+    // Reselect Selector Items
+    // Necessary because the selection of an Item
+    // hasn't worked with a not 'instantiated' Collection
+    for (const key in this.selectors) this.selectors[key].reselect();
+
+    // Rebuild of Groups
+    // Not necessary because if Items are added to the Collection,
+    // the Groups are rebuilt if they contain these added Items.
+    // for(const key in this.groups) this.groups[key].rebuild();
   }
 
   /**
@@ -588,10 +590,14 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Create dummy Selector to hold reference
     if (!selector) {
-      selector = new Selector<DataType>(this, 'unknown', {
-        key: selectorKey,
-        isPlaceholder: true,
-      });
+      selector = new Selector<DataType>(
+        this,
+        Selector.unknownItemPlaceholderKey,
+        {
+          key: selectorKey,
+          isPlaceholder: true,
+        }
+      );
       this.selectors[selectorKey] = selector;
     }
 

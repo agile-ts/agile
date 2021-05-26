@@ -1,5 +1,4 @@
 import {
-  Agile,
   State,
   Collection,
   DefaultItem,
@@ -305,7 +304,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     const groupItems: Array<Item<DataType>> = [];
 
     // Don't rebuild Group if Collection is not properly instantiated
-    // because only after a successful instantiation the Collection contains Items which are essential for a proper rebuild
+    // (because only after a successful instantiation the Collection
+    // contains Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
 
     // Create groupItems by finding Item at ItemKey in Collection

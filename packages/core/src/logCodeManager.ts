@@ -163,8 +163,10 @@ function getLog<T extends LogCodesArrayType<typeof logCodeManager>>(
 ): string {
   let result = logCodeManager[logCode] ?? `'${logCode}' is a unknown logCode!`;
 
-  for (const i in replacers)
-    result = result.split('${' + i + '}').join(replacers[i]);
+  for (const i in replacers) {
+    // https://stackoverflow.com/questions/41438656/why-do-i-get-cannot-read-property-tostring-of-undefined
+    result = result.split('${' + i + '}').join(replacers[i] + '');
+  }
 
   return result;
 }
