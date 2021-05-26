@@ -1,10 +1,10 @@
 import { Integration } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Integration Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
   });
 
   it('should create Integration', () => {

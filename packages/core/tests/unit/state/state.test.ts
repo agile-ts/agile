@@ -7,7 +7,7 @@ import {
   ComputedTracker,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 jest.mock('../../../src/state/state.persistent');
 
@@ -16,7 +16,7 @@ describe('State Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
@@ -222,8 +222,8 @@ describe('State Tests', () => {
       it('should ingestValue if value has correct type (default config)', () => {
         numberState.set(20);
 
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
+        LogMock.hasNotLogged('error');
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
           force: false,
         });
@@ -232,8 +232,8 @@ describe('State Tests', () => {
       it('should ingestValue if passed function returns value with correct type (default config)', () => {
         numberState.set((value) => value + 20);
 
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
+        LogMock.hasNotLogged('error');
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(30, {
           force: false,
         });
@@ -248,8 +248,8 @@ describe('State Tests', () => {
           storage: false,
         });
 
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
+        LogMock.hasNotLogged('error');
         expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
           sideEffects: {
             enabled: false,
@@ -265,10 +265,8 @@ describe('State Tests', () => {
 
         numberState.set('coolValue' as any);
 
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: Incorrect type (string) was provided.'
-        );
+        LogMock.hasNotLogged('warn');
+        LogMock.hasLoggedCode('14:03:00', ['string', 'number']);
         expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
       });
 
@@ -277,10 +275,8 @@ describe('State Tests', () => {
 
         numberState.set('coolValue' as any, { force: true });
 
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Incorrect type (string) was provided.'
-        );
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
+        LogMock.hasLoggedCode('14:02:00', ['string', 'number']);
         expect(
           numberState.observer.ingestValue
         ).toHaveBeenCalledWith('coolValue', { force: true });
@@ -289,8 +285,8 @@ describe('State Tests', () => {
       it("should ingestValue if value hasn't correct type but the type isn't explicit defined (default config)", () => {
         numberState.set('coolValue' as any);
 
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
+        LogMock.hasNotLogged('error');
         expect(
           numberState.observer.ingestValue
         ).toHaveBeenCalledWith('coolValue', { force: false });
@@ -332,9 +328,7 @@ describe('State Tests', () => {
         numberState.type('fuckingType');
 
         expect(numberState.valueType).toBeUndefined();
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: 'fuckingType' is not supported! Supported types: String, Boolean, Array, Object, Number"
-        );
+        LogMock.hasLoggedCode('14:03:01', ['fuckingType']);
       });
     });
 
@@ -416,18 +410,14 @@ describe('State Tests', () => {
       it("shouldn't patch and ingest passed object based value into a not object based State (default config)", () => {
         numberState.patch({ changed: 'object' });
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: You can't use the patch method on a non object based States!"
-        );
+        LogMock.hasLoggedCode('14:03:02');
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
       it("shouldn't patch and ingest passed not object based value into object based State (default config)", () => {
         objectState.patch('number' as any);
 
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: TargetWithChanges has to be an Object!'
-        );
+        LogMock.hasLoggedCode('00:03:01', ['TargetWithChanges', 'object']);
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
@@ -515,9 +505,7 @@ describe('State Tests', () => {
 
         expect(response).toBe(numberState);
         expect(numberState.watchers).not.toHaveProperty('dummyKey');
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A Watcher Callback Function has to be typeof Function!'
-        );
+        LogMock.hasLoggedCode('00:03:01', ['Watcher Callback', 'function']);
       });
 
       it("shouldn't add passed watcherFunction to watchers at passed key if passed key is already occupied", () => {
@@ -528,9 +516,7 @@ describe('State Tests', () => {
         expect(response).toBe(numberState);
         expect(numberState.watchers).toHaveProperty('dummyKey');
         expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction2);
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Watcher Callback Function with the key/name 'dummyKey' already exists!"
-        );
+        LogMock.hasLoggedCode('14:03:03', ['dummyKey']);
       });
     });
 
@@ -652,7 +638,7 @@ describe('State Tests', () => {
         });
       });
 
-      it('should overwrite existing persistent with a warning', () => {
+      it('should overwrite existing Persistent', () => {
         const oldPersistent = new StatePersistent(numberState);
         numberState.persistent = oldPersistent;
 
@@ -666,10 +652,6 @@ describe('State Tests', () => {
           key: 'newPersistentKey',
           defaultStorageKey: null,
         });
-        expect(console.warn).toHaveBeenCalledWith(
-          `Agile Warn: By persisting the State '${numberState._key}' twice you overwrite the old Persistent Instance!`,
-          oldPersistent
-        );
       });
     });
 
@@ -684,6 +666,7 @@ describe('State Tests', () => {
 
         expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should set onLoad function if State is persisted and should call it initially (state.isPersisted = true)', () => {
@@ -694,15 +677,25 @@ describe('State Tests', () => {
 
         expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
         expect(dummyCallbackFunction).toHaveBeenCalledWith(true);
+        LogMock.hasNotLogged('warn');
       });
 
-      it("shouldn't set onLoad function if State isn't persisted and should drop a error", () => {
+      it("shouldn't set onLoad function if State isn't persisted", () => {
         numberState.onLoad(dummyCallbackFunction);
 
+        expect(numberState?.persistent?.onLoad).toBeUndefined();
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Please make sure you persist the State 'numberStateKey' before using the 'onLoad' function!"
-        );
+        LogMock.hasNotLogged('warn');
+      });
+
+      it("shouldn't set invalid onLoad callback function", () => {
+        numberState.persistent = new StatePersistent(numberState);
+        numberState.isPersisted = false;
+
+        numberState.onLoad(10 as any);
+
+        expect(numberState?.persistent?.onLoad).toBeUndefined();
+        LogMock.hasLoggedCode('00:03:01', ['OnLoad Callback', 'function']);
       });
     });
 
@@ -738,7 +731,7 @@ describe('State Tests', () => {
           ref: expect.anything(),
           unref: expect.anything(),
         });
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should create an interval (with custom milliseconds)', () => {
@@ -760,7 +753,7 @@ describe('State Tests', () => {
           ref: expect.anything(),
           unref: expect.anything(),
         });
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't be able to create second interval and print warning", () => {
@@ -774,10 +767,15 @@ describe('State Tests', () => {
           3000
         );
         expect(numberState.currentInterval).toStrictEqual(currentInterval);
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: You can only have one interval active!',
-          numberState.currentInterval
-        );
+        LogMock.hasLoggedCode('14:03:04', [], numberState.currentInterval);
+      });
+
+      it("shouldn't set invalid interval callback function", () => {
+        numberState.interval(10 as any);
+
+        expect(setInterval).not.toHaveBeenCalled();
+        expect(numberState.currentInterval).toBeUndefined();
+        LogMock.hasLoggedCode('00:03:01', ['Interval Callback', 'function']);
       });
     });
 
@@ -859,15 +857,17 @@ describe('State Tests', () => {
         numberState.computeExists(computeMethod);
 
         expect(numberState.computeExistsMethod).toBe(computeMethod);
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't assign passed invalid function to computeExistsMethod", () => {
         numberState.computeExists(10 as any);
 
         expect(numberState.computeExistsMethod).toBeInstanceOf(Function);
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: A 'computeExistsMethod' has to be a function!"
-        );
+        LogMock.hasLoggedCode('00:03:01', [
+          'Compute Exists Method',
+          'function',
+        ]);
       });
     });
 
@@ -927,9 +927,7 @@ describe('State Tests', () => {
         numberState.invert();
 
         expect(numberState.set).not.toHaveBeenCalled();
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: You can only invert boolean based States!'
-        );
+        LogMock.hasLoggedCode('14:03:05');
       });
     });
 
@@ -945,6 +943,7 @@ describe('State Tests', () => {
 
         expect(numberState.set).toHaveBeenCalledWith(10);
         expect(numberState.computeValueMethod).toBe(computeMethod);
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't assign passed invalid function to computeValueMethod", () => {
@@ -952,9 +951,7 @@ describe('State Tests', () => {
 
         expect(numberState.set).not.toHaveBeenCalled();
         expect(numberState.computeValueMethod).toBeUndefined();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: A 'computeValueMethod' has to be a function!"
-        );
+        LogMock.hasLoggedCode('00:03:01', ['Compute Value Method', 'function']);
       });
     });
 
@@ -971,6 +968,7 @@ describe('State Tests', () => {
           callback: sideEffectFunction,
           weight: 10,
         });
+        LogMock.hasNotLogged('warn');
       });
 
       it('should add passed callback function to sideEffects at passed key (specific config)', () => {
@@ -983,15 +981,14 @@ describe('State Tests', () => {
           callback: sideEffectFunction,
           weight: 999,
         });
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't add passed invalid function to sideEffects at passed key (default config)", () => {
         numberState.addSideEffect('dummyKey', 10 as any);
 
         expect(numberState.sideEffects).not.toHaveProperty('dummyKey');
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: A sideEffect function has to be a function!'
-        );
+        LogMock.hasLoggedCode('00:03:01', ['Side Effect Callback', 'function']);
       });
     });
 

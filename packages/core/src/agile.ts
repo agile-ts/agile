@@ -20,6 +20,7 @@ import {
   StateConfigInterface,
   flatMerge,
   Group,
+  LogCodeManager,
 } from './internal';
 
 export class Agile {
@@ -76,15 +77,12 @@ export class Agile {
     Agile.logger = new Logger(config.logConfig);
 
     // Logging
-    Agile.logger.success('Created new AgileInstance ', this, Agile.logger);
+    LogCodeManager.log('10:00:00', [], this, Agile.logger);
 
     // Create global instance of Agile
     // Why? getAgileInstance() returns the global AgileInstance if it couldn't find the Agile Instance in the passed Instance
     if (config.bindGlobal) {
-      if (!globalBind(Agile.globalKey, this))
-        Agile.logger.warn(
-          'Be careful with binding multiple Agile Instances globally in one Application!'
-        );
+      if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
     }
   }
 
@@ -124,7 +122,7 @@ export class Agile {
    * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
    * @param config - Config
    */
-  public createCollection<DataType extends object = DefaultItem>(
+  public createCollection<DataType extends Object = DefaultItem>(
     config?: CollectionConfig<DataType>
   ): Collection<DataType> {
     return new Collection<DataType>(this, config);

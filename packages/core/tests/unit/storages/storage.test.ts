@@ -1,12 +1,12 @@
 import { Storage } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Storage Tests', () => {
   let dummyStorageMethods;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyStorageMethods = {
       get: jest.fn(),
@@ -125,7 +125,7 @@ describe('Storage Tests', () => {
         const response = storage.validate();
 
         expect(response).toBeTruthy();
-        expect(console.error).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('error');
       });
 
       it("should return false if get method isn't valid", () => {
@@ -134,9 +134,7 @@ describe('Storage Tests', () => {
         const response = storage.validate();
 
         expect(response).toBeFalsy();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Your GET StorageMethod isn't valid!"
-        );
+        LogMock.hasLoggedCode('13:03:00', ['get']);
       });
 
       it("should return false if set method isn't valid", () => {
@@ -145,9 +143,7 @@ describe('Storage Tests', () => {
         const response = storage.validate();
 
         expect(response).toBeFalsy();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Your SET StorageMethod isn't valid!"
-        );
+        LogMock.hasLoggedCode('13:03:00', ['set']);
       });
 
       it("should return false if remove method isn't valid", () => {
@@ -156,9 +152,7 @@ describe('Storage Tests', () => {
         const response = storage.validate();
 
         expect(response).toBeFalsy();
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Your REMOVE StorageMethod isn't valid!"
-        );
+        LogMock.hasLoggedCode('13:03:00', ['remove']);
       });
     });
 
@@ -213,9 +207,7 @@ describe('Storage Tests', () => {
         // expect(storage.methods.get).toHaveBeenCalledWith(
         //  storage.getStorageKey("myTestKey")
         // );
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
-        );
+        LogMock.hasLoggedCode('13:02:00');
 
         return response.then((value) => {
           expect(value).toBe('dummyResponse');

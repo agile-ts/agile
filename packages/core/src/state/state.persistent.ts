@@ -90,18 +90,18 @@ export class StatePersistent<ValueType = any> extends Persistent {
   /**
    * @internal
    * Loads State Value from the Storage
-   * @param storageKey - Prefix Key of Persisted Instances (default PersistentKey)
+   * @param storageItemKey - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
   public async loadPersistedValue(
-    storageKey?: PersistentKey
+    storageItemKey?: PersistentKey
   ): Promise<boolean> {
     if (!this.ready) return false;
-    const _storageKey = storageKey || this._key;
+    const _storageItemKey = storageItemKey ?? this._key;
 
     // Load Value from default Storage
     const loadedValue = await this.agileInstance().storages.get<ValueType>(
-      _storageKey,
+      _storageItemKey,
       this.config.defaultStorageKey as any
     );
     if (!loadedValue) return false;
@@ -110,7 +110,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     this.state().set(loadedValue, { storage: false });
 
     // Persist State, so that the Storage Value updates dynamically if the State updates
-    await this.persistValue(_storageKey);
+    await this.persistValue(_storageItemKey);
 
     return true;
   }
@@ -120,25 +120,25 @@ export class StatePersistent<ValueType = any> extends Persistent {
   //=========================================================================================================
   /**
    * @internal
-   * Sets everything up so that the State gets saved in the Storage on every Value change
-   * @param storageKey - Prefix Key of Persisted Instances (default PersistentKey)
+   * Sets everything up so that the State is saved in the Storage on every Value change
+   * @param storageItemKey - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
-  public async persistValue(storageKey?: PersistentKey): Promise<boolean> {
+  public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
-    const _storageKey = storageKey || this._key;
+    const _storageItemKey = storageItemKey ?? this._key;
 
     // Add SideEffect to State, that updates the saved State Value depending on the current State Value
     this.state().addSideEffect(
       StatePersistent.storeValueSideEffectKey,
       (instance, config) => {
-        this.rebuildStorageSideEffect(this.state(), _storageKey, config);
+        this.rebuildStorageSideEffect(this.state(), _storageItemKey, config);
       },
       { weight: 0 }
     );
 
     // Initial rebuild Storage for saving State Value in the Storage
-    this.rebuildStorageSideEffect(this.state(), _storageKey);
+    this.rebuildStorageSideEffect(this.state(), _storageItemKey);
 
     this.isPersisted = true;
     return true;
@@ -150,20 +150,20 @@ export class StatePersistent<ValueType = any> extends Persistent {
   /**
    * @internal
    * Removes State Value form the Storage
-   * @param storageKey - Prefix Key of Persisted Instances (default PersistentKey)
+   * @param storageItemKey - Prefix Key of Persisted Instances (default PersistentKey)
    * @return Success?
    */
   public async removePersistedValue(
-    storageKey?: PersistentKey
+    storageItemKey?: PersistentKey
   ): Promise<boolean> {
     if (!this.ready) return false;
-    const _storageKey = storageKey || this._key;
+    const _storageItemKey = storageItemKey || this._key;
 
     // Remove SideEffect
     this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
 
     // Remove Value from Storage
-    this.agileInstance().storages.remove(_storageKey, this.storageKeys);
+    this.agileInstance().storages.remove(_storageItemKey, this.storageKeys);
 
     this.isPersisted = false;
     return true;

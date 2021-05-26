@@ -9,18 +9,16 @@ import {
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
 import testIntegration from '../../helper/test.integration';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Runtime Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
-
-    console.warn = jest.fn();
   });
 
   it('should create Runtime', () => {
@@ -195,6 +193,7 @@ describe('Runtime Tests', () => {
         ) as CallbackSubscriptionContainer;
         rCallbackSubContainer.callback = jest.fn();
         rCallbackSubContainer.ready = true;
+        rCallbackSubContainer.key = 'rCallbackSubContainerKey';
 
         // Create Not Ready Callback Subscription
         nrCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
@@ -203,6 +202,7 @@ describe('Runtime Tests', () => {
         ) as CallbackSubscriptionContainer;
         nrCallbackSubContainer.callback = jest.fn();
         nrCallbackSubContainer.ready = false;
+        nrCallbackSubContainer.key = 'nrCallbackSubContainerKey';
 
         // Create Ready Component Subscription
         rComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
@@ -213,6 +213,7 @@ describe('Runtime Tests', () => {
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
         rComponentSubContainer.ready = true;
+        rComponentSubContainer.key = 'rComponentSubContainerKey';
 
         // Create Not Ready Component Subscription
         nrComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
@@ -222,6 +223,7 @@ describe('Runtime Tests', () => {
           }
         ).subscriptionContainer as ComponentSubscriptionContainer;
         nrComponentSubContainer.ready = false;
+        nrComponentSubContainer.key = 'nrComponentSubContainerKey';
 
         rComponentSubJob = new RuntimeJob(dummyObserver3, { key: 'dummyJob3' }); // Job with ready Component Subscription
         rCallbackSubJob = new RuntimeJob(dummyObserver1, { key: 'dummyJob1' }); // Job with ready CallbackSubscription
@@ -417,12 +419,14 @@ describe('Runtime Tests', () => {
         expect(nrArComponentSubJob.triesToUpdate).toBe(1);
         expect(nrArCallbackSubJob.triesToUpdate).toBe(1);
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
+        LogMock.hasLoggedCode(
+          '16:02:00',
+          [nrCallbackSubContainer.key],
           nrCallbackSubContainer
         );
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
+        LogMock.hasLoggedCode(
+          '16:02:00',
+          [nrComponentSubContainer.key],
           nrComponentSubContainer
         );
 
@@ -470,8 +474,9 @@ describe('Runtime Tests', () => {
           expect(dummyObserver1.subscribedTo.size).toBe(1);
           expect(rCallbackSubJob.triesToUpdate).toBe(2);
 
-          expect(console.warn).toHaveBeenCalledWith(
-            'Agile Warn: Job with not ready SubscriptionContainer/Component was removed from the runtime after 2 tries to avoid an overflow.',
+          LogMock.hasLoggedCode(
+            '16:02:01',
+            [rCallbackSubJob.config.numberOfTriesToUpdate],
             rCallbackSubContainer
           );
 
@@ -507,8 +512,9 @@ describe('Runtime Tests', () => {
           expect(dummyObserver1.subscribedTo.size).toBe(1);
           expect(rCallbackSubJob.triesToUpdate).toBe(3);
 
-          expect(console.warn).toHaveBeenCalledWith(
-            "Agile Warn: SubscriptionContainer/Component isn't ready to rerender!",
+          LogMock.hasLoggedCode(
+            '16:02:00',
+            [rCallbackSubContainer.key],
             rCallbackSubContainer
           );
 

@@ -1,5 +1,4 @@
 import {
-  Agile,
   State,
   Collection,
   DefaultItem,
@@ -16,9 +15,10 @@ import {
   StateRuntimeJobConfigInterface,
   StateIngestConfigInterface,
   removeProperties,
+  LogCodeManager,
 } from '../internal';
 
-export class Group<DataType extends object = DefaultItem> extends State<
+export class Group<DataType extends Object = DefaultItem> extends State<
   Array<ItemKey>
 > {
   static rebuildGroupSideEffectKey = 'rebuildGroup';
@@ -129,9 +129,6 @@ export class Group<DataType extends object = DefaultItem> extends State<
     _itemKeys.forEach((itemKey) => {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
-        Agile.logger.error(
-          `Couldn't find ItemKey '${itemKey}' in Group '${this._key}'!`
-        );
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
         return;
@@ -278,6 +275,7 @@ export class Group<DataType extends object = DefaultItem> extends State<
       defaultStorageKey: null,
     });
 
+    // Create storageItemKey based on Collection Name
     if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this._key,
@@ -305,10 +303,15 @@ export class Group<DataType extends object = DefaultItem> extends State<
     const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
     const groupItems: Array<Item<DataType>> = [];
 
+    // Don't rebuild Group if Collection is not properly instantiated
+    // (because only after a successful instantiation the Collection
+    // contains Items which are essential for a proper rebuild)
+    if (!this.collection().isInstantiated) return this;
+
     // Create groupItems by finding Item at ItemKey in Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
-      if (item) groupItems.push(item);
+      if (item != null) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
@@ -319,10 +322,9 @@ export class Group<DataType extends object = DefaultItem> extends State<
 
     // Logging
     if (notFoundItemKeys.length > 0) {
-      Agile.logger.warn(
-        `Couldn't find some Items in Collection '${this.collection()._key}' (${
-          this._key
-        })`,
+      LogCodeManager.log(
+        '1C:02:00',
+        [this.collection()._key, this._key],
         notFoundItemKeys
       );
     }

@@ -133,11 +133,13 @@ const App = (props: any) => {
           <h3 className={'Title'}>My Collection</h3>
           <div>
             {myGroup.map((item) => (
-              <p key={item.id}>{item.name}</p>
+              <p key={item.key}>{item.name}</p>
             ))}
           </div>
           <button
-            onClick={() => MY_COLLECTION.collect({ id: 'id3', name: 'Test3' })}>
+            onClick={() =>
+              MY_COLLECTION.collect({ key: 'id3', name: 'Test3' })
+            }>
             Collect
           </button>
           <button onClick={() => MY_COLLECTION.getGroup('myGroup')?.add('id3')}>
@@ -146,7 +148,7 @@ const App = (props: any) => {
           <button
             onClick={() =>
               MY_COLLECTION.update('id3', {
-                id: 'newId3',
+                key: 'newId3',
                 name: 'Test3_Changed',
               })
             }>

@@ -8,7 +8,7 @@ import {
   Group,
   Item,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('CollectionPersistent Tests', () => {
   interface ItemInterface {
@@ -21,7 +21,7 @@ describe('CollectionPersistent Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
@@ -1046,10 +1046,6 @@ describe('CollectionPersistent Tests', () => {
     });
 
     describe('getItemStorageKey function tests', () => {
-      beforeEach(() => {
-        console.warn = jest.fn();
-      });
-
       it('should build ItemStorageKey out of itemKey and collectionKey', () => {
         const response = CollectionPersistent.getItemStorageKey(
           'itemKey',
@@ -1057,7 +1053,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_collectionKey_item_itemKey');
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should build ItemStorageKey out of collectionKey with warning', () => {
@@ -1067,9 +1063,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_collectionKey_item_unknown');
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Item StorageKey!'
-        );
+        LogMock.hasLoggedCode('1A:02:00');
       });
 
       it('should build ItemStorageKey out of itemKey with warning', () => {
@@ -1079,9 +1073,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_unknown_item_itemKey');
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Item StorageKey!'
-        );
+        LogMock.hasLoggedCode('1A:02:00');
       });
 
       it('should build ItemStorageKey out of nothing with warning', () => {
@@ -1091,17 +1083,11 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_unknown_item_unknown');
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Item StorageKey!'
-        );
+        LogMock.hasLoggedCode('1A:02:00');
       });
     });
 
     describe('getGroupStorageKey function tests', () => {
-      beforeEach(() => {
-        console.warn = jest.fn();
-      });
-
       it('should build GroupStorageKey out of groupKey and collectionKey', () => {
         const response = CollectionPersistent.getGroupStorageKey(
           'groupKey',
@@ -1109,7 +1095,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_collectionKey_group_groupKey');
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should build GroupStorageKey out of collectionKey with warning', () => {
@@ -1119,9 +1105,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_collectionKey_group_unknown');
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Group StorageKey!'
-        );
+        LogMock.hasLoggedCode('1A:02:01');
       });
 
       it('should build GroupStorageKey out of groupKey with warning', () => {
@@ -1131,9 +1115,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_unknown_group_groupKey');
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Group StorageKey!'
-        );
+        LogMock.hasLoggedCode('1A:02:01');
       });
 
       it('should build GroupStorageKey out of nothing with warning', () => {
@@ -1143,9 +1125,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBe('_unknown_group_unknown');
-        expect(console.warn).toHaveBeenCalledWith(
-          'Agile Warn: Failed to build unique Group StorageKey!'
-        );
+        LogMock.hasLoggedCode('1A:02:01');
       });
     });
   });

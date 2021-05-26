@@ -1,5 +1,5 @@
 import { Item, Collection, Agile, StateObserver, State } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Item Tests', () => {
   let dummyAgile: Agile;
@@ -7,7 +7,7 @@ describe('Item Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection(dummyAgile);
@@ -48,7 +48,7 @@ describe('Item Tests', () => {
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
     expect(item.watchers).toStrictEqual({});
-    expect(item.isSelected).toBeFalsy();
+    expect(item.selectedBy.size).toBe(0);
   });
 
   it('should create Item (specific config)', () => {
@@ -86,7 +86,7 @@ describe('Item Tests', () => {
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
     expect(item.watchers).toStrictEqual({});
-    expect(item.isSelected).toBeFalsy();
+    expect(item.selectedBy.size).toBe(0);
   });
 
   describe('Item Function Tests', () => {

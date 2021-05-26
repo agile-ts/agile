@@ -6,6 +6,7 @@ import {
   defineConfig,
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
+  LogCodeManager,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -101,9 +102,7 @@ export class Observer<ValueType = any> {
    * @param job - Job that gets performed
    */
   public perform(job: RuntimeJob): void {
-    Agile.logger.warn(
-      "Perform function isn't Set in Observer! Be aware that Observer is no stand alone class!"
-    );
+    LogCodeManager.log('17:03:00');
   }
 
   //=========================================================================================================

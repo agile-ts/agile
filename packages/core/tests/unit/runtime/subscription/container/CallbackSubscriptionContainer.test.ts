@@ -3,7 +3,7 @@ import {
   CallbackSubscriptionContainer,
   Observer,
 } from '../../../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../../../helper/logMock';
 
 describe('CallbackSubscriptionContainer Tests', () => {
   let dummyAgile: Agile;
@@ -12,7 +12,7 @@ describe('CallbackSubscriptionContainer Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });

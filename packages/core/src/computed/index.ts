@@ -9,6 +9,7 @@ import {
   extractObservers,
   StateIngestConfigInterface,
   removeProperties,
+  LogCodeManager,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -149,17 +150,17 @@ export class Computed<ComputedValueType = any> extends State<
   //=========================================================================================================
 
   public patch() {
-    Agile.logger.error("You can't use patch method on ComputedState!");
+    LogCodeManager.log('19:03:00');
     return this;
   }
 
   public persist(): this {
-    Agile.logger.error("You can't use persist method on ComputedState!");
+    LogCodeManager.log('19:03:01');
     return this;
   }
 
   public invert(): this {
-    Agile.logger.error("You can't use invert method on ComputedState!");
+    LogCodeManager.log('19:03:02');
     return this;
   }
 }

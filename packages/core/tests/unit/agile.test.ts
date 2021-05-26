@@ -11,7 +11,7 @@ import {
   Storages,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../helper/logMock';
 
 jest.mock('../../src/runtime/index');
 jest.mock('../../src/runtime/subscription/sub.controller');
@@ -51,7 +51,7 @@ describe('Agile Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     RuntimeMock.mockClear();
     SubControllerMock.mockClear();
@@ -156,9 +156,7 @@ describe('Agile Tests', () => {
     });
 
     expect(globalThis[Agile.globalKey]).toBe(agile1);
-    expect(console.warn).toHaveBeenCalledWith(
-      'Agile Warn: Be careful with binding multiple Agile Instances globally in one Application!'
-    );
+    LogMock.hasLoggedCode('10:02:00');
   });
 
   describe('Agile Function Tests', () => {
@@ -166,6 +164,7 @@ describe('Agile Tests', () => {
 
     beforeEach(() => {
       agile = new Agile();
+      jest.clearAllMocks(); // Because creating Agile executes some mocks
     });
 
     describe('createStorage function tests', () => {

@@ -1,6 +1,6 @@
 import { Agile, Observer, SubscriptionContainer } from '../../../../../src';
 import * as Utils from '@agile-ts/utils';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../../../helper/logMock';
 
 describe('SubscriptionContainer Tests', () => {
   let dummyAgile: Agile;
@@ -9,7 +9,7 @@ describe('SubscriptionContainer Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });

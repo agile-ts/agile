@@ -16,6 +16,7 @@ import {
   ComputedTracker,
   StateIngestConfigInterface,
   removeProperties,
+  LogCodeManager,
 } from '../internal';
 
 export class State<ValueType = any> {
@@ -158,12 +159,11 @@ export class State<ValueType = any> {
 
     // Check value has correct Type (js)
     if (!this.hasCorrectType(_value)) {
-      const message = `Incorrect type (${typeof _value}) was provided.`;
-      if (!config.force) {
-        Agile.logger.error(message);
-        return this;
-      }
-      Agile.logger.warn(message);
+      LogCodeManager.log(config.force ? '14:02:00' : '14:03:00', [
+        typeof _value,
+        this.valueType,
+      ]);
+      if (!config.force) return this;
     }
 
     // Ingest new value into Runtime
@@ -199,9 +199,7 @@ export class State<ValueType = any> {
 
     // Check if type is a supported Type
     if (!supportedTypes.includes(type.name)) {
-      Agile.logger.warn(
-        `'${type}' is not supported! Supported types: String, Boolean, Array, Object, Number`
-      );
+      LogCodeManager.log('14:03:01', [type]);
       return this;
     }
 
@@ -254,14 +252,12 @@ export class State<ValueType = any> {
     });
 
     if (!isValidObject(this.nextStateValue, true)) {
-      Agile.logger.error(
-        "You can't use the patch method on a non object based States!"
-      );
+      LogCodeManager.log('14:03:02');
       return this;
     }
 
     if (!isValidObject(targetWithChanges, true)) {
-      Agile.logger.error('TargetWithChanges has to be an Object!');
+      LogCodeManager.log('00:03:01', ['TargetWithChanges', 'object']);
       return this;
     }
 
@@ -313,17 +309,13 @@ export class State<ValueType = any> {
 
     // Check if Callback is valid Function
     if (!isFunction(_callback)) {
-      Agile.logger.error(
-        'A Watcher Callback Function has to be typeof Function!'
-      );
+      LogCodeManager.log('00:03:01', ['Watcher Callback', 'function']);
       return this;
     }
 
     // Check if watcherKey is already occupied
     if (this.watchers[key]) {
-      Agile.logger.error(
-        `Watcher Callback Function with the key/name '${key}' already exists!`
-      );
+      LogCodeManager.log('14:03:03', [key]);
       return this;
     }
 
@@ -410,13 +402,6 @@ export class State<ValueType = any> {
       defaultStorageKey: null,
     });
 
-    if (this.persistent) {
-      Agile.logger.warn(
-        `By persisting the State '${this._key}' twice you overwrite the old Persistent Instance!`,
-        this.persistent
-      );
-    }
-
     // Create persistent -> Persist Value
     this.persistent = new StatePersistent<ValueType>(this, {
       instantiate: _config.loadValue,
@@ -438,10 +423,11 @@ export class State<ValueType = any> {
    * @param callback - Callback Function
    */
   public onLoad(callback: (success: boolean) => void): this {
-    if (!this.persistent) {
-      Agile.logger.error(
-        `Please make sure you persist the State '${this._key}' before using the 'onLoad' function!`
-      );
+    if (!this.persistent) return this;
+
+    // Check if Callback is valid Function
+    if (!isFunction(callback)) {
+      LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
       return this;
     }
 
@@ -466,11 +452,12 @@ export class State<ValueType = any> {
     callback: (value: ValueType) => ValueType,
     ms?: number
   ): this {
+    if (!isFunction(callback)) {
+      LogCodeManager.log('00:03:01', ['Interval Callback', 'function']);
+      return this;
+    }
     if (this.currentInterval) {
-      Agile.logger.warn(
-        `You can only have one interval active!`,
-        this.currentInterval
-      );
+      LogCodeManager.log('14:03:04', [], this.currentInterval);
       return this;
     }
 
@@ -527,7 +514,7 @@ export class State<ValueType = any> {
    */
   public computeExists(method: ComputeExistsMethod<ValueType>): this {
     if (!isFunction(method)) {
-      Agile.logger.error(`A 'computeExistsMethod' has to be a function!`);
+      LogCodeManager.log('00:03:01', ['Compute Exists Method', 'function']);
       return this;
     }
     this.computeExistsMethod = method;
@@ -571,7 +558,7 @@ export class State<ValueType = any> {
     if (typeof this._value === 'boolean') {
       this.set(!this._value as any);
     } else {
-      Agile.logger.error('You can only invert boolean based States!');
+      LogCodeManager.log('14:03:05');
     }
     return this;
   }
@@ -586,7 +573,7 @@ export class State<ValueType = any> {
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      Agile.logger.error(`A 'computeValueMethod' has to be a function!`);
+      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
       return this;
     }
     this.computeValueMethod = method;
@@ -616,7 +603,7 @@ export class State<ValueType = any> {
       weight: 10,
     });
     if (!isFunction(callback)) {
-      Agile.logger.error('A sideEffect function has to be a function!');
+      LogCodeManager.log('00:03:01', ['Side Effect Callback', 'function']);
       return this;
     }
     this.sideEffects[key] = {

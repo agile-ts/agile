@@ -1,5 +1,4 @@
 import {
-  Agile,
   Collection,
   DefaultItem,
   defineConfig,
@@ -9,10 +8,10 @@ import {
   StateRuntimeJobConfigInterface,
 } from '../internal';
 
-export class Selector<DataType extends object = DefaultItem> extends State<
+export class Selector<DataType extends Object = DefaultItem> extends State<
   DataType | undefined
 > {
-  static dummyItemKey = 'unknown';
+  static unknownItemPlaceholderKey = '__UNKNOWN__ITEM__KEY__';
   static rebuildSelectorSideEffectKey = 'rebuildSelector';
   static rebuildItemSideEffectKey = 'rebuildItem';
   public collection: () => Collection<DataType>;
@@ -31,16 +30,17 @@ export class Selector<DataType extends object = DefaultItem> extends State<
     itemKey: ItemKey,
     config: SelectorConfigInterface = {}
   ) {
-    super(collection.agileInstance(), undefined, config);
     config = defineConfig(config, {
       isPlaceholder: false,
     });
-
+    super(collection.agileInstance(), undefined, config);
     this.collection = () => collection;
     this.item = undefined;
-    this._itemKey = Selector.dummyItemKey;
+    this._itemKey = !config.isPlaceholder
+      ? itemKey
+      : Selector.unknownItemPlaceholderKey;
     this._key = config?.key;
-    this.isPlaceholder = true;
+    this.isPlaceholder = true; // Because hasn't selected any Item yet
 
     // Initial Select
     if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
@@ -75,10 +75,6 @@ export class Selector<DataType extends object = DefaultItem> extends State<
     itemKey: ItemKey,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
-    const oldItem = this.collection().getItem(this._itemKey, {
-      notExisting: true,
-    }); // Because this.item might be outdated
-    const newItem = this.collection().getItemWithReference(itemKey);
     config = defineConfig(config, {
       background: false,
       sideEffects: {
@@ -86,21 +82,29 @@ export class Selector<DataType extends object = DefaultItem> extends State<
         exclude: [],
       },
       force: false,
-      overwrite: oldItem?.isPlaceholder || false,
+      overwrite: this.item?.isPlaceholder ?? false,
       storage: true,
     });
 
-    if (this.hasSelected(itemKey) && !config.force) {
-      Agile.logger.warn(`Selector has already selected '${itemKey}'!`);
+    // Don't select Item if Collection is not properly instantiated
+    // (because only after a successful instantiation the Collection
+    // contains the Items which are essential for a proper selection)
+    if (
+      (!this.collection().isInstantiated || this.hasSelected(itemKey)) &&
+      !config.force
+    )
       return this;
-    }
 
     // Unselect old Item
     this.unselect({ background: true });
 
+    // Get new Item
+    const newItem = this.collection().getItemWithReference(itemKey);
+
+    // Select new Item
     this._itemKey = itemKey;
     this.item = newItem;
-    newItem.isSelected = true;
+    newItem.selectedBy.add(this._key as any);
 
     // Add SideEffect to newItem, that rebuild this Selector depending on the current Item Value
     newItem.addSideEffect(
@@ -134,11 +138,32 @@ export class Selector<DataType extends object = DefaultItem> extends State<
   }
 
   //=========================================================================================================
+  // Reselect
+  //=========================================================================================================
+  /**
+   * @public
+   * Reselects current Item
+   * Might help if the Selector failed to properly select an Item.
+   * You can check with 'hasSelected()' if an Item got properly selected.
+   * @param config - Config
+   */
+  public reselect(config: StateRuntimeJobConfigInterface = {}): this {
+    if (
+      (this._itemKey != null && !this.hasSelected(this._itemKey)) ||
+      config.force
+    )
+      this.select(this._itemKey, config);
+    return this;
+  }
+
+  //=========================================================================================================
   // Unselect
   //=========================================================================================================
   /**
    * @public
-   * Unselects current selected Item
+   * Unselects current selected Item.
+   * Often not necessary because by selecting a new Item,
+   * the old Item is automatically unselected.
    * @param config - Config
    */
   public unselect(config: StateRuntimeJobConfigInterface = {}): this {
@@ -149,7 +174,7 @@ export class Selector<DataType extends object = DefaultItem> extends State<
 
     // Unselect Item
     if (item) {
-      item.isSelected = false;
+      item.selectedBy.delete(this._key as any);
       item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
       item.removeSideEffect(Selector.rebuildItemSideEffectKey);
       if (item.isPlaceholder) delete this.collection().data[this._itemKey];
@@ -157,7 +182,7 @@ export class Selector<DataType extends object = DefaultItem> extends State<
 
     // Reset and rebuild Selector
     this.item = undefined;
-    this._itemKey = Selector.dummyItemKey;
+    this._itemKey = Selector.unknownItemPlaceholderKey;
     this.rebuildSelector(config);
 
     this.isPlaceholder = true;
@@ -169,13 +194,15 @@ export class Selector<DataType extends object = DefaultItem> extends State<
   // Has Selected
   //=========================================================================================================
   /**
-   * Checks if Selector has selected passed ItemKey
+   * Checks if Selector has correctly selected the Item at the passed itemKey
    * @param itemKey - ItemKey
    */
   public hasSelected(itemKey: ItemKey): boolean {
-    const isSelected = this._itemKey === itemKey;
-    if (!this.item) return isSelected;
-    return isSelected && this.item.isSelected;
+    return (
+      this._itemKey === itemKey &&
+      this.item != null &&
+      this.item.selectedBy.has(this._key as any)
+    );
   }
 
   //=========================================================================================================
@@ -183,12 +210,13 @@ export class Selector<DataType extends object = DefaultItem> extends State<
   //=========================================================================================================
   /**
    * @public
-   * Rebuilds Selector
+   * Rebuilds Selector,
+   * which updates the Selector value based on the Item value
    * @param config - Config
    */
   public rebuildSelector(config: StateRuntimeJobConfigInterface = {}): this {
     // Set Selector Value to undefined if Item doesn't exist
-    if (!this.item || this.item.isPlaceholder) {
+    if (this.item == null || this.item.isPlaceholder) {
       this.set(undefined, config);
       return this;
     }

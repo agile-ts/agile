@@ -1,7 +1,7 @@
 import { ProxyTree } from './index';
 import { isObject } from './utils';
 
-export class Branch<T extends object = DefaultProxyTreeObject> {
+export class Branch<T extends Object = DefaultProxyTreeObject> {
   public proxy: T; // Target object wrapped in proxy
   public target: T; // Target object
 
@@ -103,7 +103,7 @@ export class Branch<T extends object = DefaultProxyTreeObject> {
  * @param branch - Branch to which the Route leads.
  * If Branch is null it means that the Tree ends here since the Route represents a primitive value (like a number).
  */
-export interface BranchRoute<T extends object = DefaultProxyTreeObject> {
+export interface BranchRoute<T extends Object = DefaultProxyTreeObject> {
   key: BranchKey;
   timesAccessed: number;
   branch: Branch<T> | null;

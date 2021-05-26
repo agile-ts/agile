@@ -4,6 +4,7 @@ import {
   isAsyncFunction,
   isFunction,
   Agile,
+  LogCodeManager,
 } from '../internal';
 
 export class Storage {
@@ -49,15 +50,15 @@ export class Storage {
    */
   public validate(): boolean {
     if (!isFunction(this.methods?.get)) {
-      Agile.logger.error("Your GET StorageMethod isn't valid!");
+      LogCodeManager.log('13:03:00', ['get']);
       return false;
     }
     if (!isFunction(this.methods?.set)) {
-      Agile.logger.error("Your SET StorageMethod isn't valid!");
+      LogCodeManager.log('13:03:00', ['set']);
       return false;
     }
     if (!isFunction(this.methods?.remove)) {
-      Agile.logger.error("Your REMOVE StorageMethod isn't valid!");
+      LogCodeManager.log('13:03:00', ['remove']);
       return false;
     }
     return true;
@@ -74,10 +75,7 @@ export class Storage {
    */
   public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
     if (!this.ready || !this.methods.get) return;
-    if (isAsyncFunction(this.methods.get))
-      Agile.logger.warn(
-        "Be aware that 'normalGet' returns a Promise with a stringified Value if using it in an async Storage!"
-      );
+    if (isAsyncFunction(this.methods.get)) LogCodeManager.log('13:02:00');
 
     // Get Value
     const res = this.methods.get(this.getStorageKey(key));

@@ -8,7 +8,7 @@ import {
   State,
   CollectionPersistent,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Group Tests', () => {
   interface ItemInterface {
@@ -21,7 +21,7 @@ describe('Group Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
@@ -255,7 +255,6 @@ describe('Group Tests', () => {
       it('should remove Item from Group not in background (default config)', () => {
         group.remove('dummyItem1Key');
 
-        expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
           {}
@@ -265,7 +264,6 @@ describe('Group Tests', () => {
       it('should remove Item from Group in background (config.background = true)', () => {
         group.remove('dummyItem1Key', { background: true });
 
-        expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
           { background: true }
@@ -275,16 +273,12 @@ describe('Group Tests', () => {
       it("shouldn't remove not existing Item from Group (default config)", () => {
         group.remove('notExistingKey');
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingKey' in Group 'groupKey'!"
-        );
         expect(group.set).not.toHaveBeenCalled();
       });
 
       it("should remove Item from Group that doesn't exist in Collection in background (default config)", () => {
         group.remove('dummyItem3Key');
 
-        expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
           { background: true }
@@ -294,18 +288,12 @@ describe('Group Tests', () => {
       it('should remove Items from Group not in background (default config)', () => {
         group.remove(['dummyItem1Key', 'notExistingItemKey', 'dummyItem3Key']);
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
-        );
         expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {});
       });
 
       it("should remove Items from Group in background if passing not existing Item and Item that doesn't exist in Collection (default config)", () => {
         group.remove(['notExistingItemKey', 'dummyItem3Key']);
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
-        );
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
           { background: true }
@@ -519,18 +507,28 @@ describe('Group Tests', () => {
       it('should build Group output and items and set notFoundItemKeys to not found Item Keys', () => {
         group.rebuild();
 
-        expect(
-          console.warn
-        ).toHaveBeenCalledWith(
-          `Agile Warn: Couldn't find some Items in Collection '${dummyCollection._key}' (${group._key})`,
-          ['dummyItem3Key']
-        );
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
         expect(group.items).toStrictEqual([dummyItem1, dummyItem2]);
         expect(group._output).toStrictEqual([
           dummyItem1._value,
           dummyItem2._value,
         ]);
+        LogMock.hasLoggedCode(
+          '1C:02:00',
+          [dummyCollection._key, group._key],
+          ['dummyItem3Key']
+        );
+      });
+
+      it("shouldn't build Group output and items if Collection is not properly instantiated", () => {
+        dummyCollection.isInstantiated = false;
+
+        group.rebuild();
+
+        expect(group.notFoundItemKeys).toStrictEqual([]);
+        expect(group.items).toStrictEqual([]);
+        expect(group._output).toStrictEqual([]);
+        LogMock.hasNotLogged('warn');
       });
     });
   });

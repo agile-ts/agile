@@ -18,9 +18,11 @@ import {
   SideEffectConfigInterface,
   SelectorConfigInterface,
   removeProperties,
+  isFunction,
+  LogCodeManager,
 } from '../internal';
 
-export class Collection<DataType extends object = DefaultItem> {
+export class Collection<DataType extends Object = DefaultItem> {
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
@@ -45,14 +47,6 @@ export class Collection<DataType extends object = DefaultItem> {
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
-
-    // Set temp Config for creating proper Placeholder Items (of Selector)
-    this.config = {
-      defaultGroupKey: 'default',
-      primaryKey: 'id',
-    };
-
-    // Assign Properties
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
       primaryKey: 'id',
@@ -73,6 +67,16 @@ export class Collection<DataType extends object = DefaultItem> {
     if (_config.initialData) this.collect(_config.initialData);
 
     this.isInstantiated = true;
+
+    // Reselect Selector Items
+    // Necessary because the selection of an Item
+    // hasn't worked with a not 'instantiated' Collection
+    for (const key in this.selectors) this.selectors[key].reselect();
+
+    // Rebuild of Groups
+    // Not necessary because if Items are added to the Collection,
+    // the Groups which contain these added Items get rebuilt.
+    // for (const key in this.groups) this.groups[key].rebuild();
   }
 
   /**
@@ -126,14 +130,8 @@ export class Collection<DataType extends object = DefaultItem> {
     config: GroupConfigInterface = {}
   ): Group<DataType> {
     if (this.isInstantiated) {
-      const key = config?.key || generateId();
-      Agile.logger.warn(
-        "After the instantiation we recommend using 'MY_COLLECTION.createGroup' instead of 'MY_COLLECTION.Group'"
-      );
-      if (config?.key == null)
-        Agile.logger.warn(
-          `Failed to find key for creation of Group. Group with random key '${key}' got created!`
-        );
+      const key = config.key ?? generateId();
+      LogCodeManager.log('1B:02:00');
       return this.createGroup(key, initialItems);
     }
 
@@ -154,14 +152,8 @@ export class Collection<DataType extends object = DefaultItem> {
     config: SelectorConfigInterface = {}
   ): Selector<DataType> {
     if (this.isInstantiated) {
-      const key = config?.key || generateId();
-      Agile.logger.warn(
-        "After the instantiation we recommend using 'MY_COLLECTION.createSelector' instead of 'MY_COLLECTION.Selector'"
-      );
-      if (config?.key == null)
-        Agile.logger.warn(
-          `Failed to find key for creation of Selector. Selector with random key '${key}' got created!`
-        );
+      const key = config.key ?? generateId();
+      LogCodeManager.log('1B:02:01');
       return this.createSelector(key, initialKey);
     }
 
@@ -261,7 +253,9 @@ export class Collection<DataType extends object = DefaultItem> {
     if (!_groupKeys.includes(defaultGroupKey)) _groupKeys.push(defaultGroupKey);
 
     // Create not existing Groups
-    _groupKeys.forEach((key) => !this.groups[key] && this.createGroup(key));
+    _groupKeys.forEach(
+      (key) => this.groups[key] == null && this.createGroup(key)
+    );
 
     _data.forEach((data, index) => {
       const itemKey = data[primaryKey];
@@ -310,16 +304,12 @@ export class Collection<DataType extends object = DefaultItem> {
       background: false,
     });
 
-    if (!item) {
-      Agile.logger.error(
-        `Item with key/name '${itemKey}' doesn't exist in Collection '${this._key}'!`
-      );
+    if (item == null) {
+      LogCodeManager.log('1B:03:00', [itemKey, this._key]);
       return undefined;
     }
     if (!isValidObject(changes)) {
-      Agile.logger.error(
-        `You have to pass an valid Changes Object to update '${itemKey}' in '${this._key}'!`
-      );
+      LogCodeManager.log('1B:03:01', [itemKey, this._key]);
       return undefined;
     }
 
@@ -356,10 +346,7 @@ export class Collection<DataType extends object = DefaultItem> {
       // To make sure that the primaryKey doesn't differ from the changes object primaryKey
       if (changes[this.config.primaryKey] !== itemKey) {
         changes[this.config.primaryKey] = itemKey;
-        Agile.logger.warn(
-          `By overwriting the whole Item don't forget passing the correct primaryKey!`,
-          changes
-        );
+        LogCodeManager.log('1B:02:02', [], changes);
       }
 
       // Apply changes to Item
@@ -386,16 +373,12 @@ export class Collection<DataType extends object = DefaultItem> {
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
-    if (!this.isInstantiated) {
-      Agile.logger.warn(
-        "We recommend to use 'MY_COLLECTION.Group' instead of 'MY_COLLECTION.createGroup' in the Collection config!"
-      );
-    }
+    if (!this.isInstantiated) LogCodeManager.log('1B:02:03');
 
     // Check if Group already exists
-    if (group) {
+    if (group != null) {
       if (!group.isPlaceholder) {
-        Agile.logger.warn(`Group with the name '${groupKey}' already exists!`);
+        LogCodeManager.log('1B:03:02', [groupKey]);
         return group;
       }
       group.set(initialItems, { overwrite: true });
@@ -446,7 +429,7 @@ export class Collection<DataType extends object = DefaultItem> {
     const group = groupKey ? this.groups[groupKey] : undefined;
 
     // Check if Group exists
-    if (!group || (!config.notExisting && group.isPlaceholder))
+    if (group == null || (!config.notExisting && group.isPlaceholder))
       return undefined;
 
     ComputedTracker.tracked(group.observer);
@@ -476,7 +459,7 @@ export class Collection<DataType extends object = DefaultItem> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
     // Create dummy Group to hold reference
-    if (!group) {
+    if (group == null) {
       group = new Group<DataType>(this, [], {
         key: groupKey,
         isPlaceholder: true,
@@ -497,10 +480,7 @@ export class Collection<DataType extends object = DefaultItem> {
    * @param groupKey - Name/Key of Group
    */
   public removeGroup(groupKey: GroupKey): this {
-    if (!this.groups[groupKey]) {
-      Agile.logger.warn(`Group with the key/name '${groupKey}' doesn't exist!`);
-      return this;
-    }
+    if (this.groups[groupKey] == null) return this;
     delete this.groups[groupKey];
     return this;
   }
@@ -520,18 +500,12 @@ export class Collection<DataType extends object = DefaultItem> {
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
 
-    if (!this.isInstantiated) {
-      Agile.logger.warn(
-        "We recommend to use 'MY_COLLECTION.Selector' instead of 'MY_COLLECTION.createSelector' in the Collection config!"
-      );
-    }
+    if (!this.isInstantiated) LogCodeManager.log('1B:02:04');
 
     // Check if Selector already exists
-    if (selector) {
+    if (selector != null) {
       if (!selector.isPlaceholder) {
-        Agile.logger.warn(
-          `Selector with the name '${selectorKey}' already exists!`
-        );
+        LogCodeManager.log('1B:03:03', [selectorKey]);
         return selector;
       }
       selector.select(itemKey, { overwrite: true });
@@ -596,7 +570,7 @@ export class Collection<DataType extends object = DefaultItem> {
     const selector = selectorKey ? this.selectors[selectorKey] : undefined;
 
     // Check if Selector exists
-    if (!selector || (!config.notExisting && selector.isPlaceholder))
+    if (selector == null || (!config.notExisting && selector.isPlaceholder))
       return undefined;
 
     ComputedTracker.tracked(selector.observer);
@@ -617,11 +591,15 @@ export class Collection<DataType extends object = DefaultItem> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
 
     // Create dummy Selector to hold reference
-    if (!selector) {
-      selector = new Selector<DataType>(this, 'unknown', {
-        key: selectorKey,
-        isPlaceholder: true,
-      });
+    if (selector == null) {
+      selector = new Selector<DataType>(
+        this,
+        Selector.unknownItemPlaceholderKey,
+        {
+          key: selectorKey,
+          isPlaceholder: true,
+        }
+      );
       this.selectors[selectorKey] = selector;
     }
 
@@ -638,15 +616,9 @@ export class Collection<DataType extends object = DefaultItem> {
    * @param selectorKey - Name/Key of Selector
    */
   public removeSelector(selectorKey: SelectorKey): this {
-    if (!this.selectors[selectorKey]) {
-      Agile.logger.warn(
-        `Selector with the key/name '${selectorKey}' doesn't exist!`
-      );
-      return this;
-    }
-    this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
+    if (this.selectors[selectorKey] == null) return this;
+    this.selectors[selectorKey].unselect(); // Unselects current selected Item
     delete this.selectors[selectorKey];
-
     return this;
   }
 
@@ -687,7 +659,7 @@ export class Collection<DataType extends object = DefaultItem> {
     const item = itemKey != null ? this.data[itemKey] : undefined;
 
     // Check if Item exists
-    if (!item || (!config.notExisting && !item.exists)) return undefined;
+    if (item == null || (!config.notExisting && !item.exists)) return undefined;
 
     ComputedTracker.tracked(item.observer);
     return item;
@@ -702,7 +674,7 @@ export class Collection<DataType extends object = DefaultItem> {
     let item = this.getItem(itemKey, { notExisting: true });
 
     // Create dummy Item to hold reference
-    if (!item) {
+    if (item == null) {
       item = new Item<DataType>(
         this,
         {
@@ -734,7 +706,7 @@ export class Collection<DataType extends object = DefaultItem> {
     config: HasConfigInterface = {}
   ): DataType | undefined {
     const item = this.getItem(itemKey, config);
-    if (!item) return undefined;
+    if (item == null) return undefined;
     return item.value;
   }
 
@@ -820,11 +792,6 @@ export class Collection<DataType extends object = DefaultItem> {
       defaultStorageKey: null,
     });
 
-    if (this.persistent)
-      Agile.logger.warn(
-        `By persisting the Collection '${this._key}' twice you overwrite the old Persistent Instance!`
-      );
-
     // Create persistent -> Persist Value
     this.persistent = new CollectionPersistent<DataType>(this, {
       instantiate: _config.loadValue,
@@ -846,16 +813,19 @@ export class Collection<DataType extends object = DefaultItem> {
    * @param callback - Callback Function
    */
   public onLoad(callback: (success: boolean) => void): this {
-    if (this.persistent) {
-      this.persistent.onLoad = callback;
+    if (!this.persistent) return this;
 
-      // If Collection is already 'isPersisted' the loading was successful -> callback can be called
-      if (this.isPersisted) callback(true);
-    } else {
-      Agile.logger.error(
-        `Please make sure you persist the Collection '${this._key}' before using the 'onLoad' function!`
-      );
+    // Check if Callback is valid Function
+    if (!isFunction(callback)) {
+      LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
+      return this;
     }
+
+    this.persistent.onLoad = callback;
+
+    // If Collection is already 'isPersisted' the loading was successful -> callback can be called
+    if (this.isPersisted) callback(true);
+
     return this;
   }
 
@@ -983,13 +953,11 @@ export class Collection<DataType extends object = DefaultItem> {
       background: false,
     });
 
-    if (!item || oldItemKey === newItemKey) return false;
+    if (item == null || oldItemKey === newItemKey) return false;
 
     // Check if Item with newItemKey already exists
     if (this.hasItem(newItemKey)) {
-      Agile.logger.warn(
-        `Couldn't update ItemKey from '${oldItemKey}' to '${newItemKey}' because an Item with the key/name '${newItemKey}' already exists!`
-      );
+      LogCodeManager.log('1B:03:04', [oldItemKey, newItemKey, this._key]);
       return false;
     }
 
@@ -1010,7 +978,7 @@ export class Collection<DataType extends object = DefaultItem> {
     // Update ItemKey in Groups
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
-      if (!group || !group.has(oldItemKey)) continue;
+      if (!group?.has(oldItemKey)) continue;
       group.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
@@ -1097,7 +1065,7 @@ export class Collection<DataType extends object = DefaultItem> {
       // Remove ItemKey from Groups
       _groupKeys.forEach((groupKey) => {
         const group = this.getGroup(groupKey, { notExisting: true });
-        if (!group || !group.has(itemKey)) return;
+        if (!group?.has(itemKey)) return;
         group.remove(itemKey);
         removedFromGroupsCount++;
       });
@@ -1126,7 +1094,7 @@ export class Collection<DataType extends object = DefaultItem> {
 
     _itemKeys.forEach((itemKey) => {
       const item = this.getItem(itemKey, { notExisting: true });
-      if (!item) return;
+      if (item == null) return;
 
       // Remove Item from Groups
       for (const groupKey in this.groups) {
@@ -1171,23 +1139,19 @@ export class Collection<DataType extends object = DefaultItem> {
     });
 
     if (!isValidObject(_data)) {
-      Agile.logger.error(
-        `Item Data of Collection '${this._key}' has to be an valid Object!`
-      );
+      LogCodeManager.log('1B:03:05', [this._key]);
       return false;
     }
 
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
-      Agile.logger.warn(
-        `Collection '${this._key}' Item Data should contain a primaryKey property called '${this.config.primaryKey}'!`
-      );
+      LogCodeManager.log('1B:02:05', [this._key, this.config.primaryKey]);
       _data[this.config.primaryKey] = generateId();
     }
 
     const itemKey = _data[primaryKey];
     let item = this.getItem(itemKey, { notExisting: true });
     const wasPlaceholder = item?.isPlaceholder || false;
-    const createItem = !item;
+    const createItem = item == null;
 
     // Create or update Item
     if (!createItem && config.patch)
@@ -1347,7 +1311,7 @@ export interface SetDataConfigInterface {
   background?: boolean;
 }
 
-export type CollectionConfig<DataType extends object = DefaultItem> =
+export type CollectionConfig<DataType extends Object = DefaultItem> =
   | CreateCollectionConfigInterface<DataType>
   | ((
       collection: Collection<DataType>

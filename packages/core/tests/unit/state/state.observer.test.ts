@@ -8,7 +8,7 @@ import {
   StatePersistent,
   SubscriptionContainer,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('StateObserver Tests', () => {
   let dummyAgile: Agile;
@@ -16,7 +16,7 @@ describe('StateObserver Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });

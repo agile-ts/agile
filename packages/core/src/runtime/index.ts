@@ -7,6 +7,7 @@ import {
   defineConfig,
   notEqual,
   isValidObject,
+  LogCodeManager,
 } from '../internal';
 
 export class Runtime {
@@ -43,8 +44,9 @@ export class Runtime {
 
     this.jobQueue.push(job);
 
-    // Logging
-    Agile.logger.if.tag(['runtime']).info(`Created Job '${job._key}'`, job);
+    Agile.logger.if
+      .tag(['runtime'])
+      .info(LogCodeManager.getLog('16:01:00', [job._key]), job);
 
     // Perform Job
     if (config.perform) {
@@ -76,8 +78,9 @@ export class Runtime {
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 
-    // Logging
-    Agile.logger.if.tag(['runtime']).info(`Completed Job '${job._key}'`, job);
+    Agile.logger.if
+      .tag(['runtime'])
+      .info(LogCodeManager.getLog('16:01:01', [job._key]), job);
 
     // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
     if (this.jobQueue.length > 0) {
@@ -137,15 +140,15 @@ export class Runtime {
             job.triesToUpdate++;
             this.notReadyJobsToRerender.add(job);
 
-            // Logging
-            Agile.logger.warn(
-              "SubscriptionContainer/Component isn't ready to rerender!",
+            LogCodeManager.log(
+              '16:02:00',
+              [subscriptionContainer.key],
               subscriptionContainer
             );
           } else {
-            // Logging
-            Agile.logger.warn(
-              `Job with not ready SubscriptionContainer/Component was removed from the runtime after ${job.config.numberOfTriesToUpdate} tries to avoid an overflow.`,
+            LogCodeManager.log(
+              '16:02:01',
+              [job.config.numberOfTriesToUpdate],
               subscriptionContainer
             );
           }
@@ -184,10 +187,9 @@ export class Runtime {
         );
     });
 
-    // Logging
     Agile.logger.if
       .tag(['runtime'])
-      .info('Updated/Rerendered Subscriptions', subscriptionsToUpdate);
+      .info(LogCodeManager.getLog('16:01:02'), subscriptionsToUpdate);
 
     return true;
   }

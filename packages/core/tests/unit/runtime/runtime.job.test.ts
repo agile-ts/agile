@@ -1,5 +1,5 @@
 import { Agile, Integration, RuntimeJob, Observer } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('RuntimeJob Tests', () => {
   let dummyAgile: Agile;
@@ -8,7 +8,7 @@ describe('RuntimeJob Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({
