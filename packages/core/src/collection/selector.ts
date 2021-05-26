@@ -30,19 +30,20 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     itemKey: ItemKey,
     config: SelectorConfigInterface = {}
   ) {
+    config = defineConfig(config, {
+      isPlaceholder: false,
+    });
     super(collection.agileInstance(), undefined, config);
     this.collection = () => collection;
     this.item = undefined;
-    this._itemKey = itemKey;
+    this._itemKey = !config.isPlaceholder
+      ? itemKey
+      : Selector.unknownItemPlaceholderKey;
     this._key = config?.key;
     this.isPlaceholder = true; // Because hasn't selected any Item yet
 
     // Initial Select
-    // Only if passed itemKey isn't the 'unknownItemPlaceholderKey'
-    // which means the Selector represents no Item initially.
-    // Probably because it should be a placeholder.
-    if (itemKey !== Selector.unknownItemPlaceholderKey)
-      this.select(itemKey, { overwrite: true });
+    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -81,7 +82,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
         exclude: [],
       },
       force: false,
-      overwrite: this.item?.isPlaceholder || false,
+      overwrite: this.item?.isPlaceholder ?? false,
       storage: true,
     });
 
