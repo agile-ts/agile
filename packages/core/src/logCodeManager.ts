@@ -1,21 +1,21 @@
 import { Agile } from './agile';
 
 // 00:00:00
-// first digits is based on the AgileClass
+// |00|:00:00 first digits are based on the Agile Class
 // 00 = General
 // 10 = Agile
 // 11 = Storage
 // ..
-// second digits is based on the log type
+// 00:|00|:00 second digits are based on the Log Type
 const logCodeTypes = {
   '00': 'success',
   '01': 'info',
   '02': 'warn',
   '03': 'error',
 };
-// third digits is based on the log message
+// 00:00:|00| third digits are based on the Log Message (ascending counted)
 
-const logCodeManager = {
+const logCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
@@ -27,7 +27,6 @@ const logCodeManager = {
     "To use the '.persist()' functionality, please provide a custom Storage!",
   '11:02:01':
     'The first allocated Storage for AgileTs must be set as the default Storage!',
-
   '11:03:00': "Storage with the key/name '${0}' already exists!",
   '11:03:01':
     "Couldn't find Storage '${0}'. " +
@@ -78,7 +77,7 @@ const logCodeManager = {
   '16:02:00': "SubscriptionContainer/Component '${0}' isn't ready to rerender!",
   '16:02:01':
     'Job with not ready SubscriptionContainer/Component was removed from the runtime ' +
-    'after ${0} tries to avoid overflow.',
+    'after ${0} tries to avoid a Job overflow.',
 
   // Observer
   '17:03:00':
@@ -115,7 +114,7 @@ const logCodeManager = {
     "instead of 'Selector()' outside the Collection configuration object.",
   '1B:02:02':
     'By overwriting the whole Item ' +
-    'you have to pass the correct itemKey into the changes object!',
+    "you have to pass the correct itemKey into the 'changes object!'",
   '1B:02:03':
     "We recommend using 'Group()' instead of 'createGroup()' " +
     'inside the Collection configuration object.',
@@ -152,16 +151,21 @@ const logCodeManager = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-export type LogCodesArrayType<T> = {
-  [K in keyof T]: T[K] extends string ? K : never;
-}[keyof T] &
-  string;
-
-function getLog<T extends LogCodesArrayType<typeof logCodeManager>>(
+//=========================================================================================================
+// Get Log
+//=========================================================================================================
+/**
+ * @internal
+ * Returns the log message according to the passed logCode
+ * @param logCode - Log Code of Message
+ * @param replacers - Instances that replace these '${x}' placeholders based on the index
+ * For example: replacers[0] replaces '${0}', replacers[1] replaces '${1}', ...
+ */
+function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
   replacers: any[] = []
 ): string {
-  let result = logCodeManager[logCode] ?? `'${logCode}' is a unknown logCode!`;
+  let result = logCodeMessages[logCode] ?? `'${logCode}' is a unknown logCode!`;
 
   for (const i in replacers) {
     // https://stackoverflow.com/questions/41438656/why-do-i-get-cannot-read-property-tostring-of-undefined
@@ -171,19 +175,39 @@ function getLog<T extends LogCodesArrayType<typeof logCodeManager>>(
   return result;
 }
 
-function log<T extends LogCodesArrayType<typeof logCodeManager>>(
+//=========================================================================================================
+// Log
+//=========================================================================================================
+/**
+ * @internal
+ * Logs message at the provided logCode with the Agile.logger
+ * @param logCode - Log Code of Message
+ * @param replacers - Instances that replace these '${x}' placeholders based on the index
+ * For example: replacers[0] replaces '${0}', replacers[1] replaces '${1}', ..
+ * @param data - Data attached to the end of the log message
+ */
+function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
   replacers: any[] = [],
   ...data: any[]
 ): void {
   const codes = logCode.split(':');
-  if (codes.length !== 3) return;
-  Agile.logger[logCodeTypes[codes[1]]](getLog(logCode, replacers), ...data);
+  if (codes.length === 3)
+    Agile.logger[logCodeTypes[codes[1]]](getLog(logCode, replacers), ...data);
 }
 
+/**
+ * @internal
+ * Manages logCode based logging of AgileTs
+ */
 export const LogCodeManager = {
   getLog,
   log,
   logCodeLogTypes: logCodeTypes,
-  logCodes: logCodeManager,
+  logCodeMessages: logCodeMessages,
 };
+
+export type LogCodesArrayType<T> = {
+  [K in keyof T]: T[K] extends string ? K : never;
+}[keyof T] &
+  string;

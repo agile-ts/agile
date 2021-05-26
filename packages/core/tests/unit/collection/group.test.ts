@@ -507,17 +507,28 @@ describe('Group Tests', () => {
       it('should build Group output and items and set notFoundItemKeys to not found Item Keys', () => {
         group.rebuild();
 
-        LogMock.hasLoggedCode(
-          '1C:02:00',
-          [dummyCollection._key, group._key],
-          ['dummyItem3Key']
-        );
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
         expect(group.items).toStrictEqual([dummyItem1, dummyItem2]);
         expect(group._output).toStrictEqual([
           dummyItem1._value,
           dummyItem2._value,
         ]);
+        LogMock.hasLoggedCode(
+          '1C:02:00',
+          [dummyCollection._key, group._key],
+          ['dummyItem3Key']
+        );
+      });
+
+      it("shouldn't build Group output and items if Collection is not properly instantiated", () => {
+        dummyCollection.isInstantiated = false;
+
+        group.rebuild();
+
+        expect(group.notFoundItemKeys).toStrictEqual([]);
+        expect(group.items).toStrictEqual([]);
+        expect(group._output).toStrictEqual([]);
+        LogMock.hasNotLogged('warn');
       });
     });
   });

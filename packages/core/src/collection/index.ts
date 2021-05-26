@@ -75,8 +75,8 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Rebuild of Groups
     // Not necessary because if Items are added to the Collection,
-    // the Groups are rebuilt if they contain these added Items.
-    // for(const key in this.groups) this.groups[key].rebuild();
+    // the Groups which contain these added Items get rebuilt.
+    // for (const key in this.groups) this.groups[key].rebuild();
   }
 
   /**
@@ -253,7 +253,9 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (!_groupKeys.includes(defaultGroupKey)) _groupKeys.push(defaultGroupKey);
 
     // Create not existing Groups
-    _groupKeys.forEach((key) => !this.groups[key] && this.createGroup(key));
+    _groupKeys.forEach(
+      (key) => this.groups[key] == null && this.createGroup(key)
+    );
 
     _data.forEach((data, index) => {
       const itemKey = data[primaryKey];
@@ -374,7 +376,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (!this.isInstantiated) LogCodeManager.log('1B:02:03');
 
     // Check if Group already exists
-    if (group) {
+    if (group != null) {
       if (!group.isPlaceholder) {
         LogCodeManager.log('1B:03:02', [groupKey]);
         return group;
@@ -427,7 +429,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const group = groupKey ? this.groups[groupKey] : undefined;
 
     // Check if Group exists
-    if (!group || (!config.notExisting && group.isPlaceholder))
+    if (group == null || (!config.notExisting && group.isPlaceholder))
       return undefined;
 
     ComputedTracker.tracked(group.observer);
@@ -457,7 +459,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     let group = this.getGroup(groupKey, { notExisting: true });
 
     // Create dummy Group to hold reference
-    if (!group) {
+    if (group == null) {
       group = new Group<DataType>(this, [], {
         key: groupKey,
         isPlaceholder: true,
@@ -478,7 +480,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param groupKey - Name/Key of Group
    */
   public removeGroup(groupKey: GroupKey): this {
-    if (!this.groups[groupKey]) return this;
+    if (this.groups[groupKey] == null) return this;
     delete this.groups[groupKey];
     return this;
   }
@@ -501,7 +503,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (!this.isInstantiated) LogCodeManager.log('1B:02:04');
 
     // Check if Selector already exists
-    if (selector) {
+    if (selector != null) {
       if (!selector.isPlaceholder) {
         LogCodeManager.log('1B:03:03', [selectorKey]);
         return selector;
@@ -568,7 +570,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const selector = selectorKey ? this.selectors[selectorKey] : undefined;
 
     // Check if Selector exists
-    if (!selector || (!config.notExisting && selector.isPlaceholder))
+    if (selector == null || (!config.notExisting && selector.isPlaceholder))
       return undefined;
 
     ComputedTracker.tracked(selector.observer);
@@ -589,7 +591,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
 
     // Create dummy Selector to hold reference
-    if (!selector) {
+    if (selector == null) {
       selector = new Selector<DataType>(
         this,
         Selector.unknownItemPlaceholderKey,
@@ -614,8 +616,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param selectorKey - Name/Key of Selector
    */
   public removeSelector(selectorKey: SelectorKey): this {
-    if (!this.selectors[selectorKey]) return this;
-    this.selectors[selectorKey]?.unselect(); // Unselects current selected Item
+    if (this.selectors[selectorKey] == null) return this;
+    this.selectors[selectorKey].unselect(); // Unselects current selected Item
     delete this.selectors[selectorKey];
     return this;
   }
@@ -657,7 +659,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const item = itemKey != null ? this.data[itemKey] : undefined;
 
     // Check if Item exists
-    if (!item || (!config.notExisting && !item.exists)) return undefined;
+    if (item == null || (!config.notExisting && !item.exists)) return undefined;
 
     ComputedTracker.tracked(item.observer);
     return item;
@@ -672,7 +674,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     let item = this.getItem(itemKey, { notExisting: true });
 
     // Create dummy Item to hold reference
-    if (!item) {
+    if (item == null) {
       item = new Item<DataType>(
         this,
         {
@@ -704,7 +706,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     config: HasConfigInterface = {}
   ): DataType | undefined {
     const item = this.getItem(itemKey, config);
-    if (!item) return undefined;
+    if (item == null) return undefined;
     return item.value;
   }
 
@@ -951,7 +953,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       background: false,
     });
 
-    if (!item || oldItemKey === newItemKey) return false;
+    if (item == null || oldItemKey === newItemKey) return false;
 
     // Check if Item with newItemKey already exists
     if (this.hasItem(newItemKey)) {
@@ -976,7 +978,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Update ItemKey in Groups
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
-      if (!group || !group.has(oldItemKey)) continue;
+      if (!group?.has(oldItemKey)) continue;
       group.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
@@ -1063,7 +1065,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       // Remove ItemKey from Groups
       _groupKeys.forEach((groupKey) => {
         const group = this.getGroup(groupKey, { notExisting: true });
-        if (!group || !group.has(itemKey)) return;
+        if (!group?.has(itemKey)) return;
         group.remove(itemKey);
         removedFromGroupsCount++;
       });
@@ -1092,7 +1094,7 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     _itemKeys.forEach((itemKey) => {
       const item = this.getItem(itemKey, { notExisting: true });
-      if (!item) return;
+      if (item == null) return;
 
       // Remove Item from Groups
       for (const groupKey in this.groups) {
@@ -1149,7 +1151,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const itemKey = _data[primaryKey];
     let item = this.getItem(itemKey, { notExisting: true });
     const wasPlaceholder = item?.isPlaceholder || false;
-    const createItem = !item;
+    const createItem = item == null;
 
     // Create or update Item
     if (!createItem && config.patch)

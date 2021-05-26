@@ -267,9 +267,6 @@ describe('Collection Tests', () => {
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
-        expect(response._key).toBe('group1Key');
-        expect(response._value).toStrictEqual([1, 2]);
-        expect(response.collection()).toBe(collection);
       });
 
       it('should create Group with no key which belongs to Collection after instantiation and print warning', () => {
@@ -278,12 +275,10 @@ describe('Collection Tests', () => {
         collection.isInstantiated = true;
         const response = collection.Group([1, 2]);
 
+        expect(collection.createGroup).toHaveBeenCalledWith('randomId', [1, 2]);
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
-        expect(response._key).toBe('randomId');
-        expect(response._value).toStrictEqual([1, 2]);
-        expect(response.collection()).toBe(collection);
       });
     });
 
@@ -320,9 +315,6 @@ describe('Collection Tests', () => {
         LogMock.hasLoggedCode('1B:02:01');
 
         expect(response).toBeInstanceOf(Selector);
-        expect(response._key).toBe('selectorKey1');
-        expect(response._itemKey).toStrictEqual(1);
-        expect(response.collection()).toBe(collection);
       });
 
       it('should create Selector with no key which belongs to Collection after instantiation and print warning', () => {
@@ -331,12 +323,10 @@ describe('Collection Tests', () => {
         collection.isInstantiated = true;
         const response = collection.Selector(1);
 
+        expect(collection.createSelector).toHaveBeenCalledWith('randomId', 1);
         LogMock.hasLoggedCode('1B:02:01');
 
         expect(response).toBeInstanceOf(Selector);
-        expect(response._key).toBe('randomId');
-        expect(response._itemKey).toStrictEqual(1);
-        expect(response.collection()).toBe(collection);
       });
     });
 
@@ -1098,7 +1088,7 @@ describe('Collection Tests', () => {
       it('should remove existing Group', () => {
         collection.removeGroup('dummyGroup');
 
-        expect(collection.groups['dummyGroup']).toBeUndefined();
+        expect(collection.groups).not.toHaveProperty('dummyGroup');
       });
 
       it("shouldn't remove not existing Group and print warning", () => {
@@ -1665,6 +1655,7 @@ describe('Collection Tests', () => {
 
         expect(collection.persistent.onLoad).toBe(dummyCallbackFunction);
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should set onLoad function if Collection is persisted and should call it initially (collection.isPersisted = true)', () => {
@@ -1675,6 +1666,7 @@ describe('Collection Tests', () => {
 
         expect(collection.persistent.onLoad).toBe(dummyCallbackFunction);
         expect(dummyCallbackFunction).toHaveBeenCalledWith(true);
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't set onLoad function if Collection isn't persisted", () => {
@@ -1682,6 +1674,7 @@ describe('Collection Tests', () => {
 
         expect(collection?.persistent?.onLoad).toBeUndefined();
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't set invalid onLoad callback function", () => {
@@ -1690,6 +1683,7 @@ describe('Collection Tests', () => {
 
         collection.onLoad(10 as any);
 
+        expect(collection?.persistent?.onLoad).toBeUndefined();
         LogMock.hasLoggedCode('00:03:01', ['OnLoad Callback', 'function']);
       });
     });

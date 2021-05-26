@@ -12,7 +12,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
   DataType
 > {
   static updateGroupSideEffectKey = 'rebuildGroup';
-  public selectedBy: Set<SelectorKey> = new Set(); // Keys of Selectors whcih selected this Item
+  public selectedBy: Set<SelectorKey> = new Set(); // Keys of Selectors that have selected this Item
   public collection: () => Collection<DataType>;
 
   /**

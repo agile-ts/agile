@@ -247,7 +247,7 @@ describe('Persistent Tests', () => {
       });
 
       it(
-        'should assign passed StorageKeys, set passed as defaultStorageKey as default StorageKey' +
+        'should assign passed StorageKeys, set passed defaultStorageKey as default StorageKey' +
           'and push defaultStorageKey into storageKeys',
         () => {
           persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test4');

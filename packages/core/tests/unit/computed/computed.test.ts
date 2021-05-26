@@ -6,7 +6,6 @@ import {
   State,
   ComputedTracker,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
 import { LogMock } from '../../helper/logMock';
 
 describe('Computed Tests', () => {
@@ -14,7 +13,7 @@ describe('Computed Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 

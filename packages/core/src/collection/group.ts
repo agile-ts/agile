@@ -359,7 +359,6 @@ export interface GroupRemoveConfigInterface {
 /**
  * @param key - Key/Name of Group
  * @param isPlaceholder - If Group is initially a Placeholder
- * @param initialRebuild - If the Group is rebuilt shortly after the instantiation
  */
 export interface GroupConfigInterface {
   key?: GroupKey;

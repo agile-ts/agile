@@ -666,6 +666,7 @@ describe('State Tests', () => {
 
         expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should set onLoad function if State is persisted and should call it initially (state.isPersisted = true)', () => {
@@ -676,13 +677,15 @@ describe('State Tests', () => {
 
         expect(numberState.persistent.onLoad).toBe(dummyCallbackFunction);
         expect(dummyCallbackFunction).toHaveBeenCalledWith(true);
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't set onLoad function if State isn't persisted", () => {
         numberState.onLoad(dummyCallbackFunction);
 
-        expect(numberState?.persistent?.onLoad).toBe(undefined);
+        expect(numberState?.persistent?.onLoad).toBeUndefined();
         expect(dummyCallbackFunction).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't set invalid onLoad callback function", () => {
@@ -691,6 +694,7 @@ describe('State Tests', () => {
 
         numberState.onLoad(10 as any);
 
+        expect(numberState?.persistent?.onLoad).toBeUndefined();
         LogMock.hasLoggedCode('00:03:01', ['OnLoad Callback', 'function']);
       });
     });
@@ -853,6 +857,7 @@ describe('State Tests', () => {
         numberState.computeExists(computeMethod);
 
         expect(numberState.computeExistsMethod).toBe(computeMethod);
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't assign passed invalid function to computeExistsMethod", () => {
@@ -938,6 +943,7 @@ describe('State Tests', () => {
 
         expect(numberState.set).toHaveBeenCalledWith(10);
         expect(numberState.computeValueMethod).toBe(computeMethod);
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't assign passed invalid function to computeValueMethod", () => {
@@ -962,6 +968,7 @@ describe('State Tests', () => {
           callback: sideEffectFunction,
           weight: 10,
         });
+        LogMock.hasNotLogged('warn');
       });
 
       it('should add passed callback function to sideEffects at passed key (specific config)', () => {
@@ -974,6 +981,7 @@ describe('State Tests', () => {
           callback: sideEffectFunction,
           weight: 999,
         });
+        LogMock.hasNotLogged('warn');
       });
 
       it("shouldn't add passed invalid function to sideEffects at passed key (default config)", () => {

@@ -421,12 +421,12 @@ describe('Runtime Tests', () => {
 
         LogMock.hasLoggedCode(
           '16:02:00',
-          ['nrCallbackSubContainerKey'],
+          [nrCallbackSubContainer.key],
           nrCallbackSubContainer
         );
         LogMock.hasLoggedCode(
           '16:02:00',
-          ['nrComponentSubContainerKey'],
+          [nrComponentSubContainer.key],
           nrComponentSubContainer
         );
 
@@ -474,7 +474,11 @@ describe('Runtime Tests', () => {
           expect(dummyObserver1.subscribedTo.size).toBe(1);
           expect(rCallbackSubJob.triesToUpdate).toBe(2);
 
-          LogMock.hasLoggedCode('16:02:01', [2], rCallbackSubContainer);
+          LogMock.hasLoggedCode(
+            '16:02:01',
+            [rCallbackSubJob.config.numberOfTriesToUpdate],
+            rCallbackSubContainer
+          );
 
           expect(response).toBeFalsy();
         }
@@ -510,7 +514,7 @@ describe('Runtime Tests', () => {
 
           LogMock.hasLoggedCode(
             '16:02:00',
-            ['rCallbackSubContainerKey'],
+            [rCallbackSubContainer.key],
             rCallbackSubContainer
           );
 

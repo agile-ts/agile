@@ -50,7 +50,7 @@ function getLogArguments(type: LoggerTypes, ...data: any[]): any[] {
 }
 
 function hasLoggedCode<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodes>
+  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
 >(logCode: T, replacers: any[] = [], ...data: any[]): void {
   const codes = logCode.split(':');
   if (codes.length === 3)
@@ -62,7 +62,7 @@ function hasLoggedCode<
 }
 
 function hasNotLoggedCode<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodes>
+  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
 >(logCode: T, replacers: any[] = [], ...data: any[]) {
   const codes = logCode.split(':');
   if (codes.length === 3)
