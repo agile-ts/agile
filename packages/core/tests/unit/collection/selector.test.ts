@@ -534,7 +534,45 @@ describe('Selector Tests', () => {
     });
 
     describe('reselect function tests', () => {
-      // TODO
+      beforeEach(() => {
+        selector.select = jest.fn();
+      });
+
+      it("should reselect Item if Item isn't selected correctly (default config)", () => {
+        jest.spyOn(selector, 'hasSelected').mockReturnValueOnce(false);
+
+        selector.reselect();
+
+        expect(selector.select).toHaveBeenCalledWith(selector._itemKey, {});
+      });
+
+      it("should reselect Item if Item isn't selected correctly (specific config)", () => {
+        jest.spyOn(selector, 'hasSelected').mockReturnValueOnce(false);
+
+        selector.reselect({ force: true, background: true });
+
+        expect(selector.select).toHaveBeenCalledWith(selector._itemKey, {
+          force: true,
+          background: true,
+        });
+      });
+
+      it("shouldn't reselect Item if itemKey is not set", () => {
+        jest.spyOn(selector, 'hasSelected').mockReturnValueOnce(false);
+        selector._itemKey = null as any;
+
+        selector.reselect();
+
+        expect(selector.select).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't reselect Item if Item is already selected correctly", () => {
+        jest.spyOn(selector, 'hasSelected').mockReturnValueOnce(true);
+
+        selector.reselect();
+
+        expect(selector.select).not.toHaveBeenCalled();
+      });
     });
 
     describe('unselect function tests', () => {
@@ -607,23 +645,23 @@ describe('Selector Tests', () => {
         selector._itemKey = 'dummyItemKey';
       });
 
-      it('should return true if Selector has properly selected ItemKey and Item isSelected', () => {
+      it('should return true if Selector has selected itemKey correctly and Item isSelected', () => {
         if (selector.item) selector.item.selectedBy.add(selector._key as any);
 
         expect(selector.hasSelected('dummyItemKey')).toBeTruthy();
       });
 
-      it("should return false if Selector hasn't properly selected ItemKey (itemKey == undefined)", () => {
+      it("should return false if Selector hasn't selected itemKey correctly (itemKey == undefined)", () => {
         expect(selector.hasSelected('notSelectedItemKey')).toBeFalsy();
       });
 
-      it("should return false if Selector hasn't properly selected ItemKey (item == undefined)", () => {
+      it("should return false if Selector hasn't selected itemKey correctly (item == undefined)", () => {
         selector.item = undefined;
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();
       });
 
-      it("should return false if Selector has properly selected ItemKey and Item isn't isSelected", () => {
+      it("should return false if Selector has selected itemKey correctly and Item isn't isSelected", () => {
         if (selector.item) selector.item.selectedBy = new Set();
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();

@@ -142,7 +142,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   //=========================================================================================================
   /**
    * @public
-   * Reselect Item
+   * Reselects current Item
    * Might help if the Selector failed to properly select an Item.
    * You can check with 'hasSelected()' if an Item got properly selected.
    * @param config - Config
@@ -152,7 +152,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
       (this._itemKey != null && !this.hasSelected(this._itemKey)) ||
       config.force
     )
-      this.select(this.itemKey, config);
+      this.select(this._itemKey, config);
     return this;
   }
 
