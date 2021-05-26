@@ -1094,7 +1094,7 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     _itemKeys.forEach((itemKey) => {
       const item = this.getItem(itemKey, { notExisting: true });
-      if (item == null) return;
+      if (item == null || item.isPlaceholder) return;
 
       // Remove Item from Groups
       for (const groupKey in this.groups) {
@@ -1111,8 +1111,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       // Reselect Item in Selectors (to create new dummyItem that holds reference)
       for (const selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
-        if (selector?.hasSelected(itemKey))
-          selector?.select(itemKey, { force: true });
+        if (selector?.hasSelected(itemKey)) selector?.reselect({ force: true });
       }
 
       this.size--;

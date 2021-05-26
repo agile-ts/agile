@@ -2194,15 +2194,22 @@ describe('Collection Tests', () => {
       let dummyGroup2: Group<ItemInterface>;
       let dummyItem1: Item<ItemInterface>;
       let dummyItem2: Item<ItemInterface>;
+      let placeholderItem: Item<ItemInterface>;
 
       beforeEach(() => {
         dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         dummyItem1.persistent = new StatePersistent(dummyItem1);
         dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Hans' });
         dummyItem2.persistent = new StatePersistent(dummyItem2);
+        placeholderItem = new Item(
+          collection,
+          { id: 'placeholderItem', name: 'placeholder' },
+          { isPlaceholder: true }
+        );
         collection.data = {
           dummyItem1: dummyItem1,
           dummyItem2: dummyItem2,
+          placeholderItem: placeholderItem,
         };
         collection.size = 2;
 
@@ -2280,6 +2287,13 @@ describe('Collection Tests', () => {
         expect(dummySelector2.select).toHaveBeenCalledWith('dummyItem2', {
           force: true,
         });
+      });
+
+      it("shouldn't remove placeholder Item from Collection", () => {
+        collection.removeItems(['dummyItem1', 'placeholderItem']);
+
+        expect(collection.data).toHaveProperty('placeholderItem');
+        expect(collection.data).not.toHaveProperty('dummyItem1');
       });
     });
 
