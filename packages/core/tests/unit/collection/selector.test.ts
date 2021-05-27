@@ -651,20 +651,36 @@ describe('Selector Tests', () => {
         expect(selector.hasSelected('dummyItemKey')).toBeTruthy();
       });
 
-      it("should return false if Selector hasn't selected itemKey correctly (itemKey == undefined)", () => {
+      it("should return false if Selector hasn't selected itemKey correctly (itemKey = undefined)", () => {
         expect(selector.hasSelected('notSelectedItemKey')).toBeFalsy();
       });
 
-      it("should return false if Selector hasn't selected itemKey correctly (item == undefined)", () => {
+      it("should return false if Selector hasn't selected itemKey correctly (itemKey = undefined, correctlySelected = false)", () => {
+        expect(selector.hasSelected('notSelectedItemKey', false)).toBeFalsy();
+      });
+
+      it("should return false if Selector hasn't selected itemKey correctly (item = undefined)", () => {
         selector.item = undefined;
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();
+      });
+
+      it("should return true if Selector hasn't selected itemKey correctly (item = undefined, correctlySelected = false)", () => {
+        selector.item = undefined;
+
+        expect(selector.hasSelected('dummyItemKey', false)).toBeTruthy();
       });
 
       it("should return false if Selector has selected itemKey correctly and Item isn't isSelected", () => {
         if (selector.item) selector.item.selectedBy = new Set();
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();
+      });
+
+      it("should return true if Selector has selected itemKey correctly and Item isn't isSelected (correctlySelected = false)", () => {
+        if (selector.item) selector.item.selectedBy = new Set();
+
+        expect(selector.hasSelected('dummyItemKey', false)).toBeTruthy();
       });
     });
 

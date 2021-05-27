@@ -143,8 +143,8 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   /**
    * @public
    * Reselects current Item
-   * Might help if the Selector failed to properly select an Item.
-   * You can check with 'hasSelected()' if an Item got properly selected.
+   * Might help if the Selector failed to select an Item correctly.
+   * You can check with 'hasSelected()' if an Item got correctly selected.
    * @param config - Config
    */
   public reselect(config: StateRuntimeJobConfigInterface = {}): this {
