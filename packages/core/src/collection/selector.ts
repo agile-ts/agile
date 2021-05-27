@@ -196,13 +196,17 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   /**
    * Checks if Selector has correctly selected the Item at the passed itemKey
    * @param itemKey - ItemKey
+   * @param correctlySelected - If it should consider only correctly selected Items
    */
-  public hasSelected(itemKey: ItemKey): boolean {
-    return (
-      this._itemKey === itemKey &&
-      this.item != null &&
-      this.item.selectedBy.has(this._key as any)
-    );
+  public hasSelected(itemKey: ItemKey, correctlySelected = true): boolean {
+    if (correctlySelected) {
+      return (
+        this._itemKey === itemKey &&
+        this.item != null &&
+        this.item.selectedBy.has(this._key as any)
+      );
+    }
+    return this._itemKey === itemKey;
   }
 
   //=========================================================================================================
