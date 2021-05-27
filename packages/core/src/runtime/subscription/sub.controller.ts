@@ -283,7 +283,7 @@ export class SubController {
 
     Agile.logger.if
       .tag(['runtime', 'subscription'])
-      .info('15:01:03', callbackSubscriptionContainer);
+      .info(LogCodeManager.getLog('15:01:03'), callbackSubscriptionContainer);
 
     return callbackSubscriptionContainer;
   }

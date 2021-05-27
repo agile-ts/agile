@@ -979,26 +979,29 @@ export class Collection<DataType extends Object = DefaultItem> {
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
       if (!group?.has(oldItemKey)) continue;
-      group.replace(oldItemKey, newItemKey, { background: config.background });
+      group?.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
     // Update ItemKey in Selectors
     for (const selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
-      if (!selector) continue;
+      if (selector == null) continue;
 
-      // Reselect Item in existing Selector which has selected the newItemKey
-      if (selector.hasSelected(newItemKey)) {
-        selector.select(newItemKey, {
+      // Reselect Item in Selector that has selected the newItemKey
+      // Necessary because the reference placeholder Item got removed
+      // and replaced with the new Item (Item of which the primaryKey was renamed)
+      // -> needs to find new Item with the same itemKey
+      if (selector.hasSelected(newItemKey, false)) {
+        selector.reselect({
           force: true, // Because ItemKeys are the same
           background: config.background,
         });
       }
 
-      // Select newItemKey in existing Selector which has selected the oldItemKey
-      if (selector.hasSelected(oldItemKey))
+      // Select newItemKey in Selector that has selected the oldItemKey
+      if (selector.hasSelected(oldItemKey, false))
         selector.select(newItemKey, {
-          background: config?.background,
+          background: config.background,
         });
     }
 
@@ -1034,12 +1037,12 @@ export class Collection<DataType extends Object = DefaultItem> {
     itemKeys: ItemKey | Array<ItemKey>
   ): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
-    everywhere: () => Collection<DataType>;
+    everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
     return {
       fromGroups: (groups: Array<ItemKey> | ItemKey) =>
         this.removeFromGroups(itemKeys, groups),
-      everywhere: () => this.removeItems(itemKeys),
+      everywhere: (config) => this.removeItems(itemKeys, config || {}),
     };
   }
 
@@ -1088,13 +1091,22 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @public
    * Removes Item completely from Collection
    * @param itemKeys - ItemKey/s of Item/s
+   * @param config - Config
    */
-  public removeItems(itemKeys: ItemKey | Array<ItemKey>): this {
+  public removeItems(
+    itemKeys: ItemKey | Array<ItemKey>,
+    config: RemoveItemsConfigInterface = {}
+  ): this {
+    config = defineConfig(config, {
+      notExisting: false,
+      removeSelector: false,
+    });
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
     _itemKeys.forEach((itemKey) => {
-      const item = this.getItem(itemKey, { notExisting: true });
+      const item = this.getItem(itemKey, { notExisting: config.notExisting });
       if (item == null) return;
+      const wasPlaceholder = item.isPlaceholder;
 
       // Remove Item from Groups
       for (const groupKey in this.groups) {
@@ -1108,14 +1120,21 @@ export class Collection<DataType extends Object = DefaultItem> {
       // Remove Item from Collection
       delete this.data[itemKey];
 
-      // Reselect Item in Selectors (to create new dummyItem that holds reference)
+      // Reselect or remove Selectors representing the removed Item
       for (const selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
-        if (selector?.hasSelected(itemKey))
-          selector?.select(itemKey, { force: true });
+        if (selector?.hasSelected(itemKey, false)) {
+          if (config.removeSelector) {
+            // Remove Selector
+            this.removeSelector(selector?._key ?? 'unknown');
+          } else {
+            // Reselect Item in Selector (to create new dummyItem to hold a reference to this removed Item)
+            selector?.reselect({ force: true });
+          }
+        }
       }
 
-      this.size--;
+      if (!wasPlaceholder) this.size--;
     });
 
     return this;
@@ -1300,6 +1319,18 @@ export interface CollectionPersistentConfigInterface {
   loadValue?: boolean;
   storageKeys?: StorageKey[];
   defaultStorageKey?: StorageKey;
+}
+
+/*
+ * @param notExisting - If not existing Items like placeholder Items can be removed.
+ * Keep in mind that sometimes it won't remove the Item entirely
+ * because another Instance (like a Selector) needs to keep reference to it.
+ * https://github.com/agile-ts/agile/pull/152
+ * @param - If Selectors that have selected an Item to be removed, should be removed too
+ */
+export interface RemoveItemsConfigInterface {
+  notExisting?: boolean;
+  removeSelector?: boolean;
 }
 
 /**

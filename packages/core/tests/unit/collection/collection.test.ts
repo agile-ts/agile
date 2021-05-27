@@ -1903,6 +1903,9 @@ describe('Collection Tests', () => {
         dummySelector1.select = jest.fn();
         dummySelector2.select = jest.fn();
         dummySelector3.select = jest.fn();
+        dummySelector1.reselect = jest.fn();
+        dummySelector2.reselect = jest.fn();
+        dummySelector3.reselect = jest.fn();
       });
 
       it('should update ItemKey in Collection, Selectors and Groups (default config)', () => {
@@ -1935,7 +1938,7 @@ describe('Collection Tests', () => {
           background: false,
         });
         expect(dummySelector2.select).not.toHaveBeenCalled();
-        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
+        expect(dummySelector3.reselect).toHaveBeenCalledWith({
           force: true,
           background: false,
         });
@@ -1975,7 +1978,7 @@ describe('Collection Tests', () => {
         expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: true,
         });
-        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
+        expect(dummySelector3.reselect).toHaveBeenCalledWith({
           force: true,
           background: true,
         });
@@ -2012,7 +2015,7 @@ describe('Collection Tests', () => {
         expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: false,
         });
-        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
+        expect(dummySelector3.reselect).toHaveBeenCalledWith({
           force: true,
           background: false,
         });
@@ -2109,11 +2112,26 @@ describe('Collection Tests', () => {
         expect(collection.removeItems).not.toHaveBeenCalled();
       });
 
-      it('should remove Items from everywhere', () => {
+      it('should remove Items from everywhere (default config)', () => {
         collection.remove(['test1', 'test2']).everywhere();
 
         expect(collection.removeFromGroups).not.toHaveBeenCalled();
-        expect(collection.removeItems).toHaveBeenCalledWith(['test1', 'test2']);
+        expect(collection.removeItems).toHaveBeenCalledWith(
+          ['test1', 'test2'],
+          {}
+        );
+      });
+
+      it('should remove Items from everywhere (specific config)', () => {
+        collection
+          .remove(['test1', 'test2'])
+          .everywhere({ removeSelector: true, notExisting: true });
+
+        expect(collection.removeFromGroups).not.toHaveBeenCalled();
+        expect(collection.removeItems).toHaveBeenCalledWith(
+          ['test1', 'test2'],
+          { removeSelector: true, notExisting: true }
+        );
       });
     });
 
@@ -2194,15 +2212,22 @@ describe('Collection Tests', () => {
       let dummyGroup2: Group<ItemInterface>;
       let dummyItem1: Item<ItemInterface>;
       let dummyItem2: Item<ItemInterface>;
+      let placeholderItem: Item<ItemInterface>;
 
       beforeEach(() => {
         dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
         dummyItem1.persistent = new StatePersistent(dummyItem1);
         dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Hans' });
         dummyItem2.persistent = new StatePersistent(dummyItem2);
+        placeholderItem = new Item(
+          collection,
+          { id: 'placeholderItem', name: 'placeholder' },
+          { isPlaceholder: true }
+        );
         collection.data = {
           dummyItem1: dummyItem1,
           dummyItem2: dummyItem2,
+          placeholderItem: placeholderItem,
         };
         collection.size = 2;
 
@@ -2234,16 +2259,19 @@ describe('Collection Tests', () => {
         dummyGroup1.remove = jest.fn();
         dummyGroup2.remove = jest.fn();
 
-        dummySelector1.select = jest.fn();
-        dummySelector2.select = jest.fn();
+        dummySelector1.reselect = jest.fn();
+        dummySelector2.reselect = jest.fn();
+
+        collection.removeSelector = jest.fn();
       });
 
-      it('should remove Item from Collection, Groups and Selectors', () => {
+      it('should remove Item from Collection, Groups and reselect Selectors (default config)', () => {
         collection.removeItems('dummyItem1');
 
         expect(collection.data).not.toHaveProperty('dummyItem1');
         expect(collection.data).toHaveProperty('dummyItem2');
         expect(collection.size).toBe(1);
+        expect(collection.removeSelector).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
         expect(
@@ -2253,18 +2281,19 @@ describe('Collection Tests', () => {
         expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem1');
         expect(dummyGroup2.remove).not.toHaveBeenCalled();
 
-        expect(dummySelector1.select).toHaveBeenCalledWith('dummyItem1', {
+        expect(dummySelector1.reselect).toHaveBeenCalledWith({
           force: true,
         });
-        expect(dummySelector2.select).not.toHaveBeenCalled();
+        expect(dummySelector2.reselect).not.toHaveBeenCalled();
       });
 
-      it('should remove Items from Collection, Groups and Selectors', () => {
+      it('should remove Items from Collection, Groups and reselect Selectors (default config)', () => {
         collection.removeItems(['dummyItem1', 'dummyItem2', 'notExistingItem']);
 
         expect(collection.data).not.toHaveProperty('dummyItem1');
         expect(collection.data).not.toHaveProperty('dummyItem2');
         expect(collection.size).toBe(0);
+        expect(collection.removeSelector).not.toHaveBeenCalled();
 
         expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
         expect(dummyItem2.persistent?.removePersistedValue).toHaveBeenCalled();
@@ -2274,12 +2303,53 @@ describe('Collection Tests', () => {
         expect(dummyGroup2.remove).not.toHaveBeenCalledWith('dummyItem1');
         expect(dummyGroup2.remove).toHaveBeenCalledWith('dummyItem2');
 
-        expect(dummySelector1.select).toHaveBeenCalledWith('dummyItem1', {
+        expect(dummySelector1.reselect).toHaveBeenCalledWith({
           force: true,
         });
-        expect(dummySelector2.select).toHaveBeenCalledWith('dummyItem2', {
+        expect(dummySelector2.reselect).toHaveBeenCalledWith({
           force: true,
         });
+      });
+
+      it('should remove Item from Collection, Groups and remove Selectors (removeSelector = true)', () => {
+        collection.removeItems('dummyItem1', { removeSelector: true });
+
+        expect(collection.data).not.toHaveProperty('dummyItem1');
+        expect(collection.data).toHaveProperty('dummyItem2');
+        expect(collection.size).toBe(1);
+        expect(collection.removeSelector).toHaveBeenCalledTimes(1);
+        expect(collection.removeSelector).toHaveBeenCalledWith(
+          dummySelector1._key
+        );
+
+        expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
+        expect(
+          dummyItem2.persistent?.removePersistedValue
+        ).not.toHaveBeenCalled();
+
+        expect(dummyGroup1.remove).toHaveBeenCalledWith('dummyItem1');
+        expect(dummyGroup2.remove).not.toHaveBeenCalled();
+
+        expect(dummySelector1.reselect).not.toHaveBeenCalled();
+        expect(dummySelector2.reselect).not.toHaveBeenCalled();
+      });
+
+      it("shouldn't remove placeholder Items from Collection (default config)", () => {
+        collection.removeItems(['dummyItem1', 'placeholderItem']);
+
+        expect(collection.data).toHaveProperty('placeholderItem');
+        expect(collection.data).not.toHaveProperty('dummyItem1');
+        expect(collection.size).toBe(1);
+      });
+
+      it('should remove placeholder Items from Collection (config.notExisting = true)', () => {
+        collection.removeItems(['dummyItem1', 'placeholderItem'], {
+          notExisting: true,
+        });
+
+        expect(collection.data).not.toHaveProperty('placeholderItem');
+        expect(collection.data).not.toHaveProperty('dummyItem1');
+        expect(collection.size).toBe(1);
       });
     });
 
