@@ -1938,7 +1938,7 @@ describe('Collection Tests', () => {
           background: false,
         });
         expect(dummySelector2.select).not.toHaveBeenCalled();
-        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
+        expect(dummySelector3.reselect).toHaveBeenCalledWith({
           force: true,
           background: false,
         });
@@ -1978,7 +1978,7 @@ describe('Collection Tests', () => {
         expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: true,
         });
-        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
+        expect(dummySelector3.reselect).toHaveBeenCalledWith({
           force: true,
           background: true,
         });
@@ -2015,7 +2015,7 @@ describe('Collection Tests', () => {
         expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
           background: false,
         });
-        expect(dummySelector3.select).toHaveBeenCalledWith('newDummyItem', {
+        expect(dummySelector3.reselect).toHaveBeenCalledWith({
           force: true,
           background: false,
         });
