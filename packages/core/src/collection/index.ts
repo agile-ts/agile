@@ -40,10 +40,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   public isInstantiated = false;
 
   /**
+   * Class that holds a List of Objects with key and causes rerender on subscribed Components
+   *
    * @public
-   * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
-   * @param agileInstance - An instance of Agile
-   * @param config - Config
+   *
+   * @param agileInstance - Instance of Agile the Collection belongs to
+   *
+   * @param config - Configuration
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
@@ -408,14 +411,15 @@ export class Collection<DataType extends Object = DefaultItem> {
     return !!this.getGroup(groupKey, config);
   }
 
-  //=========================================================================================================
-  // Get Group
-  //=========================================================================================================
   /**
+   * Retrieves a single Group by key/name.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroup)
+   *
    * @public
-   * Get Group by Key/Name
-   * @param groupKey - Key/Name of Group
-   * @param config - Config
+   * @memberOf Collection
+   * @param groupKey - key/name Group identifier
+   * @param config - Configuration
    */
   public getGroup(
     groupKey: GroupKey | undefined,
@@ -1321,12 +1325,12 @@ export interface CollectionPersistentConfigInterface {
   defaultStorageKey?: StorageKey;
 }
 
-/*
- * @param notExisting - If not existing Items like placeholder Items can be removed.
+/**
+ * @property notExisting - If not existing Items like placeholder Items can be removed.
  * Keep in mind that sometimes it won't remove the Item entirely
  * because another Instance (like a Selector) needs to keep reference to it.
  * https://github.com/agile-ts/agile/pull/152
- * @param - If Selectors that have selected an Item to be removed, should be removed too
+ * @property removeSelector - If Selectors that have selected an Item to be removed, should be removed too
  */
 export interface RemoveItemsConfigInterface {
   notExisting?: boolean;
@@ -1334,8 +1338,8 @@ export interface RemoveItemsConfigInterface {
 }
 
 /**
- * @param patch - If Data gets patched into existing Item
- * @param background - If assigning Data happens in background
+ * @property patch - If Data gets patched into existing Item
+ * @property background - If assigning Data happens in background
  */
 export interface SetDataConfigInterface {
   patch?: boolean;

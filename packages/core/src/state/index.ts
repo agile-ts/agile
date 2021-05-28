@@ -48,9 +48,14 @@ export class State<ValueType = any> {
   /**
    * @public
    * State - Class that holds one Value and causes rerender on subscribed Components
+   *
    * @param agileInstance - An instance of Agile
+   *
    * @param initialValue - Initial Value of State
-   * @param config - Config
+   *
+   * @param config - Configuration
+   *
+   * @typeparam ValueType - Type of a the value the State represents
    */
   constructor(
     agileInstance: Agile,
