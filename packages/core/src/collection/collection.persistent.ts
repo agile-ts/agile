@@ -153,14 +153,7 @@ export class CollectionPersistent<
         }
 
         // Create temporary placeholder Item in which the Item value will be loaded
-        const dummyItem = new Item<DataType>(
-          this.collection(),
-          {
-            [this.collection().config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
-            dummy: 'item',
-          } as any,
-          { isPlaceholder: true }
-        );
+        const dummyItem = this.collection().createPlaceholderItem(itemKey);
 
         // Persist dummy Item and load its value manually to be 100% sure
         // that it was loaded completely and exists
@@ -170,12 +163,13 @@ export class CollectionPersistent<
           storageKeys: this.storageKeys,
         });
         if (dummyItem?.persistent?.ready) {
-          const success = await dummyItem.persistent.loadPersistedValue(
+          const loadedPersistedValueIntoItem = await dummyItem.persistent.loadPersistedValue(
             itemStorageKey
           );
 
-          // If successfully loaded add Item to Collection
-          if (success) this.collection().collectItem(dummyItem);
+          // If successfully loaded Item value add Item to Collection
+          if (loadedPersistedValueIntoItem)
+            this.collection().collectItem(dummyItem);
         }
       }
 
@@ -184,7 +178,7 @@ export class CollectionPersistent<
     const success = await loadValuesIntoCollection();
 
     // Setup Side Effects to keep the Storage value in sync with the State value
-    if (success) this.setupSideEffects(storageItemKey);
+    if (success) this.setupSideEffects(_storageItemKey);
 
     return success;
   }

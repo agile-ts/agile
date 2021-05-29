@@ -678,21 +678,38 @@ export class Collection<DataType extends Object = DefaultItem> {
     let item = this.getItem(itemKey, { notExisting: true });
 
     // Create dummy Item to hold reference
-    if (item == null) {
-      item = new Item<DataType>(
-        this,
-        {
-          [this.config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
-          dummy: 'item',
-        } as any,
-        {
-          isPlaceholder: true,
-        }
-      );
-      this.data[itemKey] = item;
-    }
+    if (item == null) item = this.createPlaceholderItem(itemKey, true);
 
     ComputedTracker.tracked(item.observer);
+    return item;
+  }
+
+  /**
+   * Creates a placeholder Item
+   * that can be used to hold a reference to an Item that doesn't yet exist.
+   *
+   * @private
+   * @param itemKey - Key/Name identifier of the Item to be created
+   * @param addToCollection - Whether the created Item should be added to the Collection
+   */
+  public createPlaceholderItem(
+    itemKey: ItemKey,
+    addToCollection = false
+  ): Item<DataType> {
+    const item = new Item<DataType>(
+      this,
+      {
+        [this.config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
+        dummy: 'item',
+      } as any,
+      { isPlaceholder: true }
+    );
+    if (
+      addToCollection &&
+      !Object.prototype.hasOwnProperty.call(this.data, itemKey)
+    )
+      this.data[itemKey] = item;
+
     return item;
   }
 
