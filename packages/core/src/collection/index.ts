@@ -813,6 +813,9 @@ export class Collection<DataType extends Object = DefaultItem> {
       defaultStorageKey: null,
     });
 
+    // Check if Collection is already persisted
+    if (this.persistent != null && this.isPersisted) return this;
+
     // Create persistent -> Persist Value
     this.persistent = new CollectionPersistent<DataType>(this, {
       instantiate: _config.loadValue,

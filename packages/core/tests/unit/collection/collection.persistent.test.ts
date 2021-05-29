@@ -760,16 +760,46 @@ describe('CollectionPersistent Tests', () => {
         expect(collectionPersistent.setupSideEffects).not.toHaveBeenCalled();
         expect(collectionPersistent.isPersisted).toBeUndefined();
       });
+    });
 
-      // TODO move since the added sideEffect isn't here anymore!!
+    describe('setupSideEffect function tests', () => {
+      let dummyDefaultGroup: Group<ItemInterface>;
+
+      beforeEach(() => {
+        dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3'], {
+          key: 'default',
+        });
+        jest.spyOn(dummyDefaultGroup, 'addSideEffect');
+
+        collectionPersistent.rebuildStorageSideEffect = jest.fn();
+
+        dummyCollection.getDefaultGroup = jest.fn(
+          () => dummyDefaultGroup as any
+        );
+      });
+
+      it('should add rebuild Storage side effect to default Group', () => {
+        collectionPersistent.setupSideEffects();
+
+        expect(
+          dummyDefaultGroup.addSideEffect
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.defaultGroupSideEffectKey,
+          expect.any(Function),
+          { weight: 0 }
+        );
+      });
+
       describe('test added sideEffect called CollectionPersistent.defaultGroupSideEffectKey', () => {
         beforeEach(() => {
           collectionPersistent.rebuildStorageSideEffect = jest.fn();
         });
 
-        it('should call rebuildStorageSideEffect with persistentKey', async () => {
+        it('should call rebuildStorageSideEffect (persistentKey)', async () => {
           collectionPersistent.ready = true;
-          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+          dummyCollection.getDefaultGroup = jest.fn(
+            () => dummyDefaultGroup as any
+          );
 
           await collectionPersistent.persistValue();
 
@@ -782,9 +812,11 @@ describe('CollectionPersistent Tests', () => {
           ).toHaveBeenCalledWith(dummyDefaultGroup, collectionPersistent._key);
         });
 
-        it('should call rebuildStorageSideEffect with specific Key', async () => {
+        it('should call rebuildStorageSideEffect (specific key)', async () => {
           collectionPersistent.ready = true;
-          dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+          dummyCollection.getDefaultGroup = jest.fn(
+            () => dummyDefaultGroup as any
+          );
 
           await collectionPersistent.persistValue('dummyKey');
 
@@ -806,16 +838,21 @@ describe('CollectionPersistent Tests', () => {
         collectionPersistent.storageKeys = ['test1', 'test2'];
         collectionPersistent.isPersisted = undefined as any;
 
-        dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3']);
-        dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
         dummyCollection.data = {
           ['1']: dummyItem1,
           ['3']: dummyItem3,
         };
 
+        dummyDefaultGroup = new Group(dummyCollection, ['1', '2', '3']);
+        dummyDefaultGroup.persistent = new StatePersistent(dummyDefaultGroup);
+        dummyDefaultGroup.removeSideEffect = jest.fn();
+
         if (dummyDefaultGroup.persistent)
           dummyDefaultGroup.persistent.removePersistedValue = jest.fn();
-        dummyDefaultGroup.removeSideEffect = jest.fn();
+
+        dummyCollection.getDefaultGroup = jest.fn(
+          () => dummyDefaultGroup as any
+        );
 
         if (dummyItem1.persistent)
           dummyItem1.persistent.removePersistedValue = jest.fn();
@@ -825,77 +862,99 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.remove = jest.fn();
       });
 
-      it('should remove persisted defaultGroup and its Items from Storage with persistentKey', async () => {
+      it('should remove persisted default Group and its Items from Storage (persistentKey)', async () => {
         collectionPersistent.ready = true;
-        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.removePersistedValue();
 
         expect(response).toBeTruthy();
-
         expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
           collectionPersistent._key,
           collectionPersistent.storageKeys
         );
+        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
 
-        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey
-        );
         expect(
           dummyDefaultGroup.persistent?.removePersistedValue
-        ).toHaveBeenCalled();
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.getGroupStorageKey(
+            dummyDefaultGroup._key,
+            collectionPersistent._key
+          )
+        );
         expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey
         );
 
-        expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
-        expect(dummyItem3.persistent?.removePersistedValue).toHaveBeenCalled();
+        expect(
+          dummyItem1.persistent?.removePersistedValue
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            dummyItem1._key,
+            collectionPersistent._key
+          )
+        );
+        expect(
+          dummyItem3.persistent?.removePersistedValue
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            dummyItem3._key,
+            collectionPersistent._key
+          )
+        );
 
         expect(collectionPersistent.isPersisted).toBeFalsy();
       });
 
-      it('should remove persisted defaultGroup and its Items from Storage with specific Key', async () => {
+      it('should remove persisted default Group and its Items from Storage (specific key)', async () => {
         collectionPersistent.ready = true;
-        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.removePersistedValue(
           'dummyKey'
         );
 
         expect(response).toBeTruthy();
-
         expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
           'dummyKey',
           collectionPersistent.storageKeys
         );
+        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
 
-        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey
-        );
         expect(
           dummyDefaultGroup.persistent?.removePersistedValue
-        ).toHaveBeenCalled();
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.getGroupStorageKey(
+            dummyDefaultGroup._key,
+            'dummyKey'
+          )
+        );
         expect(dummyDefaultGroup.removeSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey
         );
 
-        expect(dummyItem1.persistent?.removePersistedValue).toHaveBeenCalled();
-        expect(dummyItem3.persistent?.removePersistedValue).toHaveBeenCalled();
+        expect(
+          dummyItem1.persistent?.removePersistedValue
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(dummyItem1._key, 'dummyKey')
+        );
+        expect(
+          dummyItem3.persistent?.removePersistedValue
+        ).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(dummyItem3._key, 'dummyKey')
+        );
 
         expect(collectionPersistent.isPersisted).toBeFalsy();
       });
 
-      it("shouldn't remove persisted defaultGroup and its Items from Storage if Persistent isn't ready", async () => {
+      it("shouldn't remove persisted default Group and its Items from Storage if Persistent isn't ready", async () => {
         collectionPersistent.ready = false;
-        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
 
         const response = await collectionPersistent.removePersistedValue();
 
         expect(response).toBeFalsy();
-
         expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+        expect(dummyCollection.getDefaultGroup).not.toHaveBeenCalled();
 
-        expect(dummyCollection.getGroup).not.toHaveBeenCalled();
         expect(
           dummyDefaultGroup.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();
@@ -911,19 +970,16 @@ describe('CollectionPersistent Tests', () => {
         expect(collectionPersistent.isPersisted).toBeUndefined();
       });
 
-      it("shouldn't remove persisted defaultGroup and its Items from Storage if Collection has no default Group", async () => {
+      it("shouldn't remove persisted default Group and its Items from Storage if Collection has no default Group", async () => {
         collectionPersistent.ready = true;
-        dummyCollection.getGroup = jest.fn(() => undefined as any);
+        dummyCollection.getDefaultGroup = jest.fn(() => undefined as any);
 
         const response = await collectionPersistent.removePersistedValue();
 
         expect(response).toBeFalsy();
-
         expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
 
-        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey
-        );
         expect(
           dummyDefaultGroup.persistent?.removePersistedValue
         ).not.toHaveBeenCalled();

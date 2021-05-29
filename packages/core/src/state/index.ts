@@ -407,7 +407,7 @@ export class State<ValueType = any> {
       defaultStorageKey: null,
     });
 
-    // Check if State was already persisted
+    // Check if State is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
     // Create persistent -> Persist Value
