@@ -118,7 +118,6 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public perform(job: StateRuntimeJob) {
     const state = job.observer.state();
-    const previousValue = copy(state.getPublicValue());
 
     // Assign new State Values
     state.previousStateValue = copy(state._value);
@@ -142,7 +141,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // The Observer value is at some point the public Value because Integrations like React are using it as return value.
     // For example 'useAgile()' returns the Observer.value and not the State.value.
     job.observer.value = copy(state.getPublicValue());
-    job.observer.previousValue = previousValue;
+    job.observer.previousValue = copy(state.previousStateValue);
   }
 
   //=========================================================================================================

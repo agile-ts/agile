@@ -4,40 +4,33 @@ export class ComputedTracker {
   static isTracking = false;
   static trackedObservers: Set<Observer> = new Set();
 
-  //=========================================================================================================
-  // Track
-  //=========================================================================================================
   /**
    * @internal
-   * Starts tracking Observers
+   * Activates Computed Tracker to globally track used Observers.
    */
   static track(): void {
     this.isTracking = true;
   }
 
-  //=========================================================================================================
-  // Tracked
-  //=========================================================================================================
   /**
    * @internal
-   * Adds passed Observer to tracked Observers, if ComputedTracker is currently tracking
+   * Tracks the passed Observer and caches it
+   * when the Computed Tracker is actively tracking.
    * @param observer - Observer
    */
   static tracked(observer: Observer) {
     if (this.isTracking) this.trackedObservers.add(observer);
   }
 
-  //=========================================================================================================
-  // Get Tracked Observers
-  //=========================================================================================================
   /**
    * @internal
-   * Returns tracked Observers and stops tracking anymore Observers
+   * Returns the last tracked Observers
+   * and stops the Computed Tracker from tracking any more Observers.
    */
   static getTrackedObservers(): Array<Observer> {
     const trackedObservers = Array.from(this.trackedObservers);
 
-    // Reset tracking
+    // Reset Computed Tracker
     this.isTracking = false;
     this.trackedObservers = new Set();
 

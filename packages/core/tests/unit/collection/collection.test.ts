@@ -459,7 +459,7 @@ describe('Collection Tests', () => {
           dummyGroup2: dummyGroup2,
         };
 
-        collection.setData = jest.fn();
+        collection.assignData = jest.fn();
         collection.createSelector = jest.fn();
         collection.createGroup = jest.fn();
 
@@ -469,11 +469,11 @@ describe('Collection Tests', () => {
       });
 
       it('should add Data to Collection and to default Group (default config)', () => {
-        collection.setData = jest.fn(() => true);
+        collection.assignData = jest.fn(() => true);
 
         collection.collect({ id: '1', name: 'frank' });
 
-        expect(collection.setData).toHaveBeenCalledWith(
+        expect(collection.assignData).toHaveBeenCalledWith(
           {
             id: '1',
             name: 'frank',
@@ -496,7 +496,7 @@ describe('Collection Tests', () => {
       });
 
       it('should add Data to Collection and to default Group (specific config)', () => {
-        collection.setData = jest.fn(() => true);
+        collection.assignData = jest.fn(() => true);
 
         collection.collect({ id: '1', name: 'frank' }, [], {
           background: true,
@@ -504,7 +504,7 @@ describe('Collection Tests', () => {
           patch: true,
         });
 
-        expect(collection.setData).toHaveBeenCalledWith(
+        expect(collection.assignData).toHaveBeenCalledWith(
           {
             id: '1',
             name: 'frank',
@@ -527,7 +527,7 @@ describe('Collection Tests', () => {
       });
 
       it('should add Data to Collection and to passed Groups + default Group (default config)', () => {
-        collection.setData = jest.fn(() => true);
+        collection.assignData = jest.fn(() => true);
 
         collection.collect(
           [
@@ -537,7 +537,7 @@ describe('Collection Tests', () => {
           ['dummyGroup1', 'dummyGroup2']
         );
 
-        expect(collection.setData).toHaveBeenCalledWith(
+        expect(collection.assignData).toHaveBeenCalledWith(
           {
             id: '1',
             name: 'frank',
@@ -547,7 +547,7 @@ describe('Collection Tests', () => {
             background: false,
           }
         );
-        expect(collection.setData).toHaveBeenCalledWith(
+        expect(collection.assignData).toHaveBeenCalledWith(
           {
             id: '2',
             name: 'hans',
@@ -588,14 +588,14 @@ describe('Collection Tests', () => {
       });
 
       it("should call setData and shouldn't add Items to passed Groups if setData failed (default config)", () => {
-        collection.setData = jest.fn(() => false);
+        collection.assignData = jest.fn(() => false);
 
         collection.collect({ id: '1', name: 'frank' }, [
           'dummyGroup1',
           'dummyGroup2',
         ]);
 
-        expect(collection.setData).toHaveBeenCalledWith(
+        expect(collection.assignData).toHaveBeenCalledWith(
           {
             id: '1',
             name: 'frank',
@@ -617,7 +617,7 @@ describe('Collection Tests', () => {
       it("should add Data to Collection and create Groups that doesn't exist yet (default config)", () => {
         const notExistingGroup = new Group(collection);
         notExistingGroup.add = jest.fn();
-        collection.setData = jest.fn(() => true);
+        collection.assignData = jest.fn(() => true);
         collection.createGroup = jest.fn(function (groupKey) {
           //@ts-ignore
           this.groups[groupKey] = notExistingGroup;
@@ -626,7 +626,7 @@ describe('Collection Tests', () => {
 
         collection.collect({ id: '1', name: 'frank' }, 'notExistingGroup');
 
-        expect(collection.setData).toHaveBeenCalledWith(
+        expect(collection.assignData).toHaveBeenCalledWith(
           {
             id: '1',
             name: 'frank',
@@ -653,7 +653,7 @@ describe('Collection Tests', () => {
       });
 
       it('should create Selector for each Item (config.select)', () => {
-        collection.setData = jest.fn(() => true);
+        collection.assignData = jest.fn(() => true);
 
         collection.collect(
           [
@@ -669,7 +669,7 @@ describe('Collection Tests', () => {
       });
 
       it("should call 'forEachItem' for each Item (default config)", () => {
-        collection.setData = jest.fn(() => true);
+        collection.assignData = jest.fn(() => true);
         const forEachItemMock = jest.fn();
 
         collection.collect(
@@ -2368,7 +2368,10 @@ describe('Collection Tests', () => {
       });
 
       it('should create new Item out of valid Data, rebuild Groups and increase size (default config)', () => {
-        const response = collection.setData({ id: 'dummyItem2', name: 'Hans' });
+        const response = collection.assignData({
+          id: 'dummyItem2',
+          name: 'Hans',
+        });
 
         expect(response).toBeTruthy();
         expect(collection.data).toHaveProperty('dummyItem1');
@@ -2385,7 +2388,7 @@ describe('Collection Tests', () => {
       });
 
       it("shouldn't create new Item if passed Data is no valid Object", () => {
-        const response = collection.setData('noObject' as any);
+        const response = collection.assignData('noObject' as any);
 
         expect(response).toBeFalsy();
         expect(collection.size).toBe(1);
@@ -2397,7 +2400,7 @@ describe('Collection Tests', () => {
       it('should create new Item with random primaryKey if passed Data has no primaryKey', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValueOnce('randomDummyId');
 
-        const response = collection.setData({ name: 'Frank' } as any);
+        const response = collection.assignData({ name: 'Frank' } as any);
 
         expect(response).toBeTruthy();
         expect(response).toBeTruthy();
@@ -2418,7 +2421,7 @@ describe('Collection Tests', () => {
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (default config)", () => {
-        const response = collection.setData({
+        const response = collection.assignData({
           id: 'dummyItem1',
           name: 'Dieter',
         });
@@ -2440,7 +2443,7 @@ describe('Collection Tests', () => {
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.background = true)", () => {
-        const response = collection.setData(
+        const response = collection.assignData(
           {
             id: 'dummyItem1',
             name: 'Dieter',
@@ -2465,7 +2468,7 @@ describe('Collection Tests', () => {
       });
 
       it("should update Item with valid Data, shouldn't rebuild Groups and shouldn't increase size (config.patch = true, background: true)", () => {
-        const response = collection.setData(
+        const response = collection.assignData(
           {
             id: 'dummyItem1',
             name: 'Dieter',
@@ -2493,7 +2496,7 @@ describe('Collection Tests', () => {
         dummyItem1.isPlaceholder = true;
         collection.size = 0;
 
-        const response = collection.setData({
+        const response = collection.assignData({
           id: 'dummyItem1',
           name: 'Dieter',
         });

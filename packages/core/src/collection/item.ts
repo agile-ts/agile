@@ -6,6 +6,10 @@ import {
   StateRuntimeJobConfigInterface,
   defineConfig,
   SelectorKey,
+  PersistentKey,
+  isValidObject,
+  CollectionPersistent,
+  StatePersistentConfigInterface,
 } from '../internal';
 
 export class Item<DataType extends Object = DefaultItem> extends State<
@@ -86,6 +90,64 @@ export class Item<DataType extends Object = DefaultItem> extends State<
   }
 
   //=========================================================================================================
+  // Persist
+  //=========================================================================================================
+  /**
+   * @public
+   * Stores Item Value into Agile Storage permanently
+   * @param config - Config
+   */
+  public persist(config?: ItemPersistConfigInterface): this;
+  /**
+   * @public
+   * Stores Item Value into Agile Storage permanently
+   * @param key - Key/Name of created Persistent (Note: Key required if Item has no set Key!)
+   * @param config - Config
+   */
+  public persist(
+    key?: PersistentKey,
+    config?: ItemPersistConfigInterface
+  ): this;
+  public persist(
+    keyOrConfig: PersistentKey | ItemPersistConfigInterface = {},
+    config: ItemPersistConfigInterface = {}
+  ): this {
+    let _config: ItemPersistConfigInterface;
+    let key: PersistentKey | undefined;
+
+    if (isValidObject(keyOrConfig)) {
+      _config = keyOrConfig as ItemPersistConfigInterface;
+      key = this._key;
+    } else {
+      _config = config || {};
+      key = keyOrConfig as PersistentKey;
+    }
+
+    _config = defineConfig(_config, {
+      loadValue: true,
+      followCollectionPattern: false,
+      storageKeys: [],
+      defaultStorageKey: null,
+    });
+
+    // Create storageItemKey based on Collection Name
+    if (_config.followCollectionPersistKeyPattern) {
+      key = CollectionPersistent.getItemStorageKey(
+        key || this._key,
+        this.collection()._key
+      );
+    }
+
+    super.persist(key, {
+      loadValue: _config.loadValue,
+      storageKeys: _config.storageKeys,
+      defaultStorageKey: _config.defaultStorageKey,
+    });
+
+    return this;
+  }
+
+  //=========================================================================================================
   // Add Rebuild Group That Include ItemKey SideEffect
   //=========================================================================================================
   /**
@@ -108,4 +170,12 @@ export class Item<DataType extends Object = DefaultItem> extends State<
  */
 export interface ItemConfigInterface {
   isPlaceholder?: boolean;
+}
+
+/**
+ * @param useCollectionPattern - If Item storageKey follows the Collection Item StorageKey Pattern
+ */
+export interface ItemPersistConfigInterface
+  extends StatePersistentConfigInterface {
+  followCollectionPersistKeyPattern?: boolean;
 }

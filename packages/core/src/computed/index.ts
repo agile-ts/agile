@@ -22,13 +22,13 @@ export class Computed<ComputedValueType = any> extends State<
   public hardCodedDeps: Array<Observer> = []; // Only hardCoded dependencies the Computed depends
 
   /**
-   * A extension of the State Class that computes its value based on a compute function.
+   * An extension of the State Class that computes its value based on a compute function.
    *
    * The computed value will be cached to avoid unnecessary recomputes
-   * and only recomputed when one of its direct dependencies changed.
+   * and is only recomputed when one of its direct dependencies changes.
    *
    * Direct dependencies can be States and Collections.
-   * Meaning if a dependent State value changes, the computed value will be recomputed.
+   * So if for example a dependent State value changes, the computed value will be recomputed.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/)
    *
@@ -63,7 +63,7 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   /**
-   * Forces a recomputation of the cached value based on the compute function.
+   * Forces a recomputation of the cached value with the compute function.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/methods/#recompute)
    *
@@ -82,18 +82,18 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   /**
-   * Assigns new function to the Computed to compute the computed value.
+   * Assigns a new function to the Computed Class to compute its value.
    *
    * The dependencies of the new compute function are automatically detected
-   * and accordingly updated in the Computed Class.
+   * and accordingly updated.
    *
-   * A initial computation is automatically performed with the new function
-   * to update the outdated cached value of the Computed.
+   * An initial computation is automatically performed with the new function
+   * to change the obsolete cached value.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/methods/#updatecomputefunction)
    *
    * @public
-   * @param computeFunction - New function to compute the computed value.
+   * @param computeFunction - New function to compute the value of the Computed Class.
    * @param deps - Hard coded dependencies on which the Computed Class depends.
    * @param config - Configuration object
    */
@@ -125,7 +125,8 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   /**
-   * Computes the value of the Computed Class and autodetects used dependencies in the compute function.
+   * Computes the new value of the Computed Class
+   * and autodetects used dependencies in the compute function.
    *
    * @internal
    * @param config - Configuration object
@@ -183,21 +184,25 @@ export class Computed<ComputedValueType = any> extends State<
 }
 
 /**
- * @param computedDeps - Hard coded dependencies of compute function
+ * @property computedDeps - Hard coded dependencies on which the Computed Class depends.
+ * | Default = [] |
  */
 export interface ComputedConfigInterface extends StateConfigInterface {
   computedDeps?: Array<SubscribableAgileInstancesType>;
 }
 
 /**
- * @param autodetect - If dependencies get autodetected
+ * @property autodetect - Whether dependencies used in the compute function should be detected automatically.
+ * | Default = true |
  */
 export interface ComputeConfigInterface {
   autodetect?: boolean;
 }
 
 /**
- * @param overwriteDeps - If old hardCoded deps get overwritten
+ * @param overwriteDeps - Whether the old hard coded dependencies
+ * should be overwritten with the new hard coded dependencies or merged in.
+ * | Default = true |
  */
 export interface UpdateComputeFunctionConfigInterface
   extends RecomputeConfigInterface {

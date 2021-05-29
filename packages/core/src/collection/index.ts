@@ -264,7 +264,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       const itemKey = data[primaryKey];
 
       // Add Item to Collection
-      const success = this.setData(data, {
+      const success = this.assignData(data, {
         patch: config.patch,
         background: config.background,
       });
@@ -1153,9 +1153,11 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param data - Data
    * @param config - Config
    */
-  public setData(data: DataType, config: SetDataConfigInterface = {}): boolean {
+  public assignData(
+    data: DataType,
+    config: SetDataConfigInterface = {}
+  ): boolean {
     const _data = copy(data as any); // Transformed Data to any because of unknown Object (DataType)
-    const primaryKey = this.config.primaryKey;
     config = defineConfig(config, {
       patch: false,
       background: false,
@@ -1166,13 +1168,14 @@ export class Collection<DataType extends Object = DefaultItem> {
       return false;
     }
 
-    if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
+    // Check if data has valid primaryKey
+    if (!Object.prototype.hasOwnProperty.call(_data, this.config.primaryKey)) {
       LogCodeManager.log('1B:02:05', [this._key, this.config.primaryKey]);
       _data[this.config.primaryKey] = generateId();
     }
 
-    const itemKey = _data[primaryKey];
-    let item = this.getItem(itemKey, { notExisting: true });
+    const itemKey = _data[this.config.primaryKey];
+    const item = this.getItem(itemKey, { notExisting: true });
     const wasPlaceholder = item?.isPlaceholder || false;
     const createItem = item == null;
 
@@ -1181,21 +1184,44 @@ export class Collection<DataType extends Object = DefaultItem> {
       item?.patch(_data, { background: config.background });
     if (!createItem && !config.patch)
       item?.set(_data, { background: config.background });
-    if (createItem) {
-      // Create and assign Item to Collection
-      item = new Item<DataType>(this, _data);
-      this.data[itemKey] = item;
+    if (createItem) this.collectItem(new Item<DataType>(this, _data));
 
-      // Rebuild Groups That include ItemKey after assigning Item to Collection (otherwise it can't find Item)
-      this.rebuildGroupsThatIncludeItemKey(itemKey, {
-        background: config.background,
-      });
-    }
-
-    // Increase size of Collection
-    if (createItem || wasPlaceholder) this.size++;
+    // Increase size of Collection if Item was before a placeholder
+    if (wasPlaceholder) this.size++;
 
     return true;
+  }
+
+  public collectItem(
+    item: Item<DataType>,
+    config: { background?: boolean } = {}
+  ): this {
+    const itemKey = item[this.config.primaryKey];
+
+    // Check if Item has valid primaryKey
+    if (
+      !Object.prototype.hasOwnProperty.call(item._value, this.config.primaryKey)
+    ) {
+      LogCodeManager.log('1B:02:05', [this._key, this.config.primaryKey]);
+      item.patch(
+        { [this.config.primaryKey]: generateId() },
+        { background: true }
+      );
+    }
+
+    // Check if Item already exists
+    if (this.getItem(itemKey) != null) return this;
+
+    this.data[itemKey] = item;
+
+    // Rebuild Groups That include ItemKey after assigning Item to Collection (otherwise it can't find Item)
+    this.rebuildGroupsThatIncludeItemKey(itemKey, {
+      background: config.background,
+    });
+
+    this.size++;
+
+    return this;
   }
 
   //=========================================================================================================
