@@ -1,4 +1,5 @@
 import {
+  Agile,
   Collection,
   CollectionKey,
   CreatePersistentConfigInterface,
@@ -144,7 +145,7 @@ export class CollectionPersistent<
         // Persist already existing Item
         if (item != null) {
           item.persist(itemPersistKey);
-          return true;
+          continue;
         }
 
         // Create temporary placeholder Item in which the Item value will be loaded

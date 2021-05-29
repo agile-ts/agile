@@ -74,13 +74,21 @@ export class Storage {
    * @param key - Key of Storage property
    */
   public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
-    if (!this.ready || !this.methods.get) return;
+    if (!this.ready || !this.methods.get) return undefined;
     if (isAsyncFunction(this.methods.get)) LogCodeManager.log('13:02:00');
 
     // Get Value
     const res = this.methods.get(this.getStorageKey(key));
-    if (isJsonString(res)) return JSON.parse(res);
-    return res;
+    const _res = isJsonString(res) ? JSON.parse(res) : res;
+
+    Agile.logger.if
+      .tag(['storage'])
+      .info(
+        LogCodeManager.getLog('13:01:00', [this.key, this.getStorageKey(key)]),
+        _res
+      );
+
+    return _res;
   }
 
   //=========================================================================================================
@@ -103,8 +111,19 @@ export class Storage {
       this.methods
         ?.get(this.getStorageKey(key))
         .then((res: any) => {
-          if (isJsonString(res)) resolve(JSON.parse(res));
-          resolve(res);
+          const _res = isJsonString(res) ? JSON.parse(res) : res;
+
+          Agile.logger.if
+            .tag(['storage'])
+            .info(
+              LogCodeManager.getLog('13:01:00', [
+                this.key,
+                this.getStorageKey(key),
+              ]),
+              _res
+            );
+
+          resolve(_res);
         })
         .catch(reject);
     });
@@ -121,6 +140,14 @@ export class Storage {
    */
   public set(key: StorageItemKey, value: any): void {
     if (!this.ready || !this.methods.set) return;
+
+    Agile.logger.if
+      .tag(['storage'])
+      .info(
+        LogCodeManager.getLog('13:01:01', [this.key, this.getStorageKey(key)]),
+        value
+      );
+
     this.methods.set(this.getStorageKey(key), JSON.stringify(value));
   }
 
@@ -134,6 +161,13 @@ export class Storage {
    */
   public remove(key: StorageItemKey): void {
     if (!this.ready || !this.methods.remove) return;
+
+    Agile.logger.if
+      .tag(['storage'])
+      .info(
+        LogCodeManager.getLog('13:01:02', [this.key, this.getStorageKey(key)])
+      );
+
     this.methods.remove(this.getStorageKey(key));
   }
 

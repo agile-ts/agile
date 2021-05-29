@@ -21,7 +21,7 @@ const logCodeMessages = {
   '10:02:00':
     'Be careful when binding multiple Agile Instances globally in one application!',
 
-  // Storage
+  // Storages
   '11:02:00':
     "The 'Local Storage' is not available in your current environment." +
     "To use the '.persist()' functionality, please provide a custom Storage!",
@@ -49,6 +49,9 @@ const logCodeMessages = {
     "The Storage with the key/name '${1}' doesn't exists!`",
 
   // Storage
+  '13:01:00': "GET value at key '${1}' from Storage '${0}'.",
+  '13:01:01': "SET value at key '${1}' in Storage '${0}'.",
+  '13:01:02': "REMOVE value at key '${1}' from Storage '${0}'.",
   '13:02:00':
     'Using normalGet() in a async-based Storage might result in an unexpected return value. ' +
     'Instead of a resolved value a Promise is returned!',
