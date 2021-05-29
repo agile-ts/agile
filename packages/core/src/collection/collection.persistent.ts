@@ -119,16 +119,18 @@ export class CollectionPersistent<
     // Helper function to load persisted values into the Collection
     const loadValuesIntoCollection = async () => {
       const defaultGroup = this.collection().getDefaultGroup();
-      if (!defaultGroup) return false;
-      const defaultGroupPersistKey = CollectionPersistent.getGroupStorageKey(
+      if (defaultGroup == null) return false;
+      const defaultGroupStorageKey = CollectionPersistent.getGroupStorageKey(
         defaultGroup._key,
         _storageItemKey
       );
 
       // Persist default Group and load its value manually to be 100% sure
       // that it was loaded completely
-      defaultGroup.persist(defaultGroupPersistKey, {
+      defaultGroup.persist(defaultGroupStorageKey, {
         loadValue: false,
+        defaultStorageKey: this.config.defaultStorageKey || undefined,
+        storageKeys: this.storageKeys,
       });
       if (defaultGroup.persistent?.ready)
         await defaultGroup.persistent.initialLoading();
@@ -136,14 +138,17 @@ export class CollectionPersistent<
       // Persist Items found in the default Group's value
       for (const itemKey of defaultGroup._value) {
         const item = this.collection().getItem(itemKey);
-        const itemPersistKey = CollectionPersistent.getItemStorageKey(
+        const itemStorageKey = CollectionPersistent.getItemStorageKey(
           itemKey,
           _storageItemKey
         );
 
         // Persist already existing Item
         if (item != null) {
-          item.persist(itemPersistKey);
+          item.persist(itemStorageKey, {
+            defaultStorageKey: this.config.defaultStorageKey || undefined,
+            storageKeys: this.storageKeys,
+          });
           continue;
         }
 
@@ -159,12 +164,14 @@ export class CollectionPersistent<
 
         // Persist dummy Item and load its value manually to be 100% sure
         // that it was loaded completely and exists
-        dummyItem?.persist(itemPersistKey, {
+        dummyItem?.persist(itemStorageKey, {
           loadValue: false,
+          defaultStorageKey: this.config.defaultStorageKey || undefined,
+          storageKeys: this.storageKeys,
         });
         if (dummyItem?.persistent?.ready) {
           const success = await dummyItem.persistent.loadPersistedValue(
-            itemPersistKey
+            itemStorageKey
           );
 
           // If successfully loaded add Item to Collection
@@ -194,8 +201,8 @@ export class CollectionPersistent<
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey ?? this._key;
     const defaultGroup = this.collection().getDefaultGroup();
-    if (!defaultGroup) return false;
-    const defaultGroupPersistKey = CollectionPersistent.getGroupStorageKey(
+    if (defaultGroup == null) return false;
+    const defaultGroupStorageKey = CollectionPersistent.getGroupStorageKey(
       defaultGroup._key,
       _storageItemKey
     );
@@ -204,16 +211,22 @@ export class CollectionPersistent<
     this.agileInstance().storages.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
-    defaultGroup.persist(defaultGroupPersistKey);
+    defaultGroup.persist(defaultGroupStorageKey, {
+      defaultStorageKey: this.config.defaultStorageKey || undefined,
+      storageKeys: this.storageKeys,
+    });
 
     // Persist Items found in the default Group's value
     for (const itemKey of defaultGroup._value) {
       const item = this.collection().getItem(itemKey);
-      const itemPersistKey = CollectionPersistent.getItemStorageKey(
+      const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
         _storageItemKey
       );
-      item?.persist(itemPersistKey);
+      item?.persist(itemStorageKey, {
+        defaultStorageKey: this.config.defaultStorageKey || undefined,
+        storageKeys: this.storageKeys,
+      });
     }
 
     // Setup Side Effects to keep the Storage value in sync with the Collection value
@@ -232,7 +245,7 @@ export class CollectionPersistent<
   public setupSideEffects(storageItemKey?: PersistentKey): void {
     const _storageItemKey = storageItemKey ?? this._key;
     const defaultGroup = this.collection().getDefaultGroup();
-    if (!defaultGroup) return;
+    if (defaultGroup == null) return;
 
     // Add side effect to default Group
     // that adds or removes Items from the Storage based on the Group value
@@ -258,7 +271,7 @@ export class CollectionPersistent<
     const _storageItemKey = storageItemKey ?? this._key;
     const defaultGroup = this.collection().getDefaultGroup();
     if (!defaultGroup) return false;
-    const defaultGroupPersistKey = CollectionPersistent.getGroupStorageKey(
+    const defaultGroupStorageKey = CollectionPersistent.getGroupStorageKey(
       defaultGroup._key,
       _storageItemKey
     );
@@ -267,7 +280,7 @@ export class CollectionPersistent<
     this.agileInstance().storages.remove(_storageItemKey, this.storageKeys);
 
     // Remove default Group from the Storage
-    defaultGroup.persistent?.removePersistedValue(defaultGroupPersistKey);
+    defaultGroup.persistent?.removePersistedValue(defaultGroupStorageKey);
     defaultGroup.removeSideEffect(
       CollectionPersistent.defaultGroupSideEffectKey
     );
@@ -275,11 +288,11 @@ export class CollectionPersistent<
     // Remove Items found in the default Group's value from the Storage
     for (const itemKey of defaultGroup._value) {
       const item = this.collection().getItem(itemKey);
-      const itemPersistKey = CollectionPersistent.getItemStorageKey(
+      const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
         _storageItemKey
       );
-      item?.persistent?.removePersistedValue(itemPersistKey);
+      item?.persistent?.removePersistedValue(itemStorageKey);
     }
 
     this.isPersisted = false;
@@ -330,26 +343,30 @@ export class CollectionPersistent<
     // Persist newly added Items
     addedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
-      const itemPersistKey = CollectionPersistent.getItemStorageKey(
+      const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
         _storageItemKey
       );
       if (item != null) {
-        if (!item.isPersisted) item.persist(itemPersistKey);
-        else item.persistent?.persistValue(itemPersistKey);
+        if (!item.isPersisted)
+          item.persist(itemStorageKey, {
+            defaultStorageKey: this.config.defaultStorageKey || undefined,
+            storageKeys: this.storageKeys,
+          });
+        else item.persistent?.persistValue(itemStorageKey);
       }
     });
 
     // Remove removed Items from the Storage
     removedKeys.forEach((itemKey) => {
       const item = collection.getItem(itemKey);
-      const itemPersistKey = CollectionPersistent.getItemStorageKey(
+      const itemStorageKey = CollectionPersistent.getItemStorageKey(
         itemKey,
         _storageItemKey
       );
       if (item != null)
         if (item.isPersisted)
-          item.persistent?.removePersistedValue(itemPersistKey);
+          item.persistent?.removePersistedValue(itemStorageKey);
     });
   }
 

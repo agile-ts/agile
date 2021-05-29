@@ -1192,11 +1192,18 @@ export class Collection<DataType extends Object = DefaultItem> {
     return true;
   }
 
+  /**
+   * Adds passed Item to Collection.
+   *
+   * @public
+   * @param item - Item to be added
+   * @param config - Configuration object
+   */
   public collectItem(
     item: Item<DataType>,
     config: { background?: boolean } = {}
   ): this {
-    const itemKey = item[this.config.primaryKey];
+    const itemKey = item._value[this.config.primaryKey];
 
     // Check if Item has valid primaryKey
     if (

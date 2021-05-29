@@ -289,15 +289,15 @@ describe('CollectionPersistent Tests', () => {
           .mockReturnValueOnce({ id: '1', name: 'hans' })
           .mockReturnValueOnce(undefined)
           .mockReturnValueOnce({ id: '3', name: 'frank' });
-        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+        dummyCollection.getDefaultGroup = jest.fn(
+          () => dummyDefaultGroup as any
+        );
 
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeTruthy();
 
-        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey
-        );
+        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
@@ -352,13 +352,15 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest
           .fn()
           .mockReturnValueOnce(Promise.resolve(undefined));
-        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+        dummyCollection.getDefaultGroup = jest.fn(
+          () => dummyDefaultGroup as any
+        );
 
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeFalsy();
 
-        expect(dummyCollection.getGroup).not.toHaveBeenCalled();
+        expect(dummyCollection.getDefaultGroup).not.toHaveBeenCalled();
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
@@ -413,9 +415,7 @@ describe('CollectionPersistent Tests', () => {
 
         expect(response).toBeTruthy();
 
-        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey
-        );
+        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           'dummyKey',
@@ -461,13 +461,15 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest.fn(() =>
           Promise.resolve(undefined as any)
         );
-        dummyCollection.getGroup = jest.fn(() => dummyDefaultGroup as any);
+        dummyCollection.getDefaultGroup = jest.fn(
+          () => dummyDefaultGroup as any
+        );
 
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeFalsy();
 
-        expect(dummyCollection.getGroup).not.toHaveBeenCalled();
+        expect(dummyCollection.getDefaultGroup).not.toHaveBeenCalled();
 
         expect(dummyAgile.storages.get).not.toHaveBeenCalled();
 
@@ -488,15 +490,13 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest
           .fn()
           .mockReturnValueOnce(Promise.resolve(true));
-        dummyCollection.getGroup = jest.fn(() => undefined);
+        dummyCollection.getDefaultGroup = jest.fn(() => undefined);
 
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeFalsy();
 
-        expect(dummyCollection.getGroup).toHaveBeenCalledWith(
-          dummyCollection.config.defaultGroupKey
-        );
+        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
 
         expect(dummyAgile.storages.get).toHaveBeenCalledWith(
           collectionPersistent._key,
