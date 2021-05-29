@@ -109,8 +109,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
     // Assign loaded Value to State
     this.state().set(loadedValue, { storage: false, overwrite: true });
 
-    // Persist State, so that the Storage Value updates dynamically if the State updates
-    await this.persistValue(_storageItemKey);
+    // Setup Side Effects to keep the Storage value in sync with the State value
+    this.setupSideEffects(storageItemKey);
 
     return true;
   }
@@ -128,7 +128,27 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey ?? this._key;
 
-    // Add SideEffect to State, that updates the saved State Value depending on the current State Value
+    // Setup side effects to keep the Storage value in sync with the State value
+    this.setupSideEffects(storageItemKey);
+
+    // Initial rebuild Storage for persisting State value in the corresponding Storage
+    this.rebuildStorageSideEffect(this.state(), _storageItemKey);
+
+    this.isPersisted = true;
+    return true;
+  }
+
+  /**
+   * Sets up side effects to keep the Storage value in sync with the State value.
+   *
+   * @internal
+   * @param storageItemKey - Prefix key of persisted Collection Instances | default = Persistent.key |
+   */
+  public setupSideEffects(storageItemKey?: PersistentKey) {
+    const _storageItemKey = storageItemKey ?? this._key;
+
+    // Add side effect to State
+    // that updates the Storage value based on the State value
     this.state().addSideEffect(
       StatePersistent.storeValueSideEffectKey,
       (instance, config) => {
@@ -136,12 +156,6 @@ export class StatePersistent<ValueType = any> extends Persistent {
       },
       { weight: 0 }
     );
-
-    // Initial rebuild Storage for saving State Value in the Storage
-    this.rebuildStorageSideEffect(this.state(), _storageItemKey);
-
-    this.isPersisted = true;
-    return true;
   }
 
   //=========================================================================================================
