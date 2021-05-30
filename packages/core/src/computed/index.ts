@@ -28,7 +28,7 @@ export class Computed<ComputedValueType = any> extends State<
    * and is only recomputed when one of its direct dependencies changes.
    *
    * Direct dependencies can be States and Collections.
-   * So if for example a dependent State value changes, the computed value will be recomputed.
+   * So when for example a dependent State value changes, the computed value will be recomputed.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/)
    *
@@ -82,12 +82,12 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   /**
-   * Assigns a new function to the Computed Class to compute its value.
+   * Assigns a new function to the Computed Class for computing its value.
    *
    * The dependencies of the new compute function are automatically detected
    * and accordingly updated.
    *
-   * An initial computation is automatically performed with the new function
+   * An initial computation is performed with the new function
    * to change the obsolete cached value.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/methods/#updatecomputefunction)
@@ -148,7 +148,7 @@ export class Computed<ComputedValueType = any> extends State<
       this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
         newDeps.push(observer);
 
-        // Make this Observer depend on the foundDep Observer
+        // Make this Observer depend on the found dep Observers
         observer.depend(this.observer);
       });
 
@@ -201,7 +201,7 @@ export interface ComputeConfigInterface {
 
 /**
  * @param overwriteDeps - Whether the old hard coded dependencies
- * should be overwritten with the new hard coded dependencies or merged in.
+ * should be entirely overwritten with the new hard coded dependencies or merged in.
  * | Default = true |
  */
 export interface UpdateComputeFunctionConfigInterface

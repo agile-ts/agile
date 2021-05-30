@@ -6,7 +6,6 @@ import {
   defineConfig,
   Group,
   GroupKey,
-  Item,
   ItemKey,
   LogCodeManager,
   Persistent,
@@ -65,7 +64,7 @@ export class CollectionPersistent<
 
     // Assign new key to Persistent
     if (value === this._key) return;
-    this._key = value || Persistent.placeHolderKey;
+    this._key = value ?? Persistent.placeHolderKey;
 
     const isValid = this.validatePersistent();
 
@@ -83,10 +82,11 @@ export class CollectionPersistent<
   }
 
   /**
-   * @internal
    * Loads the persisted value into the Collection
    * or persists the Collection value in the corresponding Storage.
-   * This depends on whether the Collection has been persisted before.
+   * This behaviour depends on whether the Collection has been persisted before.
+   *
+   * @internal
    */
   public async initialLoading() {
     super.initialLoading().then(() => {
@@ -95,7 +95,8 @@ export class CollectionPersistent<
   }
 
   /**
-   * Loads the values of the Collection Instances from the corresponding Storage.
+   * Loads Collection Instances (like Items or Groups) from the corresponding Storage
+   * and sets up side effects that dynamically update the Storage value when the Collection (Instances) changes.
    *
    * @internal
    * @param storageItemKey - Prefix key of persisted Collection Instances | default = Persistent.key |
@@ -143,33 +144,34 @@ export class CollectionPersistent<
           _storageItemKey
         );
 
-        // Persist already existing Item
+        // Persist and therefore load already present Item
         if (item != null) {
           item.persist(itemStorageKey, {
             defaultStorageKey: this.config.defaultStorageKey || undefined,
             storageKeys: this.storageKeys,
           });
-          continue;
         }
+        // Persist and therefore load not present Item
+        else {
+          // Create temporary placeholder Item in which the Item value will be loaded
+          const dummyItem = this.collection().createPlaceholderItem(itemKey);
 
-        // Create temporary placeholder Item in which the Item value will be loaded
-        const dummyItem = this.collection().createPlaceholderItem(itemKey);
+          // Persist dummy Item and load its value manually to be 100% sure
+          // that it was loaded completely and exists at all
+          dummyItem?.persist(itemStorageKey, {
+            loadValue: false,
+            defaultStorageKey: this.config.defaultStorageKey || undefined,
+            storageKeys: this.storageKeys,
+          });
+          if (dummyItem?.persistent?.ready) {
+            const loadedPersistedValueIntoItem = await dummyItem.persistent.loadPersistedValue(
+              itemStorageKey
+            );
 
-        // Persist dummy Item and load its value manually to be 100% sure
-        // that it was loaded completely and exists
-        dummyItem?.persist(itemStorageKey, {
-          loadValue: false,
-          defaultStorageKey: this.config.defaultStorageKey || undefined,
-          storageKeys: this.storageKeys,
-        });
-        if (dummyItem?.persistent?.ready) {
-          const loadedPersistedValueIntoItem = await dummyItem.persistent.loadPersistedValue(
-            itemStorageKey
-          );
-
-          // If successfully loaded Item value add Item to Collection
-          if (loadedPersistedValueIntoItem)
-            this.collection().collectItem(dummyItem);
+            // If successfully loaded Item value, add Item to Collection
+            if (loadedPersistedValueIntoItem)
+              this.collection().collectItem(dummyItem);
+          }
         }
       }
 
@@ -177,15 +179,16 @@ export class CollectionPersistent<
     };
     const success = await loadValuesIntoCollection();
 
-    // Setup Side Effects to keep the Storage value in sync with the State value
+    // Setup Side Effects to keep the Storage value in sync with the Collection (Instances) value
     if (success) this.setupSideEffects(_storageItemKey);
 
     return success;
   }
+  // TODO STOPPED HERE (in looking at code)
 
   /**
-   * Persists Collection in corresponding Storage if not already done
-   * and sets up side effects that dynamically update the storage value when the Collection changes.
+   * Persists Collection Instances (like Items or Groups) in the corresponding Storage
+   * and sets up side effects that dynamically update the Storage value when the Collection (Instances) changes.
    *
    * @internal
    * @param storageItemKey - Prefix key of persisted Collection Instances | default = Persistent.key |
@@ -223,7 +226,7 @@ export class CollectionPersistent<
       });
     }
 
-    // Setup Side Effects to keep the Storage value in sync with the Collection value
+    // Setup Side Effects to keep the Storage value in sync with the Collection (Instances) value
     this.setupSideEffects(_storageItemKey);
 
     this.isPersisted = true;

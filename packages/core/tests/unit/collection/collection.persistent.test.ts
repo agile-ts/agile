@@ -32,7 +32,69 @@ describe('CollectionPersistent Tests', () => {
     jest.spyOn(CollectionPersistent.prototype, 'initialLoading');
   });
 
-  it("should create CollectionPersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {
+  it('should create CollectionPersistent and should call initialLoading if Persistent is ready (default config)', () => {
+    // Overwrite instantiatePersistent once to not call it
+    jest
+      .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
+      .mockImplementationOnce(function () {
+        // @ts-ignore
+        this.ready = true;
+      });
+
+    const collectionPersistent = new CollectionPersistent(dummyCollection);
+
+    expect(collectionPersistent).toBeInstanceOf(CollectionPersistent);
+    expect(collectionPersistent.instantiatePersistent).toHaveBeenCalledWith({
+      key: undefined,
+      storageKeys: [],
+      defaultStorageKey: null,
+    });
+    expect(collectionPersistent.initialLoading).toHaveBeenCalled();
+
+    expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
+    expect(collectionPersistent.ready).toBeTruthy();
+    expect(collectionPersistent.isPersisted).toBeFalsy();
+    expect(collectionPersistent.onLoad).toBeUndefined();
+    expect(collectionPersistent.storageKeys).toStrictEqual([]);
+    expect(collectionPersistent.config).toStrictEqual({
+      defaultStorageKey: null, // is assigned in 'instantiatePersistent' which is mocked
+    });
+  });
+
+  it('should create CollectionPersistent and should call initialLoading if Persistent is ready (specific config)', () => {
+    // Overwrite instantiatePersistent once to not call it and set ready property
+    jest
+      .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
+      .mockImplementationOnce(function () {
+        // @ts-ignore
+        this.ready = true;
+      });
+
+    const collectionPersistent = new CollectionPersistent(dummyCollection, {
+      key: 'collectionPersistentKey',
+      storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
+    });
+
+    expect(collectionPersistent).toBeInstanceOf(CollectionPersistent);
+    expect(collectionPersistent.instantiatePersistent).toHaveBeenCalledWith({
+      key: 'collectionPersistentKey',
+      storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
+    });
+    expect(collectionPersistent.initialLoading).toHaveBeenCalled();
+
+    expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
+    expect(collectionPersistent.ready).toBeTruthy();
+    expect(collectionPersistent.isPersisted).toBeFalsy();
+    expect(collectionPersistent.onLoad).toBeUndefined();
+    expect(collectionPersistent.storageKeys).toStrictEqual([]);
+    expect(collectionPersistent.config).toStrictEqual({
+      defaultStorageKey: null, // is assigned in 'instantiatePersistent' which is mocked
+    });
+  });
+
+  it("should create CollectionPersistent and shouldn't call initialLoading if Persistent isn't ready", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
       .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
@@ -62,53 +124,6 @@ describe('CollectionPersistent Tests', () => {
     });
   });
 
-  it("should create CollectionPersistent and shouldn't call initialLoading if Persistent isn't ready (specific config)", () => {
-    // Overwrite instantiatePersistent once to not call it and set ready property
-    jest
-      .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
-      .mockImplementationOnce(function () {
-        // @ts-ignore
-        this.ready = false;
-      });
-
-    const collectionPersistent = new CollectionPersistent(dummyCollection, {
-      key: 'collectionPersistentKey',
-      storageKeys: ['test1', 'test2'],
-      defaultStorageKey: 'test2',
-    });
-
-    expect(collectionPersistent).toBeInstanceOf(CollectionPersistent);
-    expect(collectionPersistent.instantiatePersistent).toHaveBeenCalledWith({
-      key: 'collectionPersistentKey',
-      storageKeys: ['test1', 'test2'],
-      defaultStorageKey: 'test2',
-    });
-    expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
-
-    expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
-    expect(collectionPersistent.ready).toBeFalsy();
-    expect(collectionPersistent.isPersisted).toBeFalsy();
-    expect(collectionPersistent.onLoad).toBeUndefined();
-    expect(collectionPersistent.storageKeys).toStrictEqual([]);
-    expect(collectionPersistent.config).toStrictEqual({
-      defaultStorageKey: null, // is assigned in 'instantiatePersistent' which is mocked
-    });
-  });
-
-  it('should create CollectionPersistent and should call initialLoading if Persistent is ready (default config)', () => {
-    // Overwrite instantiatePersistent once to not call it
-    jest
-      .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
-      .mockImplementationOnce(function () {
-        // @ts-ignore
-        this.ready = true;
-      });
-
-    const collectionPersistent = new CollectionPersistent(dummyCollection);
-
-    expect(collectionPersistent.initialLoading).toHaveBeenCalled();
-  });
-
   it("should create CollectionPersistent and shouldn't call initialLoading if Persistent is ready (config.instantiate = false)", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
@@ -122,7 +137,23 @@ describe('CollectionPersistent Tests', () => {
       instantiate: false,
     });
 
+    expect(collectionPersistent).toBeInstanceOf(CollectionPersistent);
+    expect(collectionPersistent.collection()).toBe(dummyCollection);
+    expect(collectionPersistent.instantiatePersistent).toHaveBeenCalledWith({
+      key: undefined,
+      storageKeys: [],
+      defaultStorageKey: null,
+    });
     expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
+
+    expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
+    expect(collectionPersistent.ready).toBeTruthy();
+    expect(collectionPersistent.isPersisted).toBeFalsy();
+    expect(collectionPersistent.onLoad).toBeUndefined();
+    expect(collectionPersistent.storageKeys).toStrictEqual([]);
+    expect(collectionPersistent.config).toStrictEqual({
+      defaultStorageKey: null,
+    });
   });
 
   describe('CollectionPersistent Function Tests', () => {
@@ -179,17 +210,18 @@ describe('CollectionPersistent Tests', () => {
         collectionPersistent.removePersistedValue = jest.fn();
         collectionPersistent.persistValue = jest.fn();
         collectionPersistent.initialLoading = jest.fn();
-        jest.spyOn(collectionPersistent, 'validatePersistent');
       });
 
       it('should update key with valid key in ready Persistent', async () => {
         collectionPersistent.ready = true;
         collectionPersistent._key = 'dummyKey';
+        jest
+          .spyOn(collectionPersistent, 'validatePersistent')
+          .mockReturnValueOnce(true);
 
         await collectionPersistent.setKey('newKey');
 
         expect(collectionPersistent._key).toBe('newKey');
-        expect(collectionPersistent.ready).toBeTruthy();
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
         expect(collectionPersistent.persistValue).toHaveBeenCalledWith(
@@ -203,13 +235,13 @@ describe('CollectionPersistent Tests', () => {
       it('should update key with not valid key in ready Persistent', async () => {
         collectionPersistent.ready = true;
         collectionPersistent._key = 'dummyKey';
+        jest
+          .spyOn(collectionPersistent, 'validatePersistent')
+          .mockReturnValueOnce(false);
 
         await collectionPersistent.setKey();
 
-        expect(collectionPersistent._key).toBe(
-          CollectionPersistent.placeHolderKey
-        );
-        expect(collectionPersistent.ready).toBeFalsy();
+        expect(collectionPersistent._key).toBe(Persistent.placeHolderKey);
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
         expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
@@ -220,11 +252,14 @@ describe('CollectionPersistent Tests', () => {
 
       it('should update key with valid key in not ready Persistent', async () => {
         collectionPersistent.ready = false;
+        collectionPersistent._key = 'dummyKey';
+        jest
+          .spyOn(collectionPersistent, 'validatePersistent')
+          .mockReturnValueOnce(true);
 
         await collectionPersistent.setKey('newKey');
 
         expect(collectionPersistent._key).toBe('newKey');
-        expect(collectionPersistent.ready).toBeTruthy();
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).toHaveBeenCalled();
         expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
@@ -235,13 +270,14 @@ describe('CollectionPersistent Tests', () => {
 
       it('should update key with not valid key in not ready Persistent', async () => {
         collectionPersistent.ready = false;
+        collectionPersistent._key = 'dummyKey';
+        jest
+          .spyOn(collectionPersistent, 'validatePersistent')
+          .mockReturnValueOnce(false);
 
         await collectionPersistent.setKey();
 
-        expect(collectionPersistent._key).toBe(
-          CollectionPersistent.placeHolderKey
-        );
-        expect(collectionPersistent.ready).toBeFalsy();
+        expect(collectionPersistent._key).toBe(Persistent.placeHolderKey);
         expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
         expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
         expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
@@ -256,7 +292,7 @@ describe('CollectionPersistent Tests', () => {
         jest.spyOn(Persistent.prototype, 'initialLoading');
       });
 
-      it('should initialLoad and set isPersisted in Collection to true', async () => {
+      it('should call initialLoad in parent and set Collection.isPersisted to true', async () => {
         await collectionPersistent.initialLoading();
 
         expect(Persistent.prototype.initialLoading).toHaveBeenCalled();
@@ -264,6 +300,7 @@ describe('CollectionPersistent Tests', () => {
       });
     });
 
+    // TODO STOPPED HERE (in tests)
     describe('loadPersistedValue function tests', () => {
       let dummyDefaultGroup: Group<ItemInterface>;
       let placeholderItem1: Item<ItemInterface>;

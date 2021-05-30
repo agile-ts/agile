@@ -5,17 +5,28 @@ export class ComputedTracker {
   static trackedObservers: Set<Observer> = new Set();
 
   /**
+   * Helper Class for automatic tracking used Observers (dependencies) in a compute function.
+   *
    * @internal
+   */
+  constructor() {
+    // empty
+  }
+
+  /**
    * Activates Computed Tracker to globally track used Observers.
+   *
+   * @internal
    */
   static track(): void {
     this.isTracking = true;
   }
 
   /**
-   * @internal
    * Tracks the passed Observer and caches it
    * when the Computed Tracker is actively tracking.
+   *
+   * @internal
    * @param observer - Observer
    */
   static tracked(observer: Observer) {
@@ -23,9 +34,10 @@ export class ComputedTracker {
   }
 
   /**
-   * @internal
-   * Returns the last tracked Observers
+   * Returns the latest tracked Observers
    * and stops the Computed Tracker from tracking any more Observers.
+   *
+   * @internal
    */
   static getTrackedObservers(): Array<Observer> {
     const trackedObservers = Array.from(this.trackedObservers);
