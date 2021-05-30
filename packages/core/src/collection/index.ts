@@ -1225,6 +1225,9 @@ export class Collection<DataType extends Object = DefaultItem> {
   ): this {
     const itemKey = item._value[this.config.primaryKey];
 
+    // TODO add to Groups at least default Group
+    // and implement it to collect method
+
     // Check if Item has valid primaryKey
     if (
       !Object.prototype.hasOwnProperty.call(item._value, this.config.primaryKey)
