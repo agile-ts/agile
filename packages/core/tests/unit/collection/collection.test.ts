@@ -447,11 +447,13 @@ describe('Collection Tests', () => {
       let dummyGroup1: Group<ItemInterface>;
       let dummyGroup2: Group<ItemInterface>;
       let defaultGroup: Group<ItemInterface>;
+      let dummyItem: Item<ItemInterface>;
 
       beforeEach(() => {
         dummyGroup1 = new Group(collection);
         dummyGroup2 = new Group(collection);
         defaultGroup = new Group(collection);
+        dummyItem = new Item(collection, { id: '1', name: 'frank' });
 
         collection.groups = {
           [collection.config.defaultGroupKey]: defaultGroup,
@@ -460,6 +462,7 @@ describe('Collection Tests', () => {
         };
 
         collection.assignData = jest.fn();
+        collection.assignItem = jest.fn();
         collection.createSelector = jest.fn();
         collection.createGroup = jest.fn();
 
@@ -1703,19 +1706,17 @@ describe('Collection Tests', () => {
         });
       });
 
-      it('should overwrite existing persistent with a warning', () => {
-        collection.persistent = new CollectionPersistent(collection);
+      it("shouldn't overwrite existing persistent", () => {
+        const dummyPersistent = new CollectionPersistent(collection);
+        collection.persistent = dummyPersistent;
+        collection.isPersisted = true;
+        jest.clearAllMocks();
 
         collection.persist('newPersistentKey');
 
-        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
+        expect(collection.persistent).toBe(dummyPersistent);
         // expect(collection.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
-        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          instantiate: true,
-          storageKeys: [],
-          key: 'newPersistentKey',
-          defaultStorageKey: null,
-        });
+        expect(CollectionPersistent).not.toHaveBeenCalled();
       });
     });
 

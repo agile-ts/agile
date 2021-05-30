@@ -638,20 +638,17 @@ describe('State Tests', () => {
         });
       });
 
-      it('should overwrite existing Persistent', () => {
-        const oldPersistent = new StatePersistent(numberState);
-        numberState.persistent = oldPersistent;
+      it("shouldn't overwrite existing Persistent", () => {
+        const dummyPersistent = new StatePersistent(numberState);
+        numberState.persistent = dummyPersistent;
+        numberState.isPersisted = true;
+        jest.clearAllMocks();
 
         numberState.persist('newPersistentKey');
 
-        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(numberState.persistent).toBe(dummyPersistent);
         // expect(numberState.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
-        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: true,
-          storageKeys: [],
-          key: 'newPersistentKey',
-          defaultStorageKey: null,
-        });
+        expect(StatePersistent).not.toHaveBeenCalled();
       });
     });
 

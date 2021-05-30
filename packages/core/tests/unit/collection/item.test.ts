@@ -2,15 +2,20 @@ import { Item, Collection, Agile, StateObserver, State } from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
 describe('Item Tests', () => {
+  interface ItemInterface {
+    id: string;
+    name: string;
+  }
+
   let dummyAgile: Agile;
-  let dummyCollection: Collection;
+  let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
-    dummyCollection = new Collection(dummyAgile);
+    dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
   });
