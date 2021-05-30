@@ -137,6 +137,8 @@ const logCodeMessages = {
     "Couldn't update ItemKey from '${0}' to '${1}' " +
     "because an Item with the key/name '${1}' already exists in the Collection '${2}'!",
   '1B:03:05': "Item Data of Collection '${0}' has to be a valid object!",
+  '1B:03:06':
+    "Item tried to add to the Collection '${0}' belongs to another Collection '${1}'!",
 
   // Group
   '1C:02:00':

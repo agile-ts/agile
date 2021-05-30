@@ -331,7 +331,7 @@ describe('CollectionPersistent Tests', () => {
         dummyCollection.getDefaultGroup = jest.fn(
           () => dummyDefaultGroup as any
         );
-        dummyCollection.collectItem = jest.fn();
+        dummyCollection.assignItem = jest.fn();
 
         dummyAgile.storages.get = jest.fn();
       });
@@ -479,13 +479,13 @@ describe('CollectionPersistent Tests', () => {
             storageKeys: collectionPersistent.storageKeys,
           }
         );
-        expect(dummyCollection.collectItem).toHaveBeenCalledWith(
+        expect(dummyCollection.assignItem).toHaveBeenCalledWith(
           placeholderItem1
         );
-        expect(dummyCollection.collectItem).not.toHaveBeenCalledWith(
+        expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
           placeholderItem2
         ); // Because Item persistent isn't ready
-        expect(dummyCollection.collectItem).not.toHaveBeenCalledWith(
+        expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
           placeholderItem3
         ); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
 
@@ -568,10 +568,10 @@ describe('CollectionPersistent Tests', () => {
               storageKeys: collectionPersistent.storageKeys,
             }
           );
-          expect(dummyCollection.collectItem).toHaveBeenCalledWith(
+          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
             placeholderItem1
           );
-          expect(dummyCollection.collectItem).not.toHaveBeenCalledWith(
+          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem3
           ); // Because Item 3 is already present in Collection
 

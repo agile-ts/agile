@@ -168,9 +168,9 @@ export class CollectionPersistent<
               itemStorageKey
             );
 
-            // If successfully loaded Item value, add Item to Collection
+            // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem)
-              this.collection().collectItem(dummyItem);
+              this.collection().assignItem(dummyItem);
           }
         }
       }

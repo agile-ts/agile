@@ -124,7 +124,7 @@ export class Logger {
   // Tag
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * Only executes following 'command' if all given tags are included in allowedTags
    * @param tags - Tags
    */

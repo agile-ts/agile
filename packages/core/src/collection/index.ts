@@ -237,11 +237,11 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param config - Config
    */
   public collect(
-    data: DataType | Array<DataType>,
+    data: DataType | Item<DataType> | Array<DataType | Item<DataType>>,
     groupKeys?: GroupKey | Array<GroupKey>,
     config: CollectConfigInterface<DataType> = {}
   ): this {
-    const _data = normalizeArray<DataType>(data);
+    const _data = normalizeArray<DataType | Item<DataType>>(data);
     const _groupKeys = normalizeArray<GroupKey>(groupKeys);
     const defaultGroupKey = this.config.defaultGroupKey;
     const primaryKey = this.config.primaryKey;
@@ -262,12 +262,20 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     _data.forEach((data, index) => {
       const itemKey = data[primaryKey];
+      let success = false;
 
-      // Add Item to Collection
-      const success = this.assignData(data, {
-        patch: config.patch,
-        background: config.background,
-      });
+      // Assign Data or Item to Collection
+      if (data instanceof Item) {
+        success = this.assignItem(data, {
+          background: config.background,
+        });
+      } else {
+        success = this.assignData(data, {
+          patch: config.patch,
+          background: config.background,
+        });
+      }
+
       if (!success) return this;
 
       // Add ItemKey to provided Groups
@@ -417,7 +425,6 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroup)
    *
    * @public
-   * @memberOf Collection
    * @param groupKey - key/name Group identifier
    * @param config - Configuration
    */
@@ -686,11 +693,11 @@ export class Collection<DataType extends Object = DefaultItem> {
 
   /**
    * Creates a placeholder Item
-   * that can be used to hold a reference to an Item that doesn't yet exist.
+   * that can be used to hold a reference to an Item that doesn't exist yet.
    *
-   * @private
-   * @param itemKey - Key/Name identifier of the Item to be created
-   * @param addToCollection - Whether the created Item should be added to the Collection
+   * @internal
+   * @param itemKey - Key/Name identifier of the Item to be created.
+   * @param addToCollection - Whether the created Item should be added to the Collection.
    */
   public createPlaceholderItem(
     itemKey: ItemKey,
@@ -704,12 +711,14 @@ export class Collection<DataType extends Object = DefaultItem> {
       } as any,
       { isPlaceholder: true }
     );
+
     if (
       addToCollection &&
       !Object.prototype.hasOwnProperty.call(this.data, itemKey)
     )
       this.data[itemKey] = item;
 
+    ComputedTracker.tracked(item.observer);
     return item;
   }
 
@@ -1164,94 +1173,118 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this;
   }
 
-  //=========================================================================================================
-  // Set Data
-  //=========================================================================================================
   /**
+   * Assigns provided data object to an already existing Item at itemKey.
+   * If Item at itemKey doesn't exist yet,
+   * a new Item with the data object as value is created and added to the Collection.
+   *
    * @internal
-   * Updates existing or creates Item from provided Data
-   * @param data - Data
-   * @param config - Config
+   * @param data - Data object
+   * @param config - Configuration object
    */
   public assignData(
     data: DataType,
-    config: SetDataConfigInterface = {}
+    config: AssignDataConfigInterface = {}
   ): boolean {
-    const _data = copy(data as any); // Transformed Data to any because of unknown Object (DataType)
     config = defineConfig(config, {
       patch: false,
       background: false,
     });
+    const _data = copy(data); // Copy data object to get rid of reference
+    const primaryKey = this.config.primaryKey;
 
     if (!isValidObject(_data)) {
       LogCodeManager.log('1B:03:05', [this._key]);
       return false;
     }
 
-    // Check if data has valid primaryKey
-    if (!Object.prototype.hasOwnProperty.call(_data, this.config.primaryKey)) {
-      LogCodeManager.log('1B:02:05', [this._key, this.config.primaryKey]);
-      _data[this.config.primaryKey] = generateId();
+    // Check if data object contains valid itemKey
+    // otherwise add random itemKey to Item
+    if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
+      LogCodeManager.log('1B:02:05', [this._key, primaryKey]);
+      _data[primaryKey] = generateId();
     }
 
-    const itemKey = _data[this.config.primaryKey];
+    const itemKey = _data[primaryKey];
     const item = this.getItem(itemKey, { notExisting: true });
     const wasPlaceholder = item?.isPlaceholder || false;
-    const createItem = item == null;
 
-    // Create or update Item
-    if (!createItem && config.patch)
-      item?.patch(_data, { background: config.background });
-    if (!createItem && !config.patch)
-      item?.set(_data, { background: config.background });
-    if (createItem) this.collectItem(new Item<DataType>(this, _data));
+    // Create new Item or update existing Item
+    if (item != null) {
+      if (config.patch) {
+        item.patch(_data, { background: config.background });
+      } else {
+        item.set(_data, { background: config.background });
+      }
+    } else {
+      this.assignItem(new Item<DataType>(this, _data), {
+        background: config.background,
+      });
+    }
 
-    // Increase size of Collection if Item was before a placeholder
+    // Increase size of Collection if Item was previously a placeholder
+    // (-> didn't officially exit in Collection)
     if (wasPlaceholder) this.size++;
 
     return true;
   }
 
   /**
-   * Adds passed Item to Collection.
+   * Adds provided Item to the Collection.
    *
-   * @public
-   * @param item - Item to be added
+   * @internal
+   * @param item - Item to be added.
    * @param config - Configuration object
    */
-  public collectItem(
+  public assignItem(
     item: Item<DataType>,
-    config: { background?: boolean } = {}
-  ): this {
-    const itemKey = item._value[this.config.primaryKey];
+    config: AssignItemConfigInterface = {}
+  ): boolean {
+    config = defineConfig(config, {
+      overwrite: false,
+      background: false,
+    });
+    const primaryKey = this.config.primaryKey;
+    let itemKey = item._value[primaryKey];
+    let increaseCollectionSize = true;
 
-    // TODO add to Groups at least default Group
-    // and implement it to collect method
-
-    // Check if Item has valid primaryKey
-    if (
-      !Object.prototype.hasOwnProperty.call(item._value, this.config.primaryKey)
-    ) {
-      LogCodeManager.log('1B:02:05', [this._key, this.config.primaryKey]);
+    // Check if Item has valid itemKey
+    // otherwise add random itemKey to Item
+    if (!Object.prototype.hasOwnProperty.call(item._value, primaryKey)) {
+      LogCodeManager.log('1B:02:05', [this._key, primaryKey]);
+      itemKey = generateId();
       item.patch(
-        { [this.config.primaryKey]: generateId() },
-        { background: true }
+        { [this.config.primaryKey]: itemKey },
+        { background: config.background }
       );
+      item._key = itemKey;
+    }
+
+    // Check if Item belongs to this Collection
+    if (item.collection() !== this) {
+      LogCodeManager.log('1B:03:06', [this._key, item.collection()._key]);
+      return false;
     }
 
     // Check if Item already exists
-    if (this.getItem(itemKey) != null) return this;
+    if (this.getItem(itemKey) != null) {
+      if (!config.overwrite) return true;
+      else increaseCollectionSize = false;
+    }
 
+    // Assign/add Item to Collection
     this.data[itemKey] = item;
 
-    // Rebuild Groups That include ItemKey after assigning Item to Collection (otherwise it can't find Item)
+    // Rebuild Groups that include itemKey
+    // after adding Item to Collection
+    // (because otherwise it can't find the Item since it doesn't exist in Collection yet)
     this.rebuildGroupsThatIncludeItemKey(itemKey, {
       background: config.background,
     });
 
-    this.size++;
+    if (increaseCollectionSize) this.size++;
 
-    return this;
+    return true;
   }
 
   //=========================================================================================================
@@ -1331,7 +1364,11 @@ export interface CollectionConfigInterface {
 export interface CollectConfigInterface<DataType = any> {
   patch?: boolean;
   method?: 'push' | 'unshift';
-  forEachItem?: (data: DataType, key: ItemKey, index: number) => void;
+  forEachItem?: (
+    data: DataType | Item<DataType>,
+    key: ItemKey,
+    index: number
+  ) => void;
   background?: boolean;
   select?: boolean;
 }
@@ -1397,8 +1434,17 @@ export interface RemoveItemsConfigInterface {
  * @property patch - If Data gets patched into existing Item
  * @property background - If assigning Data happens in background
  */
-export interface SetDataConfigInterface {
+export interface AssignDataConfigInterface {
   patch?: boolean;
+  background?: boolean;
+}
+
+/**
+ * @property overwrite - If old Item should be overwritten
+ * @property background - If assigning Data happens in background
+ */
+export interface AssignItemConfigInterface {
+  overwrite?: boolean;
   background?: boolean;
 }
 

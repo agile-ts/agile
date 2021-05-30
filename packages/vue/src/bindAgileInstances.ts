@@ -50,7 +50,7 @@ export function bindAgileInstances(
 // Format Deps With No Safe Indicator
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from dependencies which might not have an indicator.
  * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
  * @param deps - Dependencies to be formatted
@@ -86,7 +86,7 @@ const formatDepsWithNoSafeIndicator = (
 // Format Deps With Indicator
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from dependencies which have an indicator through the object property key.
  * @param deps - Dependencies to be formatted
  */

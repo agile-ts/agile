@@ -39,7 +39,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
 // Extract Observers
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from specific Instances
  * @param instances - Instances that will be formatted
  */

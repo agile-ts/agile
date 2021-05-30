@@ -46,7 +46,7 @@ export class Branch<T extends Object = DefaultProxyTreeObject> {
   }
 
   /**
-   * @private
+   * @internal
    * Record usage of an accessed property in the passed target object.
    * @param target - Target object in which a property at key was accessed
    * @param key - Key that was accessed in the target object

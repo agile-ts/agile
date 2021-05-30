@@ -74,7 +74,7 @@ export function AgileHOC(
 // Create HOC
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Creates Higher Order Component based on passed React Component that binds the deps to it
  * @param ReactComponent - React Component
  * @param agileInstance - Instance of Agile
@@ -151,7 +151,7 @@ const createHOC = (
 // Format Deps With No Safe Indicator
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from dependencies which might not have an indicator.
  * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
  * @param deps - Dependencies to be formatted
@@ -187,7 +187,7 @@ const formatDepsWithNoSafeIndicator = (
 // Format Deps With Indicator
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from dependencies which have an indicator through the object property key.
  * @param deps - Dependencies to be formatted
  */
