@@ -261,7 +261,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     );
 
     _data.forEach((data, index) => {
-      const itemKey = data[primaryKey];
+      let itemKey;
       let success = false;
 
       // Assign Data or Item to Collection
@@ -269,25 +269,28 @@ export class Collection<DataType extends Object = DefaultItem> {
         success = this.assignItem(data, {
           background: config.background,
         });
+        itemKey = data._key;
       } else {
         success = this.assignData(data, {
           patch: config.patch,
           background: config.background,
         });
+        itemKey = data[primaryKey];
       }
 
-      if (!success) return this;
-
-      // Add ItemKey to provided Groups
-      _groupKeys.forEach((groupKey) => {
-        this.getGroup(groupKey)?.add(itemKey, {
-          method: config.method,
-          background: config.background,
+      // Add ItemKey to provided Groups and create corresponding Selector
+      if (success) {
+        _groupKeys.forEach((groupKey) => {
+          this.getGroup(groupKey)?.add(itemKey, {
+            method: config.method,
+            background: config.background,
+          });
         });
-      });
 
-      if (config.select) this.createSelector(itemKey, itemKey);
-      if (config.forEachItem) config.forEachItem(data, itemKey, index);
+        if (config.select) this.createSelector(itemKey, itemKey);
+      }
+
+      if (config.forEachItem) config.forEachItem(data, itemKey, success, index);
     });
 
     return this;
@@ -1367,6 +1370,7 @@ export interface CollectConfigInterface<DataType = any> {
   forEachItem?: (
     data: DataType | Item<DataType>,
     key: ItemKey,
+    success: boolean,
     index: number
   ) => void;
   background?: boolean;

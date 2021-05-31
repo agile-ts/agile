@@ -1,7 +1,6 @@
 import {
   State,
   Collection,
-  DefaultItem,
   StateKey,
   StateRuntimeJobConfigInterface,
   defineConfig,
@@ -10,6 +9,7 @@ import {
   isValidObject,
   CollectionPersistent,
   StatePersistentConfigInterface,
+  DefaultItem,
 } from '../internal';
 
 export class Item<DataType extends Object = DefaultItem> extends State<
