@@ -40,13 +40,18 @@ export class Collection<DataType extends Object = DefaultItem> {
   public isInstantiated = false;
 
   /**
-   * Class that holds a List of Objects with key and causes rerender on subscribed Components
+   * A Collection provides a reactive set of Information that we need to remember globally at a later point in time.
+   * While providing a toolkit to use and mutate this set of Information.
+   *
+   * It is designed for arrays of data objects following the same pattern.
+   *
+   * Each of these data object must have a unique primaryKey to be correctly identified later.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/)
    *
    * @public
-   *
-   * @param agileInstance - Instance of Agile the Collection belongs to
-   *
-   * @param config - Configuration
+   * @param agileInstance - Instance of Agile the Collection belongs to.
+   * @param config - Configuration object
    */
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
@@ -73,60 +78,68 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Reselect Selector Items
     // Necessary because the selection of an Item
-    // hasn't worked with a not 'instantiated' Collection
+    // hasn't worked with a not 'instantiated' Collection before
     for (const key in this.selectors) this.selectors[key].reselect();
 
     // Rebuild of Groups
     // Not necessary because if Items are added to the Collection,
-    // the Groups which contain these added Items get rebuilt.
+    // the Groups which contain these added Items are rebuilt.
     // for (const key in this.groups) this.groups[key].rebuild();
   }
 
   /**
+   * Updates key/name identifier of Collection.
+   *
    * @public
-   * Set Key/Name of Collection
+   * @param value - New key/name identifier.
    */
   public set key(value: CollectionKey | undefined) {
     this.setKey(value);
   }
 
   /**
+   * Returns key/name identifier of Collection.
+   *
    * @public
-   * Get Key/Name of Collection
    */
   public get key(): CollectionKey | undefined {
     return this._key;
   }
 
-  //=========================================================================================================
-  // Set Key
-  //=========================================================================================================
   /**
+   * Updates key/name identifier of Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#setkey)
+   *
    * @public
-   * Set Key/Name of Collection
-   * @param value - New Key/Name of Collection
+   * @param value - New key/name identifier.
    */
   public setKey(value: CollectionKey | undefined) {
     const oldKey = this._key;
 
-    // Update State Key
+    // Update Collection key
     this._key = value;
 
-    // Update Key in Persistent (only if oldKey equal to persistentKey -> otherwise the PersistentKey got formatted and will be set where other)
+    // Update key in Persistent (only if oldKey equal to persistentKey
+    // because otherwise the persistentKey is detached from the Collection key
+    // -> not managed by Collection anymore)
     if (value && this.persistent?._key === oldKey)
       this.persistent?.setKey(value);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Group
-  //=========================================================================================================
   /**
+   * Creates a new Group without associating it to the Collection.
+   *
+   * Therefore, this function is intended for use in the Collection configuration object,
+   * where the `constructor()` takes care of the associating.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#group)
+   *
    * @public
-   * Group - Holds Items of this Collection
-   * @param initialItems - Initial ItemKeys of Group
-   * @param config - Config
+   * @param initialItems - Initial keys of Items that the Group should represent.
+   * @param config - Configuration object
    */
   public Group(
     initialItems?: Array<ItemKey>,
@@ -141,14 +154,17 @@ export class Collection<DataType extends Object = DefaultItem> {
     return new Group<DataType>(this, initialItems, config);
   }
 
-  //=========================================================================================================
-  // Selector
-  //=========================================================================================================
   /**
+   * Creates a new Selector without associating it to the Collection.
+   *
+   * Therefore, this function is intended for use in the Collection configuration object,
+   * where the `constructor()` takes care of the associating.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#selector)
+   *
    * @public
-   * Selector - Represents an Item of this Collection
-   * @param initialKey - Key of Item that the Selector represents
-   * @param config - Config
+   * @param initialKey - Initial key of the Item that the Selector should represent.
+   * @param config - Configuration object
    */
   public Selector(
     initialKey: ItemKey,
@@ -163,18 +179,18 @@ export class Collection<DataType extends Object = DefaultItem> {
     return new Selector<DataType>(this, initialKey, config);
   }
 
-  //=========================================================================================================
-  // Init Groups
-  //=========================================================================================================
   /**
+   * Sets up the give Groups or Group keys and initializes the default Group.
+   * The Groups are then assigned to the Collection after a successful set up.
+   *
    * @internal
-   * Instantiates Groups
+   * @param groups - Groups or Group keys to be setup.
    */
-  public initGroups(groups: { [key: string]: Group<any> } | string[]) {
+  public initGroups(groups: { [key: string]: Group<any> } | string[]): void {
     if (!groups) return;
     let groupsObject: { [key: string]: Group<DataType> } = {};
 
-    // If groups is Array of GroupNames transform it to Group Object
+    // If groups is Array of Group names/keys, create the Groups based these keys
     if (Array.isArray(groups)) {
       groups.forEach((groupKey) => {
         groupsObject[groupKey] = new Group<DataType>(this, [], {
@@ -188,25 +204,25 @@ export class Collection<DataType extends Object = DefaultItem> {
       key: this.config.defaultGroupKey,
     });
 
-    // Set Key/Name of Group to property Name
+    // Assign missing key/name to Group based on the property key
     for (const key in groupsObject)
       if (groupsObject[key]._key == null) groupsObject[key].setKey(key);
 
     this.groups = groupsObject;
   }
 
-  //=========================================================================================================
-  // Init Selectors
-  //=========================================================================================================
   /**
+   * Sets up the give Selectors or Selector keys
+   * and assigns them to the Collection if they are valid.
+   *
    * @internal
-   * Instantiates Selectors
+   * @param selectors - Selectors or Selector keys to be setup.
    */
   public initSelectors(selectors: { [key: string]: Selector<any> } | string[]) {
     if (!selectors) return;
     let selectorsObject: { [key: string]: Selector<DataType> } = {};
 
-    // If selectors is Array of SelectorNames transform it to Selector Object
+    // If selectors is Array of Selector names/keys, create the Selectors based these keys
     if (Array.isArray(selectors)) {
       selectors.forEach((selectorKey) => {
         selectorsObject[selectorKey] = new Selector<DataType>(
@@ -219,7 +235,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       });
     } else selectorsObject = selectors;
 
-    // Set Key/Name of Selector to property Name
+    // Assign missing key/name to Selector based on the property key
     for (const key in selectorsObject)
       if (selectorsObject[key]._key == null) selectorsObject[key].setKey(key);
 
@@ -230,8 +246,14 @@ export class Collection<DataType extends Object = DefaultItem> {
   // Collect
   //=========================================================================================================
   /**
+   * todo
+   * collect data objects or whole items
+   * adds these data objects to the Collection
+   * Each to collect data object needs a unique primaryKey (identifier)
+   *
+   *
+   *
    * @public
-   * Collect Item/s
    * @param data - Data that gets added to Collection
    * @param groupKeys - Add collected Item/s to certain Groups
    * @param config - Config

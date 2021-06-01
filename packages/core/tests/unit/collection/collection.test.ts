@@ -1555,7 +1555,7 @@ describe('Collection Tests', () => {
         );
       });
 
-      it("should return and track created reference Item if Item doesn't exist yet", () => {
+      it("should return and track created reference Item if searched Item doesn't exist yet", () => {
         const response = collection.getItemWithReference('notExistingItem');
 
         expect(response).toBe(placeholderItem);
@@ -1563,7 +1563,9 @@ describe('Collection Tests', () => {
           'notExistingItem',
           true
         );
-        expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          placeholderItem.observer
+        );
       });
     });
 
@@ -1626,6 +1628,7 @@ describe('Collection Tests', () => {
 
         expect(collection.data).toHaveProperty('2');
         expect(collection.data['2']).toStrictEqual(expect.any(Item));
+        expect(collection.data['2']._key).toBe('2');
 
         expect(ComputedTracker.tracked).toHaveBeenCalledTimes(1);
         expect(ComputedTracker.tracked).not.toHaveBeenCalledWith(
@@ -2571,12 +2574,12 @@ describe('Collection Tests', () => {
         });
 
         expect(response).toBeTruthy();
-        expect(collection.size).toBe(2); // Increased by assignItem
+        expect(collection.size).toBe(2); // Increased by assignItem()
         expect(collection.assignItem).toHaveBeenCalledWith(expect.any(Item), {
           background: false,
         });
 
-        // Check if Item, assignItem was called with, has the correct data
+        // Check if Item, assignItem() was called with, has the correct data
         expect(collection.data).toHaveProperty('dummyItem2');
         expect(collection.data['dummyItem2']._value).toStrictEqual({
           id: 'dummyItem2',
@@ -2597,12 +2600,12 @@ describe('Collection Tests', () => {
         );
 
         expect(response).toBeTruthy();
-        expect(collection.size).toBe(2); // Increased by assignItem
+        expect(collection.size).toBe(2); // Increased by assignItem()
         expect(collection.assignItem).toHaveBeenCalledWith(expect.any(Item), {
           background: true,
         });
 
-        // Check if Item, assignItem was called with, has the correct data
+        // Check if Item, assignItem() was called with, has the correct data
         expect(collection.data).toHaveProperty('dummyItem2');
         expect(collection.data['dummyItem2']._value).toStrictEqual({
           id: 'dummyItem2',
@@ -2630,12 +2633,12 @@ describe('Collection Tests', () => {
         const response = collection.assignData({ name: 'Frank' } as any);
 
         expect(response).toBeTruthy();
-        expect(collection.size).toBe(2); // Increased by assignItem
+        expect(collection.size).toBe(2); // Increased by assignItem()
         expect(collection.assignItem).toHaveBeenCalledWith(expect.any(Item), {
           background: false,
         });
 
-        // Check if Item, assignItem was called with, has the correct data
+        // Check if Item, assignItem() was called with, has the correct data
         expect(collection.data).toHaveProperty('randomDummyId');
         expect(collection.data['randomDummyId']._value).toStrictEqual({
           id: 'randomDummyId',
@@ -2649,7 +2652,7 @@ describe('Collection Tests', () => {
         ]);
       });
 
-      it('should update Item with valid data via set (default config)', () => {
+      it('should update existing Item with valid data via set (default config)', () => {
         const response = collection.assignData({
           id: 'dummyItem1',
           name: 'Dieter',
@@ -2669,7 +2672,7 @@ describe('Collection Tests', () => {
         LogMock.hasNotLogged('warn');
       });
 
-      it('should update Item with valid data via set (config.background = true)', () => {
+      it('should update existing Item with valid data via set (config.background = true)', () => {
         const response = collection.assignData(
           {
             id: 'dummyItem1',
@@ -2692,7 +2695,7 @@ describe('Collection Tests', () => {
         LogMock.hasNotLogged('warn');
       });
 
-      it('should update Item with valid data via patch (config.patch = true, background: true)', () => {
+      it('should update existing Item with valid data via patch (config.patch = true, background: true)', () => {
         const response = collection.assignData(
           {
             id: 'dummyItem1',
@@ -2715,7 +2718,7 @@ describe('Collection Tests', () => {
         LogMock.hasNotLogged('warn');
       });
 
-      it('should update placeholder Item with valid data and increase size', () => {
+      it('should update placeholder Item with valid data and increase Collection size (default config)', () => {
         dummyItem1.isPlaceholder = true;
 
         const response = collection.assignData({
@@ -2773,6 +2776,7 @@ describe('Collection Tests', () => {
         );
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
+        expect(toAddDummyItem2._key).toBe(2);
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');
@@ -2795,6 +2799,7 @@ describe('Collection Tests', () => {
         );
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
+        expect(toAddDummyItem2._key).toBe(2);
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');
@@ -2847,6 +2852,7 @@ describe('Collection Tests', () => {
         ).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
+        expect(toAddDummyItem2._key).toBe(2);
 
         LogMock.hasLoggedCode('1B:03:06', [
           collection._key,
@@ -2867,6 +2873,7 @@ describe('Collection Tests', () => {
         ).not.toHaveBeenCalled();
 
         expect(dummyItem1.patch).not.toHaveBeenCalled();
+        expect(dummyItem1._key).toBe(1);
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');
@@ -2887,6 +2894,7 @@ describe('Collection Tests', () => {
         );
 
         expect(dummyItem1.patch).not.toHaveBeenCalled();
+        expect(dummyItem1._key).toBe(2);
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');

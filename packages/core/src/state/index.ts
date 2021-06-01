@@ -103,39 +103,42 @@ export class State<ValueType = any> {
   }
 
   /**
+   * Updates key/name identifier of State.
+   *
    * @public
-   * Set Key/Name of State
+   * @param value - New key/name identifier.
    */
   public set key(value: StateKey | undefined) {
     this.setKey(value);
   }
 
   /**
+   * Returns key/name identifier of State.
+   *
    * @public
-   * Get Key/Name of State
    */
   public get key(): StateKey | undefined {
     return this._key;
   }
 
-  //=========================================================================================================
-  // Set Key
-  //=========================================================================================================
   /**
-   * @internal
-   * Updates Key/Name of State
-   * @param value - New Key/Name of State
+   * Updates key/name identifier of State.
+   *
+   * @public
+   * @param value - New key/name identifier.
    */
   public setKey(value: StateKey | undefined): this {
     const oldKey = this._key;
 
-    // Update State Key
+    // Update State key
     this._key = value;
 
-    // Update Key in Observer
+    // Update key in Observer
     this.observer._key = value;
 
-    // Update Key in Persistent (only if oldKey equal to persistentKey -> otherwise the PersistentKey got formatted and will be set where other)
+    // Update key in Persistent (only if oldKey equal to persistentKey
+    // because otherwise the persistentKey is detached from the State key
+    // -> not managed by State anymore)
     if (value && this.persistent?._key === oldKey)
       this.persistent?.setKey(value);
 
