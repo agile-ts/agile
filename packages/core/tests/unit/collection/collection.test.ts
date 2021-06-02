@@ -1321,9 +1321,15 @@ describe('Collection Tests', () => {
 
     describe('getSelector function tests', () => {
       let dummySelector: Selector<ItemInterface>;
+      let dummyItem1: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummySelector = new Selector(collection, 'dummyItem', {
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'frank' });
+        collection.data = {
+          ['dummyItem1']: dummyItem1,
+        };
+
+        dummySelector = new Selector(collection, 'dummyItem1', {
           key: 'dummySelector',
         });
         collection.selectors = {
@@ -1374,9 +1380,15 @@ describe('Collection Tests', () => {
 
     describe('getSelectorWithReference function tests', () => {
       let dummySelector: Selector<ItemInterface>;
+      let dummyItem1: Item<ItemInterface>;
 
       beforeEach(() => {
-        dummySelector = new Selector(collection, 'dummyItem', {
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'frank' });
+        collection.data = {
+          ['dummyItem1']: dummyItem1,
+        };
+
+        dummySelector = new Selector(collection, 'dummyItem1', {
           key: 'dummySelector',
         });
         collection.selectors = {
@@ -2776,7 +2788,7 @@ describe('Collection Tests', () => {
         );
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
-        expect(toAddDummyItem2._key).toBe(2);
+        expect(toAddDummyItem2._key).toBe('dummyItem2');
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');
@@ -2799,7 +2811,7 @@ describe('Collection Tests', () => {
         );
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
-        expect(toAddDummyItem2._key).toBe(2);
+        expect(toAddDummyItem2._key).toBe('dummyItem2');
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');
@@ -2852,7 +2864,7 @@ describe('Collection Tests', () => {
         ).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
-        expect(toAddDummyItem2._key).toBe(2);
+        expect(toAddDummyItem2._key).toBe('dummyItem2');
 
         LogMock.hasLoggedCode('1B:03:06', [
           collection._key,
@@ -2873,7 +2885,7 @@ describe('Collection Tests', () => {
         ).not.toHaveBeenCalled();
 
         expect(dummyItem1.patch).not.toHaveBeenCalled();
-        expect(dummyItem1._key).toBe(1);
+        expect(dummyItem1._key).toBe('dummyItem1');
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');
@@ -2894,7 +2906,7 @@ describe('Collection Tests', () => {
         );
 
         expect(dummyItem1.patch).not.toHaveBeenCalled();
-        expect(dummyItem1._key).toBe(2);
+        expect(dummyItem1._key).toBe('dummyItem1');
 
         LogMock.hasNotLogged('error');
         LogMock.hasNotLogged('warn');

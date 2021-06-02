@@ -468,7 +468,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const group = groupKey ? this.groups[groupKey] : undefined;
 
     // Check if Group exists
-    if (group == null || (!config.notExisting && group.exists))
+    if (group == null || (!config.notExisting && !group.exists))
       return undefined;
 
     ComputedTracker.tracked(group.observer);
@@ -612,7 +612,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const selector = selectorKey ? this.selectors[selectorKey] : undefined;
 
     // Check if Selector exists
-    if (selector == null || (!config.notExisting && selector.exists))
+    if (selector == null || (!config.notExisting && !selector.exists))
       return undefined;
 
     ComputedTracker.tracked(selector.observer);
