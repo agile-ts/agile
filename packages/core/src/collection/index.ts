@@ -28,24 +28,25 @@ export class Collection<DataType extends Object = DefaultItem> {
   public config: CollectionConfigInterface;
   private initialConfig: CreateCollectionConfigInterface;
 
-  public size = 0; // Amount of Items stored in Collection
+  public size = 0; // Amount of Items stored in the Collection
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
-  public isPersisted = false; // If Collection can be stored in Agile Storage (-> successfully integrated persistent)
-  public persistent: CollectionPersistent<DataType> | undefined; // Manages storing Collection Value into Storage
+  public isPersisted = false; // Whether Collection is persisted in any external Storage
+  public persistent: CollectionPersistent<DataType> | undefined; // Manages persisting Collection 'value'
 
   public groups: { [key: string]: Group<DataType> } = {};
   public selectors: { [key: string]: Selector<DataType> } = {};
 
-  public isInstantiated = false;
+  public isInstantiated = false; // Whether the Collection is instantiated completely
 
   /**
-   * A Collection provides a reactive set of Information that we need to remember globally at a later point in time.
+   * A Collection provides a reactive set of Information
+   * that we need to remember globally at a later point in time.
    * While providing a toolkit to use and mutate this set of Information.
    *
    * It is designed for arrays of data objects following the same pattern.
    *
-   * Each of these data object must have a unique primaryKey to be correctly identified later.
+   * Each of these data object must have a unique `primaryKey` to be correctly identified later.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/)
    *
@@ -132,7 +133,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   /**
    * Creates a new Group without associating it to the Collection.
    *
-   * Therefore, this function is intended for use in the Collection configuration object,
+   * This way of creating a Group is intended for use in the Collection configuration object,
    * where the `constructor()` takes care of the associating.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#group)
@@ -157,13 +158,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   /**
    * Creates a new Selector without associating it to the Collection.
    *
-   * Therefore, this function is intended for use in the Collection configuration object,
+   * This way of creating a Selector is intended for use in the Collection configuration object,
    * where the `constructor()` takes care of the associating.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#selector)
    *
    * @public
-   * @param initialKey - Initial key of Items to be represented by the Selector.
+   * @param initialKey - Initial key of Item to be represented by the Selector.
    * @param config - Configuration object
    */
   public Selector(
@@ -180,8 +181,11 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Sets up the give Groups or Group keys and initializes the default Group.
-   * The Groups are then assigned to the Collection after a successful set up.
+   * Sets up the specified Groups or Group keys
+   * and assigns them to the Collection if they are valid.
+   *
+   * It also assigns the default Group to the Collection.
+   * The default Group reflects the default pattern of the Collection.
    *
    * @internal
    * @param groups - Entire Groups or Group keys to be set up.
@@ -212,7 +216,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Sets up the give Selectors or Selector keys
+   * Sets up the specified Selectors or Selector keys
    * and assigns them to the Collection if they are valid.
    *
    * @internal
@@ -243,24 +247,23 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Appends a new data object or whole Items following the same pattern to the end of the Collection.
+   * Appends new data objects following the same pattern to the end of the Collection.
    *
-   * Each collected data object and Item requires a unique identifier at the primaryKey property
-   * to be properly identified later. By default, 'id' is the primaryKey property.
+   * Each collected `data object` requires a unique identifier at the primaryKey property (by default 'id')
+   * to be correctly identified later.
    *
-   * For example, a valid data object would look like this:
-   *
-   * {id: 1, name: 'jeff'}
-   *
-   * 'id': PrimaryKey property with a unique identifier '1'
-   *
-   * 'name': A actual data property in this case 'jeff'.
+   * For example, if we collect some kind of user object,
+   * it must contain such unique identifier at 'id'
+   * to be added to the Collection.
+   * ```
+   * MY_COLLECTION.collect({id: '1', name: 'jeff'});
+   * ```
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#collect)
    *
    * @public
-   * @param data - Data object or Items to be added.
-   * @param groupKeys - Given data objects or Items to be added to certain Group/s.
+   * @param data - Data objects or entire Items to be added.
+   * @param groupKeys - Group/s to which the specified data objects or Items are to be added.
    * @param config - Configuration object
    */
   public collect(
@@ -324,13 +327,14 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates Item data object at give identifier key, if it exists.
+   * Updates the Item `data object` with the specified `object with changes`, if the Item exists.
+   * By default the `object with changes` is merged into the Item `data object`.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#update)
    *
    * @public
-   * @param itemKey - ItemKey of Item to be updated.
-   * @param changes - Object with changes to be merged into the Item data.
+   * @param itemKey - Key/Name identifier of Item to be updated.
+   * @param changes - Object with changes to be merged into the Item data object.
    * @param config - Configuration object
    */
   public update(
@@ -403,7 +407,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#createGroup)
    *
    * @public
-   * @param groupKey - Unique Group identifier of the new Group.
+   * @param groupKey - Unique identifier of the to create Group.
    * @param initialItems - Initial keys of Items to be represented by the Group.
    */
   public createGroup(
@@ -431,7 +435,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Returns a boolean indicating whether an Group with the specified groupKey
+   * Returns a boolean indicating whether a Group with the specified `groupKey`
    * exists in the Collection or not.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasgroup)
@@ -450,6 +454,8 @@ export class Collection<DataType extends Object = DefaultItem> {
   /**
    * Retrieves a single Group with the specified key/name identifier from the Collection.
    *
+   * If the to retrieve Group doesn't exist, `undefined` is returned.
+   *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroup)
    *
    * @public
@@ -464,10 +470,10 @@ export class Collection<DataType extends Object = DefaultItem> {
       notExisting: false,
     });
 
-    // Get Group
+    // Retrieve Group
     const group = groupKey ? this.groups[groupKey] : undefined;
 
-    // Check if Group exists
+    // Check if retrieved Group exists
     if (group == null || (!config.notExisting && !group.exists))
       return undefined;
 
@@ -478,8 +484,8 @@ export class Collection<DataType extends Object = DefaultItem> {
   /**
    * Retrieves the default Group from the Collection.
    *
-   * Every Collection has a default Group,
-   * which represents the main pattern of the Collection.
+   * Every Collection should have a default Group,
+   * which represents the default pattern of the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getdefaultgroup)
    *
@@ -489,13 +495,17 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this.getGroup(this.config.defaultGroupKey);
   }
 
-  //=========================================================================================================
-  // Get Group With Reference
-  //=========================================================================================================
   /**
+   * Retrieves a single Group with the specified key/name identifier from the Collection.
+   *
+   * If the to retrieve Group doesn't exist, a reference Group is returned.
+   * This has the advantage that Components that have the reference Group bound to themselves
+   * are rerenderd when the original Group is created.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupwithreference)
+   *
    * @public
-   * Get Group by Key/Name or a Reference to it if it doesn't exist yet
-   * @param groupKey - Name/Key of Group
+   * @param groupKey - Key/Name identifier of Group.
    */
   public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
@@ -513,35 +523,34 @@ export class Collection<DataType extends Object = DefaultItem> {
     return group;
   }
 
-  //=========================================================================================================
-  // Remove Group
-  //=========================================================================================================
   /**
+   * Removes a Group with the specified identifier from the Collection,
+   * if it exists in the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removegroup)
+   *
    * @public
-   * Removes Group by Key/Name
-   * @param groupKey - Name/Key of Group
+   * @param groupKey - Key/Name identifier of Group.
    */
   public removeGroup(groupKey: GroupKey): this {
-    if (this.groups[groupKey] == null) return this;
-    delete this.groups[groupKey];
+    if (this.groups[groupKey] != null) delete this.groups[groupKey];
     return this;
   }
 
-  //=========================================================================================================
-  // Create Selector
-  //=========================================================================================================
   /**
+   * Creates a new Selector and associates it to the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#createSelector)
+   *
    * @public
-   * Creates new Selector that represents an Item of the Collection
-   * @param selectorKey - Name/Key of Selector
-   * @param itemKey - Key of Item which the Selector represents
+   * @param selectorKey - Unique identifier of the to create Selector.
+   * @param itemKey - Initial key of Item to be represented by the Selector.
    */
   public createSelector(
     selectorKey: SelectorKey,
     itemKey: ItemKey
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
-
     if (!this.isInstantiated) LogCodeManager.log('1B:02:04');
 
     // Check if Selector already exists
@@ -554,7 +563,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       return selector;
     }
 
-    // Create Selector
+    // Create new Selector
     selector = new Selector<DataType>(this, itemKey, {
       key: selectorKey,
     });
@@ -563,26 +572,34 @@ export class Collection<DataType extends Object = DefaultItem> {
     return selector;
   }
 
-  //=========================================================================================================
-  // Select
-  //=========================================================================================================
   /**
+   * Creates a new Selector and associates it to the Collection.
+   *
+   * The specified `itemKey` is used as the unique identifier key of the new Selector.
+   * ```
+   * MY_COLLECTION.select('1');
+   * // is equivalent to
+   * MY_COLLECTION.createSelector('1', '1');
+   * ```
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#select)
+   *
    * @public
-   * Creates new Selector that represents an Item of the Collection
-   * @param itemKey - Key of Item which the Selector represents
+   * @param itemKey - ItemKey to be selected.
    */
   public select(itemKey: ItemKey): Selector<DataType> {
     return this.createSelector(itemKey, itemKey);
   }
 
-  //=========================================================================================================
-  // Has Selector
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether a Selector with the specified `selectorKey`
+   * exists in the Collection or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasselector)
+   *
    * @public
-   * Check if Selector exists in Collection
-   * @param selectorKey - Key/Name of Selector
-   * @param config - Config
+   * @param selectorKey - Key/Name identifier of Selector.
+   * @param config - Configuration object
    */
   public hasSelector(
     selectorKey: SelectorKey | undefined,
@@ -591,14 +608,16 @@ export class Collection<DataType extends Object = DefaultItem> {
     return !!this.getSelector(selectorKey, config);
   }
 
-  //=========================================================================================================
-  // Get Selector
-  //=========================================================================================================
   /**
+   * Retrieves a single Selector with the specified key/name identifier from the Collection.
+   *
+   * If the to retrieve Selector doesn't exist, `undefined` is returned.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselector)
+   *
    * @public
-   * Get Selector by Key/Name
-   * @param selectorKey - Key/Name of Selector
-   * @param config - Config
+   * @param selectorKey - Key/Name identifier of Selector.
+   * @param config - Configuration object
    */
   public getSelector(
     selectorKey: SelectorKey | undefined,
@@ -619,13 +638,17 @@ export class Collection<DataType extends Object = DefaultItem> {
     return selector;
   }
 
-  //=========================================================================================================
-  // Get Selector With Reference
-  //=========================================================================================================
   /**
+   * Retrieves a single Selector with the specified key/name identifier from the Collection.
+   *
+   * If the to retrieve Selector doesn't exist, a reference Selector is returned.
+   * This has the advantage that Components that have the reference Selector bound to themselves
+   * are rerenderd when the original Selector is created.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselectorwithreference)
+   *
    * @public
-   * Get Selector by Key/Name or a Reference to it if it doesn't exist yet
-   * @param selectorKey - Name/Key of Selector
+   * @param selectorKey - Key/Name identifier of Selector.
    */
   public getSelectorWithReference(
     selectorKey: SelectorKey
@@ -649,29 +672,32 @@ export class Collection<DataType extends Object = DefaultItem> {
     return selector;
   }
 
-  //=========================================================================================================
-  // Remove Selector
-  //=========================================================================================================
   /**
+   * Removes a Selector with the specified identifier from the Collection,
+   * if it exists in the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removeselector)
+   *
    * @public
-   * Removes Selector by Key/Name
-   * @param selectorKey - Name/Key of Selector
+   * @param selectorKey - Key/Name identifier of Selector.
    */
   public removeSelector(selectorKey: SelectorKey): this {
-    if (this.selectors[selectorKey] == null) return this;
-    this.selectors[selectorKey].unselect(); // Unselects current selected Item
-    delete this.selectors[selectorKey];
+    if (this.selectors[selectorKey] != null) {
+      this.selectors[selectorKey].unselect();
+      delete this.selectors[selectorKey];
+    }
     return this;
   }
 
-  //=========================================================================================================
-  // Has Item
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether a Item with the specified `itemKey`
+   * exists in the Collection or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasitem)
+   *
    * @public
-   * Check if Item exists in Collection
-   * @param itemKey - Key/Name of Item
-   * @param config - Config
+   * @param itemKey - Key/Name identifier of Item.
+   * @param config - Configuration object
    */
   public hasItem(
     itemKey: ItemKey | undefined,
@@ -680,14 +706,16 @@ export class Collection<DataType extends Object = DefaultItem> {
     return !!this.getItem(itemKey, config);
   }
 
-  //=========================================================================================================
-  // Get Item by Id
-  //=========================================================================================================
   /**
+   * Retrieves a single Item with the specified key/name identifier from the Collection.
+   *
+   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitem)
+   *
    * @public
-   * Get Item by Key/Name
-   * @param itemKey - ItemKey of Item
-   * @param config - Config
+   * @param itemKey - Key/Name identifier of Item.
+   * @param config - Configuration object
    */
   public getItem(
     itemKey: ItemKey | undefined,
@@ -708,9 +736,16 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
+   * Retrieves a single Item with the specified key/name identifier from the Collection.
+   *
+   * If the to retrieve Item doesn't exist, a reference Item is returned.
+   * This has the advantage that Components that have the reference Item bound to themselves
+   * are rerenderd when the original Item is created.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitemwithreference)
+   *
    * @public
-   * Get Item by Key/Name or a Reference to it if it doesn't exist yet
-   * @param itemKey - Key/Name of Item
+   * @param itemKey - Key/Name identifier of Item.
    */
   public getItemWithReference(itemKey: ItemKey): Item<DataType> {
     let item = this.getItem(itemKey, { notExisting: true });
@@ -724,16 +759,17 @@ export class Collection<DataType extends Object = DefaultItem> {
 
   /**
    * Creates a placeholder Item
-   * that can be used to hold a reference to an Item that doesn't exist yet.
+   * that can be used to hold a reference to a not existing Item.
    *
    * @internal
-   * @param itemKey - Key/Name identifier of the Item to be created.
+   * @param itemKey - Unique identifier of the to create placeholder Item.
    * @param addToCollection - Whether the created Item should be added to the Collection.
    */
   public createPlaceholderItem(
     itemKey: ItemKey,
     addToCollection = false
   ): Item<DataType> {
+    // Create placeholder Item
     const item = new Item<DataType>(
       this,
       {
@@ -743,6 +779,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       { isPlaceholder: true }
     );
 
+    // Add placeholder Item to Collection
     if (
       addToCollection &&
       !Object.prototype.hasOwnProperty.call(this.data, itemKey)
@@ -753,14 +790,17 @@ export class Collection<DataType extends Object = DefaultItem> {
     return item;
   }
 
-  //=========================================================================================================
-  // Get Value by Id
-  //=========================================================================================================
   /**
+   * Retrieves the value (data object) of a single Item
+   * with the specified key/name identifier from the Collection.
+   *
+   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitemvalue)
+   *
    * @public
-   * Get Value of Item by Key/Name
-   * @param itemKey - ItemKey of Item that holds the Value
-   * @param config - Config
+   * @param itemKey - Key/Name identifier of Item.
+   * @param config - Configuration object
    */
   public getItemValue(
     itemKey: ItemKey | undefined,
@@ -771,13 +811,18 @@ export class Collection<DataType extends Object = DefaultItem> {
     return item.value;
   }
 
-  //=========================================================================================================
-  // Get All Items
-  //=========================================================================================================
   /**
+   * Retrieves all Items from the Collection.
+   * ```
+   * MY_COLLECTION.getAllItems();
+   * // is equivalent to
+   * MY_COLLECTION.getDefaultGroup().items;
+   * ```
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getallitems)
+   *
    * @public
-   * Get all Items of Collection
-   * @param config - Config
+   * @param config - Configuration object
    */
   public getAllItems(config: HasConfigInterface = {}): Array<Item<DataType>> {
     config = defineConfig(config, {
@@ -793,40 +838,52 @@ export class Collection<DataType extends Object = DefaultItem> {
     } else {
       // Why defaultGroup Items and not all .exists === true Items?
       // Because the default Group keeps track of all existing Items
-      // It also does control the Collection output in useAgile() and should do it here too
+      // It also does control the Collection output in useAgile()
+      // and therefore should do it here too.
       items = defaultGroup?.items || [];
     }
 
     return items;
   }
 
-  //=========================================================================================================
-  // Get All Item Values
-  //=========================================================================================================
   /**
+   * Retrieves the values (data objects) of all Items from the Collection.
+   * ```
+   * MY_COLLECTION.getAllItemValues();
+   * // is equivalent to
+   * MY_COLLECTION.getDefaultGroup().output;
+   * ```
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getallitemvalues)
+   *
    * @public
-   * Get all Values of Items in a Collection
-   * @param config - Config
+   * @param config - Configuration object
    */
   public getAllItemValues(config: HasConfigInterface = {}): Array<DataType> {
     const items = this.getAllItems(config);
     return items.map((item) => item.value);
   }
 
-  //=========================================================================================================
-  // Persist
-  //=========================================================================================================
   /**
+   * Preserves the Collection `value` in the corresponding external Storage.
+   *
+   * The Collection key/name is used as the unique identifier for the Persistent.
+   * If that is not desired, please specify a unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#persist)
+   *
    * @public
-   * Stores Collection Value into Agile Storage permanently
-   * @param config - Config
+   * @param config - Configuration object
    */
   public persist(config?: CollectionPersistentConfigInterface): this;
   /**
+   * Preserves the Collection `value` in the corresponding external Storage.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#persist)
+   *
    * @public
-   * Stores Collection Value into Agile Storage permanently
-   * @param key - Key/Name of created Persistent (Note: Key required if Collection has no set Key!)
-   * @param config - Config
+   * @param key - Key/Name identifier of Persistent.
+   * @param config - Configuration object
    */
   public persist(
     key?: StorageKey,
@@ -856,7 +913,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Check if Collection is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
-    // Create persistent -> Persist Value
+    // Create Persistent -> persist value
     this.persistent = new CollectionPersistent<DataType>(this, {
       instantiate: _config.loadValue,
       storageKeys: _config.storageKeys,
@@ -867,67 +924,72 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this;
   }
 
-  //=========================================================================================================
-  // On Load
-  //=========================================================================================================
   /**
+   * Fires immediately after the persisted `value`
+   * is loaded into the Collection from a corresponding external Storage.
+   *
+   * Registering this callback only makes sense
+   * when the Collection is [persisted](https://agile-ts.org/docs/core/collection/methods/#persist) in an external Storage.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#onload)
+   *
    * @public
-   * Callback Function that gets called if the persisted Value gets loaded into the Collection for the first Time
-   * Note: Only useful for persisted Collections!
-   * @param callback - Callback Function
+   * @param callback - Callback function
    */
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
 
-    // Check if Callback is valid Function
+    // Check if provided callback is valid function
     if (!isFunction(callback)) {
       LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
       return this;
     }
 
+    // Register provided callback
     this.persistent.onLoad = callback;
 
-    // If Collection is already 'isPersisted' the loading was successful -> callback can be called
+    // If Collection is already persisted ('isPersisted') fire provided callback immediately
     if (this.isPersisted) callback(true);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Get Group Count
-  //=========================================================================================================
   /**
+   * Returns the count of registered Groups in the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupcount)
+   *
    * @public
-   * Get count of registered Groups in Collection
    */
   public getGroupCount(): number {
     let size = 0;
-    for (const group in this.groups) size++;
+    Object.keys(this.groups).map(() => size++);
     return size;
   }
 
-  //=========================================================================================================
-  // Get Selector Count
-  //=========================================================================================================
   /**
+   * Returns the count of registered Selectors in the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselectorcount)
+   *
    * @public
-   * Get count of registered Selectors in Collection
    */
   public getSelectorCount(): number {
     let size = 0;
-    for (const selector in this.selectors) size++;
+    Object.keys(this.selectors).map(() => size++);
     return size;
   }
 
-  //=========================================================================================================
-  // Reset
-  //=========================================================================================================
   /**
+   * Removes all Items from the Collection
+   * and resets the Groups and Selectors.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#reset)
+   *
    * @public
-   * Resets this Collection
    */
   public reset(): this {
-    // Reset Data
+    // Reset data
     this.data = {};
     this.size = 0;
 
@@ -940,15 +1002,15 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this;
   }
 
-  //=========================================================================================================
-  // Put
-  //=========================================================================================================
   /**
+   * Puts `itemKeys/s` into Group/s.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#put)
+   *
    * @public
-   * Puts ItemKey/s into Group/s (GroupKey/s)
-   * @param itemKeys - ItemKey/s that get added to provided Group/s
-   * @param groupKeys - Group/s to which the ItemKey/s get added
-   * @param config - Config
+   * @param itemKeys - `itemKey/s` to be put into the specified Group/s.
+   * @param groupKeys - Group identifier/s the specified `itemKey/s` are to put in.
+   * @param config - Configuration object
    */
   public put(
     itemKeys: ItemKey | Array<ItemKey>,
@@ -958,7 +1020,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const _itemKeys = normalizeArray(itemKeys);
     const _groupKeys = normalizeArray(groupKeys);
 
-    // Add ItemKeys to Groups
+    // Assign itemKeys to Groups
     _groupKeys.forEach((groupKey) => {
       this.getGroup(groupKey)?.add(_itemKeys, config);
     });
@@ -966,16 +1028,16 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this;
   }
 
-  //=========================================================================================================
-  // Move
-  //=========================================================================================================
   /**
+   * Moves specified `itemKey/s` from one Group to another Group.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#move)
+   *
    * @public
-   * Move ItemKey/s from one Group to another
-   * @param itemKeys - ItemKey/s that are moved
-   * @param oldGroupKey - GroupKey of the Group that currently keeps the Items at itemKey/s
-   * @param newGroupKey - GroupKey of the Group into which the Items at itemKey/s are moved
-   * @param config - Config
+   * @param itemKeys - `itemKey/s` to be moved.
+   * @param oldGroupKey - Group identifier of the Group the `itemKeys` are moved from.
+   * @param newGroupKey - Group identifier of the Group the `itemKeys` are moved in.
+   * @param config - Configuration object
    */
   public move(
     itemKeys: ItemKey | Array<ItemKey>,
@@ -991,21 +1053,21 @@ export class Collection<DataType extends Object = DefaultItem> {
       removeProperties(config, ['method', 'overwrite'])
     );
 
-    // Add itemKeys to new Group
+    // Assign itemKeys to new Group
     this.getGroup(newGroupKey)?.add(_itemKeys, config);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Update Item Key
-  //=========================================================================================================
   /**
+   * Updates key/name identifier of Item
+   * and returns a boolean indicating
+   * whether the Item identifier was updated successfully.
+   *
    * @internal
-   * Updates Key/Name of Item in all Instances (Group, Selector, ..)
-   * @param oldItemKey - Old ItemKey
-   * @param newItemKey - New ItemKey
-   * @param config - Config
+   * @param oldItemKey - Old Item identifier.
+   * @param newItemKey - New Item identifier.
+   * @param config - Configuration object
    */
   public updateItemKey(
     oldItemKey: ItemKey,
@@ -1025,39 +1087,42 @@ export class Collection<DataType extends Object = DefaultItem> {
       return false;
     }
 
-    // Remove Item from old ItemKey and add Item to new ItemKey
+    // Update itemKey in data object
     delete this.data[oldItemKey];
     this.data[newItemKey] = item;
 
-    // Update Key/Name of Item
+    // Update key/name of Item
     item.setKey(newItemKey, {
       background: config.background,
     });
 
-    // Update persist Key of Item (Doesn't get updated by updating key of Item because PersistKey is special formatted)
+    // Update Persistent key of Item
+    // because it differs from the actual Item key
+    // and therefore isn't updated when the Item key is updated
     item.persistent?.setKey(
       CollectionPersistent.getItemStorageKey(newItemKey, this._key)
     );
 
-    // Update ItemKey in Groups
+    // Update itemKey in Groups
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey, { notExisting: true });
-      if (!group?.has(oldItemKey)) continue;
-      group?.replace(oldItemKey, newItemKey, { background: config.background });
+      if (group == null || !group.has(oldItemKey)) continue;
+      group.replace(oldItemKey, newItemKey, { background: config.background });
     }
 
-    // Update ItemKey in Selectors
+    // Update itemKey in Selectors
     for (const selectorKey in this.selectors) {
       const selector = this.getSelector(selectorKey, { notExisting: true });
       if (selector == null) continue;
 
       // Reselect Item in Selector that has selected the newItemKey
-      // Necessary because the reference placeholder Item got removed
-      // and replaced with the new Item (Item of which the primaryKey was renamed)
-      // -> needs to find new Item with the same itemKey
+      // Necessary because potential reference placeholder Item got overwritten
+      // with the new (renamed) Item
+      // -> has to find the new Item at selected itemKey
+      //    since the placeholder Item got overwritten
       if (selector.hasSelected(newItemKey, false)) {
         selector.reselect({
-          force: true, // Because ItemKeys are the same
+          force: true, // Because itemKeys are the same
           background: config.background,
         });
       }
@@ -1072,30 +1137,45 @@ export class Collection<DataType extends Object = DefaultItem> {
     return true;
   }
 
-  //=========================================================================================================
-  // Get GroupKeys That Have ItemKey
-  //=========================================================================================================
   /**
+   * Returns all identifier keys/names of Group/s representing the specified `itemKey`.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupkeysthathaveitemkey)
+   *
    * @public
-   * Gets GroupKeys that contain the passed ItemKey
-   * @param itemKey - ItemKey
+   * @param itemKey - `itemKey` to be contained in Group/s.
    */
   public getGroupKeysThatHaveItemKey(itemKey: ItemKey): Array<GroupKey> {
     const groupKeys: Array<GroupKey> = [];
     for (const groupKey in this.groups) {
-      const group = this.getGroup(groupKey, { notExisting: true });
+      const group = this.groups[groupKey];
       if (group?.has(itemKey)) groupKeys.push(groupKey);
     }
     return groupKeys;
   }
 
-  //=========================================================================================================
-  // Remove
-  //=========================================================================================================
   /**
+   * Removes Item/s from:
+   *
+   * - `.everywhere()`:
+   *    Removes Item/s from the entire Collection and all its Groups and Selectors (i.e. from everywhere)
+   *    ```
+   *    MY_COLLECTION.remove('1').everywhere();
+   *    // is equivalent to
+   *    MY_COLLECTION.removeItems('1');
+   *    ```
+   * - `.fromGroups()`:
+   *   Removes Item/s only from specified Groups.
+   *   ```
+   *    MY_COLLECTION.remove('1').fromGroups(['1', '2']);
+   *    // is equivalent to
+   *    MY_COLLECTION.removeFromGroups('1', ['1', '2']);
+   *    ```
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#remove)
+   *
    * @public
-   * Remove Items from Collection
-   * @param itemKeys - ItemKey/s that get removed
+   * @param itemKeys - Item/s with identifier/s to be removed.
    */
   public remove(
     itemKeys: ItemKey | Array<ItemKey>
@@ -1110,14 +1190,14 @@ export class Collection<DataType extends Object = DefaultItem> {
     };
   }
 
-  //=========================================================================================================
-  // Remove From Groups
-  //=========================================================================================================
   /**
+   * Remove Item/s from Group/s.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removefromgroups)
+   *
    * @public
-   * Removes Item/s from Group/s
-   * @param itemKeys - ItemKey/s that get removed from Group/s
-   * @param groupKeys - GroupKey/s of Group/s form which the ItemKey/s will be removed
+   * @param itemKeys - Item/s with identifier/s to be removed from Group/s.
+   * @param groupKeys - Group/s with identifier/s the Item/s are to remove from.
    */
   public removeFromGroups(
     itemKeys: ItemKey | Array<ItemKey>,
@@ -1129,7 +1209,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     _itemKeys.forEach((itemKey) => {
       let removedFromGroupsCount = 0;
 
-      // Remove ItemKey from Groups
+      // Remove itemKey from Groups
       _groupKeys.forEach((groupKey) => {
         const group = this.getGroup(groupKey, { notExisting: true });
         if (!group?.has(itemKey)) return;
@@ -1137,7 +1217,8 @@ export class Collection<DataType extends Object = DefaultItem> {
         removedFromGroupsCount++;
       });
 
-      // If Item got removed from every Groups the Item was in, remove it completely
+      // If the Item was removed from each Group in which it was represented,
+      // remove it completely
       if (
         removedFromGroupsCount >=
         this.getGroupKeysThatHaveItemKey(itemKey).length
@@ -1148,13 +1229,13 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this;
   }
 
-  //=========================================================================================================
-  // Remove Items
-  //=========================================================================================================
   /**
+   * Removes Item/s from the entire Collection and all its Groups and Selectors
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removeitems)
+   *
    * @public
-   * Removes Item completely from Collection
-   * @param itemKeys - ItemKey/s of Item/s
+   * @param itemKeys - Item/s with identifier/s to be removed from the entire Collection.
    * @param config - Config
    */
   public removeItems(
@@ -1184,16 +1265,18 @@ export class Collection<DataType extends Object = DefaultItem> {
       // Remove Item from Collection
       delete this.data[itemKey];
 
-      // Reselect or remove Selectors representing the removed Item
+      // Reselect or remove Selectors which have represented the removed Item
       for (const selectorKey in this.selectors) {
         const selector = this.getSelector(selectorKey, { notExisting: true });
-        if (selector?.hasSelected(itemKey, false)) {
+        if (selector != null && selector.hasSelected(itemKey, false)) {
           if (config.removeSelector) {
             // Remove Selector
-            this.removeSelector(selector?._key ?? 'unknown');
+            this.removeSelector(selector._key ?? 'unknown');
           } else {
-            // Reselect Item in Selector (to create new dummyItem to hold a reference to this removed Item)
-            selector?.reselect({ force: true });
+            // Reselect Item in Selector
+            // in order to create a new dummyItem
+            // to hold a reference to the now not existing Item
+            selector.reselect({ force: true });
           }
         }
       }
@@ -1318,14 +1401,12 @@ export class Collection<DataType extends Object = DefaultItem> {
     return true;
   }
 
-  //=========================================================================================================
-  // Rebuild Groups That Includes Item Key
-  //=========================================================================================================
   /**
+   * Rebuilds all Groups that include the specified `itemKey`.
+   *
    * @internal
-   * Rebuilds Groups that include the provided ItemKey
-   * @itemKey - Item Key
-   * @config - Config
+   * @itemKey - `itemKey` Groups must contain to be rebuilt.
+   * @config - Configuration object
    */
   public rebuildGroupsThatIncludeItemKey(
     itemKey: ItemKey,
@@ -1339,16 +1420,17 @@ export class Collection<DataType extends Object = DefaultItem> {
       },
     });
 
-    // Rebuild Groups that include ItemKey
+    // Rebuild Groups that include itemKey
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey);
       if (group?.has(itemKey)) {
-        // group.rebuild(); Not necessary because a sideEffect of the Group is to rebuild it self
+        // Not necessary because a sideEffect of ingesting the Group is to rebuilt it self
+        // group.rebuild();
         group?.ingest({
           background: config?.background,
-          force: true, // because Group value doesn't change only the output changes
+          force: true, // because Group value didn't change, only the output changes
           sideEffects: config?.sideEffects,
-          storage: false, // because Group only rebuilds and doesn't change its value
+          storage: false, // because Group only rebuilds -> actual value hasn't changed
         });
       }
     }

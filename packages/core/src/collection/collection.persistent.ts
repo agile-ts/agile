@@ -314,7 +314,7 @@ export class CollectionPersistent<
    * Adds and removes Items from the Storage based on the Group value.
    *
    * @internal
-   * @param group - Group whose Items should be dynamically added and removed from the Storage.
+   * @param group - Group whose Items are to be dynamically added or removed from the Storage.
    * @param storageItemKey - Prefix key of persisted Collection Instances. | default = Persistent.key |
    */
   public rebuildStorageSideEffect(

@@ -370,20 +370,26 @@ export class State<ValueType = any> {
     return !!this.watchers[key];
   }
 
-  //=========================================================================================================
-  // Persist
-  //=========================================================================================================
   /**
+   * Preserves the State `value` in the corresponding external Storage.
+   *
+   * The State key/name is used as the unique identifier for the Persistent.
+   * If that is not desired, please specify a unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
    * @public
-   * Stores State Value into Agile Storage permanently
-   * @param config - Config
+   * @param config - Configuration object
    */
   public persist(config?: StatePersistentConfigInterface): this;
   /**
+   * Preserves the State `value` in the corresponding external Storage.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
    * @public
-   * Stores State Value into Agile Storage permanently
-   * @param key - Key/Name of created Persistent (Note: Key required if State has no set Key!)
-   * @param config - Config
+   * @param key - Key/Name identifier of Persistent.
+   * @param config - Configuration object
    */
   public persist(
     key?: PersistentKey,
@@ -413,7 +419,7 @@ export class State<ValueType = any> {
     // Check if State is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
-    // Create persistent -> Persist Value
+    // Create Persistent -> persist value
     this.persistent = new StatePersistent<ValueType>(this, {
       instantiate: _config.loadValue,
       storageKeys: _config.storageKeys,
@@ -424,27 +430,30 @@ export class State<ValueType = any> {
     return this;
   }
 
-  //=========================================================================================================
-  // On Load
-  //=========================================================================================================
   /**
+   * Fires immediately after the persisted `value`
+   * is loaded into the State from corresponding the external Storage.
+   *
+   * Registering this callback only makes sense when the State is [persisted](https://agile-ts.org/docs/core/state/methods/#persist).
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#onload)
+   *
    * @public
-   * Callback Function that gets called if the persisted Value gets loaded into the State for the first Time
-   * Note: Only useful for persisted States!
-   * @param callback - Callback Function
+   * @param callback - Callback function
    */
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
 
-    // Check if Callback is valid Function
+    // Check if provided callback is valid function
     if (!isFunction(callback)) {
       LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
       return this;
     }
 
+    // Register provided callback
     this.persistent.onLoad = callback;
 
-    // If State is already 'isPersisted' the loading was successful -> callback can be called
+    // If State is already persisted ('isPersisted') fire provided callback immediately
     if (this.isPersisted) callback(true);
 
     return this;
