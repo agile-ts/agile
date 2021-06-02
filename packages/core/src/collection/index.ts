@@ -138,7 +138,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#group)
    *
    * @public
-   * @param initialItems - Initial keys of Items that the Group should represent.
+   * @param initialItems - Initial keys of Items to be represented by the Group.
    * @param config - Configuration object
    */
   public Group(
@@ -163,7 +163,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#selector)
    *
    * @public
-   * @param initialKey - Initial key of the Item that the Selector should represent.
+   * @param initialKey - Initial key of Items to be represented by the Selector.
    * @param config - Configuration object
    */
   public Selector(
@@ -184,7 +184,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * The Groups are then assigned to the Collection after a successful set up.
    *
    * @internal
-   * @param groups - Groups or Group keys to be setup.
+   * @param groups - Entire Groups or Group keys to be set up.
    */
   public initGroups(groups: { [key: string]: Group<any> } | string[]): void {
     if (!groups) return;
@@ -216,7 +216,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * and assigns them to the Collection if they are valid.
    *
    * @internal
-   * @param selectors - Selectors or Selector keys to be setup.
+   * @param selectors - Entire Selectors or Selector keys to be set up.
    */
   public initSelectors(selectors: { [key: string]: Selector<any> } | string[]) {
     if (!selectors) return;
@@ -242,21 +242,26 @@ export class Collection<DataType extends Object = DefaultItem> {
     this.selectors = selectorsObject;
   }
 
-  //=========================================================================================================
-  // Collect
-  //=========================================================================================================
   /**
-   * todo
-   * collect data objects or whole items
-   * adds these data objects to the Collection
-   * Each to collect data object needs a unique primaryKey (identifier)
+   * Appends a new data object or whole Items following the same pattern to the end of the Collection.
    *
+   * Each collected data object and Item requires a unique identifier at the primaryKey property
+   * to be properly identified later. By default, 'id' is the primaryKey property.
    *
+   * For example, a valid data object would look like this:
+   *
+   * {id: 1, name: 'jeff'}
+   *
+   * 'id': PrimaryKey property with a unique identifier '1'
+   *
+   * 'name': A actual data property in this case 'jeff'.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#collect)
    *
    * @public
-   * @param data - Data that gets added to Collection
-   * @param groupKeys - Add collected Item/s to certain Groups
-   * @param config - Config
+   * @param data - Data object or Items to be added.
+   * @param groupKeys - Given data objects or Items to be added to certain Group/s.
+   * @param config - Configuration object
    */
   public collect(
     data: DataType | Item<DataType> | Array<DataType | Item<DataType>>,
@@ -274,7 +279,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       select: false,
     });
 
-    // Add default GroupKey, because Items get always added to default Group
+    // Add default groupKey, since all Items are added to the default Group
     if (!_groupKeys.includes(defaultGroupKey)) _groupKeys.push(defaultGroupKey);
 
     // Create not existing Groups
@@ -300,7 +305,7 @@ export class Collection<DataType extends Object = DefaultItem> {
         itemKey = data[primaryKey];
       }
 
-      // Add ItemKey to provided Groups and create corresponding Selector
+      // Add itemKey to provided Groups and create corresponding Selector
       if (success) {
         _groupKeys.forEach((groupKey) => {
           this.getGroup(groupKey)?.add(itemKey, {
@@ -318,15 +323,15 @@ export class Collection<DataType extends Object = DefaultItem> {
     return this;
   }
 
-  //=========================================================================================================
-  // Update
-  //=========================================================================================================
   /**
+   * Updates Item data object at give identifier key, if it exists.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#update)
+   *
    * @public
-   * Updates Item at provided Key
-   * @param itemKey - ItemKey of Item that gets updated
-   * @param changes - Changes that will be merged into the Item (flatMerge)
-   * @param config - Config
+   * @param itemKey - ItemKey of Item to be updated.
+   * @param changes - Object with changes to be merged into the Item data.
+   * @param config - Configuration object
    */
   public update(
     itemKey: ItemKey,
@@ -340,6 +345,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       background: false,
     });
 
+    // Validate passed data
     if (item == null) {
       LogCodeManager.log('1B:03:00', [itemKey, this._key]);
       return undefined;
@@ -351,17 +357,17 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     const oldItemKey = item._value[primaryKey];
     const newItemKey = changes[primaryKey] || oldItemKey;
-    const updateItemKey = oldItemKey !== newItemKey;
 
-    // Update ItemKey
-    if (updateItemKey)
+    // Update itemKey if the new itemKey differs from the old one
+    if (oldItemKey !== newItemKey)
       this.updateItemKey(oldItemKey, newItemKey, {
         background: config.background,
       });
 
-    // Patch changes into Item
+    // Patch changes into Item data object
     if (config.patch) {
-      // Delete primaryKey from 'changes' because if it has changed, it gets properly updated in 'updateItemKey' (see above)
+      // Delete primaryKey property from 'changes object' because if it has changed,
+      // it is correctly updated in the above called 'updateItemKey()' method
       if (changes[primaryKey]) delete changes[primaryKey];
 
       let patchConfig: { addNewProperties?: boolean } =
@@ -370,22 +376,19 @@ export class Collection<DataType extends Object = DefaultItem> {
         addNewProperties: true,
       });
 
-      // Apply changes to Item
       item.patch(changes as any, {
         background: config.background,
         addNewProperties: patchConfig.addNewProperties,
       });
     }
-
-    // Set changes into Item
-    if (!config.patch) {
-      // To make sure that the primaryKey doesn't differ from the changes object primaryKey
+    // Apply changes to Item data object
+    else {
+      // Ensure that the current Item identifier isn't different from the 'changes object' itemKey
       if (changes[this.config.primaryKey] !== itemKey) {
         changes[this.config.primaryKey] = itemKey;
         LogCodeManager.log('1B:02:02', [], changes);
       }
 
-      // Apply changes to Item
       item.set(changes as any, {
         background: config.background,
       });
@@ -394,21 +397,20 @@ export class Collection<DataType extends Object = DefaultItem> {
     return item;
   }
 
-  //=========================================================================================================
-  // Create Group
-  //=========================================================================================================
   /**
+   * Creates a new Group and associates it to the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#createGroup)
+   *
    * @public
-   * Creates new Group that can hold Items of Collection
-   * @param groupKey - Name/Key of Group
-   * @param initialItems - Initial ItemKeys of Group
+   * @param groupKey - Unique Group identifier of the new Group.
+   * @param initialItems - Initial keys of Items to be represented by the Group.
    */
   public createGroup(
     groupKey: GroupKey,
     initialItems: Array<ItemKey> = []
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
-
     if (!this.isInstantiated) LogCodeManager.log('1B:02:03');
 
     // Check if Group already exists
@@ -421,21 +423,22 @@ export class Collection<DataType extends Object = DefaultItem> {
       return group;
     }
 
-    // Create Group
+    // Create new Group
     group = new Group<DataType>(this, initialItems, { key: groupKey });
     this.groups[groupKey] = group;
 
     return group;
   }
 
-  //=========================================================================================================
-  // Has Group
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether an Group with the specified groupKey
+   * exists in the Collection or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasgroup)
+   *
    * @public
-   * Check if Group exists in Collection
-   * @param groupKey - Key/Name of Group
-   * @param config - Config
+   * @param groupKey - Key/Name identifier of Group.
+   * @param config - Configuration object
    */
   public hasGroup(
     groupKey: GroupKey | undefined,
@@ -445,13 +448,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Retrieves a single Group by key/name.
+   * Retrieves a single Group with the specified key/name identifier from the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroup)
    *
    * @public
-   * @param groupKey - key/name Group identifier
-   * @param config - Configuration
+   * @param groupKey - Key/Name identifier of Group.
+   * @param config - Configuration object
    */
   public getGroup(
     groupKey: GroupKey | undefined,
@@ -465,19 +468,22 @@ export class Collection<DataType extends Object = DefaultItem> {
     const group = groupKey ? this.groups[groupKey] : undefined;
 
     // Check if Group exists
-    if (group == null || (!config.notExisting && group.isPlaceholder))
+    if (group == null || (!config.notExisting && group.exists))
       return undefined;
 
     ComputedTracker.tracked(group.observer);
     return group;
   }
 
-  //=========================================================================================================
-  // Get Default Group
-  //=========================================================================================================
   /**
+   * Retrieves the default Group from the Collection.
+   *
+   * Every Collection has a default Group,
+   * which represents the main pattern of the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getdefaultgroup)
+   *
    * @public
-   * Get default Group of Collection
    */
   public getDefaultGroup(): Group<DataType> | undefined {
     return this.getGroup(this.config.defaultGroupKey);
@@ -606,7 +612,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const selector = selectorKey ? this.selectors[selectorKey] : undefined;
 
     // Check if Selector exists
-    if (selector == null || (!config.notExisting && selector.isPlaceholder))
+    if (selector == null || (!config.notExisting && selector.exists))
       return undefined;
 
     ComputedTracker.tracked(selector.observer);
