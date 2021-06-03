@@ -40,7 +40,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   public isInstantiated = false; // Whether the Collection is instantiated completely
 
   /**
-   * A Collection provides a reactive set of Information
+   * A Collection manages a reactive set of Information
    * that we need to remember globally at a later point in time.
    * While providing a toolkit to use and mutate this set of Information.
    *
@@ -134,7 +134,10 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Creates a new Group without associating it to the Collection.
    *
    * This way of creating a Group is intended for use in the Collection configuration object,
-   * where the `constructor()` takes care of the associating.
+   * where the `constructor()` takes care of the binding.
+   *
+   * After a successful initiation of the Collection we recommend using `createGroup()`,
+   * because it automatically connects the Group to the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#group)
    *
@@ -159,7 +162,10 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Creates a new Selector without associating it to the Collection.
    *
    * This way of creating a Selector is intended for use in the Collection configuration object,
-   * where the `constructor()` takes care of the associating.
+   * where the `constructor()` takes care of the binding.
+   *
+   * After a successful initiation of the Collection we recommend using `createSelector()`,
+   * because it automatically connects the Group to the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#selector)
    *
@@ -184,7 +190,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Sets up the specified Groups or Group keys
    * and assigns them to the Collection if they are valid.
    *
-   * It also assigns the default Group to the Collection.
+   * It also instantiates and assigns the default Group to the Collection.
    * The default Group reflects the default pattern of the Collection.
    *
    * @internal
@@ -194,7 +200,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (!groups) return;
     let groupsObject: { [key: string]: Group<DataType> } = {};
 
-    // If groups is Array of Group names/keys, create the Groups based these keys
+    // If groups is Array of Group keys/names, create the Groups based on these keys
     if (Array.isArray(groups)) {
       groups.forEach((groupKey) => {
         groupsObject[groupKey] = new Group<DataType>(this, [], {
@@ -226,7 +232,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (!selectors) return;
     let selectorsObject: { [key: string]: Selector<DataType> } = {};
 
-    // If selectors is Array of Selector names/keys, create the Selectors based these keys
+    // If selectors is Array of Selector keys/names, create the Selectors based on these keys
     if (Array.isArray(selectors)) {
       selectors.forEach((selectorKey) => {
         selectorsObject[selectorKey] = new Selector<DataType>(
@@ -256,7 +262,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * it must contain such unique identifier at 'id'
    * to be added to the Collection.
    * ```
-   * MY_COLLECTION.collect({id: '1', name: 'jeff'});
+   * MY_COLLECTION.collect({id: '1', name: 'jeff'}); // valid
+   * MY_COLLECTION.collect({name: 'frank'}); // invalid
    * ```
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#collect)
@@ -328,7 +335,7 @@ export class Collection<DataType extends Object = DefaultItem> {
 
   /**
    * Updates the Item `data object` with the specified `object with changes`, if the Item exists.
-   * By default the `object with changes` is merged into the Item `data object`.
+   * By default the `object with changes` is merged into the Item `data object` at top level.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#update)
    *
@@ -407,7 +414,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#createGroup)
    *
    * @public
-   * @param groupKey - Unique identifier of the to create Group.
+   * @param groupKey - Unique identifier of the Group to be created.
    * @param initialItems - Initial keys of Items to be represented by the Group.
    */
   public createGroup(
@@ -487,6 +494,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Every Collection should have a default Group,
    * which represents the default pattern of the Collection.
    *
+   * If the default Group, for what ever reason, doesn't exist, `undefined` is returned.
+   *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getdefaultgroup)
    *
    * @public
@@ -530,11 +539,24 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removegroup)
    *
    * @public
-   * @param groupKey - Key/Name identifier of Group.
+   * @param groupKey - Key/Name identifier of Group to be removed.
    */
   public removeGroup(groupKey: GroupKey): this {
     if (this.groups[groupKey] != null) delete this.groups[groupKey];
     return this;
+  }
+
+  /**
+   * Returns the count of registered Groups in the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupcount)
+   *
+   * @public
+   */
+  public getGroupCount(): number {
+    let size = 0;
+    Object.keys(this.groups).map(() => size++);
+    return size;
   }
 
   /**
@@ -543,7 +565,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#createSelector)
    *
    * @public
-   * @param selectorKey - Unique identifier of the to create Selector.
+   * @param selectorKey - Unique identifier of Selector to be created.
    * @param itemKey - Initial key of Item to be represented by the Selector.
    */
   public createSelector(
@@ -585,7 +607,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#select)
    *
    * @public
-   * @param itemKey - ItemKey to be selected.
+   * @param itemKey - Initial key of Item to be represented by the Selector
+   * and used as unique identifier of the Selector.
    */
   public select(itemKey: ItemKey): Selector<DataType> {
     return this.createSelector(itemKey, itemKey);
@@ -679,7 +702,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removeselector)
    *
    * @public
-   * @param selectorKey - Key/Name identifier of Selector.
+   * @param selectorKey - Key/Name identifier of Selector to be removed.
    */
   public removeSelector(selectorKey: SelectorKey): this {
     if (this.selectors[selectorKey] != null) {
@@ -687,6 +710,19 @@ export class Collection<DataType extends Object = DefaultItem> {
       delete this.selectors[selectorKey];
     }
     return this;
+  }
+
+  /**
+   * Returns the count of registered Selectors in the Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselectorcount)
+   *
+   * @public
+   */
+  public getSelectorCount(): number {
+    let size = 0;
+    Object.keys(this.selectors).map(() => size++);
+    return size;
   }
 
   /**
@@ -763,7 +799,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    *
    * @internal
    * @param itemKey - Unique identifier of the to create placeholder Item.
-   * @param addToCollection - Whether the created Item should be added to the Collection.
+   * @param addToCollection - Whether to add the Item to be created to the Collection.
    */
   public createPlaceholderItem(
     itemKey: ItemKey,
@@ -773,7 +809,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const item = new Item<DataType>(
       this,
       {
-        [this.config.primaryKey]: itemKey, // Setting PrimaryKey of Item to passed itemKey
+        [this.config.primaryKey]: itemKey, // Setting primaryKey of Item to passed itemKey
         dummy: 'item',
       } as any,
       { isPlaceholder: true }
@@ -794,7 +830,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Retrieves the value (data object) of a single Item
    * with the specified key/name identifier from the Collection.
    *
-   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   * If the to retrieve Item containing the value doesn't exist, `undefined` is returned.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitemvalue)
    *
@@ -832,13 +868,14 @@ export class Collection<DataType extends Object = DefaultItem> {
     const defaultGroup = this.getDefaultGroup();
     let items: Array<Item<DataType>> = [];
 
-    // If config.notExisting transform this.data into array, otherwise return the default Group items
+    // If config.notExisting transform the data object into array since it contains all Items,
+    // otherwise return the default Group Items
     if (config.notExisting) {
       for (const key in this.data) items.push(this.data[key]);
     } else {
-      // Why defaultGroup Items and not all .exists === true Items?
-      // Because the default Group keeps track of all existing Items
-      // It also does control the Collection output in useAgile()
+      // Why default Group Items and not all '.exists === true' Items?
+      // Because the default Group keeps track of all existing Items.
+      // It also does control the Collection output in binding methods like 'useAgile()'
       // and therefore should do it here too.
       items = defaultGroup?.items || [];
     }
@@ -868,7 +905,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Preserves the Collection `value` in the corresponding external Storage.
    *
    * The Collection key/name is used as the unique identifier for the Persistent.
-   * If that is not desired, please specify a unique identifier for the Persistent.
+   * If that is not desired or the Collection has no unique identifier,
+   * please specify a separate unique identifier for the Persistent.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#persist)
    *
@@ -878,6 +916,8 @@ export class Collection<DataType extends Object = DefaultItem> {
   public persist(config?: CollectionPersistentConfigInterface): this;
   /**
    * Preserves the Collection `value` in the corresponding external Storage.
+   *
+   * The specified key is used as the unique identifier for the Persistent.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#persist)
    *
@@ -913,7 +953,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Check if Collection is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
-    // Create Persistent -> persist value
+    // Create Persistent (-> persist value)
     this.persistent = new CollectionPersistent<DataType>(this, {
       instantiate: _config.loadValue,
       storageKeys: _config.storageKeys,
@@ -955,34 +995,8 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Returns the count of registered Groups in the Collection.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupcount)
-   *
-   * @public
-   */
-  public getGroupCount(): number {
-    let size = 0;
-    Object.keys(this.groups).map(() => size++);
-    return size;
-  }
-
-  /**
-   * Returns the count of registered Selectors in the Collection.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselectorcount)
-   *
-   * @public
-   */
-  public getSelectorCount(): number {
-    let size = 0;
-    Object.keys(this.selectors).map(() => size++);
-    return size;
-  }
-
-  /**
    * Removes all Items from the Collection
-   * and resets the Groups and Selectors.
+   * and resets all Groups and Selectors of the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#reset)
    *
@@ -1009,7 +1023,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    *
    * @public
    * @param itemKeys - `itemKey/s` to be put into the specified Group/s.
-   * @param groupKeys - Group identifier/s the specified `itemKey/s` are to put in.
+   * @param groupKeys - Identifier/s of the Group/s the specified `itemKey/s` are to put in.
    * @param config - Configuration object
    */
   public put(
@@ -1035,8 +1049,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    *
    * @public
    * @param itemKeys - `itemKey/s` to be moved.
-   * @param oldGroupKey - Group identifier of the Group the `itemKeys` are moved from.
-   * @param newGroupKey - Group identifier of the Group the `itemKeys` are moved in.
+   * @param oldGroupKey - Identifier of the Group the `itemKey/s` are moved from.
+   * @param newGroupKey - Identifier of the Group the `itemKey/s` are moved in.
    * @param config - Configuration object
    */
   public move(
@@ -1097,11 +1111,17 @@ export class Collection<DataType extends Object = DefaultItem> {
     });
 
     // Update Persistent key of Item
-    // because it differs from the actual Item key
-    // and therefore isn't updated when the Item key is updated
-    item.persistent?.setKey(
-      CollectionPersistent.getItemStorageKey(newItemKey, this._key)
-    );
+    // if it follows the Item Storage Key pattern
+    // and therefore differs from the actual Item key
+    // (-> isn't automatically updated when the Item key is updated)
+    if (
+      item.persistent != null &&
+      item.persistent._key ===
+        CollectionPersistent.getItemStorageKey(oldItemKey, this._key)
+    )
+      item.persistent?.setKey(
+        CollectionPersistent.getItemStorageKey(newItemKey, this._key)
+      );
 
     // Update itemKey in Groups
     for (const groupKey in this.groups) {
@@ -1122,7 +1142,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       //    since the placeholder Item got overwritten
       if (selector.hasSelected(newItemKey, false)) {
         selector.reselect({
-          force: true, // Because itemKeys are the same
+          force: true, // Because itemKeys are the same (but not the Items)
           background: config.background,
         });
       }

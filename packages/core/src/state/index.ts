@@ -139,8 +139,12 @@ export class State<ValueType = any> {
     // Update key in Persistent (only if oldKey equal to persistentKey
     // because otherwise the persistentKey is detached from the State key
     // -> not managed by State anymore)
-    if (value && this.persistent?._key === oldKey)
-      this.persistent?.setKey(value);
+    if (
+      value != null &&
+      this.persistent != null &&
+      this.persistent._key === oldKey
+    )
+      this.persistent.setKey(value);
 
     return this;
   }
@@ -374,7 +378,8 @@ export class State<ValueType = any> {
    * Preserves the State `value` in the corresponding external Storage.
    *
    * The State key/name is used as the unique identifier for the Persistent.
-   * If that is not desired, please specify a unique identifier for the Persistent.
+   * If that is not desired or the State has no unique identifier,
+   * please specify a separate unique identifier for the Persistent.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
    *
@@ -384,6 +389,8 @@ export class State<ValueType = any> {
   public persist(config?: StatePersistentConfigInterface): this;
   /**
    * Preserves the State `value` in the corresponding external Storage.
+   *
+   * The specified key is used as the unique identifier for the Persistent.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
    *
@@ -419,7 +426,7 @@ export class State<ValueType = any> {
     // Check if State is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
-    // Create Persistent -> persist value
+    // Create Persistent (-> persist value)
     this.persistent = new StatePersistent<ValueType>(this, {
       instantiate: _config.loadValue,
       storageKeys: _config.storageKeys,

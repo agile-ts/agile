@@ -92,7 +92,7 @@ export class Persistent {
   public instantiatePersistent(
     config: InstantiatePersistentConfigInterface = {}
   ) {
-    this._key = this.formatKey(config.key) || Persistent.placeHolderKey;
+    this._key = this.formatKey(config.key) ?? Persistent.placeHolderKey;
     this.assignStorageKeys(config.storageKeys, config.defaultStorageKey);
     this.validatePersistent();
   }

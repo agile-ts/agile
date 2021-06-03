@@ -2118,7 +2118,13 @@ describe('Collection Tests', () => {
         dummySelector3.reselect = jest.fn();
       });
 
-      it('should update ItemKey in Collection, Selectors and Groups (default config)', () => {
+      it('should update ItemKey in Collection, Selectors, Groups and Persistent (default config)', () => {
+        if (dummyItem1.persistent)
+          dummyItem1.persistent._key = CollectionPersistent.getItemStorageKey(
+            dummyItem1._key,
+            collection._key
+          );
+
         const response = collection.updateItemKey('dummyItem1', 'newDummyItem');
 
         expect(response).toBeTruthy();
@@ -2156,7 +2162,13 @@ describe('Collection Tests', () => {
         LogMock.hasNotLogged('warn');
       });
 
-      it('should update ItemKey in Collection, Selectors and Groups (specific config)', () => {
+      it('should update ItemKey in Collection, Selectors, Groups and Persistent (specific config)', () => {
+        if (dummyItem1.persistent)
+          dummyItem1.persistent._key = CollectionPersistent.getItemStorageKey(
+            dummyItem1._key,
+            collection._key
+          );
+
         const response = collection.updateItemKey(
           'dummyItem1',
           'newDummyItem',
@@ -2196,7 +2208,13 @@ describe('Collection Tests', () => {
         LogMock.hasNotLogged('warn');
       });
 
-      it('should update ItemKey in Collection, dummy Selectors and dummy Groups (default config)', () => {
+      it('should update ItemKey in Collection, dummy Selectors, dummy Groups and Persistent (default config)', () => {
+        if (dummyItem1.persistent)
+          dummyItem1.persistent._key = CollectionPersistent.getItemStorageKey(
+            dummyItem1._key,
+            collection._key
+          );
+
         dummyGroup1.isPlaceholder = true;
         dummySelector1.isPlaceholder = true;
 
@@ -2232,6 +2250,49 @@ describe('Collection Tests', () => {
 
         LogMock.hasNotLogged('warn');
       });
+
+      it(
+        'should update ItemKey in Collection, Selectors, Groups ' +
+          "and shouldn't update it in Persistent if persist key doesn't follow the Item Storage Key pattern (default config)",
+        () => {
+          if (dummyItem1.persistent)
+            dummyItem1.persistent._key = 'randomPersistKey';
+
+          const response = collection.updateItemKey(
+            'dummyItem1',
+            'newDummyItem'
+          );
+
+          expect(response).toBeTruthy();
+
+          expect(dummyItem1.setKey).toHaveBeenCalledWith('newDummyItem', {
+            background: false,
+          });
+          expect(dummyItem2.setKey).not.toHaveBeenCalled();
+          expect(dummyItem1.persistent?.setKey).not.toHaveBeenCalled();
+          expect(dummyItem2.persistent?.setKey).not.toHaveBeenCalled();
+
+          expect(dummyGroup1.replace).toHaveBeenCalledWith(
+            'dummyItem1',
+            'newDummyItem',
+            {
+              background: false,
+            }
+          );
+          expect(dummyGroup2.replace).not.toHaveBeenCalled();
+
+          expect(dummySelector1.select).toHaveBeenCalledWith('newDummyItem', {
+            background: false,
+          });
+          expect(dummySelector2.select).not.toHaveBeenCalled();
+          expect(dummySelector3.reselect).toHaveBeenCalledWith({
+            force: true,
+            background: false,
+          });
+
+          LogMock.hasNotLogged('warn');
+        }
+      );
 
       it("shouldn't update ItemKey of Item that doesn't exist (default config)", () => {
         const response = collection.updateItemKey(
