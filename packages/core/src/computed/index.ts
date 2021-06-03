@@ -183,29 +183,29 @@ export class Computed<ComputedValueType = any> extends State<
   }
 }
 
-/**
- * @property computedDeps - Hard coded dependencies on which the Computed Class depends.
- * | Default = [] |
- */
 export interface ComputedConfigInterface extends StateConfigInterface {
+  /**
+   * Hard-coded dependencies on which the Computed Class should depend.
+   * @default []
+   */
   computedDeps?: Array<SubscribableAgileInstancesType>;
 }
 
-/**
- * @property autodetect - Whether dependencies used in the compute function should be detected automatically.
- * | Default = true |
- */
 export interface ComputeConfigInterface {
+  /**
+   * Whether dependencies used in the compute function should be detected automatically.
+   * @default true
+   */
   autodetect?: boolean;
 }
 
-/**
- * @param overwriteDeps - Whether the old hard coded dependencies
- * should be entirely overwritten with the new hard coded dependencies or merged in.
- * | Default = true |
- */
 export interface UpdateComputeFunctionConfigInterface
   extends RecomputeConfigInterface {
+  /**
+   * Whether the old hard-coded dependencies should be completely overwritten
+   * with the new ones or merged into the new ones.
+   * @default false
+   */
   overwriteDeps?: boolean;
 }
 

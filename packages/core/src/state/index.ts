@@ -99,7 +99,7 @@ export class State<ValueType = any> {
    */
   public get value(): ValueType {
     ComputedTracker.tracked(this.observer);
-    return this._value;
+    return copy(this._value);
   }
 
   /**
@@ -719,10 +719,15 @@ export interface StateConfigInterface {
   isPlaceholder?: boolean;
 }
 
-/**
- * @param addNewProperties - If new Properties gets added to the State Value
- */
-export interface PatchConfigInterface extends StateIngestConfigInterface {
+export interface PatchConfigInterface
+  extends StateIngestConfigInterface,
+    PatchOptionConfigInterface {}
+
+export interface PatchOptionConfigInterface {
+  /**
+   * Whether to add new properties to the object during the merge.
+   * @default true
+   */
   addNewProperties?: boolean;
 }
 

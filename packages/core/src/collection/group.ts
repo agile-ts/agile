@@ -56,7 +56,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    */
   public get output(): Array<DataType> {
     ComputedTracker.tracked(this.observer);
-    return this._output;
+    return copy(this._output);
   }
 
   /**
@@ -64,7 +64,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * Set Item Values of Group
    */
   public set output(value: DataType[]) {
-    this._output = value;
+    this._output = copy(value);
   }
 
   /**

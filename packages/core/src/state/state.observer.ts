@@ -124,6 +124,9 @@ export class StateObserver<ValueType = any> extends Observer {
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
 
+    // https://www.geeksforgeeks.org/object-freeze-javascript/#:~:text=Object.freeze()%20Method&text=freeze()%20which%20is%20used,the%20prototype%20of%20the%20object.
+    // if (typeof state._value === 'object') Object.freeze(state._value);
+
     // Overwrite old State Values
     if (job.config.overwrite) {
       state.initialStateValue = copy(state._value);

@@ -20,6 +20,7 @@ import {
   removeProperties,
   isFunction,
   LogCodeManager,
+  PatchOptionConfigInterface,
 } from '../internal';
 
 export class Collection<DataType extends Object = DefaultItem> {
@@ -1079,8 +1080,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * whether the Item identifier was updated successfully.
    *
    * @internal
-   * @param oldItemKey - Old Item identifier.
-   * @param newItemKey - New Item identifier.
+   * @param oldItemKey - Old key/name Item identifier.
+   * @param newItemKey - New key/name Item identifier.
    * @param config - Configuration object
    */
   public updateItemKey(
@@ -1110,8 +1111,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       background: config.background,
     });
 
-    // Update Persistent key of Item
-    // if it follows the Item Storage Key pattern
+    // Update Persistent key of Item if it follows the Item Storage Key pattern
     // and therefore differs from the actual Item key
     // (-> isn't automatically updated when the Item key is updated)
     if (
@@ -1135,14 +1135,14 @@ export class Collection<DataType extends Object = DefaultItem> {
       const selector = this.getSelector(selectorKey, { notExisting: true });
       if (selector == null) continue;
 
-      // Reselect Item in Selector that has selected the newItemKey
+      // Reselect Item in Selector that has selected the newItemKey.
       // Necessary because potential reference placeholder Item got overwritten
       // with the new (renamed) Item
       // -> has to find the new Item at selected itemKey
       //    since the placeholder Item got overwritten
       if (selector.hasSelected(newItemKey, false)) {
         selector.reselect({
-          force: true, // Because itemKeys are the same (but not the Items)
+          force: true, // Because itemKeys are the same (but not the Items at this itemKey anymore)
           background: config.background,
         });
       }
@@ -1158,7 +1158,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Returns all identifier keys/names of Group/s representing the specified `itemKey`.
+   * Returns all key/name identifiers of the Group/s containing the specified `itemKey`.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupkeysthathaveitemkey)
    *
@@ -1216,8 +1216,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removefromgroups)
    *
    * @public
-   * @param itemKeys - Item/s with identifier/s to be removed from Group/s.
-   * @param groupKeys - Group/s with identifier/s the Item/s are to remove from.
+   * @param itemKeys - Identifier/s of Item/s to be removed from Group/s.
+   * @param groupKeys - Identifier/s of Group/s the Item/s are to remove from.
    */
   public removeFromGroups(
     itemKeys: ItemKey | Array<ItemKey>,
@@ -1237,7 +1237,7 @@ export class Collection<DataType extends Object = DefaultItem> {
         removedFromGroupsCount++;
       });
 
-      // If the Item was removed from each Group in which it was represented,
+      // If the Item was removed from each Group representing the Item,
       // remove it completely
       if (
         removedFromGroupsCount >=
@@ -1250,13 +1250,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Removes Item/s from the entire Collection and all its Groups and Selectors
+   * Removes Item/s from the entire Collection and all the Collection's Groups and Selectors.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removeitems)
    *
    * @public
-   * @param itemKeys - Item/s with identifier/s to be removed from the entire Collection.
-   * @param config - Config
+   * @param itemKeys - Identifier/s of Item/s to be removed from the entire Collection.
+   * @param config - Configuration object
    */
   public removeItems(
     itemKeys: ItemKey | Array<ItemKey>,
@@ -1308,9 +1308,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Assigns provided data object to an already existing Item at itemKey.
-   * If Item at itemKey doesn't exist yet,
-   * a new Item with the data object as value is created and added to the Collection.
+   * Assigns the provided `data` object to an already existing Item
+   * with specified key/name identifier found in the `data` object.
+   * If the Item doesn't exist yet, a new Item with the `data` object as value
+   * is created and assigned to the Collection.
+   *
+   * Returns a boolean indicating
+   * whether the `data` object was assigned/updated successfully.
    *
    * @internal
    * @param data - Data object
@@ -1332,7 +1336,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       return false;
     }
 
-    // Check if data object contains valid itemKey
+    // Check if data object contains valid itemKey,
     // otherwise add random itemKey to Item
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
       LogCodeManager.log('1B:02:05', [this._key, primaryKey]);
@@ -1357,14 +1361,18 @@ export class Collection<DataType extends Object = DefaultItem> {
     }
 
     // Increase size of Collection if Item was previously a placeholder
-    // (-> didn't officially exit in Collection)
+    // (-> hasn't officially existed in Collection before)
     if (wasPlaceholder) this.size++;
 
     return true;
   }
 
   /**
-   * Adds provided Item to the Collection.
+   * Assigns the specified Item to the Collection
+   * at the key/name identifier of the Item.
+   *
+   * And returns a boolean indicating
+   * whether the Item was assigned successfully.
    *
    * @internal
    * @param item - Item to be added.
@@ -1382,7 +1390,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     let itemKey = item._value[primaryKey];
     let increaseCollectionSize = true;
 
-    // Check if Item has valid itemKey
+    // Check if Item has valid itemKey,
     // otherwise add random itemKey to Item
     if (!Object.prototype.hasOwnProperty.call(item._value, primaryKey)) {
       LogCodeManager.log('1B:02:05', [this._key, primaryKey]);
@@ -1410,8 +1418,8 @@ export class Collection<DataType extends Object = DefaultItem> {
     this.data[itemKey] = item;
 
     // Rebuild Groups that include itemKey
-    // after adding Item to Collection
-    // (because otherwise it can't find the Item since it doesn't exist in Collection yet)
+    // after adding Item with itemKey to the Collection
+    // (because otherwise it can't find the Item as it isn't added yet)
     this.rebuildGroupsThatIncludeItemKey(itemKey, {
       background: config.background,
     });
@@ -1422,7 +1430,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Rebuilds all Groups that include the specified `itemKey`.
+   * Rebuilds all Groups that contain the specified `itemKey`.
    *
    * @internal
    * @itemKey - `itemKey` Groups must contain to be rebuilt.
@@ -1444,13 +1452,15 @@ export class Collection<DataType extends Object = DefaultItem> {
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey);
       if (group?.has(itemKey)) {
-        // Not necessary because a sideEffect of ingesting the Group is to rebuilt it self
+        // Not necessary because a sideEffect of ingesting the Group
+        // into the runtime is to rebuilt itself
         // group.rebuild();
+
         group?.ingest({
           background: config?.background,
-          force: true, // because Group value didn't change, only the output changes
+          force: true, // because Group value didn't change, only the output might change
           sideEffects: config?.sideEffects,
-          storage: false, // because Group only rebuilds -> actual value hasn't changed
+          storage: false, // because Group only rebuilds (-> actual persisted value hasn't changed)
         });
       }
     }
@@ -1461,125 +1471,40 @@ export type DefaultItem = Record<string, any>; // same as { [key: string]: any }
 export type CollectionKey = string | number;
 export type ItemKey = string | number;
 
-/**
- * @param key - Key/Name of Collection
- * @param groups - Groups of Collection
- * @param selectors - Selectors of Collection
- * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
- * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
- * @param initialData - Initial Data of Collection
- */
 export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
+  /**
+   * Initial Groups of Collection.
+   * @default []
+   */
   groups?: { [key: string]: Group<any> } | string[];
+  /**
+   * Initial Selectors of Collection
+   * @default []
+   */
   selectors?: { [key: string]: Selector<any> } | string[];
+  /**
+   * Key/Name identifier of Collection.
+   * @default undefined
+   */
   key?: CollectionKey;
+  /**
+   * Key/Name of the property
+   * which should represent the unique Item identifier
+   * in collected data objects.
+   * @default 'id'
+   */
   primaryKey?: string;
+  /**
+   * Key/Name identifier of the default Group that is created shortly after instantiation.
+   * The default Group represents the default pattern of the Collection.
+   * @default 'default'
+   */
   defaultGroupKey?: GroupKey;
+  /**
+   * Initial data objects of the Collection.
+   * @default []
+   */
   initialData?: Array<DataType>;
-}
-
-/**
- * @param primaryKey - Name of Property that holds the PrimaryKey (default = id)
- * @param defaultGroupKey - Key/Name of Default Group that holds all collected Items
- */
-export interface CollectionConfigInterface {
-  primaryKey: string;
-  defaultGroupKey: ItemKey;
-}
-
-/**
- * @param patch - If Item gets patched into existing Item with the same Id
- * @param method - Way of adding Item to Collection (push, unshift)
- * @param forEachItem - Gets called for each Item that got collected
- * @param background - If collecting an Item happens in the background (-> not causing any rerender)
- * @param select - If collected Items get selected with a Selector
- */
-export interface CollectConfigInterface<DataType = any> {
-  patch?: boolean;
-  method?: 'push' | 'unshift';
-  forEachItem?: (
-    data: DataType | Item<DataType>,
-    key: ItemKey,
-    success: boolean,
-    index: number
-  ) => void;
-  background?: boolean;
-  select?: boolean;
-}
-
-/**
- * @param patch - If Data gets merged into the current Data
- * @param background - If updating an Item happens in the background (-> not causing any rerender)
- */
-export interface UpdateConfigInterface {
-  patch?: boolean | { addNewProperties?: boolean };
-  background?: boolean;
-}
-
-/**
- * @param background - If updating the primaryKey of an Item happens in the background (-> not causing any rerender)
- */
-export interface UpdateItemKeyConfigInterface {
-  background?: boolean;
-}
-
-/**
- * @param background - If assigning a new value happens in the background (-> not causing any rerender)
- * @param force - Force creating and performing Job
- * @param sideEffects - If Side Effects of Group gets executed
- */
-export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
-  background?: boolean;
-  force?: boolean;
-  sideEffects?: SideEffectConfigInterface;
-}
-
-/**
- * @param notExisting - If placeholder can be found
- */
-export interface HasConfigInterface {
-  notExisting?: boolean;
-}
-
-/**
- * @param loadValue - If Persistent loads the persisted value into the Collection
- * @param storageKeys - Key/Name of Storages which gets used to persist the Collection Value (NOTE: If not passed the default Storage will be used)
- * @param defaultStorageKey - Default Storage Key (if not provided it takes the first index of storageKeys or the AgileTs default Storage)
- */
-export interface CollectionPersistentConfigInterface {
-  loadValue?: boolean;
-  storageKeys?: StorageKey[];
-  defaultStorageKey?: StorageKey;
-}
-
-/**
- * @property notExisting - If not existing Items like placeholder Items can be removed.
- * Keep in mind that sometimes it won't remove the Item entirely
- * because another Instance (like a Selector) needs to keep reference to it.
- * https://github.com/agile-ts/agile/pull/152
- * @property removeSelector - If Selectors that have selected an Item to be removed, should be removed too
- */
-export interface RemoveItemsConfigInterface {
-  notExisting?: boolean;
-  removeSelector?: boolean;
-}
-
-/**
- * @property patch - If Data gets patched into existing Item
- * @property background - If assigning Data happens in background
- */
-export interface AssignDataConfigInterface {
-  patch?: boolean;
-  background?: boolean;
-}
-
-/**
- * @property overwrite - If old Item should be overwritten
- * @property background - If assigning Data happens in background
- */
-export interface AssignItemConfigInterface {
-  overwrite?: boolean;
-  background?: boolean;
 }
 
 export type CollectionConfig<DataType extends Object = DefaultItem> =
@@ -1587,3 +1512,162 @@ export type CollectionConfig<DataType extends Object = DefaultItem> =
   | ((
       collection: Collection<DataType>
     ) => CreateCollectionConfigInterface<DataType>);
+
+export interface CollectionConfigInterface {
+  /**
+   * Key/Name of the property
+   * which should represent the unique Item identifier
+   * in collected data objects.
+   * @default 'id'
+   */
+  primaryKey: string;
+  /**
+   * Key/Name identifier of the default Group that is created shortly after instantiation.
+   * The default Group represents the default pattern of the Collection.
+   * @default 'default'
+   */
+  defaultGroupKey: ItemKey;
+}
+
+export interface CollectConfigInterface<DataType = any>
+  extends AssignDataConfigInterface {
+  /**
+   * In which way the collected data should be added to the Collection.
+   * - 'push' =  at the end
+   * - 'unshift' = at the beginning
+   * @default 'push'
+   */
+  method?: 'push' | 'unshift';
+  /**
+   * Performs the specified action for each collected data object.
+   * @default undefined
+   */
+  forEachItem?: (
+    data: DataType | Item<DataType>,
+    key: ItemKey,
+    success: boolean,
+    index: number
+  ) => void;
+  /**
+   * Whether a Selector should be created for each collected data object.
+   * @default false
+   */
+  select?: boolean;
+}
+
+export interface UpdateConfigInterface {
+  /**
+   * Whether the data object with changes should be merged into the existing Item data object
+   * or overwrite it entirely.
+   * @default true
+   */
+  patch?: boolean | PatchOptionConfigInterface;
+  /**
+   * Whether the Item data object should be updated in background.
+   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * @default false
+   */
+  background?: boolean;
+}
+
+export interface UpdateItemKeyConfigInterface {
+  /**
+   * Whether the Item key/name identifier should be updated in background.
+   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * @default false
+   */
+  background?: boolean;
+}
+
+export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
+  /**
+   * Whether the Group should be rebuilt in background.
+   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * @default false
+   */
+  background?: boolean;
+  /**
+   * Whether the defined side effects should be executed.
+   * @default true
+   */
+  sideEffects?: SideEffectConfigInterface;
+}
+
+export interface HasConfigInterface {
+  /**
+   * Whether Items that do not officially exist,
+   * such as placeholder Items, can be found
+   * @default true
+   */
+  notExisting?: boolean;
+}
+
+export interface CollectionPersistentConfigInterface {
+  /**
+   * Whether the Persistent should automatically load
+   * the persisted value into the Collection after instantiation.
+   * @default true
+   */
+  loadValue?: boolean;
+  /**
+   * Key/Name identifier of Storages in which the Collection should be persisted.
+   * @default [AgileTs default Storage key]
+   */
+  storageKeys?: StorageKey[];
+  /**
+   * Default Storage key of the specified Storage keys.
+   * The Collection value is loaded from the default Storage.
+   * The value is only loaded from the remaining Storages (storageKeys)
+   * if the loading of the default Storage failed.
+   *
+   * @default first index of the specified Storage keys or the AgileTs default Storage key
+   */
+  defaultStorageKey?: StorageKey;
+}
+
+export interface RemoveItemsConfigInterface {
+  /**
+   * Whether not officially existing Items (such as placeholder Items) can be removed.
+   * Keep in mind that sometimes it won't remove the Item entirely
+   * as another Instance (like a Selector) might need to keep reference to it.
+   * https://github.com/agile-ts/agile/pull/152
+   * @default false
+   */
+  notExisting?: boolean;
+  /**
+   * Whether to remove Selectors that have selected an Item to be removed.
+   * @default false
+   */
+  removeSelector?: boolean;
+}
+
+export interface AssignDataConfigInterface {
+  /**
+   * When the Item identifier of the to assign data object already exists in the Collection,
+   * whether then the newly assigned data should be merged into the existing one
+   * or overwrite it entirely.
+   * @default true
+   */
+  patch?: boolean;
+  /**
+   * Whether to assign the data object to the Collection in background.
+   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * @default false
+   */
+  background?: boolean;
+}
+
+export interface AssignItemConfigInterface {
+  /**
+   * If an Item with the Item identifier already exists,
+   * whether it should then be overwritten with the new Item.
+   * @default false
+   */
+  overwrite?: boolean;
+  /**
+   * Whether to assign the Item to the Collection in background.
+   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * @default false
+   */
+  background?: boolean;
+}

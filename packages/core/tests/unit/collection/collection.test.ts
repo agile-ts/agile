@@ -1664,7 +1664,7 @@ describe('Collection Tests', () => {
       it('should return existing Item Value (default config)', () => {
         const response = collection.getItemValue('1');
 
-        expect(response).toBe(dummyItem._value);
+        expect(response).toStrictEqual(dummyItem._value);
         expect(collection.getItem).toHaveBeenCalledWith('1', {});
       });
 
@@ -1691,7 +1691,7 @@ describe('Collection Tests', () => {
           notExisting: true,
         });
 
-        expect(response).toBe(dummyItem._value);
+        expect(response).toStrictEqual(dummyItem._value);
         expect(collection.getItem).toHaveBeenCalledWith('1', {
           notExisting: true,
         });
