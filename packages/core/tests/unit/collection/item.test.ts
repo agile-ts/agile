@@ -94,8 +94,44 @@ describe('Item Tests', () => {
     expect(item.selectedBy.size).toBe(0);
   });
 
+  it("should create Item and shouldn't add rebuild Group side effect to it if no itemKey was provided (default config)", () => {
+    // Overwrite addRebuildGroupThatIncludeItemKeySideEffect once to not call it
+    jest
+      .spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect')
+      .mockReturnValueOnce(undefined);
+
+    const dummyData = { name: 'dummyName' };
+    const item = new Item(dummyCollection, dummyData as any);
+
+    expect(item.collection()).toBe(dummyCollection);
+    expect(
+      item.addRebuildGroupThatIncludeItemKeySideEffect
+    ).not.toHaveBeenCalled();
+
+    expect(item._key).toBeUndefined();
+    expect(item.valueType).toBeUndefined();
+    expect(item.isSet).toBeFalsy();
+    expect(item.isPlaceholder).toBeFalsy();
+    expect(item.initialStateValue).toStrictEqual(dummyData);
+    expect(item._value).toStrictEqual(dummyData);
+    expect(item.previousStateValue).toStrictEqual(dummyData);
+    expect(item.nextStateValue).toStrictEqual(dummyData);
+    expect(item.observer).toBeInstanceOf(StateObserver);
+    expect(item.observer.dependents.size).toBe(0);
+    expect(item.observer._key).toBe(
+      dummyData[dummyCollection.config.primaryKey]
+    );
+    expect(item.sideEffects).toStrictEqual({});
+    expect(item.computeValueMethod).toBeUndefined();
+    expect(item.computeExistsMethod).toBeInstanceOf(Function);
+    expect(item.isPersisted).toBeFalsy();
+    expect(item.persistent).toBeUndefined();
+    expect(item.watchers).toStrictEqual({});
+    expect(item.selectedBy.size).toBe(0);
+  });
+
   describe('Item Function Tests', () => {
-    let item: Item;
+    let item: Item<ItemInterface>;
 
     beforeEach(() => {
       item = new Item(dummyCollection, { id: 'dummyId', name: 'dummyName' });

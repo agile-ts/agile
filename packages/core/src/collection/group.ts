@@ -234,20 +234,29 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     return this;
   }
 
-  //=========================================================================================================
-  // Persist
-  //=========================================================================================================
   /**
+   * Preserves the Group `value` in the corresponding external Storage.
+   *
+   * The Group key/name is used as the unique identifier for the Persistent.
+   * If that is not desired or the Group has no unique identifier,
+   * please specify a separate unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
    * @public
-   * Stores Group Value into Agile Storage permanently
-   * @param config - Config
+   * @param config - Configuration object
    */
   public persist(config?: GroupPersistConfigInterface): this;
   /**
+   * Preserves the Group `value` in the corresponding external Storage.
+   *
+   * The specified key is used as the unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
    * @public
-   * Stores Group Value into Agile Storage permanently
-   * @param key - Key/Name of created Persistent (Note: Key required if Group has no set Key!)
-   * @param config - Config
+   * @param key - Key/Name identifier of Persistent.
+   * @param config - Configuration object
    */
   public persist(
     key?: PersistentKey,
@@ -275,7 +284,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       defaultStorageKey: null,
     });
 
-    // Create storageItemKey based on Collection Name
+    // Create storageItemKey based on Collection key/name identifier
     if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this._key,
@@ -283,6 +292,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       );
     }
 
+    // Persist Group
     super.persist(key, {
       loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
