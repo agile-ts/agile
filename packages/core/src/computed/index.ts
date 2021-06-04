@@ -193,7 +193,7 @@ export interface ComputedConfigInterface extends StateConfigInterface {
 
 export interface ComputeConfigInterface {
   /**
-   * Whether dependencies used in the compute function should be detected automatically.
+   * Whether to automatically detect used dependencies in the compute method.
    * @default true
    */
   autodetect?: boolean;
@@ -202,8 +202,8 @@ export interface ComputeConfigInterface {
 export interface UpdateComputeFunctionConfigInterface
   extends RecomputeConfigInterface {
   /**
-   * Whether the old hard-coded dependencies should be completely overwritten
-   * with the new ones or merged into the new ones.
+   * Whether to overwrite the old hard-coded dependencies with the new ones
+   * or merge them into the new ones.
    * @default false
    */
   overwriteDeps?: boolean;

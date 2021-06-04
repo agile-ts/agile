@@ -1489,7 +1489,7 @@ export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
   key?: CollectionKey;
   /**
    * Key/Name of the property
-   * which should represent the unique Item identifier
+   * which represents the unique Item identifier
    * in collected data objects.
    * @default 'id'
    */
@@ -1516,7 +1516,7 @@ export type CollectionConfig<DataType extends Object = DefaultItem> =
 export interface CollectionConfigInterface {
   /**
    * Key/Name of the property
-   * which should represent the unique Item identifier
+   * which represents the unique Item identifier
    * in collected data objects.
    * @default 'id'
    */
@@ -1549,7 +1549,7 @@ export interface CollectConfigInterface<DataType = any>
     index: number
   ) => void;
   /**
-   * Whether a Selector should be created for each collected data object.
+   * Whether to create a Selector for each collected data object.
    * @default false
    */
   select?: boolean;
@@ -1557,13 +1557,13 @@ export interface CollectConfigInterface<DataType = any>
 
 export interface UpdateConfigInterface {
   /**
-   * Whether the data object with changes should be merged into the existing Item data object
-   * or overwrite it entirely.
+   * Whether to merge the data object with changes into the existing Item data object
+   * or overwrite the existing Item data object entirely.
    * @default true
    */
   patch?: boolean | PatchOptionConfigInterface;
   /**
-   * Whether the Item data object should be updated in background.
+   * Whether to update the data object in background.
    * So that the UI isn't notified of these changes and thus doesn't rerender.
    * @default false
    */
@@ -1572,7 +1572,7 @@ export interface UpdateConfigInterface {
 
 export interface UpdateItemKeyConfigInterface {
   /**
-   * Whether the Item key/name identifier should be updated in background.
+   * Whether to update the Item key/name identifier in background
    * So that the UI isn't notified of these changes and thus doesn't rerender.
    * @default false
    */
@@ -1581,13 +1581,13 @@ export interface UpdateItemKeyConfigInterface {
 
 export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
   /**
-   * Whether the Group should be rebuilt in background.
+   * Whether to rebuilt the Group in background.
    * So that the UI isn't notified of these changes and thus doesn't rerender.
    * @default false
    */
   background?: boolean;
   /**
-   * Whether the defined side effects should be executed.
+   * Whether to execute the defined side effects.
    * @default true
    */
   sideEffects?: SideEffectConfigInterface;
@@ -1605,19 +1605,20 @@ export interface HasConfigInterface {
 export interface CollectionPersistentConfigInterface {
   /**
    * Whether the Persistent should automatically load
-   * the persisted value into the Collection after instantiation.
+   * the persisted value into the Collection after its instantiation.
    * @default true
    */
   loadValue?: boolean;
   /**
-   * Key/Name identifier of Storages in which the Collection should be persisted.
+   * Key/Name identifier of Storages
+   * in which the Collection value should be or is persisted.
    * @default [AgileTs default Storage key]
    */
   storageKeys?: StorageKey[];
   /**
    * Default Storage key of the specified Storage keys.
-   * The Collection value is loaded from the default Storage.
-   * The value is only loaded from the remaining Storages (storageKeys)
+   * The Collection value is loaded from the default Storage
+   * and only loaded from the remaining Storages (storageKeys)
    * if the loading of the default Storage failed.
    *
    * @default first index of the specified Storage keys or the AgileTs default Storage key
@@ -1627,8 +1628,8 @@ export interface CollectionPersistentConfigInterface {
 
 export interface RemoveItemsConfigInterface {
   /**
-   * Whether not officially existing Items (such as placeholder Items) can be removed.
-   * Keep in mind that sometimes it won't remove the Item entirely
+   * Whether to remove not officially existing Items (such as placeholder Items).
+   * Keep in mind that sometimes it won't remove an Item entirely
    * as another Instance (like a Selector) might need to keep reference to it.
    * https://github.com/agile-ts/agile/pull/152
    * @default false
@@ -1644,8 +1645,8 @@ export interface RemoveItemsConfigInterface {
 export interface AssignDataConfigInterface {
   /**
    * When the Item identifier of the to assign data object already exists in the Collection,
-   * whether then the newly assigned data should be merged into the existing one
-   * or overwrite it entirely.
+   * whether to merge the newly assigned data into the existing one
+   * or overwrite the existing one entirely.
    * @default true
    */
   patch?: boolean;
@@ -1660,7 +1661,7 @@ export interface AssignDataConfigInterface {
 export interface AssignItemConfigInterface {
   /**
    * If an Item with the Item identifier already exists,
-   * whether it should then be overwritten with the new Item.
+   * whether to overwrite it entirely with the new one.
    * @default false
    */
   overwrite?: boolean;

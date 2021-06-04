@@ -279,7 +279,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
     _config = defineConfig(_config, {
       loadValue: true,
-      followCollectionPattern: false,
+      followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null,
     });
@@ -375,10 +375,12 @@ export interface GroupConfigInterface {
   isPlaceholder?: boolean;
 }
 
-/**
- * @param useCollectionPattern - If Group storageKey follows the Collection Group StorageKey Pattern
- */
 export interface GroupPersistConfigInterface
   extends StatePersistentConfigInterface {
+  /**
+   * Whether to format the specified Storage key into the Collection Group Storage key pattern.
+   * `_${collectionKey}_group_${groupKey}`
+   * @default true
+   */
   followCollectionPersistKeyPattern?: boolean;
 }

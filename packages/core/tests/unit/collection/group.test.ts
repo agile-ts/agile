@@ -418,56 +418,8 @@ describe('Group Tests', () => {
         jest.spyOn(State.prototype, 'persist');
       });
 
-      it('should persist Group with GroupKey (default config)', () => {
+      it('should persist Group with formatted groupKey (default config)', () => {
         group.persist();
-
-        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
-      });
-
-      it('should persist Group with GroupKey (specific config)', () => {
-        group.persist({
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-
-        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-      });
-
-      it('should persist Group with passed Key (default config)', () => {
-        group.persist('dummyKey');
-
-        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
-      });
-
-      it('should persist Group with passed Key (specific config)', () => {
-        group.persist('dummyKey', {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-
-        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-      });
-
-      it('should persist Group with formatted GroupKey (config.followCollectionPersistKeyPattern)', () => {
-        group.persist({ followCollectionPersistKeyPattern: true });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
@@ -482,8 +434,28 @@ describe('Group Tests', () => {
         );
       });
 
-      it('should persist Group with formatted passed Key (config.followCollectionPersistKeyPattern)', () => {
-        group.persist('dummyKey', { followCollectionPersistKeyPattern: true });
+      it('should persist Group with formatted groupKey (specific config)', () => {
+        group.persist({
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getGroupStorageKey(
+            group._key,
+            dummyCollection._key
+          ),
+          {
+            loadValue: false,
+            storageKeys: ['test1', 'test2'],
+            defaultStorageKey: 'test1',
+          }
+        );
+      });
+
+      it('should persist Group with formatted specified key (default config)', () => {
+        group.persist('dummyKey');
 
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
@@ -496,6 +468,46 @@ describe('Group Tests', () => {
             defaultStorageKey: null,
           }
         );
+      });
+
+      it('should persist Group with formatted specified key (specific config)', () => {
+        group.persist('dummyKey', {
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getGroupStorageKey(
+            'dummyKey',
+            dummyCollection._key
+          ),
+          {
+            loadValue: false,
+            storageKeys: ['test1', 'test2'],
+            defaultStorageKey: 'test1',
+          }
+        );
+      });
+
+      it('should persist Group with groupKey (config.followCollectionPersistKeyPattern = false)', () => {
+        group.persist({ followCollectionPersistKeyPattern: false });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
+          loadValue: true,
+          storageKeys: [],
+          defaultStorageKey: null,
+        });
+      });
+
+      it('should persist Group with specified key (config.followCollectionPersistKeyPattern = false)', () => {
+        group.persist('dummyKey', { followCollectionPersistKeyPattern: false });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
+          loadValue: true,
+          storageKeys: [],
+          defaultStorageKey: null,
+        });
       });
     });
 

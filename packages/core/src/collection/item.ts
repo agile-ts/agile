@@ -23,6 +23,8 @@ export class Item<DataType extends Object = DefaultItem> extends State<
   /**
    * An extension of the State Class that represents a single data object of a Collection.
    *
+   * It can be used independently, but is always synchronized with the Collection.
+   *
    * @public
    * @param collection - Collection to which the Item belongs.
    * @param data - Data object to be represented by the Item.
@@ -47,7 +49,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Updates key/name identifier of Persistent.
+   * Updates key/name identifier of Item.
    *
    * @internal
    * @param value - New key/name identifier.
@@ -76,16 +78,8 @@ export class Item<DataType extends Object = DefaultItem> extends State<
 
     // Update itemKey in Item value
     // (After updating the side effect, because otherwise it would call the old side effect)
-    this.patch(
-      { [this.collection().config.primaryKey]: value },
-      {
-        sideEffects: config.sideEffects,
-        background: config.background,
-        force: config.force,
-        storage: config.storage,
-        overwrite: config.overwrite,
-      }
-    );
+    this.patch({ [this.collection().config.primaryKey]: value }, config);
+
     return this;
   }
 
@@ -134,7 +128,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
 
     _config = defineConfig(_config, {
       loadValue: true,
-      followCollectionPattern: false,
+      followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null,
     });
@@ -157,20 +151,20 @@ export class Item<DataType extends Object = DefaultItem> extends State<
     return this;
   }
 
-  //=========================================================================================================
-  // Add Rebuild Group That Include ItemKey SideEffect
-  //=========================================================================================================
   /**
+   * Adds the 'Rebuild Group that include Item Key' action to the Item side effects,
+   * so that the Groups which include the Item with the identifier `itemKey`
+   * are rebuilt when the Item changes.
+   *
    * @internal
-   * Adds rebuildGroupThatIncludeItemKey to the Item sideEffects
-   * @param itemKey - ItemKey at which the groups has to rebuild
+   * @param itemKey - Item identifier that has to be included in Groups so that these Groups can be rebuilt.
    */
   public addRebuildGroupThatIncludeItemKeySideEffect(itemKey: StateKey) {
     this.addSideEffect<Item<DataType>>(
       Item.updateGroupSideEffectKey,
       (instance, config) => {
         // TODO optimise this because currently the whole Group rebuilds
-        //  although only the Item value has changed which definitely needs no complete rebuild
+        //  although only one Item value has changed which definitely needs no complete rebuild
         //   https://github.com/agile-ts/agile/issues/113
         instance.collection().rebuildGroupsThatIncludeItemKey(itemKey, config);
       },
@@ -179,17 +173,21 @@ export class Item<DataType extends Object = DefaultItem> extends State<
   }
 }
 
-/**
- * @param isPlaceholder - If Item is initially a Placeholder
- */
 export interface ItemConfigInterface {
+  /**
+   * Whether the Item should be a placeholder
+   * and therefore only exists in background.
+   * @default false
+   */
   isPlaceholder?: boolean;
 }
 
-/**
- * @param useCollectionPattern - If Item storageKey follows the Collection Item StorageKey Pattern
- */
 export interface ItemPersistConfigInterface
   extends StatePersistentConfigInterface {
+  /**
+   * Whether to format the specified Storage key into the Collection Item Storage key pattern.
+   * `_${collectionKey}_item_${itemKey}`
+   * @default true
+   */
   followCollectionPersistKeyPattern?: boolean;
 }
