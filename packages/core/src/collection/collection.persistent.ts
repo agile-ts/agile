@@ -132,6 +132,7 @@ export class CollectionPersistent<
         loadValue: false,
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
+        followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
       });
       if (defaultGroup.persistent?.ready)
         await defaultGroup.persistent.initialLoading();
@@ -149,6 +150,7 @@ export class CollectionPersistent<
           item.persist(itemStorageKey, {
             defaultStorageKey: this.config.defaultStorageKey || undefined,
             storageKeys: this.storageKeys,
+            followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
         }
         // Persist and therefore load not present Item
@@ -162,6 +164,7 @@ export class CollectionPersistent<
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey || undefined,
             storageKeys: this.storageKeys,
+            followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
           if (dummyItem?.persistent?.ready) {
             const loadedPersistedValueIntoItem = await dummyItem.persistent.loadPersistedValue(
@@ -210,6 +213,7 @@ export class CollectionPersistent<
     defaultGroup.persist(defaultGroupStorageKey, {
       defaultStorageKey: this.config.defaultStorageKey || undefined,
       storageKeys: this.storageKeys,
+      followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
     });
 
     // Persist Items found in the default Group's value
@@ -222,6 +226,7 @@ export class CollectionPersistent<
       item?.persist(itemStorageKey, {
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
+        followCollectionPersistKeyPattern: false,// Because of the dynamic 'storageItemKey', the key is already formatted above
       });
     }
 
@@ -347,6 +352,7 @@ export class CollectionPersistent<
         item.persist(itemStorageKey, {
           defaultStorageKey: this.config.defaultStorageKey || undefined,
           storageKeys: this.storageKeys,
+          followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
         });
     });
 

@@ -364,6 +364,7 @@ describe('CollectionPersistent Tests', () => {
             loadValue: false,
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
@@ -377,6 +378,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
 
@@ -438,6 +440,7 @@ describe('CollectionPersistent Tests', () => {
             loadValue: false,
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
@@ -455,6 +458,7 @@ describe('CollectionPersistent Tests', () => {
             loadValue: false,
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(placeholderItem2.persist).toHaveBeenCalledWith(
@@ -466,6 +470,7 @@ describe('CollectionPersistent Tests', () => {
             loadValue: false,
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(placeholderItem3.persist).toHaveBeenCalledWith(
@@ -477,6 +482,7 @@ describe('CollectionPersistent Tests', () => {
             loadValue: false,
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(dummyCollection.assignItem).toHaveBeenCalledWith(
@@ -539,6 +545,7 @@ describe('CollectionPersistent Tests', () => {
               loadValue: false,
               defaultStorageKey: collectionPersistent.config.defaultStorageKey,
               storageKeys: collectionPersistent.storageKeys,
+              followCollectionPersistKeyPattern: false,
             }
           );
           expect(
@@ -551,6 +558,7 @@ describe('CollectionPersistent Tests', () => {
             {
               defaultStorageKey: collectionPersistent.config.defaultStorageKey,
               storageKeys: collectionPersistent.storageKeys,
+              followCollectionPersistKeyPattern: false,
             }
           );
 
@@ -566,6 +574,7 @@ describe('CollectionPersistent Tests', () => {
               loadValue: false,
               defaultStorageKey: collectionPersistent.config.defaultStorageKey,
               storageKeys: collectionPersistent.storageKeys,
+              followCollectionPersistKeyPattern: false,
             }
           );
           expect(dummyCollection.assignItem).toHaveBeenCalledWith(
@@ -708,6 +717,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
 
@@ -719,6 +729,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(dummyItem3.persist).toHaveBeenCalledWith(
@@ -729,6 +740,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
 
@@ -757,6 +769,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
 
@@ -765,6 +778,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
         expect(dummyItem3.persist).toHaveBeenCalledWith(
@@ -772,6 +786,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
 
@@ -1180,6 +1195,7 @@ describe('CollectionPersistent Tests', () => {
           {
             defaultStorageKey: collectionPersistent.config.defaultStorageKey,
             storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
           }
         );
 

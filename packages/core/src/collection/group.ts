@@ -191,9 +191,9 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
-      // Remove itemKey from Group
-      // if it should be overwritten and already exists
-      if (this.has(itemKey)) {
+      // Remove itemKey temporary from newGroupValue
+      // if it should be overwritten and already exists in the newGroupValue
+      if (newGroupValue.includes(itemKey)) {
         if (config.overwrite) {
           newGroupValue = newGroupValue.filter((key) => key !== itemKey);
         } else {
