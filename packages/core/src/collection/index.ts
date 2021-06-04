@@ -92,6 +92,8 @@ export class Collection<DataType extends Object = DefaultItem> {
   /**
    * Updates key/name identifier of Collection.
    *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/properties#key)
+   *
    * @public
    * @param value - New key/name identifier.
    */
@@ -101,6 +103,8 @@ export class Collection<DataType extends Object = DefaultItem> {
 
   /**
    * Returns key/name identifier of Collection.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/properties#key)
    *
    * @public
    */

@@ -21,8 +21,9 @@ import {
 export class Group<DataType extends Object = DefaultItem> extends State<
   Array<ItemKey>
 > {
-  static rebuildGroupSideEffectKey = 'rebuildGroup';
   collection: () => Collection<DataType>;
+
+  static rebuildGroupSideEffectKey = 'rebuildGroup';
 
   _output: Array<DataType> = []; // Output of Group
   _items: Array<() => Item<DataType>> = []; // Items of Group
@@ -38,8 +39,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/)
    *
    * @public
-   * @param collection - Collection to which the Item belongs.
-   * @param initialItems - Identifiers of the Items to be clustered by the Group.
+   * @param collection - Collection to which the Group belongs.
+   * @param initialItems - Key/Name identifiers of the Items to be clustered by the Group.
    * @param config - Configuration object
    */
   constructor(
@@ -61,6 +62,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   /**
    * Retrieves values of the Items clustered by the Group.
    *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#output)
+   *
    * @public
    */
   public get output(): Array<DataType> {
@@ -75,6 +78,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   /**
    * Retrieves Items clustered by the Group.
    *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#items)
+   *
    * @public
    */
   public get items(): Array<Item<DataType>> {
@@ -87,7 +92,6 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   *
    * Returns a boolean indicating whether an Item with the specified `itemKey`
    * is clustered in the Group or not.
    *
@@ -321,7 +325,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
     const groupItems: Array<Item<DataType>> = [];
 
-    // Don't rebuild Group if Collection isn't correctly instantiated
+    // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
     // contains the Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
@@ -385,7 +389,7 @@ export interface GroupConfigInterface {
   key?: GroupKey;
   /**
    * Whether the Group should be a placeholder
-   * and therefore should only exists in the background.
+   * and therefore should only exist in the background.
    * @default false
    */
   isPlaceholder?: boolean;

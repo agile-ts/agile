@@ -176,7 +176,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
 export interface ItemConfigInterface {
   /**
    * Whether the Item should be a placeholder
-   * and therefore should only exists in the background.
+   * and therefore should only exist in the background.
    * @default false
    */
   isPlaceholder?: boolean;

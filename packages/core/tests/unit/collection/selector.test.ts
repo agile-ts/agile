@@ -29,7 +29,7 @@ describe('Selector Tests', () => {
     const selector = new Selector(dummyCollection, 'dummyItemKey');
 
     expect(selector.collection()).toBe(dummyCollection);
-    expect(selector.item).toBeUndefined();
+    expect(selector._item).toBeUndefined();
     expect(selector._itemKey).toBe('dummyItemKey');
     expect(selector.select).toHaveBeenCalledWith('dummyItemKey', {
       overwrite: true,
@@ -65,7 +65,7 @@ describe('Selector Tests', () => {
     });
 
     expect(selector.collection()).toBe(dummyCollection);
-    expect(selector.item).toBeUndefined();
+    expect(selector._item).toBeUndefined();
     expect(selector._itemKey).toBe('dummyItemKey');
     expect(selector.select).toHaveBeenCalledWith('dummyItemKey', {
       overwrite: true,
@@ -101,7 +101,7 @@ describe('Selector Tests', () => {
     });
 
     expect(selector.collection()).toBe(dummyCollection);
-    expect(selector.item).toBeUndefined();
+    expect(selector._item).toBeUndefined();
     expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
     expect(selector.select).not.toHaveBeenCalled();
 
@@ -143,18 +143,42 @@ describe('Selector Tests', () => {
     describe('itemKey set function tests', () => {
       it('should call select function with passed value', () => {
         selector.select = jest.fn();
+        selector._itemKey = null as any;
 
         selector.itemKey = 'newItemKey';
 
         expect(selector.select).toHaveBeenCalledWith('newItemKey');
+        expect(selector._itemKey).toBeNull();
       });
     });
 
     describe('itemKey get function tests', () => {
-      it('should return current ItemKey of Selector', () => {
+      it('should return currently selected ItemKey of Selector', () => {
         selector._itemKey = 'coolItemKey';
 
         expect(selector.itemKey).toBe('coolItemKey');
+      });
+    });
+
+    describe('item set function tests', () => {
+      it('should call select function with passed Item identifier', () => {
+        selector.select = jest.fn();
+        selector._item = null as any;
+
+        dummyItem1._key = 'AReallyCoolKey';
+
+        selector.item = dummyItem1;
+
+        expect(selector.select).toHaveBeenCalledWith('AReallyCoolKey');
+        expect(selector._item).toBeNull();
+      });
+    });
+
+    describe('item get function tests', () => {
+      it('should return currently selected Item of Selector', () => {
+        selector._item = dummyItem1;
+
+        expect(selector.item).toBe(dummyItem1);
       });
     });
 
@@ -185,7 +209,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector._itemKey).toBe('dummyItem2');
-        expect(selector.item).toBe(dummyItem2);
+        expect(selector._item).toBe(dummyItem2);
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
@@ -233,7 +257,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector._itemKey).toBe('dummyItem2');
-        expect(selector.item).toBe(dummyItem2);
+        expect(selector._item).toBe(dummyItem2);
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: true,
@@ -270,7 +294,7 @@ describe('Selector Tests', () => {
 
         expect(dummyCollection.getItemWithReference).not.toHaveBeenCalled();
         expect(selector._itemKey).toBe('dummyItem1');
-        expect(selector.item).toBe(dummyItem1);
+        expect(selector._item).toBe(dummyItem1);
         expect(selector.unselect).not.toHaveBeenCalled();
         expect(selector.rebuildSelector).not.toHaveBeenCalled();
         expect(selector.addSideEffect).not.toHaveBeenCalled();
@@ -292,7 +316,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector._itemKey).toBe('dummyItem1');
-        expect(selector.item).toBe(dummyItem1);
+        expect(selector._item).toBe(dummyItem1);
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
@@ -331,7 +355,7 @@ describe('Selector Tests', () => {
 
         expect(dummyCollection.getItemWithReference).not.toHaveBeenCalled();
         expect(selector._itemKey).toBe('dummyItem1');
-        expect(selector.item).toBe(dummyItem1);
+        expect(selector._item).toBe(dummyItem1);
         expect(selector.unselect).not.toHaveBeenCalled();
         expect(selector.rebuildSelector).not.toHaveBeenCalled();
         expect(selector.addSideEffect).not.toHaveBeenCalled();
@@ -353,7 +377,7 @@ describe('Selector Tests', () => {
         );
 
         expect(selector._itemKey).toBe('dummyItem2');
-        expect(selector.item).toBe(dummyItem2);
+        expect(selector._item).toBe(dummyItem2);
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
@@ -394,7 +418,7 @@ describe('Selector Tests', () => {
           'dummyItem2'
         );
         expect(selector._itemKey).toBe('dummyItem2');
-        expect(selector.item).toBe(dummyItem2);
+        expect(selector._item).toBe(dummyItem2);
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
@@ -435,7 +459,7 @@ describe('Selector Tests', () => {
           'dummyItem2'
         );
         expect(selector._itemKey).toBe('dummyItem2');
-        expect(selector.item).toBe(dummyItem2);
+        expect(selector._item).toBe(dummyItem2);
         expect(selector.unselect).toHaveBeenCalledWith({ background: true });
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
           background: false,
@@ -589,7 +613,7 @@ describe('Selector Tests', () => {
           Selector.rebuildSelectorSideEffectKey
         );
 
-        expect(selector.item).toBeUndefined();
+        expect(selector._item).toBeUndefined();
         expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
         expect(selector.isPlaceholder).toBeTruthy();
         expect(selector.rebuildSelector).toHaveBeenCalledWith({});
@@ -609,7 +633,7 @@ describe('Selector Tests', () => {
           Selector.rebuildSelectorSideEffectKey
         );
 
-        expect(selector.item).toBeUndefined();
+        expect(selector._item).toBeUndefined();
         expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
         expect(selector.isPlaceholder).toBeTruthy();
         expect(selector.rebuildSelector).toHaveBeenCalledWith({
@@ -631,7 +655,7 @@ describe('Selector Tests', () => {
           Selector.rebuildSelectorSideEffectKey
         );
 
-        expect(selector.item).toBeUndefined();
+        expect(selector._item).toBeUndefined();
         expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
         expect(selector.isPlaceholder).toBeTruthy();
         expect(selector.rebuildSelector).toHaveBeenCalledWith({});
@@ -646,7 +670,7 @@ describe('Selector Tests', () => {
       });
 
       it('should return true if Selector has selected itemKey correctly and Item isSelected', () => {
-        if (selector.item) selector.item.selectedBy.add(selector._key as any);
+        if (selector._item) selector._item.selectedBy.add(selector._key as any);
 
         expect(selector.hasSelected('dummyItemKey')).toBeTruthy();
       });
@@ -660,25 +684,25 @@ describe('Selector Tests', () => {
       });
 
       it("should return false if Selector hasn't selected itemKey correctly (item = undefined)", () => {
-        selector.item = undefined;
+        selector._item = undefined;
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();
       });
 
       it("should return true if Selector hasn't selected itemKey correctly (item = undefined, correctlySelected = false)", () => {
-        selector.item = undefined;
+        selector._item = undefined;
 
         expect(selector.hasSelected('dummyItemKey', false)).toBeTruthy();
       });
 
       it("should return false if Selector has selected itemKey correctly and Item isn't isSelected", () => {
-        if (selector.item) selector.item.selectedBy = new Set();
+        if (selector._item) selector._item.selectedBy = new Set();
 
         expect(selector.hasSelected('dummyItemKey')).toBeFalsy();
       });
 
       it("should return true if Selector has selected itemKey correctly and Item isn't isSelected (correctlySelected = false)", () => {
-        if (selector.item) selector.item.selectedBy = new Set();
+        if (selector._item) selector._item.selectedBy = new Set();
 
         expect(selector.hasSelected('dummyItemKey', false)).toBeTruthy();
       });
@@ -690,15 +714,15 @@ describe('Selector Tests', () => {
       });
 
       it('should set selector value to item value (default config)', () => {
-        selector.item = dummyItem1;
+        selector._item = dummyItem1;
 
         selector.rebuildSelector();
 
-        expect(selector.set).toHaveBeenCalledWith(selector.item._value, {});
+        expect(selector.set).toHaveBeenCalledWith(selector._item._value, {});
       });
 
       it('should set selector value to item value (specific config)', () => {
-        selector.item = dummyItem1;
+        selector._item = dummyItem1;
 
         selector.rebuildSelector({
           sideEffects: {
@@ -708,7 +732,7 @@ describe('Selector Tests', () => {
           force: true,
         });
 
-        expect(selector.set).toHaveBeenCalledWith(selector.item._value, {
+        expect(selector.set).toHaveBeenCalledWith(selector._item._value, {
           sideEffects: {
             enabled: false,
           },
@@ -718,7 +742,7 @@ describe('Selector Tests', () => {
       });
 
       it('should set selector value to undefined if Item is undefined (default config)', () => {
-        selector.item = undefined;
+        selector._item = undefined;
 
         selector.rebuildSelector();
 
