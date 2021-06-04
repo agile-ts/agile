@@ -67,7 +67,8 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Updates the currently selected Item of the Selector.
+   * Updates the currently selected Item of the Selector
+   * based on the specified `itemKey`.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/selector/properties#itemkey)
    *
@@ -90,7 +91,8 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Updates the currently selected Item of the Selector.
+   * Updates the currently selected Item of the Selector
+   * based on the specified Item.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/selector/properties#item)
    *
@@ -146,7 +148,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     newItem.selectedBy.add(this._key as any);
 
     // Add side effect to the newly selected Item
-    // that rebuilds the Selector depending on the current Item value
+    // that rebuilds the Selector value depending on the current Item value
     newItem.addSideEffect(
       Selector.rebuildSelectorSideEffectKey,
       (instance, config) => this.rebuildSelector(config),
@@ -172,7 +174,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
       { weight: 90 }
     );
 
-    // Rebuild Selector for 'instantiating' the newly selected Item properly
+    // Rebuild the Selector to properly 'instantiate' the newly selected Item
     this.rebuildSelector(config);
 
     return this;
@@ -181,10 +183,11 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   /**
    * Reselects the currently selected Item.
    *
-   * This might be helpful if the Selector failed to select the Item correctly
+   * This might be helpful if the Selector failed to select the Item correctly before
    * and therefore should try to select it again.
    *
-   * You can use the 'hasSelected()' method to check whether the Item is selected correctly.
+   * You can use the 'hasSelected()' method to check
+   * whether the 'selected' Item is selected correctly.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/selector/methods#reselect)
    *
@@ -212,7 +215,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    * @param config - Configuration object
    */
   public unselect(config: StateRuntimeJobConfigInterface = {}): this {
-    // Retrieve Item from Collection because 'this._item' might be outdated
+    // Retrieve Item from the Collection because 'this._item' might be outdated
     const item = this.collection().getItem(this._itemKey, {
       notExisting: true,
     });
@@ -256,8 +259,8 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Rebuilds the Selector,
-   * which updates the Selector value based on the Item value.
+   * Rebuilds the Selector.
+   * During this process, it updates the Selector `value` based on the Item `value`.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/selector/methods#rebuild)
    *

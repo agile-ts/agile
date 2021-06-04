@@ -12,7 +12,6 @@ import {
   isValidObject,
   PersistentKey,
   ComputedTracker,
-  StateRuntimeJobConfigInterface,
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
@@ -25,9 +24,9 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
   static rebuildGroupSideEffectKey = 'rebuildGroup';
 
-  _output: Array<DataType> = []; // Output of Group
-  _items: Array<() => Item<DataType>> = []; // Items of Group
-  notFoundItemKeys: Array<ItemKey> = []; // Contains all itemKeys that couldn't be found in the Collection
+  _output: Array<DataType> = []; // Item values represented by the Group
+  _items: Array<() => Item<DataType>> = []; // Items represented by the Group
+  notFoundItemKeys: Array<ItemKey> = []; // Contains all Item identifiers for Items that couldn't be found in the Collection
 
   /**
    * An extension of the State Class that categorizes and preserves the ordering of structured data.
@@ -51,8 +50,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
 
-    // Add the 'Rebuild Group' action to the Group side effects
-    // in order to rebuild the Group whenever its value changes
+    // Add side effect to Group
+    // that rebuilds the Group whenever the Group value changes
     this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
     // Initial rebuild
@@ -60,7 +59,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Retrieves values of the Items clustered by the Group.
+   * Retrieves the values of the Items clustered by the Group.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#output)
    *
@@ -76,7 +75,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Retrieves Items clustered by the Group.
+   * Retrieves the Items clustered by the Group.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#items)
    *
@@ -105,7 +104,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Returns the count of the Items clustered in the Group.
+   * Returns the count of Items clustered by the Group.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#size)
    *
@@ -192,7 +191,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
-      // Remove itemKey from Group if it should be overwritten and already exists
+      // Remove itemKey from Group
+      // if it should be overwritten and already exists
       if (this.has(itemKey)) {
         if (config.overwrite) {
           newGroupValue = newGroupValue.filter((key) => key !== itemKey);
@@ -229,7 +229,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    *
    * @public
    * @param oldItemKey - Old `itemKey` to be replaced.
-   * @param newItemKey - New `itemKey` which replaces the specified old `itemKey`.
+   * @param newItemKey - New `itemKey` to replace the before specified old `itemKey`.
    * @param config - Configuration object
    */
   public replace(
@@ -315,7 +315,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * Rebuilds the entire `output` and `items` property of the Group.
    *
    * In doing so, it traverses the Group `value` (Item identifiers)
-   * and fetches the Items that belong to an Item identifier.
+   * and fetches the fitting Items accordingly.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#rebuild)
    *
@@ -337,7 +337,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       else notFoundItemKeys.push(itemKey);
     });
 
-    // Get Item values of fetched Items
+    // Extract Item values from the retrieved Items
     const groupOutput = groupItems.map((item) => {
       return item.getPublicValue();
     });
@@ -366,21 +366,18 @@ export interface GroupAddConfigInterface extends StateIngestConfigInterface {
    * In which way the `itemKey` should be added to the Group.
    * - 'push' =  at the end
    * - 'unshift' = at the beginning
+   * https://www.tutorialspoint.com/what-are-the-differences-between-unshift-and-push-methods-in-javascript
    * @default 'push'
    */
   method?: 'unshift' | 'push';
   /**
    * If the to add `itemKey` already exists,
-   * whether to overwrite its position with the position of the new `itemKey`.
+   * whether its position should be overwritten with the position of the new `itemKey`.
    * @default false
    */
   overwrite?: boolean;
 }
 
-/**
- * @param key - Key/Name of Group
- * @param isPlaceholder - If Group is initially a Placeholder
- */
 export interface GroupConfigInterface {
   /**
    * Key/Name identifier of Group.

@@ -90,7 +90,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates key/name identifier of Collection.
+   * Updates the key/name identifier of Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/properties#key)
    *
@@ -102,7 +102,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Returns key/name identifier of Collection.
+   * Returns the key/name identifier of Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/properties#key)
    *
@@ -113,7 +113,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates key/name identifier of Collection.
+   * Updates the key/name identifier of Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#setkey)
    *
@@ -1539,6 +1539,7 @@ export interface CollectConfigInterface<DataType = any>
    * In which way the collected data should be added to the Collection.
    * - 'push' =  at the end
    * - 'unshift' = at the beginning
+   * https://www.tutorialspoint.com/what-are-the-differences-between-unshift-and-push-methods-in-javascript
    * @default 'push'
    */
   method?: 'push' | 'unshift';

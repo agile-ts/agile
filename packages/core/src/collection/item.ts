@@ -41,15 +41,15 @@ export class Item<DataType extends Object = DefaultItem> extends State<
     });
     this.collection = () => collection;
 
-    // Add 'rebuildGroupsThatIncludeItemKey' side effect
-    // in order to rebuild all Groups that include this Item whenever it mutates
+    // Add side effect to Item
+    // that rebuilds all Groups containing the Item whenever it changes
     if (this._key != null) {
       this.addRebuildGroupThatIncludeItemKeySideEffect(this._key);
     }
   }
 
   /**
-   * Updates key/name identifier of Item.
+   * Updates the key/name identifier of Item.
    *
    * @internal
    * @param value - New key/name identifier.
@@ -152,12 +152,12 @@ export class Item<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Adds the 'Rebuild Group that include Item Key' action to the Item side effects,
-   * so that the Groups which include the Item with the identifier `itemKey`
-   * are rebuilt when the Item changes.
+   * Adds side effect to Item
+   * that rebuilds all Groups containing the specified Item identifier
+   * whenever the Item changes.
    *
    * @internal
-   * @param itemKey - Item identifier that has to be included in Groups so that these Groups are rebuilt.
+   * @param itemKey - Item identifier that has to be contained in Groups.
    */
   public addRebuildGroupThatIncludeItemKeySideEffect(itemKey: StateKey) {
     this.addSideEffect<Item<DataType>>(

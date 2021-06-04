@@ -141,7 +141,7 @@ describe('Selector Tests', () => {
     });
 
     describe('itemKey set function tests', () => {
-      it('should call select function with passed value', () => {
+      it('should call the select() method with the passed value', () => {
         selector.select = jest.fn();
         selector._itemKey = null as any;
 
@@ -153,7 +153,7 @@ describe('Selector Tests', () => {
     });
 
     describe('itemKey get function tests', () => {
-      it('should return currently selected ItemKey of Selector', () => {
+      it('should return the identifier of the Item currently selected by the Selector', () => {
         selector._itemKey = 'coolItemKey';
 
         expect(selector.itemKey).toBe('coolItemKey');
@@ -161,7 +161,7 @@ describe('Selector Tests', () => {
     });
 
     describe('item set function tests', () => {
-      it('should call select function with passed Item identifier', () => {
+      it('should call the select() method with the Item identifier of the specified Item', () => {
         selector.select = jest.fn();
         selector._item = null as any;
 
@@ -175,7 +175,7 @@ describe('Selector Tests', () => {
     });
 
     describe('item get function tests', () => {
-      it('should return currently selected Item of Selector', () => {
+      it('should return the currently selected Item of the Selector', () => {
         selector._item = dummyItem1;
 
         expect(selector.item).toBe(dummyItem1);
