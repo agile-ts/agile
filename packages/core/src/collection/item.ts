@@ -157,7 +157,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
    * are rebuilt when the Item changes.
    *
    * @internal
-   * @param itemKey - Item identifier that has to be included in Groups so that these Groups can be rebuilt.
+   * @param itemKey - Item identifier that has to be included in Groups so that these Groups are rebuilt.
    */
   public addRebuildGroupThatIncludeItemKeySideEffect(itemKey: StateKey) {
     this.addSideEffect<Item<DataType>>(
@@ -176,7 +176,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
 export interface ItemConfigInterface {
   /**
    * Whether the Item should be a placeholder
-   * and therefore only exists in background.
+   * and therefore should only exists in the background.
    * @default false
    */
   isPlaceholder?: boolean;
@@ -185,7 +185,7 @@ export interface ItemConfigInterface {
 export interface ItemPersistConfigInterface
   extends StatePersistentConfigInterface {
   /**
-   * Whether to format the specified Storage key into the Collection Item Storage key pattern.
+   * Whether to format the specified Storage key following the Collection Item Storage key pattern.
    * `_${collectionKey}_item_${itemKey}`
    * @default true
    */

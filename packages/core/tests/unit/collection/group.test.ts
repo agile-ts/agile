@@ -182,16 +182,16 @@ describe('Group Tests', () => {
     });
 
     describe('output set function tests', () => {
-      it('should set output to passed value', () => {
+      it("shouldn't set output to passed value and print error", () => {
+        group._output = null as any;
+
         group.output = [
           { id: '12', name: 'Hans der 3' },
           { id: '99', name: 'Frank' },
         ];
 
-        expect(group._output).toStrictEqual([
-          { id: '12', name: 'Hans der 3' },
-          { id: '99', name: 'Frank' },
-        ]);
+        expect(group._output).toStrictEqual(null);
+        expect(LogMock.hasLoggedCode('1C:03:00', [group._key]));
       });
     });
 
@@ -211,12 +211,13 @@ describe('Group Tests', () => {
     });
 
     describe('item set function tests', () => {
-      it('should set items to passed value', () => {
+      it("shouldn't set items to passed value and print error", () => {
+        group._items = null as any;
+
         group.items = [dummyItem1, dummyItem2];
 
-        expect(group._items.length).toBe(2);
-        expect(group._items[0]()).toBe(dummyItem1);
-        expect(group._items[1]()).toBe(dummyItem2);
+        expect(group._items).toStrictEqual(null);
+        expect(LogMock.hasLoggedCode('1C:03:01', [group._key]));
       });
     });
 

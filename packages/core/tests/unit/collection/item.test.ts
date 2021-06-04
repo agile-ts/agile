@@ -232,7 +232,7 @@ describe('Item Tests', () => {
         );
       });
 
-      it('should persist Item with formatted itemLeu (specific config)', () => {
+      it('should persist Item with formatted itemKey (specific config)', () => {
         item.persist({
           loadValue: false,
           storageKeys: ['test1', 'test2'],

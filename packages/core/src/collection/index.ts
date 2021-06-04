@@ -29,7 +29,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   public config: CollectionConfigInterface;
   private initialConfig: CreateCollectionConfigInterface;
 
-  public size = 0; // Amount of Items stored in the Collection
+  public size = 0; // Amount of the Items stored in the Collection
   public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
   public isPersisted = false; // Whether Collection is persisted in any external Storage
@@ -143,7 +143,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#group)
    *
    * @public
-   * @param initialItems - Initial keys of Items to be represented by the Group.
+   * @param initialItems - Key/Name identifiers of the Items to be clustered by the Group.
    * @param config - Configuration object
    */
   public Group(
@@ -171,7 +171,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#selector)
    *
    * @public
-   * @param initialKey - Initial key of Item to be represented by the Selector.
+   * @param initialKey - Key/Name identifier of the Item to be represented by the Selector.
    * @param config - Configuration object
    */
   public Selector(
@@ -341,7 +341,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#update)
    *
    * @public
-   * @param itemKey - Key/Name identifier of Item to be updated.
+   * @param itemKey - Key/Name identifier of the Item to be updated.
    * @param changes - Object with changes to be merged into the Item data object.
    * @param config - Configuration object
    */
@@ -416,7 +416,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    *
    * @public
    * @param groupKey - Unique identifier of the Group to be created.
-   * @param initialItems - Initial keys of Items to be represented by the Group.
+   * @param initialItems - Key/Name identifiers of the Items to be clustered by the Group.
    */
   public createGroup(
     groupKey: GroupKey,
@@ -449,7 +449,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasgroup)
    *
    * @public
-   * @param groupKey - Key/Name identifier of Group.
+   * @param groupKey - Key/Name identifier of the Group.
    * @param config - Configuration object
    */
   public hasGroup(
@@ -467,7 +467,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroup)
    *
    * @public
-   * @param groupKey - Key/Name identifier of Group.
+   * @param groupKey - Key/Name identifier of the Group.
    * @param config - Configuration object
    */
   public getGroup(
@@ -515,7 +515,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getgroupwithreference)
    *
    * @public
-   * @param groupKey - Key/Name identifier of Group.
+   * @param groupKey - Key/Name identifier of the Group.
    */
   public getGroupWithReference(groupKey: GroupKey): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
@@ -534,13 +534,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Removes a Group with the specified identifier from the Collection,
+   * Removes a Group with the specified key/name identifier from the Collection,
    * if it exists in the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removegroup)
    *
    * @public
-   * @param groupKey - Key/Name identifier of Group to be removed.
+   * @param groupKey - Key/Name identifier of the Group to be removed.
    */
   public removeGroup(groupKey: GroupKey): this {
     if (this.groups[groupKey] != null) delete this.groups[groupKey];
@@ -566,8 +566,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#createSelector)
    *
    * @public
-   * @param selectorKey - Unique identifier of Selector to be created.
-   * @param itemKey - Initial key of Item to be represented by the Selector.
+   * @param selectorKey - Unique identifier of the Selector to be created.
+   * @param itemKey - Key/Name identifier of the Item to be represented by the Selector.
    */
   public createSelector(
     selectorKey: SelectorKey,
@@ -608,7 +608,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#select)
    *
    * @public
-   * @param itemKey - Initial key of Item to be represented by the Selector
+   * @param itemKey - Key/Name identifier of the Item to be represented by the Selector
    * and used as unique identifier of the Selector.
    */
   public select(itemKey: ItemKey): Selector<DataType> {
@@ -622,7 +622,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasselector)
    *
    * @public
-   * @param selectorKey - Key/Name identifier of Selector.
+   * @param selectorKey - Key/Name identifier of the Selector.
    * @param config - Configuration object
    */
   public hasSelector(
@@ -640,7 +640,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselector)
    *
    * @public
-   * @param selectorKey - Key/Name identifier of Selector.
+   * @param selectorKey - Key/Name identifier of the Selector.
    * @param config - Configuration object
    */
   public getSelector(
@@ -672,7 +672,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getselectorwithreference)
    *
    * @public
-   * @param selectorKey - Key/Name identifier of Selector.
+   * @param selectorKey - Key/Name identifier of the Selector.
    */
   public getSelectorWithReference(
     selectorKey: SelectorKey
@@ -697,13 +697,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Removes a Selector with the specified identifier from the Collection,
+   * Removes a Selector with the specified key/name identifier from the Collection,
    * if it exists in the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removeselector)
    *
    * @public
-   * @param selectorKey - Key/Name identifier of Selector to be removed.
+   * @param selectorKey - Key/Name identifier of the Selector to be removed.
    */
   public removeSelector(selectorKey: SelectorKey): this {
     if (this.selectors[selectorKey] != null) {
@@ -733,7 +733,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasitem)
    *
    * @public
-   * @param itemKey - Key/Name identifier of Item.
+   * @param itemKey - Key/Name identifier of the Item.
    * @param config - Configuration object
    */
   public hasItem(
@@ -751,7 +751,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitem)
    *
    * @public
-   * @param itemKey - Key/Name identifier of Item.
+   * @param itemKey - Key/Name identifier of the Item.
    * @param config - Configuration object
    */
   public getItem(
@@ -782,7 +782,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitemwithreference)
    *
    * @public
-   * @param itemKey - Key/Name identifier of Item.
+   * @param itemKey - Key/Name identifier of the Item.
    */
   public getItemWithReference(itemKey: ItemKey): Item<DataType> {
     let item = this.getItem(itemKey, { notExisting: true });
@@ -810,7 +810,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     const item = new Item<DataType>(
       this,
       {
-        [this.config.primaryKey]: itemKey, // Setting primaryKey of Item to passed itemKey
+        [this.config.primaryKey]: itemKey, // Setting primaryKey of the Item to passed itemKey
         dummy: 'item',
       } as any,
       { isPlaceholder: true }
@@ -836,7 +836,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#getitemvalue)
    *
    * @public
-   * @param itemKey - Key/Name identifier of Item.
+   * @param itemKey - Key/Name identifier of the Item.
    * @param config - Configuration object
    */
   public getItemValue(
@@ -1024,7 +1024,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    *
    * @public
    * @param itemKeys - `itemKey/s` to be put into the specified Group/s.
-   * @param groupKeys - Identifier/s of the Group/s the specified `itemKey/s` are to put in.
+   * @param groupKeys - Key/Name Identifier/s of the Group/s the specified `itemKey/s` are to put in.
    * @param config - Configuration object
    */
   public put(
@@ -1050,8 +1050,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    *
    * @public
    * @param itemKeys - `itemKey/s` to be moved.
-   * @param oldGroupKey - Identifier of the Group the `itemKey/s` are moved from.
-   * @param newGroupKey - Identifier of the Group the `itemKey/s` are moved in.
+   * @param oldGroupKey - Key/Name Identifier of the Group the `itemKey/s` are moved from.
+   * @param newGroupKey - Key/Name Identifier of the Group the `itemKey/s` are moved in.
    * @param config - Configuration object
    */
   public move(
@@ -1075,7 +1075,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates key/name identifier of Item
+   * Updates key/name identifier of the Item
    * and returns a boolean indicating
    * whether the Item identifier was updated successfully.
    *
@@ -1106,12 +1106,12 @@ export class Collection<DataType extends Object = DefaultItem> {
     delete this.data[oldItemKey];
     this.data[newItemKey] = item;
 
-    // Update key/name of Item
+    // Update key/name of the Item
     item.setKey(newItemKey, {
       background: config.background,
     });
 
-    // Update Persistent key of Item if it follows the Item Storage Key pattern
+    // Update Persistent key of the Item if it follows the Item Storage Key pattern
     // and therefore differs from the actual Item key
     // (-> isn't automatically updated when the Item key is updated)
     if (
@@ -1211,13 +1211,13 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Remove Item/s from Group/s.
+   * Remove Item/s from specified Group/s.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removefromgroups)
    *
    * @public
-   * @param itemKeys - Identifier/s of Item/s to be removed from Group/s.
-   * @param groupKeys - Identifier/s of Group/s the Item/s are to remove from.
+   * @param itemKeys - Key/Name Identifier/s of the Item/s to be removed from the Group/s.
+   * @param groupKeys - Key/Name Identifier/s of the Group/s the Item/s are to remove from.
    */
   public removeFromGroups(
     itemKeys: ItemKey | Array<ItemKey>,
@@ -1229,7 +1229,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     _itemKeys.forEach((itemKey) => {
       let removedFromGroupsCount = 0;
 
-      // Remove itemKey from Groups
+      // Remove itemKey from the Groups
       _groupKeys.forEach((groupKey) => {
         const group = this.getGroup(groupKey, { notExisting: true });
         if (!group?.has(itemKey)) return;
@@ -1255,7 +1255,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#removeitems)
    *
    * @public
-   * @param itemKeys - Identifier/s of Item/s to be removed from the entire Collection.
+   * @param itemKeys - Key/Name identifier/s of the Item/s to be removed from the entire Collection.
    * @param config - Configuration object
    */
   public removeItems(
@@ -1273,7 +1273,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       if (item == null) return;
       const wasPlaceholder = item.isPlaceholder;
 
-      // Remove Item from Groups
+      // Remove Item from the Groups
       for (const groupKey in this.groups) {
         const group = this.getGroup(groupKey, { notExisting: true });
         if (group?.has(itemKey)) group?.remove(itemKey);

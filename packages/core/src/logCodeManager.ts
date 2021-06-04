@@ -144,6 +144,12 @@ const logCodeMessages = {
   '1C:02:00':
     "Couldn't find some Items in the Collection '${0}' " +
     "during the rebuild of the Group '${1}' output.",
+  '1C:03:00':
+    "The 'output' property of the Group '${0}' is a automatically generated readonly property " +
+    'that can only be mutated by the Group itself!',
+  '1C:03:01':
+    "The 'item' property of the Group '${0}' is a automatically generated readonly property " +
+    'that can only be mutated by the Group itself!',
 
   // Utils
   '20:03:00': 'Failed to get Agile Instance from',
