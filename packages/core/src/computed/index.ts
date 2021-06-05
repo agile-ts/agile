@@ -17,9 +17,9 @@ export class Computed<ComputedValueType = any> extends State<
 > {
   public agileInstance: () => Agile;
 
-  public computeFunction: () => ComputedValueType; // Function to compute the computed value
-  public deps: Array<Observer> = []; // All dependencies the Computed depends on (including hardCoded and autoDetected dependencies)
-  public hardCodedDeps: Array<Observer> = []; // Only hardCoded dependencies the Computed depends
+  public computeFunction: () => ComputedValueType; // Function to compute the Computed Class value
+  public deps: Array<Observer> = []; // All dependencies the Computed Class depends on (including hardCoded and automatically detected dependencies)
+  public hardCodedDeps: Array<Observer> = []; // Only hardCoded dependencies the Computed Class depends
 
   /**
    * An extension of the State Class that computes its value based on a compute function.

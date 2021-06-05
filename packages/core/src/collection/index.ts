@@ -29,16 +29,16 @@ export class Collection<DataType extends Object = DefaultItem> {
   public config: CollectionConfigInterface;
   private initialConfig: CreateCollectionConfigInterface;
 
-  public size = 0; // Amount of the Items stored in the Collection
-  public data: { [key: string]: Item<DataType> } = {}; // Collection Data
   public _key?: CollectionKey;
-  public isPersisted = false; // Whether Collection is persisted in any external Storage
-  public persistent: CollectionPersistent<DataType> | undefined; // Manages persisting Collection 'value'
+  public size = 0; // Amount of the Items stored in the Collection
+  public data: { [key: string]: Item<DataType> } = {}; // Items stored in the Collection
+  public isPersisted = false; // Whether the Collection is persisted in an external Storage
+  public persistent: CollectionPersistent<DataType> | undefined; // Manages persisting the Collection 'value'
 
-  public groups: { [key: string]: Group<DataType> } = {};
-  public selectors: { [key: string]: Selector<DataType> } = {};
+  public groups: { [key: string]: Group<DataType> } = {}; // Groups of Collection
+  public selectors: { [key: string]: Selector<DataType> } = {}; // Selectors of Collection
 
-  public isInstantiated = false; // Whether the Collection is instantiated completely
+  public isInstantiated = false; // Whether the Collection was instantiated correctly
 
   /**
    * A Collection manages a reactive set of Information
@@ -48,6 +48,8 @@ export class Collection<DataType extends Object = DefaultItem> {
    * It is designed for arrays of data objects following the same pattern.
    *
    * Each of these data object must have a unique `primaryKey` to be correctly identified later.
+   *
+   * You can create as many global Collections as you need.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/)
    *
@@ -90,7 +92,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates the key/name identifier of Collection.
+   * Updates the key/name identifier of the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/properties#key)
    *
@@ -102,7 +104,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Returns the key/name identifier of Collection.
+   * Returns the key/name identifier of the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/properties#key)
    *
@@ -113,7 +115,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates the key/name identifier of Collection.
+   * Updates the key/name identifier of the Collection.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#setkey)
    *
@@ -361,7 +363,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       background: false,
     });
 
-    // Validate passed data
+    // Check if the given conditions are suitable for a update action
     if (item == null) {
       LogCodeManager.log('1B:03:00', [itemKey, this._key]);
       return undefined;

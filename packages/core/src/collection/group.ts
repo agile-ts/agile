@@ -59,7 +59,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Retrieves the values of the Items clustered by the Group.
+   * Returns the values of the Items clustered by the Group.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#output)
    *
@@ -75,7 +75,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Retrieves the Items clustered by the Group.
+   * Returns the Items clustered by the Group.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#items)
    *

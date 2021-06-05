@@ -56,7 +56,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Retrieves the `itemKey` currently selected by the Selector.
+   * Returns the `itemKey` currently selected by the Selector.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/selector/properties#itemkey)
    *

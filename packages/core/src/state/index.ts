@@ -23,39 +23,42 @@ export class State<ValueType = any> {
   public agileInstance: () => Agile;
 
   public _key?: StateKey;
-  public valueType?: string; // primitive Type of State Value (for JS users)
-  public isSet = false; // If value is not the same as initialValue
+  public valueType?: string; // Primitive type which constrains the State value (for basic typesafety in Javascript)
+  public isSet = false; // Whether the current value differs from the initial value
   public isPlaceholder = false;
-  public initialStateValue: ValueType;
-  public _value: ValueType; // Current Value of State
-  public previousStateValue: ValueType;
-  public nextStateValue: ValueType; // Represents the next Value of the State (mostly used internal)
 
-  public observer: StateObserver<ValueType>; // Handles deps and subs of State and is like an interface to the Runtime
+  public initialStateValue: ValueType; // First value assigned to the State
+  public _value: ValueType; // Current value of the State
+  public previousStateValue: ValueType; // Previous value of the State
+  public nextStateValue: ValueType; // Next value of the State (which can be used for dynamic State updates)
+
+  // Handles dependencies to other States and subscriptions of UI-Components
+  // and serves as an interface to the runtime
+  public observer: StateObserver<ValueType>;
   public sideEffects: {
     [key: string]: SideEffectInterface<State<ValueType>>;
-  } = {}; // SideEffects of State (will be executed in Runtime)
-  public computeValueMethod?: ComputeValueMethod<ValueType>;
-  public computeExistsMethod: ComputeExistsMethod<ValueType>;
+  } = {}; // Side effects of changing the State value
+  public computeValueMethod?: ComputeValueMethod<ValueType>; // Method for dynamically computing the State value
+  public computeExistsMethod: ComputeExistsMethod<ValueType>; // Method for dynamically computing the existence of the State
 
-  public isPersisted = false; // If State can be stored in Agile Storage (-> successfully integrated persistent)
-  public persistent: StatePersistent | undefined; // Manages storing State Value into Storage
+  public isPersisted = false; // Whether the State is persisted in an external Storage
+  public persistent: StatePersistent | undefined; // Manages persisting the State value
 
-  public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
+  public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {}; // Callbacks that are fired on State changes
 
-  public currentInterval?: NodeJS.Timer | number;
+  public currentInterval?: NodeJS.Timer | number; // The current active interval
 
   /**
+   * A State manages a piece of Information
+   * that we need to remember globally at a later point int time.
+   * While providing a toolkit to use and mutate this set of Information.
+   *
+   * You can create as many global States as you need.
+   *
    * @public
-   * State - Class that holds one Value and causes rerender on subscribed Components
-   *
-   * @param agileInstance - An instance of Agile
-   *
-   * @param initialValue - Initial Value of State
-   *
-   * @param config - Configuration
-   *
-   * @typeparam ValueType - Type of a the value the State represents
+   * @param agileInstance - Instance of Agile the State belongs to.
+   * @param initialValue - Initial value of State.
+   * @param config - Configuration object
    */
   constructor(
     agileInstance: Agile,
@@ -81,21 +84,28 @@ export class State<ValueType = any> {
       return v != null;
     };
 
-    // Initial Set
+    // Set State value to specified initial value
     if (!config.isPlaceholder) this.set(initialValue, { overwrite: true });
   }
 
   /**
+   * Updates the value of the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/properties#value)
+   *
    * @public
-   * Set Value of State
+   * @param value - New State value.
    */
   public set value(value: ValueType) {
     this.set(value);
   }
 
   /**
+   * Returns a reference-free version of the State value.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/properties#value)
+   *
    * @public
-   * Get Value of State
    */
   public get value(): ValueType {
     ComputedTracker.tracked(this.observer);
@@ -103,7 +113,9 @@ export class State<ValueType = any> {
   }
 
   /**
-   * Updates key/name identifier of State.
+   * Updates the key/name identifier of the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/properties#key)
    *
    * @public
    * @param value - New key/name identifier.
@@ -113,7 +125,9 @@ export class State<ValueType = any> {
   }
 
   /**
-   * Returns key/name identifier of State.
+   * Returns the key/name identifier of the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/properties#key)
    *
    * @public
    */
@@ -122,7 +136,9 @@ export class State<ValueType = any> {
   }
 
   /**
-   * Updates key/name identifier of State.
+   * Updates the key/name identifier of the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#setkey)
    *
    * @public
    * @param value - New key/name identifier.
@@ -133,30 +149,26 @@ export class State<ValueType = any> {
     // Update State key
     this._key = value;
 
-    // Update key in Observer
+    // Update key of Observer
     this.observer._key = value;
 
     // Update key in Persistent (only if oldKey equal to persistentKey
     // because otherwise the persistentKey is detached from the State key
     // -> not managed by State anymore)
-    if (
-      value != null &&
-      this.persistent != null &&
-      this.persistent._key === oldKey
-    )
-      this.persistent.setKey(value);
+    if (value && this.persistent?._key === oldKey)
+      this.persistent?.setKey(value);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Set
-  //=========================================================================================================
   /**
+   * Assigns a new value to the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#set)
+   *
    * @public
-   * Updates Value of State
-   * @param value - new State Value
-   * @param config - Config
+   * @param value - New State value
+   * @param config - Configuration object
    */
   public set(
     value: ValueType | ((value: ValueType) => ValueType),
@@ -169,7 +181,7 @@ export class State<ValueType = any> {
       ? (value as any)(copy(this._value))
       : value;
 
-    // Check value has correct Type (js)
+    // Check value has correct type (Javascript)
     if (!this.hasCorrectType(_value)) {
       LogCodeManager.log(config.force ? '14:02:00' : '14:03:00', [
         typeof _value,
@@ -178,38 +190,42 @@ export class State<ValueType = any> {
       if (!config.force) return this;
     }
 
-    // Ingest new value into Runtime
+    // Ingest the State with the new value into the runtime
     this.observer.ingestValue(_value, config);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Ingest
-  //=========================================================================================================
   /**
+   * Ingests the State without any specified new value into the runtime.
+   *
+   * Since no new value was defined either the State value is computed (Computed Class)
+   * or the `nextStateValue` is taken.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#ingest)
+   *
    * @internal
-   * Ingests nextStateValue, computedValue into Runtime
-   * @param config - Config
+   * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): this {
     this.observer.ingest(config);
     return this;
   }
 
-  //=========================================================================================================
-  // Type
-  //=========================================================================================================
   /**
+   * Assigns a primitive type to the State
+   * which constrains the State value on the specified type
+   * to ensure basic typesafety in Javascript.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#type)
+   *
    * @public
-   * Assign primitive type to State Value
-   * Note: This function is mainly thought for JS users
-   * @param type - wished Type ('String', 'Boolean', 'Array', 'Object', 'Number')
+   * @param type - Primitive type the State value must follow (`String`, `Boolean`, `Array`, `Object`, `Number`).
    */
   public type(type: any): this {
     const supportedTypes = ['String', 'Boolean', 'Array', 'Object', 'Number'];
 
-    // Check if type is a supported Type
+    // Check if type is a supported type
     if (!supportedTypes.includes(type.name)) {
       LogCodeManager.log('14:03:01', [type]);
       return this;
@@ -219,41 +235,45 @@ export class State<ValueType = any> {
     return this;
   }
 
-  //=========================================================================================================
-  // Undo
-  //=========================================================================================================
   /**
+   * Undoes the latest State value change.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#undo)
+   *
    * @public
-   * Undoes latest State Value change
-   * @param config - Config
+   * @param config - Configuration object
    */
   public undo(config: StateIngestConfigInterface = {}): this {
     this.set(this.previousStateValue, config);
     return this;
   }
 
-  //=========================================================================================================
-  // Reset
-  //=========================================================================================================
   /**
+   * Resets the State value to its initial value.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#reset)
+   *
    * @public
-   * Resets State to its initial Value
-   * @param config - Config
+   * @param config - Configuration object
    */
   public reset(config: StateIngestConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
     return this;
   }
 
-  //=========================================================================================================
-  // Patch
-  //=========================================================================================================
   /**
+   * Merges the specified `targetWithChanges` object into the current State value.
+   * This merge can be different for different value combinations:
+   * - If the current State value is an `object`, it does partial update for the object.
+   * - If the current State value is an `array` an the argument is an array too,
+   *   it concatenates the current value with the value of the argument.
+   * - If the current State value is not a `object` or an `array` it prints an warning.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#patch)
+   *
    * @public
-   * Patches Object with changes into State Value
-   * Note: Only useful if State is an Object
-   * @param targetWithChanges - Object that holds changes which get patched into State Value
-   * @param config - Config
+   * @param targetWithChanges - Object to be merged into the current State value.
+   * @param config - Configuration object
    */
   public patch(
     targetWithChanges: Object,
@@ -263,44 +283,58 @@ export class State<ValueType = any> {
       addNewProperties: true,
     });
 
+    // Check if the given conditions are suitable for a patch action
     if (!isValidObject(this.nextStateValue, true)) {
       LogCodeManager.log('14:03:02');
       return this;
     }
-
     if (!isValidObject(targetWithChanges, true)) {
       LogCodeManager.log('00:03:01', ['TargetWithChanges', 'object']);
       return this;
     }
 
-    // Merge targetWithChanges into nextStateValue
-    this.nextStateValue = flatMerge<ValueType>(
-      copy(this.nextStateValue),
-      targetWithChanges,
-      { addNewProperties: config.addNewProperties }
-    );
+    // Merge targetWithChanges object into the nextStateValue
+    if (
+      Array.isArray(targetWithChanges) &&
+      Array.isArray(this.nextStateValue)
+    ) {
+      this.nextStateValue = [
+        ...this.nextStateValue,
+        ...targetWithChanges,
+      ] as any;
+    } else {
+      this.nextStateValue = flatMerge<ValueType>(
+        this.nextStateValue,
+        targetWithChanges,
+        { addNewProperties: config.addNewProperties }
+      );
+    }
 
-    // Ingest updated nextStateValue into Runtime
+    // Ingest updated 'nextStateValue' into runtime
     this.ingest(removeProperties(config, ['addNewProperties']));
 
     return this;
   }
 
-  //=========================================================================================================
-  // Watch
-  //=========================================================================================================
   /**
+   * Fires on each State value change.
+   *
+   * Returns the key/name identifier of the created watcher callback.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#watch)
+   *
    * @public
-   * Watches State and detects State changes
-   * @param callback - Callback Function that gets called if the State Value changes
-   * @return Key of Watcher
+   * @param callback - Callback function
    */
   public watch(callback: StateWatcherCallback<ValueType>): string;
   /**
+   * Fires on each State value change.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#watch)
+   *
    * @public
-   * Watches State and detects State changes
-   * @param key - Key/Name of Watcher Function
-   * @param callback - Callback Function that gets called if the State Value changes
+   * @param key - Key/Name identifier of the watcher callback.
+   * @param callback - Callback function
    */
   public watch(key: string, callback: StateWatcherCallback<ValueType>): this;
   public watch(
@@ -319,13 +353,13 @@ export class State<ValueType = any> {
       _callback = callback as StateWatcherCallback<ValueType>;
     }
 
-    // Check if Callback is valid Function
+    // Check if specified callback is a valid function
     if (!isFunction(_callback)) {
       LogCodeManager.log('00:03:01', ['Watcher Callback', 'function']);
       return this;
     }
 
-    // Check if watcherKey is already occupied
+    // Check if watcher with key is already occupied
     if (this.watchers[key]) {
       LogCodeManager.log('14:03:03', [key]);
       return this;
@@ -335,13 +369,13 @@ export class State<ValueType = any> {
     return generateKey ? key : this;
   }
 
-  //=========================================================================================================
-  // Remove Watcher
-  //=========================================================================================================
   /**
+   * Removes a watcher callback with the specified key/name identifier from the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#removewatcher)
+   *
    * @public
-   * Removes Watcher at given Key
-   * @param key - Key of Watcher that gets removed
+   * @param key - Key/Name identifier of the watcher callback to be removed.
    */
   public removeWatcher(key: string): this {
     delete this.watchers[key];
@@ -349,9 +383,25 @@ export class State<ValueType = any> {
   }
 
   /**
+   * Returns a boolean indicating whether a watcher callback with the specified `key`
+   * exists in the State or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#haswatcher)
+   *
    * @public
-   * Creates a Watcher that gets once called when the State Value changes for the first time and than destroys itself
-   * @param callback - Callback Function that gets called if the State Value changes
+   * @param key - Key/Name identifier of the watcher callback.
+   */
+  public hasWatcher(key: string): boolean {
+    return !!this.watchers[key];
+  }
+
+  /**
+   * Fires on the first State value assignment and then destroys itself.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#oninaugurated)
+   *
+   * @public
+   * @param callback - Callback function
    */
   public onInaugurated(callback: StateWatcherCallback<ValueType>): this {
     const watcherKey = 'InauguratedWatcherKey';
@@ -360,18 +410,6 @@ export class State<ValueType = any> {
       this.removeWatcher(watcherKey);
     });
     return this;
-  }
-
-  //=========================================================================================================
-  // Has Watcher
-  //=========================================================================================================
-  /**
-   * @public
-   * Checks if watcher at given Key exists
-   * @param key - Key/Name of Watcher
-   */
-  public hasWatcher(key: string): boolean {
-    return !!this.watchers[key];
   }
 
   /**
@@ -466,20 +504,21 @@ export class State<ValueType = any> {
     return this;
   }
 
-  //=========================================================================================================
-  // Interval
-  //=========================================================================================================
   /**
+   * Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#interval)
+   *
    * @public
-   * Calls callback at certain intervals in milliseconds and assigns the callback return value to the State
-   * @param callback- Callback that is called on each interval and should return the new State value
-   * @param ms - The intervals in milliseconds
+   * @param handler - A function to be executed every delay milliseconds.
+   * @param delay - The time, in milliseconds (thousandths of a second),
+   * the timer should delay in between executions of the specified function.
    */
   public interval(
-    callback: (value: ValueType) => ValueType,
-    ms?: number
+    handler: (value: ValueType) => ValueType,
+    delay?: number
   ): this {
-    if (!isFunction(callback)) {
+    if (!isFunction(handler)) {
       LogCodeManager.log('00:03:01', ['Interval Callback', 'function']);
       return this;
     }
@@ -489,18 +528,19 @@ export class State<ValueType = any> {
     }
 
     this.currentInterval = setInterval(() => {
-      this.set(callback(this._value));
-    }, ms ?? 1000);
+      this.set(handler(this._value));
+    }, delay ?? 1000);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Clear Interval
-  //=========================================================================================================
   /**
+   * Cancels a active timed, repeating action
+   * which was previously established by a call to `interval()`.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#clearinterval)
+   *
    * @public
-   * Clears the current Interval
    */
   public clearInterval(): void {
     if (this.currentInterval) {
@@ -509,35 +549,24 @@ export class State<ValueType = any> {
     }
   }
 
-  //=========================================================================================================
-  // Copy
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether the State exists.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#exists)
+   *
    * @public
-   * Creates fresh copy of State Value (-> No reference to State Value)
-   */
-  public copy(): ValueType {
-    return copy(this.value);
-  }
-
-  //=========================================================================================================
-  // Exists
-  //=========================================================================================================
-  /**
-   * @public
-   * Checks if State exists
    */
   public get exists(): boolean {
     return !this.isPlaceholder && this.computeExistsMethod(this.value);
   }
 
-  //=========================================================================================================
-  // Compute Exists
-  //=========================================================================================================
   /**
+   * TODO
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#computeexists)
+   *
    * @public
-   * Function that computes the exists status of the State
-   * @param method - Computed Function
+   * @param method - Computed function
    */
   public computeExists(method: ComputeExistsMethod<ValueType>): this {
     if (!isFunction(method)) {
@@ -549,25 +578,46 @@ export class State<ValueType = any> {
     return this;
   }
 
-  //=========================================================================================================
-  // Is
-  //=========================================================================================================
   /**
+   * TODO
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#computevalue)
+   *
    * @public
-   * Equivalent to ===
-   * @param value - Value that gets checked if its equals to the State Value
+   * @param method - Computed function
+   */
+  public computeValue(method: ComputeValueMethod<ValueType>): this {
+    if (!isFunction(method)) {
+      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
+      return this;
+    }
+    this.computeValueMethod = method;
+
+    // Initial compute
+    this.set(method(this.nextStateValue));
+
+    return this;
+  }
+
+  /**
+   * Returns a boolean indicating whether the specified value is equal to the current State value.
+   * Equivalent to '===' with the difference that it looks at the value
+   * and not on the reference.
+   *
+   * @public
+   * @param value - Value to be compared with the current State value.
    */
   public is(value: ValueType): boolean {
     return equal(value, this.value);
   }
 
-  //=========================================================================================================
-  // Is Not
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether the specified value is not equal to the current State value.
+   * Equivalent to '!==' with the difference that it looks at the value
+   * and not on the reference.
+   *
    * @public
-   * Equivalent to !==
-   * @param value - Value that gets checked if its not equals to the State Value
+   * @param value - Value to be compared with the current State value.
    */
   public isNot(value: ValueType): boolean {
     return notEqual(value, this.value);
@@ -587,27 +637,6 @@ export class State<ValueType = any> {
     } else {
       LogCodeManager.log('14:03:05');
     }
-    return this;
-  }
-
-  //=========================================================================================================
-  // Compute Value
-  //=========================================================================================================
-  /**
-   * @public
-   * Function that recomputes State Value if it changes
-   * @param method - Computed Function
-   */
-  public computeValue(method: ComputeValueMethod<ValueType>): this {
-    if (!isFunction(method)) {
-      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
-      return this;
-    }
-    this.computeValueMethod = method;
-
-    // Initial compute
-    this.set(method(this.nextStateValue));
-
     return this;
   }
 

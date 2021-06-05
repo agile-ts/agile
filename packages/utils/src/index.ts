@@ -198,13 +198,13 @@ export function flatMerge<DataType = Object>(
 
   // Copy Source to avoid References
   const _source = copy<DataType>(source);
-  if (!_source) return _source;
+  if (_source == null) return _source;
 
   // Merge Changes Object into Source Object
   const keys = Object.keys(changes);
   keys.forEach((property) => {
-    if (!config.addNewProperties && !_source[property]) return;
-    _source[property] = changes[property];
+    if (config.addNewProperties && _source[property] != null)
+      _source[property] = changes[property];
   });
 
   return _source;

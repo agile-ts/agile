@@ -404,24 +404,25 @@ describe('State Tests', () => {
       beforeEach(() => {
         objectState.ingest = jest.fn();
         numberState.ingest = jest.fn();
+        arrayState.ingest = jest.fn();
         jest.spyOn(Utils, 'flatMerge');
       });
 
-      it("shouldn't patch and ingest passed object based value into a not object based State (default config)", () => {
+      it("shouldn't patch specified object value into a not object based State (default config)", () => {
         numberState.patch({ changed: 'object' });
 
         LogMock.hasLoggedCode('14:03:02');
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
-      it("shouldn't patch and ingest passed not object based value into object based State (default config)", () => {
+      it("shouldn't patch specified non object value into a object based State (default config)", () => {
         objectState.patch('number' as any);
 
         LogMock.hasLoggedCode('00:03:01', ['TargetWithChanges', 'object']);
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
-      it('should patch and ingest passed object based value into a object based State (default config)', () => {
+      it('should patch specified object value into a object based State (default config)', () => {
         objectState.patch({ name: 'frank' });
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
@@ -436,7 +437,7 @@ describe('State Tests', () => {
         expect(objectState.ingest).toHaveBeenCalledWith({});
       });
 
-      it('should patch and ingest passed object based value into a object based State (specific config)', () => {
+      it('should patch specified object value into a object based State (specific config)', () => {
         objectState.patch(
           { name: 'frank' },
           {
@@ -467,6 +468,30 @@ describe('State Tests', () => {
             enabled: false,
           },
         });
+      });
+
+      it('should patch specified array value into a array based State (default config)', () => {
+        arrayState.patch(['hi']);
+
+        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(arrayState.nextStateValue).toStrictEqual(['jeff', 'hi']);
+        expect(arrayState.ingest).toHaveBeenCalledWith({});
+      });
+
+      it('should patch specified array value into a object based State', () => {
+        objectState.patch(['hi'], { addNewProperties: true });
+
+        expect(Utils.flatMerge).toHaveBeenCalledWith(
+          { age: 10, name: 'jeff' },
+          ['hi'],
+          { addNewProperties: true }
+        );
+        expect(objectState.nextStateValue).toStrictEqual({
+          0: 'hi',
+          age: 10,
+          name: 'jeff',
+        });
+        expect(objectState.ingest).toHaveBeenCalledWith({});
       });
     });
 
@@ -804,16 +829,6 @@ describe('State Tests', () => {
 
         expect(clearInterval).not.toHaveBeenCalled();
         expect(numberState.currentInterval).toBeUndefined();
-      });
-    });
-
-    describe('copy function tests', () => {
-      it('should return a reference free copy of the current State Value', () => {
-        jest.spyOn(Utils, 'copy');
-        const value = numberState.copy();
-
-        expect(value).toBe(10);
-        expect(Utils.copy).toHaveBeenCalledWith(10);
       });
     });
 
