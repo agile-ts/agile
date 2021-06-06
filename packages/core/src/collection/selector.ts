@@ -11,14 +11,17 @@ import {
 export class Selector<DataType extends Object = DefaultItem> extends State<
   DataType | undefined
 > {
+  // Collection the Selector belongs to
   public collection: () => Collection<DataType>;
 
   static unknownItemPlaceholderKey = '__UNKNOWN__ITEM__KEY__';
   static rebuildSelectorSideEffectKey = 'rebuildSelector';
   static rebuildItemSideEffectKey = 'rebuildItem';
 
-  public _item: Item<DataType> | undefined; // Item the Selector represents
-  public _itemKey: ItemKey; // Key/Name identifier of the Item the Selector represents
+  // Item the Selector represents
+  public _item: Item<DataType> | undefined;
+  // Key/Name identifier of the Item the Selector represents
+  public _itemKey: ItemKey;
 
   /**
    * A Selector represents an Item from a Collection in the long term.

@@ -203,7 +203,10 @@ export function flatMerge<DataType = Object>(
   // Merge Changes Object into Source Object
   const keys = Object.keys(changes);
   keys.forEach((property) => {
-    if (config.addNewProperties && _source[property] != null)
+    if (
+      (!config.addNewProperties && _source[property] != null) ||
+      config.addNewProperties
+    )
       _source[property] = changes[property];
   });
 

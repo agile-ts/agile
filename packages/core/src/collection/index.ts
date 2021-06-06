@@ -24,21 +24,30 @@ import {
 } from '../internal';
 
 export class Collection<DataType extends Object = DefaultItem> {
+  // Agile Instance the Collection belongs to
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
   private initialConfig: CreateCollectionConfigInterface;
 
+  // Key/Name identifier of the Collection
   public _key?: CollectionKey;
-  public size = 0; // Amount of the Items stored in the Collection
-  public data: { [key: string]: Item<DataType> } = {}; // Items stored in the Collection
-  public isPersisted = false; // Whether the Collection is persisted in an external Storage
-  public persistent: CollectionPersistent<DataType> | undefined; // Manages persisting the Collection 'value'
+  // Amount of the Items stored in the Collection
+  public size = 0;
+  // Items stored in the Collection
+  public data: { [key: string]: Item<DataType> } = {};
+  // Whether the Collection is persisted in an external Storage
+  public isPersisted = false;
+  // Manages the permanent persistent in external Storages
+  public persistent: CollectionPersistent<DataType> | undefined;
 
-  public groups: { [key: string]: Group<DataType> } = {}; // Groups of Collection
-  public selectors: { [key: string]: Selector<DataType> } = {}; // Selectors of Collection
+  // Registered Groups of Collection
+  public groups: { [key: string]: Group<DataType> } = {};
+  // Registered Selectors of Collection
+  public selectors: { [key: string]: Selector<DataType> } = {};
 
-  public isInstantiated = false; // Whether the Collection was instantiated correctly
+  // Whether the Collection was instantiated correctly
+  public isInstantiated = false;
 
   /**
    * A Collection manages a reactive set of Information
@@ -128,7 +137,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Update Collection key
     this._key = value;
 
-    // Update key in Persistent (only if oldKey equal to persistentKey
+    // Update key in Persistent (only if oldKey is equal to persistentKey
     // because otherwise the persistentKey is detached from the Collection key
     // -> not managed by Collection anymore)
     if (value && this.persistent?._key === oldKey)
@@ -455,7 +464,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasgroup)
    *
    * @public
-   * @param groupKey - Key/Name identifier of the Group.
+   * @param groupKey - Key/Name identifier of the Group to be checked for existence.
    * @param config - Configuration object
    */
   public hasGroup(
@@ -628,7 +637,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#hasselector)
    *
    * @public
-   * @param selectorKey - Key/Name identifier of the Selector.
+   * @param selectorKey - Key/Name identifier of the Selector to be checked for existence.
    * @param config - Configuration object
    */
   public hasSelector(
@@ -975,27 +984,25 @@ export class Collection<DataType extends Object = DefaultItem> {
    * Fires immediately after the persisted `value`
    * is loaded into the Collection from a corresponding external Storage.
    *
-   * Registering this callback only makes sense
+   * Registering such callback function makes only sense
    * when the Collection is [persisted](https://agile-ts.org/docs/core/collection/methods/#persist) in an external Storage.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#onload)
    *
    * @public
-   * @param callback - Callback function
+   * @param callback - A function to be executed after the externally persisted `value` was loaded into the Collection.
    */
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
-
-    // Check if provided callback is valid function
     if (!isFunction(callback)) {
       LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
       return this;
     }
 
-    // Register provided callback
+    // Register specified callback
     this.persistent.onLoad = callback;
 
-    // If Collection is already persisted ('isPersisted') fire provided callback immediately
+    // If Collection is already persisted ('isPersisted') fire specified callback immediately
     if (this.isPersisted) callback(true);
 
     return this;

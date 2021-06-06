@@ -20,13 +20,18 @@ import {
 export class Group<DataType extends Object = DefaultItem> extends State<
   Array<ItemKey>
 > {
+  // Collection the Group belongs to
   collection: () => Collection<DataType>;
 
   static rebuildGroupSideEffectKey = 'rebuildGroup';
 
-  _output: Array<DataType> = []; // Item values represented by the Group
-  _items: Array<() => Item<DataType>> = []; // Items represented by the Group
-  notFoundItemKeys: Array<ItemKey> = []; // Contains all Item identifiers for Items that couldn't be found in the Collection
+  // Item values represented by the Group
+  _output: Array<DataType> = [];
+  // Items represented by the Group
+  _items: Array<() => Item<DataType>> = [];
+
+  // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
+  notFoundItemKeys: Array<ItemKey> = [];
 
   /**
    * An extension of the State Class that categorizes and preserves the ordering of structured data.

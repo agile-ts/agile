@@ -15,10 +15,13 @@ import {
 export class Item<DataType extends Object = DefaultItem> extends State<
   DataType
 > {
+  // Collection the Group belongs to
   public collection: () => Collection<DataType>;
 
   static updateGroupSideEffectKey = 'rebuildGroup';
-  public selectedBy: Set<SelectorKey> = new Set(); // Key/Name Identifiers of Selectors which have selected the Item
+
+  // Key/Name identifiers of Selectors which have selected the Item
+  public selectedBy: Set<SelectorKey> = new Set();
 
   /**
    * An extension of the State Class that represents a single data object of a Collection.

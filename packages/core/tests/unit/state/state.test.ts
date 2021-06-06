@@ -532,17 +532,6 @@ describe('State Tests', () => {
         expect(numberState.watchers).not.toHaveProperty('dummyKey');
         LogMock.hasLoggedCode('00:03:01', ['Watcher Callback', 'function']);
       });
-
-      it("shouldn't add passed watcherFunction to watchers at passed key if passed key is already occupied", () => {
-        numberState.watchers['dummyKey'] = dummyCallbackFunction2;
-
-        const response = numberState.watch('dummyKey', dummyCallbackFunction1);
-
-        expect(response).toBe(numberState);
-        expect(numberState.watchers).toHaveProperty('dummyKey');
-        expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction2);
-        LogMock.hasLoggedCode('14:03:03', ['dummyKey']);
-      });
     });
 
     describe('removeWatcher function tests', () => {
@@ -789,7 +778,7 @@ describe('State Tests', () => {
           3000
         );
         expect(numberState.currentInterval).toStrictEqual(currentInterval);
-        LogMock.hasLoggedCode('14:03:04', [], numberState.currentInterval);
+        LogMock.hasLoggedCode('14:03:03', [], numberState.currentInterval);
       });
 
       it("shouldn't set invalid interval callback function", () => {
@@ -972,7 +961,7 @@ describe('State Tests', () => {
         dummyState.invert();
 
         expect(dummyState.set).not.toHaveBeenCalled();
-        LogMock.hasLoggedCode('14:03:05', ['function']);
+        LogMock.hasLoggedCode('14:03:04', ['function']);
       });
     });
 

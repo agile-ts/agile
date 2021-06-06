@@ -16,6 +16,7 @@ import {
 export class CollectionPersistent<
   DataType extends Object = DefaultItem
 > extends Persistent {
+  // Collection the Persistent belongs to
   public collection: () => Collection<DataType>;
 
   static defaultGroupSideEffectKey = 'rebuildGroupStorageValue';
@@ -226,7 +227,7 @@ export class CollectionPersistent<
       item?.persist(itemStorageKey, {
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
-        followCollectionPersistKeyPattern: false,// Because of the dynamic 'storageItemKey', the key is already formatted above
+        followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
       });
     }
 
