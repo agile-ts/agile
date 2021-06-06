@@ -47,14 +47,14 @@ export function useAgile<
   config: AgileHookConfigInterface = {}
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   const depsArray = extractObservers(deps);
-  const proxyWeakMap: ProxyWeakMapType = new WeakMap();
+  const proxyTreeWeakMap = new WeakMap();
   config = defineConfig(config, {
     proxyBased: false,
     key: generateId(),
     agileInstance: null,
   });
 
-  // Creates Return Value of Hook, depending if deps are in Array shape or not
+  // Creates Return Value of Hook, depending whether deps are in Array shape or not
   const getReturnValue = (
     depsArray: (Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
@@ -62,16 +62,15 @@ export function useAgile<
       if (dep == null) return undefined as any;
       const value = dep.value;
 
-      // If proxyBased and value is object wrap Proxy around it to track used properties
+      // If proxyBased and value is of type object.
+      // Wrap a Proxy around the object to track the used properties
       if (config.proxyBased && isValidObject(value, true)) {
         const proxyTree = new ProxyTree(value);
-        proxyWeakMap.set(dep, {
-          paths: proxyTree.getUsedRoutes() as any,
-        });
+        proxyTreeWeakMap.set(dep, proxyTree);
         return proxyTree.proxy;
       }
 
-      return dep.value;
+      return value;
     };
 
     // Handle single dep
@@ -79,7 +78,7 @@ export function useAgile<
       return handleReturn(depsArray[0]);
     }
 
-    // Handle dep array
+    // Handle deps array
     return depsArray.map((dep) => {
       return handleReturn(dep);
     }) as AgileHookArrayType<X>;
@@ -105,6 +104,23 @@ export function useAgile<
     const observers: Observer[] = depsArray.filter(
       (dep): dep is Observer => dep !== undefined
     );
+
+    // Build Proxy Path WeakMap Map based on the Proxy Tree WeakMap
+    // by extracting the routes of the Tree
+    // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
+    // because the 'useIsomorphicLayoutEffect' is called after the rerender
+    // -> In the Component used paths got successfully tracked
+    const proxyWeakMap: ProxyWeakMapType = new WeakMap();
+    if (config.proxyBased) {
+      for (const observer of observers) {
+        const proxyTree = proxyTreeWeakMap.get(observer);
+        if (proxyTree != null) {
+          proxyWeakMap.set(observer, {
+            paths: proxyTree.getUsedRoutes() as any,
+          });
+        }
+      }
+    }
 
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(

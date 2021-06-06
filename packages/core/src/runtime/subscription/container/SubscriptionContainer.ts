@@ -13,21 +13,24 @@ export class SubscriptionContainer {
   /**
    * Whether the Subscription Container
    * and the Component the Subscription Container represents are ready.
-   * So that the Subscription Container can trigger rerenders on the Component.
+   *
+   * When both are ready, the Subscription Container is allowed to trigger rerenders on the Component.
    */
   public ready = false;
 
   /**
    * Observers that have subscribed the Subscription Container.
    *
-   * The Observers use the Subscription Container
+   * The subscribed Observers use the Subscription Container
    * as an interface to the Component the Subscription Container represents
    * in order to cause rerenders on the Component.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/integration#-subscriptions)
    */
   public subscribers: Set<Observer>;
   /**
    * Temporary stores the subscribed Observers,
-   * that have been updated and are running through the runtime.
+   * that were updated and are currently running through the runtime.
    */
   public updatedSubscribers: Array<Observer> = [];
 
@@ -41,7 +44,7 @@ export class SubscriptionContainer {
    *   state2: Observer
    * }
    * ```
-   * Thus each Observer has its unique key stored in the 'subscribersWeakMap'.
+   * Thus each Observer has its 'external' unique key stored in the 'subscribersWeakMap'.
    *
    * Often Component based Subscriptions are object based,
    * because each Observer requires a unique identifier
@@ -49,28 +52,30 @@ export class SubscriptionContainer {
    */
   public isObjectBased = false;
   /**
-   * Weak map for storing a key identifier for each Observer.
+   * Weak map for storing a 'external' key identifier for each Observer.
    *
    * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
   public subscriberKeysWeakMap: WeakMap<Observer, string>;
 
   /**
-   * Weak map representing Selectors of the Subscription Container.
+   * Weak Map storing selector functions for subscribed Observer.
+   *
+   * A selector functions allows the partly subscription to the Observer value.
+   * So only if the selected part changes, the Subscription Container
+   * rerenders the Component it represents.
    *
    * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
   public selectorsWeakMap: SelectorWeakMapType;
 
   /**
-   * SubscriptionContainer - Represents Component/(Way to rerender Component) that is subscribed by Observer/s (Agile)
-   * -> Used to cause rerender on Component
+   * A Subscription Container is an interface to a UI-Component,
+   * that can be subscribed by multiple Observers.
    *
-   *
-   * A Subscription Container is like an interface to the Components.
-   *
-   * When a subscribed Observer value mutates a rerender is triggered on the Component
-   * through the Subscription Container.
+   * These Observers use the Subscription Container
+   * to trigger a rerender on the Component it represents,
+   * when their value change.
    *
    * @internal
    * @param subs - Observers to be subscribed to the Subscription Container.
@@ -94,9 +99,31 @@ export class SubscriptionContainer {
     // which selects the property at the path
     const selectorWeakMap: SelectorWeakMapType = config.selectorWeakMap as any;
 
-    for (const observer of subs) {
-      const paths = config.proxyWeakMap?.get(observer)?.paths;
+    // Assign selector functions based on the Proxy Weak Map
+    this.assignProxySelectors(
+      selectorWeakMap,
+      config.proxyWeakMap as any,
+      subs
+    );
 
+    this.selectorsWeakMap = selectorWeakMap;
+  }
+
+  /**
+   * Assigns selector functions created based on the paths of the Proxy Weak Map
+   * to the Selector Weak Map.
+   *
+   * @param selectorWeakMap
+   * @param proxyWeakMap
+   * @param subs
+   */
+  public assignProxySelectors(
+    selectorWeakMap: SelectorWeakMapType,
+    proxyWeakMap: ProxyWeakMapType,
+    subs: Array<Observer>
+  ): void {
+    for (const observer of subs) {
+      const paths = proxyWeakMap.get(observer)?.paths;
       if (paths != null) {
         const selectors: SelectorMethodType[] = [];
         for (const path of paths) {
@@ -112,8 +139,6 @@ export class SubscriptionContainer {
         selectorWeakMap.set(observer, { selectors });
       }
     }
-
-    this.selectorsWeakMap = selectorWeakMap;
   }
 }
 
@@ -126,28 +151,36 @@ export interface SubscriptionContainerConfigInterface {
    */
   key?: SubscriptionContainerKeyType;
   /**
-   * A keymap with a 2 dimensional arrays representing paths/routes to particular properties in the State at key.
-   * The subscriptionContainer will then only rerender the Component, when a property at a given path changes.
-   * Not anymore if anything in the State object mutates, although it might not even be displayed in the Component.
-   * For example:
-   * {
-   *   myState1: {paths: [['data', 'name']]},
-   *   myState2: {paths: [['car', 'speed']]}
-   * }
-   * Now the subscriptionContain will only trigger a rerender on the Component
-   * if 'data.name' in myState1 or 'car.speed' in myState2 changes.
-   * If, for instance, 'data.age' in myState1 mutates it won't trigger a rerender,
-   * since 'data.age' isn't represented in the proxyKeyMap.
+   * A Weak Map with a 2 dimensional arrays representing paths/routes
+   * to particular properties in the Observer.
    *
-   * These particular paths can be tracked with the ProxyTree.
+   * The Component the Subscription Container represents
+   * is then only rerendered, when a property at a specified path changes.
+   * Not anymore if anything in the Observer object mutates,
+   * although it might not even be displayed in the Component.
+   *
+   * For example:
+   * ```
+   * WeakMap: {
+   *   Observer1: {paths: [['data', 'name']]},
+   *   Observer2: {paths: [['car', 'speed']]}
+   * }
+   * ```
+   * Now the Subscription Container will only trigger a rerender on the Component
+   * if 'data.name' in Observer1 or 'car.speed' in Observer2 changes.
+   * If, for instance, 'data.age' in Observer1 mutates it won't trigger a rerender,
+   * since 'data.age' isn't represented in the Proxy Weak Map.
+   *
+   * These particular paths were tracked via the ProxyTree.
    * https://github.com/agile-ts/agile/tree/master/packages/proxytree
    *
-   * @default {}
+   * @default new WeakMap()
    */
   proxyWeakMap?: ProxyWeakMapType;
   /**
-   * TODO
-   * @default undefined
+   * A Weak Map with an array of selector functions for the Observer
+   *
+   * @default new WeakMap()
    */
   selectorWeakMap?: SelectorWeakMapType;
 }

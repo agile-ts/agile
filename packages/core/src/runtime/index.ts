@@ -234,20 +234,24 @@ export class Runtime {
     subscriptionContainer: SubscriptionContainer,
     job: RuntimeJob
   ): boolean {
-    // TODO add Selector support for Object based subscriptions
     const selectors = subscriptionContainer.selectorsWeakMap.get(job.observer)
       ?.selectors;
+
+    // If no selector functions found, return true
+    // because no specific part of the Observer was selected
+    // -> The Subscription Container should update
+    // no matter what was updated in the Observer
     if (!selectors) return true;
 
+    // Check if a selected part of Observer value has changed
     const previousValue = job.observer.previousValue;
     const newValue = job.observer.value;
     for (const selector of selectors) {
       if (
         notEqual(selector(newValue), selector(previousValue))
         // || newValueDeepness !== previousValueDeepness // Not possible to check
-      ) {
+      )
         return true;
-      }
     }
 
     return false;
