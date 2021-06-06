@@ -61,7 +61,8 @@ export class SubController {
 
     // Set SubscriptionContainer to Object based
     subscriptionContainer.isObjectBased = true;
-    subscriptionContainer.subsObject = subs;
+    for (const key in subs)
+      subscriptionContainer.subscriberKeysWeakMap.set(subs[key], key);
 
     // Register subs and build props object
     for (const key in subs) {

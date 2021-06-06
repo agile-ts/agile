@@ -38,11 +38,11 @@ describe('CallbackSubscriptionContainer Tests', () => {
     expect(subscriptionContainer.subscribers.has(dummyObserver1)).toBeTruthy();
     expect(subscriptionContainer.subscribers.has(dummyObserver2)).toBeTruthy();
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
-    expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
-    expect(subscriptionContainer.subsObject).toBeUndefined();
+    expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
+    expect(subscriptionContainer.subscriberKeysWeakMap).toBeUndefined();
     expect(subscriptionContainer.proxyKeyMap).toStrictEqual({
       myState: { paths: [['hi']] },
     });
-    expect(subscriptionContainer.proxyBased).toBeTruthy();
+    expect(subscriptionContainer.isProxyBased).toBeTruthy();
   });
 });

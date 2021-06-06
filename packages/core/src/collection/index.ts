@@ -1486,12 +1486,12 @@ export type ItemKey = string | number;
 
 export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
   /**
-   * Initial Groups of Collection.
+   * Initial Groups of the Collection.
    * @default []
    */
   groups?: { [key: string]: Group<any> } | string[];
   /**
-   * Initial Selectors of Collection
+   * Initial Selectors of the Collection
    * @default []
    */
   selectors?: { [key: string]: Selector<any> } | string[];

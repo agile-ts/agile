@@ -12,6 +12,7 @@ import {
   isValidObject,
   ProxyKeyMapInterface,
   generateId,
+  ProxyWeakMapType,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
@@ -47,7 +48,7 @@ export function useAgile<
   config: AgileHookConfigInterface = {}
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   const depsArray = extractObservers(deps);
-  const proxyTreeMap: ProxyTreeMapInterface = {};
+  const proxyWeakMap: ProxyWeakMapType = new WeakMap();
   config = defineConfig(config, {
     proxyBased: false,
     key: generateId(),
@@ -58,23 +59,16 @@ export function useAgile<
   const getReturnValue = (
     depsArray: (Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    const handleReturn = (
-      dep: State | Observer | undefined
-    ): AgileHookType<Y> => {
+    const handleReturn = (dep: Observer | undefined): AgileHookType<Y> => {
       const value = dep?.value;
-      const depKey = dep?.key;
 
       // If proxyBased and value is object wrap Proxy around it to track used properties
       if (config.proxyBased && isValidObject(value, true)) {
-        if (depKey) {
-          const proxyTree = new ProxyTree(value);
-          proxyTreeMap[depKey] = proxyTree;
-          return proxyTree.proxy;
-        }
-        Agile.logger.warn(
-          'Keep in mind that without a key no Proxy can be wrapped around the dependency value!',
-          dep
-        );
+        const proxyTree = new ProxyTree(value);
+        proxyWeakMap.set(dep, {
+          paths: proxyTree.getUsedRoutes() as any,
+        });
+        return proxyTree.proxy;
       }
 
       return dep?.value;
@@ -112,24 +106,13 @@ export function useAgile<
       (dep): dep is Observer => dep !== undefined
     );
 
-    // Build Proxy Key Map
-    const proxyKeyMap: ProxyKeyMapInterface = {};
-    if (config.proxyBased) {
-      for (const proxyTreeKey in proxyTreeMap) {
-        const proxyTree = proxyTreeMap[proxyTreeKey];
-        proxyKeyMap[proxyTreeKey] = {
-          paths: proxyTree.getUsedRoutes() as any,
-        };
-      }
-    }
-
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
       () => {
         forceRender();
       },
       observers,
-      { key: config.key, proxyKeyMap, waitForMount: false }
+      { key: config.key, proxyWeakMap, waitForMount: false }
     );
 
     // Unsubscribe Callback based Subscription on Unmount

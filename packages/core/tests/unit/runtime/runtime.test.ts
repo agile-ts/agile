@@ -236,7 +236,7 @@ describe('Runtime Tests', () => {
 
         jest.spyOn(dummyAgile.integrations, 'update');
         jest.spyOn(runtime, 'handleObjectBasedSubscription');
-        jest.spyOn(runtime, 'handleProxyBasedSubscription');
+        jest.spyOn(runtime, 'handleSelectors');
       });
 
       it('should return false if agile has no integration', () => {
@@ -272,7 +272,7 @@ describe('Runtime Tests', () => {
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).not.toHaveBeenCalled();
+        expect(runtime.handleSelectors).not.toHaveBeenCalled();
 
         expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
         expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
@@ -299,7 +299,7 @@ describe('Runtime Tests', () => {
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).not.toHaveBeenCalled();
+        expect(runtime.handleSelectors).not.toHaveBeenCalled();
 
         expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
         expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
@@ -309,11 +309,9 @@ describe('Runtime Tests', () => {
       });
 
       it('should update ready proxy, callback based SubscriptionContainer if handleProxyBasedSubscriptions() returns true', () => {
-        jest
-          .spyOn(runtime, 'handleProxyBasedSubscription')
-          .mockReturnValueOnce(true);
+        jest.spyOn(runtime, 'handleSelectors').mockReturnValueOnce(true);
         dummyAgile.hasIntegration = jest.fn(() => true);
-        rCallbackSubContainer.proxyBased = true;
+        rCallbackSubContainer.isProxyBased = true;
         rCallbackSubContainer.proxyKeyMap = dummyProxyKeyMap;
         runtime.jobsToRerender.push(rCallbackSubJob);
 
@@ -321,7 +319,7 @@ describe('Runtime Tests', () => {
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).toHaveBeenCalledWith(
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
           rCallbackSubContainer,
           rCallbackSubJob
         );
@@ -334,11 +332,9 @@ describe('Runtime Tests', () => {
       });
 
       it("shouldn't update ready proxy, callback based SubscriptionContainer if handleProxyBasedSubscriptions() returns false", () => {
-        jest
-          .spyOn(runtime, 'handleProxyBasedSubscription')
-          .mockReturnValueOnce(false);
+        jest.spyOn(runtime, 'handleSelectors').mockReturnValueOnce(false);
         dummyAgile.hasIntegration = jest.fn(() => true);
-        rCallbackSubContainer.proxyBased = true;
+        rCallbackSubContainer.isProxyBased = true;
         rCallbackSubContainer.proxyKeyMap = dummyProxyKeyMap;
         runtime.jobsToRerender.push(rCallbackSubJob);
 
@@ -346,7 +342,7 @@ describe('Runtime Tests', () => {
 
         expect(runtime.jobsToRerender).toStrictEqual([]);
         expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).toHaveBeenCalledWith(
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
           rCallbackSubContainer,
           rCallbackSubJob
         );
@@ -561,9 +557,7 @@ describe('Runtime Tests', () => {
           arrayJob
         );
 
-        expect(arraySubscriptionContainer.observerKeysToUpdate).toStrictEqual(
-          []
-        );
+        expect(arraySubscriptionContainer.updatedSubscribers).toStrictEqual([]);
       });
 
       it('should add Job Observer to changedObjectKeys in SubscriptionContainer', () => {
@@ -572,7 +566,7 @@ describe('Runtime Tests', () => {
           objectJob1
         );
 
-        expect(objectSubscriptionContainer.observerKeysToUpdate).toStrictEqual([
+        expect(objectSubscriptionContainer.updatedSubscribers).toStrictEqual([
           'observer1',
         ]);
       });
@@ -598,18 +592,18 @@ describe('Runtime Tests', () => {
       });
 
       it('should build Observer Value Object out of observerKeysToUpdate and Value of Observer', () => {
-        subscriptionContainer.observerKeysToUpdate.push('observer1');
-        subscriptionContainer.observerKeysToUpdate.push('observer2');
-        subscriptionContainer.observerKeysToUpdate.push('observer3');
+        subscriptionContainer.updatedSubscribers.push('observer1');
+        subscriptionContainer.updatedSubscribers.push('observer2');
+        subscriptionContainer.updatedSubscribers.push('observer3');
 
-        const props = runtime.getObjectBasedProps(subscriptionContainer);
+        const props = runtime.getUpdatedObserverValues(subscriptionContainer);
 
         expect(props).toStrictEqual({
           observer1: 'dummyObserverValue1',
           observer2: undefined,
           observer3: 'dummyObserverValue3',
         });
-        expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
+        expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
       });
     });
 
@@ -640,7 +634,7 @@ describe('Runtime Tests', () => {
           key: 'dummyObserverValue1',
           data: { name: 'jeff' },
         };
-        objectSubscriptionContainer.proxyBased = true;
+        objectSubscriptionContainer.isProxyBased = true;
         objectSubscriptionContainer.proxyKeyMap = {
           [dummyObserver1._key || 'unknown']: { paths: [['data', 'name']] },
         };
@@ -672,7 +666,7 @@ describe('Runtime Tests', () => {
             data: { name: 'hans' },
           },
         ];
-        arraySubscriptionContainer.proxyBased = true;
+        arraySubscriptionContainer.isProxyBased = true;
         arraySubscriptionContainer.proxyKeyMap = {
           [dummyObserver2._key || 'unknown']: {
             paths: [['0', 'data', 'name']],
@@ -688,9 +682,9 @@ describe('Runtime Tests', () => {
       });
 
       it("should return true if subscriptionContainer isn't proxy based", () => {
-        objectSubscriptionContainer.proxyBased = false;
+        objectSubscriptionContainer.isProxyBased = false;
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -702,7 +696,7 @@ describe('Runtime Tests', () => {
       it('should return true if observer the job represents has no key', () => {
         objectJob.observer._key = undefined;
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -716,7 +710,7 @@ describe('Runtime Tests', () => {
           unknownKey: { paths: [['a', 'b']] },
         };
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -731,7 +725,7 @@ describe('Runtime Tests', () => {
           data: { name: 'hans' },
         };
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -744,7 +738,7 @@ describe('Runtime Tests', () => {
       });
 
       it("should return false if used property hasn't changed (object value)", () => {
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -765,7 +759,7 @@ describe('Runtime Tests', () => {
           data: { name: undefined },
         };
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -786,7 +780,7 @@ describe('Runtime Tests', () => {
           },
         ];
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           arraySubscriptionContainer,
           arrayJob
         );
@@ -799,7 +793,7 @@ describe('Runtime Tests', () => {
       });
 
       it("should return false if used property hasn't changed (array value)", () => {
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           arraySubscriptionContainer,
           arrayJob
         );

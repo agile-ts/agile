@@ -74,7 +74,7 @@ export class State<ValueType = any> {
    *
    * @public
    * @param agileInstance - Instance of Agile the State belongs to.
-   * @param initialValue - Initial value of State.
+   * @param initialValue - Initial value of the State.
    * @param config - Configuration object
    */
   constructor(

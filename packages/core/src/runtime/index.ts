@@ -155,17 +155,20 @@ export class Runtime {
           return;
         }
 
-        // Handle Object based Subscription
-        if (subscriptionContainer.isObjectBased)
-          this.handleObjectBasedSubscription(subscriptionContainer, job);
+        let updateSubscriptionContainer = true;
 
-        // Check if subscriptionContainer should be updated
-        const updateSubscriptionContainer = subscriptionContainer.proxyBased
-          ? this.handleProxyBasedSubscription(subscriptionContainer, job)
-          : true;
+        // Handle Selectors
+        if (subscriptionContainer.hasSelectors) {
+          updateSubscriptionContainer = this.handleSelectors(
+            subscriptionContainer,
+            job
+          );
+        }
 
-        if (updateSubscriptionContainer)
+        if (updateSubscriptionContainer) {
+          subscriptionContainer.updatedSubscribers.push(job.observer);
           subscriptionsToUpdate.add(subscriptionContainer);
+        }
 
         job.subscriptionContainersToUpdate.delete(subscriptionContainer);
       });
@@ -183,8 +186,10 @@ export class Runtime {
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
-          this.getObjectBasedProps(subscriptionContainer)
+          this.getUpdatedObserverValues(subscriptionContainer)
         );
+
+      subscriptionContainer.updatedSubscribers = [];
     });
 
     Agile.logger.if
@@ -194,56 +199,27 @@ export class Runtime {
     return true;
   }
 
-  //=========================================================================================================
-  // Handle Object Based Subscription
-  //=========================================================================================================
   /**
+   * Returns a key map with Observer values that have been updated.
+   *
    * @internal
-   * Finds key of Observer (Job) in subsObject and adds it to 'changedObjectKeys'
-   * @param subscriptionContainer - Object based SubscriptionContainer
-   * @param job - Job that holds the searched Observer
-   */
-  public handleObjectBasedSubscription(
-    subscriptionContainer: SubscriptionContainer,
-    job: RuntimeJob
-  ): void {
-    let foundKey: string | null = null;
-
-    // Check if SubscriptionContainer is Object based
-    if (!subscriptionContainer.isObjectBased) return;
-
-    // Find Key of Job Observer in SubscriptionContainer
-    for (const key in subscriptionContainer.subsObject)
-      if (subscriptionContainer.subsObject[key] === job.observer)
-        foundKey = key;
-
-    if (foundKey) subscriptionContainer.observerKeysToUpdate.push(foundKey);
-  }
-
-  //=========================================================================================================
-  // Get Object Based Props
-  //=========================================================================================================
-  /**
-   * @internal
-   * Builds Object out of changedObjectKeys with Observer Value
    * @param subscriptionContainer - Object based SubscriptionContainer
    */
-  public getObjectBasedProps(
+  public getUpdatedObserverValues(
     subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
     const props: { [key: string]: any } = {};
 
-    // Map trough observerKeysToUpdate and build object out of Observer value
-    if (subscriptionContainer.subsObject)
-      for (const updatedKey of subscriptionContainer.observerKeysToUpdate)
-        props[updatedKey] = subscriptionContainer.subsObject[updatedKey]?.value;
-
-    subscriptionContainer.observerKeysToUpdate = [];
+    // Map 'Observer To Update' values into the props object
+    for (const observer of subscriptionContainer.updatedSubscribers) {
+      const key = subscriptionContainer.subscriberKeysWeakMap.get(observer);
+      if (key != null) props[key] = observer.value;
+    }
     return props;
   }
 
   //=========================================================================================================
-  // Handle Proxy Based Subscription
+  // Handle Selectors
   //=========================================================================================================
   /**
    * @internal
@@ -256,47 +232,25 @@ export class Runtime {
    * -> If a from the Proxy Tree detected property differs from the same property in the previous value
    * or the passed subscriptionContainer isn't properly proxy based
    */
-  public handleProxyBasedSubscription(
+  public handleSelectors(
     subscriptionContainer: SubscriptionContainer,
     job: RuntimeJob
   ): boolean {
+    // TODO add Selector support for Object based subscriptions
+    const selectors = subscriptionContainer.selectorsWeakMap.get(job.observer)
+      ?.selectors;
+
     // Return true because in this cases the subscriptionContainer isn't properly proxyBased
-    if (
-      !subscriptionContainer.proxyBased ||
-      !job.observer._key ||
-      !subscriptionContainer.proxyKeyMap[job.observer._key]
-    )
-      return true;
+    if (!subscriptionContainer.hasSelectors || !selectors) return true;
 
-    const paths = subscriptionContainer.proxyKeyMap[job.observer._key].paths;
-
-    if (paths) {
-      for (const path of paths) {
-        // Get property in new Value located at path
-        let newValue = job.observer.value;
-        let newValueDeepness = 0;
-        for (const branch of path) {
-          if (!isValidObject(newValue, true)) break;
-          newValue = newValue[branch];
-          newValueDeepness++;
-        }
-
-        // Get property in previous Value located at path
-        let previousValue = job.observer.previousValue;
-        let previousValueDeepness = 0;
-        for (const branch of path) {
-          if (!isValidObject(previousValue, true)) break;
-          previousValue = previousValue[branch];
-          previousValueDeepness++;
-        }
-
-        // Check if found values differ
-        if (
-          notEqual(newValue, previousValue) ||
-          newValueDeepness !== previousValueDeepness
-        ) {
-          return true;
-        }
+    const previousValue = job.observer.previousValue;
+    const newValue = job.observer.value;
+    for (const selector of selectors) {
+      if (
+        notEqual(selector(newValue), selector(previousValue))
+        // || newValueDeepness !== previousValueDeepness // Not possible to check
+      ) {
+        return true;
       }
     }
 

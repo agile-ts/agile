@@ -84,7 +84,7 @@ describe('SubController Tests', () => {
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeTruthy();
-        expect(dummySubscriptionContainer.subsObject).toStrictEqual({
+        expect(dummySubscriptionContainer.subscriberKeysWeakMap).toStrictEqual({
           dummyObserver1: dummyObserver1,
           dummyObserver2: dummyObserver2,
         });
@@ -144,7 +144,9 @@ describe('SubController Tests', () => {
         );
 
         expect(dummySubscriptionContainer.isObjectBased).toBeFalsy();
-        expect(dummySubscriptionContainer.subsObject).toBeUndefined();
+        expect(
+          dummySubscriptionContainer.subscriberKeysWeakMap
+        ).toBeUndefined();
 
         expect(dummySubscriptionContainer.subscribers.size).toBe(2);
         expect(
@@ -544,7 +546,7 @@ describe('SubController Tests', () => {
         // Note:This 'issue' happens in multiple parts of the AgileTs test
         expect(callbackSubscriptionContainer.key).toBe('randomKey');
         expect(callbackSubscriptionContainer.proxyKeyMap).toStrictEqual({});
-        expect(callbackSubscriptionContainer.proxyBased).toBeFalsy();
+        expect(callbackSubscriptionContainer.isProxyBased).toBeFalsy();
 
         expect(callbackSubscriptionContainer.subscribers.size).toBe(2);
         expect(
@@ -584,7 +586,7 @@ describe('SubController Tests', () => {
         expect(callbackSubscriptionContainer.proxyKeyMap).toStrictEqual({
           jeff: { paths: [[]] },
         });
-        expect(callbackSubscriptionContainer.proxyBased).toBeTruthy();
+        expect(callbackSubscriptionContainer.isProxyBased).toBeTruthy();
 
         expect(callbackSubscriptionContainer.subscribers.size).toBe(2);
         expect(
