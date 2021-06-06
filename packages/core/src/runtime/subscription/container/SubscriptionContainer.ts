@@ -17,6 +17,7 @@ export class SubscriptionContainer {
    * When both are ready, the Subscription Container is allowed to trigger rerenders on the Component.
    */
   public ready = false;
+  public componentId?: ComponentIdType;
 
   /**
    * Observers that have subscribed the Subscription Container.
@@ -30,7 +31,8 @@ export class SubscriptionContainer {
   public subscribers: Set<Observer>;
   /**
    * Temporary stores the subscribed Observers,
-   * that were updated and are currently running through the runtime.
+   * that were performed by the runtime
+   * and are currently running through the update Subscription Container process.
    */
   public updatedSubscribers: Array<Observer> = [];
 
@@ -93,6 +95,7 @@ export class SubscriptionContainer {
 
     this.subscribers = new Set(subs);
     this.key = config.key;
+    this.componentId = config?.componentId;
     this.subscriberKeysWeakMap = new WeakMap();
 
     // Create for each proxy path a Selector,
@@ -146,10 +149,15 @@ export type SubscriptionContainerKeyType = string | number;
 
 export interface SubscriptionContainerConfigInterface {
   /**
-   * Key/Name identifier of Subscription Container
+   * Key/Name identifier of the Subscription Container
    * @default undefined
    */
   key?: SubscriptionContainerKeyType;
+  /**
+   * Key/Name identifier of the Component the Subscription Container represents.
+   * @default undefined
+   */
+  componentId?: ComponentIdType;
   /**
    * A Weak Map with a 2 dimensional arrays representing paths/routes
    * to particular properties in the Observer.
@@ -192,3 +200,5 @@ export type SelectorWeakMapType<T = any> = WeakMap<
   { selectors: SelectorMethodType<T>[] }
 >;
 export type SelectorMethodType<T = any> = (value: T) => any;
+
+export type ComponentIdType = string | number;
