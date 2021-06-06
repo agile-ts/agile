@@ -924,22 +924,55 @@ describe('State Tests', () => {
     });
 
     describe('invert function tests', () => {
+      let dummyState: State;
+
       beforeEach(() => {
-        numberState.set = jest.fn();
-        booleanState.set = jest.fn();
+        dummyState = new State(dummyAgile, null);
+
+        dummyState.set = jest.fn();
       });
 
-      it('should invert current value of a boolean based State', () => {
-        booleanState.invert();
+      it('should invert value of the type boolean', () => {
+        dummyState.nextStateValue = false;
 
-        expect(booleanState.set).toHaveBeenCalledWith(true);
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith(true);
       });
 
-      it("shouldn't invert current value if not boolean based State and should print a error", () => {
-        numberState.invert();
+      it('should invert value of the type number', () => {
+        dummyState.nextStateValue = 10;
 
-        expect(numberState.set).not.toHaveBeenCalled();
-        LogMock.hasLoggedCode('14:03:05');
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith(-10);
+      });
+
+      it('should invert value of the type array', () => {
+        dummyState.nextStateValue = ['1', '2', '3'];
+
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith(['3', '2', '1']);
+      });
+
+      it('should invert value of the type string', () => {
+        dummyState.nextStateValue = 'jeff';
+
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith('ffej');
+      });
+
+      it("shouldn't invert not invertible types like function, null, undefined, object", () => {
+        dummyState.nextStateValue = () => {
+          // empty
+        };
+
+        dummyState.invert();
+
+        expect(dummyState.set).not.toHaveBeenCalled();
+        LogMock.hasLoggedCode('14:03:05', ['function']);
       });
     });
 

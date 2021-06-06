@@ -1489,7 +1489,7 @@ export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
    */
   selectors?: { [key: string]: Selector<any> } | string[];
   /**
-   * Key/Name identifier of Collection.
+   * Key/Name identifier of the Collection.
    * @default undefined
    */
   key?: CollectionKey;
@@ -1625,9 +1625,8 @@ export interface CollectionPersistentConfigInterface {
   /**
    * Default Storage key of the specified Storage keys.
    * The Collection value is loaded from the default Storage
-   * and only loaded from the remaining Storages (storageKeys)
+   * and is only loaded from the remaining Storages (storageKeys)
    * if the loading of the default Storage failed.
-   *
    * @default first index of the specified Storage keys or the AgileTs default Storage key
    */
   defaultStorageKey?: StorageKey;

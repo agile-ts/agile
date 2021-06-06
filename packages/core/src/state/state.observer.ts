@@ -143,8 +143,8 @@ export class StateObserver<ValueType = any> extends Observer {
     // because sometimes (for instance in a Group State) the publicValue() is not the .value (nextStateValue) property.
     // The Observer value is at some point the public Value because Integrations like React are using it as return value.
     // For example 'useAgile()' returns the Observer.value and not the State.value.
+    job.observer.previousValue = copy(job.observer.value);
     job.observer.value = copy(state.getPublicValue());
-    job.observer.previousValue = copy(state.previousStateValue);
   }
 
   //=========================================================================================================

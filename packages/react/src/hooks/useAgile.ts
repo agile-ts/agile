@@ -56,7 +56,7 @@ export function useAgile<
 
   // Creates Return Value of Hook, depending if deps are in Array shape or not
   const getReturnValue = (
-    depsArray: (State | Observer | undefined)[]
+    depsArray: (Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
     const handleReturn = (
       dep: State | Observer | undefined

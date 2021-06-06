@@ -224,13 +224,10 @@ export class State<ValueType = any> {
    */
   public type(type: any): this {
     const supportedTypes = ['String', 'Boolean', 'Array', 'Object', 'Number'];
-
-    // Check if type is a supported type
     if (!supportedTypes.includes(type.name)) {
       LogCodeManager.log('14:03:01', [type]);
       return this;
     }
-
     this.valueType = type.name.toLowerCase();
     return this;
   }
@@ -389,7 +386,7 @@ export class State<ValueType = any> {
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#haswatcher)
    *
    * @public
-   * @param key - Key/Name identifier of the watcher callback.
+   * @param key - Key/Name identifier of the watcher callback to be checked for existence.
    */
   public hasWatcher(key: string): boolean {
     return !!this.watchers[key];
@@ -488,24 +485,23 @@ export class State<ValueType = any> {
    */
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
-
-    // Check if provided callback is valid function
     if (!isFunction(callback)) {
       LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
       return this;
     }
 
-    // Register provided callback
+    // Register specified callback
     this.persistent.onLoad = callback;
 
-    // If State is already persisted ('isPersisted') fire provided callback immediately
+    // If State is already persisted ('isPersisted') fire specified callback immediately
     if (this.isPersisted) callback(true);
 
     return this;
   }
 
   /**
-   * Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
+   * Repeatedly calls a function or executes a code snippet,
+   * with a fixed time delay between each call.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#interval)
    *
@@ -527,6 +523,7 @@ export class State<ValueType = any> {
       return this;
     }
 
+    // Create interval
     this.currentInterval = setInterval(() => {
       this.set(handler(this._value));
     }, delay ?? 1000);
@@ -552,6 +549,9 @@ export class State<ValueType = any> {
   /**
    * Returns a boolean indicating whether the State exists.
    *
+   * It calculates the value based on the `computeExistsMethod()`
+   * and whether the State is a placeholder.
+   *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#exists)
    *
    * @public
@@ -561,12 +561,15 @@ export class State<ValueType = any> {
   }
 
   /**
-   * TODO
+   * Defines the method used to compute the existence of the State.
+   *
+   * It is retrieved on each `exists()` method call
+   * to determine whether the State exists or not.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#computeexists)
    *
    * @public
-   * @param method - Computed function
+   * @param method - Method to compute the existence of the State.
    */
   public computeExists(method: ComputeExistsMethod<ValueType>): this {
     if (!isFunction(method)) {
@@ -579,12 +582,16 @@ export class State<ValueType = any> {
   }
 
   /**
-   * TODO
+   * Defines the method used to compute the value of the State.
+   *
+   * It is retrieved on each State value change,
+   * in order to compute the new State value
+   * based on the specified compute method.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#computevalue)
    *
    * @public
-   * @param method - Computed function
+   * @param method - Method to compute the value of the State.
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
@@ -601,8 +608,9 @@ export class State<ValueType = any> {
 
   /**
    * Returns a boolean indicating whether the specified value is equal to the current State value.
-   * Equivalent to '===' with the difference that it looks at the value
-   * and not on the reference.
+   *
+   * Equivalent to `===` with the difference that it looks at the value
+   * and not on the reference in the case of objects.
    *
    * @public
    * @param value - Value to be compared with the current State value.
@@ -613,8 +621,9 @@ export class State<ValueType = any> {
 
   /**
    * Returns a boolean indicating whether the specified value is not equal to the current State value.
-   * Equivalent to '!==' with the difference that it looks at the value
-   * and not on the reference.
+   *
+   * Equivalent to `!==` with the difference that it looks at the value
+   * and not on the reference in the case of objects.
    *
    * @public
    * @param value - Value to be compared with the current State value.
@@ -623,32 +632,52 @@ export class State<ValueType = any> {
     return notEqual(value, this.value);
   }
 
-  //=========================================================================================================
-  // Invert
-  //=========================================================================================================
   /**
+   * Inverts the current State value.
+   *
+   * Some examples are:
+   * - `'jeff'` -> `'ffej'`
+   * - `true` -> `false`
+   * - `[1, 2, 3]` -> `[3, 2, 1]`
+   * - `10` -> `-10`
+   *
    * @public
-   * Inverts State Value
-   * Note: Only useful with boolean based States
    */
   public invert(): this {
-    if (typeof this._value === 'boolean') {
-      this.set(!this._value as any);
-    } else {
-      LogCodeManager.log('14:03:05');
+    switch (typeof this.nextStateValue) {
+      case 'boolean':
+        this.set(!this.nextStateValue as any);
+        break;
+      case 'object':
+        if (Array.isArray(this.nextStateValue))
+          this.set(this.nextStateValue.reverse() as any);
+        break;
+      case 'string':
+        this.set(this.nextStateValue.split('').reverse().join('') as any);
+        break;
+      case 'number':
+        this.set((this.nextStateValue * -1) as any);
+        break;
+      default:
+        LogCodeManager.log('14:03:05', [typeof this.nextStateValue]);
     }
+
     return this;
   }
 
-  //=========================================================================================================
-  // Add SideEffect
-  //=========================================================================================================
   /**
+   *
+   * Registers a `callback` function that is executed during the `runtime`
+   * as a side effect of State changes.
+   *
+   * For example it is called when the State value changes from 'jeff' to 'hans'.
+   *
+   * A typical side effect could be the updating of the external Storage value.
+   *
    * @internal
-   * Adds SideEffect to State
-   * @param key - Key/Name of SideEffect
-   * @param callback - Callback Function that gets called on every State Value change
-   * @param config - Config
+   * @param key - Key/Name identifier of the to register side effect.
+   * @param callback - Callback function to be called on each State value change.
+   * @param config - Configuration object
    */
   public addSideEffect<Instance extends State<ValueType>>(
     key: string,
@@ -669,26 +698,27 @@ export class State<ValueType = any> {
     return this;
   }
 
-  //=========================================================================================================
-  // Remove SideEffect
-  //=========================================================================================================
   /**
+   * Removes a side effect callback with the specified key/name identifier from the State.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#removesideeffect)
+   *
    * @internal
-   * Removes SideEffect at given Key
-   * @param key - Key of the SideEffect that gets removed
+   * @param key - Key/Name identifier of the side effect callback to be removed.
    */
   public removeSideEffect(key: string): this {
     delete this.sideEffects[key];
     return this;
   }
 
-  //=========================================================================================================
-  // Has SideEffect
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether a side effect callback with the specified `key`
+   * exists in the State or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#hassideeffect)
+   *
    * @internal
-   * Checks if sideEffect at given Key exists
-   * @param key - Key of SideEffect
+   * @param key - Key/Name identifier of the side effect callback to be checked for existence.
    */
   public hasSideEffect(key: string): boolean {
     return !!this.sideEffects[key];
@@ -709,26 +739,23 @@ export class State<ValueType = any> {
     return type === this.valueType;
   }
 
-  //=========================================================================================================
-  // Get Public Value
-  //=========================================================================================================
   /**
+   * Returns the public value of the State.
+   *
    * @internal
-   * Returns public Value of State
    */
   public getPublicValue(): ValueType {
-    // If State Value is used internally and output represents the real state value (for instance in Group)
+    // If State value is used internally
+    // and output represents the public State value (for instance in Group)
     if (this['output'] !== undefined) return this['output'];
 
     return this._value;
   }
 
-  //=========================================================================================================
-  // Get Persistable Value
-  //=========================================================================================================
   /**
+   * Returns the persistable value of the State.
+   *
    * @internal
-   * Returns Value that gets written into the Agile Storage
    */
   public getPersistableValue(): any {
     return this._value;
@@ -743,8 +770,21 @@ export type StateKey = string | number;
  * @param isPlaceholder - If State is initially a Placeholder
  */
 export interface StateConfigInterface {
+  /**
+   * Key/Name identifier of the State.
+   * @default undefined
+   */
   key?: StateKey;
+  /**
+   * Observers that depend on the State.
+   * @default undefined
+   */
   dependents?: Array<Observer>;
+  /**
+   * Whether the State should be a placeholder
+   * and therefore should only exist in the background.
+   * @default false
+   */
   isPlaceholder?: boolean;
 }
 
@@ -760,14 +800,26 @@ export interface PatchOptionConfigInterface {
   addNewProperties?: boolean;
 }
 
-/**
- * @param loadValue - If Persistent loads the persisted value into the State
- * @param storageKeys - Key/Name of Storages which gets used to persist the State Value (NOTE: If not passed the default Storage will be used)
- * @param defaultStorageKey - Default Storage Key (if not provided it takes the first index of storageKeys or the AgileTs default Storage)
- */
 export interface StatePersistentConfigInterface {
+  /**
+   * Whether the Persistent should automatically load
+   * the persisted value into the State after its instantiation.
+   * @default true
+   */
   loadValue?: boolean;
+  /**
+   * Key/Name identifier of Storages
+   * in which the State value should be or is persisted.
+   * @default [AgileTs default Storage key]
+   */
   storageKeys?: StorageKey[];
+  /**
+   * Default Storage key of the specified Storage keys.
+   * The State value is loaded from the default Storage
+   * and is only loaded from the remaining Storages (storageKeys)
+   * if the loading of the default Storage failed.
+   * @default first index of the specified Storage keys or the AgileTs default Storage key
+   */
   defaultStorageKey?: StorageKey;
 }
 
@@ -782,18 +834,25 @@ export type SideEffectFunctionType<Instance extends State<any>> = (
   }
 ) => void;
 
-/**
- * @param callback - Callback Function that gets called on every State Value change
- * @param weight - When the sideEffect gets executed. The higher, the earlier it gets executed.
- */
 export interface SideEffectInterface<Instance extends State<any>> {
+  /**
+   * Callback function to be called on every State value change
+   * @return () => {}
+   */
   callback: SideEffectFunctionType<Instance>;
+  /**
+   * Weight of the side effect.
+   * Determines the order of execution of the registered side effects.
+   * The higher the weight, the earlier it is executed.
+   */
   weight: number;
 }
 
-/**
- * @param weight - When the sideEffect gets executed. The higher, the earlier it gets executed.
- */
 export interface AddSideEffectConfigInterface {
+  /**
+   * Weight of the side effect.
+   * Determines the order of execution of the registered side effects.
+   * The higher the weight, the earlier it is executed.
+   */
   weight?: number;
 }

@@ -285,7 +285,7 @@ export type SelectorKey = string | number;
 
 export interface SelectorConfigInterface {
   /**
-   * Key/Name identifier of Selector.
+   * Key/Name identifier of the Selector.
    * @default undefined
    */
   key?: SelectorKey;

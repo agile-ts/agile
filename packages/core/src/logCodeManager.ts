@@ -65,7 +65,7 @@ const logCodeMessages = {
   '14:03:02': "The 'patch()' method works only in object based States!",
   '14:03:03': "Watcher Callback with the key/name '${0}' already exists!",
   '14:03:04': 'Only one Interval can be active at once!',
-  '14:03:05': "The 'invert()' method works only in boolean based States!",
+  '14:03:05': "Failed to invert value of the type '${0}'!",
 
   // SubController
   '15:01:00': "Unregistered 'Callback' based Subscription.",

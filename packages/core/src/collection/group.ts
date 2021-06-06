@@ -380,7 +380,7 @@ export interface GroupAddConfigInterface extends StateIngestConfigInterface {
 
 export interface GroupConfigInterface {
   /**
-   * Key/Name identifier of Group.
+   * Key/Name identifier of the Group.
    * @default undefined
    */
   key?: GroupKey;
