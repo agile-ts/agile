@@ -10,7 +10,6 @@ import {
   SubscriptionContainerKeyType,
   defineConfig,
   isValidObject,
-  ProxyKeyMapInterface,
   generateId,
   ProxyWeakMapType,
 } from '@agile-ts/core';
@@ -60,7 +59,8 @@ export function useAgile<
     depsArray: (Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
     const handleReturn = (dep: Observer | undefined): AgileHookType<Y> => {
-      const value = dep?.value;
+      if (dep == null) return undefined as any;
+      const value = dep.value;
 
       // If proxyBased and value is object wrap Proxy around it to track used properties
       if (config.proxyBased && isValidObject(value, true)) {
@@ -71,7 +71,7 @@ export function useAgile<
         return proxyTree.proxy;
       }
 
-      return dep?.value;
+      return dep.value;
     };
 
     // Handle single dep

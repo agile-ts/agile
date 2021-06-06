@@ -158,12 +158,10 @@ export class Runtime {
         let updateSubscriptionContainer = true;
 
         // Handle Selectors
-        if (subscriptionContainer.hasSelectors) {
-          updateSubscriptionContainer = this.handleSelectors(
-            subscriptionContainer,
-            job
-          );
-        }
+        updateSubscriptionContainer = this.handleSelectors(
+          subscriptionContainer,
+          job
+        );
 
         if (updateSubscriptionContainer) {
           subscriptionContainer.updatedSubscribers.push(job.observer);
@@ -239,9 +237,7 @@ export class Runtime {
     // TODO add Selector support for Object based subscriptions
     const selectors = subscriptionContainer.selectorsWeakMap.get(job.observer)
       ?.selectors;
-
-    // Return true because in this cases the subscriptionContainer isn't properly proxyBased
-    if (!subscriptionContainer.hasSelectors || !selectors) return true;
+    if (!selectors) return true;
 
     const previousValue = job.observer.previousValue;
     const newValue = job.observer.value;

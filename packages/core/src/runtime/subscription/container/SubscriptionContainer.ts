@@ -50,11 +50,15 @@ export class SubscriptionContainer {
   public isObjectBased = false;
   /**
    * Weak map for storing a key identifier for each Observer.
+   *
+   * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
   public subscriberKeysWeakMap: WeakMap<Observer, string>;
 
   /**
    * Weak map representing Selectors of the Subscription Container.
+   *
+   * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
   public selectorsWeakMap: SelectorWeakMapType;
 
