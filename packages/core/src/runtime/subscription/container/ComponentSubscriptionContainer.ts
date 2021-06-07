@@ -14,17 +14,16 @@ export class ComponentSubscriptionContainer<
   public component: C;
 
   /**
-   * Subscription Container for component based subscriptions.
-   *
-   * In a component based subscription, a rerender is triggered on the Component
-   * by muting a local State Management instance/property of the Component.
-   * For example in a React Class Component the `this.state` property.
+   * A Component Subscription Container represents a UI-Component in AgileTs
+   * and triggers a rerender on the UI-Component by muting the specified Component Instance.
+   * For example by updating a local State Management property of the Component.
+   * (like in a React Class Components the `this.state` property)
    *
    * The Component Subscription Container keeps track of the Component itself,
-   * to synchronize the Component State Management instance with the subscribed Observer values.
+   * to mutate it accordingly so that a rerender is triggered.
    *
-   * For this to work well, a component subscription is often object based
-   * so that each observer has a uniq key.
+   * For this to work well, a Component Subscription Container is often object based.
+   * Meaning that each Observer was provided in a object keymap with a unique key identifier.
    * ```
    * // Object based (guaranteed unique key)
    * {
@@ -34,6 +33,14 @@ export class ComponentSubscriptionContainer<
    *
    * // Array based (no guaranteed unique key)
    * [Observer, Observer]
+   * ```
+   * Thus the Integrations 'updateMethod' method can be called
+   *  with an complete object of changed Observer values.
+   * ```
+   * {
+   *   state1: Observer.value,
+   *   state2: Observer.value
+   * }
    * ```
    *
    * [Learn more..](https://agile-ts.org/docs/core/integration#component-based)

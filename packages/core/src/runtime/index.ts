@@ -13,25 +13,34 @@ export class Runtime {
   // Agile Instance the Runtime belongs to
   public agileInstance: () => Agile;
 
-  // Job that is currently performed
+  // Job that is currently being performed
   public currentJob: RuntimeJob | null = null;
-  // Jobs to perform
+  // Jobs to be performed
   public jobQueue: Array<RuntimeJob> = [];
 
   // Jobs that were performed and are ready to rerender
   public jobsToRerender: Array<RuntimeJob> = [];
-  // Jobs that were performed and should rerender
-  // but the Subscription Container isn't ready to rerender it yet
-  // For example if the UI-Component isn't mounted yet.
+  // Jobs that were performed and should be rerendered.
+  // However their Subscription Container isn't ready to rerender yet.
+  // For example when the UI-Component isn't mounted yet.
   public notReadyJobsToRerender: Set<RuntimeJob> = new Set();
 
-  // Whether Jobs are currently performed
+  // Whether the job queue is currently being actively processed
   public isPerformingJobs = false;
 
   /**
-   * The Runtime queues and performs ingested Observer change Jobs.
+   * The Runtime executes and queues ingested Observer based Jobs
+   * to prevent race conditions and optimized rerenders of subscribed Components.
    *
-   * It prevents race conditions and combines Job Subscription Container rerenders.
+   * Each provided Job will be executed when it is its turn
+   * by calling the Job Observer's 'perform()' method.
+   *
+   * After a successful execution the Job is added to a rerender queue,
+   * which is firstly put into the browser's 'Bucket' and executed when resources are left.
+   *
+   * The rerender queue is designed for optimizing the render count
+   * by combining rerender Jobs of the same Component
+   * and ingoing rerender requests for unmounted Components.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Runtime belongs to.
@@ -41,7 +50,7 @@ export class Runtime {
   }
 
   /**
-   * Adds the specified Job to the Job queue,
+   * Adds the specified Observer based Job to the internal Job queue,
    * where it will be performed when it is its turn.
    *
    * @internal
@@ -71,9 +80,9 @@ export class Runtime {
    * Performs the specified Job
    * and adds it to the rerender queue if necessary.
    *
-   * After the execution it checks if there is still a Job in the queue.
-   * If so, the next Job in the queue is performed.
-   * If not, the `jobsToRerender` queue will be started to work off.
+   * After the execution of the Job it checks if there are still Jobs left in the queue.
+   * - If so, the next Job in the queue is performed.
+   * - If not, the `jobsToRerender` queue will be started to work off.
    *
    * @internal
    * @param job - Job to be performed.
@@ -87,7 +96,7 @@ export class Runtime {
     job.performed = true;
 
     // Ingest dependents of the Observer into runtime,
-    // since they depend on the Observer and might have been changed
+    // since they depend on the Observer and have properly changed too
     job.observer.dependents.forEach((observer) =>
       observer.ingest({ perform: false })
     );
@@ -100,8 +109,9 @@ export class Runtime {
       .tag(['runtime'])
       .info(LogCodeManager.getLog('16:01:01', [job._key]), job);
 
-    // Perform Jobs as long as Jobs are left in the queue
-    // If no job left start updating/rerendering Subscribers of jobsToRerender
+    // Perform Jobs as long as Jobs are left in the queue.
+    // If no Job is left start updating/rerendering Subscribers
+    // of the Job based on the 'jobsToRerender' queue.
     if (this.jobQueue.length > 0) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
@@ -121,8 +131,9 @@ export class Runtime {
    * and updates (causes rerender on) the Subscription Container (subscribed Component)
    * of each Job Observer.
    *
+   * It returns a boolean indicating whether any Subscription Container was updated.
+   *
    * @internal
-   * @return A boolean indicating whether any Subscription Container was updated.
    */
   public updateSubscribers(): boolean {
     if (!this.agileInstance().hasIntegration()) {
@@ -228,6 +239,8 @@ export class Runtime {
 
   /**
    * Maps the values of updated Observers (updatedSubscribers) into a key map.
+   *
+   * The key is extracted from the Observer itself or from the Subscription Containers 'subscriberKeysWeakMap'.
    *
    * @internal
    * @param subscriptionContainer - Subscription Container from which the 'updatedSubscribers' are to be mapped to a key map.

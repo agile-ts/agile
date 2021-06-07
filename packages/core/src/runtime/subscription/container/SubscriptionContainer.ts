@@ -80,12 +80,12 @@ export class SubscriptionContainer {
   public selectorsWeakMap: SelectorWeakMapType;
 
   /**
-   * A Subscription Container is an interface to a UI-Component,
+   * A Subscription Container represents a UI-Component in AgileTs
    * that can be subscribed by multiple Observers.
    *
-   * These Observers use the Subscription Container
-   * to trigger a rerender on the Component it represents,
-   * when their value change.
+   * These Observers use the Subscription Container as an interface
+   * to trigger a rerender on the UI-Component it represents,
+   * for example when their value has changed.
    *
    * @internal
    * @param subs - Observers to be subscribed to the Subscription Container.
@@ -106,7 +106,7 @@ export class SubscriptionContainer {
     this.componentId = config?.componentId;
     this.subscriberKeysWeakMap = new WeakMap();
 
-    // Create for each specified proxy path a selector function,
+    // Create a selector function for each specified proxy path,
     // which selects the property at the path end
     const selectorWeakMap: SelectorWeakMapType = config.selectorWeakMap as any;
     this.assignProxySelectors(
@@ -118,12 +118,12 @@ export class SubscriptionContainer {
   }
 
   /**
-   * Assigns selector functions created based on the paths of the Proxy Weak Map
-   * to the Selector Weak Map.
+   * Assigns selector functions created based on the paths of the provided Proxy Weak Map
+   * to the specified `selectorWeakMap`.
    *
-   * @param selectorWeakMap
-   * @param proxyWeakMap
-   * @param subs
+   * @param selectorWeakMap - Selector Weak Map the created proxy selectors are added to.
+   * @param proxyWeakMap - Proxy Weak Map containing proxy paths for specified Observers in `subs`.
+   * @param subs - Observers whose values are to be selected based on the specified `proxyWeakMap`.
    */
   public assignProxySelectors(
     selectorWeakMap: SelectorWeakMapType,

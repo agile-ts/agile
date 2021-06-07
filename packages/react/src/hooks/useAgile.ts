@@ -12,6 +12,7 @@ import {
   isValidObject,
   generateId,
   ProxyWeakMapType,
+  ComponentIdType,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
@@ -128,7 +129,12 @@ export function useAgile<
         forceRender();
       },
       observers,
-      { key: config.key, proxyWeakMap, waitForMount: false }
+      {
+        key: config.key,
+        proxyWeakMap,
+        waitForMount: false,
+        componentId: config.componentId,
+      }
     );
 
     // Unsubscribe Callback based Subscription on Unmount
@@ -184,6 +190,7 @@ interface AgileHookConfigInterface {
   key?: SubscriptionContainerKeyType;
   agileInstance?: Agile;
   proxyBased?: boolean;
+  componentId?: ComponentIdType;
 }
 
 interface ProxyTreeMapInterface {
