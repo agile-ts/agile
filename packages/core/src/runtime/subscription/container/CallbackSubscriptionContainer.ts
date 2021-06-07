@@ -7,17 +7,19 @@ import {
 export class CallbackSubscriptionContainer extends SubscriptionContainer {
   /**
    * Callback function to trigger a rerender
-   * on the Component the Subscription Container represents.
+   * on the Component represented by the Subscription Container.
    */
   public callback: Function;
 
   /**
    * Subscription Container for callback based subscriptions.
    *
-   * In a callback based subscription, a rerender is triggered on the Component via a specified callback function.
+   * In a callback based subscription, a rerender is triggered on the Component
+   * using a specified callback function.
    *
    * The Callback Subscription Container doesn't keep track of the Component itself.
-   * It only knows how to trigger a rerender on the particular Component through the callback function.
+   * It only knows how to trigger a rerender
+   * on the particular Component through the callback function.
    *
    * [Learn more..](https://agile-ts.org/docs/core/integration#callback-based)
    *

@@ -12,31 +12,48 @@ import {
 } from '../../internal';
 
 export class SubController {
+  // Agile Instance the Runtime belongs to
   public agileInstance: () => Agile;
 
-  public componentSubs: Set<ComponentSubscriptionContainer> = new Set(); // Holds all registered Component based Subscriptions
-  public callbackSubs: Set<CallbackSubscriptionContainer> = new Set(); // Holds all registered Callback based Subscriptions
+  // Represents all registered Component based Subscriptions
+  public componentSubs: Set<ComponentSubscriptionContainer> = new Set();
+  // Represents all registered Callback based Subscriptions
+  public callbackSubs: Set<CallbackSubscriptionContainer> = new Set();
 
-  public mountedComponents: Set<any> = new Set(); // Holds all mounted Components (only if agileInstance.config.mount = true)
+  // Keeps track of all mounted Components (only if agileInstance.config.mount = true)
+  public mountedComponents: Set<any> = new Set();
 
   /**
+   * Manages the subscription to UI-Components.
+   *
    * @internal
-   * SubController - Handles subscriptions to Components
-   * @param agileInstance - An instance of Agile
+   * @param agileInstance - Instance of Agile the Subscription Container belongs to.
    */
   public constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
   }
 
-  //=========================================================================================================
-  // Subscribe with Subs Object
-  //=========================================================================================================
   /**
+   * Subscribes the in an object specified Observers to a Component represented by the 'integrationInstance'.
+   * Such subscription ensures that the Observer is able to trigger rerenders on the Component
+   * for example if its value changes.
+   *
+   * There are two ways of causing a rerender through the 'integrationInstance' on the Component.
+   * - 1. Via a callback function which triggers a rerender
+   * on the Component when it is called. (Callback based Subscription)
+   * [Learn more..](https://agile-ts.org/docs/core/integration/#callback-based)
+   * - 2. Via the Component itself.
+   * For example by mutating the local State Management property
+   * of the Component. (Component based Subscription)
+   * [Learn more..](https://agile-ts.org/docs/core/integration/#component-based)
+   *
+   * The Component (way of rerendering the Component) is then represented by a created Subscription Container
+   * that is added to the Observer and serves like an interface to the Component.
+   *
    * @internal
-   * Subscribe with Object shaped Subscriptions
-   * @param integrationInstance - Callback Function or Component
-   * @param subs - Initial Subscription Object
-   * @param config - Config
+   * @param integrationInstance - Callback function or Component Instance for triggering a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the Subscription Container in object shape.
+   * @param config - Configuration object
    */
   public subscribeWithSubsObject(
     integrationInstance: any,
@@ -81,11 +98,12 @@ export class SubController {
   // Subscribe with Subs Array
   //=========================================================================================================
   /**
-   * @internal
    * Subscribe with Array shaped Subscriptions
-   * @param integrationInstance - Callback Function or Component
-   * @param subs - Initial Subscription Array
-   * @param config - Config
+   *
+   *  @internal
+   * @param integrationInstance - Callback function or Component Instance for triggering a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the Subscription Container in array shape.
+   * @param config - Configuration object
    */
   public subscribeWithSubsArray(
     integrationInstance: any,

@@ -227,7 +227,7 @@ export class Runtime {
   }
 
   /**
-   * Maps the values of the updated Observers into a key map.
+   * Maps the values of updated Observers (updatedSubscribers) into a key map.
    *
    * @internal
    * @param subscriptionContainer - Subscription Container from which the 'updatedSubscribers' are to be mapped to a key map.
@@ -249,8 +249,9 @@ export class Runtime {
 
   /**
    * Returns a boolean indicating whether the Subscription Container can be updated or not.
-   * Therefore it reviews the '.value' and the '.previousValue' property of the Observer the Job represents.
-   * If a selected property differs, the Subscription Container is allowed to update/rerender.
+   *
+   * Therefore it reviews the '.value' and the '.previousValue' property of the Observer represented by the Job.
+   * If a selected property differs, the Subscription Container is allowed to update/rerender (returns true).
    *
    * @internal
    * @param subscriptionContainer - Subscription Container to be checked if it can update.

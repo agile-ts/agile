@@ -14,17 +14,22 @@ export class SubscriptionContainer {
    * Whether the Subscription Container
    * and the Component the Subscription Container represents are ready.
    *
-   * When both are ready, the Subscription Container is allowed to trigger rerenders on the Component.
+   * When both are ready, the Subscription Container is allowed
+   * to trigger rerenders on the Component based on its type. (Component or Callback based)
    */
   public ready = false;
+  /**
+   * Id of the Component the Subscription Container represents.
+   */
   public componentId?: ComponentIdType;
 
   /**
    * Observers that have subscribed the Subscription Container.
    *
    * The subscribed Observers use the Subscription Container
-   * as an interface to the Component the Subscription Container represents
-   * in order to cause rerenders on the Component.
+   * as an interface to the Component it represents.
+   * Through the Subscription Container, they can then trigger rerenders
+   * on the Component when their value changes.
    *
    * [Learn more..](https://agile-ts.org/docs/core/integration#-subscriptions)
    */
@@ -33,13 +38,16 @@ export class SubscriptionContainer {
    * Temporary stores the subscribed Observers,
    * that were performed by the runtime
    * and are currently running through the update Subscription Container process.
+   *
+   * This is used for example, to merge the changed Observer values
+   * into the Component's local State Management instance for a Component based Subscription.
    */
   public updatedSubscribers: Array<Observer> = [];
 
   /**
    * Whether the Subscription Container is object based.
    *
-   * A Observer is object based when the subscribed Observers were provided in a Observer key map.
+   * A Observer is object based when the subscribed Observers were provided in an Observer key map.
    * ```
    * {
    *   state1: Observer,
@@ -50,22 +58,22 @@ export class SubscriptionContainer {
    *
    * Often Component based Subscriptions are object based,
    * because each Observer requires a unique identifier
-   * to properly merge the Observer value into the local State Management instance.
+   * to properly merge the Observer value into the Component's local State Management instance.
    */
   public isObjectBased = false;
   /**
-   * Weak map for storing a 'external' key identifier for each Observer.
+   * Weak map for storing 'external' key identifiers for Observer.
    *
    * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
   public subscriberKeysWeakMap: WeakMap<Observer, string>;
 
   /**
-   * Weak Map storing selector functions for subscribed Observer.
+   * Weak Map for storing selector functions of subscribed Observer.
    *
-   * A selector functions allows the partly subscription to the Observer value.
-   * So only if the selected part changes, the Subscription Container
-   * rerenders the Component it represents.
+   * A selector functions allows the partly subscription to an Observer value.
+   * Only if the selected Observe value part changes,
+   * the Subscription Container rerenders the Component it represents.
    *
    * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
@@ -98,17 +106,14 @@ export class SubscriptionContainer {
     this.componentId = config?.componentId;
     this.subscriberKeysWeakMap = new WeakMap();
 
-    // Create for each proxy path a Selector,
-    // which selects the property at the path
+    // Create for each specified proxy path a selector function,
+    // which selects the property at the path end
     const selectorWeakMap: SelectorWeakMapType = config.selectorWeakMap as any;
-
-    // Assign selector functions based on the Proxy Weak Map
     this.assignProxySelectors(
       selectorWeakMap,
       config.proxyWeakMap as any,
       subs
     );
-
     this.selectorsWeakMap = selectorWeakMap;
   }
 
@@ -186,7 +191,11 @@ export interface SubscriptionContainerConfigInterface {
    */
   proxyWeakMap?: ProxyWeakMapType;
   /**
-   * A Weak Map with an array of selector functions for the Observer
+   * A Weak Map with an array of selector functions for Observers.
+   *
+   * A selector functions allows the partly subscription to an Observer value.
+   * Only if the selected Observe value part changes,
+   * the Subscription Container rerenders the Component it represents.
    *
    * @default new WeakMap()
    */
