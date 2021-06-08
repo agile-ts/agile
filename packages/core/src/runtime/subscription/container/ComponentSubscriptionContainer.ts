@@ -35,18 +35,23 @@ export class ComponentSubscriptionContainer<
    * [Observer, Observer]
    * ```
    * Thus the Integrations 'updateMethod' method can be called
-   *  with an complete object of changed Observer values.
+   * with an complete object of changed Observer values.
    * ```
-   * {
-   *   state1: Observer.value,
-   *   state2: Observer.value
-   * }
+   * updateMethod: (componentInstance, updatedData) => {
+   *  console.log(componentInstance); // Returns [this.component]
+   *  console.log(updatedData); // Returns changed Observer values (see below)
+   *  // {
+   *  //   state1: Observer.value,
+   *  //   state2: Observer.value
+   *  // }
+   *  }
    * ```
    *
    * [Learn more..](https://agile-ts.org/docs/core/integration#component-based)
    *
    * @internal
-   * @param component - Component to be represent by the Subscription Container.
+   * @param component - Component to be represented by the Subscription Container
+   * and mutated via the Integration method 'updateMethod()' to trigger rerender on it.
    * @param subs - Observers to be subscribed to the Subscription Container.
    * @param config - Configuration object
    */

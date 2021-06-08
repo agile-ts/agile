@@ -1,19 +1,27 @@
 import { Observer, defineConfig, SubscriptionContainer } from '../internal';
 
 export class RuntimeJob<ObserverType extends Observer = Observer> {
-  public _key?: RuntimeJobKey;
   public config: RuntimeJobConfigInterface;
-  public observer: ObserverType; // Observer the Job represents
-  public rerender: boolean; // If Job will cause rerender on subscriptionContainer in Observer
-  public performed = false; // If Job has been performed by Runtime
-  public subscriptionContainersToUpdate = new Set<SubscriptionContainer>(); // SubscriptionContainer (from Observer) that have to be updated/rerendered
-  public triesToUpdate = 0; // How often not ready subscriptionContainers of this Job have been tried to update
+
+  // Key/Name identifier of the Subscription Container
+  public _key?: RuntimeJobKey;
+  // Observer the Job represents
+  public observer: ObserverType;
+  // Whether the Subscription Containers (Components) of the Observer can be re-rendered
+  public rerender: boolean;
+  // Whether the Job has been performed by the runtime
+  public performed = false;
+  // Subscription Container of the Observer that have to be updated/re-rendered
+  public subscriptionContainersToUpdate = new Set<SubscriptionContainer>();
+  // How often not ready Subscription Container of the Observer have been tried to update
+  public triesToUpdate = 0;
 
   /**
+   * A Job that contains an Observer to be executed by the runtime.
+   *
    * @internal
-   * Job - Represents Observer that gets performed by the Runtime
-   * @param observer - Observer
-   * @param config - Config
+   * @param observer - Observer to be represented by the Runtime Job.
+   * @param config - Configuration object
    */
   constructor(
     observer: ObserverType,
@@ -42,22 +50,34 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
     this.subscriptionContainersToUpdate = new Set(observer.subscribedTo);
   }
 
-  public get key(): RuntimeJobKey | undefined {
-    return this._key;
-  }
-
+  /**
+   * Updates the key/name identifier of the Runtime Job.
+   *
+   * @public
+   * @param value - New key/name identifier.
+   */
   public set key(value: RuntimeJobKey | undefined) {
     this._key = value;
+  }
+
+  /**
+   * Returns the key/name identifier of the Runtime Job.
+   *
+   * @public
+   */
+  public get key(): RuntimeJobKey | undefined {
+    return this._key;
   }
 }
 
 export type RuntimeJobKey = string | number;
 
-/**
- * @param key - Key/Name of RuntimeJob
- */
 export interface CreateRuntimeJobConfigInterface
   extends RuntimeJobConfigInterface {
+  /**
+   * Key/Name identifier of the Runtime Job.
+   * @default undefined
+   */
   key?: RuntimeJobKey;
 }
 
@@ -70,17 +90,40 @@ export interface CreateRuntimeJobConfigInterface
  * But be aware that this can lead to an overflow of 'old' Jobs after some time. (affects performance)
  */
 export interface RuntimeJobConfigInterface {
+  /**
+   * Whether to perform the Runtime Job in background.
+   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * @default false
+   */
   background?: boolean;
+  /**
+   * Configuration of the execution of defined side effects.
+   * @default {enabled: true, exclude: []}
+   */
   sideEffects?: SideEffectConfigInterface;
+  /**
+   * Whether the Runtime Job should be forced through the runtime
+   * although it might be useless from the viewpoint of the runtime.
+   * @default false
+   */
   force?: boolean;
+  /**
+   * How often the runtime should try to update not ready Subscription Containers of the Observer the Job represents.
+   * If 'null' the runtime tries to update the not ready Subscription Container until they are ready (infinite).
+   * @default 3
+   */
   numberOfTriesToUpdate?: number | null;
 }
 
-/**
- * @param enabled - If SideEffects get executed
- * @param exclude - SideEffect at Keys that doesn't get executed
- */
 export interface SideEffectConfigInterface {
+  /**
+   * Whether to execute the defined side effects
+   * @default true
+   */
   enabled?: boolean;
+  /**
+   * Side effect key identifier that won't be executed.
+   * @default []
+   */
   exclude?: string[];
 }

@@ -24,10 +24,13 @@ export class SubController {
   public mountedComponents: Set<any> = new Set();
 
   /**
-   * Manages the subscription to UI-Components.
+   * The Subscription Controller manages the subscription to UI-Components.
+   *
+   * Thus it creates Subscription Containers (Interfaces to UI-Components)
+   * and assigns them to Observers, so that the Observers can easily trigger rerender on Components.
    *
    * @internal
-   * @param agileInstance - Instance of Agile the Subscription Container belongs to.
+   * @param agileInstance - Instance of Agile the Subscription Controller belongs to.
    */
   public constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
@@ -38,7 +41,7 @@ export class SubController {
    * Such Subscription Container know how to trigger a rerender on the UI-Component it represents
    * through the provided `integrationInstance`.
    *
-   * There exist two different ways on how the Subscription Container can cause a rerender on the Component.
+   * There exist two different ways the Subscription Container can cause a rerender on the Component.
    * - 1. Via a callback function that directly triggers a rerender on the Component. (Callback based Subscription)
    * [Learn more..](https://agile-ts.org/docs/core/integration/#callback-based)
    * - 2. Via the Component instance itself.
@@ -46,7 +49,7 @@ export class SubController {
    * [Learn more..](https://agile-ts.org/docs/core/integration/#component-based)
    *
    * The in an object specified Observers are then automatically subscribed
-   * to the created Subscription Container and thus to the Component the Subscription Container represents.
+   * to the created Subscription Container and thus to the Component it represents.
    *
    * The advantage of subscribing the Observer via a object keymap,
    * is that each Observer has its own unique key identifier.
@@ -56,9 +59,9 @@ export class SubController {
    * this.state = {...this.state, {state1: Observer1.value, state2: Observer2.value}}
    * ```
    *
-   * @internal
-   * @param integrationInstance - Callback function or Component Instance for triggering a rerender on a UI-Component.
-   * @param subs - Observers to be subscribed to the Subscription Container.
+   * @public
+   * @param integrationInstance - Callback function or Component Instance to trigger a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the to create Subscription Container.
    * @param config - Configuration object
    */
   public subscribeWithSubsObject(
@@ -84,7 +87,7 @@ export class SubController {
       subscriptionContainer.subscriberKeysWeakMap.set(subs[key], key);
 
     // Subscribe Observers to the created Subscription Container
-    // and build a Observer value keymap
+    // and build a Observer value keymap called props
     for (const key in subs) {
       const observer = subs[key];
       observer.subscribe(subscriptionContainer);
@@ -102,7 +105,7 @@ export class SubController {
    * Such Subscription Container know how to trigger a rerender on the UI-Component it represents
    * through the provided `integrationInstance`.
    *
-   * There exist two different ways on how the Subscription Container can cause a rerender on the Component.
+   * There exist two different ways the Subscription Container can cause a rerender on the Component.
    * - 1. Via a callback function that directly triggers a rerender on the Component. (Callback based Subscription)
    * [Learn more..](https://agile-ts.org/docs/core/integration/#callback-based)
    * - 2. Via the Component instance itself.
@@ -110,11 +113,11 @@ export class SubController {
    * [Learn more..](https://agile-ts.org/docs/core/integration/#component-based)
    *
    * The in an array specified Observers are then automatically subscribed
-   * to the created Subscription Container and thus to the Component the Subscription Container represents.
+   * to the created Subscription Container and thus to the Component it represents.
    *
-   * @internal
-   * @param integrationInstance - Callback function or Component Instance for triggering a rerender on a UI-Component.
-   * @param subs - Observers to be subscribed to the Subscription Container.
+   * @public
+   * @param integrationInstance - Callback function or Component Instance to trigger a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the to create Subscription Container.
    * @param config - Configuration object
    */
   public subscribeWithSubsArray(
@@ -138,12 +141,12 @@ export class SubController {
    * Unsubscribe the Subscription Container extracted from the specified 'subscriptionInstance'
    * from all Observers that were subscribed to it.
    *
-   * We should always unsubscribe a Subscription Container when it isn't in use anymore,
-   * for example when the Component it represented has been unmounted.
+   * We should always unregister a Subscription Container when it is no longer in use,
+   * for example when the Component it represents has been unmounted.
    *
-   * @internal
+   * @public
    * @param subscriptionInstance - Subscription Container
-   * or an UI-Component that contains an instance of the Subscription Container to be unsubscribed.
+   * or a UI-Component that contains an instance of a Subscription Container to be unsubscribed.
    */
   public unsubscribe(subscriptionInstance: any) {
     // Helper function to remove Subscription Container from Observer
@@ -196,11 +199,11 @@ export class SubController {
   }
 
   /**
-   * Returns a Component or Callback based Subscription Container
+   * Returns a newly created Component or Callback based Subscription Container
    * based on the specified `integrationInstance`.
    *
    * @internal
-   * @param integrationInstance - Callback function or Component Instance for triggering a rerender on a UI-Component.
+   * @param integrationInstance - Callback function or Component Instance to trigger a rerender on a UI-Component.
    * @param config - Configuration object
    */
   public createSubscriptionContainer(
@@ -215,18 +218,11 @@ export class SubController {
       : this.createComponentSubscriptionContainer(integrationInstance, config);
   }
 
-  //=========================================================================================================
-  // Create Component Subscription Container
-  //=========================================================================================================
   /**
    * Returns a newly created Component based Subscription Container.
    *
-   * Registers Component based Subscription and applies SubscriptionContainer to Component.
-   * If an instance called 'subscriptionContainers' exists in Component it will push the new SubscriptionContainer to this Array,
-   * otherwise it creates a new Instance called 'subscriptionContainer' which holds the new  SubscriptionContainer
-   *
    * @internal
-   * @param componentInstance - Component Instance for triggering a rerender on a UI-Component.
+   * @param componentInstance - Component Instance to trigger a rerender on a UI-Component.
    * @param config - Configuration object.
    */
   public createComponentSubscriptionContainer(
@@ -247,7 +243,7 @@ export class SubController {
     } else componentSubscriptionContainer.ready = true;
 
     // Add subscriptionContainer to Component, to have an instance of it there
-    // (Required to unsubscribe the Subscription Container later via the Component Instance)
+    // (For example, required to unsubscribe the Subscription Container via the Component Instance)
     if (
       componentInstance.componentSubscriptionContainers &&
       Array.isArray(componentInstance.componentSubscriptionContainers)
@@ -271,7 +267,7 @@ export class SubController {
    * Returns a newly created Callback based Subscription Container.
    *
    * @internal
-   * @param callbackFunction - Callback function for triggering a rerender on a UI-Component.
+   * @param callbackFunction - Callback function to trigger a rerender on a UI-Component.
    * @param config - Configuration object
    */
   public createCallbackSubscriptionContainer(
@@ -296,8 +292,8 @@ export class SubController {
   /**
    * Mounts Component based Subscription Container.
    *
-   * @internal
-   * @param componentInstance - SubscriptionContainer(Component) that gets mounted
+   * @public
+   * @param componentInstance - Component Instance containing a Subscription Container to be mounted
    */
   public mount(componentInstance: any) {
     if (
@@ -314,8 +310,8 @@ export class SubController {
   /**
    * Unmounts Component based Subscription Containers.
    *
-   * @internal
-   * @param componentInstance - SubscriptionContainer(Component) that gets unmounted
+   * @public
+   * @param componentInstance - Component Instance containing a Subscription Container to be unmounted
    */
   public unmount(componentInstance: any) {
     if (
@@ -333,8 +329,8 @@ export class SubController {
 interface RegisterSubscriptionConfigInterface
   extends SubscriptionContainerConfigInterface {
   /**
-   * Whether the Subscription Container should only become ready
-   * when the Component has been mounted.
+   * Whether the Subscription Container should be ready only
+   * when the Component it represents has been mounted.
    * @default agileInstance.config.waitForMount
    */
   waitForMount?: boolean;

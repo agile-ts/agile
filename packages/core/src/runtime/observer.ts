@@ -12,20 +12,32 @@ import {
 export type ObserverKey = string | number;
 
 export class Observer<ValueType = any> {
+  // Agile Instance the Observer belongs to
   public agileInstance: () => Agile;
 
+  // Key/Name identifier of the Subscription Container
   public _key?: ObserverKey;
-  public dependents: Set<Observer> = new Set(); // Observers that depend on this Observer
-  public subscribedTo: Set<SubscriptionContainer> = new Set(); // SubscriptionContainers (Components) that this Observer is subscribed to
-  public value?: ValueType; // Value of Observer
-  public previousValue?: ValueType; // Previous Value of Observer
+  // Observers that depend on this Observer
+  public dependents: Set<Observer> = new Set();
+  // Subscription Containers (Components) the Observer is subscribed to
+  public subscribedTo: Set<SubscriptionContainer> = new Set();
+  // Current value of Observer
+  public value?: ValueType;
+  // Previous value of Observer
+  public previousValue?: ValueType;
 
   /**
+   * Handles the subscriptions to Subscription Containers (Components)
+   * and keeps track of dependencies.
+   *
+   * All Agile Classes that can be bound a UI-Component have their own Observer
+   * which manages the above mentioned things for them.
+   *
+   * The Observer is no standalone class and should be extended from a 'real' Observer.
+   *
    * @internal
-   * Observer - Handles subscriptions and dependencies of an Agile Class and is like an instance to the Runtime
-   * Note: No stand alone class!!
-   * @param agileInstance - An instance of Agile
-   * @param config - Config
+   * @param agileInstance - Instance of Agile the Observer belongs to.
+   * @param config - Configuration object
    */
   constructor(
     agileInstance: Agile,
@@ -46,28 +58,31 @@ export class Observer<ValueType = any> {
   }
 
   /**
-   * @internal
-   * Set Key/Name of Observer
+   * Updates the key/name identifier of the Observer.
+   *
+   * @public
+   * @param value - New key/name identifier.
    */
   public set key(value: StateKey | undefined) {
     this._key = value;
   }
 
   /**
-   * @internal
-   * Get Key/Name of Observer
+   * Returns the key/name identifier of the State.
+   *
+   * @public
    */
   public get key(): StateKey | undefined {
     return this._key;
   }
 
-  //=========================================================================================================
-  // Ingest
-  //=========================================================================================================
   /**
-   * @internal
-   * Ingests Observer into Runtime
-   * @param config - Configuration
+   * Ingests the Observer into the runtime,
+   * by creating a Runtime Job
+   * and adding the Observer to the created Job.
+   *
+   * @public
+   * @param config - Configuration object
    */
   public ingest(config: ObserverIngestConfigInterface = {}): void {
     config = defineConfig(config, {
@@ -93,54 +108,56 @@ export class Observer<ValueType = any> {
     });
   }
 
-  //=========================================================================================================
-  // Perform
-  //=========================================================================================================
   /**
-   * @internal
-   * Performs Job of Runtime
-   * @param job - Job that gets performed
+   * Method executed by the Runtime to perform the Runtime Job,
+   * previously ingested (`ingest()`) by the Observer.
+   *
+   * @public
+   * @param job - Runtime Job to be performed.
    */
   public perform(job: RuntimeJob): void {
     LogCodeManager.log('17:03:00');
   }
 
-  //=========================================================================================================
-  // Depend
-  //=========================================================================================================
   /**
-   * @internal
-   * Adds Dependent to Observer which gets ingested into the Runtime whenever this Observer mutates
-   * @param observer - Observer that will depend on this Observer
+   * Adds specified Observer to the dependents of this Observer.
+   *
+   * Every time this Observer is ingested into the Runtime,
+   * the dependent Observers are ingested into the Runtime too.
+   *
+   * @public
+   * @param observer - Observer to depends on this Observer.
    */
   public depend(observer: Observer): void {
     if (!this.dependents.has(observer)) this.dependents.add(observer);
   }
 
-  //=========================================================================================================
-  // Subscribe
-  //=========================================================================================================
   /**
-   * @internal
-   * Adds Subscription to Observer
-   * @param subscriptionContainer - SubscriptionContainer(Component) that gets subscribed by this Observer
+   * Subscribes Observer to the specified Subscription Container (Component).
+   *
+   * Every time this Observer is ingested into the Runtime,
+   * a rerender might be triggered on the Component the Subscription Container represents.
+   *
+   * @public
+   * @param subscriptionContainer - Subscription Container to which the Observer should subscribe.
    */
   public subscribe(subscriptionContainer: SubscriptionContainer): void {
     if (!this.subscribedTo.has(subscriptionContainer)) {
       this.subscribedTo.add(subscriptionContainer);
 
-      // Add this to subscriptionContainer to keep track of the Observers the subscriptionContainer hold
+      // Add Observer to Subscription Container
+      // to keep track of the Observers that have subscribed the Subscription Container.
+      // For example to unsubscribe the subscribed Observers
+      // when the Subscription Container (Component) unmounts.
       subscriptionContainer.subscribers.add(this);
     }
   }
 
-  //=========================================================================================================
-  // Unsubscribe
-  //=========================================================================================================
   /**
-   * @internal
-   * Removes Subscription from Observer
-   * @param subscriptionContainer - SubscriptionContainer(Component) that gets unsubscribed by this Observer
+   * Unsubscribes Observer from specified Subscription Container (Component).
+   *
+   * @public
+   * @param subscriptionContainer - Subscription Container that the Observer should unsubscribe.
    */
   public unsubscribe(subscriptionContainer: SubscriptionContainer): void {
     if (this.subscribedTo.has(subscriptionContainer)) {
@@ -157,9 +174,25 @@ export class Observer<ValueType = any> {
  * @param value - Initial Value of Observer
  */
 export interface CreateObserverConfigInterface<ValueType = any> {
+  /**
+   * Initial Observers that depend on this Observer.
+   * @default []
+   */
   dependents?: Array<Observer>;
+  /**
+   * Initial Subscription Container the Observer is subscribed to.
+   * @default []
+   */
   subs?: Array<SubscriptionContainer>;
+  /**
+   * Key/Name identifier of the Observer.
+   * @default undefined
+   */
   key?: ObserverKey;
+  /**
+   * Initial value of the Observer.
+   * @defualt undefined
+   */
   value?: ValueType;
 }
 

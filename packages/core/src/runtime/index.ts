@@ -30,7 +30,7 @@ export class Runtime {
 
   /**
    * The Runtime executes and queues ingested Observer based Jobs
-   * to prevent race conditions and optimized rerenders of subscribed Components.
+   * to prevent race conditions and optimized rerender of subscribed Components.
    *
    * Each provided Job will be executed when it is its turn
    * by calling the Job Observer's 'perform()' method.
@@ -40,7 +40,7 @@ export class Runtime {
    *
    * The rerender queue is designed for optimizing the render count
    * by combining rerender Jobs of the same Component
-   * and ingoing rerender requests for unmounted Components.
+   * and ignoring rerender requests for unmounted Components.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Runtime belongs to.
@@ -53,7 +53,11 @@ export class Runtime {
    * Adds the specified Observer based Job to the internal Job queue,
    * where it will be performed when it is its turn.
    *
-   * @internal
+   * After a successful execution it is added to the rerender queue,
+   * where all the Observer's subscribed Subscription Containers
+   * cause rerender on Components the Observer is represented in.
+   *
+   * @public
    * @param job - Job to be performed.
    * @param config - Configuration object
    */
@@ -80,7 +84,8 @@ export class Runtime {
    * Performs the specified Job
    * and adds it to the rerender queue if necessary.
    *
-   * After the execution of the Job it checks if there are still Jobs left in the queue.
+   * After the execution of the provided Job it is checked whether
+   * there are still Jobs left in the Job queue.
    * - If so, the next Job in the queue is performed.
    * - If not, the `jobsToRerender` queue will be started to work off.
    *
@@ -127,8 +132,8 @@ export class Runtime {
   }
 
   /**
-   * Executes the `jobsToRerender` queue
-   * and updates (causes rerender on) the Subscription Container (subscribed Component)
+   * Works of the `jobsToRerender` queue by updating (causing rerender on)
+   * the Subscription Container (subscribed Component)
    * of each Job Observer.
    *
    * It returns a boolean indicating whether any Subscription Container was updated.
@@ -147,7 +152,7 @@ export class Runtime {
     )
       return false;
 
-    // Subscription Containers that have to be updated (perform rerender on Component it represents).
+    // Subscription Containers that have to be updated.
     // Using a 'Set()' to combine several equal SubscriptionContainers into one (rerender optimisation).
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
@@ -188,14 +193,15 @@ export class Runtime {
 
         let updateSubscriptionContainer;
 
-        // Handle Selectors
+        // Handle Selectors of Subscription Container
+        // (-> check if a selected part of the Observer value has changed)
         updateSubscriptionContainer = this.handleSelectors(
           subscriptionContainer,
           job
         );
 
-        // Check if Subscription Container with same componentId is already in the 'subscriptionToUpdate' queue
-        // (rerender optimisation)
+        // Check if Subscription Container with same 'componentId'
+        // is already in the 'subscriptionToUpdate' queue (rerender optimisation)
         updateSubscriptionContainer =
           updateSubscriptionContainer &&
           Array.from(subscriptionsToUpdate).findIndex(
@@ -214,13 +220,13 @@ export class Runtime {
 
     if (subscriptionsToUpdate.size <= 0) return false;
 
-    // Update Subscription Containers (trigger rerender on subscribed Component)
+    // Update Subscription Containers (trigger rerender on Components they represent)
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
         subscriptionContainer.callback();
 
-      // Call 'update method' if Component based Subscription
+      // Call 'update method' in Integrations if Component based Subscription
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
@@ -238,19 +244,19 @@ export class Runtime {
   }
 
   /**
-   * Maps the values of updated Observers (updatedSubscribers) into a key map.
+   * Maps the values of updated Observers (`updatedSubscribers`)
+   * of the specified Subscription Container into a key map.
    *
-   * The key is extracted from the Observer itself or from the Subscription Containers 'subscriberKeysWeakMap'.
+   * The key containing the Observer value is extracted from the Observer itself
+   * or from the Subscription Container's `subscriberKeysWeakMap`.
    *
    * @internal
-   * @param subscriptionContainer - Subscription Container from which the 'updatedSubscribers' are to be mapped to a key map.
+   * @param subscriptionContainer - Subscription Container from which the `updatedSubscribers` are to be mapped to a key map.
    */
   public getUpdatedObserverValues(
     subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
     const props: { [key: string]: any } = {};
-
-    // Map updated Observer values into the props key map
     for (const observer of subscriptionContainer.updatedSubscribers) {
       const key =
         subscriptionContainer.subscriberKeysWeakMap.get(observer) ??
@@ -261,14 +267,15 @@ export class Runtime {
   }
 
   /**
-   * Returns a boolean indicating whether the Subscription Container can be updated or not.
+   * Returns a boolean indicating whether the specified Subscription Container can be updated or not
+   * based on the selector functions (`selectorsWeakMap`) of the Subscription Container.
    *
-   * Therefore it reviews the '.value' and the '.previousValue' property of the Observer represented by the Job.
+   * This is done by checking the '.value' and the '.previousValue' property of the Observer represented by the Job.
    * If a selected property differs, the Subscription Container is allowed to update/rerender (returns true).
    *
    * @internal
    * @param subscriptionContainer - Subscription Container to be checked if it can update.
-   * @param job - Job the Subscription Container belongs to.
+   * @param job - Job containing the Observer which has subscribed the Subscription Container.
    */
   public handleSelectors(
     subscriptionContainer: SubscriptionContainer,
@@ -281,7 +288,7 @@ export class Runtime {
     // because no specific part of the Observer was selected
     // -> The Subscription Container should update
     // no matter what was updated in the Observer
-    if (!selectors) return true;
+    if (selectors == null) return true;
 
     // Check if a selected part of Observer value has changed
     const previousValue = job.observer.previousValue;
@@ -289,7 +296,7 @@ export class Runtime {
     for (const selector of selectors) {
       if (
         notEqual(selector(newValue), selector(previousValue))
-        // || newValueDeepness !== previousValueDeepness // Not possible to check
+        // || newValueDeepness !== previousValueDeepness // Not possible to check the object deepness
       )
         return true;
     }
