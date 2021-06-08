@@ -45,9 +45,7 @@ describe('SubController Tests', () => {
         dummySubscriptionContainer = new SubscriptionContainer();
         dummyObserver1.value = 'myCoolValue';
 
-        subController.createSubscriptionContainer = jest.fn(
-          () => dummySubscriptionContainer
-        );
+        subController.subscribe = jest.fn(() => dummySubscriptionContainer);
         jest.spyOn(dummyObserver1, 'subscribe');
         jest.spyOn(dummyObserver2, 'subscribe');
       });
@@ -73,7 +71,7 @@ describe('SubController Tests', () => {
           subscriptionContainer: dummySubscriptionContainer,
         });
 
-        expect(subController.createSubscriptionContainer).toHaveBeenCalledWith(
+        expect(subController.subscribe).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
           {
@@ -113,9 +111,7 @@ describe('SubController Tests', () => {
       beforeEach(() => {
         dummySubscriptionContainer = new SubscriptionContainer();
 
-        subController.createSubscriptionContainer = jest.fn(
-          () => dummySubscriptionContainer
-        );
+        subController.subscribe = jest.fn(() => dummySubscriptionContainer);
         jest.spyOn(dummyObserver1, 'subscribe');
         jest.spyOn(dummyObserver2, 'subscribe');
       });
@@ -133,7 +129,7 @@ describe('SubController Tests', () => {
 
         expect(subscribeWithSubsArrayResponse).toBe(dummySubscriptionContainer);
 
-        expect(subController.createSubscriptionContainer).toHaveBeenCalledWith(
+        expect(subController.subscribe).toHaveBeenCalledWith(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
           {
@@ -290,7 +286,7 @@ describe('SubController Tests', () => {
           /* empty function */
         };
 
-        const subscriptionContainer = subController.createSubscriptionContainer(
+        const subscriptionContainer = subController.subscribe(
           dummyIntegration,
           [dummyObserver1, dummyObserver2]
         );
@@ -313,7 +309,7 @@ describe('SubController Tests', () => {
           /* empty function */
         };
 
-        const subscriptionContainer = subController.createSubscriptionContainer(
+        const subscriptionContainer = subController.subscribe(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
           { key: 'niceKey', proxyKeyMap: {}, waitForMount: false }
@@ -335,7 +331,7 @@ describe('SubController Tests', () => {
       it('should call registerComponentSubscription if passed integrationInstance is not a Function (default config)', () => {
         const dummyIntegration = { dummy: 'integration' };
 
-        const subscriptionContainer = subController.createSubscriptionContainer(
+        const subscriptionContainer = subController.subscribe(
           dummyIntegration,
           [dummyObserver1, dummyObserver2]
         );
@@ -356,7 +352,7 @@ describe('SubController Tests', () => {
       it('should call registerComponentSubscription if passed integrationInstance is not a Function (specific config)', () => {
         const dummyIntegration = { dummy: 'integration' };
 
-        const subscriptionContainer = subController.createSubscriptionContainer(
+        const subscriptionContainer = subController.subscribe(
           dummyIntegration,
           [dummyObserver1, dummyObserver2],
           { key: 'niceKey', proxyKeyMap: {}, waitForMount: false }

@@ -109,16 +109,14 @@ const createHOC = (
     UNSAFE_componentWillMount() {
       // Create Subscription with Observer that have no Indicator and can't be merged into 'this.state' (Rerender will be caused via force Update)
       if (depsWithoutIndicator.length > 0) {
-        this.agileInstance.subController.subscribeWithSubsArray(
-          this,
-          depsWithoutIndicator,
-          { waitForMount: this.waitForMount }
-        );
+        this.agileInstance.subController.subscribe(this, depsWithoutIndicator, {
+          waitForMount: this.waitForMount,
+        });
       }
 
       // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.state')
       if (depsWithIndicator) {
-        const response = this.agileInstance.subController.subscribeWithSubsObject(
+        const response = this.agileInstance.subController.subscribe(
           this,
           depsWithIndicator,
           { waitForMount: this.waitForMount }

@@ -37,7 +37,32 @@ export class SubController {
   }
 
   /**
-   * Creates a so called Subscription Container which represents an UI-Component in AgileTs.
+   * Creates a so called Subscription Container that represents an UI-Component in AgileTs.
+   * Such Subscription Container know how to trigger a rerender on the UI-Component it represents
+   * through the provided `integrationInstance`.
+   *
+   * There exist two different ways the Subscription Container can cause a rerender on the Component.
+   * - 1. Via a callback function that directly triggers a rerender on the Component. (Callback based Subscription)
+   * [Learn more..](https://agile-ts.org/docs/core/integration/#callback-based)
+   * - 2. Via the Component instance itself.
+   * For example by mutating a local State Management property. (Component based Subscription)
+   * [Learn more..](https://agile-ts.org/docs/core/integration/#component-based)
+   *
+   * The in an array specified Observers are then automatically subscribed
+   * to the created Subscription Container and thus to the Component it represents.
+   *
+   * @public
+   * @param integrationInstance - Callback function or Component Instance to trigger a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the to create Subscription Container.
+   * @param config - Configuration object
+   */
+  public subscribe(
+    integrationInstance: any,
+    subs: Array<Observer>,
+    config: RegisterSubscriptionConfigInterface
+  ): SubscriptionContainer;
+  /**
+   * Creates a so called Subscription Container that represents an UI-Component in AgileTs.
    * Such Subscription Container know how to trigger a rerender on the UI-Component it represents
    * through the provided `integrationInstance`.
    *
@@ -64,77 +89,57 @@ export class SubController {
    * @param subs - Observers to be subscribed to the to create Subscription Container.
    * @param config - Configuration object
    */
-  public subscribeWithSubsObject(
+  public subscribe(
     integrationInstance: any,
-    subs: { [key: string]: Observer } = {},
-    config: RegisterSubscriptionConfigInterface = {}
+    subs: { [key: string]: Observer },
+    config: RegisterSubscriptionConfigInterface
   ): {
     subscriptionContainer: SubscriptionContainer;
     props: { [key: string]: Observer['value'] };
-  } {
-    const props: { [key: string]: Observer['value'] } = {};
+  };
+  public subscribe(
+    integrationInstance: any,
+    subs: { [key: string]: Observer } | Array<Observer>,
+    config: RegisterSubscriptionConfigInterface = {}
+  ):
+    | SubscriptionContainer
+    | {
+        subscriptionContainer: SubscriptionContainer;
+        props: { [key: string]: Observer['value'] };
+      } {
+    config = defineConfig(config, {
+      waitForMount: this.agileInstance().config.waitForMount,
+    });
 
     // Create Subscription Container
-    const subscriptionContainer = this.createSubscriptionContainer(
-      integrationInstance,
-      config
-    );
+    const subscriptionContainer = isFunction(integrationInstance)
+      ? this.createCallbackSubscriptionContainer(
+          integrationInstance,
+          subs,
+          config
+        )
+      : this.createComponentSubscriptionContainer(
+          integrationInstance,
+          subs,
+          config
+        );
 
-    // Set SubscriptionContainer to object based
-    // and assign property keys to the 'subscriberKeysWeakMap'
-    subscriptionContainer.isObjectBased = true;
-    for (const key in subs)
-      subscriptionContainer.subscriberKeysWeakMap.set(subs[key], key);
+    const props: { [key: string]: Observer['value'] } = {};
 
     // Subscribe Observers to the created Subscription Container
-    // and build a Observer value keymap called props
+    // and build an Observer value keymap called props
     for (const key in subs) {
       const observer = subs[key];
-      observer.subscribe(subscriptionContainer);
+      observer.subscribedTo.add(subscriptionContainer);
       if (observer.value) props[key] = observer.value;
     }
 
-    return {
-      subscriptionContainer: subscriptionContainer,
-      props: props,
-    };
-  }
-
-  /**
-   * Creates a so called Subscription Container which represents an UI-Component in AgileTs.
-   * Such Subscription Container know how to trigger a rerender on the UI-Component it represents
-   * through the provided `integrationInstance`.
-   *
-   * There exist two different ways the Subscription Container can cause a rerender on the Component.
-   * - 1. Via a callback function that directly triggers a rerender on the Component. (Callback based Subscription)
-   * [Learn more..](https://agile-ts.org/docs/core/integration/#callback-based)
-   * - 2. Via the Component instance itself.
-   * For example by mutating a local State Management property. (Component based Subscription)
-   * [Learn more..](https://agile-ts.org/docs/core/integration/#component-based)
-   *
-   * The in an array specified Observers are then automatically subscribed
-   * to the created Subscription Container and thus to the Component it represents.
-   *
-   * @public
-   * @param integrationInstance - Callback function or Component Instance to trigger a rerender on a UI-Component.
-   * @param subs - Observers to be subscribed to the to create Subscription Container.
-   * @param config - Configuration object
-   */
-  public subscribeWithSubsArray(
-    integrationInstance: any,
-    subs: Array<Observer> = [],
-    config: RegisterSubscriptionConfigInterface = {}
-  ): SubscriptionContainer {
-    // Create Subscription Container
-    const subscriptionContainer = this.createSubscriptionContainer(
-      integrationInstance,
-      config
-    );
-
-    // Subscribe Observers to the created Subscription Container
-    subs.forEach((observer) => observer.subscribe(subscriptionContainer));
-
-    return subscriptionContainer;
+    return Array.isArray(subs)
+      ? subscriptionContainer
+      : {
+          subscriptionContainer: subscriptionContainer,
+          props: props,
+        };
   }
 
   /**
@@ -199,39 +204,21 @@ export class SubController {
   }
 
   /**
-   * Returns a newly created Component or Callback based Subscription Container
-   * based on the specified `integrationInstance`.
-   *
-   * @internal
-   * @param integrationInstance - Callback function or Component Instance to trigger a rerender on a UI-Component.
-   * @param config - Configuration object
-   */
-  public createSubscriptionContainer(
-    integrationInstance: any,
-    config: RegisterSubscriptionConfigInterface = {}
-  ): SubscriptionContainer {
-    config = defineConfig(config, {
-      waitForMount: this.agileInstance().config.waitForMount,
-    });
-    return isFunction(integrationInstance)
-      ? this.createCallbackSubscriptionContainer(integrationInstance, config)
-      : this.createComponentSubscriptionContainer(integrationInstance, config);
-  }
-
-  /**
    * Returns a newly created Component based Subscription Container.
    *
    * @internal
    * @param componentInstance - Component Instance to trigger a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the to create Subscription Container.
    * @param config - Configuration object.
    */
   public createComponentSubscriptionContainer(
     componentInstance: any,
+    subs: { [key: string]: Observer } | Array<Observer>,
     config: RegisterSubscriptionConfigInterface = {}
   ): ComponentSubscriptionContainer {
     const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
-      [],
+      subs,
       removeProperties(config, ['waitForMount'])
     );
     this.componentSubs.add(componentSubscriptionContainer);
@@ -268,15 +255,17 @@ export class SubController {
    *
    * @internal
    * @param callbackFunction - Callback function to trigger a rerender on a UI-Component.
+   * @param subs - Observers to be subscribed to the to create Subscription Container.
    * @param config - Configuration object
    */
   public createCallbackSubscriptionContainer(
     callbackFunction: () => void,
+    subs: { [key: string]: Observer } | Array<Observer>,
     config: RegisterSubscriptionConfigInterface = {}
   ): CallbackSubscriptionContainer {
     const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
       callbackFunction,
-      [],
+      subs,
       removeProperties(config, ['waitForMount'])
     );
     this.callbackSubs.add(callbackSubscriptionContainer);

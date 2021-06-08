@@ -57,7 +57,7 @@ export class ComponentSubscriptionContainer<
    */
   constructor(
     component: C,
-    subs: Array<Observer> = [],
+    subs: Array<Observer> | { [key: string]: Observer },
     config: SubscriptionContainerConfigInterface = {}
   ) {
     super(subs, config);

@@ -7,6 +7,7 @@ import {
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
   LogCodeManager,
+  AddSubscriptionMethodConfigInterface,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -140,8 +141,12 @@ export class Observer<ValueType = any> {
    *
    * @public
    * @param subscriptionContainer - Subscription Container to which the Observer should subscribe.
+   * @param config - Configuration object
    */
-  public subscribe(subscriptionContainer: SubscriptionContainer): void {
+  public subscribe(
+    subscriptionContainer: SubscriptionContainer,
+    config: AddSubscriptionMethodConfigInterface = {}
+  ): void {
     if (!this.subscribedTo.has(subscriptionContainer)) {
       this.subscribedTo.add(subscriptionContainer);
 
@@ -149,7 +154,7 @@ export class Observer<ValueType = any> {
       // to keep track of the Observers that have subscribed the Subscription Container.
       // For example to unsubscribe the subscribed Observers
       // when the Subscription Container (Component) unmounts.
-      subscriptionContainer.subscribers.add(this);
+      subscriptionContainer.addSubscription(this, config);
     }
   }
 
@@ -162,7 +167,7 @@ export class Observer<ValueType = any> {
   public unsubscribe(subscriptionContainer: SubscriptionContainer): void {
     if (this.subscribedTo.has(subscriptionContainer)) {
       this.subscribedTo.delete(subscriptionContainer);
-      subscriptionContainer.subscribers.delete(this);
+      subscriptionContainer.removeSubscription(this);
     }
   }
 }

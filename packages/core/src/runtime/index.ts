@@ -281,21 +281,22 @@ export class Runtime {
     subscriptionContainer: SubscriptionContainer,
     job: RuntimeJob
   ): boolean {
-    const selectors = subscriptionContainer.selectorsWeakMap.get(job.observer)
-      ?.selectors;
+    const selectorMethods = subscriptionContainer.selectorsWeakMap.get(
+      job.observer
+    )?.methods;
 
     // If no selector functions found, return true
     // because no specific part of the Observer was selected
     // -> The Subscription Container should update
     // no matter what was updated in the Observer
-    if (selectors == null) return true;
+    if (selectorMethods == null) return true;
 
     // Check if a selected part of Observer value has changed
     const previousValue = job.observer.previousValue;
     const newValue = job.observer.value;
-    for (const selector of selectors) {
+    for (const selectorMethod of selectorMethods) {
       if (
-        notEqual(selector(newValue), selector(previousValue))
+        notEqual(selectorMethod(newValue), selectorMethod(previousValue))
         // || newValueDeepness !== previousValueDeepness // Not possible to check the object deepness
       )
         return true;

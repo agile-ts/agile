@@ -90,7 +90,7 @@ export class SubscriptionContainer {
    * @param config - Configuration object
    */
   constructor(
-    subs: Array<Observer> = [],
+    subs: Array<Observer> | { [key: string]: Observer },
     config: SubscriptionContainerConfigInterface = {}
   ) {
     config = defineConfig(config, {
@@ -99,52 +99,78 @@ export class SubscriptionContainer {
       key: generateId(),
     });
 
-    this.subscribers = new Set(subs);
+    this.subscribers = new Set();
     this.key = config.key;
     this.componentId = config?.componentId;
     this.subscriberKeysWeakMap = new WeakMap();
+    this.selectorsWeakMap = new WeakMap();
+    this.isObjectBased = !Array.isArray(subs);
 
-    // Create a selector function for each specified proxy path
-    // that selects the property at the path end
-    const selectorWeakMap: SelectorWeakMapType = config.selectorWeakMap as any;
-    this.assignProxySelectors(
-      selectorWeakMap,
-      config.proxyWeakMap as any,
-      subs
-    );
-    this.selectorsWeakMap = selectorWeakMap;
+    for (const key in subs) {
+      const sub = subs[key];
+      this.addSubscription(sub, {
+        proxyPaths: config.proxyWeakMap?.get(sub)?.paths,
+        selectorMethods: config.selectorWeakMap?.get(sub)?.methods,
+        key: !Array.isArray(subs) ? key : undefined,
+      });
+    }
   }
 
   /**
-   * Assigns to the specified `selectorWeakMap` selector functions
-   * created based on the paths of the specified Proxy WeakMap.
+   * Adds specified Observer to the `subscription` array
+   * and its selectors to the `selectorsWeakMap`.
    *
-   * @param selectorWeakMap - Selector WeakMap the created proxy selector functions are added to.
-   * @param proxyWeakMap - Proxy Weak Map containing proxy paths for specified Observers in `subs`.
-   * @param subs - Observers whose values are to be selected based on the specified `proxyWeakMap`.
+   * @internal
+   * @param sub - Observer to be subscribed to the Subscription Container
+   * @param config - Configuration object
    */
-  public assignProxySelectors(
-    selectorWeakMap: SelectorWeakMapType,
-    proxyWeakMap: ProxyWeakMapType,
-    subs: Array<Observer>
+  public addSubscription(
+    sub: Observer,
+    config: AddSubscriptionMethodConfigInterface = {}
   ): void {
-    for (const observer of subs) {
-      const paths = proxyWeakMap.get(observer)?.paths;
-      if (paths != null) {
-        const selectors: SelectorMethodType[] = [];
-        for (const path of paths) {
-          selectors.push((value) => {
-            let _value = value;
-            for (const branch of path) {
-              if (!isValidObject(_value, true)) break;
-              _value = _value[branch];
-            }
-            return _value;
-          });
+    const toAddSelectorMethods: SelectorMethodType[] =
+      config.selectorMethods ?? [];
+    const paths = config.proxyPaths ?? [];
+
+    // Create selector methods based on the specified proxy paths
+    for (const path of paths) {
+      toAddSelectorMethods.push((value) => {
+        let _value = value;
+        for (const branch of path) {
+          if (!isValidObject(_value, true)) break;
+          _value = _value[branch];
         }
-        selectorWeakMap.set(observer, { selectors });
-      }
+        return _value;
+      });
     }
+
+    // Add defined/created selector methods to the 'selectorsWeakMap'
+    const existingSelectorMethods = this.selectorsWeakMap.get(sub)?.methods;
+    const newSelectorMethods = existingSelectorMethods
+      ? existingSelectorMethods.concat(toAddSelectorMethods)
+      : toAddSelectorMethods;
+    if (newSelectorMethods.length > 0)
+      this.selectorsWeakMap.set(sub, { methods: newSelectorMethods });
+
+    // Assign specified key to the 'subscriberKeysWeakMap'
+    // (Not to the Observer, since the here specified key only counts for this Subscription Container)
+    if (config.key != null) this.subscriberKeysWeakMap.set(sub, config.key);
+
+    // Add Observer to subscribers
+    this.subscribers.add(sub);
+  }
+
+  /**
+   * Removes the Observer from the Subscription Container
+   * and from all WeakMaps it might be in.
+   *
+   * @internal
+   * @param sub - Observer to be removed from the Subscription Container
+   */
+  public removeSubscription(sub: Observer) {
+    this.selectorsWeakMap.delete(sub);
+    this.subscriberKeysWeakMap.delete(sub);
+    this.subscribers.delete(sub);
   }
 }
 
@@ -200,12 +226,19 @@ export interface SubscriptionContainerConfigInterface {
   selectorWeakMap?: SelectorWeakMapType;
 }
 
-export type ProxyWeakMapType = WeakMap<Observer, { paths: string[][] }>;
+export interface AddSubscriptionMethodConfigInterface {
+  proxyPaths?: ProxyPathType[];
+  selectorMethods?: SelectorMethodType[];
+  key?: string;
+}
 
+export type ProxyPathType = string[];
+export type ProxyWeakMapType = WeakMap<Observer, { paths: ProxyPathType[] }>;
+
+export type SelectorMethodType<T = any> = (value: T) => any;
 export type SelectorWeakMapType<T = any> = WeakMap<
   Observer,
-  { selectors: SelectorMethodType<T>[] }
+  { methods: SelectorMethodType<T>[] }
 >;
-export type SelectorMethodType<T = any> = (value: T) => any;
 
 export type ComponentIdType = string | number;

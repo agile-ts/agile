@@ -519,60 +519,7 @@ describe('Runtime Tests', () => {
       );
     });
 
-    describe('handleObjectBasedSubscription function tests', () => {
-      let arraySubscriptionContainer: SubscriptionContainer;
-      const dummyComponent = {
-        my: 'cool component',
-      };
-      let objectSubscriptionContainer: SubscriptionContainer;
-      const dummyComponent2 = {
-        my: 'second cool component',
-      };
-      let arrayJob: RuntimeJob;
-      let objectJob1: RuntimeJob;
-      let objectJob2: RuntimeJob;
-
-      beforeEach(() => {
-        arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsArray(
-          dummyComponent,
-          [dummyObserver1, dummyObserver2, dummyObserver3]
-        );
-        arrayJob = new RuntimeJob(dummyObserver1, { key: 'dummyArrayJob' });
-
-        objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
-          dummyComponent2,
-          {
-            observer1: dummyObserver1,
-            observer2: dummyObserver2,
-            observer3: dummyObserver3,
-          }
-        ).subscriptionContainer;
-        objectJob1 = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
-        objectJob2 = new RuntimeJob(dummyObserver3, { key: 'dummyObjectJob2' });
-      });
-
-      it('should ignore not object based SubscriptionContainer', () => {
-        runtime.handleObjectBasedSubscription(
-          arraySubscriptionContainer,
-          arrayJob
-        );
-
-        expect(arraySubscriptionContainer.updatedSubscribers).toStrictEqual([]);
-      });
-
-      it('should add Job Observer to changedObjectKeys in SubscriptionContainer', () => {
-        runtime.handleObjectBasedSubscription(
-          objectSubscriptionContainer,
-          objectJob1
-        );
-
-        expect(objectSubscriptionContainer.updatedSubscribers).toStrictEqual([
-          'observer1',
-        ]);
-      });
-    });
-
-    describe('getObjectBasedProps function tests', () => {
+    describe('getUpdatedObserverValues function tests', () => {
       let subscriptionContainer: SubscriptionContainer;
       const dummyFunction = () => {
         /* empty function */
@@ -607,7 +554,7 @@ describe('Runtime Tests', () => {
       });
     });
 
-    describe('handleProxyBasedSubscription function tests', () => {
+    describe('handleSelector function tests', () => {
       let objectSubscriptionContainer: SubscriptionContainer;
       const dummyFunction = () => {
         /* empty function */

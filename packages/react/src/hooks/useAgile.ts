@@ -124,7 +124,7 @@ export function useAgile<
     }
 
     // Create Callback based Subscription
-    const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
+    const subscriptionContainer = agileInstance.subController.subscribe(
       () => {
         forceRender();
       },

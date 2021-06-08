@@ -28,7 +28,7 @@ export class CallbackSubscriptionContainer extends SubscriptionContainer {
    */
   constructor(
     callback: Function,
-    subs: Array<Observer> = [],
+    subs: Array<Observer> | { [key: string]: Observer },
     config: SubscriptionContainerConfigInterface = {}
   ) {
     super(subs, config);
