@@ -1,10 +1,10 @@
-import { Agile, clone, Collection, Logger } from '@agile-ts/core';
+import { Agile, clone, Item, Logger } from '@agile-ts/core';
 import Event from '@agile-ts/event';
 
 export const myStorage: any = {};
 
 export const App = new Agile({
-  logConfig: { level: Logger.level.DEBUG },
+  logConfig: { level: Logger.level.DEBUG, allowedTags: ['storage'] },
   localStorage: true,
 });
 
@@ -84,15 +84,20 @@ export const MY_COLLECTION = App.createCollection<collectionValueInterface>(
     ],
   })
 ).persist();
-MY_COLLECTION.collect({ key: 'id1', name: 'test' });
-MY_COLLECTION.collect({ key: 'id2', name: 'test2' }, 'myGroup');
-MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
-MY_COLLECTION.getGroup('myGroup')?.persist({
-  followCollectionPersistKeyPattern: true,
-});
-MY_COLLECTION.onLoad(() => {
-  console.log('On Load MY_COLLECTION');
-});
+// MY_COLLECTION.collect({ key: 'id1', name: 'test' });
+// MY_COLLECTION.collect({ key: 'id2', name: 'test2' }, 'myGroup');
+// MY_COLLECTION.update('id1', { key: 'id1Updated', name: 'testUpdated' });
+// MY_COLLECTION.getGroup('myGroup')?.persist({
+//   followCollectionPersistKeyPattern: true,
+// });
+// MY_COLLECTION.onLoad(() => {
+//   console.log('On Load MY_COLLECTION');
+// });
+
+export const externalCreatedItem = new Item(MY_COLLECTION, {
+  key: 'id10',
+  name: 'test',
+}).persist({ followCollectionPersistKeyPattern: true });
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));
 

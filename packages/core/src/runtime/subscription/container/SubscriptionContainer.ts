@@ -144,7 +144,7 @@ export class SubscriptionContainer {
       });
     }
 
-    // Add defined/created selector methods to the 'selectorsWeakMap'
+    // Assign defined/created selector methods to the 'selectorsWeakMap'
     const existingSelectorMethods = this.selectorsWeakMap.get(sub)?.methods;
     const newSelectorMethods = existingSelectorMethods
       ? existingSelectorMethods.concat(toAddSelectorMethods)
@@ -153,11 +153,15 @@ export class SubscriptionContainer {
       this.selectorsWeakMap.set(sub, { methods: newSelectorMethods });
 
     // Assign specified key to the 'subscriberKeysWeakMap'
-    // (Not to the Observer, since the here specified key only counts for this Subscription Container)
+    // (Not to the Observer itself, since the key specified here only counts for this Subscription Container)
     if (config.key != null) this.subscriberKeysWeakMap.set(sub, config.key);
 
     // Add Observer to subscribers
     this.subscribers.add(sub);
+
+    // Add Subscription Container to Observer
+    // so that it can be updated when to Observer changes
+    sub.subscribedTo.add(this);
   }
 
   /**
@@ -168,9 +172,12 @@ export class SubscriptionContainer {
    * @param sub - Observer to be removed from the Subscription Container
    */
   public removeSubscription(sub: Observer) {
-    this.selectorsWeakMap.delete(sub);
-    this.subscriberKeysWeakMap.delete(sub);
-    this.subscribers.delete(sub);
+    if (this.subscribers.has(sub)) {
+      this.selectorsWeakMap.delete(sub);
+      this.subscriberKeysWeakMap.delete(sub);
+      this.subscribers.delete(sub);
+      sub.subscribedTo.delete(this);
+    }
   }
 }
 

@@ -1,4 +1,9 @@
-import { Observer, defineConfig, SubscriptionContainer } from '../internal';
+import {
+  Observer,
+  defineConfig,
+  SubscriptionContainer,
+  Agile,
+} from '../internal';
 
 export class RuntimeJob<ObserverType extends Observer = Observer> {
   public config: RuntimeJobConfigInterface;

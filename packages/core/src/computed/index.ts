@@ -153,7 +153,7 @@ export class Computed<ComputedValueType = any> extends State<
         newDeps.push(observer);
 
         // Make this Observer depend on the found dep Observers
-        observer.depend(this.observer);
+        observer.addDependent(this.observer);
       });
 
       this.deps = newDeps;

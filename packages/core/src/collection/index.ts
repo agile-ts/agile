@@ -97,7 +97,11 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Rebuild of Groups
     // Not necessary because if Items are added to the Collection,
     // the Groups which contain these added Items are rebuilt.
-    // for (const key in this.groups) this.groups[key].rebuild();
+    for (const key in this.groups) this.groups[key].rebuild();
+
+    // TODO ISSUE with collecting the 'initialData' before 'isInstantiated = true'
+    // if (_config.initialData) this.collect(_config.initialData); // TODO REMOVE
+    Agile.logger.debug('END of COLLECTION INSTANTIATION'); // TODO REMOVE
   }
 
   /**

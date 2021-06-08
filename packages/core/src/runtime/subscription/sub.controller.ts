@@ -158,7 +158,7 @@ export class SubController {
     const unsub = (subscriptionContainer: SubscriptionContainer) => {
       subscriptionContainer.ready = false;
       subscriptionContainer.subscribers.forEach((observer) => {
-        observer.unsubscribe(subscriptionContainer);
+        subscriptionContainer.removeSubscription(observer);
       });
     };
 

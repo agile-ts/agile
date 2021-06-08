@@ -158,16 +158,16 @@ describe('Observer Tests', () => {
       });
 
       it('should add passed Observer to deps', () => {
-        observer.depend(dummyObserver1);
+        observer.addDependent(dummyObserver1);
 
         expect(observer.dependents.size).toBe(1);
         expect(observer.dependents.has(dummyObserver2));
       });
 
       it("shouldn't add the same Observer twice to deps", () => {
-        observer.depend(dummyObserver1);
+        observer.addDependent(dummyObserver1);
 
-        observer.depend(dummyObserver1);
+        observer.addDependent(dummyObserver1);
 
         expect(observer.dependents.size).toBe(1);
         expect(observer.dependents.has(dummyObserver1));

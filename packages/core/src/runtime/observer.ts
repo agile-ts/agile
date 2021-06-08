@@ -7,7 +7,6 @@ import {
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
   LogCodeManager,
-  AddSubscriptionMethodConfigInterface,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -52,9 +51,9 @@ export class Observer<ValueType = any> {
     this._key = config.key;
     this.value = config.value;
     this.previousValue = config.value;
-    config.dependents?.forEach((observer) => this.depend(observer));
+    config.dependents?.forEach((observer) => this.addDependent(observer));
     config.subs?.forEach((subscriptionContainer) =>
-      this.subscribe(subscriptionContainer)
+      subscriptionContainer.addSubscription(this)
     );
   }
 
@@ -129,46 +128,8 @@ export class Observer<ValueType = any> {
    * @public
    * @param observer - Observer to depends on this Observer.
    */
-  public depend(observer: Observer): void {
+  public addDependent(observer: Observer): void {
     if (!this.dependents.has(observer)) this.dependents.add(observer);
-  }
-
-  /**
-   * Subscribes Observer to the specified Subscription Container (Component).
-   *
-   * Every time this Observer is ingested into the Runtime,
-   * a rerender might be triggered on the Component the Subscription Container represents.
-   *
-   * @public
-   * @param subscriptionContainer - Subscription Container to which the Observer should subscribe.
-   * @param config - Configuration object
-   */
-  public subscribe(
-    subscriptionContainer: SubscriptionContainer,
-    config: AddSubscriptionMethodConfigInterface = {}
-  ): void {
-    if (!this.subscribedTo.has(subscriptionContainer)) {
-      this.subscribedTo.add(subscriptionContainer);
-
-      // Add Observer to Subscription Container
-      // to keep track of the Observers that have subscribed the Subscription Container.
-      // For example to unsubscribe the subscribed Observers
-      // when the Subscription Container (Component) unmounts.
-      subscriptionContainer.addSubscription(this, config);
-    }
-  }
-
-  /**
-   * Unsubscribes Observer from specified Subscription Container (Component).
-   *
-   * @public
-   * @param subscriptionContainer - Subscription Container that the Observer should unsubscribe.
-   */
-  public unsubscribe(subscriptionContainer: SubscriptionContainer): void {
-    if (this.subscribedTo.has(subscriptionContainer)) {
-      this.subscribedTo.delete(subscriptionContainer);
-      subscriptionContainer.removeSubscription(this);
-    }
   }
 }
 
