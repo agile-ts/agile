@@ -85,23 +85,22 @@ export class Collection<DataType extends Object = DefaultItem> {
     this.initGroups(_config.groups as any);
     this.initSelectors(_config.selectors as any);
 
-    if (_config.initialData) this.collect(_config.initialData);
-
     this.isInstantiated = true;
+
+    // Add 'initialData' to Collection
+    // (after 'isInstantiated' to add them properly to the Collection)
+    if (_config.initialData) this.collect(_config.initialData);
 
     // Reselect Selector Items
     // Necessary because the selection of an Item
-    // hasn't worked with a not 'instantiated' Collection before
+    // hasn't worked with a not correctly 'instantiated' Collection before
     for (const key in this.selectors) this.selectors[key].reselect();
 
     // Rebuild of Groups
     // Not necessary because if Items are added to the Collection,
+    // (after 'isInstantiated = true')
     // the Groups which contain these added Items are rebuilt.
-    for (const key in this.groups) this.groups[key].rebuild();
-
-    // TODO ISSUE with collecting the 'initialData' before 'isInstantiated = true'
-    // if (_config.initialData) this.collect(_config.initialData); // TODO REMOVE
-    Agile.logger.debug('END of COLLECTION INSTANTIATION'); // TODO REMOVE
+    // for (const key in this.groups) this.groups[key].rebuild();
   }
 
   /**

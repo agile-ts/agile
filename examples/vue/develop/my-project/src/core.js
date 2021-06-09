@@ -12,6 +12,7 @@ export const MY_STATE = App.createState('Hello World', { key: 'my-state' });
 // Create Collection
 export const TODOS = App.createCollection({
   initialData: [{ id: 1, name: 'Clean Bathroom' }],
+  selectors: [1],
 }); // .persist('todos');
 
 // TODOS.collect({ id: 2, name: 'jeff' });
