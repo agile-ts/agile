@@ -107,7 +107,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (loadedValue == null) return false;
 
     // Assign loaded Value to State
-    this.state().set(loadedValue, { storage: false, overwrite: true });
+    this.state().set(loadedValue, {
+      storage: false,
+      overwrite: true,
+    });
 
     // Setup Side Effects to keep the Storage value in sync with the State value
     this.setupSideEffects(storageItemKey);

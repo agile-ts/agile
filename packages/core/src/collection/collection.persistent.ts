@@ -138,6 +138,14 @@ export class CollectionPersistent<
       if (defaultGroup.persistent?.ready)
         await defaultGroup.persistent.initialLoading();
 
+      // TODO rebuild the default Group once at the end when all Items were loaded into the Collection
+      //  because otherwise it rebuilds the Group for each loaded Item
+      //  (-> warnings are printed for all not yet loaded Items when rebuilding the Group)
+      //  or rethink the whole Group rebuild process by adding a 'addItem()', 'removeItem()' and 'updateItem()' function
+      //  so that there is no need for rebuilding the whole Group when for example only Item B changed or Item C was added
+      //
+      //  See Issue by starting the vue develop example app and adding some todos to the _todo_ list
+
       // Persist Items found in the default Group's value
       for (const itemKey of defaultGroup._value) {
         const item = this.collection().getItem(itemKey);
@@ -170,11 +178,11 @@ export class CollectionPersistent<
           if (dummyItem?.persistent?.ready) {
             const loadedPersistedValueIntoItem = await dummyItem.persistent.loadPersistedValue(
               itemStorageKey
-            );
+            ); // TODO FIRST GROUP REBUILD (by assigning loaded value to Item)
 
             // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem)
-              this.collection().assignItem(dummyItem);
+              this.collection().assignItem(dummyItem); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
           }
         }
       }
