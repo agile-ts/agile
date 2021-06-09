@@ -152,10 +152,6 @@ export class Runtime {
     )
       return false;
 
-    // Subscription Containers that have to be updated.
-    // Using a 'Set()' to combine several equal SubscriptionContainers into one (rerender optimisation).
-    const subscriptionsToUpdate = new Set<SubscriptionContainer>();
-
     // Build final 'jobsToRerender' array
     // based on the new 'jobsToRerender' array and the 'notReadyJobsToRerender' array.
     const jobsToRerender = this.jobsToRerender.concat(
@@ -164,10 +160,39 @@ export class Runtime {
     this.notReadyJobsToRerender = new Set();
     this.jobsToRerender = [];
 
+    // Extract Subscription Container from the Jobs to be rerendered
+    const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
+      jobsToRerender
+    );
+    if (subscriptionContainerToUpdate.length <= 0) return false;
+
+    // Update Subscription Container (trigger rerender on Components they represent)
+    this.updateSubscriptionContainer(subscriptionContainerToUpdate);
+
+    return true;
+  }
+
+  /**
+   * Extracts the Subscription Containers
+   * that should be updated from the provided Runtime Jobs.
+   *
+   * @internal
+   * @param jobs - Jobs from which to extract the Subscription Containers to be updated.
+   */
+  public extractToUpdateSubscriptionContainer(
+    jobs: Array<RuntimeJob>
+  ): Array<SubscriptionContainer> {
+    // Subscription Containers that have to be updated.
+    // Using a 'Set()' to combine several equal SubscriptionContainers into one (rerender optimisation).
+    const subscriptionsToUpdate = new Set<SubscriptionContainer>();
+
     // Check if Job Subscription Container of Jobs should be updated
     // and if so add it to the 'subscriptionsToUpdate' array
-    jobsToRerender.forEach((job) => {
+    jobs.forEach((job) => {
       job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
+        let updateSubscriptionContainer = true;
+
+        // Handle not ready Subscription Container
         if (!subscriptionContainer.ready) {
           if (
             !job.config.numberOfTriesToUpdate ||
@@ -191,14 +216,11 @@ export class Runtime {
           return;
         }
 
-        let updateSubscriptionContainer;
-
         // Handle Selectors of Subscription Container
         // (-> check if a selected part of the Observer value has changed)
-        updateSubscriptionContainer = this.handleSelectors(
-          subscriptionContainer,
-          job
-        );
+        updateSubscriptionContainer =
+          updateSubscriptionContainer &&
+          this.handleSelectors(subscriptionContainer, job);
 
         // Check if Subscription Container with same 'componentId'
         // is already in the 'subscriptionToUpdate' queue (rerender optimisation)
@@ -218,8 +240,21 @@ export class Runtime {
       });
     });
 
-    if (subscriptionsToUpdate.size <= 0) return false;
+    return Array.from(subscriptionsToUpdate);
+  }
 
+  /**
+   * Updates the specified Subscription Container.
+   *
+   * By updating the SubscriptionContainer a rerender is triggered
+   * on the Component it represents.
+   *
+   * @internal
+   * @param subscriptionsToUpdate - Subscription Containers to be updated.
+   */
+  public updateSubscriptionContainer(
+    subscriptionsToUpdate: Array<SubscriptionContainer>
+  ): void {
     // Update Subscription Containers (trigger rerender on Components they represent)
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
       // Call 'callback function' if Callback based Subscription
@@ -239,8 +274,6 @@ export class Runtime {
     Agile.logger.if
       .tag(['runtime'])
       .info(LogCodeManager.getLog('16:01:02'), subscriptionsToUpdate);
-
-    return true;
   }
 
   /**
