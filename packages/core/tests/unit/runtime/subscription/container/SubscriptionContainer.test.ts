@@ -24,39 +24,112 @@ describe('SubscriptionContainer Tests', () => {
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
     dummySelectorWeakMap = new WeakMap();
     dummyProxyWeakMap = new WeakMap();
-
-    jest.spyOn(SubscriptionContainer.prototype, 'assignProxySelectors');
   });
 
-  it('should create SubscriptionContainer (default config)', () => {
-    jest.spyOn(Utils, 'generateId').mockReturnValue('generatedId');
+  it('should create SubscriptionContainer with passed subs array (default config)', () => {
+    jest.spyOn(Utils, 'generateId').mockReturnValueOnce('generatedId');
+    jest
+      .spyOn(SubscriptionContainer.prototype, 'addSubscription')
+      .mockReturnValueOnce()
+      .mockReturnValueOnce();
 
-    const subscriptionContainer = new SubscriptionContainer();
+    const subscriptionContainer = new SubscriptionContainer([
+      dummyObserver1,
+      dummyObserver2,
+    ]);
 
-    expect(subscriptionContainer.assignProxySelectors).toHaveBeenCalledWith(
-      expect.any(WeakMap),
-      expect.any(WeakMap),
-      []
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledTimes(2);
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledWith(
+      dummyObserver1,
+      {
+        proxyPaths: undefined,
+        selectorMethods: undefined,
+        key: undefined,
+      }
+    );
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledWith(
+      dummyObserver2,
+      {
+        proxyPaths: undefined,
+        selectorMethods: undefined,
+        key: undefined,
+      }
     );
 
     expect(subscriptionContainer.key).toBe('generatedId');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.componentId).toBeUndefined();
-    expect(subscriptionContainer.subscribers.size).toBe(0);
+    expect(subscriptionContainer.subscribers.size).toBe(0); // because of mocking addSubscription
     expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)
-    );
-    expect(subscriptionContainer.selectorsWeakMap).not.toBe(
-      dummySelectorWeakMap
     );
     expect(subscriptionContainer.selectorsWeakMap).toStrictEqual(
       expect.any(WeakMap)
     );
   });
 
-  it('should create SubscriptionContainer (specific config)', () => {
+  it('should create SubscriptionContainer with passed subs object (default config)', () => {
+    jest.spyOn(Utils, 'generateId').mockReturnValueOnce('generatedId');
+    jest
+      .spyOn(SubscriptionContainer.prototype, 'addSubscription')
+      .mockReturnValueOnce()
+      .mockReturnValueOnce();
+
+    const subscriptionContainer = new SubscriptionContainer({
+      dummyObserver1: dummyObserver1,
+      dummyObserver2: dummyObserver2,
+    });
+
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledTimes(2);
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledWith(
+      dummyObserver1,
+      {
+        proxyPaths: undefined,
+        selectorMethods: undefined,
+        key: 'dummyObserver1',
+      }
+    );
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledWith(
+      dummyObserver2,
+      {
+        proxyPaths: undefined,
+        selectorMethods: undefined,
+        key: 'dummyObserver2',
+      }
+    );
+
+    expect(subscriptionContainer.key).toBe('generatedId');
+    expect(subscriptionContainer.ready).toBeFalsy();
+    expect(subscriptionContainer.componentId).toBeUndefined();
+    expect(subscriptionContainer.subscribers.size).toBe(0); // because of mocking addSubscription
+    expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
+    expect(subscriptionContainer.isObjectBased).toBeTruthy();
+    expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
+      expect.any(WeakMap)
+    );
+    expect(subscriptionContainer.selectorsWeakMap).toStrictEqual(
+      expect.any(WeakMap)
+    );
+  });
+
+  it('should create SubscriptionContainer with passed subs array (specific config)', () => {
+    jest
+      .spyOn(SubscriptionContainer.prototype, 'addSubscription')
+      .mockReturnValueOnce()
+      .mockReturnValueOnce();
+
+    dummyProxyWeakMap.set(dummyObserver1, {
+      paths: 'dummyObserver1_paths' as any,
+    });
+    dummyProxyWeakMap.set(dummyObserver2, {
+      paths: 'dummyObserver2_paths' as any,
+    });
+    dummySelectorWeakMap.set(dummyObserver2, {
+      methods: 'dummyObserver2_selectors' as any,
+    });
+
     const subscriptionContainer = new SubscriptionContainer(
       [dummyObserver1, dummyObserver2],
       {
@@ -67,39 +140,189 @@ describe('SubscriptionContainer Tests', () => {
       }
     );
 
-    expect(
-      subscriptionContainer.assignProxySelectors
-    ).toHaveBeenCalledWith(dummySelectorWeakMap, dummyProxyWeakMap, [
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledTimes(2);
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledWith(
       dummyObserver1,
+      {
+        proxyPaths: 'dummyObserver1_paths',
+        selectorMethods: undefined,
+        key: undefined,
+      }
+    );
+    expect(subscriptionContainer.addSubscription).toHaveBeenCalledWith(
       dummyObserver2,
-    ]);
+      {
+        proxyPaths: 'dummyObserver2_paths',
+        selectorMethods: 'dummyObserver2_selectors',
+        key: undefined,
+      }
+    );
 
     expect(subscriptionContainer.key).toBe('dummyKey');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.componentId).toBe('testID');
-    expect(subscriptionContainer.subscribers.size).toBe(2);
-    expect(subscriptionContainer.subscribers.has(dummyObserver1)).toBeTruthy();
-    expect(subscriptionContainer.subscribers.has(dummyObserver2)).toBeTruthy();
+    expect(subscriptionContainer.subscribers.size).toBe(0); // because of mocking addSubscription
     expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)
     );
-    expect(subscriptionContainer.selectorsWeakMap).toBe(dummySelectorWeakMap);
+    expect(subscriptionContainer.selectorsWeakMap).toStrictEqual(
+      expect.any(WeakMap)
+    );
+    expect(subscriptionContainer.selectorsWeakMap).not.toBe(
+      dummySelectorWeakMap
+    );
   });
 
   describe('Subscription Container Function Tests', () => {
-    let observer: SubscriptionContainer;
+    let subscriptionContainer: SubscriptionContainer;
 
     beforeEach(() => {
-      observer = new SubscriptionContainer();
+      subscriptionContainer = new SubscriptionContainer([]);
     });
 
-    describe('assignProxySelectors function tests', () => {
-      beforeEach(() => {});
+    describe('addSubscription function tests', () => {
+      it(
+        'should create selectors based on the specified proxies, ' +
+          'assigns newly created or provided selectors to the selectorsWeakMap ' +
+          'and subscribe the specified Observer to the SubscriptionContainer',
+        () => {
+          dummyObserver1.value = {
+            das: { haus: { vom: 'nikolaus' } },
+            alle: { meine: 'entchien' },
+            test1: 'test1Value',
+            test2: 'test2Value',
+            test3: 'test3Value',
+          };
+          subscriptionContainer.selectorsWeakMap.set(dummyObserver1, {
+            methods: [(value) => value.test3],
+          });
+          subscriptionContainer.selectorsWeakMap.set(dummyObserver2, {
+            methods: [(value) => 'doesNotMatter'],
+          });
+          subscriptionContainer.subscriberKeysWeakMap.set(
+            dummyObserver2,
+            'dummyObserver2'
+          );
 
-      it('todo', () => {
-        // TODO
+          subscriptionContainer.addSubscription(dummyObserver1, {
+            key: 'dummyObserver1',
+            proxyPaths: [['das', 'haus', 'vom'], ['test1']],
+            selectorMethods: [
+              (value) => value.alle.meine,
+              (value) => value.test2,
+            ],
+          });
+
+          expect(subscriptionContainer.subscribers.size).toBe(1);
+          expect(
+            subscriptionContainer.subscribers.has(dummyObserver1)
+          ).toBeTruthy();
+          expect(dummyObserver1.subscribedTo.size).toBe(1);
+          expect(
+            dummyObserver1.subscribedTo.has(subscriptionContainer)
+          ).toBeTruthy();
+
+          // should assign specified selectors/(and selectors created from proxy paths) to the selectorsWeakMap
+          const observer1Selector = subscriptionContainer.selectorsWeakMap.get(
+            dummyObserver1
+          ) as any;
+          expect(observer1Selector.methods.length).toBe(5);
+          expect(observer1Selector.methods[0](dummyObserver1.value)).toBe(
+            'test3Value'
+          );
+          expect(observer1Selector.methods[1](dummyObserver1.value)).toBe(
+            'entchien'
+          );
+          expect(observer1Selector.methods[2](dummyObserver1.value)).toBe(
+            'test2Value'
+          );
+          expect(observer1Selector.methods[3](dummyObserver1.value)).toBe(
+            'nikolaus'
+          );
+          expect(observer1Selector.methods[4](dummyObserver1.value)).toBe(
+            'test1Value'
+          );
+
+          // shouldn't overwrite already set values in selectorsWeakMap
+          const observer2Selector = subscriptionContainer.selectorsWeakMap.get(
+            dummyObserver2
+          ) as any;
+          expect(observer2Selector.methods.length).toBe(1);
+          expect(observer2Selector.methods[0](null)).toBe('doesNotMatter');
+
+          // should assign specified key to the subscriberKeysWeakMap
+          const observer1Key = subscriptionContainer.subscriberKeysWeakMap.get(
+            dummyObserver1
+          );
+          expect(observer1Key).toBe('dummyObserver1');
+
+          // shouldn't overwrite already set values in subscriberKeysWeakMap
+          const observer2Key = subscriptionContainer.subscriberKeysWeakMap.get(
+            dummyObserver2
+          );
+          expect(observer2Key).toBe('dummyObserver2');
+        }
+      );
+    });
+
+    describe('removeSubscription function tests', () => {
+      let subscriptionContainer: SubscriptionContainer;
+
+      beforeEach(() => {
+        subscriptionContainer = new SubscriptionContainer([]);
+
+        subscriptionContainer.subscribers = new Set([
+          dummyObserver1,
+          dummyObserver2,
+        ]);
+        dummyObserver1.subscribedTo = new Set([subscriptionContainer]);
+        dummyObserver2.subscribedTo = new Set([subscriptionContainer]);
+
+        subscriptionContainer.selectorsWeakMap.set(dummyObserver1, {
+          methods: [],
+        });
+        subscriptionContainer.selectorsWeakMap.set(dummyObserver2, {
+          methods: [],
+        });
+        subscriptionContainer.subscriberKeysWeakMap.set(
+          dummyObserver1,
+          'dummyObserver1'
+        );
+        subscriptionContainer.subscriberKeysWeakMap.set(
+          dummyObserver2,
+          'dummyObserver2'
+        );
+      });
+
+      it('should remove subscribed Observer from Subscription Container', () => {
+        subscriptionContainer.removeSubscription(dummyObserver1);
+
+        expect(subscriptionContainer.subscribers.size).toBe(1);
+        expect(
+          subscriptionContainer.subscribers.has(dummyObserver2)
+        ).toBeTruthy();
+
+        expect(
+          subscriptionContainer.selectorsWeakMap.get(dummyObserver1)
+        ).toBeUndefined();
+        expect(
+          subscriptionContainer.selectorsWeakMap.get(dummyObserver2)
+        ).not.toBeUndefined();
+
+        expect(
+          subscriptionContainer.subscriberKeysWeakMap.get(dummyObserver1)
+        ).toBeUndefined();
+        expect(
+          subscriptionContainer.subscriberKeysWeakMap.get(dummyObserver2)
+        ).toBe('dummyObserver2');
+
+        expect(dummyObserver1.subscribedTo.size).toBe(0);
+        expect(dummyObserver2.subscribedTo.size).toBe(1);
+        expect(
+          dummyObserver2.subscribedTo.has(subscriptionContainer)
+        ).toBeTruthy();
       });
     });
   });

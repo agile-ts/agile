@@ -145,10 +145,11 @@ export class SubscriptionContainer {
     }
 
     // Assign defined/created selector methods to the 'selectorsWeakMap'
-    const existingSelectorMethods = this.selectorsWeakMap.get(sub)?.methods;
-    const newSelectorMethods = existingSelectorMethods
-      ? existingSelectorMethods.concat(toAddSelectorMethods)
-      : toAddSelectorMethods;
+    const existingSelectorMethods =
+      this.selectorsWeakMap.get(sub)?.methods ?? [];
+    const newSelectorMethods = existingSelectorMethods.concat(
+      toAddSelectorMethods
+    );
     if (newSelectorMethods.length > 0)
       this.selectorsWeakMap.set(sub, { methods: newSelectorMethods });
 
@@ -160,7 +161,8 @@ export class SubscriptionContainer {
     this.subscribers.add(sub);
 
     // Add Subscription Container to Observer
-    // so that it can be updated when to Observer changes
+    // so that it can be updated (cause rerender on the Component it represents)
+    // when for example the Observer value changes
     sub.subscribedTo.add(this);
   }
 

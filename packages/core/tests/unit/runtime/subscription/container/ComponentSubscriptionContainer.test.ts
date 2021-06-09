@@ -52,6 +52,11 @@ describe('ComponentSubscriptionContainer Tests', () => {
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)
     );
-    expect(subscriptionContainer.selectorsWeakMap).toBe(dummySelectorWeakMap);
+    expect(subscriptionContainer.selectorsWeakMap).toStrictEqual(
+      expect.any(WeakMap)
+    );
+    expect(subscriptionContainer.selectorsWeakMap).not.toBe(
+      dummySelectorWeakMap
+    );
   });
 });
