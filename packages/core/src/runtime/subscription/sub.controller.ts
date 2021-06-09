@@ -59,7 +59,7 @@ export class SubController {
   public subscribe(
     integrationInstance: any,
     subs: Array<Observer>,
-    config: RegisterSubscriptionConfigInterface
+    config?: RegisterSubscriptionConfigInterface
   ): SubscriptionContainer;
   /**
    * Creates a so called Subscription Container that represents an UI-Component in AgileTs.
@@ -92,7 +92,7 @@ export class SubController {
   public subscribe(
     integrationInstance: any,
     subs: { [key: string]: Observer },
-    config: RegisterSubscriptionConfigInterface
+    config?: RegisterSubscriptionConfigInterface
   ): {
     subscriptionContainer: SubscriptionContainer;
     props: { [key: string]: Observer['value'] };
@@ -124,22 +124,17 @@ export class SubController {
           config
         );
 
-    const props: { [key: string]: Observer['value'] } = {};
+    // Return object based Subscription Container
+    if (subscriptionContainer.isObjectBased && !Array.isArray(subs)) {
+      // Build an Observer value keymap
+      const props: { [key: string]: Observer['value'] } = {};
+      for (const key in subs) if (subs[key].value) props[key] = subs[key].value;
 
-    // Subscribe Observers to the created Subscription Container
-    // and build an Observer value keymap called props
-    for (const key in subs) {
-      const observer = subs[key];
-      observer.subscribedTo.add(subscriptionContainer);
-      if (observer.value) props[key] = observer.value;
+      return { subscriptionContainer, props };
     }
 
-    return Array.isArray(subs)
-      ? subscriptionContainer
-      : {
-          subscriptionContainer: subscriptionContainer,
-          props: props,
-        };
+    // Return array based Subscription Container
+    return subscriptionContainer;
   }
 
   /**
