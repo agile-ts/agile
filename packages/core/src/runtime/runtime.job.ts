@@ -19,7 +19,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
   // Subscription Container of the Observer that have to be updated/re-rendered
   public subscriptionContainersToUpdate = new Set<SubscriptionContainer>();
   // How often not ready Subscription Container of the Observer have been tried to update
-  public triesToUpdate = 0;
+  public triedToUpdateCount = 0;
 
   /**
    * A Job that contains an Observer to be executed by the runtime.
@@ -39,13 +39,13 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
         exclude: [],
       },
       force: false,
-      numberOfTriesToUpdate: 3,
+      maxOfTriesToUpdate: 3,
     });
     this.config = {
       background: config.background,
       force: config.force,
       sideEffects: config.sideEffects,
-      numberOfTriesToUpdate: config.numberOfTriesToUpdate,
+      maxOfTriesToUpdate: config.maxOfTriesToUpdate,
     };
     this.observer = observer;
     this.rerender =
@@ -86,14 +86,6 @@ export interface CreateRuntimeJobConfigInterface
   key?: RuntimeJobKey;
 }
 
-/**
- * @param background - If Job gets executed in the background -> not causing any rerender
- * @param sideEffects - If SideEffects get executed
- * @param force - Force performing Job
- * @param numberOfTriesToUpdate - How often the runtime should try to update not ready SubscriptionContainers of this Job
- * If 'null' the runtime tries to update the not ready SubscriptionContainer until they are ready (infinite).
- * But be aware that this can lead to an overflow of 'old' Jobs after some time. (affects performance)
- */
 export interface RuntimeJobConfigInterface {
   /**
    * Whether to perform the Runtime Job in background.
@@ -117,7 +109,7 @@ export interface RuntimeJobConfigInterface {
    * If 'null' the runtime tries to update the not ready Subscription Container until they are ready (infinite).
    * @default 3
    */
-  numberOfTriesToUpdate?: number | null;
+  maxOfTriesToUpdate?: number | null;
 }
 
 export interface SideEffectConfigInterface {

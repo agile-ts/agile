@@ -15,25 +15,39 @@ export class Observer<ValueType = any> {
   // Agile Instance the Observer belongs to
   public agileInstance: () => Agile;
 
-  // Key/Name identifier of the Subscription Container
+  // Key/Name identifier of the Observer
   public _key?: ObserverKey;
   // Observers that depend on this Observer
   public dependents: Set<Observer> = new Set();
   // Subscription Containers (Components) the Observer is subscribed to
   public subscribedTo: Set<SubscriptionContainer> = new Set();
+
   // Current value of Observer
   public value?: ValueType;
   // Previous value of Observer
   public previousValue?: ValueType;
 
   /**
-   * Handles the subscriptions to Subscription Containers (Components)
-   * and keeps track of dependencies.
+   * An Observer manages the subscriptions to Subscription Containers (UI-Components)
+   * and dependencies to other Observers (Agile Classes)
+   * for an Agile Class like the `State Class`.
    *
-   * All Agile Classes that can be bound a UI-Component have their own Observer
-   * which manages the above mentioned things for them.
+   * An Agile Class can use an Observer as an interface to the Runtime.
+   * Thereby, it ingests its own Observer into the Runtime
+   * when the Agile Class has changed in such a way
+   * that these changes need to be applied to UI-Components or dependent Observers.
    *
-   * The Observer is no standalone class and should be extended from a 'real' Observer.
+   * After the Observer has been ingested into the Runtime
+   * wrapped into a Runtime-Job, it is first added to the Jobs queue.
+   * When it is executed, the Observer's `perform()` method is called,
+   * where the accordingly changes can be applied to the Agile Class.
+   *
+   * Now that the Job was performed, it is added to the rerender queue,
+   * where the subscribed Subscription Container (UI-Components) are updated (rerender)
+   * accordingly.
+   *
+   * Note that the Observer itself is no standalone class
+   * and should be inherited and adapted to fulfill the Agile Class functions.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Observer belongs to.
@@ -68,7 +82,7 @@ export class Observer<ValueType = any> {
   }
 
   /**
-   * Returns the key/name identifier of the State.
+   * Returns the key/name identifier of the Observer.
    *
    * @public
    */
@@ -77,9 +91,10 @@ export class Observer<ValueType = any> {
   }
 
   /**
-   * Ingests the Observer into the runtime,
-   * by creating a Runtime Job
-   * and adding the Observer to the created Job.
+   * Passes the Observer into the runtime wrapped into a Runtime-Job
+   * where it is executed accordingly
+   * by performing its `perform()` method, updating its dependents
+   * and the UI-Components it is subscribed to
    *
    * @public
    * @param config - Configuration object
@@ -95,7 +110,7 @@ export class Observer<ValueType = any> {
       force: false,
     });
 
-    // Create Job
+    // Create Runtime-Job
     const job = new RuntimeJob(this, {
       force: config.force,
       sideEffects: config.sideEffects,
@@ -103,45 +118,43 @@ export class Observer<ValueType = any> {
       key: config.key || this._key,
     });
 
+    // Pass created Job into the Runtime
     this.agileInstance().runtime.ingest(job, {
       perform: config.perform,
     });
   }
 
   /**
-   * Method executed by the Runtime to perform the Runtime Job,
-   * previously ingested (`ingest()`) by the Observer.
+   * Method executed by the Runtime to perform the Runtime-Job,
+   * previously ingested via the `ingest()` method.
+   *
+   * Note that this method should be overwritten
+   * to correctly apply the changes to the Agile Class it belongs to.
    *
    * @public
-   * @param job - Runtime Job to be performed.
+   * @param job - Runtime-Job to be performed.
    */
   public perform(job: RuntimeJob): void {
     LogCodeManager.log('17:03:00');
   }
 
   /**
-   * Adds specified Observer to the dependents of this Observer.
+   * Makes specified Observer depend on the Observer.
    *
-   * Every time this Observer is ingested into the Runtime,
-   * the dependent Observers are ingested into the Runtime too.
+   * A dependent Observer is always ingested into the Runtime,
+   * when the Observer it depends on was ingested too.
    *
    * @public
-   * @param observer - Observer to depends on this Observer.
+   * @param observer - Observer to depend on the Observer.
    */
   public addDependent(observer: Observer): void {
     if (!this.dependents.has(observer)) this.dependents.add(observer);
   }
 }
 
-/**
- * @param deps - Initial Dependents of Observer
- * @param subs - Initial Subscriptions of Observer
- * @param key - Key/Name of Observer
- * @param value - Initial Value of Observer
- */
 export interface CreateObserverConfigInterface<ValueType = any> {
   /**
-   * Initial Observers that depend on this Observer.
+   * Initial Observers to depend on the Observer.
    * @default []
    */
   dependents?: Array<Observer>;
@@ -157,7 +170,7 @@ export interface CreateObserverConfigInterface<ValueType = any> {
   key?: ObserverKey;
   /**
    * Initial value of the Observer.
-   * @defualt undefined
+   * @default undefined
    */
   value?: ValueType;
 }

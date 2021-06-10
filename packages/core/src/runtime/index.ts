@@ -187,10 +187,10 @@ export class Runtime {
         // Handle not ready Subscription Container
         if (!subscriptionContainer.ready) {
           if (
-            !job.config.numberOfTriesToUpdate ||
-            job.triesToUpdate < job.config.numberOfTriesToUpdate
+            !job.config.maxOfTriesToUpdate ||
+            job.triedToUpdateCount < job.config.maxOfTriesToUpdate
           ) {
-            job.triesToUpdate++;
+            job.triedToUpdateCount++;
             this.notReadyJobsToRerender.add(job);
 
             LogCodeManager.log(
@@ -201,7 +201,7 @@ export class Runtime {
           } else {
             LogCodeManager.log(
               '16:02:01',
-              [job.config.numberOfTriesToUpdate],
+              [job.config.maxOfTriesToUpdate],
               subscriptionContainer
             );
           }
@@ -251,7 +251,6 @@ export class Runtime {
   public updateSubscriptionContainer(
     subscriptionsToUpdate: Array<SubscriptionContainer>
   ): void {
-    // Update Subscription Containers (trigger rerender on Components they represent)
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)

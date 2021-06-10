@@ -347,7 +347,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob1.subscriptionContainersToUpdate)
           ).toStrictEqual([]);
-          expect(dummyJob1.triesToUpdate).toBe(0);
+          expect(dummyJob1.triedToUpdateCount).toBe(0);
           expect(
             Array.from(dummySubscriptionContainer1.updatedSubscribers)
           ).toStrictEqual([dummyObserver1]);
@@ -356,7 +356,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob2.subscriptionContainersToUpdate)
           ).toStrictEqual([dummySubscriptionContainer2]);
-          expect(dummyJob2.triesToUpdate).toBe(1);
+          expect(dummyJob2.triedToUpdateCount).toBe(1);
           expect(
             Array.from(dummySubscriptionContainer2.updatedSubscribers)
           ).toStrictEqual([]);
@@ -373,7 +373,7 @@ describe('Runtime Tests', () => {
 
       it(
         "shouldn't extract not ready Subscription Container from the specified Jobs, " +
-          "remove the Job when it exceeded the max 'numberOfTriesToUpdate' " +
+          "remove the Job when it exceeded the max 'maxOfTriesToUpdate' " +
           'and print warning',
         () => {
           jest
@@ -382,9 +382,8 @@ describe('Runtime Tests', () => {
             .mockReturnValueOnce(true);
           dummySubscriptionContainer1.ready = true;
           dummySubscriptionContainer2.ready = false;
-          const numberOfTries =
-            (dummyJob2.config.numberOfTriesToUpdate ?? 0) + 1;
-          dummyJob2.triesToUpdate = numberOfTries;
+          const numberOfTries = (dummyJob2.config.maxOfTriesToUpdate ?? 0) + 1;
+          dummyJob2.triedToUpdateCount = numberOfTries;
 
           const response = runtime.extractToUpdateSubscriptionContainer([
             dummyJob1,
@@ -406,7 +405,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob1.subscriptionContainersToUpdate)
           ).toStrictEqual([]);
-          expect(dummyJob1.triesToUpdate).toBe(0);
+          expect(dummyJob1.triedToUpdateCount).toBe(0);
           expect(
             Array.from(dummySubscriptionContainer1.updatedSubscribers)
           ).toStrictEqual([dummyObserver1]);
@@ -415,7 +414,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob2.subscriptionContainersToUpdate)
           ).toStrictEqual([dummySubscriptionContainer2]);
-          expect(dummyJob2.triesToUpdate).toBe(numberOfTries);
+          expect(dummyJob2.triedToUpdateCount).toBe(numberOfTries);
           expect(
             Array.from(dummySubscriptionContainer2.updatedSubscribers)
           ).toStrictEqual([]);
@@ -424,7 +423,7 @@ describe('Runtime Tests', () => {
           expect(console.warn).toHaveBeenCalledTimes(1);
           LogMock.hasLoggedCode(
             '16:02:01',
-            [numberOfTries],
+            [dummyJob2.config.maxOfTriesToUpdate],
             dummySubscriptionContainer2
           );
         }
@@ -462,7 +461,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob1.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob1.triesToUpdate).toBe(0);
+        expect(dummyJob1.triedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer1.updatedSubscribers)
         ).toStrictEqual([]);
@@ -471,7 +470,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob2.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob2.triesToUpdate).toBe(0);
+        expect(dummyJob2.triedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer2.updatedSubscribers)
         ).toStrictEqual([dummyObserver2]);
@@ -513,7 +512,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob1.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob1.triesToUpdate).toBe(0);
+        expect(dummyJob1.triedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer1.updatedSubscribers)
         ).toStrictEqual([dummyObserver1]);
@@ -522,7 +521,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob2.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob2.triesToUpdate).toBe(0);
+        expect(dummyJob2.triedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer2.updatedSubscribers)
         ).toStrictEqual([dummyObserver2]);
@@ -532,7 +531,70 @@ describe('Runtime Tests', () => {
     });
 
     describe('updateSubscriptionContainer function tests', () => {
-      // TODO
+      const dummyIntegration1 = { dummy: 'component' };
+      let componentSubscriptionContainer1: ComponentSubscriptionContainer;
+      const dummyIntegration2 = jest.fn();
+      let callbackSubscriptionContainer2: CallbackSubscriptionContainer;
+      const dummyIntegration3 = jest.fn();
+      let callbackSubscriptionContainer3: CallbackSubscriptionContainer;
+
+      beforeEach(() => {
+        componentSubscriptionContainer1 = dummyAgile.subController.subscribe(
+          dummyIntegration1,
+          [dummyObserver1]
+        ) as ComponentSubscriptionContainer;
+        componentSubscriptionContainer1.updatedSubscribers = new Set([
+          dummyObserver1,
+        ]);
+        callbackSubscriptionContainer2 = dummyAgile.subController.subscribe(
+          dummyIntegration2,
+          [dummyObserver2]
+        ) as CallbackSubscriptionContainer;
+        callbackSubscriptionContainer2.updatedSubscribers = new Set([
+          dummyObserver2,
+        ]);
+        callbackSubscriptionContainer3 = dummyAgile.subController.subscribe(
+          dummyIntegration3,
+          [dummyObserver3]
+        ) as CallbackSubscriptionContainer;
+        callbackSubscriptionContainer3.updatedSubscribers = new Set([
+          dummyObserver3,
+        ]);
+
+        dummyAgile.integrations.update = jest.fn();
+      });
+
+      it('should update the specified Subscription Container', () => {
+        jest
+          .spyOn(runtime, 'getUpdatedObserverValues')
+          .mockReturnValueOnce('propsBasedOnUpdatedObservers' as any);
+
+        runtime.updateSubscriptionContainer([
+          componentSubscriptionContainer1,
+          callbackSubscriptionContainer2,
+          callbackSubscriptionContainer3,
+        ]);
+
+        // Component Subscription Container 1
+        expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
+        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
+          dummyIntegration1,
+          'propsBasedOnUpdatedObservers'
+        );
+        expect(
+          Array.from(componentSubscriptionContainer1.updatedSubscribers)
+        ).toStrictEqual([]);
+
+        // Callback Subscription Container 2
+        expect(callbackSubscriptionContainer2.callback).toHaveBeenCalledTimes(
+          1
+        );
+
+        // Callback Subscription Container 3
+        expect(callbackSubscriptionContainer3.callback).toHaveBeenCalledTimes(
+          1
+        );
+      });
     });
 
     describe('getUpdatedObserverValues function tests', () => {
