@@ -32,22 +32,23 @@ export class Observer<ValueType = any> {
    * and dependencies to other Observers (Agile Classes)
    * for an Agile Class like the `State Class`.
    *
-   * An Agile Class can use an Observer as an interface to the Runtime.
-   * Thereby, it ingests its own Observer into the Runtime
+   * Agile Classes often use an Observer as an interface to the Runtime.
+   * In doing so, they ingest their own Observer into the Runtime
    * when the Agile Class has changed in such a way
    * that these changes need to be applied to UI-Components or dependent Observers.
    *
    * After the Observer has been ingested into the Runtime
-   * wrapped into a Runtime-Job, it is first added to the Jobs queue.
+   * wrapped into a Runtime-Job, it is first added to the Jobs queue
+   * to prevent race conditions.
    * When it is executed, the Observer's `perform()` method is called,
-   * where the accordingly changes can be applied to the Agile Class.
+   * where the accordingly changes are applied to the Agile Class.
    *
    * Now that the Job was performed, it is added to the rerender queue,
-   * where the subscribed Subscription Container (UI-Components) are updated (rerender)
-   * accordingly.
+   * where the subscribed Subscription Container (UI-Components)
+   * of the Observer are updated (rerender).
    *
    * Note that the Observer itself is no standalone class
-   * and should be inherited and adapted to fulfill the Agile Class functions.
+   * and should be adapted to the Agile Class it belongs to.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Observer belongs to.
@@ -94,7 +95,7 @@ export class Observer<ValueType = any> {
    * Passes the Observer into the runtime wrapped into a Runtime-Job
    * where it is executed accordingly
    * by performing its `perform()` method, updating its dependents
-   * and the UI-Components it is subscribed to
+   * and the UI-Components it is subscribed to.
    *
    * @public
    * @param config - Configuration object
@@ -129,7 +130,8 @@ export class Observer<ValueType = any> {
    * previously ingested via the `ingest()` method.
    *
    * Note that this method should be overwritten
-   * to correctly apply the changes to the Agile Class it belongs to.
+   * to correctly apply the changes to the Agile Class
+   * to which the Observer belongs.
    *
    * @public
    * @param job - Runtime-Job to be performed.
@@ -139,10 +141,10 @@ export class Observer<ValueType = any> {
   }
 
   /**
-   * Makes specified Observer depend on the Observer.
+   * Makes the specified Observer depend on the Observer.
    *
    * A dependent Observer is always ingested into the Runtime,
-   * when the Observer it depends on was ingested too.
+   * when the Observer it depends on has also been ingested.
    *
    * @public
    * @param observer - Observer to depend on the Observer.
@@ -159,7 +161,7 @@ export interface CreateObserverConfigInterface<ValueType = any> {
    */
   dependents?: Array<Observer>;
   /**
-   * Initial Subscription Container the Observer is subscribed to.
+   * Initial Subscription Containers the Observer is subscribed to.
    * @default []
    */
   subs?: Array<SubscriptionContainer>;
@@ -170,6 +172,10 @@ export interface CreateObserverConfigInterface<ValueType = any> {
   key?: ObserverKey;
   /**
    * Initial value of the Observer.
+   *
+   * The value of an Observer is merged into the Component (Component Subscription Container)
+   * to be represented there, for example, in a local State Management property.
+   *
    * @default undefined
    */
   value?: ValueType;

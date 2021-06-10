@@ -49,7 +49,9 @@ describe('CallbackSubscriptionContainer Tests', () => {
     expect(subscriptionContainer.subscribers.size).toBe(2);
     expect(subscriptionContainer.subscribers.has(dummyObserver1)).toBeTruthy();
     expect(subscriptionContainer.subscribers.has(dummyObserver2)).toBeTruthy();
-    expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
+    expect(Array.from(subscriptionContainer.updatedSubscribers)).toStrictEqual(
+      []
+    );
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)

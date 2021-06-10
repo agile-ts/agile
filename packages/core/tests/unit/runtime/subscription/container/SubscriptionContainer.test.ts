@@ -59,8 +59,10 @@ describe('SubscriptionContainer Tests', () => {
     expect(subscriptionContainer.key).toBe('generatedId');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.componentId).toBeUndefined();
-    expect(subscriptionContainer.subscribers.size).toBe(0); // because of mocking addSubscription
-    expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
+    expect(Array.from(subscriptionContainer.subscribers)).toStrictEqual([]); // because of mocking addSubscription
+    expect(Array.from(subscriptionContainer.updatedSubscribers)).toStrictEqual(
+      []
+    );
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)
@@ -103,8 +105,10 @@ describe('SubscriptionContainer Tests', () => {
     expect(subscriptionContainer.key).toBe('generatedId');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.componentId).toBeUndefined();
-    expect(subscriptionContainer.subscribers.size).toBe(0); // because of mocking addSubscription
-    expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
+    expect(Array.from(subscriptionContainer.subscribers)).toStrictEqual([]); // because of mocking addSubscription
+    expect(Array.from(subscriptionContainer.updatedSubscribers)).toStrictEqual(
+      []
+    );
     expect(subscriptionContainer.isObjectBased).toBeTruthy();
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)
@@ -161,8 +165,10 @@ describe('SubscriptionContainer Tests', () => {
     expect(subscriptionContainer.key).toBe('dummyKey');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.componentId).toBe('testID');
-    expect(subscriptionContainer.subscribers.size).toBe(0); // because of mocking addSubscription
-    expect(subscriptionContainer.updatedSubscribers).toStrictEqual([]);
+    expect(Array.from(subscriptionContainer.subscribers)).toStrictEqual([]); // because of mocking addSubscription
+    expect(Array.from(subscriptionContainer.updatedSubscribers)).toStrictEqual(
+      []
+    );
     expect(subscriptionContainer.isObjectBased).toBeFalsy();
     expect(subscriptionContainer.subscriberKeysWeakMap).toStrictEqual(
       expect.any(WeakMap)
@@ -215,14 +221,12 @@ describe('SubscriptionContainer Tests', () => {
             ],
           });
 
-          expect(subscriptionContainer.subscribers.size).toBe(1);
-          expect(
-            subscriptionContainer.subscribers.has(dummyObserver1)
-          ).toBeTruthy();
-          expect(dummyObserver1.subscribedTo.size).toBe(1);
-          expect(
-            dummyObserver1.subscribedTo.has(subscriptionContainer)
-          ).toBeTruthy();
+          expect(Array.from(subscriptionContainer.subscribers)).toStrictEqual([
+            dummyObserver1,
+          ]);
+          expect(Array.from(dummyObserver1.subscribedTo)).toStrictEqual([
+            subscriptionContainer,
+          ]);
 
           // should assign specified selectors/(and selectors created from proxy paths) to the selectorsWeakMap
           const observer1Selector = subscriptionContainer.selectorsWeakMap.get(
@@ -299,10 +303,9 @@ describe('SubscriptionContainer Tests', () => {
       it('should remove subscribed Observer from Subscription Container', () => {
         subscriptionContainer.removeSubscription(dummyObserver1);
 
-        expect(subscriptionContainer.subscribers.size).toBe(1);
-        expect(
-          subscriptionContainer.subscribers.has(dummyObserver2)
-        ).toBeTruthy();
+        expect(Array.from(subscriptionContainer.subscribers)).toStrictEqual([
+          dummyObserver2,
+        ]);
 
         expect(
           subscriptionContainer.selectorsWeakMap.get(dummyObserver1)
@@ -318,11 +321,10 @@ describe('SubscriptionContainer Tests', () => {
           subscriptionContainer.subscriberKeysWeakMap.get(dummyObserver2)
         ).toBe('dummyObserver2');
 
-        expect(dummyObserver1.subscribedTo.size).toBe(0);
-        expect(dummyObserver2.subscribedTo.size).toBe(1);
-        expect(
-          dummyObserver2.subscribedTo.has(subscriptionContainer)
-        ).toBeTruthy();
+        expect(Array.from(dummyObserver1.subscribedTo)).toStrictEqual([]);
+        expect(Array.from(dummyObserver2.subscribedTo)).toStrictEqual([
+          subscriptionContainer,
+        ]);
       });
     });
   });
