@@ -214,17 +214,21 @@ export class Runtime {
           updateSubscriptionContainer &&
           this.handleSelectors(subscriptionContainer, job);
 
+        // TODO has to be overthought because if it is a Component based Subscription
+        //  the rerender is triggered via merging the changed properties into the Component.
+        //  Although the 'componentId' might be equal, it doesn't mean
+        //  that the changed properties are the equal! (-> changed properties would get missing)
         // Check if Subscription Container with same 'componentId'
         // is already in the 'subscriptionToUpdate' queue (rerender optimisation)
-        updateSubscriptionContainer =
-          updateSubscriptionContainer &&
-          Array.from(subscriptionsToUpdate).findIndex(
-            (sc) => sc.componentId === subscriptionContainer.componentId
-          ) === -1;
+        // updateSubscriptionContainer =
+        //   updateSubscriptionContainer &&
+        //   Array.from(subscriptionsToUpdate).findIndex(
+        //     (sc) => sc.componentId === subscriptionContainer.componentId
+        //   ) === -1;
 
         // Add Subscription Container to the 'subscriptionsToUpdate' queue
         if (updateSubscriptionContainer) {
-          subscriptionContainer.updatedSubscribers.push(job.observer);
+          subscriptionContainer.updatedSubscribers.add(job.observer);
           subscriptionsToUpdate.add(subscriptionContainer);
         }
 
@@ -260,7 +264,7 @@ export class Runtime {
           this.getUpdatedObserverValues(subscriptionContainer)
         );
 
-      subscriptionContainer.updatedSubscribers = [];
+      subscriptionContainer.updatedSubscribers.clear();
     });
 
     Agile.logger.if

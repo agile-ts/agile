@@ -39,7 +39,7 @@ export class SubscriptionContainer {
    * that were performed by the runtime
    * and are currently running through the update Subscription Container (rerender) process.
    */
-  public updatedSubscribers: Array<Observer> = [];
+  public updatedSubscribers: Set<Observer> = new Set();
 
   /**
    * Whether the Subscription Container is object based.

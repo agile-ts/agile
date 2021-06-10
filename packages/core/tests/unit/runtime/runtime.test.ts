@@ -287,7 +287,248 @@ describe('Runtime Tests', () => {
     });
 
     describe('extractToUpdateSubscriptionContainer function tests', () => {
-      // TODO
+      let dummyJob1: RuntimeJob;
+      let dummyJob2: RuntimeJob;
+      const dummySubscriptionContainer1IntegrationInstance = () => {
+        /* empty function */
+      };
+      let dummySubscriptionContainer1: SubscriptionContainer;
+      const dummySubscriptionContainer2IntegrationInstance = {
+        my: 'cool component',
+      };
+      let dummySubscriptionContainer2: SubscriptionContainer;
+
+      beforeEach(() => {
+        dummySubscriptionContainer1 = dummyAgile.subController.subscribe(
+          dummySubscriptionContainer1IntegrationInstance,
+          [dummyObserver1]
+        );
+        dummySubscriptionContainer2 = dummyAgile.subController.subscribe(
+          dummySubscriptionContainer2IntegrationInstance,
+          [dummyObserver2]
+        );
+
+        dummyJob1 = new RuntimeJob(dummyObserver1);
+        dummyJob2 = new RuntimeJob(dummyObserver2);
+
+        jest.spyOn(runtime, 'handleSelectors');
+      });
+
+      it(
+        "shouldn't extract not ready Subscription Container from the specified Jobs, " +
+          "add it to the 'notReadyJobsToRerender' queue and print warning",
+        () => {
+          jest
+            .spyOn(runtime, 'handleSelectors')
+            .mockReturnValueOnce(true)
+            .mockReturnValueOnce(true);
+          dummySubscriptionContainer1.ready = true;
+          dummySubscriptionContainer2.ready = false;
+
+          const response = runtime.extractToUpdateSubscriptionContainer([
+            dummyJob1,
+            dummyJob2,
+          ]);
+
+          expect(response).toStrictEqual([dummySubscriptionContainer1]);
+
+          // Called with Job that ran through
+          expect(runtime.handleSelectors).toHaveBeenCalledTimes(1);
+          expect(runtime.handleSelectors).toHaveBeenCalledWith(
+            dummySubscriptionContainer1,
+            dummyJob1
+          );
+
+          expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([
+            dummyJob2,
+          ]);
+
+          // Job that ran through
+          expect(
+            Array.from(dummyJob1.subscriptionContainersToUpdate)
+          ).toStrictEqual([]);
+          expect(dummyJob1.triesToUpdate).toBe(0);
+          expect(
+            Array.from(dummySubscriptionContainer1.updatedSubscribers)
+          ).toStrictEqual([dummyObserver1]);
+
+          // Job that didn't ran through
+          expect(
+            Array.from(dummyJob2.subscriptionContainersToUpdate)
+          ).toStrictEqual([dummySubscriptionContainer2]);
+          expect(dummyJob2.triesToUpdate).toBe(1);
+          expect(
+            Array.from(dummySubscriptionContainer2.updatedSubscribers)
+          ).toStrictEqual([]);
+
+          // Called with Job that didn't ran through
+          expect(console.warn).toHaveBeenCalledTimes(1);
+          LogMock.hasLoggedCode(
+            '16:02:00',
+            [dummySubscriptionContainer2.key],
+            dummySubscriptionContainer2
+          );
+        }
+      );
+
+      it(
+        "shouldn't extract not ready Subscription Container from the specified Jobs, " +
+          "remove the Job when it exceeded the max 'numberOfTriesToUpdate' " +
+          'and print warning',
+        () => {
+          jest
+            .spyOn(runtime, 'handleSelectors')
+            .mockReturnValueOnce(true)
+            .mockReturnValueOnce(true);
+          dummySubscriptionContainer1.ready = true;
+          dummySubscriptionContainer2.ready = false;
+          const numberOfTries =
+            (dummyJob2.config.numberOfTriesToUpdate ?? 0) + 1;
+          dummyJob2.triesToUpdate = numberOfTries;
+
+          const response = runtime.extractToUpdateSubscriptionContainer([
+            dummyJob1,
+            dummyJob2,
+          ]);
+
+          expect(response).toStrictEqual([dummySubscriptionContainer1]);
+
+          // Called with Job that ran through
+          expect(runtime.handleSelectors).toHaveBeenCalledTimes(1);
+          expect(runtime.handleSelectors).toHaveBeenCalledWith(
+            dummySubscriptionContainer1,
+            dummyJob1
+          );
+
+          expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]); // Because not ready Job was removed
+
+          // Job that ran through
+          expect(
+            Array.from(dummyJob1.subscriptionContainersToUpdate)
+          ).toStrictEqual([]);
+          expect(dummyJob1.triesToUpdate).toBe(0);
+          expect(
+            Array.from(dummySubscriptionContainer1.updatedSubscribers)
+          ).toStrictEqual([dummyObserver1]);
+
+          // Job that didn't ran through
+          expect(
+            Array.from(dummyJob2.subscriptionContainersToUpdate)
+          ).toStrictEqual([dummySubscriptionContainer2]);
+          expect(dummyJob2.triesToUpdate).toBe(numberOfTries);
+          expect(
+            Array.from(dummySubscriptionContainer2.updatedSubscribers)
+          ).toStrictEqual([]);
+
+          // Called with Job that didn't ran through
+          expect(console.warn).toHaveBeenCalledTimes(1);
+          LogMock.hasLoggedCode(
+            '16:02:01',
+            [numberOfTries],
+            dummySubscriptionContainer2
+          );
+        }
+      );
+
+      it("shouldn't extract Subscription Container if the selected property hasn't changed", () => {
+        jest
+          .spyOn(runtime, 'handleSelectors')
+          .mockReturnValueOnce(false)
+          .mockReturnValueOnce(true);
+        dummySubscriptionContainer1.ready = true;
+        dummySubscriptionContainer2.ready = true;
+
+        const response = runtime.extractToUpdateSubscriptionContainer([
+          dummyJob1,
+          dummyJob2,
+        ]);
+
+        expect(response).toStrictEqual([dummySubscriptionContainer2]);
+
+        expect(runtime.handleSelectors).toHaveBeenCalledTimes(2);
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer1,
+          dummyJob1
+        );
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer2,
+          dummyJob2
+        );
+
+        // Since the Job is ready but the Observer value simply hasn't changed
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+
+        // Job that didn't ran through
+        expect(
+          Array.from(dummyJob1.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob1.triesToUpdate).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer1.updatedSubscribers)
+        ).toStrictEqual([]);
+
+        // Job that ran through
+        expect(
+          Array.from(dummyJob2.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob2.triesToUpdate).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([dummyObserver2]);
+
+        expect(console.warn).toHaveBeenCalledTimes(0);
+      });
+
+      it('should extract ready and updated Subscription Containers', () => {
+        jest
+          .spyOn(runtime, 'handleSelectors')
+          .mockReturnValueOnce(true)
+          .mockReturnValueOnce(true);
+        dummySubscriptionContainer1.ready = true;
+        dummySubscriptionContainer2.ready = true;
+
+        const response = runtime.extractToUpdateSubscriptionContainer([
+          dummyJob1,
+          dummyJob2,
+        ]);
+
+        expect(response).toStrictEqual([
+          dummySubscriptionContainer1,
+          dummySubscriptionContainer2,
+        ]);
+
+        expect(runtime.handleSelectors).toHaveBeenCalledTimes(2);
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer1,
+          dummyJob1
+        );
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer2,
+          dummyJob2
+        );
+
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+
+        // Job that ran through
+        expect(
+          Array.from(dummyJob1.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob1.triesToUpdate).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer1.updatedSubscribers)
+        ).toStrictEqual([dummyObserver1]);
+
+        // Job that ran through
+        expect(
+          Array.from(dummyJob2.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob2.triesToUpdate).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([dummyObserver2]);
+
+        expect(console.warn).not.toHaveBeenCalled();
+      });
     });
 
     describe('updateSubscriptionContainer function tests', () => {
@@ -322,9 +563,9 @@ describe('Runtime Tests', () => {
       });
 
       it('should map the values of the updated Observers into an object and return it', () => {
-        subscriptionContainer.updatedSubscribers.push(dummyObserver1);
-        subscriptionContainer.updatedSubscribers.push(dummyObserver2);
-        subscriptionContainer.updatedSubscribers.push(dummyObserver3);
+        subscriptionContainer.updatedSubscribers.add(dummyObserver1);
+        subscriptionContainer.updatedSubscribers.add(dummyObserver2);
+        subscriptionContainer.updatedSubscribers.add(dummyObserver3);
 
         const props = runtime.getUpdatedObserverValues(subscriptionContainer);
 
@@ -333,11 +574,9 @@ describe('Runtime Tests', () => {
           dummyObserver2KeyInWeakMap: undefined,
           dummyObserver3KeyInWeakMap: 'dummyObserverValue3',
         });
-        expect(subscriptionContainer.updatedSubscribers).toStrictEqual([
-          dummyObserver1,
-          dummyObserver2,
-          dummyObserver3,
-        ]);
+        expect(
+          Array.from(subscriptionContainer.updatedSubscribers)
+        ).toStrictEqual([dummyObserver1, dummyObserver2, dummyObserver3]);
       });
     });
 
