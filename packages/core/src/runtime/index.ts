@@ -136,22 +136,11 @@ export class Runtime {
    * the Subscription Container (subscribed Component)
    * of each Job Observer.
    *
-   * It returns a boolean indicating whether any Subscription Container was updated.
+   * It returns a boolean indicating whether any Subscription Container was updated or not.
    *
    * @internal
    */
   public updateSubscribers(): boolean {
-    if (!this.agileInstance().hasIntegration()) {
-      this.jobsToRerender = [];
-      this.notReadyJobsToRerender = new Set();
-      return false;
-    }
-    if (
-      this.jobsToRerender.length <= 0 &&
-      this.notReadyJobsToRerender.size <= 0
-    )
-      return false;
-
     // Build final 'jobsToRerender' array
     // based on the new 'jobsToRerender' array and the 'notReadyJobsToRerender' array.
     const jobsToRerender = this.jobsToRerender.concat(
@@ -159,6 +148,9 @@ export class Runtime {
     );
     this.notReadyJobsToRerender = new Set();
     this.jobsToRerender = [];
+
+    if (!this.agileInstance().hasIntegration() || jobsToRerender.length <= 0)
+      return false;
 
     // Extract Subscription Container from the Jobs to be rerendered
     const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
@@ -277,7 +269,7 @@ export class Runtime {
   }
 
   /**
-   * Maps the values of updated Observers (`updatedSubscribers`)
+   * Maps the values of the updated Observers (`updatedSubscribers`)
    * of the specified Subscription Container into a key map.
    *
    * The key containing the Observer value is extracted from the Observer itself
@@ -293,7 +285,7 @@ export class Runtime {
     for (const observer of subscriptionContainer.updatedSubscribers) {
       const key =
         subscriptionContainer.subscriberKeysWeakMap.get(observer) ??
-        subscriptionContainer.key;
+        observer.key;
       if (key != null) props[key] = observer.value;
     }
     return props;
@@ -324,7 +316,7 @@ export class Runtime {
     // no matter what was updated in the Observer
     if (selectorMethods == null) return true;
 
-    // Check if a selected part of Observer value has changed
+    // Check if a selected part of the Observer value has changed
     const previousValue = job.observer.previousValue;
     const newValue = job.observer.value;
     for (const selectorMethod of selectorMethods) {
