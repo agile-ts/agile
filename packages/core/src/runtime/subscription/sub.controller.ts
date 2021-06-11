@@ -27,7 +27,8 @@ export class SubController {
    * The Subscription Controller manages the subscription to UI-Components.
    *
    * Thus it creates Subscription Containers (Interfaces to UI-Components)
-   * and assigns them to Observers, so that the Observers can easily trigger rerender on Components.
+   * and assigns them to specified Observers,
+   * so that these Observers can easily trigger re-renders on UI-Components.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Subscription Controller belongs to.

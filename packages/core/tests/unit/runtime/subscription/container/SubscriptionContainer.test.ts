@@ -190,9 +190,9 @@ describe('SubscriptionContainer Tests', () => {
 
     describe('addSubscription function tests', () => {
       it(
-        'should create selectors based on the specified proxies, ' +
-          'assigns newly created or provided selectors to the selectorsWeakMap ' +
-          'and subscribe the specified Observer to the SubscriptionContainer',
+        'should create selector methods based on the specified proxy paths, ' +
+          "assign newly created and provided selector methods to the 'selectorsWeakMap' " +
+          'and subscribe the specified Observer to the Subscription Container',
         () => {
           dummyObserver1.value = {
             das: { haus: { vom: 'nikolaus' } },
@@ -228,7 +228,7 @@ describe('SubscriptionContainer Tests', () => {
             subscriptionContainer,
           ]);
 
-          // should assign specified selectors/(and selectors created from proxy paths) to the selectorsWeakMap
+          // should assign specified selectors/(and selectors created from proxy paths) to the 'selectorsWeakMap'
           const observer1Selector = subscriptionContainer.selectorsWeakMap.get(
             dummyObserver1
           ) as any;
@@ -249,20 +249,20 @@ describe('SubscriptionContainer Tests', () => {
             'test1Value'
           );
 
-          // shouldn't overwrite already set values in selectorsWeakMap
+          // shouldn't overwrite already set values in 'selectorsWeakMap' (Observer2)
           const observer2Selector = subscriptionContainer.selectorsWeakMap.get(
             dummyObserver2
           ) as any;
           expect(observer2Selector.methods.length).toBe(1);
           expect(observer2Selector.methods[0](null)).toBe('doesNotMatter');
 
-          // should assign specified key to the subscriberKeysWeakMap
+          // should assign specified key to the 'subscriberKeysWeakMap'
           const observer1Key = subscriptionContainer.subscriberKeysWeakMap.get(
             dummyObserver1
           );
           expect(observer1Key).toBe('dummyObserver1');
 
-          // shouldn't overwrite already set values in subscriberKeysWeakMap
+          // shouldn't overwrite already set values in 'subscriberKeysWeakMap' (Observer2)
           const observer2Key = subscriptionContainer.subscriberKeysWeakMap.get(
             dummyObserver2
           );

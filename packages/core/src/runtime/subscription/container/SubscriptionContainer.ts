@@ -12,55 +12,66 @@ export class SubscriptionContainer {
   public key?: SubscriptionContainerKeyType;
   /**
    * Whether the Subscription Container
-   * and the Component the Subscription Container represents are ready.
+   * and the UI-Component it represents are ready.
    *
-   * When both are ready, the Subscription Container is allowed
-   * to trigger rerender on the Component.
+   * When both instances are ready,
+   * the Subscription Container is allowed
+   * to trigger re-renders on the UI-Component.
    */
   public ready = false;
   /**
-   * Unique identifier of the UI-Component the Subscription Container represents in AgileTs.
+   * Unique identifier of the UI-Component
+   * the Subscription Container represents.
    */
   public componentId?: ComponentIdType;
 
   /**
-   * Observers that have subscribed the Subscription Container.
+   * Observers that are subscribed to the Subscription Container.
    *
    * The subscribed Observers use the Subscription Container
-   * as an interface to the Component it represents.
-   * Through the Subscription Container, they can easily trigger rerender
-   * on the Component, for example, when their value changes.
+   * as an interface to the UI-Component it represents.
+   *
+   * Through the Subscription Container, the Observers can easily trigger re-renders
+   * on the UI-Component, for example, when their value updates.
    *
    * [Learn more..](https://agile-ts.org/docs/core/integration#-subscriptions)
    */
   public subscribers: Set<Observer>;
   /**
    * Temporary stores the subscribed Observers,
-   * that were performed by the runtime
-   * and are currently running through the update Subscription Container (rerender) process.
+   * that were updated by the runtime
+   * and are currently running through
+   * the update (rerender) Subscription Container (UI-Component) process.
    */
   public updatedSubscribers: Set<Observer> = new Set();
 
   /**
    * Whether the Subscription Container is object based.
    *
-   * An Observer is object based when the subscribed Observers
-   * have been provided in an Observer key map.
+   * A Subscription Container is object based when the subscribed Observers
+   * have been provided in an Observer keymap object
    * ```
    * {
    *   state1: Observer,
    *   state2: Observer
    * }
    * ```
-   * Thus each Observer has its 'external' unique key stored in the 'subscribersWeakMap'.
+   * Thus each Observer has its 'external' unique key stored in the `subscribersWeakMap`.
    *
    * Often Component based Subscriptions are object based,
-   * because each Observer requires a unique identifier
-   * to be properly represented in the 'updatedData' object sent to the Integration 'updateMethod()'.
+   * because each Observer requires in such Subscription a unique identifier.
+   * Mainly to be properly represented in the `updatedData` object
+   * sent to the Integration's `updateMethod()` method
+   * when the Subscription Container updates (re-renders the UI-Component).
    */
   public isObjectBased = false;
   /**
    * Weak map for storing 'external' key identifiers for subscribed Observers.
+   *
+   * Why is the key not applied directly to the Observer?
+   *
+   * Because the key defined here should be only valid
+   * for the scope of the Subscription Container.
    *
    * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
@@ -69,9 +80,14 @@ export class SubscriptionContainer {
   /**
    * Weak Map for storing selector functions for subscribed Observers.
    *
-   * A selector function allows partial subscription to an Observer value.
+   * A selector function allows the partial subscription to an Observer value.
    * Only when the selected Observer value part changes,
-   * the Subscription Container rerender the Component.
+   * the Subscription Container is updated (-> re-renders the UI-Component).
+   *
+   * Why are the selector functions not applied directly to the Observer?
+   *
+   * Because the selector function defined here should be only valid
+   * for the scope of the Subscription Container.
    *
    * https://stackoverflow.com/questions/29413222/what-are-the-actual-uses-of-es6-weakmap
    */
@@ -81,9 +97,10 @@ export class SubscriptionContainer {
    * A Subscription Container represents a UI-Component in AgileTs
    * that can be subscribed by multiple Observer Instances.
    *
-   * These Observers use the Subscription Container as an interface
-   * to trigger a rerender on the UI-Component it represents,
-   * for example, when their value has changed.
+   * The subscribed Observers can use the Subscription Container as an interface
+   * to the UI-Component it represents.
+   * For example, to trigger re-renders on the UI-Component,
+   * when their value has changed.
    *
    * @internal
    * @param subs - Observers to be initial subscribed to the Subscription Container.
@@ -106,19 +123,18 @@ export class SubscriptionContainer {
     this.selectorsWeakMap = new WeakMap();
     this.isObjectBased = !Array.isArray(subs);
 
+    // Assign initial Observers to the Subscription Container
     for (const key in subs) {
-      const sub = subs[key];
-      this.addSubscription(sub, {
-        proxyPaths: config.proxyWeakMap?.get(sub)?.paths,
-        selectorMethods: config.selectorWeakMap?.get(sub)?.methods,
-        key: !Array.isArray(subs) ? key : undefined,
+      this.addSubscription(subs[key], {
+        proxyPaths: config.proxyWeakMap?.get(subs[key])?.paths,
+        selectorMethods: config.selectorWeakMap?.get(subs[key])?.methods,
+        key: this.isObjectBased ? key : undefined,
       });
     }
   }
 
   /**
-   * Adds specified Observer to the `subscription` array
-   * and its selectors to the `selectorsWeakMap`.
+   * Subscribes the specified Observer to the Subscription Container.
    *
    * @internal
    * @param sub - Observer to be subscribed to the Subscription Container
@@ -130,10 +146,10 @@ export class SubscriptionContainer {
   ): void {
     const toAddSelectorMethods: SelectorMethodType[] =
       config.selectorMethods ?? [];
-    const paths = config.proxyPaths ?? [];
+    const proxyPaths = config.proxyPaths ?? [];
 
-    // Create selector methods based on the specified proxy paths
-    for (const path of paths) {
+    // Create additional selector methods based on the specified proxy paths
+    for (const path of proxyPaths) {
       toAddSelectorMethods.push((value) => {
         let _value = value;
         for (const branch of path) {
@@ -145,6 +161,8 @@ export class SubscriptionContainer {
     }
 
     // Assign defined/created selector methods to the 'selectorsWeakMap'
+    // (Not to the Observer itself, since the selector methods specified here
+    // only count for the scope of the Subscription Container)
     const existingSelectorMethods =
       this.selectorsWeakMap.get(sub)?.methods ?? [];
     const newSelectorMethods = existingSelectorMethods.concat(
@@ -154,24 +172,24 @@ export class SubscriptionContainer {
       this.selectorsWeakMap.set(sub, { methods: newSelectorMethods });
 
     // Assign specified key to the 'subscriberKeysWeakMap'
-    // (Not to the Observer itself, since the key specified here only counts for this Subscription Container)
+    // (Not to the Observer itself, since the key specified here
+    // only counts for the scope of the Subscription Container)
     if (config.key != null) this.subscriberKeysWeakMap.set(sub, config.key);
 
     // Add Observer to subscribers
     this.subscribers.add(sub);
 
     // Add Subscription Container to Observer
-    // so that it can be updated (cause rerender on the Component it represents)
-    // when for example the Observer value changes
+    // so that the Observer can cause updates on it
+    // (trigger re-render on the UI-Component it represents).
     sub.subscribedTo.add(this);
   }
 
   /**
-   * Removes the Observer from the Subscription Container
-   * and from all WeakMaps it might be in.
+   * Unsubscribes the specified Observer from the Subscription Container.
    *
    * @internal
-   * @param sub - Observer to be removed from the Subscription Container
+   * @param sub - Observer to be unsubscribed from the Subscription Container.
    */
   public removeSubscription(sub: Observer) {
     if (this.subscribers.has(sub)) {
@@ -192,18 +210,18 @@ export interface SubscriptionContainerConfigInterface {
    */
   key?: SubscriptionContainerKeyType;
   /**
-   * Key/Name identifier of the Component to be represented by the Subscription Container.
+   * Key/Name identifier of the UI-Component to be represented by the Subscription Container.
    * @default undefined
    */
   componentId?: ComponentIdType;
   /**
-   * A Weak Map with a set of paths to certain properties
-   * in a Observer value for Observers.
+   * A Weak Map with a set of proxy paths to certain properties
+   * in an Observer value for subscribed Observers.
    *
    * These paths are then selected via selector functions
    * which allow the partly subscription to an Observer value.
    * Only if the selected Observer value part changes,
-   * the Subscription Container rerender the Component.
+   * the Subscription Container re-renders the UI-Component it represents.
    *
    * For example:
    * ```
@@ -212,12 +230,12 @@ export interface SubscriptionContainerConfigInterface {
    *   Observer2: {paths: [['car', 'speed']]}
    * }
    * ```
-   * Now the Subscription Container will only trigger a rerender on the Component
-   * if 'data.name' in Observer1 or 'car.speed' in Observer2 changes.
-   * If, for instance, 'data.age' in Observer1 mutates it won't trigger a rerender,
-   * since 'data.age' isn't represented in the Proxy Weak Map.
+   * Now the Subscription Container will only trigger a re-render on the UI-Component
+   * if 'data.name' in Observer1 or 'car.speed' in Observer2 updates.
+   * If, for instance, 'data.age' in Observer1 mutates it won't trigger a re-render,
+   * since 'data.age' isn't represented in the specified Proxy Weak Map.
    *
-   * These particular paths were tracked via the ProxyTree.
+   * These particular paths can, for example, be tracked via the ProxyTree.
    * https://github.com/agile-ts/agile/tree/master/packages/proxytree
    *
    * @default new WeakMap()
@@ -226,9 +244,21 @@ export interface SubscriptionContainerConfigInterface {
   /**
    * A Weak Map with a set of selector functions for Observers.
    *
-   * A selector functions allows the partly subscription to an Observer value.
+   * Selector functions allow the partly subscription to Observer values.
    * Only if the selected Observer value part changes,
-   * the Subscription Container rerender the Component.
+   * the Subscription Container re-renders the UI-Component it represents.
+   *
+   * For example:
+   * ```
+   * WeakMap: {
+   *   Observer1: {methods: [(value) => value.data.name]},
+   *   Observer2: {methods: [(value) => value.car.speed]}
+   * }
+   * ```
+   * Now the Subscription Container will only trigger a re-render on the UI-Component
+   * if 'data.name' in Observer1 or 'car.speed' in Observer2 updates.
+   * If, for instance, 'data.age' in Observer1 mutates it won't trigger a re-render,
+   * since 'data.age' isn't selected by any selector method in the specified Selector Weak Map.
    *
    * @default new WeakMap()
    */
