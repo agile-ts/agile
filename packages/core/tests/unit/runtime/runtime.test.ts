@@ -382,7 +382,7 @@ describe('Runtime Tests', () => {
             .mockReturnValueOnce(true);
           dummySubscriptionContainer1.ready = true;
           dummySubscriptionContainer2.ready = false;
-          const numberOfTries = (dummyJob2.config.maxOfTriesToUpdate ?? 0) + 1;
+          const numberOfTries = (dummyJob2.config.maxTriesToUpdate ?? 0) + 1;
           dummyJob2.triedToUpdateCount = numberOfTries;
 
           const response = runtime.extractToUpdateSubscriptionContainer([
@@ -423,7 +423,7 @@ describe('Runtime Tests', () => {
           expect(console.warn).toHaveBeenCalledTimes(1);
           LogMock.hasLoggedCode(
             '16:02:01',
-            [dummyJob2.config.maxOfTriesToUpdate],
+            [dummyJob2.config.maxTriesToUpdate],
             dummySubscriptionContainer2
           );
         }

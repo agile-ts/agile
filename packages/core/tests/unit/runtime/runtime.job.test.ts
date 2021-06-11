@@ -17,7 +17,7 @@ describe('RuntimeJob Tests', () => {
     dummyObserver = new Observer(dummyAgile);
   });
 
-  it('should create RuntimeJob with Agile that has integrations (default config)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has a registered Integration (default config)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new RuntimeJob(dummyObserver);
@@ -31,24 +31,25 @@ describe('RuntimeJob Tests', () => {
         exclude: [],
       },
       force: false,
-      maxOfTriesToUpdate: 3,
+      maxTriesToUpdate: 3,
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
+    expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
     expect(job.triedToUpdateCount).toBe(0);
   });
 
-  it('should create RuntimeJob with Agile that has integrations (specific config)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has a registered Integration (specific config)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new RuntimeJob(dummyObserver, {
       key: 'dummyJob',
       sideEffects: {
         enabled: false,
+        exclude: ['jeff'],
       },
       force: true,
-      maxOfTriesToUpdate: 10,
+      maxTriesToUpdate: 10,
     });
 
     expect(job._key).toBe('dummyJob');
@@ -57,16 +58,17 @@ describe('RuntimeJob Tests', () => {
       background: false,
       sideEffects: {
         enabled: false,
+        exclude: ['jeff'],
       },
       force: true,
-      maxOfTriesToUpdate: 10,
+      maxTriesToUpdate: 10,
     });
     expect(job.rerender).toBeTruthy();
     expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
+    expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
   });
 
-  it('should create RuntimeJob with Agile that has no integrations (default config)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has no registered Integration (default config)', () => {
     const job = new RuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();
@@ -78,14 +80,14 @@ describe('RuntimeJob Tests', () => {
         exclude: [],
       },
       force: false,
-      maxOfTriesToUpdate: 3,
+      maxTriesToUpdate: 3,
     });
     expect(job.rerender).toBeFalsy();
     expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
+    expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
   });
 
-  it('should create RuntimeJob and Agile that has integrations (config.background = true)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has a registered Integrations (config.background = true)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new RuntimeJob(dummyObserver, { background: true });
@@ -99,11 +101,11 @@ describe('RuntimeJob Tests', () => {
         exclude: [],
       },
       force: false,
-      maxOfTriesToUpdate: 3,
+      maxTriesToUpdate: 3,
     });
     expect(job.rerender).toBeFalsy();
     expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
+    expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
   });
 
   describe('RuntimeJob Function Tests', () => {

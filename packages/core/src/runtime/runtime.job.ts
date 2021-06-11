@@ -1,28 +1,28 @@
-import {
-  Observer,
-  defineConfig,
-  SubscriptionContainer,
-  Agile,
-} from '../internal';
+import { Observer, defineConfig, SubscriptionContainer } from '../internal';
 
 export class RuntimeJob<ObserverType extends Observer = Observer> {
   public config: RuntimeJobConfigInterface;
 
-  // Key/Name identifier of the Subscription Container
+  // Key/Name identifier of the Runtime Job
   public _key?: RuntimeJobKey;
   // Observer the Job represents
   public observer: ObserverType;
-  // Whether the Subscription Containers (Components) of the Observer can be re-rendered
+  // Whether the Subscription Containers (UI-Components) of the Observer should be updated (re-rendered)
   public rerender: boolean;
-  // Whether the Job has been performed by the runtime
-  public performed = false;
-  // Subscription Container of the Observer that have to be updated/re-rendered
+  // Subscription Containers (UI-Components) of the Observer that have to be updated (re-rendered)
   public subscriptionContainersToUpdate = new Set<SubscriptionContainer>();
-  // How often not ready Subscription Container of the Observer have been tried to update
+  // How often not ready Subscription Containers of the Observer have been tried to update
   public triedToUpdateCount = 0;
 
+  // Whether the Job has been performed by the runtime
+  public performed = false;
+
   /**
-   * A Job that contains an Observer to be executed by the runtime.
+   * A Runtime Job is sent to the Runtime on behalf of the Observer it represents.
+   *
+   * In the Runtime, the Observer is performed via its `perform()` method
+   * and the Subscription Containers (UI-Components)
+   * to which it is subscribed are updated (re-rendered) accordingly.
    *
    * @internal
    * @param observer - Observer to be represented by the Runtime Job.
@@ -39,13 +39,13 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
         exclude: [],
       },
       force: false,
-      maxOfTriesToUpdate: 3,
+      maxTriesToUpdate: 3,
     });
     this.config = {
       background: config.background,
       force: config.force,
       sideEffects: config.sideEffects,
-      maxOfTriesToUpdate: config.maxOfTriesToUpdate,
+      maxTriesToUpdate: config.maxTriesToUpdate,
     };
     this.observer = observer;
     this.rerender =
@@ -89,7 +89,8 @@ export interface CreateRuntimeJobConfigInterface
 export interface RuntimeJobConfigInterface {
   /**
    * Whether to perform the Runtime Job in background.
-   * So that the UI isn't notified of these changes and thus doesn't rerender.
+   * So that the Subscription Containers (UI-Components) aren't notified
+   * of these changes and thus doesn't update (re-render).
    * @default false
    */
   background?: boolean;
@@ -100,21 +101,24 @@ export interface RuntimeJobConfigInterface {
   sideEffects?: SideEffectConfigInterface;
   /**
    * Whether the Runtime Job should be forced through the runtime
-   * although it might be useless from the viewpoint of the runtime.
+   * although it might be useless from the current viewpoint of the runtime.
    * @default false
    */
   force?: boolean;
   /**
-   * How often the runtime should try to update not ready Subscription Containers of the Observer the Job represents.
-   * If 'null' the runtime tries to update the not ready Subscription Container until they are ready (infinite).
+   * How often the Runtime should try to update not ready Subscription Containers
+   * subscribed by the Observer which the Job represents.
+   *
+   * When `null` the Runtime tries to update the not ready Subscription Containers
+   * until they are ready (infinite).
    * @default 3
    */
-  maxOfTriesToUpdate?: number | null;
+  maxTriesToUpdate?: number | null;
 }
 
 export interface SideEffectConfigInterface {
   /**
-   * Whether to execute the defined side effects
+   * Whether to execute the defined side effects.
    * @default true
    */
   enabled?: boolean;

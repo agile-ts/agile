@@ -98,7 +98,7 @@ describe('Observer Tests', () => {
               exclude: [],
             },
             force: false,
-            maxOfTriesToUpdate: 3,
+            maxTriesToUpdate: 3,
           });
         });
 
@@ -123,7 +123,7 @@ describe('Observer Tests', () => {
               exclude: [],
             },
             force: true,
-            maxOfTriesToUpdate: 3,
+            maxTriesToUpdate: 3,
           });
         });
 
