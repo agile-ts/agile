@@ -7,6 +7,7 @@ import {
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
   LogCodeManager,
+  generateId,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -19,12 +20,12 @@ export class Observer<ValueType = any> {
   public _key?: ObserverKey;
   // Observers that depend on this Observer
   public dependents: Set<Observer> = new Set();
-  // Subscription Containers (Components) the Observer is subscribed to
+  // Subscription Containers (UI-Components) the Observer is subscribed to
   public subscribedTo: Set<SubscriptionContainer> = new Set();
 
-  // Current value of Observer
+  // Current value of the Observer
   public value?: ValueType;
-  // Previous value of Observer
+  // Previous value of the Observer
   public previousValue?: ValueType;
 
   /**
@@ -35,7 +36,8 @@ export class Observer<ValueType = any> {
    * Agile Classes often use an Observer as an interface to the Runtime.
    * In doing so, they ingest their own Observer into the Runtime
    * when the Agile Class has changed in such a way
-   * that these changes need to be applied to UI-Components or dependent Observers.
+   * that these changes need to be applied to UI-Components
+   * or dependent other Observers.
    *
    * After the Observer has been ingested into the Runtime
    * wrapped into a Runtime-Job, it is first added to the Jobs queue
@@ -45,10 +47,10 @@ export class Observer<ValueType = any> {
    *
    * Now that the Job was performed, it is added to the rerender queue,
    * where the subscribed Subscription Container (UI-Components)
-   * of the Observer are updated (rerender).
+   * of the Observer are updated (re-rendered).
    *
    * Note that the Observer itself is no standalone class
-   * and should be adapted to the Agile Class it belongs to.
+   * and should be adapted to the Agile Class needs it belongs to.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Observer belongs to.
@@ -93,9 +95,10 @@ export class Observer<ValueType = any> {
 
   /**
    * Passes the Observer into the runtime wrapped into a Runtime-Job
-   * where it is executed accordingly
-   * by performing its `perform()` method, updating its dependents
-   * and the UI-Components it is subscribed to.
+   * where it is executed accordingly.
+   *
+   * During the execution the runtime performs the Observer's `perform()` method,
+   * updates its dependents and re-renders the UI-Components it is subscribed to.
    *
    * @public
    * @param config - Configuration object
@@ -116,7 +119,9 @@ export class Observer<ValueType = any> {
       force: config.force,
       sideEffects: config.sideEffects,
       background: config.background,
-      key: config.key || this._key,
+      key:
+        config.key ??
+        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
     });
 
     // Pass created Job into the Runtime
@@ -173,8 +178,13 @@ export interface CreateObserverConfigInterface<ValueType = any> {
   /**
    * Initial value of the Observer.
    *
-   * The value of an Observer is merged into the Component (Component Subscription Container)
-   * to be represented there, for example, in a local State Management property.
+   * The value of an Observer is given to the Integration's `updateMethod()` method
+   * (Component Subscription Container) where it can be,
+   * for example, merged in a local State Management property of the UI-Component
+   * it is subscribed to.
+   *
+   * Also the selection of specific properties of an Agile Class value
+   * is based on the Observer `value` and `previousValue`.
    *
    * @default undefined
    */

@@ -19,7 +19,7 @@ export class SubscriptionContainer {
    */
   public ready = false;
   /**
-   * Unique identifier of the Component the Subscription Container represents.
+   * Unique identifier of the UI-Component the Subscription Container represents in AgileTs.
    */
   public componentId?: ComponentIdType;
 
@@ -86,7 +86,7 @@ export class SubscriptionContainer {
    * for example, when their value has changed.
    *
    * @internal
-   * @param subs - Observers to be subscribed to the Subscription Container.
+   * @param subs - Observers to be initial subscribed to the Subscription Container.
    * @param config - Configuration object
    */
   constructor(

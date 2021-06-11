@@ -41,12 +41,14 @@ describe('ComponentSubscriptionContainer Tests', () => {
 
     expect(subscriptionContainer.component).toStrictEqual(dummyIntegration);
 
+    // Check if SubscriptionContainer was called with correct parameters
     expect(subscriptionContainer.key).toBe('dummyKey');
     expect(subscriptionContainer.ready).toBeFalsy();
     expect(subscriptionContainer.componentId).toBe('testID');
-    expect(subscriptionContainer.subscribers.size).toBe(2);
-    expect(subscriptionContainer.subscribers.has(dummyObserver1)).toBeTruthy();
-    expect(subscriptionContainer.subscribers.has(dummyObserver2)).toBeTruthy();
+    expect(Array.from(subscriptionContainer.subscribers)).toStrictEqual([
+      dummyObserver1,
+      dummyObserver2,
+    ]);
     expect(Array.from(subscriptionContainer.updatedSubscribers)).toStrictEqual(
       []
     );
