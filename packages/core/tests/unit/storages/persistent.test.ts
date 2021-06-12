@@ -118,6 +118,74 @@ describe('Persistent Tests', () => {
       });
     });
 
+    describe('setKey function tests', () => {
+      beforeEach(() => {
+        persistent.removePersistedValue = jest.fn();
+        persistent.persistValue = jest.fn();
+        persistent.initialLoading = jest.fn();
+      });
+
+      it('should update key with valid key in ready Persistent', async () => {
+        persistent.ready = true;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(true);
+
+        await persistent.setKey('newKey');
+
+        expect(persistent._key).toBe('newKey');
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).not.toHaveBeenCalled();
+        expect(persistent.persistValue).toHaveBeenCalledWith('newKey');
+        expect(persistent.removePersistedValue).toHaveBeenCalledWith(
+          'dummyKey'
+        );
+      });
+
+      it('should update key with not valid key in ready Persistent', async () => {
+        persistent.ready = true;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(false);
+
+        await persistent.setKey();
+
+        expect(persistent._key).toBe(Persistent.placeHolderKey);
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).not.toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.removePersistedValue).toHaveBeenCalledWith(
+          'dummyKey'
+        );
+      });
+
+      it('should update key with valid key in not ready Persistent', async () => {
+        persistent.ready = false;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(true);
+
+        await persistent.setKey('newKey');
+
+        expect(persistent._key).toBe('newKey');
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.removePersistedValue).not.toHaveBeenCalled();
+      });
+
+      it('should update key with not valid key in not ready Persistent', async () => {
+        persistent.ready = false;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(false);
+
+        await persistent.setKey();
+
+        expect(persistent._key).toBe(Persistent.placeHolderKey);
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).not.toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.removePersistedValue).not.toHaveBeenCalled();
+      });
+    });
+
     describe('instantiatePersistent function tests', () => {
       it('should call assign key to formatKey and call assignStorageKeys, validatePersistent', () => {
         jest.spyOn(persistent, 'formatKey');

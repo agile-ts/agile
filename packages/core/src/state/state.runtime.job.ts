@@ -35,20 +35,26 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
   }
 }
 
-/**
- * @param key - Key/Name of Job
- */
 export interface CreateStateRuntimeJobConfigInterface
   extends StateRuntimeJobConfigInterface {
+  /**
+   * Key/Name identifier of the Runtime Job.
+   * @default undefined
+   */
   key?: RuntimeJobKey;
 }
 
-/**
- * @param overwrite - If whole State Value gets overwritten with Job Value
- * @param storage - If Job Value can be saved in Storage
- */
 export interface StateRuntimeJobConfigInterface
   extends RuntimeJobConfigInterface {
+  /**
+   * Whether to overwrite the whole State with the new State value.
+   * @default false
+   */
   overwrite?: boolean;
+  /**
+   * If the State is persisted,
+   * whether to store the new State value in an external Storage
+   * @default true
+   */
   storage?: boolean;
 }

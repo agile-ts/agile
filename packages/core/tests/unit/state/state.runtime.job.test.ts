@@ -27,7 +27,7 @@ describe('RuntimeJob Tests', () => {
     dummyObserver = new StateObserver(dummyState);
   });
 
-  it('should create RuntimeJob with Agile that has integrations (default config)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has a registered Integration (default config)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new StateRuntimeJob(dummyObserver);
@@ -49,7 +49,7 @@ describe('RuntimeJob Tests', () => {
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it('should create RuntimeJob with Agile that has integrations (specific config)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has a registered Integration (specific config)', () => {
     dummyAgile.integrate(dummyIntegration);
 
     const job = new StateRuntimeJob(dummyObserver, {
@@ -76,7 +76,7 @@ describe('RuntimeJob Tests', () => {
     expect(job.subscriptionContainersToUpdate.size).toBe(0);
   });
 
-  it('should create RuntimeJob with Agile that has no integrations (default config)', () => {
+  it('should create RuntimeJob with a specified Agile Instance that has no registered Integration (default config)', () => {
     const job = new StateRuntimeJob(dummyObserver);
 
     expect(job._key).toBeUndefined();

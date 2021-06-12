@@ -205,88 +205,6 @@ describe('CollectionPersistent Tests', () => {
       });
     });
 
-    describe('setKey function tests', () => {
-      beforeEach(() => {
-        collectionPersistent.removePersistedValue = jest.fn();
-        collectionPersistent.persistValue = jest.fn();
-        collectionPersistent.initialLoading = jest.fn();
-      });
-
-      it('should update key with valid key in ready Persistent', async () => {
-        collectionPersistent.ready = true;
-        collectionPersistent._key = 'dummyKey';
-        jest
-          .spyOn(collectionPersistent, 'validatePersistent')
-          .mockReturnValueOnce(true);
-
-        await collectionPersistent.setKey('newKey');
-
-        expect(collectionPersistent._key).toBe('newKey');
-        expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
-        expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
-        expect(collectionPersistent.persistValue).toHaveBeenCalledWith(
-          'newKey'
-        );
-        expect(collectionPersistent.removePersistedValue).toHaveBeenCalledWith(
-          'dummyKey'
-        );
-      });
-
-      it('should update key with not valid key in ready Persistent', async () => {
-        collectionPersistent.ready = true;
-        collectionPersistent._key = 'dummyKey';
-        jest
-          .spyOn(collectionPersistent, 'validatePersistent')
-          .mockReturnValueOnce(false);
-
-        await collectionPersistent.setKey();
-
-        expect(collectionPersistent._key).toBe(Persistent.placeHolderKey);
-        expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
-        expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
-        expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
-        expect(collectionPersistent.removePersistedValue).toHaveBeenCalledWith(
-          'dummyKey'
-        );
-      });
-
-      it('should update key with valid key in not ready Persistent', async () => {
-        collectionPersistent.ready = false;
-        collectionPersistent._key = 'dummyKey';
-        jest
-          .spyOn(collectionPersistent, 'validatePersistent')
-          .mockReturnValueOnce(true);
-
-        await collectionPersistent.setKey('newKey');
-
-        expect(collectionPersistent._key).toBe('newKey');
-        expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
-        expect(collectionPersistent.initialLoading).toHaveBeenCalled();
-        expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
-        expect(
-          collectionPersistent.removePersistedValue
-        ).not.toHaveBeenCalled();
-      });
-
-      it('should update key with not valid key in not ready Persistent', async () => {
-        collectionPersistent.ready = false;
-        collectionPersistent._key = 'dummyKey';
-        jest
-          .spyOn(collectionPersistent, 'validatePersistent')
-          .mockReturnValueOnce(false);
-
-        await collectionPersistent.setKey();
-
-        expect(collectionPersistent._key).toBe(Persistent.placeHolderKey);
-        expect(collectionPersistent.validatePersistent).toHaveBeenCalled();
-        expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
-        expect(collectionPersistent.persistValue).not.toHaveBeenCalled();
-        expect(
-          collectionPersistent.removePersistedValue
-        ).not.toHaveBeenCalled();
-      });
-    });
-
     describe('initialLoading function tests', () => {
       beforeEach(() => {
         jest.spyOn(Persistent.prototype, 'initialLoading');
@@ -336,7 +254,7 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest.fn();
       });
 
-      it('should load default Group and apply persisted value to Items that are already present in Collection (persistentKey)', async () => {
+      it('should load default Group and apply persisted value to Items that are already present in the Collection (persistentKey)', async () => {
         collectionPersistent.ready = true;
         dummyCollection.data = {
           ['3']: dummyItem3,
@@ -387,7 +305,8 @@ describe('CollectionPersistent Tests', () => {
         );
       });
 
-      it("should load default Group and create/add persisted Items that aren't present in Collection yet (persistentKey)", async () => {
+      it("should load default Group " +
+        "and create/add persisted Items that aren't present in the Collection yet (persistentKey)", async () => {
         collectionPersistent.ready = true;
         dummyCollection.data = {};
         dummyAgile.storages.get = jest
@@ -502,8 +421,8 @@ describe('CollectionPersistent Tests', () => {
 
       it(
         'should load default Group, ' +
-          "create/add persisted Items that aren't present in Collection yet " +
-          'and apply persisted value to Items that are already present in Collection (specific key)',
+          "create/add persisted Items that aren't present in the Collection yet " +
+          'and apply persisted value to Items that are already present in the Collection (specific key)',
         async () => {
           collectionPersistent.ready = true;
           dummyCollection.data = {
@@ -564,7 +483,7 @@ describe('CollectionPersistent Tests', () => {
 
           expect(
             dummyCollection.createPlaceholderItem
-          ).not.toHaveBeenCalledWith('3'); // Because Item 3 is already present in Collection
+          ).not.toHaveBeenCalledWith('3'); // Because Item 3 is already present in the Collection
           expect(dummyCollection.createPlaceholderItem).toHaveBeenCalledWith(
             '1'
           );
@@ -582,7 +501,7 @@ describe('CollectionPersistent Tests', () => {
           );
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem3
-          ); // Because Item 3 is already present in Collection
+          ); // Because Item 3 is already present in the Collection
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
             'dummyKey'
@@ -832,7 +751,7 @@ describe('CollectionPersistent Tests', () => {
       });
     });
 
-    describe('setupSideEffect function tests', () => {
+    describe('setupSideEffects function tests', () => {
       let dummyDefaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
@@ -848,7 +767,7 @@ describe('CollectionPersistent Tests', () => {
         );
       });
 
-      it("shouldn't add rebuild Storage side effect to default Group", () => {
+      it("shouldn't add rebuild Storage side effect to the default Group", () => {
         collectionPersistent.setupSideEffects();
 
         expect(
@@ -860,7 +779,7 @@ describe('CollectionPersistent Tests', () => {
         );
       });
 
-      it("shouldn't add rebuild Storage side effect to default Group if Collection has no default Group", () => {
+      it("shouldn't add rebuild Storage side effect to the default Group if the Collection has no default Group", () => {
         dummyCollection.getDefaultGroup = jest.fn(() => undefined as any);
 
         collectionPersistent.setupSideEffects();
@@ -868,10 +787,8 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyDefaultGroup.addSideEffect).not.toHaveBeenCalled();
       });
 
-      describe('test added sideEffect called CollectionPersistent.defaultGroupSideEffectKey', () => {
+      describe("test added sideEffect called 'CollectionPersistent.defaultGroupSideEffectKey'", () => {
         beforeEach(() => {
-          collectionPersistent.ready = true;
-
           collectionPersistent.rebuildStorageSideEffect = jest.fn();
           dummyCollection.getDefaultGroup = jest.fn(
             () => dummyDefaultGroup as any
@@ -879,7 +796,7 @@ describe('CollectionPersistent Tests', () => {
         });
 
         it('should call rebuildStorageSideEffect (persistentKey)', async () => {
-          await collectionPersistent.persistValue();
+          await collectionPersistent.setupSideEffects();
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey
@@ -890,8 +807,8 @@ describe('CollectionPersistent Tests', () => {
           ).toHaveBeenCalledWith(dummyDefaultGroup, collectionPersistent._key);
         });
 
-        it('should call rebuildStorageSideEffect (specific key)', async () => {
-          await collectionPersistent.persistValue('dummyKey');
+        it('should call rebuildStorageSideEffect (specified key)', async () => {
+          await collectionPersistent.setupSideEffects('dummyKey');
 
           dummyDefaultGroup.sideEffects[
             CollectionPersistent.defaultGroupSideEffectKey

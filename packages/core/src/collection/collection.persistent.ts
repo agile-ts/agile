@@ -54,35 +54,6 @@ export class CollectionPersistent<
   }
 
   /**
-   * Updates key/name identifier of Persistent.
-   *
-   * @internal
-   * @param value - New key/name identifier.
-   */
-  public async setKey(value?: StorageKey): Promise<void> {
-    const oldKey = this._key;
-    const wasReady = this.ready;
-
-    // Assign new key to Persistent
-    if (value === this._key) return;
-    this._key = value ?? Persistent.placeHolderKey;
-
-    const isValid = this.validatePersistent();
-
-    // Try to initial load value if persistent wasn't ready before
-    if (!wasReady) {
-      if (isValid) await this.initialLoading();
-      return;
-    }
-
-    // Remove persisted values at old key
-    await this.removePersistedValue(oldKey);
-
-    // Persist values at the new key
-    if (isValid) await this.persistValue(value);
-  }
-
-  /**
    * Loads the persisted value into the Collection
    * or persists the Collection value in the corresponding Storage.
    * This behaviour depends on whether the Collection has been persisted before.
@@ -97,10 +68,12 @@ export class CollectionPersistent<
 
   /**
    * Loads Collection Instances (like Items or Groups) from the corresponding Storage
-   * and sets up side effects that dynamically update the Storage value when the Collection (Instances) changes.
+   * and sets up side effects that dynamically update
+   * the Storage value when the Collection (Instances) changes.
    *
    * @internal
-   * @param storageItemKey - Prefix key of persisted Collection Instances. | default = Persistent.key |
+   * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
+   * | default = Persistent.key |
    * @return Whether the loading was successful.
    */
   public async loadPersistedValue(
@@ -109,13 +82,14 @@ export class CollectionPersistent<
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey ?? this._key;
 
-    // Check if Collection is already persisted (indicated by the persistence of true at _storageItemKey)
+    // Check if Collection is already persisted
+    // (indicated by the persistence of 'true' at '_storageItemKey')
     const isPersisted = await this.agileInstance().storages.get<DataType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
 
-    // Return false if Collection isn't persisted yet
+    // Return 'false' if Collection isn't persisted yet
     if (!isPersisted) return false;
 
     // Helper function to load persisted values into the Collection
@@ -191,7 +165,8 @@ export class CollectionPersistent<
     };
     const success = await loadValuesIntoCollection();
 
-    // Setup Side Effects to keep the Storage value in sync with the Collection (Instances) value
+    // Setup Side Effects to keep the Storage value in sync
+    // with the Collection (Instances) value
     if (success) this.setupSideEffects(_storageItemKey);
 
     return success;
@@ -199,10 +174,12 @@ export class CollectionPersistent<
 
   /**
    * Persists Collection Instances (like Items or Groups) in the corresponding Storage
-   * and sets up side effects that dynamically update the Storage value when the Collection (Instances) changes.
+   * and sets up side effects that dynamically update
+   * the Storage value when the Collection (Instances) changes.
    *
    * @internal
-   * @param storageItemKey - Prefix key of persisted Collection Instances. | default = Persistent.key |
+   * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
+   * | default = Persistent.key |
    * @return Whether the persisting and the setting up of the side effects was successful.
    */
   public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
@@ -239,7 +216,8 @@ export class CollectionPersistent<
       });
     }
 
-    // Setup Side Effects to keep the Storage value in sync with the Collection (Instances) value
+    // Setup Side Effects to keep the Storage value in sync
+    // with the Collection (Instances) value
     this.setupSideEffects(_storageItemKey);
 
     this.isPersisted = true;
@@ -247,17 +225,19 @@ export class CollectionPersistent<
   }
 
   /**
-   * Sets up side effects to keep the Storage value in sync with the Collection (Instances) value.
+   * Sets up side effects to keep the Storage value in sync
+   * with the Collection (Instances) value.
    *
    * @internal
-   * @param storageItemKey - Prefix key of persisted Collection Instances. | default = Persistent.key |
+   * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
+   * | default = Persistent.key |
    */
   public setupSideEffects(storageItemKey?: PersistentKey): void {
     const _storageItemKey = storageItemKey ?? this._key;
     const defaultGroup = this.collection().getDefaultGroup();
     if (defaultGroup == null) return;
 
-    // Add side effect to default Group
+    // Add side effect to the default Group
     // that adds and removes Items from the Storage based on the Group value
     defaultGroup.addSideEffect<typeof defaultGroup>(
       CollectionPersistent.defaultGroupSideEffectKey,
@@ -267,12 +247,13 @@ export class CollectionPersistent<
   }
 
   /**
-   * Removes Collection from the corresponding Storage.
+   * Removes the Collection from the corresponding Storage.
    * -> Collection is no longer persisted
    *
    * @internal
-   * @param storageItemKey - Prefix key of persisted Collection Instances. | default = Persistent.key |
-   * @return Whether the removing was successful.
+   * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
+   * | default = Persistent.key |
+   * @return Whether the removal of the persisted value was successful.
    */
   public async removePersistedValue(
     storageItemKey?: PersistentKey
@@ -310,12 +291,12 @@ export class CollectionPersistent<
   }
 
   /**
-   * Formats given key so that it can be used as a valid Storage key and returns it.
-   * If no formatable key (undefined/null) is given,
-   * an attempt is made to use the Collection key.
+   * Formats specified key so that it can be used as a valid Storage key and returns it.
+   * If no formatable key (undefined/null) was provided,
+   * an attempt is made to use the Collection identifier key.
    *
    * @internal
-   * @param key - Key to be formatted
+   * @param key - Key to be formatted.
    */
   public formatKey(key: StorageKey | undefined | null): StorageKey | undefined {
     if (key == null && this.collection()._key) return this.collection()._key;
@@ -329,7 +310,8 @@ export class CollectionPersistent<
    *
    * @internal
    * @param group - Group whose Items are to be dynamically added or removed from the Storage.
-   * @param storageItemKey - Prefix key of persisted Collection Instances. | default = Persistent.key |
+   * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
+   * | default = Persistent.key |
    */
   public rebuildStorageSideEffect(
     group: Group<DataType>,

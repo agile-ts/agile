@@ -133,73 +133,6 @@ describe('StatePersistent Tests', () => {
       );
     });
 
-    describe('setKey function tests', () => {
-      beforeEach(() => {
-        statePersistent.removePersistedValue = jest.fn();
-        statePersistent.persistValue = jest.fn();
-        statePersistent.initialLoading = jest.fn();
-        jest.spyOn(statePersistent, 'validatePersistent');
-      });
-
-      it('should update key with valid key in ready Persistent', async () => {
-        statePersistent.ready = true;
-        statePersistent._key = 'dummyKey';
-
-        await statePersistent.setKey('newKey');
-
-        expect(statePersistent._key).toBe('newKey');
-        expect(statePersistent.ready).toBeTruthy();
-        expect(statePersistent.validatePersistent).toHaveBeenCalled();
-        expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-        expect(statePersistent.persistValue).toHaveBeenCalledWith('newKey');
-        expect(statePersistent.removePersistedValue).toHaveBeenCalledWith(
-          'dummyKey'
-        );
-      });
-
-      it('should update key with not valid key in ready Persistent', async () => {
-        statePersistent.ready = true;
-        statePersistent._key = 'dummyKey';
-
-        await statePersistent.setKey();
-
-        expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
-        expect(statePersistent.ready).toBeFalsy();
-        expect(statePersistent.validatePersistent).toHaveBeenCalled();
-        expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-        expect(statePersistent.persistValue).not.toHaveBeenCalled();
-        expect(statePersistent.removePersistedValue).toHaveBeenCalledWith(
-          'dummyKey'
-        );
-      });
-
-      it('should update key with valid key in not ready Persistent', async () => {
-        statePersistent.ready = false;
-
-        await statePersistent.setKey('newKey');
-
-        expect(statePersistent._key).toBe('newKey');
-        expect(statePersistent.ready).toBeTruthy();
-        expect(statePersistent.validatePersistent).toHaveBeenCalled();
-        expect(statePersistent.initialLoading).toHaveBeenCalled();
-        expect(statePersistent.persistValue).not.toHaveBeenCalled();
-        expect(statePersistent.removePersistedValue).not.toHaveBeenCalled();
-      });
-
-      it('should update key with not valid key in not ready Persistent', async () => {
-        statePersistent.ready = false;
-
-        await statePersistent.setKey();
-
-        expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
-        expect(statePersistent.ready).toBeFalsy();
-        expect(statePersistent.validatePersistent).toHaveBeenCalled();
-        expect(statePersistent.initialLoading).not.toHaveBeenCalled();
-        expect(statePersistent.persistValue).not.toHaveBeenCalled();
-        expect(statePersistent.removePersistedValue).not.toHaveBeenCalled();
-      });
-    });
-
     describe('initialLoading function tests', () => {
       beforeEach(() => {
         jest.spyOn(Persistent.prototype, 'initialLoading');
@@ -216,101 +149,117 @@ describe('StatePersistent Tests', () => {
     describe('loadPersistedValue function tests', () => {
       beforeEach(() => {
         dummyState.set = jest.fn();
-        statePersistent.persistValue = jest.fn();
+        statePersistent.setupSideEffects = jest.fn();
       });
 
-      it('should load State Value with persistentKey and apply it to the State if loading was successful', async () => {
-        statePersistent.ready = true;
-        dummyAgile.storages.get = jest.fn(() =>
-          Promise.resolve('dummyValue' as any)
-        );
+      it(
+        'should load State value with Persistent key from the corresponding Storage ' +
+          'and apply it to the State if the loading was successful',
+        async () => {
+          statePersistent.ready = true;
+          dummyAgile.storages.get = jest.fn(() =>
+            Promise.resolve('dummyValue' as any)
+          );
 
-        const response = await statePersistent.loadPersistedValue();
+          const response = await statePersistent.loadPersistedValue();
 
-        expect(response).toBeTruthy();
-        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
-          statePersistent._key,
-          statePersistent.config.defaultStorageKey
-        );
-        expect(dummyState.set).toHaveBeenCalledWith('dummyValue', {
-          storage: false,
-        });
-        expect(statePersistent.persistValue).toHaveBeenCalledWith(
-          statePersistent._key
-        );
-      });
+          expect(response).toBeTruthy();
+          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+            statePersistent._key,
+            statePersistent.config.defaultStorageKey
+          );
+          expect(dummyState.set).toHaveBeenCalledWith('dummyValue', {
+            storage: false,
+            overwrite: true,
+          });
+          expect(statePersistent.setupSideEffects).toHaveBeenCalledWith(
+            statePersistent._key
+          );
+        }
+      );
 
-      it("should load State Value with persistentKey and shouldn't apply it to the State if loading wasn't successful", async () => {
-        statePersistent.ready = true;
-        dummyAgile.storages.get = jest.fn(() =>
-          Promise.resolve(undefined as any)
-        );
+      it(
+        "shouldn't load State value with Persistent key from the corresponding Storage " +
+          "and apply it to the State if the loading wasn't successful",
+        async () => {
+          statePersistent.ready = true;
+          dummyAgile.storages.get = jest.fn(() =>
+            Promise.resolve(undefined as any)
+          );
 
-        const response = await statePersistent.loadPersistedValue();
+          const response = await statePersistent.loadPersistedValue();
 
-        expect(response).toBeFalsy();
-        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
-          statePersistent._key,
-          statePersistent.config.defaultStorageKey
-        );
-        expect(dummyState.set).not.toHaveBeenCalled();
-        expect(statePersistent.persistValue).not.toHaveBeenCalled();
-      });
+          expect(response).toBeFalsy();
+          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+            statePersistent._key,
+            statePersistent.config.defaultStorageKey
+          );
+          expect(dummyState.set).not.toHaveBeenCalled();
+          expect(statePersistent.setupSideEffects).not.toHaveBeenCalled();
+        }
+      );
 
-      it('should load State Value with specific Key and apply it to the State if loading was successful', async () => {
-        statePersistent.ready = true;
-        dummyAgile.storages.get = jest.fn(() =>
-          Promise.resolve('dummyValue' as any)
-        );
+      it(
+        'should load State value with specified key from the corresponding Storage ' +
+          'and apply it to the State if the loading was successful',
+        async () => {
+          statePersistent.ready = true;
+          dummyAgile.storages.get = jest.fn(() =>
+            Promise.resolve('dummyValue' as any)
+          );
 
-        const response = await statePersistent.loadPersistedValue('coolKey');
+          const response = await statePersistent.loadPersistedValue('coolKey');
 
-        expect(response).toBeTruthy();
-        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
-          'coolKey',
-          statePersistent.config.defaultStorageKey
-        );
-        expect(dummyState.set).toHaveBeenCalledWith('dummyValue', {
-          storage: false,
-        });
-        expect(statePersistent.persistValue).toHaveBeenCalledWith('coolKey');
-      });
+          expect(response).toBeTruthy();
+          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+            'coolKey',
+            statePersistent.config.defaultStorageKey
+          );
+          expect(dummyState.set).toHaveBeenCalledWith('dummyValue', {
+            storage: false,
+            overwrite: true,
+          });
+          expect(statePersistent.setupSideEffects).toHaveBeenCalledWith(
+            'coolKey'
+          );
+        }
+      );
 
-      it("shouldn't load State Value if Persistent isn't ready", async () => {
-        statePersistent.ready = false;
-        dummyAgile.storages.get = jest.fn(() =>
-          Promise.resolve(undefined as any)
-        );
+      it(
+        "shouldn't load State value from the corresponding Storage " +
+          "if Persistent isn't ready yet",
+        async () => {
+          statePersistent.ready = false;
+          dummyAgile.storages.get = jest.fn(() =>
+            Promise.resolve(undefined as any)
+          );
 
-        const response = await statePersistent.loadPersistedValue();
+          const response = await statePersistent.loadPersistedValue();
 
-        expect(response).toBeFalsy();
-        expect(dummyAgile.storages.get).not.toHaveBeenCalled();
-        expect(dummyState.set).not.toHaveBeenCalled();
-        expect(statePersistent.persistValue).not.toHaveBeenCalled();
-      });
+          expect(response).toBeFalsy();
+          expect(dummyAgile.storages.get).not.toHaveBeenCalled();
+          expect(dummyState.set).not.toHaveBeenCalled();
+          expect(statePersistent.setupSideEffects).not.toHaveBeenCalled();
+        }
+      );
     });
 
     describe('persistValue function tests', () => {
       beforeEach(() => {
-        dummyState.addSideEffect = jest.fn();
+        statePersistent.setupSideEffects = jest.fn();
         statePersistent.rebuildStorageSideEffect = jest.fn();
 
         statePersistent.isPersisted = false;
       });
 
-      it('should persist State with persistentKey', async () => {
+      it('should persist State value with Persistent key', async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.persistValue();
 
         expect(response).toBeTruthy();
-        expect(
-          dummyState.addSideEffect
-        ).toHaveBeenCalledWith(
-          StatePersistent.storeValueSideEffectKey,
-          expect.any(Function),
-          { weight: 0 }
+        expect(statePersistent.setupSideEffects).toHaveBeenCalledWith(
+          statePersistent._key
         );
         expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
           dummyState,
@@ -319,18 +268,14 @@ describe('StatePersistent Tests', () => {
         expect(statePersistent.isPersisted).toBeTruthy();
       });
 
-      it('should persist State with specific Key', async () => {
+      it('should persist State value with specified key', async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.persistValue('coolKey');
 
         expect(response).toBeTruthy();
-        expect(
-          dummyState.addSideEffect
-        ).toHaveBeenCalledWith(
-          StatePersistent.storeValueSideEffectKey,
-          expect.any(Function),
-          { weight: 0 }
+        expect(statePersistent.setupSideEffects).toHaveBeenCalledWith(
+          'coolKey'
         );
         expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
           dummyState,
@@ -339,24 +284,46 @@ describe('StatePersistent Tests', () => {
         expect(statePersistent.isPersisted).toBeTruthy();
       });
 
-      it("shouldn't persist State if Persistent isn't ready", async () => {
+      it("shouldn't persist State if Persistent isn't ready yet", async () => {
         statePersistent.ready = false;
 
         const response = await statePersistent.persistValue();
 
         expect(response).toBeFalsy();
-        expect(dummyState.addSideEffect).not.toHaveBeenCalled();
+        expect(statePersistent.setupSideEffects).not.toHaveBeenCalled();
         expect(statePersistent.rebuildStorageSideEffect).not.toHaveBeenCalled();
         expect(statePersistent.isPersisted).toBeFalsy();
       });
+    });
 
-      describe('test added sideEffect called StatePersistent.storeValueSideEffectKey', () => {
+    describe('setupSideEffects function tests', () => {
+      beforeEach(() => {
+        jest.spyOn(dummyState, 'addSideEffect');
+      });
+
+      it(
+        'should add side effects for keeping the State value in sync ' +
+          'with the Storage value to the State',
+        () => {
+          statePersistent.setupSideEffects();
+
+          expect(
+            dummyState.addSideEffect
+          ).toHaveBeenCalledWith(
+            StatePersistent.storeValueSideEffectKey,
+            expect.any(Function),
+            { weight: 0 }
+          );
+        }
+      );
+
+      describe("test added sideEffect called 'StatePersistent.storeValueSideEffectKey'", () => {
         beforeEach(() => {
           statePersistent.rebuildStorageSideEffect = jest.fn();
         });
 
-        it('should call rebuildStorageSideEffect', async () => {
-          await statePersistent.persistValue();
+        it('should call rebuildStorageSideEffect (persistentKey)', async () => {
+          await statePersistent.setupSideEffects();
 
           dummyState.sideEffects[
             StatePersistent.storeValueSideEffectKey
@@ -367,6 +334,24 @@ describe('StatePersistent Tests', () => {
           expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
             dummyState,
             statePersistent._key,
+            {
+              dummy: 'property',
+            }
+          );
+        });
+
+        it('should call rebuildStorageSideEffect (specified key)', async () => {
+          await statePersistent.setupSideEffects('dummyKey');
+
+          dummyState.sideEffects[
+            StatePersistent.storeValueSideEffectKey
+          ].callback(dummyState, {
+            dummy: 'property',
+          });
+
+          expect(statePersistent.rebuildStorageSideEffect).toHaveBeenCalledWith(
+            dummyState,
+            'dummyKey',
             {
               dummy: 'property',
             }
@@ -383,7 +368,7 @@ describe('StatePersistent Tests', () => {
         statePersistent.isPersisted = true;
       });
 
-      it('should remove persisted State from Storage with persistentKey', async () => {
+      it('should remove persisted State value from the corresponding Storage with Persistent key', async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.removePersistedValue();
@@ -399,7 +384,7 @@ describe('StatePersistent Tests', () => {
         expect(statePersistent.isPersisted).toBeFalsy();
       });
 
-      it('should remove persisted State from Storage with specific Key', async () => {
+      it('should remove persisted State from the corresponding Storage with specified Key', async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.removePersistedValue('coolKey');
@@ -415,7 +400,7 @@ describe('StatePersistent Tests', () => {
         expect(statePersistent.isPersisted).toBeFalsy();
       });
 
-      it("shouldn't remove State from Storage if Persistent isn't ready", async () => {
+      it("shouldn't remove State from the corresponding Storage if Persistent isn't ready yet", async () => {
         statePersistent.ready = false;
 
         const response = await statePersistent.removePersistedValue('coolKey');
@@ -428,10 +413,10 @@ describe('StatePersistent Tests', () => {
     });
 
     describe('formatKey function tests', () => {
-      it('should return key of State if no key got passed', () => {
+      it('should return key of the State if no valid key was specified', () => {
         dummyState._key = 'coolKey';
 
-        const response = statePersistent.formatKey();
+        const response = statePersistent.formatKey(undefined);
 
         expect(response).toBe('coolKey');
       });
@@ -444,7 +429,7 @@ describe('StatePersistent Tests', () => {
         expect(response).toBe('awesomeKey');
       });
 
-      it('should return and apply passed key to State if State had no own key before', () => {
+      it('should return and apply specified key to State if State has no own valid key before', () => {
         dummyState._key = undefined;
 
         const response = statePersistent.formatKey('awesomeKey');
@@ -453,10 +438,10 @@ describe('StatePersistent Tests', () => {
         expect(dummyState._key).toBe('awesomeKey');
       });
 
-      it('should return undefined if no key got passed and State has no key', () => {
+      it('should return undefined if no valid key was specified and State has no valid key either', () => {
         dummyState._key = undefined;
 
-        const response = statePersistent.formatKey();
+        const response = statePersistent.formatKey(undefined);
 
         expect(response).toBeUndefined();
       });

@@ -52,31 +52,51 @@ export class Persistent {
   }
 
   /**
-   * @internal
-   * Set Key/Name of Persistent
+   * Updates the key/name identifier of the Persistent.
+   *
+   * @public
+   * @param value - New key/name identifier.
    */
   public set key(value: StorageKey) {
     this.setKey(value);
   }
 
   /**
-   * @internal
-   * Get Key/Name of Persistent
+   * Returns the key/name identifier of the Persistent.
+   *
+   * @public
    */
   public get key(): StorageKey {
     return this._key;
   }
 
-  //=========================================================================================================
-  // Set Key
-  //=========================================================================================================
   /**
+   * Updates key/name identifier of Persistent.
+   *
    * @public
-   * Sets Key/Name of Persistent
-   * @param value - New Key/Name of Persistent
+   * @param value - New key/name identifier.
    */
-  public setKey(value: StorageKey): void {
-    this._key = value;
+  public async setKey(value?: StorageKey): Promise<void> {
+    const oldKey = this._key;
+    const wasReady = this.ready;
+
+    // Assign new key to Persistent
+    if (value === this._key) return;
+    this._key = value ?? Persistent.placeHolderKey;
+
+    const isValid = this.validatePersistent();
+
+    // Try to initial load value if persistent wasn't ready before
+    if (!wasReady) {
+      if (isValid) await this.initialLoading();
+      return;
+    }
+
+    // Remove persisted values with the old key
+    await this.removePersistedValue(oldKey);
+
+    // Persist Collection values with the new key
+    if (isValid) await this.persistValue(value);
   }
 
   //=========================================================================================================
@@ -181,9 +201,13 @@ export class Persistent {
   /**
    * @internal
    * Loads Value from Storage
+   * @param storageItemKey - Storage key of the persisted Instance.
+   * | default = Persistent.key |
    * @return Success?
    */
-  public async loadPersistedValue(): Promise<boolean> {
+  public async loadPersistedValue(
+    storageItemKey?: PersistentKey
+  ): Promise<boolean> {
     LogCodeManager.log('00:03:00', ['loadPersistedValue', 'Persistent']);
     return false;
   }
@@ -194,9 +218,11 @@ export class Persistent {
   /**
    * @internal
    * Saves/Updates Value in Storage
+   * @param storageItemKey - Storage key of the persisted Instance.
+   * | default = Persistent.key |
    * @return Success?
    */
-  public async persistValue(): Promise<boolean> {
+  public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
     LogCodeManager.log('00:03:00', ['persistValue', 'Persistent']);
     return false;
   }
@@ -207,9 +233,13 @@ export class Persistent {
   /**
    * @internal
    * Removes Value form Storage
+   * @param storageItemKey - Storage key of the persisted Instance.
+   * | default = Persistent.key |
    * @return Success?
    */
-  public async removePersistedValue(): Promise<boolean> {
+  public async removePersistedValue(
+    storageItemKey?: PersistentKey
+  ): Promise<boolean> {
     LogCodeManager.log('00:03:00', ['removePersistedValue', 'Persistent']);
     return false;
   }
