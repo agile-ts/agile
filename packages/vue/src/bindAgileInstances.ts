@@ -27,20 +27,16 @@ export function bindAgileInstances(
 
   // Create Subscription with Observer that have no Indicator and can't be merged into the 'sharedState' (Rerender will be caused via force Update)
   if (depsWithoutIndicator.length > 0) {
-    agile.subController.subscribeWithSubsArray(
-      vueComponent,
-      depsWithoutIndicator,
-      { waitForMount: false }
-    );
+    agile.subController.subscribe(vueComponent, depsWithoutIndicator, {
+      waitForMount: false,
+    });
   }
 
   // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.$data.sharedState')
   if (depsWithIndicator) {
-    return agile.subController.subscribeWithSubsObject(
-      vueComponent,
-      depsWithIndicator,
-      { waitForMount: false }
-    ).props;
+    return agile.subController.subscribe(vueComponent, depsWithIndicator, {
+      waitForMount: false,
+    }).props;
   }
 
   return {};

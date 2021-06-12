@@ -10,8 +10,9 @@ import {
   SubscriptionContainerKeyType,
   defineConfig,
   isValidObject,
-  ProxyKeyMapInterface,
   generateId,
+  ProxyWeakMapType,
+  ComponentIdType,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
@@ -47,37 +48,30 @@ export function useAgile<
   config: AgileHookConfigInterface = {}
 ): AgileHookArrayType<X> | AgileHookType<Y> {
   const depsArray = extractObservers(deps);
-  const proxyTreeMap: ProxyTreeMapInterface = {};
+  const proxyTreeWeakMap = new WeakMap();
   config = defineConfig(config, {
     proxyBased: false,
     key: generateId(),
     agileInstance: null,
   });
 
-  // Creates Return Value of Hook, depending if deps are in Array shape or not
+  // Creates Return Value of Hook, depending whether deps are in Array shape or not
   const getReturnValue = (
     depsArray: (Observer | undefined)[]
   ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    const handleReturn = (
-      dep: State | Observer | undefined
-    ): AgileHookType<Y> => {
-      const value = dep?.value;
-      const depKey = dep?.key;
+    const handleReturn = (dep: Observer | undefined): AgileHookType<Y> => {
+      if (dep == null) return undefined as any;
+      const value = dep.value;
 
-      // If proxyBased and value is object wrap Proxy around it to track used properties
+      // If proxyBased and value is of type object.
+      // Wrap a Proxy around the object to track the used properties
       if (config.proxyBased && isValidObject(value, true)) {
-        if (depKey) {
-          const proxyTree = new ProxyTree(value);
-          proxyTreeMap[depKey] = proxyTree;
-          return proxyTree.proxy;
-        }
-        Agile.logger.warn(
-          'Keep in mind that without a key no Proxy can be wrapped around the dependency value!',
-          dep
-        );
+        const proxyTree = new ProxyTree(value);
+        proxyTreeWeakMap.set(dep, proxyTree);
+        return proxyTree.proxy;
       }
 
-      return dep?.value;
+      return value;
     };
 
     // Handle single dep
@@ -85,7 +79,7 @@ export function useAgile<
       return handleReturn(depsArray[0]);
     }
 
-    // Handle dep array
+    // Handle deps array
     return depsArray.map((dep) => {
       return handleReturn(dep);
     }) as AgileHookArrayType<X>;
@@ -112,24 +106,35 @@ export function useAgile<
       (dep): dep is Observer => dep !== undefined
     );
 
-    // Build Proxy Key Map
-    const proxyKeyMap: ProxyKeyMapInterface = {};
+    // Build Proxy Path WeakMap Map based on the Proxy Tree WeakMap
+    // by extracting the routes of the Tree
+    // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
+    // because the 'useIsomorphicLayoutEffect' is called after the rerender
+    // -> In the Component used paths got successfully tracked
+    const proxyWeakMap: ProxyWeakMapType = new WeakMap();
     if (config.proxyBased) {
-      for (const proxyTreeKey in proxyTreeMap) {
-        const proxyTree = proxyTreeMap[proxyTreeKey];
-        proxyKeyMap[proxyTreeKey] = {
-          paths: proxyTree.getUsedRoutes() as any,
-        };
+      for (const observer of observers) {
+        const proxyTree = proxyTreeWeakMap.get(observer);
+        if (proxyTree != null) {
+          proxyWeakMap.set(observer, {
+            paths: proxyTree.getUsedRoutes() as any,
+          });
+        }
       }
     }
 
     // Create Callback based Subscription
-    const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
+    const subscriptionContainer = agileInstance.subController.subscribe(
       () => {
         forceRender();
       },
       observers,
-      { key: config.key, proxyKeyMap, waitForMount: false }
+      {
+        key: config.key,
+        proxyWeakMap,
+        waitForMount: false,
+        componentId: config.componentId,
+      }
     );
 
     // Unsubscribe Callback based Subscription on Unmount
@@ -185,6 +190,7 @@ interface AgileHookConfigInterface {
   key?: SubscriptionContainerKeyType;
   agileInstance?: Agile;
   proxyBased?: boolean;
+  componentId?: ComponentIdType;
 }
 
 interface ProxyTreeMapInterface {

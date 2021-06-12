@@ -8,7 +8,6 @@ import {
   SubscriptionContainer,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
-import testIntegration from '../../helper/test.integration';
 import { LogMock } from '../../helper/logMock';
 
 describe('Runtime Tests', () => {
@@ -24,10 +23,12 @@ describe('Runtime Tests', () => {
   it('should create Runtime', () => {
     const runtime = new Runtime(dummyAgile);
 
+    expect(runtime.agileInstance()).toBe(dummyAgile);
     expect(runtime.currentJob).toBeNull();
     expect(runtime.jobQueue).toStrictEqual([]);
-    expect(runtime.notReadyJobsToRerender.size).toBe(0);
     expect(runtime.jobsToRerender).toStrictEqual([]);
+    expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+    expect(runtime.isPerformingJobs).toBeFalsy();
   });
 
   describe('Runtime Function Tests', () => {
@@ -52,18 +53,37 @@ describe('Runtime Tests', () => {
         runtime.perform = jest.fn();
       });
 
-      it('should perform passed Job (default config)', () => {
+      it("should perform specified Job immediately if jobQueue isn't being processed (default config)", () => {
+        runtime.isPerformingJobs = false;
+
         runtime.ingest(dummyJob);
 
-        expect(runtime.jobQueue.length).toBe(0);
+        expect(runtime.jobQueue).toStrictEqual([]);
         expect(runtime.perform).toHaveBeenCalledWith(dummyJob);
       });
 
-      it("shouldn't perform passed Job (config.perform = false)", () => {
+      it("shouldn't perform specified Job immediately if jobQueue is being processed (default config)", () => {
+        runtime.isPerformingJobs = true;
+
+        runtime.ingest(dummyJob);
+
+        expect(runtime.jobQueue).toStrictEqual([dummyJob]);
+        expect(runtime.perform).not.toHaveBeenCalled();
+      });
+
+      it('should perform specified Job immediately (config.perform = true)', () => {
+        runtime.isPerformingJobs = true;
+        runtime.ingest(dummyJob, { perform: true });
+
+        expect(runtime.jobQueue).toStrictEqual([]);
+        expect(runtime.perform).toHaveBeenCalledWith(dummyJob);
+      });
+
+      it("shouldn't perform specified Job immediately (config.perform = false)", () => {
+        runtime.isPerformingJobs = false;
         runtime.ingest(dummyJob, { perform: false });
 
-        expect(runtime.jobQueue.length).toBe(1);
-        expect(runtime.jobQueue[0]).toBe(dummyJob);
+        expect(runtime.jobQueue).toStrictEqual([dummyJob]);
         expect(runtime.perform).not.toHaveBeenCalled();
       });
     });
@@ -88,32 +108,34 @@ describe('Runtime Tests', () => {
         dummyObserver2.ingest = jest.fn();
       });
 
-      it('should perform passed and all in jobQueue remaining Jobs and call updateSubscribers', async () => {
-        runtime.jobQueue.push(dummyJob2);
-        runtime.jobQueue.push(dummyJob3);
+      it(
+        "should perform specified Job and all remaining Jobs in the 'jobQueue' " +
+          "and call 'updateSubscribers' if at least one performed Job needs to rerender",
+        async () => {
+          runtime.jobQueue.push(dummyJob2);
+          runtime.jobQueue.push(dummyJob3);
 
-        runtime.perform(dummyJob1);
+          runtime.perform(dummyJob1);
 
-        expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
-        expect(dummyJob1.performed).toBeTruthy();
-        expect(dummyObserver2.perform).toHaveBeenCalledWith(dummyJob2);
-        expect(dummyJob2.performed).toBeTruthy();
-        expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob3);
-        expect(dummyJob3.performed).toBeTruthy();
+          expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
+          expect(dummyJob1.performed).toBeTruthy();
+          expect(dummyObserver2.perform).toHaveBeenCalledWith(dummyJob2);
+          expect(dummyJob2.performed).toBeTruthy();
+          expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob3);
+          expect(dummyJob3.performed).toBeTruthy();
 
-        expect(runtime.jobQueue.length).toBe(0);
-        expect(runtime.jobsToRerender.length).toBe(2);
-        expect(runtime.jobsToRerender.includes(dummyJob1)).toBeTruthy();
-        expect(runtime.jobsToRerender.includes(dummyJob2)).toBeTruthy();
-        expect(runtime.jobsToRerender.includes(dummyJob3)).toBeFalsy();
+          expect(runtime.isPerformingJobs).toBeFalsy(); // because Jobs were performed
+          expect(runtime.jobQueue).toStrictEqual([]);
+          expect(runtime.jobsToRerender).toStrictEqual([dummyJob1, dummyJob2]);
 
-        // Sleep 5ms because updateSubscribers get called in Timeout
-        await new Promise((resolve) => setTimeout(resolve, 5));
+          // Sleep 5ms because updateSubscribers is called in a timeout
+          await new Promise((resolve) => setTimeout(resolve, 5));
 
-        expect(runtime.updateSubscribers).toHaveBeenCalledTimes(1);
-      });
+          expect(runtime.updateSubscribers).toHaveBeenCalledTimes(1);
+        }
+      );
 
-      it('should perform passed Job and update it dependents', async () => {
+      it('should perform specified Job and ingest its dependents into the runtime', async () => {
         dummyJob1.observer.dependents.add(dummyObserver2);
         dummyJob1.observer.dependents.add(dummyObserver1);
 
@@ -122,139 +144,90 @@ describe('Runtime Tests', () => {
         expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
         expect(dummyJob1.performed).toBeTruthy();
 
+        expect(dummyObserver1.ingest).toHaveBeenCalledTimes(1);
         expect(dummyObserver1.ingest).toHaveBeenCalledWith({
           perform: false,
         });
-        expect(dummyObserver1.ingest).toHaveBeenCalledTimes(1);
+        expect(dummyObserver2.ingest).toHaveBeenCalledTimes(1);
         expect(dummyObserver2.ingest).toHaveBeenCalledWith({
           perform: false,
         });
-        expect(dummyObserver2.ingest).toHaveBeenCalledTimes(1);
       });
 
-      it("should perform passed and all in jobQueue remaining Jobs and shouldn't call updateSubscribes if no job needs to rerender", async () => {
-        dummyJob1.rerender = false;
-        runtime.jobQueue.push(dummyJob3);
+      it(
+        "should perform specified Job and all remaining Jobs in the 'jobQueue' " +
+          "and shouldn't call 'updateSubscribes' if no performed Job needs to rerender",
+        async () => {
+          dummyJob1.rerender = false;
+          runtime.jobQueue.push(dummyJob3);
 
-        runtime.perform(dummyJob1);
+          runtime.perform(dummyJob1);
 
-        expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
-        expect(dummyJob1.performed).toBeTruthy();
-        expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob3);
-        expect(dummyJob3.performed).toBeTruthy();
+          expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
+          expect(dummyJob1.performed).toBeTruthy();
+          expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob3);
+          expect(dummyJob3.performed).toBeTruthy();
 
-        expect(runtime.jobQueue.length).toBe(0);
-        expect(runtime.jobsToRerender.length).toBe(0);
+          expect(runtime.isPerformingJobs).toBeFalsy(); // because Jobs were performed
+          expect(runtime.jobQueue).toStrictEqual([]);
+          expect(runtime.jobsToRerender).toStrictEqual([]);
 
-        // Sleep 5ms because updateSubscribers get called in Timeout
-        await new Promise((resolve) => setTimeout(resolve, 5));
+          // Sleep 5ms because updateSubscribers is called in a timeout
+          await new Promise((resolve) => setTimeout(resolve, 5));
 
-        expect(runtime.updateSubscribers).not.toHaveBeenCalled();
-      });
+          expect(runtime.updateSubscribers).not.toHaveBeenCalled();
+        }
+      );
     });
 
     describe('updateSubscribers function tests', () => {
-      let dummyObserver4: Observer;
-      let rCallbackSubJob: RuntimeJob;
-      let nrArCallbackSubJob: RuntimeJob;
-      let rComponentSubJob: RuntimeJob;
-      let nrArComponentSubJob: RuntimeJob;
-      let rCallbackSubContainer: CallbackSubscriptionContainer;
-      const rCallbackSubContainerCallbackFunction = () => {
+      let dummyJob1: RuntimeJob;
+      let dummyJob2: RuntimeJob;
+      let dummyJob3: RuntimeJob;
+      const dummySubscriptionContainer1IntegrationInstance = () => {
         /* empty function */
       };
-      let nrCallbackSubContainer: CallbackSubscriptionContainer;
-      const nrCallbackSubContainerCallbackFunction = () => {
-        /* empty function */
-      };
-      let rComponentSubContainer: ComponentSubscriptionContainer;
-      const rComponentSubContainerComponent = {
+      let dummySubscriptionContainer1: SubscriptionContainer;
+      const dummySubscriptionContainer2IntegrationInstance = {
         my: 'cool component',
       };
-      let nrComponentSubContainer: ComponentSubscriptionContainer;
-      const nrComponentSubContainerComponent = {
-        my: 'second cool component',
-      };
-      const dummyProxyKeyMap = { myState: { paths: [['a', 'b']] } };
+      let dummySubscriptionContainer2: SubscriptionContainer;
 
       beforeEach(() => {
-        dummyAgile.integrate(testIntegration);
-        dummyObserver4 = new Observer(dummyAgile, { key: 'dummyObserver4' });
+        dummySubscriptionContainer1 = dummyAgile.subController.subscribe(
+          dummySubscriptionContainer1IntegrationInstance,
+          [dummyObserver1]
+        );
+        dummySubscriptionContainer2 = dummyAgile.subController.subscribe(
+          dummySubscriptionContainer2IntegrationInstance,
+          [dummyObserver2, dummyObserver3]
+        );
 
-        dummyObserver1.value = 'dummyObserverValue1';
-        dummyObserver2.value = 'dummyObserverValue2';
-        dummyObserver3.value = 'dummyObserverValue3';
-        dummyObserver4.value = 'dummyObserverValue4';
+        dummyJob1 = new RuntimeJob(dummyObserver1);
+        dummyJob2 = new RuntimeJob(dummyObserver2);
+        dummyJob3 = new RuntimeJob(dummyObserver3);
 
-        // Create Ready Callback Subscription
-        rCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
-          rCallbackSubContainerCallbackFunction,
-          [dummyObserver1, dummyObserver2]
-        ) as CallbackSubscriptionContainer;
-        rCallbackSubContainer.callback = jest.fn();
-        rCallbackSubContainer.ready = true;
-        rCallbackSubContainer.key = 'rCallbackSubContainerKey';
-
-        // Create Not Ready Callback Subscription
-        nrCallbackSubContainer = dummyAgile.subController.subscribeWithSubsArray(
-          nrCallbackSubContainerCallbackFunction,
-          [dummyObserver2]
-        ) as CallbackSubscriptionContainer;
-        nrCallbackSubContainer.callback = jest.fn();
-        nrCallbackSubContainer.ready = false;
-        nrCallbackSubContainer.key = 'nrCallbackSubContainerKey';
-
-        // Create Ready Component Subscription
-        rComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
-          rComponentSubContainerComponent,
-          {
-            observer3: dummyObserver3,
-            observer4: dummyObserver4,
-          }
-        ).subscriptionContainer as ComponentSubscriptionContainer;
-        rComponentSubContainer.ready = true;
-        rComponentSubContainer.key = 'rComponentSubContainerKey';
-
-        // Create Not Ready Component Subscription
-        nrComponentSubContainer = dummyAgile.subController.subscribeWithSubsObject(
-          nrComponentSubContainerComponent,
-          {
-            observer4: dummyObserver4,
-          }
-        ).subscriptionContainer as ComponentSubscriptionContainer;
-        nrComponentSubContainer.ready = false;
-        nrComponentSubContainer.key = 'nrComponentSubContainerKey';
-
-        rComponentSubJob = new RuntimeJob(dummyObserver3, { key: 'dummyJob3' }); // Job with ready Component Subscription
-        rCallbackSubJob = new RuntimeJob(dummyObserver1, { key: 'dummyJob1' }); // Job with ready CallbackSubscription
-        nrArComponentSubJob = new RuntimeJob(dummyObserver4, {
-          key: 'dummyJob4',
-        }); // Job with not ready and ready Component Subscription
-        nrArCallbackSubJob = new RuntimeJob(dummyObserver2, {
-          key: 'dummyJob2',
-        }); // Job with not ready and ready Callback Subscription
-
-        jest.spyOn(dummyAgile.integrations, 'update');
-        jest.spyOn(runtime, 'handleObjectBasedSubscription');
-        jest.spyOn(runtime, 'handleProxyBasedSubscription');
+        runtime.updateSubscriptionContainer = jest.fn();
+        jest.spyOn(runtime, 'extractToUpdateSubscriptionContainer');
       });
 
-      it('should return false if agile has no integration', () => {
+      it('should return false if Agile has no registered Integration', () => {
         dummyAgile.hasIntegration = jest.fn(() => false);
-        runtime.jobsToRerender.push(rCallbackSubJob);
-        runtime.jobsToRerender.push(nrArCallbackSubJob);
+        runtime.jobsToRerender = [dummyJob1, dummyJob2];
 
         const response = runtime.updateSubscribers();
 
         expect(response).toBeFalsy();
+
         expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(dummyAgile.integrations.update).not.toHaveBeenCalled();
-        expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
-        expect(nrCallbackSubContainer.callback).not.toHaveBeenCalled();
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+        expect(
+          runtime.extractToUpdateSubscriptionContainer
+        ).not.toHaveBeenCalled();
+        expect(runtime.updateSubscriptionContainer).not.toHaveBeenCalled();
       });
 
-      it('should return false if no Jobs in jobsToRerender and notReadyJobsToRerender left', () => {
+      it('should return false if jobsToRerender and notReadyJobsToRerender queue are both empty', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         runtime.jobsToRerender = [];
         runtime.notReadyJobsToRerender = new Set();
@@ -262,358 +235,425 @@ describe('Runtime Tests', () => {
         const response = runtime.updateSubscribers();
 
         expect(response).toBeFalsy();
-      });
-
-      it('should update ready component based SubscriptionContainer', () => {
-        dummyAgile.hasIntegration = jest.fn(() => true);
-        runtime.jobsToRerender.push(rComponentSubJob);
-
-        const response = runtime.updateSubscribers();
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).not.toHaveBeenCalled();
-
-        expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
-        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
-          rComponentSubContainerComponent,
-          {
-            observer3: 'dummyObserverValue3',
-          }
-        );
-        expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
-          rComponentSubContainer,
-          rComponentSubJob
-        );
-        expect(rComponentSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver3.subscribedTo.size).toBe(1);
-
-        expect(response).toBeTruthy();
-      });
-
-      it('should update ready callback based SubscriptionContainer', () => {
-        dummyAgile.hasIntegration = jest.fn(() => true);
-        runtime.jobsToRerender.push(rCallbackSubJob);
-
-        const response = runtime.updateSubscribers();
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).not.toHaveBeenCalled();
-
-        expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
-        expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subscribedTo.size).toBe(1);
-
-        expect(response).toBeTruthy();
-      });
-
-      it('should update ready proxy, callback based SubscriptionContainer if handleProxyBasedSubscriptions() returns true', () => {
-        jest
-          .spyOn(runtime, 'handleProxyBasedSubscription')
-          .mockReturnValueOnce(true);
-        dummyAgile.hasIntegration = jest.fn(() => true);
-        rCallbackSubContainer.proxyBased = true;
-        rCallbackSubContainer.proxyKeyMap = dummyProxyKeyMap;
-        runtime.jobsToRerender.push(rCallbackSubJob);
-
-        const response = runtime.updateSubscribers();
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).toHaveBeenCalledWith(
-          rCallbackSubContainer,
-          rCallbackSubJob
-        );
-
-        expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
-        expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subscribedTo.size).toBe(1);
-
-        expect(response).toBeTruthy();
-      });
-
-      it("shouldn't update ready proxy, callback based SubscriptionContainer if handleProxyBasedSubscriptions() returns false", () => {
-        jest
-          .spyOn(runtime, 'handleProxyBasedSubscription')
-          .mockReturnValueOnce(false);
-        dummyAgile.hasIntegration = jest.fn(() => true);
-        rCallbackSubContainer.proxyBased = true;
-        rCallbackSubContainer.proxyKeyMap = dummyProxyKeyMap;
-        runtime.jobsToRerender.push(rCallbackSubJob);
-
-        const response = runtime.updateSubscribers();
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-        expect(runtime.handleProxyBasedSubscription).toHaveBeenCalledWith(
-          rCallbackSubContainer,
-          rCallbackSubJob
-        );
-
-        expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
-        expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subscribedTo.size).toBe(1);
 
         expect(response).toBeFalsy();
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+        expect(
+          runtime.extractToUpdateSubscriptionContainer
+        ).not.toHaveBeenCalled();
+        expect(runtime.updateSubscriptionContainer).not.toHaveBeenCalled();
       });
 
-      it("shouldn't update not ready SubscriptionContainers but it should update ready SubscriptionContainers", () => {
+      it('should return false if no Subscription Container of the Jobs to rerender queue needs to update', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
-        runtime.jobsToRerender.push(nrArCallbackSubJob);
-        runtime.jobsToRerender.push(nrArComponentSubJob);
+        jest
+          .spyOn(runtime, 'extractToUpdateSubscriptionContainer')
+          .mockReturnValueOnce([]);
+        runtime.jobsToRerender = [dummyJob1, dummyJob2];
+        runtime.notReadyJobsToRerender = new Set([dummyJob3]);
 
         const response = runtime.updateSubscribers();
 
+        expect(response).toBeFalsy();
         expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(2);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
         expect(
-          runtime.notReadyJobsToRerender.has(nrArCallbackSubJob)
-        ).toBeTruthy();
-        expect(
-          runtime.notReadyJobsToRerender.has(nrArComponentSubJob)
-        ).toBeTruthy();
-
-        expect(nrArCallbackSubJob.subscriptionContainersToUpdate.size).toBe(1);
-        expect(
-          nrArCallbackSubJob.subscriptionContainersToUpdate.has(
-            nrCallbackSubContainer
-          )
-        ).toBeTruthy();
-        expect(nrArComponentSubJob.subscriptionContainersToUpdate.size).toBe(1);
-        expect(
-          nrArComponentSubJob.subscriptionContainersToUpdate.has(
-            nrComponentSubContainer
-          )
-        ).toBeTruthy();
-
-        expect(rCallbackSubContainer.callback).toHaveBeenCalledTimes(1);
-        expect(nrCallbackSubContainer.callback).not.toHaveBeenCalled();
-
-        expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
-        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
-          rComponentSubContainerComponent,
-          {
-            observer4: 'dummyObserverValue4',
-          }
-        );
-        expect(dummyAgile.integrations.update).not.toHaveBeenCalledWith(
-          nrComponentSubContainerComponent,
-          {
-            observer4: 'dummyObserverValue4',
-          }
-        );
-
-        expect(dummyObserver2.subscribedTo.size).toBe(2);
-        expect(dummyObserver4.subscribedTo.size).toBe(2);
-
-        expect(runtime.handleObjectBasedSubscription).toHaveBeenCalledWith(
-          rComponentSubContainer,
-          nrArComponentSubJob
-        );
-        expect(runtime.handleObjectBasedSubscription).not.toHaveBeenCalledWith(
-          nrComponentSubContainer,
-          nrArComponentSubJob
-        );
-
-        expect(nrArComponentSubJob.triesToUpdate).toBe(1);
-        expect(nrArCallbackSubJob.triesToUpdate).toBe(1);
-
-        LogMock.hasLoggedCode(
-          '16:02:00',
-          [nrCallbackSubContainer.key],
-          nrCallbackSubContainer
-        );
-        LogMock.hasLoggedCode(
-          '16:02:00',
-          [nrComponentSubContainer.key],
-          nrComponentSubContainer
-        );
-
-        expect(response).toBeTruthy(); // because 2 SubscriptionContainer were ready
+          runtime.extractToUpdateSubscriptionContainer
+        ).toHaveBeenCalledWith([dummyJob1, dummyJob2, dummyJob3]);
+        expect(runtime.updateSubscriptionContainer).not.toHaveBeenCalled();
       });
 
-      it('should try to update in the past not ready SubscriptionContainers from the notReadyJobsToUpdate queue', () => {
+      it('should return true if at least one Subscription Container of the Jobs to rerender queue needs to update', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
-        runtime.notReadyJobsToRerender.add(rCallbackSubJob);
+        jest
+          .spyOn(runtime, 'extractToUpdateSubscriptionContainer')
+          .mockReturnValueOnce([
+            dummySubscriptionContainer1,
+            dummySubscriptionContainer2,
+          ]);
+        runtime.jobsToRerender = [dummyJob1, dummyJob2];
+        runtime.notReadyJobsToRerender = new Set([dummyJob3]);
 
         const response = runtime.updateSubscribers();
-
-        expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
-
-        expect(rCallbackSubContainer.callback).toHaveBeenCalled();
-        expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(0);
-        expect(dummyObserver1.subscribedTo.size).toBe(1);
 
         expect(response).toBeTruthy();
-      });
-
-      it(
-        "shouldn't update not ready SubscriptionContainers from the notReadyJobsToUpdate queue " +
-          'and completely remove them from the runtime when it exceeded numberOfTriesToUpdate',
-        () => {
-          dummyAgile.hasIntegration = jest.fn(() => true);
-          rCallbackSubJob.config.numberOfTriesToUpdate = 2;
-          rCallbackSubJob.triesToUpdate = 2;
-          rCallbackSubContainer.ready = false;
-          runtime.notReadyJobsToRerender.add(rCallbackSubJob);
-
-          const response = runtime.updateSubscribers();
-
-          expect(runtime.jobsToRerender).toStrictEqual([]);
-          expect(runtime.notReadyJobsToRerender.size).toBe(0);
-
-          expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
-          expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(1);
-          expect(
-            rCallbackSubJob.subscriptionContainersToUpdate.has(
-              rCallbackSubContainer
-            )
-          ).toBeTruthy();
-          expect(dummyObserver1.subscribedTo.size).toBe(1);
-          expect(rCallbackSubJob.triesToUpdate).toBe(2);
-
-          LogMock.hasLoggedCode(
-            '16:02:01',
-            [rCallbackSubJob.config.numberOfTriesToUpdate],
-            rCallbackSubContainer
-          );
-
-          expect(response).toBeFalsy();
-        }
-      );
-
-      it(
-        "shouldn't update not ready SubscriptionContainer from the notReadyJobsToUpdate queue " +
-          'and add it again to the notReadyJobsToUpdate queue if numberOfTriesToUpdate is null',
-        () => {
-          dummyAgile.hasIntegration = jest.fn(() => true);
-          rCallbackSubJob.config.numberOfTriesToUpdate = null;
-          rCallbackSubJob.triesToUpdate = 2;
-          rCallbackSubContainer.ready = false;
-          runtime.notReadyJobsToRerender.add(rCallbackSubJob);
-
-          const response = runtime.updateSubscribers();
-
-          expect(runtime.jobsToRerender).toStrictEqual([]);
-          expect(runtime.notReadyJobsToRerender.size).toBe(1);
-          expect(
-            runtime.notReadyJobsToRerender.has(rCallbackSubJob)
-          ).toBeTruthy();
-
-          expect(rCallbackSubContainer.callback).not.toHaveBeenCalled();
-          expect(rCallbackSubJob.subscriptionContainersToUpdate.size).toBe(1);
-          expect(
-            rCallbackSubJob.subscriptionContainersToUpdate.has(
-              rCallbackSubContainer
-            )
-          ).toBeTruthy();
-          expect(dummyObserver1.subscribedTo.size).toBe(1);
-          expect(rCallbackSubJob.triesToUpdate).toBe(3);
-
-          LogMock.hasLoggedCode(
-            '16:02:00',
-            [rCallbackSubContainer.key],
-            rCallbackSubContainer
-          );
-
-          expect(response).toBeFalsy();
-        }
-      );
-    });
-
-    describe('handleObjectBasedSubscription function tests', () => {
-      let arraySubscriptionContainer: SubscriptionContainer;
-      const dummyComponent = {
-        my: 'cool component',
-      };
-      let objectSubscriptionContainer: SubscriptionContainer;
-      const dummyComponent2 = {
-        my: 'second cool component',
-      };
-      let arrayJob: RuntimeJob;
-      let objectJob1: RuntimeJob;
-      let objectJob2: RuntimeJob;
-
-      beforeEach(() => {
-        arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsArray(
-          dummyComponent,
-          [dummyObserver1, dummyObserver2, dummyObserver3]
-        );
-        arrayJob = new RuntimeJob(dummyObserver1, { key: 'dummyArrayJob' });
-
-        objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
-          dummyComponent2,
-          {
-            observer1: dummyObserver1,
-            observer2: dummyObserver2,
-            observer3: dummyObserver3,
-          }
-        ).subscriptionContainer;
-        objectJob1 = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
-        objectJob2 = new RuntimeJob(dummyObserver3, { key: 'dummyObjectJob2' });
-      });
-
-      it('should ignore not object based SubscriptionContainer', () => {
-        runtime.handleObjectBasedSubscription(
-          arraySubscriptionContainer,
-          arrayJob
-        );
-
-        expect(arraySubscriptionContainer.observerKeysToUpdate).toStrictEqual(
-          []
-        );
-      });
-
-      it('should add Job Observer to changedObjectKeys in SubscriptionContainer', () => {
-        runtime.handleObjectBasedSubscription(
-          objectSubscriptionContainer,
-          objectJob1
-        );
-
-        expect(objectSubscriptionContainer.observerKeysToUpdate).toStrictEqual([
-          'observer1',
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+        expect(
+          runtime.extractToUpdateSubscriptionContainer
+        ).toHaveBeenCalledWith([dummyJob1, dummyJob2, dummyJob3]);
+        expect(runtime.updateSubscriptionContainer).toHaveBeenCalledWith([
+          dummySubscriptionContainer1,
+          dummySubscriptionContainer2,
         ]);
       });
     });
 
-    describe('getObjectBasedProps function tests', () => {
+    describe('extractToUpdateSubscriptionContainer function tests', () => {
+      let dummyJob1: RuntimeJob;
+      let dummyJob2: RuntimeJob;
+      const dummySubscriptionContainer1IntegrationInstance = () => {
+        /* empty function */
+      };
+      let dummySubscriptionContainer1: SubscriptionContainer;
+      const dummySubscriptionContainer2IntegrationInstance = {
+        my: 'cool component',
+      };
+      let dummySubscriptionContainer2: SubscriptionContainer;
+
+      beforeEach(() => {
+        dummySubscriptionContainer1 = dummyAgile.subController.subscribe(
+          dummySubscriptionContainer1IntegrationInstance,
+          [dummyObserver1]
+        );
+        dummySubscriptionContainer2 = dummyAgile.subController.subscribe(
+          dummySubscriptionContainer2IntegrationInstance,
+          [dummyObserver2]
+        );
+
+        dummyJob1 = new RuntimeJob(dummyObserver1);
+        dummyJob2 = new RuntimeJob(dummyObserver2);
+
+        jest.spyOn(runtime, 'handleSelectors');
+      });
+
+      it(
+        "shouldn't extract not ready Subscription Container from the specified Jobs, " +
+          "should add it to the 'notReadyJobsToRerender' queue and print a warning",
+        () => {
+          jest
+            .spyOn(runtime, 'handleSelectors')
+            .mockReturnValueOnce(true)
+            .mockReturnValueOnce(true);
+          dummySubscriptionContainer1.ready = true;
+          dummySubscriptionContainer2.ready = false;
+
+          const response = runtime.extractToUpdateSubscriptionContainer([
+            dummyJob1,
+            dummyJob2,
+          ]);
+
+          expect(response).toStrictEqual([dummySubscriptionContainer1]);
+
+          // Called with Job that ran through
+          expect(runtime.handleSelectors).toHaveBeenCalledTimes(1);
+          expect(runtime.handleSelectors).toHaveBeenCalledWith(
+            dummySubscriptionContainer1,
+            dummyJob1
+          );
+
+          expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([
+            dummyJob2,
+          ]);
+
+          // Job that ran through
+          expect(
+            Array.from(dummyJob1.subscriptionContainersToUpdate)
+          ).toStrictEqual([]);
+          expect(dummyJob1.triedToUpdateCount).toBe(0);
+          expect(
+            Array.from(dummySubscriptionContainer1.updatedSubscribers)
+          ).toStrictEqual([dummyObserver1]);
+
+          // Job that didn't ran through
+          expect(
+            Array.from(dummyJob2.subscriptionContainersToUpdate)
+          ).toStrictEqual([dummySubscriptionContainer2]);
+          expect(dummyJob2.triedToUpdateCount).toBe(1);
+          expect(
+            Array.from(dummySubscriptionContainer2.updatedSubscribers)
+          ).toStrictEqual([]);
+
+          // Called with Job that didn't ran through
+          expect(console.warn).toHaveBeenCalledTimes(1);
+          LogMock.hasLoggedCode(
+            '16:02:00',
+            [dummySubscriptionContainer2.key],
+            dummySubscriptionContainer2
+          );
+        }
+      );
+
+      it(
+        "shouldn't extract not ready Subscription Container from the specified Jobs, " +
+          "should remove the Job when it exceeded the max 'maxTriesToUpdate' " +
+          'and print a warning',
+        () => {
+          jest
+            .spyOn(runtime, 'handleSelectors')
+            .mockReturnValueOnce(true)
+            .mockReturnValueOnce(true);
+          dummySubscriptionContainer1.ready = true;
+          dummySubscriptionContainer2.ready = false;
+          const numberOfTries = (dummyJob2.config.maxTriesToUpdate ?? 0) + 1;
+          dummyJob2.triedToUpdateCount = numberOfTries;
+
+          const response = runtime.extractToUpdateSubscriptionContainer([
+            dummyJob1,
+            dummyJob2,
+          ]);
+
+          expect(response).toStrictEqual([dummySubscriptionContainer1]);
+
+          // Called with Job that ran through
+          expect(runtime.handleSelectors).toHaveBeenCalledTimes(1);
+          expect(runtime.handleSelectors).toHaveBeenCalledWith(
+            dummySubscriptionContainer1,
+            dummyJob1
+          );
+
+          expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]); // Because exceeded Job was removed
+
+          // Job that ran through
+          expect(
+            Array.from(dummyJob1.subscriptionContainersToUpdate)
+          ).toStrictEqual([]);
+          expect(dummyJob1.triedToUpdateCount).toBe(0);
+          expect(
+            Array.from(dummySubscriptionContainer1.updatedSubscribers)
+          ).toStrictEqual([dummyObserver1]);
+
+          // Job that didn't ran through
+          expect(
+            Array.from(dummyJob2.subscriptionContainersToUpdate)
+          ).toStrictEqual([dummySubscriptionContainer2]);
+          expect(dummyJob2.triedToUpdateCount).toBe(numberOfTries);
+          expect(
+            Array.from(dummySubscriptionContainer2.updatedSubscribers)
+          ).toStrictEqual([]);
+
+          // Called with Job that didn't ran through
+          expect(console.warn).toHaveBeenCalledTimes(1);
+          LogMock.hasLoggedCode(
+            '16:02:01',
+            [dummyJob2.config.maxTriesToUpdate],
+            dummySubscriptionContainer2
+          );
+        }
+      );
+
+      it("shouldn't extract Subscription Container if the selected property hasn't changed", () => {
+        jest
+          .spyOn(runtime, 'handleSelectors')
+          .mockReturnValueOnce(false)
+          .mockReturnValueOnce(true);
+        dummySubscriptionContainer1.ready = true;
+        dummySubscriptionContainer2.ready = true;
+
+        const response = runtime.extractToUpdateSubscriptionContainer([
+          dummyJob1,
+          dummyJob2,
+        ]);
+
+        expect(response).toStrictEqual([dummySubscriptionContainer2]);
+
+        expect(runtime.handleSelectors).toHaveBeenCalledTimes(2);
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer1,
+          dummyJob1
+        );
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer2,
+          dummyJob2
+        );
+
+        // Since the Job is ready but the Observer value simply hasn't changed
+        // -> no point in trying to update it again
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+
+        // Job that didn't ran through
+        expect(
+          Array.from(dummyJob1.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob1.triedToUpdateCount).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer1.updatedSubscribers)
+        ).toStrictEqual([]);
+
+        // Job that ran through
+        expect(
+          Array.from(dummyJob2.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob2.triedToUpdateCount).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([dummyObserver2]);
+
+        expect(console.warn).toHaveBeenCalledTimes(0);
+      });
+
+      it('should extract ready and to update Subscription Containers', () => {
+        jest
+          .spyOn(runtime, 'handleSelectors')
+          .mockReturnValueOnce(true)
+          .mockReturnValueOnce(true);
+        dummySubscriptionContainer1.ready = true;
+        dummySubscriptionContainer2.ready = true;
+
+        const response = runtime.extractToUpdateSubscriptionContainer([
+          dummyJob1,
+          dummyJob2,
+        ]);
+
+        expect(response).toStrictEqual([
+          dummySubscriptionContainer1,
+          dummySubscriptionContainer2,
+        ]);
+
+        expect(runtime.handleSelectors).toHaveBeenCalledTimes(2);
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer1,
+          dummyJob1
+        );
+        expect(runtime.handleSelectors).toHaveBeenCalledWith(
+          dummySubscriptionContainer2,
+          dummyJob2
+        );
+
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+
+        // Job that ran through
+        expect(
+          Array.from(dummyJob1.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob1.triedToUpdateCount).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer1.updatedSubscribers)
+        ).toStrictEqual([dummyObserver1]);
+
+        // Job that ran through
+        expect(
+          Array.from(dummyJob2.subscriptionContainersToUpdate)
+        ).toStrictEqual([]);
+        expect(dummyJob2.triedToUpdateCount).toBe(0);
+        expect(
+          Array.from(dummySubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([dummyObserver2]);
+
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('updateSubscriptionContainer function tests', () => {
+      const dummyIntegration1 = { dummy: 'component' };
+      let componentSubscriptionContainer1: ComponentSubscriptionContainer;
+      const dummyIntegration2 = jest.fn();
+      let callbackSubscriptionContainer2: CallbackSubscriptionContainer;
+      const dummyIntegration3 = jest.fn();
+      let callbackSubscriptionContainer3: CallbackSubscriptionContainer;
+
+      beforeEach(() => {
+        componentSubscriptionContainer1 = dummyAgile.subController.subscribe(
+          dummyIntegration1,
+          [dummyObserver1]
+        ) as ComponentSubscriptionContainer;
+        componentSubscriptionContainer1.updatedSubscribers = new Set([
+          dummyObserver1,
+        ]);
+        callbackSubscriptionContainer2 = dummyAgile.subController.subscribe(
+          dummyIntegration2,
+          [dummyObserver2]
+        ) as CallbackSubscriptionContainer;
+        callbackSubscriptionContainer2.updatedSubscribers = new Set([
+          dummyObserver2,
+        ]);
+        callbackSubscriptionContainer3 = dummyAgile.subController.subscribe(
+          dummyIntegration3,
+          [dummyObserver3]
+        ) as CallbackSubscriptionContainer;
+        callbackSubscriptionContainer3.updatedSubscribers = new Set([
+          dummyObserver3,
+        ]);
+
+        dummyAgile.integrations.update = jest.fn();
+      });
+
+      it('should update the specified Subscription Container', () => {
+        jest
+          .spyOn(runtime, 'getUpdatedObserverValues')
+          .mockReturnValueOnce('propsBasedOnUpdatedObservers' as any);
+
+        runtime.updateSubscriptionContainer([
+          componentSubscriptionContainer1,
+          callbackSubscriptionContainer2,
+          callbackSubscriptionContainer3,
+        ]);
+
+        // Component Subscription Container 1
+        expect(dummyAgile.integrations.update).toHaveBeenCalledTimes(1);
+        expect(dummyAgile.integrations.update).toHaveBeenCalledWith(
+          dummyIntegration1,
+          'propsBasedOnUpdatedObservers'
+        );
+        expect(
+          Array.from(componentSubscriptionContainer1.updatedSubscribers)
+        ).toStrictEqual([]);
+
+        // Callback Subscription Container 2
+        expect(callbackSubscriptionContainer2.callback).toHaveBeenCalledTimes(
+          1
+        );
+        expect(
+          Array.from(callbackSubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([]);
+
+        // Callback Subscription Container 3
+        expect(callbackSubscriptionContainer3.callback).toHaveBeenCalledTimes(
+          1
+        );
+        expect(
+          Array.from(callbackSubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([]);
+      });
+    });
+
+    describe('getUpdatedObserverValues function tests', () => {
       let subscriptionContainer: SubscriptionContainer;
       const dummyFunction = () => {
         /* empty function */
       };
 
       beforeEach(() => {
-        subscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+        subscriptionContainer = dummyAgile.subController.subscribe(
           dummyFunction,
-          {
-            observer1: dummyObserver1,
-            observer2: dummyObserver2,
-            observer3: dummyObserver3,
-          }
-        ).subscriptionContainer;
+          [dummyObserver1, dummyObserver2, dummyObserver3]
+        );
         dummyObserver1.value = 'dummyObserverValue1';
         dummyObserver3.value = 'dummyObserverValue3';
+
+        dummyObserver1._key = 'dummyObserver1KeyInObserver';
+        dummyObserver2._key = undefined;
+        subscriptionContainer.subscriberKeysWeakMap.set(
+          dummyObserver2,
+          'dummyObserver2KeyInWeakMap'
+        );
+        dummyObserver3._key = 'dummyObserver3KeyInObserver';
+        subscriptionContainer.subscriberKeysWeakMap.set(
+          dummyObserver3,
+          'dummyObserver3KeyInWeakMap'
+        );
       });
 
-      it('should build Observer Value Object out of observerKeysToUpdate and Value of Observer', () => {
-        subscriptionContainer.observerKeysToUpdate.push('observer1');
-        subscriptionContainer.observerKeysToUpdate.push('observer2');
-        subscriptionContainer.observerKeysToUpdate.push('observer3');
+      it('should map the values of the updated Observers into an object and return it', () => {
+        subscriptionContainer.updatedSubscribers.add(dummyObserver1);
+        subscriptionContainer.updatedSubscribers.add(dummyObserver2);
+        subscriptionContainer.updatedSubscribers.add(dummyObserver3);
 
-        const props = runtime.getObjectBasedProps(subscriptionContainer);
+        const props = runtime.getUpdatedObserverValues(subscriptionContainer);
 
         expect(props).toStrictEqual({
-          observer1: 'dummyObserverValue1',
-          observer2: undefined,
-          observer3: 'dummyObserverValue3',
+          dummyObserver1KeyInObserver: 'dummyObserverValue1',
+          dummyObserver2KeyInWeakMap: undefined,
+          dummyObserver3KeyInWeakMap: 'dummyObserverValue3',
         });
-        expect(subscriptionContainer.observerKeysToUpdate).toStrictEqual([]);
+        expect(
+          Array.from(subscriptionContainer.updatedSubscribers)
+        ).toStrictEqual([dummyObserver1, dummyObserver2, dummyObserver3]);
       });
     });
 
-    describe('handleProxyBasedSubscription function tests', () => {
+    describe('handleSelector function tests', () => {
       let objectSubscriptionContainer: SubscriptionContainer;
       const dummyFunction = () => {
         /* empty function */
@@ -627,70 +667,69 @@ describe('Runtime Tests', () => {
       let arrayJob: RuntimeJob;
 
       beforeEach(() => {
-        // Create Job with Object value
-        objectSubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+        // Create Job with object based value
+        objectSubscriptionContainer = dummyAgile.subController.subscribe(
           dummyFunction,
-          { observer1: dummyObserver1 }
-        ).subscriptionContainer;
+          [dummyObserver1]
+        );
         dummyObserver1.value = {
-          key: 'dummyObserverValue1',
           data: { name: 'jeff' },
         };
         dummyObserver1.previousValue = {
-          key: 'dummyObserverValue1',
           data: { name: 'jeff' },
         };
-        objectSubscriptionContainer.proxyBased = true;
-        objectSubscriptionContainer.proxyKeyMap = {
-          [dummyObserver1._key || 'unknown']: { paths: [['data', 'name']] },
-        };
+        objectSubscriptionContainer.selectorsWeakMap.set(dummyObserver1, {
+          methods: [(value) => value?.data?.name],
+        });
 
         objectJob = new RuntimeJob(dummyObserver1, { key: 'dummyObjectJob1' });
 
-        // Create Job with Array value
-        arraySubscriptionContainer = dummyAgile.subController.subscribeWithSubsObject(
+        // Create Job with array based value
+        arraySubscriptionContainer = dummyAgile.subController.subscribe(
           dummyFunction2,
-          { observer2: dummyObserver2 }
+          { dummyObserver2: dummyObserver2 }
         ).subscriptionContainer;
         dummyObserver2.value = [
           {
-            key: 'dummyObserver2Value1',
             data: { name: 'jeff' },
           },
           {
-            key: 'dummyObserver2Value2',
             data: { name: 'hans' },
+          },
+          {
+            data: { name: 'frank' },
           },
         ];
         dummyObserver2.previousValue = [
           {
-            key: 'dummyObserver2Value1',
             data: { name: 'jeff' },
           },
           {
-            key: 'dummyObserver2Value2',
             data: { name: 'hans' },
           },
-        ];
-        arraySubscriptionContainer.proxyBased = true;
-        arraySubscriptionContainer.proxyKeyMap = {
-          [dummyObserver2._key || 'unknown']: {
-            paths: [['0', 'data', 'name']],
+          {
+            data: { name: 'frank' },
           },
-        };
+        ];
+        arraySubscriptionContainer.selectorsWeakMap.set(dummyObserver2, {
+          methods: [
+            (value) => value[0]?.data?.name,
+            (value) => value[2]?.data?.name,
+          ],
+        });
 
         arrayJob = new RuntimeJob(dummyObserver2, { key: 'dummyObjectJob2' });
 
         jest.spyOn(Utils, 'notEqual');
 
-        // Because not equals is called once during the creation of the subscriptionContainer
+        // Because not equals is called once during the creation of the Subscription Containers
         jest.clearAllMocks();
       });
 
-      it("should return true if subscriptionContainer isn't proxy based", () => {
-        objectSubscriptionContainer.proxyBased = false;
+      it('should return true if Subscription Container has no selector methods', () => {
+        objectSubscriptionContainer.selectorsWeakMap.delete(dummyObserver1);
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
@@ -699,115 +738,118 @@ describe('Runtime Tests', () => {
         expect(Utils.notEqual).not.toHaveBeenCalled();
       });
 
-      it('should return true if observer the job represents has no key', () => {
-        objectJob.observer._key = undefined;
-
-        const response = runtime.handleProxyBasedSubscription(
-          objectSubscriptionContainer,
-          objectJob
-        );
-
-        expect(response).toBeTruthy();
-        expect(Utils.notEqual).not.toHaveBeenCalled();
-      });
-
-      it("should return true if the observer key isn't represented in the proxyKeyMap", () => {
-        objectSubscriptionContainer.proxyKeyMap = {
-          unknownKey: { paths: [['a', 'b']] },
-        };
-
-        const response = runtime.handleProxyBasedSubscription(
-          objectSubscriptionContainer,
-          objectJob
-        );
-
-        expect(response).toBeTruthy();
-        expect(Utils.notEqual).not.toHaveBeenCalled();
-      });
-
-      it('should return true if used property has changed (object value)', () => {
+      it('should return true if selected property has changed (object value)', () => {
         dummyObserver1.value = {
-          key: 'dummyObserverValue1',
-          data: { name: 'hans' },
+          data: { name: 'changedName' },
         };
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
 
         expect(response).toBeTruthy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(1);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver1.value.data.name,
           dummyObserver1.previousValue.data.name
         );
       });
 
-      it("should return false if used property hasn't changed (object value)", () => {
-        const response = runtime.handleProxyBasedSubscription(
+      it("should return false if selected property hasn't changed (object value)", () => {
+        const response = runtime.handleSelectors(
           objectSubscriptionContainer,
           objectJob
         );
 
         expect(response).toBeFalsy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(1);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver1.value.data.name,
           dummyObserver1.previousValue.data.name
         );
       });
 
-      it('should return true if used property has changed in the deepness (object value)', () => {
-        dummyObserver1.value = {
-          key: 'dummyObserverValue1',
-        };
-        dummyObserver1.previousValue = {
-          key: 'dummyObserverValue1',
-          data: { name: undefined },
-        };
+      // TODO the deepness check isn't possible with the current way of handling selector methods
+      // it('should return true if selected property has changed in the deepness (object value)', () => {
+      //   dummyObserver1.value = {
+      //     key: 'dummyObserverValue1',
+      //   };
+      //   dummyObserver1.previousValue = {
+      //     key: 'dummyObserverValue1',
+      //     data: { name: undefined },
+      //   };
+      //
+      //   const response = runtime.handleSelectors(
+      //     objectSubscriptionContainer,
+      //     objectJob
+      //   );
+      //
+      //   expect(response).toBeTruthy();
+      //   expect(Utils.notEqual).toHaveBeenCalledWith(undefined, undefined);
+      // });
 
-        const response = runtime.handleProxyBasedSubscription(
-          objectSubscriptionContainer,
-          objectJob
-        );
-
-        expect(response).toBeTruthy();
-        expect(Utils.notEqual).toHaveBeenCalledWith(undefined, undefined);
-      });
-
-      it('should return true if used property has changed (array value)', () => {
+      it('should return true if a selected property has changed (array value)', () => {
         dummyObserver2.value = [
           {
-            key: 'dummyObserver2Value1',
-            data: { name: 'frank' },
+            data: { name: 'jeff' },
           },
           {
-            key: 'dummyObserver2Value2',
             data: { name: 'hans' },
+          },
+          {
+            data: { name: 'changedName' },
           },
         ];
 
-        const response = runtime.handleProxyBasedSubscription(
+        const response = runtime.handleSelectors(
           arraySubscriptionContainer,
           arrayJob
         );
 
         expect(response).toBeTruthy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(2);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver2.value['0'].data.name,
           dummyObserver2.previousValue['0'].data.name
+        );
+        expect(Utils.notEqual).toHaveBeenCalledWith(
+          dummyObserver2.value['2'].data.name,
+          dummyObserver2.previousValue['2'].data.name
         );
       });
 
       it("should return false if used property hasn't changed (array value)", () => {
-        const response = runtime.handleProxyBasedSubscription(
+        dummyObserver2.value = [
+          {
+            data: { name: 'jeff' },
+          },
+          {
+            data: { name: 'changedName (but not selected)' },
+          },
+          {
+            data: { name: 'frank' },
+          },
+        ];
+
+        const response = runtime.handleSelectors(
           arraySubscriptionContainer,
           arrayJob
         );
 
         expect(response).toBeFalsy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(2);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver2.value['0'].data.name,
           dummyObserver2.previousValue['0'].data.name
+        );
+        expect(Utils.notEqual).toHaveBeenCalledWith(
+          dummyObserver2.value['2'].data.name,
+          dummyObserver2.previousValue['2'].data.name
         );
       });
     });

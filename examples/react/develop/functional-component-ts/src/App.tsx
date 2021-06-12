@@ -4,6 +4,7 @@ import { useAgile, useWatcher, useProxy } from '@agile-ts/react';
 import { useEvent } from '@agile-ts/event';
 import {
   COUNTUP,
+  externalCreatedItem,
   MY_COLLECTION,
   MY_COMPUTED,
   MY_EVENT,
@@ -12,7 +13,7 @@ import {
   MY_STATE_3,
   STATE_OBJECT,
 } from './core';
-import { generateId, globalBind } from '@agile-ts/core';
+import { generateId, globalBind, Item } from '@agile-ts/core';
 
 let rerenderCount = 0;
 let rerenderCountInCountupView = 0;
@@ -42,11 +43,10 @@ const App = (props: any) => {
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
 
-  const [stateObject, item2, collection2] = useProxy([
-    STATE_OBJECT,
-    MY_COLLECTION.getItem('id2'),
-    MY_COLLECTION,
-  ]);
+  const [stateObject, item2, collection2] = useProxy(
+    [STATE_OBJECT, MY_COLLECTION.getItem('id2'), MY_COLLECTION],
+    { key: 'useProxy' }
+  );
 
   console.log('Item1: ', item2?.name);
   console.log('Collection: ', collection2.slice(0, 2));
@@ -141,6 +141,12 @@ const App = (props: any) => {
               MY_COLLECTION.collect({ key: 'id3', name: 'Test3' })
             }>
             Collect
+          </button>
+          <button
+            onClick={() =>
+              MY_COLLECTION.collect(externalCreatedItem, ['myGroup'])
+            }>
+            Collect external Item
           </button>
           <button onClick={() => MY_COLLECTION.getGroup('myGroup')?.add('id3')}>
             Add to myGroup

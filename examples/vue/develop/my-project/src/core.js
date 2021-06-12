@@ -1,4 +1,4 @@
-import { Agile, Logger } from '@agile-ts/core';
+import { Agile, Logger, globalBind } from '@agile-ts/core';
 import vueIntegration from '@agile-ts/vue';
 
 // Create Agile Instance
@@ -7,9 +7,14 @@ export const App = new Agile({
 }).integrate(vueIntegration);
 
 // Create State
-export const MY_STATE = App.createState('Hello World');
+export const MY_STATE = App.createState('Hello World', { key: 'my-state' });
 
 // Create Collection
 export const TODOS = App.createCollection({
   initialData: [{ id: 1, name: 'Clean Bathroom' }],
+  selectors: [1],
 }).persist('todos');
+
+// TODOS.collect({ id: 2, name: 'jeff' });
+
+globalBind('__core__', { App, MY_STATE, TODOS });

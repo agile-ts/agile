@@ -6,75 +6,109 @@ import {
   ComponentSubscriptionContainer,
   defineConfig,
   notEqual,
-  isValidObject,
   LogCodeManager,
 } from '../internal';
 
 export class Runtime {
+  // Agile Instance the Runtime belongs to
   public agileInstance: () => Agile;
 
-  // Queue system
+  // Job that is currently being performed
   public currentJob: RuntimeJob | null = null;
+  // Jobs to be performed
   public jobQueue: Array<RuntimeJob> = [];
-  public notReadyJobsToRerender: Set<RuntimeJob> = new Set(); // Jobs that got performed but aren't ready to get rerendered (wait for mount)
-  public jobsToRerender: Array<RuntimeJob> = []; // Jobs that are performed and will be rendered
+
+  // Jobs that were performed and are ready to re-render
+  public jobsToRerender: Array<RuntimeJob> = [];
+  // Jobs that were performed and couldn't be re-rendered yet.
+  // That is the case when at least one Subscription Container (UI-Component) in the Job
+  // wasn't ready to update (re-render).
+  public notReadyJobsToRerender: Set<RuntimeJob> = new Set();
+
+  // Whether the `jobQueue` is currently being actively processed
+  public isPerformingJobs = false;
 
   /**
+   * The Runtime queues and executes incoming Observer-based Jobs
+   * to prevent [race conditions](https://en.wikipedia.org/wiki/Race_condition#:~:text=A%20race%20condition%20or%20race,the%20possible%20behaviors%20is%20undesirable.)
+   * and optimized the re-rendering of the Observer's subscribed UI-Components.
+   *
+   * Each queued Job is executed when it is its turn
+   * by calling the Job Observer's `perform()` method.
+   *
+   * After successful execution, the Job is added to a re-render queue,
+   * which is first put into the browser's 'Bucket' and started to work off
+   * when resources are left.
+   *
+   * The re-render queue is designed for optimizing the render count
+   * by batching multiple re-render Jobs of the same UI-Component
+   * and ignoring re-render requests for unmounted UI-Components.
+   *
    * @internal
-   * Runtime - Performs ingested Observers
-   * @param agileInstance - An instance of Agile
+   * @param agileInstance - Instance of Agile the Runtime belongs to.
    */
   constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
   }
 
-  //=========================================================================================================
-  // Ingest
-  //=========================================================================================================
   /**
-   * @internal
-   * Ingests Job into Runtime that gets performed
-   * @param job - Job
-   * @param config - Config
+   * Adds the specified Observer-based Job to the internal Job queue,
+   * where it is executed when it is its turn.
+   *
+   * After successful execution, the Job is assigned to the re-render queue,
+   * where all the Observer's subscribed Subscription Containers (UI-Components)
+   * are updated (re-rendered).
+   *
+   * @public
+   * @param job - Job to be added to the Job queue.
+   * @param config - Configuration object
    */
   public ingest(job: RuntimeJob, config: IngestConfigInterface = {}): void {
     config = defineConfig(config, {
-      perform: true,
+      perform: !this.isPerformingJobs,
     });
 
+    // Add specified Job to the queue
     this.jobQueue.push(job);
 
     Agile.logger.if
       .tag(['runtime'])
       .info(LogCodeManager.getLog('16:01:00', [job._key]), job);
 
-    // Perform Job
+    // Run first Job from the queue
     if (config.perform) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
     }
   }
 
-  //=========================================================================================================
-  // Perform
-  //=========================================================================================================
   /**
+   * Performs the specified Job
+   * and assigns it to the re-render queue if necessary.
+   *
+   * After the execution of the provided Job, it is checked whether
+   * there are still Jobs left in the Job queue.
+   * - If so, the next Job in the `jobQueue` is performed.
+   * - If not, the `jobsToRerender` queue is started to work off.
+   *
    * @internal
-   * Performs Job and adds it to the rerender queue if necessary
-   * @param job - Job that gets performed
+   * @param job - Job to be performed.
    */
   public perform(job: RuntimeJob): void {
+    this.isPerformingJobs = true;
     this.currentJob = job;
 
     // Perform Job
     job.observer.perform(job);
     job.performed = true;
 
-    // Ingest Dependents of Observer into Runtime
+    // Ingest dependents of the Observer into runtime,
+    // since they depend on the Observer and therefore have properly changed too
     job.observer.dependents.forEach((observer) =>
       observer.ingest({ perform: false })
     );
 
+    // Add Job to rerender queue and reset current Job property
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 
@@ -82,11 +116,14 @@ export class Runtime {
       .tag(['runtime'])
       .info(LogCodeManager.getLog('16:01:01', [job._key]), job);
 
-    // Perform Jobs as long as Jobs are left in queue, if no job left update/rerender Subscribers of jobsToRerender
+    // Perform Jobs as long as Jobs are left in the queue.
+    // If no Job is left start updating (re-rendering) Subscription Container (UI-Components)
+    // of the Job based on the 'jobsToRerender' queue.
     if (this.jobQueue.length > 0) {
       const performJob = this.jobQueue.shift();
       if (performJob) this.perform(performJob);
     } else {
+      this.isPerformingJobs = false;
       if (this.jobsToRerender.length > 0) {
         // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
         setTimeout(() => {
@@ -96,50 +133,63 @@ export class Runtime {
     }
   }
 
-  //=========================================================================================================
-  // Update Subscribers
-  //=========================================================================================================
   /**
+   * Processes the `jobsToRerender` queue by updating (causing a re-render on)
+   * the subscribed Subscription Containers (UI-Components) of each Job Observer.
+   *
+   * It returns a boolean indicating whether
+   * any Subscription Container (UI-Component) was updated (re-rendered) or not.
+   *
    * @internal
-   * Updates/Rerenders all Subscribed Components (SubscriptionContainer) of the Job (Observer)
-   * @return If any subscriptionContainer got updated (-> triggered a rerender on the Component it represents)
    */
   public updateSubscribers(): boolean {
-    if (!this.agileInstance().hasIntegration()) {
-      this.jobsToRerender = [];
-      this.notReadyJobsToRerender = new Set();
-      return false;
-    }
-    if (
-      this.jobsToRerender.length <= 0 &&
-      this.notReadyJobsToRerender.size <= 0
-    )
-      return false;
-
-    // Subscriptions that has to be updated/rerendered
-    // A Set() to combine several equal SubscriptionContainers into one (optimizes rerender)
-    // (Even better would be to combine SubscriptionContainer based on the Component,
-    // since a Component can have multiple SubscriptionContainers)
-    const subscriptionsToUpdate = new Set<SubscriptionContainer>();
-
-    // Build final jobsToRerender array based on new jobsToRerender and not ready jobsToRerender
+    // Build final 'jobsToRerender' array
+    // based on the new 'jobsToRerender' array and the 'notReadyJobsToRerender' array
     const jobsToRerender = this.jobsToRerender.concat(
       Array.from(this.notReadyJobsToRerender)
     );
     this.notReadyJobsToRerender = new Set();
     this.jobsToRerender = [];
 
-    // Check if Job SubscriptionContainers should be updated and if so add them to the subscriptionsToUpdate array
-    jobsToRerender.forEach((job) => {
+    if (!this.agileInstance().hasIntegration() || jobsToRerender.length <= 0)
+      return false;
+
+    // Extract the Subscription Container to be re-rendered from the Jobs
+    const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
+      jobsToRerender
+    );
+    if (subscriptionContainerToUpdate.length <= 0) return false;
+
+    // Update Subscription Container (trigger re-render on the UI-Component they represent)
+    this.updateSubscriptionContainer(subscriptionContainerToUpdate);
+
+    return true;
+  }
+
+  /**
+   * Extracts the Subscription Containers (UI-Components)
+   * to be updated (re-rendered) from the specified Runtime Jobs.
+   *
+   * @internal
+   * @param jobs - Jobs from which to extract the Subscription Containers to be updated.
+   */
+  public extractToUpdateSubscriptionContainer(
+    jobs: Array<RuntimeJob>
+  ): Array<SubscriptionContainer> {
+    const subscriptionsToUpdate = new Set<SubscriptionContainer>();
+
+    jobs.forEach((job) => {
       job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
+        let updateSubscriptionContainer = true;
+
+        // Handle not ready Subscription Container
         if (!subscriptionContainer.ready) {
           if (
-            !job.config.numberOfTriesToUpdate ||
-            job.triesToUpdate < job.config.numberOfTriesToUpdate
+            !job.config.maxTriesToUpdate ||
+            job.triedToUpdateCount < job.config.maxTriesToUpdate
           ) {
-            job.triesToUpdate++;
+            job.triedToUpdateCount++;
             this.notReadyJobsToRerender.add(job);
-
             LogCodeManager.log(
               '16:02:00',
               [subscriptionContainer.key],
@@ -148,165 +198,145 @@ export class Runtime {
           } else {
             LogCodeManager.log(
               '16:02:01',
-              [job.config.numberOfTriesToUpdate],
+              [job.config.maxTriesToUpdate],
               subscriptionContainer
             );
           }
           return;
         }
 
-        // Handle Object based Subscription
-        if (subscriptionContainer.isObjectBased)
-          this.handleObjectBasedSubscription(subscriptionContainer, job);
+        // TODO has to be overthought because when it is a Component based Subscription
+        //  the rerender is triggered via merging the changed properties into the Component.
+        //  Although the 'componentId' might be equal, it doesn't mean
+        //  that the changed properties are equal! (-> changed properties might get missing)
+        // Check if Subscription Container with same 'componentId'
+        // is already in the 'subscriptionToUpdate' queue (rerender optimisation)
+        // updateSubscriptionContainer =
+        //   updateSubscriptionContainer &&
+        //   Array.from(subscriptionsToUpdate).findIndex(
+        //     (sc) => sc.componentId === subscriptionContainer.componentId
+        //   ) === -1;
 
-        // Check if subscriptionContainer should be updated
-        const updateSubscriptionContainer = subscriptionContainer.proxyBased
-          ? this.handleProxyBasedSubscription(subscriptionContainer, job)
-          : true;
+        // Check whether a selected part of the Observer value has changed
+        updateSubscriptionContainer =
+          updateSubscriptionContainer &&
+          this.handleSelectors(subscriptionContainer, job);
 
-        if (updateSubscriptionContainer)
+        // Add Subscription Container to the 'subscriptionsToUpdate' queue
+        if (updateSubscriptionContainer) {
+          subscriptionContainer.updatedSubscribers.add(job.observer);
           subscriptionsToUpdate.add(subscriptionContainer);
+        }
 
         job.subscriptionContainersToUpdate.delete(subscriptionContainer);
       });
     });
 
-    if (subscriptionsToUpdate.size <= 0) return false;
+    return Array.from(subscriptionsToUpdate);
+  }
 
-    // Update Subscription Containers (trigger rerender on subscribed Component)
+  /**
+   * Updates the specified Subscription Containers.
+   *
+   * Updating a Subscription Container triggers a re-render
+   * on the Component it represents, based on the type of the Subscription Containers.
+   *
+   * @internal
+   * @param subscriptionsToUpdate - Subscription Containers to be updated.
+   */
+  public updateSubscriptionContainer(
+    subscriptionsToUpdate: Array<SubscriptionContainer>
+  ): void {
     subscriptionsToUpdate.forEach((subscriptionContainer) => {
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
         subscriptionContainer.callback();
 
-      // Call 'update method' if Component based Subscription
+      // Call 'update method' in Integrations if Component based Subscription
       if (subscriptionContainer instanceof ComponentSubscriptionContainer)
         this.agileInstance().integrations.update(
           subscriptionContainer.component,
-          this.getObjectBasedProps(subscriptionContainer)
+          this.getUpdatedObserverValues(subscriptionContainer)
         );
+
+      subscriptionContainer.updatedSubscribers.clear();
     });
 
     Agile.logger.if
       .tag(['runtime'])
       .info(LogCodeManager.getLog('16:01:02'), subscriptionsToUpdate);
-
-    return true;
   }
 
-  //=========================================================================================================
-  // Handle Object Based Subscription
-  //=========================================================================================================
   /**
+   * Maps the values of the updated Observers (`updatedSubscribers`)
+   * of the specified Subscription Container into a key map object.
+   *
+   * The key containing the Observer value is extracted from the Observer itself
+   * or from the Subscription Container's `subscriberKeysWeakMap`.
+   *
    * @internal
-   * Finds key of Observer (Job) in subsObject and adds it to 'changedObjectKeys'
-   * @param subscriptionContainer - Object based SubscriptionContainer
-   * @param job - Job that holds the searched Observer
+   * @param subscriptionContainer - Subscription Container from which the `updatedSubscribers` are to be mapped into a key map.
    */
-  public handleObjectBasedSubscription(
-    subscriptionContainer: SubscriptionContainer,
-    job: RuntimeJob
-  ): void {
-    let foundKey: string | null = null;
-
-    // Check if SubscriptionContainer is Object based
-    if (!subscriptionContainer.isObjectBased) return;
-
-    // Find Key of Job Observer in SubscriptionContainer
-    for (const key in subscriptionContainer.subsObject)
-      if (subscriptionContainer.subsObject[key] === job.observer)
-        foundKey = key;
-
-    if (foundKey) subscriptionContainer.observerKeysToUpdate.push(foundKey);
-  }
-
-  //=========================================================================================================
-  // Get Object Based Props
-  //=========================================================================================================
-  /**
-   * @internal
-   * Builds Object out of changedObjectKeys with Observer Value
-   * @param subscriptionContainer - Object based SubscriptionContainer
-   */
-  public getObjectBasedProps(
+  public getUpdatedObserverValues(
     subscriptionContainer: SubscriptionContainer
   ): { [key: string]: any } {
     const props: { [key: string]: any } = {};
-
-    // Map trough observerKeysToUpdate and build object out of Observer value
-    if (subscriptionContainer.subsObject)
-      for (const updatedKey of subscriptionContainer.observerKeysToUpdate)
-        props[updatedKey] = subscriptionContainer.subsObject[updatedKey]?.value;
-
-    subscriptionContainer.observerKeysToUpdate = [];
+    for (const observer of subscriptionContainer.updatedSubscribers) {
+      const key =
+        subscriptionContainer.subscriberKeysWeakMap.get(observer) ??
+        observer.key;
+      if (key != null) props[key] = observer.value;
+    }
     return props;
   }
 
-  //=========================================================================================================
-  // Handle Proxy Based Subscription
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether the specified Subscription Container can be updated or not,
+   * based on its selector functions (`selectorsWeakMap`).
+   *
+   * This is done by checking the '.value' and the '.previousValue' property of the Observer represented by the Job.
+   * If a selected property differs, the Subscription Container (UI-Component) is allowed to update (re-render)
+   * and `true` is returned.
+   *
+   * If the Subscription Container has no selector function at all, `true` is returned.
+   *
    * @internal
-   * Checks if the subscriptionContainer should be updated.
-   * Therefore it reviews the '.value' and the '.previousValue' property of the Observer the Job represents.
-   * If a property at the proxy detected path differs, the subscriptionContainer is allowed to update.
-   * @param subscriptionContainer - SubscriptionContainer
-   * @param job - Job
-   * @return {boolean} If the subscriptionContainer should be updated
-   * -> If a from the Proxy Tree detected property differs from the same property in the previous value
-   * or the passed subscriptionContainer isn't properly proxy based
+   * @param subscriptionContainer - Subscription Container to be checked if it can be updated.
+   * @param job - Job containing the Observer that is subscribed to the Subscription Container.
    */
-  public handleProxyBasedSubscription(
+  public handleSelectors(
     subscriptionContainer: SubscriptionContainer,
     job: RuntimeJob
   ): boolean {
-    // Return true because in this cases the subscriptionContainer isn't properly proxyBased
-    if (
-      !subscriptionContainer.proxyBased ||
-      !job.observer._key ||
-      !subscriptionContainer.proxyKeyMap[job.observer._key]
-    )
-      return true;
+    const selectorMethods = subscriptionContainer.selectorsWeakMap.get(
+      job.observer
+    )?.methods;
 
-    const paths = subscriptionContainer.proxyKeyMap[job.observer._key].paths;
+    // If no selector functions found, return true.
+    // Because no specific part of the Observer was selected.
+    // -> The Subscription Container should be updated
+    //    no matter what has updated in the Observer.
+    if (selectorMethods == null) return true;
 
-    if (paths) {
-      for (const path of paths) {
-        // Get property in new Value located at path
-        let newValue = job.observer.value;
-        let newValueDeepness = 0;
-        for (const branch of path) {
-          if (!isValidObject(newValue, true)) break;
-          newValue = newValue[branch];
-          newValueDeepness++;
-        }
-
-        // Get property in previous Value located at path
-        let previousValue = job.observer.previousValue;
-        let previousValueDeepness = 0;
-        for (const branch of path) {
-          if (!isValidObject(previousValue, true)) break;
-          previousValue = previousValue[branch];
-          previousValueDeepness++;
-        }
-
-        // Check if found values differ
-        if (
-          notEqual(newValue, previousValue) ||
-          newValueDeepness !== previousValueDeepness
-        ) {
-          return true;
-        }
-      }
+    // Check if a selected part of the Observer value has changed
+    const previousValue = job.observer.previousValue;
+    const newValue = job.observer.value;
+    for (const selectorMethod of selectorMethods) {
+      if (
+        notEqual(selectorMethod(newValue), selectorMethod(previousValue))
+        // || newValueDeepness !== previousValueDeepness // Not possible to check the object deepness
+      )
+        return true;
     }
 
     return false;
   }
 }
 
-/**
- * @param perform - If Job gets performed immediately
- */
 export interface IngestConfigInterface {
+  /**
+   * Whether the ingested Job should be performed immediately
+   * or added to the queue first and then executed when it is his turn.
+   */
   perform?: boolean;
 }
