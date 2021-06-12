@@ -8,6 +8,7 @@ import {
   StatePersistent,
   SubscriptionContainer,
 } from '../../../src';
+import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
 
 describe('StateObserver Tests', () => {
@@ -38,8 +39,8 @@ describe('StateObserver Tests', () => {
   it('should create StateObserver (specific config)', () => {
     const dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
     const dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
-    const dummySubscription1 = new SubscriptionContainer();
-    const dummySubscription2 = new SubscriptionContainer();
+    const dummySubscription1 = new SubscriptionContainer([]);
+    const dummySubscription2 = new SubscriptionContainer([]);
 
     const stateObserver = new StateObserver(dummyState, {
       key: 'testKey',
@@ -145,8 +146,10 @@ describe('StateObserver Tests', () => {
       });
 
       it("should ingest State into Runtime if newValue isn't equal to currentValue (default config)", () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
+
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(stateObserver._key);
+          expect(job._key).toBe(`${stateObserver._key}_randomKey`);
           expect(job.observer).toBe(stateObserver);
           expect(job.config).toStrictEqual({
             background: false,
@@ -215,9 +218,10 @@ describe('StateObserver Tests', () => {
       });
 
       it('should ingest State into Runtime if newValue is equal to currentValue (config.force = true)', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
         dummyState._value = 'updatedDummyValue';
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(stateObserver._key);
+          expect(job._key).toBe(`${stateObserver._key}_randomKey`);
           expect(job.observer).toBe(stateObserver);
           expect(job.config).toStrictEqual({
             background: false,
@@ -243,8 +247,9 @@ describe('StateObserver Tests', () => {
       });
 
       it('should ingest placeholder State into Runtime (default config)', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(stateObserver._key);
+          expect(job._key).toBe(`${stateObserver._key}_randomKey`);
           expect(job.observer).toBe(stateObserver);
           expect(job.config).toStrictEqual({
             background: false,
@@ -302,11 +307,11 @@ describe('StateObserver Tests', () => {
 
       it('should perform Job', () => {
         dummyJob.observer.nextStateValue = 'newValue';
+        dummyJob.observer.value = 'dummyValue';
         dummyState.initialStateValue = 'initialValue';
         dummyState._value = 'dummyValue';
         dummyState.getPublicValue = jest
           .fn()
-          .mockReturnValueOnce('previousPublicValue')
           .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
@@ -316,20 +321,21 @@ describe('StateObserver Tests', () => {
         expect(dummyState._value).toBe('newValue');
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeTruthy();
+
         expect(stateObserver.value).toBe('newPublicValue');
-        expect(stateObserver.previousValue).toBe('previousPublicValue');
+        expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
       it('should perform Job and overwrite State (job.config.overwrite = true)', () => {
         dummyJob.observer.nextStateValue = 'newValue';
+        dummyJob.observer.value = 'dummyValue';
         dummyJob.config.overwrite = true;
         dummyState.isPlaceholder = true;
         dummyState.initialStateValue = 'overwriteValue';
         dummyState._value = 'dummyValue';
         dummyState.getPublicValue = jest
           .fn()
-          .mockReturnValueOnce('previousPublicValue')
           .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
@@ -340,18 +346,19 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
         expect(dummyState.isPlaceholder).toBeFalsy();
+
         expect(stateObserver.value).toBe('newPublicValue');
-        expect(stateObserver.previousValue).toBe('previousPublicValue');
+        expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
 
       it('should perform Job and set isSet to false if initialStateValue equals to newStateValue', () => {
         dummyJob.observer.nextStateValue = 'newValue';
+        dummyJob.observer.value = 'dummyValue';
         dummyState.initialStateValue = 'newValue';
         dummyState._value = 'dummyValue';
         dummyState.getPublicValue = jest
           .fn()
-          .mockReturnValueOnce('previousPublicValue')
           .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
@@ -361,8 +368,9 @@ describe('StateObserver Tests', () => {
         expect(dummyState._value).toBe('newValue');
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeFalsy();
+
         expect(stateObserver.value).toBe('newPublicValue');
-        expect(stateObserver.previousValue).toBe('previousPublicValue');
+        expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
     });

@@ -218,9 +218,9 @@ export class State<ValueType = any> {
   /**
    * Ingests the State without any specified new value into the runtime.
    *
-   * Since no new value was defined either the State value is computed
+   * Since no new value was defined either the new State value is computed
    * based on a compute method (Computed Class)
-   * or the `nextStateValue` is taken.
+   * or the `nextStateValue` is taken as the next State value.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#ingest)
    *
@@ -610,7 +610,8 @@ export class State<ValueType = any> {
     this.computeValueMethod = method;
 
     // Initial compute
-    this.set(method(this.nextStateValue));
+    // (not directly computing it here since it is computed once in the runtime!)
+    this.set(this.nextStateValue);
 
     return this;
   }

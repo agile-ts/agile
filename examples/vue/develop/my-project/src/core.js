@@ -7,7 +7,11 @@ export const App = new Agile({
 }).integrate(vueIntegration);
 
 // Create State
-export const MY_STATE = App.createState('Hello World', { key: 'my-state' });
+export const MY_STATE = App.createState('World', {
+  key: 'my-state',
+}).computeValue((v) => {
+  return `Hello ${v}`;
+});
 
 // Create Collection
 export const TODOS = App.createCollection({
