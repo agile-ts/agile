@@ -8,7 +8,6 @@ import {
   SubscriptionContainer,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
-import testIntegration from '../../helper/test.integration';
 import { LogMock } from '../../helper/logMock';
 
 describe('Runtime Tests', () => {
@@ -24,10 +23,12 @@ describe('Runtime Tests', () => {
   it('should create Runtime', () => {
     const runtime = new Runtime(dummyAgile);
 
+    expect(runtime.agileInstance()).toBe(dummyAgile);
     expect(runtime.currentJob).toBeNull();
     expect(runtime.jobQueue).toStrictEqual([]);
-    expect(runtime.notReadyJobsToRerender.size).toBe(0);
     expect(runtime.jobsToRerender).toStrictEqual([]);
+    expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+    expect(runtime.isPerformingJobs).toBeFalsy();
   });
 
   describe('Runtime Function Tests', () => {
@@ -52,22 +53,21 @@ describe('Runtime Tests', () => {
         runtime.perform = jest.fn();
       });
 
-      it("should perform specified Job immediately if jobQueue isn't currently being processed (default config)", () => {
+      it("should perform specified Job immediately if jobQueue isn't being processed (default config)", () => {
         runtime.isPerformingJobs = false;
 
         runtime.ingest(dummyJob);
 
-        expect(runtime.jobQueue.length).toBe(0);
+        expect(runtime.jobQueue).toStrictEqual([]);
         expect(runtime.perform).toHaveBeenCalledWith(dummyJob);
       });
 
-      it("shouldn't perform specified Job immediately if jobQueue is currently being processed (default config)", () => {
+      it("shouldn't perform specified Job immediately if jobQueue is being processed (default config)", () => {
         runtime.isPerformingJobs = true;
 
         runtime.ingest(dummyJob);
 
-        expect(runtime.jobQueue.length).toBe(1);
-        expect(runtime.jobQueue[0]).toBe(dummyJob);
+        expect(runtime.jobQueue).toStrictEqual([dummyJob]);
         expect(runtime.perform).not.toHaveBeenCalled();
       });
 
@@ -75,7 +75,7 @@ describe('Runtime Tests', () => {
         runtime.isPerformingJobs = true;
         runtime.ingest(dummyJob, { perform: true });
 
-        expect(runtime.jobQueue.length).toBe(0);
+        expect(runtime.jobQueue).toStrictEqual([]);
         expect(runtime.perform).toHaveBeenCalledWith(dummyJob);
       });
 
@@ -83,8 +83,7 @@ describe('Runtime Tests', () => {
         runtime.isPerformingJobs = false;
         runtime.ingest(dummyJob, { perform: false });
 
-        expect(runtime.jobQueue.length).toBe(1);
-        expect(runtime.jobQueue[0]).toBe(dummyJob);
+        expect(runtime.jobQueue).toStrictEqual([dummyJob]);
         expect(runtime.perform).not.toHaveBeenCalled();
       });
     });
@@ -110,8 +109,8 @@ describe('Runtime Tests', () => {
       });
 
       it(
-        'should perform specified Job and all remaining Jobs in the jobQueue,' +
-          ' and call updateSubscribers if at least one performed Job needs to rerender',
+        "should perform specified Job and all remaining Jobs in the 'jobQueue' " +
+          "and call 'updateSubscribers' if at least one performed Job needs to rerender",
         async () => {
           runtime.jobQueue.push(dummyJob2);
           runtime.jobQueue.push(dummyJob3);
@@ -125,11 +124,9 @@ describe('Runtime Tests', () => {
           expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob3);
           expect(dummyJob3.performed).toBeTruthy();
 
-          expect(runtime.jobQueue.length).toBe(0);
-          expect(runtime.jobsToRerender.length).toBe(2);
-          expect(runtime.jobsToRerender.includes(dummyJob1)).toBeTruthy();
-          expect(runtime.jobsToRerender.includes(dummyJob2)).toBeTruthy();
-          expect(runtime.jobsToRerender.includes(dummyJob3)).toBeFalsy();
+          expect(runtime.isPerformingJobs).toBeFalsy(); // because Jobs were performed
+          expect(runtime.jobQueue).toStrictEqual([]);
+          expect(runtime.jobsToRerender).toStrictEqual([dummyJob1, dummyJob2]);
 
           // Sleep 5ms because updateSubscribers is called in a timeout
           await new Promise((resolve) => setTimeout(resolve, 5));
@@ -147,19 +144,19 @@ describe('Runtime Tests', () => {
         expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob1);
         expect(dummyJob1.performed).toBeTruthy();
 
+        expect(dummyObserver1.ingest).toHaveBeenCalledTimes(1);
         expect(dummyObserver1.ingest).toHaveBeenCalledWith({
           perform: false,
         });
-        expect(dummyObserver1.ingest).toHaveBeenCalledTimes(1);
+        expect(dummyObserver2.ingest).toHaveBeenCalledTimes(1);
         expect(dummyObserver2.ingest).toHaveBeenCalledWith({
           perform: false,
         });
-        expect(dummyObserver2.ingest).toHaveBeenCalledTimes(1);
       });
 
       it(
-        'should perform specified Job and all remaining Jobs in the jobQueue' +
-          " and shouldn't call updateSubscribes if no performed Job needs to rerender",
+        "should perform specified Job and all remaining Jobs in the 'jobQueue' " +
+          "and shouldn't call 'updateSubscribes' if no performed Job needs to rerender",
         async () => {
           dummyJob1.rerender = false;
           runtime.jobQueue.push(dummyJob3);
@@ -171,8 +168,9 @@ describe('Runtime Tests', () => {
           expect(dummyObserver1.perform).toHaveBeenCalledWith(dummyJob3);
           expect(dummyJob3.performed).toBeTruthy();
 
-          expect(runtime.jobQueue.length).toBe(0);
-          expect(runtime.jobsToRerender.length).toBe(0);
+          expect(runtime.isPerformingJobs).toBeFalsy(); // because Jobs were performed
+          expect(runtime.jobQueue).toStrictEqual([]);
+          expect(runtime.jobsToRerender).toStrictEqual([]);
 
           // Sleep 5ms because updateSubscribers is called in a timeout
           await new Promise((resolve) => setTimeout(resolve, 5));
@@ -215,21 +213,21 @@ describe('Runtime Tests', () => {
 
       it('should return false if Agile has no registered Integration', () => {
         dummyAgile.hasIntegration = jest.fn(() => false);
-        runtime.jobsToRerender.push(dummyJob1);
-        runtime.jobsToRerender.push(dummyJob2);
+        runtime.jobsToRerender = [dummyJob1, dummyJob2];
 
         const response = runtime.updateSubscribers();
 
         expect(response).toBeFalsy();
+
         expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
         expect(
           runtime.extractToUpdateSubscriptionContainer
         ).not.toHaveBeenCalled();
         expect(runtime.updateSubscriptionContainer).not.toHaveBeenCalled();
       });
 
-      it('should return false if jobsToRerender and notReadyJobsToRerender queue is empty', () => {
+      it('should return false if jobsToRerender and notReadyJobsToRerender queue are both empty', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         runtime.jobsToRerender = [];
         runtime.notReadyJobsToRerender = new Set();
@@ -237,29 +235,36 @@ describe('Runtime Tests', () => {
         const response = runtime.updateSubscribers();
 
         expect(response).toBeFalsy();
+
+        expect(response).toBeFalsy();
+        expect(runtime.jobsToRerender).toStrictEqual([]);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
+        expect(
+          runtime.extractToUpdateSubscriptionContainer
+        ).not.toHaveBeenCalled();
+        expect(runtime.updateSubscriptionContainer).not.toHaveBeenCalled();
       });
 
-      it('should return false if no Subscription Container of the Jobs to rerender needs to update', () => {
+      it('should return false if no Subscription Container of the Jobs to rerender queue needs to update', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         jest
           .spyOn(runtime, 'extractToUpdateSubscriptionContainer')
           .mockReturnValueOnce([]);
-        runtime.jobsToRerender.push(dummyJob1);
-        runtime.jobsToRerender.push(dummyJob2);
-        runtime.notReadyJobsToRerender.add(dummyJob3);
+        runtime.jobsToRerender = [dummyJob1, dummyJob2];
+        runtime.notReadyJobsToRerender = new Set([dummyJob3]);
 
         const response = runtime.updateSubscribers();
 
         expect(response).toBeFalsy();
         expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
         expect(
           runtime.extractToUpdateSubscriptionContainer
         ).toHaveBeenCalledWith([dummyJob1, dummyJob2, dummyJob3]);
         expect(runtime.updateSubscriptionContainer).not.toHaveBeenCalled();
       });
 
-      it('should return true if at least one Subscription Container of the Jobs to rerender needs to update', () => {
+      it('should return true if at least one Subscription Container of the Jobs to rerender queue needs to update', () => {
         dummyAgile.hasIntegration = jest.fn(() => true);
         jest
           .spyOn(runtime, 'extractToUpdateSubscriptionContainer')
@@ -267,15 +272,14 @@ describe('Runtime Tests', () => {
             dummySubscriptionContainer1,
             dummySubscriptionContainer2,
           ]);
-        runtime.jobsToRerender.push(dummyJob1);
-        runtime.jobsToRerender.push(dummyJob2);
-        runtime.notReadyJobsToRerender.add(dummyJob3);
+        runtime.jobsToRerender = [dummyJob1, dummyJob2];
+        runtime.notReadyJobsToRerender = new Set([dummyJob3]);
 
         const response = runtime.updateSubscribers();
 
         expect(response).toBeTruthy();
         expect(runtime.jobsToRerender).toStrictEqual([]);
-        expect(runtime.notReadyJobsToRerender.size).toBe(0);
+        expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
         expect(
           runtime.extractToUpdateSubscriptionContainer
         ).toHaveBeenCalledWith([dummyJob1, dummyJob2, dummyJob3]);
@@ -316,7 +320,7 @@ describe('Runtime Tests', () => {
 
       it(
         "shouldn't extract not ready Subscription Container from the specified Jobs, " +
-          "add it to the 'notReadyJobsToRerender' queue and print warning",
+          "should add it to the 'notReadyJobsToRerender' queue and print a warning",
         () => {
           jest
             .spyOn(runtime, 'handleSelectors')
@@ -373,8 +377,8 @@ describe('Runtime Tests', () => {
 
       it(
         "shouldn't extract not ready Subscription Container from the specified Jobs, " +
-          "remove the Job when it exceeded the max 'maxOfTriesToUpdate' " +
-          'and print warning',
+          "should remove the Job when it exceeded the max 'maxTriesToUpdate' " +
+          'and print a warning',
         () => {
           jest
             .spyOn(runtime, 'handleSelectors')
@@ -399,7 +403,7 @@ describe('Runtime Tests', () => {
             dummyJob1
           );
 
-          expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]); // Because not ready Job was removed
+          expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]); // Because exceeded Job was removed
 
           // Job that ran through
           expect(
@@ -455,6 +459,7 @@ describe('Runtime Tests', () => {
         );
 
         // Since the Job is ready but the Observer value simply hasn't changed
+        // -> no point in trying to update it again
         expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
 
         // Job that didn't ran through
@@ -478,7 +483,7 @@ describe('Runtime Tests', () => {
         expect(console.warn).toHaveBeenCalledTimes(0);
       });
 
-      it('should extract ready and updated Subscription Containers', () => {
+      it('should extract ready and to update Subscription Containers', () => {
         jest
           .spyOn(runtime, 'handleSelectors')
           .mockReturnValueOnce(true)
@@ -589,11 +594,17 @@ describe('Runtime Tests', () => {
         expect(callbackSubscriptionContainer2.callback).toHaveBeenCalledTimes(
           1
         );
+        expect(
+          Array.from(callbackSubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([]);
 
         // Callback Subscription Container 3
         expect(callbackSubscriptionContainer3.callback).toHaveBeenCalledTimes(
           1
         );
+        expect(
+          Array.from(callbackSubscriptionContainer2.updatedSubscribers)
+        ).toStrictEqual([]);
       });
     });
 
@@ -685,19 +696,26 @@ describe('Runtime Tests', () => {
           {
             data: { name: 'hans' },
           },
+          {
+            data: { name: 'frank' },
+          },
         ];
         dummyObserver2.previousValue = [
           {
-            key: 'dummyObserver2Value1',
             data: { name: 'jeff' },
           },
           {
-            key: 'dummyObserver2Value2',
             data: { name: 'hans' },
+          },
+          {
+            data: { name: 'frank' },
           },
         ];
         arraySubscriptionContainer.selectorsWeakMap.set(dummyObserver2, {
-          methods: [(value) => value[0]?.data?.name],
+          methods: [
+            (value) => value[0]?.data?.name,
+            (value) => value[2]?.data?.name,
+          ],
         });
 
         arrayJob = new RuntimeJob(dummyObserver2, { key: 'dummyObjectJob2' });
@@ -708,7 +726,7 @@ describe('Runtime Tests', () => {
         jest.clearAllMocks();
       });
 
-      it('should return true if Subscritpion Container has no selector methods', () => {
+      it('should return true if Subscription Container has no selector methods', () => {
         objectSubscriptionContainer.selectorsWeakMap.delete(dummyObserver1);
 
         const response = runtime.handleSelectors(
@@ -722,8 +740,7 @@ describe('Runtime Tests', () => {
 
       it('should return true if selected property has changed (object value)', () => {
         dummyObserver1.value = {
-          key: 'dummyObserverValue1',
-          data: { name: 'hans' },
+          data: { name: 'changedName' },
         };
 
         const response = runtime.handleSelectors(
@@ -732,6 +749,8 @@ describe('Runtime Tests', () => {
         );
 
         expect(response).toBeTruthy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(1);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver1.value.data.name,
           dummyObserver1.previousValue.data.name
@@ -745,13 +764,15 @@ describe('Runtime Tests', () => {
         );
 
         expect(response).toBeFalsy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(1);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver1.value.data.name,
           dummyObserver1.previousValue.data.name
         );
       });
 
-      // TODO the deepness check isn't possible with the custom defined selector methods
+      // TODO the deepness check isn't possible with the current way of handling selector methods
       // it('should return true if selected property has changed in the deepness (object value)', () => {
       //   dummyObserver1.value = {
       //     key: 'dummyObserverValue1',
@@ -770,15 +791,16 @@ describe('Runtime Tests', () => {
       //   expect(Utils.notEqual).toHaveBeenCalledWith(undefined, undefined);
       // });
 
-      it('should return true if used property has changed (array value)', () => {
+      it('should return true if a selected property has changed (array value)', () => {
         dummyObserver2.value = [
           {
-            key: 'dummyObserver2Value1',
-            data: { name: 'frank' },
+            data: { name: 'jeff' },
           },
           {
-            key: 'dummyObserver2Value2',
             data: { name: 'hans' },
+          },
+          {
+            data: { name: 'changedName' },
           },
         ];
 
@@ -788,22 +810,46 @@ describe('Runtime Tests', () => {
         );
 
         expect(response).toBeTruthy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(2);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver2.value['0'].data.name,
           dummyObserver2.previousValue['0'].data.name
         );
+        expect(Utils.notEqual).toHaveBeenCalledWith(
+          dummyObserver2.value['2'].data.name,
+          dummyObserver2.previousValue['2'].data.name
+        );
       });
 
       it("should return false if used property hasn't changed (array value)", () => {
+        dummyObserver2.value = [
+          {
+            data: { name: 'jeff' },
+          },
+          {
+            data: { name: 'changedName (but not selected)' },
+          },
+          {
+            data: { name: 'frank' },
+          },
+        ];
+
         const response = runtime.handleSelectors(
           arraySubscriptionContainer,
           arrayJob
         );
 
         expect(response).toBeFalsy();
+
+        expect(Utils.notEqual).toHaveBeenCalledTimes(2);
         expect(Utils.notEqual).toHaveBeenCalledWith(
           dummyObserver2.value['0'].data.name,
           dummyObserver2.previousValue['0'].data.name
+        );
+        expect(Utils.notEqual).toHaveBeenCalledWith(
+          dummyObserver2.value['2'].data.name,
+          dummyObserver2.previousValue['2'].data.name
         );
       });
     });
