@@ -7,8 +7,10 @@ import {
 } from '../internal';
 
 export class StatePersistent<ValueType = any> extends Persistent {
-  static storeValueSideEffectKey = 'rebuildStateStorageValue';
+  // State the Persistent belongs to
   public state: () => State;
+
+  static storeValueSideEffectKey = 'rebuildStateStorageValue';
 
   /**
    * Internal Class for managing the permanent persistence of a State.
@@ -61,7 +63,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @internal
    * @param storageItemKey - Storage key of the persisted State Instance.
    * | default = Persistent.key |
-   * @return Whether the loading was successful.
+   * @return Whether the loading and the setting up of the side effects was successful.
    */
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
@@ -69,7 +71,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey ?? this._key;
 
-    // Load value from default Storage
+    // Load State value from the default Storage
     const loadedValue = await this.agileInstance().storages.get<ValueType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
@@ -82,8 +84,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
       overwrite: true,
     });
 
-    // Setup Side Effects to keep the Storage value in sync
-    // with the State value
+    // Setup side effects to keep the Storage value in sync
+    // with the current State value
     this.setupSideEffects(_storageItemKey);
 
     return true;
@@ -103,7 +105,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey ?? this._key;
 
-    // Setup Side Effects to keep the Storage value in sync
+    // Setup side effects to keep the Storage value in sync
     // with the State value
     this.setupSideEffects(_storageItemKey);
 
@@ -116,7 +118,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
 
   /**
    * Sets up side effects to keep the Storage value in sync
-   * with the State value.
+   * with the current State value.
    *
    * @internal
    * @param storageItemKey - Storage key of the persisted State Instance.
@@ -157,7 +159,9 @@ export class StatePersistent<ValueType = any> extends Persistent {
   }
 
   /**
-   * Formats specified key so that it can be used as a valid Storage key and returns it.
+   * Formats the specified key so that it can be used as a valid Storage key
+   * and returns the formatted variant of it.
+   *
    * If no formatable key (undefined/null) was provided,
    * an attempt is made to use the State identifier key.
    *
@@ -167,19 +171,18 @@ export class StatePersistent<ValueType = any> extends Persistent {
   public formatKey(
     key: PersistentKey | undefined | null
   ): PersistentKey | undefined {
-    const state = this.state();
-    if (!key && state._key) return state._key;
-    if (!key) return;
-    if (!state._key) state._key = key;
+    if (key == null && this.state()._key) return this.state()._key;
+    if (key == null) return;
+    if (this.state()._key == null) this.state()._key = key;
     return key;
   }
 
   /**
-   * Rebuilds Storage value based on the current State value
+   * Rebuilds Storage value based on the current State value.
    *
    * @internal
-   * @param state - State whose value to be in sync with the Storage value.
-   * @param storageItemKey - Storage key of the persisted State.
+   * @param state - State whose current value to be applied to the Storage value.
+   * @param storageItemKey - Storage key of the persisted State Instance.
    * | default = Persistent.key |
    * @param config - Configuration object
    */

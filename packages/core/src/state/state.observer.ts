@@ -91,19 +91,19 @@ export class StateObserver<ValueType = any> extends Observer {
       overwrite: false,
     });
 
-    // Force overwriting the State value if it was a placeholder.
-    // Because after assigning a value to the State it shouldn't be a placeholder anymore.
+    // Force overwriting the State value if it is a placeholder.
+    // After assigning a value to the State it shouldn't be a placeholder anymore.
     if (state.isPlaceholder) {
       config.force = true;
       config.overwrite = true;
     }
 
-    // Assign next State value and compute it if necessary
+    // Assign next State value to Observer and compute it if necessary
     this.nextStateValue = state.computeValueMethod
       ? copy(state.computeValueMethod(newStateValue))
       : copy(newStateValue);
 
-    // Check if current State value and to assign State value are equals
+    // Check if current State value and to assign State value are equal
     if (equal(state._value, this.nextStateValue) && !config.force) return;
 
     // Create Runtime-Job
@@ -128,8 +128,8 @@ export class StateObserver<ValueType = any> extends Observer {
    * Method executed by the Runtime to perform the Runtime-Job,
    * previously ingested via the `ingest()` or `ingestValue()` method.
    *
-   * Thereby the previously defined `nextStateValue` is assigned to the State
-   * and the side effects (`sideEffects`) are executed.
+   * Thereby the previously defined `nextStateValue` is assigned to the State.
+   * Also side effects (like calling watcher callbacks) of a State change are executed.
    *
    * @internal
    * @param job - Runtime-Job to be performed.
@@ -142,6 +142,7 @@ export class StateObserver<ValueType = any> extends Observer {
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
 
+    // TODO think about freezing the State value..
     // https://www.geeksforgeeks.org/object-freeze-javascript/#:~:text=Object.freeze()%20Method&text=freeze()%20which%20is%20used,the%20prototype%20of%20the%20object.
     // if (typeof state._value === 'object') Object.freeze(state._value);
 
@@ -168,7 +169,7 @@ export class StateObserver<ValueType = any> extends Observer {
   /**
    * Performs the side effects of applying the next State value to the State.
    *
-   * Side effects are, for example, calling the watcher functions
+   * Side effects are, for example, calling the watcher callbacks
    * or executing the side effects defined in the State Class
    * like 'rebuildGroup' or 'rebuildStateStorageValue'.
    *

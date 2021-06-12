@@ -322,7 +322,7 @@ describe('StatePersistent Tests', () => {
           statePersistent.rebuildStorageSideEffect = jest.fn();
         });
 
-        it('should call rebuildStorageSideEffect (persistentKey)', async () => {
+        it("should call 'rebuildStorageSideEffect' (persistentKey)", async () => {
           await statePersistent.setupSideEffects();
 
           dummyState.sideEffects[
@@ -340,7 +340,7 @@ describe('StatePersistent Tests', () => {
           );
         });
 
-        it('should call rebuildStorageSideEffect (specified key)', async () => {
+        it("should call 'rebuildStorageSideEffect' (specified key)", async () => {
           await statePersistent.setupSideEffects('dummyKey');
 
           dummyState.sideEffects[
@@ -384,7 +384,7 @@ describe('StatePersistent Tests', () => {
         expect(statePersistent.isPersisted).toBeFalsy();
       });
 
-      it('should remove persisted State from the corresponding Storage with specified Key', async () => {
+      it('should remove persisted State from the corresponding Storage with specified key', async () => {
         statePersistent.ready = true;
 
         const response = await statePersistent.removePersistedValue('coolKey');
@@ -421,7 +421,7 @@ describe('StatePersistent Tests', () => {
         expect(response).toBe('coolKey');
       });
 
-      it('should return passed key', () => {
+      it('should return specified key', () => {
         dummyState._key = 'coolKey';
 
         const response = statePersistent.formatKey('awesomeKey');
@@ -429,7 +429,7 @@ describe('StatePersistent Tests', () => {
         expect(response).toBe('awesomeKey');
       });
 
-      it('should return and apply specified key to State if State has no own valid key before', () => {
+      it('should return and apply specified key to State if State had no own valid key before', () => {
         dummyState._key = undefined;
 
         const response = statePersistent.formatKey('awesomeKey');
@@ -452,7 +452,7 @@ describe('StatePersistent Tests', () => {
         dummyAgile.storages.set = jest.fn();
       });
 
-      it('should save State Value in Storage (default config)', () => {
+      it('should store current State value in the corresponding Storage (default config)', () => {
         statePersistent.rebuildStorageSideEffect(dummyState, 'coolKey');
 
         expect(dummyAgile.storages.set).toHaveBeenCalledWith(
@@ -462,7 +462,7 @@ describe('StatePersistent Tests', () => {
         );
       });
 
-      it("shouldn't save State Value in Storage (config.storage = false)", () => {
+      it("shouldn't store State value in the corresponding Storage (config.storage = false)", () => {
         statePersistent.rebuildStorageSideEffect(dummyState, 'coolKey', {
           storage: false,
         });

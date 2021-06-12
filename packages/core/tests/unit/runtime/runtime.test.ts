@@ -351,7 +351,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob1.subscriptionContainersToUpdate)
           ).toStrictEqual([]);
-          expect(dummyJob1.triedToUpdateCount).toBe(0);
+          expect(dummyJob1.timesTriedToUpdateCount).toBe(0);
           expect(
             Array.from(dummySubscriptionContainer1.updatedSubscribers)
           ).toStrictEqual([dummyObserver1]);
@@ -360,7 +360,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob2.subscriptionContainersToUpdate)
           ).toStrictEqual([dummySubscriptionContainer2]);
-          expect(dummyJob2.triedToUpdateCount).toBe(1);
+          expect(dummyJob2.timesTriedToUpdateCount).toBe(1);
           expect(
             Array.from(dummySubscriptionContainer2.updatedSubscribers)
           ).toStrictEqual([]);
@@ -387,7 +387,7 @@ describe('Runtime Tests', () => {
           dummySubscriptionContainer1.ready = true;
           dummySubscriptionContainer2.ready = false;
           const numberOfTries = (dummyJob2.config.maxTriesToUpdate ?? 0) + 1;
-          dummyJob2.triedToUpdateCount = numberOfTries;
+          dummyJob2.timesTriedToUpdateCount = numberOfTries;
 
           const response = runtime.extractToUpdateSubscriptionContainer([
             dummyJob1,
@@ -409,7 +409,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob1.subscriptionContainersToUpdate)
           ).toStrictEqual([]);
-          expect(dummyJob1.triedToUpdateCount).toBe(0);
+          expect(dummyJob1.timesTriedToUpdateCount).toBe(0);
           expect(
             Array.from(dummySubscriptionContainer1.updatedSubscribers)
           ).toStrictEqual([dummyObserver1]);
@@ -418,7 +418,7 @@ describe('Runtime Tests', () => {
           expect(
             Array.from(dummyJob2.subscriptionContainersToUpdate)
           ).toStrictEqual([dummySubscriptionContainer2]);
-          expect(dummyJob2.triedToUpdateCount).toBe(numberOfTries);
+          expect(dummyJob2.timesTriedToUpdateCount).toBe(numberOfTries);
           expect(
             Array.from(dummySubscriptionContainer2.updatedSubscribers)
           ).toStrictEqual([]);
@@ -466,7 +466,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob1.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob1.triedToUpdateCount).toBe(0);
+        expect(dummyJob1.timesTriedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer1.updatedSubscribers)
         ).toStrictEqual([]);
@@ -475,7 +475,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob2.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob2.triedToUpdateCount).toBe(0);
+        expect(dummyJob2.timesTriedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer2.updatedSubscribers)
         ).toStrictEqual([dummyObserver2]);
@@ -517,7 +517,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob1.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob1.triedToUpdateCount).toBe(0);
+        expect(dummyJob1.timesTriedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer1.updatedSubscribers)
         ).toStrictEqual([dummyObserver1]);
@@ -526,7 +526,7 @@ describe('Runtime Tests', () => {
         expect(
           Array.from(dummyJob2.subscriptionContainersToUpdate)
         ).toStrictEqual([]);
-        expect(dummyJob2.triedToUpdateCount).toBe(0);
+        expect(dummyJob2.timesTriedToUpdateCount).toBe(0);
         expect(
           Array.from(dummySubscriptionContainer2.updatedSubscribers)
         ).toStrictEqual([dummyObserver2]);

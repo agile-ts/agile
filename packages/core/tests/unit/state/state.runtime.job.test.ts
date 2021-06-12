@@ -27,94 +27,118 @@ describe('RuntimeJob Tests', () => {
     dummyObserver = new StateObserver(dummyState);
   });
 
-  it('should create RuntimeJob with a specified Agile Instance that has a registered Integration (default config)', () => {
-    dummyAgile.integrate(dummyIntegration);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has a registered Integration (default config)',
+    () => {
+      dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver);
+      const job = new StateRuntimeJob(dummyObserver);
 
-    expect(job._key).toBeUndefined();
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeTruthy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBeUndefined();
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: false,
+        sideEffects: {
+          enabled: true,
+          exclude: [],
+        },
+        force: false,
+        storage: true,
+        overwrite: false,
+      });
+      expect(job.rerender).toBeTruthy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 
-  it('should create RuntimeJob with a specified Agile Instance that has a registered Integration (specific config)', () => {
-    dummyAgile.integrate(dummyIntegration);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has a registered Integration (specific config)',
+    () => {
+      dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver, {
-      key: 'dummyJob',
-      sideEffects: {
-        enabled: false,
-      },
-      force: true,
-    });
+      const job = new StateRuntimeJob(dummyObserver, {
+        key: 'dummyJob',
+        sideEffects: {
+          enabled: false,
+        },
+        force: true,
+      });
 
-    expect(job._key).toBe('dummyJob');
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: false,
-      sideEffects: {
-        enabled: false,
-      },
-      force: true,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeTruthy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBe('dummyJob');
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: false,
+        sideEffects: {
+          enabled: false,
+        },
+        force: true,
+        storage: true,
+        overwrite: false,
+      });
+      expect(job.rerender).toBeTruthy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 
-  it('should create RuntimeJob with a specified Agile Instance that has no registered Integration (default config)', () => {
-    const job = new StateRuntimeJob(dummyObserver);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has no registered Integration (default config)',
+    () => {
+      const job = new StateRuntimeJob(dummyObserver);
 
-    expect(job._key).toBeUndefined();
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeFalsy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBeUndefined();
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: false,
+        sideEffects: {
+          enabled: true,
+          exclude: [],
+        },
+        force: false,
+        storage: true,
+        overwrite: false,
+      });
+      expect(job.rerender).toBeFalsy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 
-  it('should create RuntimeJob and Agile that has integrations (config.background = true)', () => {
-    dummyAgile.integrate(dummyIntegration);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has a registered Integrations (config.background = true)',
+    () => {
+      dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver, { background: true });
+      const job = new StateRuntimeJob(dummyObserver, { background: true });
 
-    expect(job._key).toBeUndefined();
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: true,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeFalsy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBeUndefined();
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: true,
+        sideEffects: {
+          enabled: true,
+          exclude: [],
+        },
+        force: false,
+        storage: true,
+        overwrite: false,
+      });
+      expect(job.rerender).toBeFalsy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 });

@@ -186,9 +186,9 @@ export class Runtime {
         if (!subscriptionContainer.ready) {
           if (
             !job.config.maxTriesToUpdate ||
-            job.triedToUpdateCount < job.config.maxTriesToUpdate
+            job.timesTriedToUpdateCount < job.config.maxTriesToUpdate
           ) {
-            job.triedToUpdateCount++;
+            job.timesTriedToUpdateCount++;
             this.notReadyJobsToRerender.add(job);
             LogCodeManager.log(
               '16:02:00',

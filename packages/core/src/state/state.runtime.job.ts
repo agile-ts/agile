@@ -9,6 +9,17 @@ import {
 export class StateRuntimeJob extends RuntimeJob<StateObserver> {
   public config: StateRuntimeJobConfigInterface;
 
+  /**
+   * A State Runtime Job is sent to the Runtime on behalf of the State Observer it represents.
+   *
+   * In the Runtime, the State Observer is performed via its `perform()` method
+   * and the Subscription Containers (UI-Components)
+   * to which it is subscribed are updated (re-rendered) accordingly.
+   *
+   * @internal
+   * @param observer - State Observer to be represented by the State Runtime Job.
+   * @param config - Configuration object
+   */
   constructor(
     observer: StateObserver,
     config: CreateStateRuntimeJobConfigInterface = {}
@@ -38,7 +49,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
 export interface CreateStateRuntimeJobConfigInterface
   extends StateRuntimeJobConfigInterface {
   /**
-   * Key/Name identifier of the Runtime Job.
+   * Key/Name identifier of the State Runtime Job.
    * @default undefined
    */
   key?: RuntimeJobKey;
@@ -53,7 +64,7 @@ export interface StateRuntimeJobConfigInterface
   overwrite?: boolean;
   /**
    * If the State is persisted,
-   * whether to store the new State value in an external Storage
+   * whether to apply the new State value to the external Storages.
    * @default true
    */
   storage?: boolean;

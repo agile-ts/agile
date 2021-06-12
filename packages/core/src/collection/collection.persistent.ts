@@ -74,7 +74,7 @@ export class CollectionPersistent<
    * @internal
    * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
    * | default = Persistent.key |
-   * @return Whether the loading was successful.
+   * @return Whether the loading and the setting up of the side effects was successful.
    */
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
@@ -165,7 +165,7 @@ export class CollectionPersistent<
     };
     const success = await loadValuesIntoCollection();
 
-    // Setup Side Effects to keep the Storage value in sync
+    // Setup side effects to keep the Storage value in sync
     // with the Collection (Instances) value
     if (success) this.setupSideEffects(_storageItemKey);
 
@@ -216,7 +216,7 @@ export class CollectionPersistent<
       });
     }
 
-    // Setup Side Effects to keep the Storage value in sync
+    // Setup side effects to keep the Storage value in sync
     // with the Collection (Instances) value
     this.setupSideEffects(_storageItemKey);
 
@@ -253,7 +253,7 @@ export class CollectionPersistent<
    * @internal
    * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
    * | default = Persistent.key |
-   * @return Whether the removal of the persisted value was successful.
+   * @return Whether the removal of the persisted values was successful.
    */
   public async removePersistedValue(
     storageItemKey?: PersistentKey
@@ -291,7 +291,9 @@ export class CollectionPersistent<
   }
 
   /**
-   * Formats specified key so that it can be used as a valid Storage key and returns it.
+   * Formats the specified key so that it can be used as a valid Storage key
+   * and returns the formatted variant of it.
+   *
    * If no formatable key (undefined/null) was provided,
    * an attempt is made to use the Collection identifier key.
    *

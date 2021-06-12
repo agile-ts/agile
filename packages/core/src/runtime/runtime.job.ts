@@ -12,7 +12,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
   // Subscription Containers (UI-Components) of the Observer that have to be updated (re-rendered)
   public subscriptionContainersToUpdate = new Set<SubscriptionContainer>();
   // How often not ready Subscription Containers of the Observer have been tried to update
-  public triedToUpdateCount = 0;
+  public timesTriedToUpdateCount = 0;
 
   // Whether the Job has been performed by the runtime
   public performed = false;
