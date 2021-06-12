@@ -4,6 +4,7 @@ import {
   SubscriptionContainer,
   RuntimeJob,
 } from '../../../src';
+import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
 
 describe('Observer Tests', () => {
@@ -88,8 +89,10 @@ describe('Observer Tests', () => {
 
     describe('ingest function tests', () => {
       it('should create RuntimeJob containing the Observer and ingest it into the Runtime (default config)', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValueOnce('generatedKey');
+
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-          expect(job._key).toBe(observer._key);
+          expect(job._key).toBe(`${observer._key}_generatedKey`);
           expect(job.observer).toBe(observer);
           expect(job.config).toStrictEqual({
             background: false,

@@ -14,6 +14,7 @@ import {
   SideEffectInterface,
   createArrayFromObject,
   CreateStateRuntimeJobConfigInterface,
+  generateId,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -100,7 +101,9 @@ export class StateObserver<ValueType = any> extends Observer {
       force: config.force,
       background: config.background,
       overwrite: config.overwrite,
-      key: config.key || this._key,
+      key:
+        config.key ??
+        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
     });
 
     this.agileInstance().runtime.ingest(job, {

@@ -396,7 +396,7 @@ describe('SubController Tests', () => {
           );
           expect(componentSubscriptionContainer.ready).toBeTruthy();
 
-          expect(Array.from(subController.componentSubs)).toBe([
+          expect(Array.from(subController.componentSubs)).toStrictEqual([
             componentSubscriptionContainer,
           ]);
 
@@ -407,10 +407,9 @@ describe('SubController Tests', () => {
           // Check if ComponentSubscriptionContainer was called with correct parameters
           expect(componentSubscriptionContainer.key).toBe('dummyKey');
           expect(componentSubscriptionContainer.componentId).toBe('testID');
-          expect(Array.from(componentSubscriptionContainer.subscribers)).toBe([
-            dummyObserver1,
-            dummyObserver2,
-          ]);
+          expect(
+            Array.from(componentSubscriptionContainer.subscribers)
+          ).toStrictEqual([dummyObserver1, dummyObserver2]);
         }
       );
 
@@ -434,17 +433,16 @@ describe('SubController Tests', () => {
         );
         expect(componentSubscriptionContainer.ready).toBeFalsy();
 
-        expect(Array.from(subController.componentSubs)).toBe([
+        expect(Array.from(subController.componentSubs)).toStrictEqual([
           componentSubscriptionContainer,
         ]);
 
         // Check if ComponentSubscriptionContainer was called with correct parameters
         expect(componentSubscriptionContainer.key).toBe('generatedKey');
         expect(componentSubscriptionContainer.componentId).toBeUndefined();
-        expect(Array.from(componentSubscriptionContainer.subscribers)).toBe([
-          dummyObserver1,
-          dummyObserver2,
-        ]);
+        expect(
+          Array.from(componentSubscriptionContainer.subscribers)
+        ).toStrictEqual([dummyObserver1, dummyObserver2]);
       });
 
       it('should return ready Component based Subscription Container if componentInstance is mounted (config.waitForMount = true)', () => {
@@ -468,7 +466,7 @@ describe('SubController Tests', () => {
         );
         expect(componentSubscriptionContainer.ready).toBeTruthy();
 
-        expect(Array.from(subController.componentSubs)).toBe([
+        expect(Array.from(subController.componentSubs)).toStrictEqual([
           componentSubscriptionContainer,
         ]);
 
