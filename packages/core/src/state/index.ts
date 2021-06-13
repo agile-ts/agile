@@ -72,6 +72,8 @@ export class State<ValueType = any> {
    *
    * You can create as many global States as you need.
    *
+   * [Learn more..](https://agile-ts.org/docs/core/state/)
+   *
    * @public
    * @param agileInstance - Instance of Agile the State belongs to.
    * @param initialValue - Initial value of the State.

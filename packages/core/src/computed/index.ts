@@ -26,7 +26,8 @@ export class Computed<ComputedValueType = any> extends State<
   public hardCodedDeps: Array<Observer> = [];
 
   /**
-   * An extension of the State Class that computes its value based on a compute function.
+   * A Computed is an extension of the State Class
+   * that computes its value based on a compute function.
    *
    * The computed value will be cached to avoid unnecessary recomputes
    * and is only recomputed when one of its direct dependencies changes.
@@ -217,4 +218,4 @@ export interface RecomputeConfigInterface
   extends StateIngestConfigInterface,
     ComputeConfigInterface {}
 
-type SubscribableAgileInstancesType = State | Collection | Observer;
+export type SubscribableAgileInstancesType = State | Collection | Observer;
