@@ -18,7 +18,7 @@ export class Integrations {
   constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
 
-    // Integrate initial Integrations which were statically set from external
+    // Integrate initial Integrations which were statically set externally
     Agile.initialIntegrations.forEach((integration) =>
       this.integrate(integration)
     );
@@ -43,7 +43,7 @@ export class Integrations {
       integration.ready = await integration.methods.bind(this.agileInstance());
     else integration.ready = true;
 
-    // Integrate Framework
+    // Integrate Integration
     this.integrations.add(integration);
     integration.integrated = true;
 

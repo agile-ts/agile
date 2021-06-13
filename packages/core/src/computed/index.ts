@@ -27,13 +27,13 @@ export class Computed<ComputedValueType = any> extends State<
 
   /**
    * A Computed is an extension of the State Class
-   * that computes its value based on a compute function.
+   * that computes its value based on a specified compute function.
    *
    * The computed value will be cached to avoid unnecessary recomputes
    * and is only recomputed when one of its direct dependencies changes.
    *
    * Direct dependencies can be States and Collections.
-   * So when for example a dependent State value changes, the computed value will be recomputed.
+   * So when, for example, a dependent State value changes, the computed value is recomputed.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/)
    *

@@ -319,7 +319,7 @@ export class SubController {
 interface RegisterSubscriptionConfigInterface
   extends SubscriptionContainerConfigInterface {
   /**
-   * Whether the Subscription Container should not be ready
+   * Whether the Subscription Container shouldn't be ready
    * until the UI-Component it represents has been mounted.
    * @default agileInstance.config.waitForMount
    */

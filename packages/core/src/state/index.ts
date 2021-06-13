@@ -68,7 +68,7 @@ export class State<ValueType = any> {
   /**
    * A State manages a piece of Information
    * that we need to remember globally at a later point in time.
-   * While providing a toolkit to use and mutate this set of Information.
+   * While providing a toolkit to use and mutate this piece of Information.
    *
    * You can create as many global States as you need.
    *
