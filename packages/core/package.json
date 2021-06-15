@@ -36,7 +36,8 @@
     "preview": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "lint": "eslint src/**/*"
+    "lint": "eslint src/**/*",
+    "size": "yarn run build && size-limit"
   },
   "devDependencies": {
     "@agile-ts/logger": "file:../logger",
