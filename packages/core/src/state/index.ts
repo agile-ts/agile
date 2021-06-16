@@ -183,7 +183,7 @@ export class State<ValueType = any> {
 
   /**
    * Assigns a new value to the State
-   * and rerenders all subscribed Components.
+   * and re-renders all subscribed UI-Components.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/methods/#set)
    *
@@ -832,14 +832,14 @@ export type StateWatcherCallback<T = any> = (value: T, key: string) => void;
 export type ComputeValueMethod<T = any> = (value: T) => T;
 export type ComputeExistsMethod<T = any> = (value: T) => boolean;
 
-export type SideEffectFunctionType<Instance extends State<any>> = (
+export type SideEffectFunctionType<Instance extends State> = (
   instance: Instance,
   properties?: {
     [key: string]: any;
   }
 ) => void;
 
-export interface SideEffectInterface<Instance extends State<any>> {
+export interface SideEffectInterface<Instance extends State> {
   /**
    * Callback function to be called on every State value change.
    * @return () => {}
