@@ -1091,7 +1091,7 @@ export class Collection<DataType extends Object = DefaultItem> {
   }
 
   /**
-   * Updates key/name identifier of the Item
+   * Updates the key/name identifier of the Item
    * and returns a boolean indicating
    * whether the Item identifier was updated successfully.
    *
@@ -1629,14 +1629,16 @@ export interface CollectionPersistentConfigInterface {
   /**
    * Key/Name identifier of Storages
    * in which the Collection value should be or is persisted.
-   * @default [AgileTs default Storage key]
+   * @default [`defaultStorageKey`]
    */
   storageKeys?: StorageKey[];
   /**
-   * Default Storage key of the specified Storage keys.
-   * The Collection value is loaded from the default Storage
-   * and is only loaded from the remaining Storages (storageKeys)
-   * if the loading of the default Storage failed.
+   * Key/Name identifier of the default Storage of the specified Storage keys.
+   *
+   * The Collection value is loaded from the default Storage by default
+   * and is only loaded from the remaining Storages (`storageKeys`)
+   * if the loading from the default Storage failed.
+   *
    * @default first index of the specified Storage keys or the AgileTs default Storage key
    */
   defaultStorageKey?: StorageKey;

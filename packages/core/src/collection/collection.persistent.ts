@@ -74,7 +74,7 @@ export class CollectionPersistent<
    * @internal
    * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
    * | default = Persistent.key |
-   * @return Whether the loading and the setting up of the side effects was successful.
+   * @return Whether the loading of the persisted value and the setting up of the side effects was successful.
    */
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
@@ -180,7 +180,7 @@ export class CollectionPersistent<
    * @internal
    * @param storageItemKey - Prefix Storage key of the persisted Collection Instances.
    * | default = Persistent.key |
-   * @return Whether the persisting and the setting up of the side effects was successful.
+   * @return Whether the persisting of the value and the setting up of the side effects was successful.
    */
   public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;

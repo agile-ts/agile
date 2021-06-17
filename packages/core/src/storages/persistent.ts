@@ -7,25 +7,35 @@ import {
 } from '../internal';
 
 export class Persistent {
+  // Agile Instance the Persistent belongs to
   public agileInstance: () => Agile;
 
   public static placeHolderKey = '__THIS_IS_A_PLACEHOLDER__';
+
   public config: PersistentConfigInterface;
 
+  // Key/Name identifier of the Persistent
   public _key: PersistentKey;
+  // Whether the Persistent is ready and is allowed to persist values
   public ready = false;
-  public isPersisted = false; // If Value is stored in Agile Storage
-  public onLoad: ((success: boolean) => void) | undefined; // Gets called if PersistValue got loaded for the first Time
+  // Whether the Persistent value is stored in the corresponding Storage/s
+  public isPersisted = false;
+  // Callback that is called when the persisted value was loaded into the Persistent for the first time
+  public onLoad: ((success: boolean) => void) | undefined;
 
-  // Storages in which the Persisted Value is saved
+  // Key/Name identifier of the Storages the Persistent value is stored in
   public storageKeys: StorageKey[] = [];
 
   /**
+   * A Persistent manages the permanent persistence
+   * of an Agile Class such as the `State Class` in external Storages.
+   *
+   * Note that the Persistent itself is no standalone class
+   * and should be adapted to the Agile Class needs it belongs to.
+   *
    * @internal
-   * Persistent - Handles storing of Agile Instances
-   * Note: No stand alone class!!
-   * @param agileInstance - An instance of Agile
-   * @param config - Config
+   * @param agileInstance - Instance of Agile the Persistent belongs to.
+   * @param config - Configuration object
    */
   constructor(
     agileInstance: Agile,
@@ -71,7 +81,7 @@ export class Persistent {
   }
 
   /**
-   * Updates key/name identifier of Persistent.
+   * Updates the key/name identifier of the Persistent.
    *
    * @public
    * @param value - New key/name identifier.
@@ -86,28 +96,29 @@ export class Persistent {
 
     const isValid = this.validatePersistent();
 
-    // Try to initial load value if persistent wasn't ready before
+    // Try to initial load value if Persistent hasn't been ready before
     if (!wasReady) {
       if (isValid) await this.initialLoading();
       return;
     }
 
-    // Remove persisted values with the old key
+    // Remove persisted value that is located at the old key
     await this.removePersistedValue(oldKey);
 
-    // Persist Collection values with the new key
+    // Persist value at the new key
     if (isValid) await this.persistValue(value);
   }
 
-  //=========================================================================================================
-  // Instantiate Persistent
-  //=========================================================================================================
   /**
+   * Instantiates the Persistent by assigning the specified Storage keys
+   * and validating the Persistent.
+   *
+   * This was moved out of the `constructor`
+   * because some classes that extend the Persistent need to configure some
+   * things before they can properly instantiate the parent Persistent.
+   *
    * @internal
-   * Instantiates this Class
-   * Note: Had to outsource it from the constructor because some extending classes
-   * have to define some stuff before being able to instantiate the parent (this)
-   * @param config - Config
+   * @param config - Configuration object
    */
   public instantiatePersistent(
     config: InstantiatePersistentConfigInterface = {}
@@ -117,29 +128,31 @@ export class Persistent {
     this.validatePersistent();
   }
 
-  //=========================================================================================================
-  // Validate Persistent
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether the Persistent was setup correctly
+   * and is able to persist a value permanently in an external Storage.
+   *
+   * Based on this tapped boolean value,
+   * the Persistent's `ready` property is updated.
+   *
    * @internal
-   * Validates Persistent and updates its 'ready' property
    */
   public validatePersistent(): boolean {
     let isValid = true;
 
-    // Validate Key
+    // Validate Persistent key/name identifier
     if (this._key === Persistent.placeHolderKey) {
       LogCodeManager.log('12:03:00');
       isValid = false;
     }
 
-    // Validate StorageKeys
+    // Validate Storage keys
     if (!this.config.defaultStorageKey || this.storageKeys.length <= 0) {
       LogCodeManager.log('12:03:01');
       isValid = false;
     }
 
-    // Check if Storages exist
+    // Check if the Storages exist at the specified Storage keys
     this.storageKeys.map((key) => {
       if (!this.agileInstance().storages.storages[key]) {
         LogCodeManager.log('12:03:02', [this._key, key]);
@@ -151,14 +164,14 @@ export class Persistent {
     return isValid;
   }
 
-  //=========================================================================================================
-  // Assign StorageKeys
-  //=========================================================================================================
   /**
+   * Assigns the specified Storage keys to the Persistent
+   * and overwrites the old ones.
+   *
+   *
    * @internal
-   * Assign new StorageKeys to Persistent and overwrite the old ones
-   * @param storageKeys - New Storage Keys
-   * @param defaultStorageKey - Key of default Storage
+   * @param storageKeys - Key/Name identifiers to be assigned.
+   * @param defaultStorageKey - Key/Name identifier of the default Storage.
    */
   public assignStorageKeys(
     storageKeys: StorageKey[] = [],
@@ -167,11 +180,13 @@ export class Persistent {
     const storages = this.agileInstance().storages;
     const _storageKeys = copy(storageKeys);
 
-    // Add passed default Storage Key to 'storageKeys'
+    // Assign specified default Storage key to the 'storageKeys' array
     if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey))
       _storageKeys.push(defaultStorageKey);
 
-    // Add default Storage of AgileTs to storageKeys and assign it as default Storage Key of Persistent if no storageKeys provided
+    // Assign default Storage of AgileTs to the `storageKeys' array
+    // and assign it as default Storage key of the Persistent
+    // if no valid 'storageKeys' were provided
     if (_storageKeys.length <= 0) {
       this.config.defaultStorageKey = storages.config.defaultStorageKey as any;
       _storageKeys.push(storages.config.defaultStorageKey as any);
@@ -182,12 +197,10 @@ export class Persistent {
     this.storageKeys = _storageKeys;
   }
 
-  //=========================================================================================================
-  // Initial Loading
-  //=========================================================================================================
   /**
+   * Stores or loads the Persistent value from the external Storages for the first time.
+   *
    * @internal
-   * Loads/Saves Storage Value for the first Time
    */
   public async initialLoading(): Promise<void> {
     const success = await this.loadPersistedValue();
@@ -195,15 +208,17 @@ export class Persistent {
     if (!success) await this.persistValue();
   }
 
-  //=========================================================================================================
-  // Load Value
-  //=========================================================================================================
   /**
+   * Loads the Persistent value from the corresponding Storage.
+   *
+   * Note that this method should be overwritten
+   * to correctly apply the changes to the Agile Class
+   * the Persistent belongs to.
+   *
    * @internal
-   * Loads Value from Storage
-   * @param storageItemKey - Storage key of the persisted Instance.
+   * @param storageItemKey - Storage key of the persisted value.
    * | default = Persistent.key |
-   * @return Success?
+   * @return Whether loading of the persisted value was successful.
    */
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
@@ -212,30 +227,35 @@ export class Persistent {
     return false;
   }
 
-  //=========================================================================================================
-  // Update Value
-  //=========================================================================================================
   /**
+   * Persists the Persistent value in the corresponding Storage.
+   *
+   * Note that this method should be overwritten
+   * to correctly apply the changes to the Agile Class
+   * the Persistent belongs to.
+   *
    * @internal
-   * Saves/Updates Value in Storage
-   * @param storageItemKey - Storage key of the persisted Instance.
+   * @param storageItemKey - Storage key of the persisted value
    * | default = Persistent.key |
-   * @return Success?
+   * @return Whether the persisting of the value was successful.
    */
   public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
     LogCodeManager.log('00:03:00', ['persistValue', 'Persistent']);
     return false;
   }
 
-  //=========================================================================================================
-  // Remove Value
-  //=========================================================================================================
   /**
+   * Removes the Persistent value from the corresponding Storage.
+   * -> Persistent value is no longer persisted
+   *
+   * Note that this method should be overwritten
+   * to correctly apply the changes to the Agile Class
+   * the Persistent belongs to.
+   *
    * @internal
-   * Removes Value form Storage
-   * @param storageItemKey - Storage key of the persisted Instance.
+   * @param storageItemKey - Storage key of the persisted value.
    * | default = Persistent.key |
-   * @return Success?
+   * @return Whether the removal of the persisted value was successful.
    */
   public async removePersistedValue(
     storageItemKey?: PersistentKey
@@ -244,13 +264,16 @@ export class Persistent {
     return false;
   }
 
-  //=========================================================================================================
-  // Format Key
-  //=========================================================================================================
   /**
+   * Formats the specified key so that it can be used as a valid Storage key
+   * and returns the formatted variant of it.
+   *
+   * Note that this method should be overwritten
+   * to correctly apply the changes to the Agile Class
+   * the Persistent belongs to.
+   *
    * @internal
-   * Validates Storage Key
-   * @param key - Key that gets validated
+   * @param key - Key to be formatted.
    */
   public formatKey(key?: PersistentKey): PersistentKey | undefined {
     return key;
@@ -259,33 +282,67 @@ export class Persistent {
 
 export type PersistentKey = string | number;
 
-/**
- * @param key - Key/Name of Persistent
- * @param storageKeys - Keys of Storages in that the persisted Value gets saved
- * @param defaultStorage - Default Storage Key
- * @param instantiate - If Persistent gets Instantiated immediately
- */
 export interface CreatePersistentConfigInterface {
+  /**
+   * Key/Name identifier of the Persistent.
+   */
   key?: PersistentKey;
+  /**
+   * Key/Name identifier of Storages
+   * in which the Persistent value should be or is persisted.
+   * @default [`defaultStorageKey`]
+   */
   storageKeys?: StorageKey[];
+  /**
+   * Key/Name identifier of the default Storage of the specified Storage keys.
+   *
+   * The Persistent value is loaded from the default Storage by default
+   * and is only loaded from the remaining Storages (`storageKeys)
+   * if the loading from the default Storage failed.
+   *
+   * @default first index of the specified Storage keys or the AgileTs default Storage key
+   */
   defaultStorageKey?: StorageKey;
+  /**
+   * Whether the Persistent should be instantiated immediately
+   * or whether this should be done manually.
+   * @default true
+   */
   instantiate?: boolean;
 }
 
-/**
- * @param defaultStorageKey - Default Storage Key
- */
 export interface PersistentConfigInterface {
+  /**
+   * Key/Name identifier of the default Storage of the specified Storage keys.
+   *
+   * The Persistent value is loaded from the default Storage by default
+   * and is only loaded from the remaining Storages (`storageKeys)
+   * if the loading from the default Storage failed.
+   *
+   * @default first index of the specified Storage keys or the AgileTs default Storage key
+   */
   defaultStorageKey: StorageKey | null;
 }
 
-/**
- * @param key - Key/Name of Persistent
- * @param storageKeys - Keys of Storages in that the persisted Value gets saved
- * @param defaultStorageKey - Default Storage Key (if not provided it takes the first index of storageKeys or the AgileTs default Storage)
- */
 export interface InstantiatePersistentConfigInterface {
+  /**
+   * Key/Name identifier of the Persistent.
+   */
   key?: PersistentKey;
+  /**
+   * Key/Name identifier of Storages
+   * in which the Persistent value should be or is persisted.
+   * @default [`defaultStorageKey`]
+   */
   storageKeys?: StorageKey[];
+  /**
+   * Key/Name identifier of the default Storage of the specified Storage keys.
+   *
+   * The Persistent value is loaded from the default Storage by default
+   * and is only loaded from the remaining Storages (`storageKeys)
+   * if the loading from the default Storage failed.
+   *
+   * @default first index of the specified Storage keys or the AgileTs default Storage key
+   */
   defaultStorageKey?: StorageKey;
 }

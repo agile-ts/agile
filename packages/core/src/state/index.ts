@@ -815,14 +815,16 @@ export interface StatePersistentConfigInterface {
   /**
    * Key/Name identifier of Storages
    * in which the State value should be or is persisted.
-   * @default [AgileTs default Storage key]
+   * @default [`defaultStorageKey`]
    */
   storageKeys?: StorageKey[];
   /**
-   * Default Storage key of the specified Storage keys.
-   * The State value is loaded from the default Storage
-   * and is only loaded from the remaining Storages (storageKeys)
-   * if the loading of the default Storage failed.
+   * Key/Name identifier of the default Storage of the specified Storage keys.
+   *
+   * The State value is loaded from the default Storage by default
+   * and is only loaded from the remaining Storages (`storageKeys`)
+   * if the loading from the default Storage failed.
+   *
    * @default first index of the specified Storage keys or the AgileTs default Storage key
    */
   defaultStorageKey?: StorageKey;

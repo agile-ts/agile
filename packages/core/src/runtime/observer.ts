@@ -31,7 +31,7 @@ export class Observer<ValueType = any> {
   /**
    * An Observer manages the subscriptions to Subscription Containers (UI-Components)
    * and dependencies to other Observers (Agile Classes)
-   * for an Agile Class like the `State Class`.
+   * for an Agile Class such as the `State Class`.
    *
    * Agile Classes often use an Observer as an interface to the Runtime.
    * In doing so, they ingest their own Observer into the Runtime
@@ -136,7 +136,7 @@ export class Observer<ValueType = any> {
    *
    * Note that this method should be overwritten
    * to correctly apply the changes to the Agile Class
-   * to which the Observer belongs.
+   * the Observer belongs to.
    *
    * @public
    * @param job - Runtime-Job to be performed.
