@@ -13,7 +13,7 @@ export class Integration<F = any, C = any> {
   public methods: IntegrationMethods<C>;
 
   /**
-   * An Integrations is an interface to a UI-Framework,
+   * An Integration is an interface to a UI-Framework,
    * and allows the easy interaction with that Framework.
    *
    * Due to the Integration, AgileTs can be integrated into almost any UI-Framework

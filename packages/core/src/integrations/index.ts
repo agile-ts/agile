@@ -28,7 +28,7 @@ export class Integrations {
    * Integrates the specified Integration into AgileTs
    * and sets it to ready when the binding was successful.
    *
-   * @internal
+   * @public
    * @param integration - Integration to be integrated into AgileTs.
    */
   public async integrate(integration: Integration): Promise<boolean> {
@@ -59,7 +59,7 @@ export class Integrations {
    * In doing so, it calls the `updateMethod()` method
    * in all registered Integrations with the specified parameters.
    *
-   * @internal
+   * @public
    * @param componentInstance - Component Instance to be updated.
    * @param updatedData - Data object with updated data.
    */
@@ -76,9 +76,9 @@ export class Integrations {
 
   /**
    * Returns a boolean indicating whether any Integration
-   * has been registered or not.
+   * has been registered with the Agile Instance or not.
    *
-   * @internal
+   * @public
    */
   public hasIntegration(): boolean {
     return this.integrations.size > 0;

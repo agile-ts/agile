@@ -74,7 +74,7 @@ export class Storages {
    * and updates the Persistents that have already attempted
    * to use the now registered Storage.
    *
-   * @internal
+   * @public
    * @param storage - Storage to be registered with AgileTs.
    * @param config - Configuration object
    */
@@ -120,7 +120,8 @@ export class Storages {
   }
 
   /**
-   * Retrieves a single Storage with the specified key/name identifier from the Storages Class.
+   * Retrieves a single Storage with the specified key/name identifier
+   * from the Storages Class.
    *
    * If the to retrieve Storage doesn't exist, `undefined` is returned.
    *
@@ -155,7 +156,7 @@ export class Storages {
    * When no Storage has been specified,
    * the value is retrieved from the default Storage.
    *
-   * @internal
+   * @public
    * @param storageItemKey - Key/Name identifier of the value to be retrieved.
    * @param storageKey - Key/Name identifier of the external Storage
    * from which the value is to be retrieved.
@@ -187,9 +188,9 @@ export class Storages {
    * in the defined external Storages (`storageKeys`).
    *
    * When no Storage has been specified,
-   * the value is stored/updated in the default Storage
+   * the value is stored/updated in the default Storage.
    *
-   * @internal
+   * @public
    * @param storageItemKey - Key/Name identifier of the value to be stored.
    * @param value - Value to be stored in an external Storage.
    * @param storageKeys - Key/Name identifier of the external Storage
@@ -222,9 +223,9 @@ export class Storages {
    * from the defined external Storages (`storageKeys`).
    *
    * When no Storage has been specified,
-   * the value is removed from the default Storage
+   * the value is removed from the default Storage.
    *
-   * @internal
+   * @public
    * @param storageItemKey - Key/Name identifier of the value to be removed.
    * @param storageKeys - Key/Name identifier of the external Storage
    * from which the value is to be removed.
@@ -252,9 +253,9 @@ export class Storages {
 
   /**
    * Returns a boolean indicating whether any Storage
-   * has been registered or not.
+   * has been registered with the Agile Instance or not.
    *
-   * @internal
+   * @public
    */
   public hasStorage(): boolean {
     return notEqual(this.storages, {});
@@ -265,7 +266,7 @@ export class Storages {
    * [Local Storage](https://developer.mozilla.org/de/docs/Web/API/Window/localStorage)
    * is available in this environment.
    *
-   * @internal
+   * @public
    */
   static localStorageAvailable(): boolean {
     try {
@@ -281,25 +282,40 @@ export class Storages {
 export interface CreateStoragesConfigInterface {
   /**
    * Whether the Local Storage should be registered by default.
-   * @default true
+   * @default false
    */
   localStorage?: boolean;
   /**
-   * Storage key of the Storage that should be the default Storage.
+   * Key/Name identifier of the Storage to become the default Storage.
+   *
+   * When no specified Storage has been defined in methods like `get()`, `set()`, `remove()`,
+   * the default Storage will be used.
+   *
+   * @default undefined
    */
   defaultStorageKey?: StorageKey;
 }
 
 export interface StoragesConfigInterface {
   /**
-   * Storage key of the Storage that should be the default Storage.
+   * Key/Name identifier of the Storage to become the default Storage.
+   *
+   * When no specified Storage has been defined in methods like `get()`, `set()`, `remove()`,
+   * the default Storage will be used.
+   *
+   * @default undefined
    */
   defaultStorageKey: StorageKey | null;
 }
 
 export interface RegisterConfigInterface {
   /**
-   * Whether the to register Storage should get the default Storage.
+   * Whether the to register Storage should become the default Storage.
+   *
+   * When no specified Storage has been defined in methods like `get()`, `set()`, `remove()`,
+   * the default Storage will be used.
+   *
+   * @default false
    */
   default?: boolean;
 }

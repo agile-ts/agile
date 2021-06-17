@@ -8,15 +8,24 @@ import {
 } from '../internal';
 
 export class Storage {
-  public key: StorageKey;
-  public ready = false;
-  public methods: StorageMethodsInterface;
   public config: StorageConfigInterface;
 
+  // Key/Name identifier of the Storage
+  public key: StorageKey;
+  // Whether the Storage is ready and is able to persist values
+  public ready = false;
+  // Methods to interact with the external Storage (get, set, remove)
+  public methods: StorageMethodsInterface;
+
   /**
+   * An Storage is an interface to an external Storage,
+   * and allows the easy interaction with that Storage.
+   *
+   * Due to the Storage, AgileTs can easily persist its Instances in almost any Storage
+   * without a huge overhead.
+   *
    * @public
-   * Storage - Interface for storing Items permanently
-   * @param config - Config
+   * @param config - Configuration object
    */
   constructor(config: CreateStorageConfigInterface) {
     config = defineConfig(config, {
@@ -41,12 +50,11 @@ export class Storage {
       this.config.async = true;
   }
 
-  //=========================================================================================================
-  // Validate
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether the Storage is valid
+   * and can be used to persist Instances in it or not.
+   *
    * @public
-   * Validates Storage Methods
    */
   public validate(): boolean {
     if (!isFunction(this.methods?.get)) {
@@ -64,20 +72,20 @@ export class Storage {
     return true;
   }
 
-  //=========================================================================================================
-  // Normal Get
-  //=========================================================================================================
   /**
-   * @internal
-   * Gets value at provided Key (normal)
-   * Note: Only use this if you are 100% sure this Storage doesn't work async
-   * @param key - Key of Storage property
+   * Synchronously retrieves the stored value
+   * at the specified Storage Item key from the Storage.
+   *
+   * When the retrieved value is a JSON-String it is parsed automatically.
+   *
+   * @public
+   * @param key - Key/Name identifier of the value to be retrieved.
    */
   public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
     if (!this.ready || !this.methods.get) return undefined;
     if (isAsyncFunction(this.methods.get)) LogCodeManager.log('13:02:00');
 
-    // Get Value
+    // Retrieve value
     const res = this.methods.get(this.getStorageKey(key));
     const _res = isJsonString(res) ? JSON.parse(res) : res;
 
@@ -91,22 +99,23 @@ export class Storage {
     return _res;
   }
 
-  //=========================================================================================================
-  // Async Get
-  //=========================================================================================================
   /**
-   * @internal
-   * Gets value at provided Key (async)
-   * @param key - Key of Storage property
+   * Asynchronously retrieves the stored value
+   * at the specified Storage Item key from the Storage.
+   *
+   * When the retrieved value is a JSON-String it is parsed automatically.
+   *
+   * @public
+   * @param key - Key/Name identifier of the value to be retrieved.
    */
   public get<GetTpe = any>(key: StorageItemKey): Promise<GetTpe | undefined> {
     if (!this.ready || !this.methods.get) return Promise.resolve(undefined);
 
-    // Get Value in 'dummy' promise if get method isn't async
+    // Retrieve value from not promise based Storage
     if (!isAsyncFunction(this.methods.get))
       return Promise.resolve(this.normalGet(key));
 
-    // Get Value (async)
+    // Retrieve value from promise based Storage
     return new Promise((resolve, reject) => {
       this.methods
         ?.get(this.getStorageKey(key))
@@ -129,14 +138,12 @@ export class Storage {
     });
   }
 
-  //=========================================================================================================
-  // Set
-  //=========================================================================================================
   /**
+   * Stores or updates the value at the specified Storage Item key in the Storage.
+   *
    * @public
-   * Saves/Updates value at provided Key
-   * @param key - Key of Storage property
-   * @param value - new Value that gets set
+   * @param key - Key/Name identifier of the value to be stored.
+   * @param value - Value to be stored.
    */
   public set(key: StorageItemKey, value: any): void {
     if (!this.ready || !this.methods.set) return;
@@ -151,13 +158,11 @@ export class Storage {
     this.methods.set(this.getStorageKey(key), JSON.stringify(value));
   }
 
-  //=========================================================================================================
-  // Remove
-  //=========================================================================================================
   /**
+   * Removes the value at the specified Storage Item key from the Storage.
+   *
    * @public
-   * Removes value at provided Key
-   * @param key - Key of Storage property
+   * @param key - Key/Name identifier of the value to be removed.
    */
   public remove(key: StorageItemKey): void {
     if (!this.ready || !this.methods.remove) return;
@@ -171,12 +176,10 @@ export class Storage {
     this.methods.remove(this.getStorageKey(key));
   }
 
-  //=========================================================================================================
-  // Get Storage Key
-  //=========================================================================================================
   /**
+   * Generates and returns a valid Storage key based on the specified key.
+   *
    * @internal
-   * Creates Storage Key from provided key
    * @param key - Key that gets converted into a Storage Key
    */
   public getStorageKey(key: StorageItemKey): string {
@@ -194,7 +197,15 @@ export type StorageItemKey = string | number;
  * @param methods - Storage methods like (get, set, remove)
  */
 export interface CreateStorageConfigInterface extends StorageConfigInterface {
+  /**
+   * Key/Name identifier of the Storage
+   * @default undefined
+   */
   key: string;
+  /**
+   * Storage methods for interacting with the external Storage.
+   * @default undefined
+   */
   methods: StorageMethodsInterface;
 }
 
@@ -204,8 +215,24 @@ export interface CreateStorageConfigInterface extends StorageConfigInterface {
  * @param remove - Remove Methods of Storage (removes items from storage)
  */
 export interface StorageMethodsInterface {
+  /**
+   * Method to retrieve a value at the specified key from the external Storage.
+   *
+   * @param key - Key/Name identifier of the value to be retrieved.
+   */
   get: (key: string) => any;
+  /**
+   * Method to store a value at the specified key in the external Storage.
+   *
+   * @param key - Key/Name identifier of the value to be stored.
+   * @param value - Value to be stored.
+   */
   set: (key: string, value: any) => void;
+  /**
+   * Method to remove a value at the specified key from the external Storage.
+   *
+   * @param key - Key/Name identifier of the value to be removed.
+   */
   remove: (key: string) => void;
 }
 
@@ -214,6 +241,14 @@ export interface StorageMethodsInterface {
  * @param prefix - Prefix of Storage Property
  */
 export interface StorageConfigInterface {
+  /**
+   * Whether the external Storage works async.
+   * @default Automatically detected via `isAsyncFunction()`
+   */
   async?: boolean;
+  /**
+   * Prefix to be added before each persisted value key/name identifier.
+   * @default 'agile'
+   */
   prefix?: string;
 }
