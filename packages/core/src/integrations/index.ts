@@ -10,7 +10,7 @@ export class Integrations {
   /**
    * The Integrations Class manages all Integrations for an Agile Instance
    * and provides an interface to easily update
-   * or invoke functions in all registered Integrations.
+   * and invoke functions in all registered Integrations.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Integrations belongs to.

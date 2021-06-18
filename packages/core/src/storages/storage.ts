@@ -12,13 +12,13 @@ export class Storage {
 
   // Key/Name identifier of the Storage
   public key: StorageKey;
-  // Whether the Storage is ready and is able to persist values
+  // Whether the Storage is ready and is able to store values
   public ready = false;
   // Methods to interact with the external Storage (get, set, remove)
   public methods: StorageMethodsInterface;
 
   /**
-   * An Storage is an interface to an external Storage,
+   * A Storage is an interface to an external Storage,
    * and allows the easy interaction with that Storage.
    *
    * Due to the Storage, AgileTs can easily persist its Instances in almost any Storage
@@ -74,7 +74,7 @@ export class Storage {
 
   /**
    * Synchronously retrieves the stored value
-   * at the specified Storage Item key from the Storage.
+   * at the specified Storage Item key from the external Storage.
    *
    * When the retrieved value is a JSON-String it is parsed automatically.
    *
@@ -101,7 +101,7 @@ export class Storage {
 
   /**
    * Asynchronously retrieves the stored value
-   * at the specified Storage Item key from the Storage.
+   * at the specified Storage Item key from the external Storage.
    *
    * When the retrieved value is a JSON-String it is parsed automatically.
    *
@@ -139,10 +139,11 @@ export class Storage {
   }
 
   /**
-   * Stores or updates the value at the specified Storage Item key in the Storage.
+   * Stores or updates the value at the specified Storage Item key
+   * in the external Storage.
    *
    * @public
-   * @param key - Key/Name identifier of the value to be stored.
+   * @param key - Key/Name identifier of the value to be stored or updated.
    * @param value - Value to be stored.
    */
   public set(key: StorageItemKey, value: any): void {
@@ -159,7 +160,8 @@ export class Storage {
   }
 
   /**
-   * Removes the value at the specified Storage Item key from the Storage.
+   * Removes the value at the specified Storage Item key
+   * from the external Storage.
    *
    * @public
    * @param key - Key/Name identifier of the value to be removed.
@@ -180,7 +182,7 @@ export class Storage {
    * Generates and returns a valid Storage key based on the specified key.
    *
    * @internal
-   * @param key - Key that gets converted into a Storage Key
+   * @param key - Key to be converted into a valid Storage key.
    */
   public getStorageKey(key: StorageItemKey): string {
     return this.config.prefix
@@ -192,13 +194,9 @@ export class Storage {
 export type StorageKey = string | number;
 export type StorageItemKey = string | number;
 
-/**
- * @param key - Key/Name of Storage
- * @param methods - Storage methods like (get, set, remove)
- */
 export interface CreateStorageConfigInterface extends StorageConfigInterface {
   /**
-   * Key/Name identifier of the Storage
+   * Key/Name identifier of the Storage.
    * @default undefined
    */
   key: string;
@@ -209,11 +207,6 @@ export interface CreateStorageConfigInterface extends StorageConfigInterface {
   methods: StorageMethodsInterface;
 }
 
-/**
- * @param get - Get Method of Storage (gets items from storage)
- * @param set - Set Method of Storage (saves/updates items in storage)
- * @param remove - Remove Methods of Storage (removes items from storage)
- */
 export interface StorageMethodsInterface {
   /**
    * Method to retrieve a value at the specified key from the external Storage.
@@ -222,9 +215,9 @@ export interface StorageMethodsInterface {
    */
   get: (key: string) => any;
   /**
-   * Method to store a value at the specified key in the external Storage.
+   * Method to store or update a value at the specified key in the external Storage.
    *
-   * @param key - Key/Name identifier of the value to be stored.
+   * @param key - Key/Name identifier of the value to be stored or updated.
    * @param value - Value to be stored.
    */
   set: (key: string, value: any) => void;
@@ -236,14 +229,10 @@ export interface StorageMethodsInterface {
   remove: (key: string) => void;
 }
 
-/**
- * @param async - If its an async storage
- * @param prefix - Prefix of Storage Property
- */
 export interface StorageConfigInterface {
   /**
-   * Whether the external Storage works async.
-   * @default Automatically detected via `isAsyncFunction()`
+   * Whether the external Storage represented by the Storage Class works async.
+   * @default Automatically detected via the `isAsyncFunction()` method
    */
   async?: boolean;
   /**

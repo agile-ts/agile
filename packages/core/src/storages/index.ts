@@ -17,12 +17,13 @@ export class Storages {
 
   // Registered Storages
   public storages: { [key: string]: Storage } = {};
-  // Persistent from Instances that were persisted
+  // Persistent from Instances (for example States) that were persisted
   public persistentInstances: Set<Persistent> = new Set();
 
   /**
    * The Storages Class manages all external Storages for an Agile Instance
-   * and provides an interface to easily store, load and remove values from multiple Storages at once.
+   * and provides an interface to easily store,
+   * load and remove values from multiple Storages at once.
    *
    * @internal
    * @param agileInstance - Instance of Agile the Storages belongs to.
@@ -45,18 +46,15 @@ export class Storages {
    * Instantiates and registers the
    * [Local Storage](https://developer.mozilla.org/de/docs/Web/API/Window/localStorage).
    *
-   * Note that this only works in a web environment!
+   * Note that the Local Storage is only available in a web environment.
    *
    * @internal
    */
   public instantiateLocalStorage(): boolean {
-    // Check if Local Storage is available in this environment
     if (!Storages.localStorageAvailable()) {
       LogCodeManager.log('11:02:00');
       return false;
     }
-
-    // Create and register Local Storage
     const _localStorage = new Storage({
       key: 'localStorage',
       async: false,
@@ -71,8 +69,8 @@ export class Storages {
 
   /**
    * Registers the specified Storage with AgileTs
-   * and updates the Persistents that have already attempted
-   * to use the now registered Storage.
+   * and updates the Persistent Instances that have already attempted
+   * to use the previously unregistered Storage.
    *
    * @public
    * @param storage - Storage to be registered with AgileTs.
@@ -90,7 +88,7 @@ export class Storages {
       return false;
     }
 
-    // Assign first added Storage as default Storage
+    // Assign Storage as default Storage if it is the first one added
     if (!hasRegisteredAnyStorage && config.default === false)
       LogCodeManager.log('11:02:01');
     if (!hasRegisteredAnyStorage) config.default = true;
@@ -100,15 +98,16 @@ export class Storages {
     if (config.default) this.config.defaultStorageKey = storage.key;
 
     this.persistentInstances.forEach((persistent) => {
-      // Revalidate Persistent that includes the newly registered storage key
+      // Revalidate Persistent, which contains key/name identifier of the newly registered Storage
       if (persistent.storageKeys.includes(storage.key)) {
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
         return;
       }
 
-      // If Persistent has no default storage key
-      // (reassign storage keys since this registered Storage might be tagged as default Storage)
+      // If Persistent has no default Storage key,
+      // reassign Storage keys since the now registered Storage
+      // might be tagged as default Storage of AgileTs
       if (persistent.config.defaultStorageKey == null) {
         persistent.assignStorageKeys();
         const isValid = persistent.validatePersistent();
@@ -133,19 +132,14 @@ export class Storages {
   ): Storage | undefined {
     if (!storageKey) return undefined;
     const storage = this.storages[storageKey];
-
-    // Check if Storage exists
     if (!storage) {
       LogCodeManager.log('11:03:01', [storageKey]);
       return undefined;
     }
-
-    // Check if Storage is ready
     if (!storage.ready) {
       LogCodeManager.log('11:03:02', [storageKey]);
       return undefined;
     }
-
     return storage;
   }
 
@@ -207,7 +201,7 @@ export class Storages {
     }
 
     // Call set method on specified Storages
-    if (storageKeys) {
+    if (storageKeys != null) {
       for (const storageKey of storageKeys)
         this.getStorage(storageKey)?.set(storageItemKey, value);
       return;
@@ -264,7 +258,7 @@ export class Storages {
   /**
    * Returns a boolean indication whether the
    * [Local Storage](https://developer.mozilla.org/de/docs/Web/API/Window/localStorage)
-   * is available in this environment.
+   * is available in the current environment.
    *
    * @public
    */
@@ -281,15 +275,21 @@ export class Storages {
 
 export interface CreateStoragesConfigInterface {
   /**
-   * Whether the Local Storage should be registered by default.
+   * Whether to register the Local Storage by default.
+   * Note that the Local Storage is only available in a web environment.
    * @default false
    */
   localStorage?: boolean;
   /**
-   * Key/Name identifier of the Storage to become the default Storage.
+   * Key/Name identifier of the default Storage.
    *
-   * When no specified Storage has been defined in methods like `get()`, `set()`, `remove()`,
-   * the default Storage will be used.
+   * The default Storage represents the default Storage of the Storages Class,
+   * on which executed actions are performed if no specific Storage was specified.
+   *
+   * Also, the persisted value is loaded from the default Storage by default,
+   * since only one persisted value can be applied.
+   * If the loading of the value from the default Storage failed,
+   * an attempt is made to load the value from the remaining Storages.
    *
    * @default undefined
    */
@@ -298,10 +298,15 @@ export interface CreateStoragesConfigInterface {
 
 export interface StoragesConfigInterface {
   /**
-   * Key/Name identifier of the Storage to become the default Storage.
+   * Key/Name identifier of the default Storage.
    *
-   * When no specified Storage has been defined in methods like `get()`, `set()`, `remove()`,
-   * the default Storage will be used.
+   * The default Storage represents the default Storage of the Storages Class,
+   * on which executed actions are performed if no specific Storage was specified.
+   *
+   * Also, the persisted value is loaded from the default Storage by default,
+   * since only one persisted value can be applied.
+   * If the loading of the value from the default Storage failed,
+   * an attempt is made to load the value from the remaining Storages.
    *
    * @default undefined
    */
@@ -312,8 +317,13 @@ export interface RegisterConfigInterface {
   /**
    * Whether the to register Storage should become the default Storage.
    *
-   * When no specified Storage has been defined in methods like `get()`, `set()`, `remove()`,
-   * the default Storage will be used.
+   * The default Storage represents the default Storage of the Storages Class,
+   * on which executed actions are performed if no specific Storage was specified.
+   *
+   * Also, the persisted value is loaded from the default Storage by default,
+   * since only one persisted value can be applied.
+   * If the loading of the value from the default Storage failed,
+   * an attempt is made to load the value from the remaining Storages.
    *
    * @default false
    */

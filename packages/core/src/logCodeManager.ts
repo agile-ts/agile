@@ -1,11 +1,19 @@
 import { Agile } from './agile';
 
+// The Log Code Manager keeps track
+// and manages all important Logs of AgileTs.
+//
+// How does the identification of Log Messages work?
+// Let's take a look at this example:
 // 00:00:00
+//
 // |00|:00:00 first digits are based on the Agile Class
 // 00 = General
 // 10 = Agile
 // 11 = Storage
 // ..
+//
+// ---
 // 00:|00|:00 second digits are based on the Log Type
 const logCodeTypes = {
   '00': 'success',
@@ -13,6 +21,8 @@ const logCodeTypes = {
   '02': 'warn',
   '03': 'error',
 };
+//
+// ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
 const logCodeMessages = {
@@ -161,15 +171,13 @@ const logCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-//=========================================================================================================
-// Get Log
-//=========================================================================================================
 /**
+ * Returns the log message according to the specified log code.
+ *
  * @internal
- * Returns the log message according to the passed logCode
- * @param logCode - Log Code of Message
+ * @param logCode - Log code of the message to be returned.
  * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: replacers[0] replaces '${0}', replacers[1] replaces '${1}', ...
+ * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
  */
 function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
@@ -185,16 +193,15 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   return result;
 }
 
-//=========================================================================================================
-// Log
-//=========================================================================================================
 /**
+ * Logs the log message according to the specified log code
+ * with the Agile Logger.
+ *
  * @internal
- * Logs message at the provided logCode with the Agile.logger
- * @param logCode - Log Code of Message
+ * @param logCode - Log code of the message to be returned.
  * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: replacers[0] replaces '${0}', replacers[1] replaces '${1}', ..
- * @param data - Data attached to the end of the log message
+ * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
+ * @param data - Data to be attached to the end of the log message.
  */
 function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
@@ -207,8 +214,10 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
 }
 
 /**
+ * The Log Code Manager keeps track
+ * and manages all important Logs of AgileTs.
+ *
  * @internal
- * Manages logCode based logging of AgileTs
  */
 export const LogCodeManager = {
   getLog,

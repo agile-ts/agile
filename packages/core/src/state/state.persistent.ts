@@ -61,9 +61,9 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * the Storage value when the State changes.
    *
    * @internal
-   * @param storageItemKey - Storage key of the persisted State Instance.
+   * @param storageItemKey - Storage key of the to load State Instance.
    * | default = Persistent.key |
-   * @return Whether the loading of the persisted value and the setting up of the side effects was successful.
+   * @return Whether the loading of the persisted State Instance and the setting up of the corresponding side effects was successful.
    */
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
@@ -97,9 +97,9 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * the Storage value when the State changes.
    *
    * @internal
-   * @param storageItemKey - Storage key of the persisted State Instance.
+   * @param storageItemKey - Storage key of the to persist State Instance.
    * | default = Persistent.key |
-   * @return Whether the persisting of the value and the setting up of the side effects was successful.
+   * @return Whether the persisting of the State Instance and setting up of the corresponding side effects was successful.
    */
   public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
     if (!this.ready) return false;
@@ -126,9 +126,6 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   public setupSideEffects(storageItemKey?: PersistentKey) {
     const _storageItemKey = storageItemKey ?? this._key;
-
-    // Add side effect to the State
-    // that updates the Storage value based on the current State value
     this.state().addSideEffect(
       StatePersistent.storeValueSideEffectKey,
       (instance, config) => {
@@ -143,9 +140,9 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * -> State is no longer persisted
    *
    * @internal
-   * @param storageItemKey - Storage key of the persisted State Instance.
+   * @param storageItemKey - Storage key of the to remove State Instance.
    * | default = Persistent.key |
-   * @return Whether the removal of the persisted value was successful.
+   * @return Whether the removal of the persisted State Instance was successful.
    */
   public async removePersistedValue(
     storageItemKey?: PersistentKey
@@ -162,11 +159,11 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * Formats the specified key so that it can be used as a valid Storage key
    * and returns the formatted variant of it.
    *
-   * If no formatable key (undefined/null) was provided,
-   * an attempt is made to use the State identifier key.
+   * If no formatable key (`undefined`/`null`) was provided,
+   * an attempt is made to use the State identifier key as Storage key.
    *
    * @internal
-   * @param key - Key to be formatted.
+   * @param key - Storage key to be formatted.
    */
   public formatKey(
     key: PersistentKey | undefined | null
