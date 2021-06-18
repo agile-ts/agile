@@ -1,11 +1,19 @@
 import { Agile } from './agile';
 
+// The Log Code Manager keeps track
+// and manages all important Logs of AgileTs.
+//
+// How does the identification of Log Messages work?
+// Let's take a look at this example:
 // 00:00:00
+//
 // |00|:00:00 first digits are based on the Agile Class
 // 00 = General
 // 10 = Agile
 // 11 = Storage
 // ..
+//
+// ---
 // 00:|00|:00 second digits are based on the Log Type
 const logCodeTypes = {
   '00': 'success',
@@ -13,6 +21,8 @@ const logCodeTypes = {
   '02': 'warn',
   '03': 'error',
 };
+//
+// ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
 const logCodeMessages = {
@@ -21,7 +31,7 @@ const logCodeMessages = {
   '10:02:00':
     'Be careful when binding multiple Agile Instances globally in one application!',
 
-  // Storage
+  // Storages
   '11:02:00':
     "The 'Local Storage' is not available in your current environment." +
     "To use the '.persist()' functionality, please provide a custom Storage!",
@@ -49,6 +59,9 @@ const logCodeMessages = {
     "The Storage with the key/name '${1}' doesn't exists!`",
 
   // Storage
+  '13:01:00': "GET value at key '${1}' from Storage '${0}'.",
+  '13:01:01': "SET value at key '${1}' in Storage '${0}'.",
+  '13:01:02': "REMOVE value at key '${1}' from Storage '${0}'.",
   '13:02:00':
     'Using normalGet() in a async-based Storage might result in an unexpected return value. ' +
     'Instead of a resolved value a Promise is returned!',
@@ -60,9 +73,8 @@ const logCodeMessages = {
   '14:03:01':
     "'${1}' is a not supported type! Supported types are: String, Boolean, Array, Object, Number.",
   '14:03:02': "The 'patch()' method works only in object based States!",
-  '14:03:03': "Watcher Callback with the key/name '${0}' already exists!",
-  '14:03:04': 'Only one Interval can be active at once!',
-  '14:03:05': "The 'invert()' method works only in boolean based States!",
+  '14:03:03': 'Only one Interval can be active at once!',
+  '14:03:04': "Failed to invert value of the type '${0}'!",
 
   // SubController
   '15:01:00': "Unregistered 'Callback' based Subscription.",
@@ -134,11 +146,19 @@ const logCodeMessages = {
     "Couldn't update ItemKey from '${0}' to '${1}' " +
     "because an Item with the key/name '${1}' already exists in the Collection '${2}'!",
   '1B:03:05': "Item Data of Collection '${0}' has to be a valid object!",
+  '1B:03:06':
+    "Item tried to add to the Collection '${0}' belongs to another Collection '${1}'!",
 
   // Group
   '1C:02:00':
     "Couldn't find some Items in the Collection '${0}' " +
     "during the rebuild of the Group '${1}' output.",
+  '1C:03:00':
+    "The 'output' property of the Group '${0}' is a automatically generated readonly property " +
+    'that can only be mutated by the Group itself!',
+  '1C:03:01':
+    "The 'item' property of the Group '${0}' is a automatically generated readonly property " +
+    'that can only be mutated by the Group itself!',
 
   // Utils
   '20:03:00': 'Failed to get Agile Instance from',
@@ -151,15 +171,13 @@ const logCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-//=========================================================================================================
-// Get Log
-//=========================================================================================================
 /**
+ * Returns the log message according to the specified log code.
+ *
  * @internal
- * Returns the log message according to the passed logCode
- * @param logCode - Log Code of Message
+ * @param logCode - Log code of the message to be returned.
  * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: replacers[0] replaces '${0}', replacers[1] replaces '${1}', ...
+ * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
  */
 function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
@@ -175,16 +193,15 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   return result;
 }
 
-//=========================================================================================================
-// Log
-//=========================================================================================================
 /**
+ * Logs the log message according to the specified log code
+ * with the Agile Logger.
+ *
  * @internal
- * Logs message at the provided logCode with the Agile.logger
- * @param logCode - Log Code of Message
+ * @param logCode - Log code of the message to be returned.
  * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: replacers[0] replaces '${0}', replacers[1] replaces '${1}', ..
- * @param data - Data attached to the end of the log message
+ * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
+ * @param data - Data to be attached to the end of the log message.
  */
 function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
@@ -197,8 +214,10 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
 }
 
 /**
+ * The Log Code Manager keeps track
+ * and manages all important Logs of AgileTs.
+ *
  * @internal
- * Manages logCode based logging of AgileTs
  */
 export const LogCodeManager = {
   getLog,

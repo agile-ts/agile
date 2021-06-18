@@ -4,6 +4,7 @@ import {
   SubscriptionContainer,
   RuntimeJob,
 } from '../../../src';
+import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
 
 describe('Observer Tests', () => {
@@ -20,20 +21,22 @@ describe('Observer Tests', () => {
     dummyAgile = new Agile();
     dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
-    dummySubscription1 = new SubscriptionContainer();
-    dummySubscription2 = new SubscriptionContainer();
+    dummySubscription1 = new SubscriptionContainer([]);
+    dummySubscription2 = new SubscriptionContainer([]);
 
-    jest.spyOn(Observer.prototype, 'subscribe');
+    jest.spyOn(dummySubscription1, 'addSubscription');
+    jest.spyOn(dummySubscription2, 'addSubscription');
   });
 
   it('should create Observer (default config)', () => {
     const observer = new Observer(dummyAgile);
 
+    expect(observer.agileInstance()).toBe(dummyAgile);
     expect(observer._key).toBeUndefined();
+    expect(Array.from(observer.dependents)).toStrictEqual([]);
+    expect(Array.from(observer.subscribedTo)).toStrictEqual([]);
     expect(observer.value).toBeUndefined();
     expect(observer.previousValue).toBeUndefined();
-    expect(observer.dependents.size).toBe(0);
-    expect(observer.subscribedTo.size).toBe(0);
   });
 
   it('should create Observer (specific config)', () => {
@@ -44,18 +47,21 @@ describe('Observer Tests', () => {
       value: 'coolValue',
     });
 
+    expect(observer.agileInstance()).toBe(dummyAgile);
     expect(observer._key).toBe('testKey');
+    expect(Array.from(observer.dependents)).toStrictEqual([
+      dummyObserver1,
+      dummyObserver2,
+    ]);
+    expect(Array.from(observer.subscribedTo)).toStrictEqual([
+      dummySubscription1,
+      dummySubscription2,
+    ]);
     expect(observer.value).toBe('coolValue');
     expect(observer.previousValue).toBe('coolValue');
-    expect(observer.dependents.size).toBe(2);
-    expect(observer.dependents.has(dummyObserver2)).toBeTruthy();
-    expect(observer.dependents.has(dummyObserver1)).toBeTruthy();
-    expect(observer.subscribedTo.size).toBe(2);
-    expect(observer.subscribedTo.has(dummySubscription1)).toBeTruthy();
-    expect(observer.subscribedTo.has(dummySubscription2)).toBeTruthy();
 
-    expect(observer.subscribe).toHaveBeenCalledWith(dummySubscription1);
-    expect(observer.subscribe).toHaveBeenCalledWith(dummySubscription2);
+    expect(dummySubscription1.addSubscription).toHaveBeenCalledWith(observer);
+    expect(dummySubscription2.addSubscription).toHaveBeenCalledWith(observer);
   });
 
   describe('Observer Function Tests', () => {
@@ -82,9 +88,11 @@ describe('Observer Tests', () => {
     });
 
     describe('ingest function tests', () => {
-      it('should create RuntimeJob and ingest Observer into the Runtime (default config)', () => {
+      it('should create RuntimeJob containing the Observer and ingest it into the Runtime (default config)', () => {
+        jest.spyOn(Utils, 'generateId').mockReturnValueOnce('generatedKey');
+
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-          expect(job._key).toBe(observer._key);
+          expect(job._key).toBe(`${observer._key}_generatedKey`);
           expect(job.observer).toBe(observer);
           expect(job.config).toStrictEqual({
             background: false,
@@ -93,7 +101,7 @@ describe('Observer Tests', () => {
               exclude: [],
             },
             force: false,
-            numberOfTriesToUpdate: 3,
+            maxTriesToUpdate: 3,
           });
         });
 
@@ -107,7 +115,7 @@ describe('Observer Tests', () => {
         );
       });
 
-      it('should create RuntimeJob and ingest Observer into the Runtime (specific config)', () => {
+      it('should create RuntimeJob containing the Observer and ingest it into the Runtime (specific config)', () => {
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
           expect(job._key).toBe('coolKey');
           expect(job.observer).toBe(observer);
@@ -118,7 +126,7 @@ describe('Observer Tests', () => {
               exclude: [],
             },
             force: true,
-            numberOfTriesToUpdate: 3,
+            maxTriesToUpdate: 3,
           });
         });
 
@@ -148,7 +156,7 @@ describe('Observer Tests', () => {
       });
     });
 
-    describe('depend function tests', () => {
+    describe('addDependent function tests', () => {
       let dummyObserver1: Observer;
       let dummyObserver2: Observer;
 
@@ -157,76 +165,20 @@ describe('Observer Tests', () => {
         dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
       });
 
-      it('should add passed Observer to deps', () => {
-        observer.depend(dummyObserver1);
+      it('should add specified Observer to the dependents array', () => {
+        observer.addDependent(dummyObserver1);
 
         expect(observer.dependents.size).toBe(1);
         expect(observer.dependents.has(dummyObserver2));
       });
 
-      it("shouldn't add the same Observer twice to deps", () => {
-        observer.depend(dummyObserver1);
+      it("shouldn't add specified Observer twice to the dependents array", () => {
+        observer.addDependent(dummyObserver1);
 
-        observer.depend(dummyObserver1);
+        observer.addDependent(dummyObserver1);
 
         expect(observer.dependents.size).toBe(1);
         expect(observer.dependents.has(dummyObserver1));
-      });
-    });
-
-    describe('subscribe function tests', () => {
-      let dummySubscriptionContainer1: SubscriptionContainer;
-
-      beforeEach(() => {
-        dummySubscriptionContainer1 = new SubscriptionContainer();
-      });
-
-      it('should add subscriptionContainer to subs and this(Observer) to SubscriptionContainer subs', () => {
-        observer.subscribe(dummySubscriptionContainer1);
-
-        expect(observer.subscribedTo.size).toBe(1);
-        expect(observer.subscribedTo.has(dummySubscriptionContainer1));
-        expect(dummySubscriptionContainer1.subscribers.size).toBe(1);
-        expect(
-          dummySubscriptionContainer1.subscribers.has(observer)
-        ).toBeTruthy();
-      });
-
-      it("shouldn't add same subscriptionContainer twice to subs", () => {
-        observer.subscribe(dummySubscriptionContainer1);
-
-        observer.subscribe(dummySubscriptionContainer1);
-
-        expect(observer.subscribedTo.size).toBe(1);
-        expect(observer.subscribedTo.has(dummySubscriptionContainer1));
-        expect(dummySubscriptionContainer1.subscribers.size).toBe(1);
-        expect(
-          dummySubscriptionContainer1.subscribers.has(observer)
-        ).toBeTruthy();
-      });
-    });
-
-    describe('unsubscribe function tests', () => {
-      let dummySubscriptionContainer1: SubscriptionContainer;
-      let dummySubscriptionContainer2: SubscriptionContainer;
-
-      beforeEach(() => {
-        dummySubscriptionContainer1 = new SubscriptionContainer();
-        dummySubscriptionContainer2 = new SubscriptionContainer();
-        observer.subscribe(dummySubscriptionContainer1);
-        observer.subscribe(dummySubscriptionContainer2);
-      });
-
-      it('should remove subscriptionContainer from subs and this(Observer) from SubscriptionContainer subs', () => {
-        observer.unsubscribe(dummySubscriptionContainer1);
-
-        expect(observer.subscribedTo.size).toBe(1);
-        expect(observer.subscribedTo.has(dummySubscriptionContainer1));
-        expect(dummySubscriptionContainer1.subscribers.size).toBe(0);
-        expect(dummySubscriptionContainer2.subscribers.size).toBe(1);
-        expect(
-          dummySubscriptionContainer2.subscribers.has(observer)
-        ).toBeTruthy();
       });
     });
   });

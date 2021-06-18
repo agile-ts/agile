@@ -8,7 +8,6 @@ import {
   DefaultItem,
   Computed,
   Integrations,
-  Observer,
   SubController,
   globalBind,
   Storages,
@@ -19,35 +18,62 @@ import {
   CreateLoggerConfigInterface,
   StateConfigInterface,
   flatMerge,
-  Group,
   LogCodeManager,
+  ComputedConfigInterface,
+  SubscribableAgileInstancesType,
 } from './internal';
 
 export class Agile {
   public config: AgileConfigInterface;
 
-  public runtime: Runtime; // Handles assigning Values to Agile Instances
-  public subController: SubController; // Handles subscriptions to Components
-  public storages: Storages; // Handles permanent saving
+  // Queues and executes incoming Observer-based Jobs
+  public runtime: Runtime;
+  // Manages and simplifies the subscription to UI-Components
+  public subController: SubController;
+  // Handles the permanent persistence of Agile Classes
+  public storages: Storages;
 
-  // Integrations
-  public integrations: Integrations; // Integrated frameworks
-  static initialIntegrations: Integration[] = []; // External added initial Integrations
+  // Integrations (UI-Frameworks) that are integrated into AgileTs
+  public integrations: Integrations;
+  // External added Integrations that are to integrate into AgileTs when it is instantiated
+  static initialIntegrations: Integration[] = [];
 
-  // Static Logger with default config -> will be overwritten by config of last created Agile Instance
+  // Static AgileTs Logger with the default config
+  // (-> is overwritten by the last created Agile Instance)
   static logger = new Logger({
     prefix: 'Agile',
     active: true,
     level: Logger.level.WARN,
   });
 
-  // Key used to bind AgileTs globally
+  // Identifier used to bind an Agile Instance globally
   static globalKey = '__agile__';
 
   /**
+   * The Agile Class is the main Instance of AgileTs
+   * and should be unique to your application.
+   *
+   * Simply put, the Agile Instance is the brain of AgileTs
+   * and manages all [Agile Sub Instance](https://agile-ts.org/docs/introduction/#agile-sub-instance)
+   * such as States.
+   *
+   * It should be noted that it doesn't store the States;
+   * It only manages them. Each State has an Instance of the Agile Class,
+   * for example, to ingest its changes into the Runtime.
+   * In summary, the main tasks of the Agile Class are to:
+   * - queue [Agile Sub Instance](https://agile-ts.org/docs/introduction/#agile-sub-instance)
+   *   changes in the Runtime to prevent race conditions
+   * - update/rerender subscribed UI-Components through the provided Integrations
+   *   such as the [React Integration](https://agile-ts.org/docs/react)
+   * - integrate with the persistent [Storage](https://agile-ts.org/docs/core/storage)
+   * - provide configuration object
+   *
+   * Each Agile Sub Instance requires an Agile Instance to be instantiated and function properly.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/)
+   *
    * @public
-   * Agile - Global state and logic framework for reactive Typescript & Javascript applications
-   * @param config - Config
+   * @param config - Configuration object
    */
   constructor(config: CreateAgileConfigInterface = {}) {
     config = defineConfig(config, {
@@ -73,39 +99,51 @@ export class Agile {
       localStorage: config.localStorage,
     });
 
-    // Assign customized config to Logger
+    // Assign customized Logger config to the static Logger
     Agile.logger = new Logger(config.logConfig);
 
-    // Logging
     LogCodeManager.log('10:00:00', [], this, Agile.logger);
 
-    // Create global instance of Agile
-    // Why? getAgileInstance() returns the global AgileInstance if it couldn't find the Agile Instance in the passed Instance
-    if (config.bindGlobal) {
+    // Create a global instance of the Agile Instance.
+    // Why? 'getAgileInstance()' returns the global Agile Instance
+    // if it couldn't find any Agile Instance in the specified Instance.
+    if (config.bindGlobal)
       if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
-    }
   }
 
-  //=========================================================================================================
-  // Storage
-  //=========================================================================================================
   /**
+   * Returns a newly created Storage.
+   *
+   * A Storage Class serves as an interface to external storages,
+   * such as the [Async Storage](https://github.com/react-native-async-storage/async-storage) or
+   * [Local Storage](https://www.w3schools.com/html/html5_webstorage.asp).
+   *
+   * It creates the foundation to easily [`persist()`](https://agile-ts.org/docs/core/state/methods#persist) [Agile Sub Instances](https://agile-ts.org/docs/introduction/#agile-sub-instance)
+   * (like States or Collections) in nearly any external storage.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstorage)
+   *
    * @public
-   * Storage - Handy Interface for storing Items permanently
-   * @param config - Config
+   * @param config - Configuration object
    */
   public createStorage(config: CreateStorageConfigInterface): Storage {
     return new Storage(config);
   }
 
-  //=========================================================================================================
-  // State
-  //=========================================================================================================
   /**
+   * Returns a newly created State.
+   *
+   * A State manages a piece of Information
+   * that we need to remember globally at a later point in time.
+   * While providing a toolkit to use and mutate this piece of Information.
+   *
+   * You can create as many global States as you need.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
+   *
    * @public
-   * State - Class that holds one Value and causes rerender on subscribed Components
-   * @param initialValue - Initial Value of the State
-   * @param config - Config
+   * @param initialValue - Initial value of the State.
+   * @param config - Configuration object
    */
   public createState<ValueType = any>(
     initialValue: ValueType,
@@ -114,13 +152,23 @@ export class Agile {
     return new State<ValueType>(this, initialValue, config);
   }
 
-  //=========================================================================================================
-  // Collection
-  //=========================================================================================================
   /**
+   * Returns a newly created Collection.
+   *
+   * A Collection manages a reactive set of Information
+   * that we need to remember globally at a later point in time.
+   * While providing a toolkit to use and mutate this set of Information.
+   *
+   * It is designed for arrays of data objects following the same pattern.
+   *
+   * Each of these data object must have a unique `primaryKey` to be correctly identified later.
+   *
+   * You can create as many global Collections as you need.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcollection)
+   *
    * @public
-   * Collection - Class that holds a List of Objects with key and causes rerender on subscribed Components
-   * @param config - Config
+   * @param config - Configuration object
    */
   public createCollection<DataType extends Object = DefaultItem>(
     config?: CollectionConfig<DataType>
@@ -128,77 +176,98 @@ export class Agile {
     return new Collection<DataType>(this, config);
   }
 
-  //=========================================================================================================
-  // Computed
-  //=========================================================================================================
   /**
+   * Returns a newly created Computed.
+   *
+   * A Computed is an extension of the State Class
+   * that computes its value based on a specified compute function.
+   *
+   * The computed value will be cached to avoid unnecessary recomputes
+   * and is only recomputed when one of its direct dependencies changes.
+   *
+   * Direct dependencies can be States and Collections.
+   * So when, for example, a dependent State value changes, the computed value is recomputed.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
+   *
    * @public
-   * Computed - Function that recomputes its value if a dependency changes
-   * @param computeFunction - Function for computing value
-   * @param config - Config
-   * @param deps - Hard coded dependencies of Computed Function
+   * @param computeFunction - Function to compute the computed value.
+   * @param config - Configuration object
    */
   public createComputed<ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
-    config?: StateConfigInterface,
-    deps?: Array<Observer | State | Event | Group>
+    config?: ComputedConfigInterface
   ): Computed<ComputedValueType>;
   /**
+   * Returns a newly created Computed.
+   *
+   * A Computed is an extension of the State Class
+   * that computes its value based on a specified compute function.
+   *
+   * The computed value will be cached to avoid unnecessary recomputes
+   * and is only recomputed when one of its direct dependencies changes.
+   *
+   * Direct dependencies can be States and Collections.
+   * So when, for example, a dependent State value changes, the computed value is recomputed.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcomputed)
+   *
    * @public
-   * Computed - Function that recomputes its value if a dependency changes
-   * @param computeFunction - Function for computing value
-   * @param deps - Hard coded dependencies of Computed Function
+   * @param computeFunction - Function to compute the computed value.
+   * @param deps - Hard-coded dependencies on which the Computed Class should depend.
    */
   public createComputed<ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
-    deps?: Array<Observer | State | Event>
+    deps?: Array<SubscribableAgileInstancesType>
   ): Computed<ComputedValueType>;
   public createComputed<ComputedValueType = any>(
     computeFunction: () => ComputedValueType,
-    configOrDeps?: StateConfigInterface | Array<Observer | State | Event>,
-    deps?: Array<Observer | State | Event>
+    configOrDeps?:
+      | ComputedConfigInterface
+      | Array<SubscribableAgileInstancesType>
   ): Computed<ComputedValueType> {
-    let _deps: Array<Observer | State | Event>;
-    let _config: StateConfigInterface;
+    let _config: ComputedConfigInterface = {};
 
     if (Array.isArray(configOrDeps)) {
-      _deps = configOrDeps;
-      _config = {};
+      _config = flatMerge(_config, {
+        computedDeps: configOrDeps,
+      });
     } else {
-      _config = configOrDeps || {};
-      _deps = deps || [];
+      if (configOrDeps) _config = configOrDeps;
     }
 
-    return new Computed<ComputedValueType>(
-      this,
-      computeFunction,
-      flatMerge(_config, {
-        computedDeps: _deps,
-      })
-    );
+    return new Computed<ComputedValueType>(this, computeFunction, _config);
   }
 
-  //=========================================================================================================
-  // Integrate
-  //=========================================================================================================
   /**
+   * Registers the specified Integration with AgileTs.
+   *
+   * After a successful registration,
+   * [Agile Sub Instances](https://agile-ts.org/docs/introduction/#agile-sub-instance) such as States
+   * can be bound to the Integration's UI-Components for reactivity.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#integrate)
+   *
    * @public
-   * Integrates framework into Agile
-   * @param integration - Integration that gets registered/integrated
+   * @param integration - Integration to be integrated/registered.
    */
   public integrate(integration: Integration) {
     this.integrations.integrate(integration);
     return this;
   }
 
-  //=========================================================================================================
-  // Register Storage
-  //=========================================================================================================
   /**
+   * Registers the specified Storage with AgileTs.
+   *
+   * After a successful registration,
+   * [Agile Sub Instances](https://agile-ts.org/docs/introduction/#agile-sub-instance) such as States
+   * can be persisted in the external Storage.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#registerstorage)
+   *
    * @public
-   * Registers new Storage as Agile Storage
-   * @param storage - new Storage
-   * @param config - Config
+   * @param storage - Storage to be registered.
+   * @param config - Configuration object
    */
   public registerStorage(
     storage: Storage,
@@ -208,45 +277,67 @@ export class Agile {
     return this;
   }
 
-  //=========================================================================================================
-  // Has Integration
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether any Integration
+   * has been registered with AgileTs or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#hasintegration)
+   *
    * @public
-   * Checks if Agile has any registered Integration
    */
   public hasIntegration(): boolean {
     return this.integrations.hasIntegration();
   }
 
-  //=========================================================================================================
-  // Has Storage
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether any Storage
+   * has been registered with AgileTs or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#hasstorage)
+   *
    * @public
-   * Checks if Agile has any registered Storage
    */
   public hasStorage(): boolean {
     return this.storages.hasStorage();
   }
 }
 
-/**
- * @param logJobs - Allow Agile Logs
- * @param waitForMount - If Agile should wait until the component mounts
- * @param storageConfig - To configure Agile Storage
- * @param bindGlobal - Binds Agile Instance Global
- */
 export interface CreateAgileConfigInterface {
+  /**
+   * Configures the logging behaviour of AgileTs.
+   * @default {
+      prefix: 'Agile',
+      active: true,
+      level: Logger.level.WARN,
+      canUseCustomStyles: true,
+      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
+    }
+   */
   logConfig?: CreateLoggerConfigInterface;
+  /**
+   * Whether the Subscription Container shouldn't be ready
+   * until the UI-Component it represents has been mounted.
+   * @default true
+   */
   waitForMount?: boolean;
+  /**
+   * Whether the Local Storage should be registered as a Agile Storage by default.
+   * @default true
+   */
   localStorage?: boolean;
+  /**
+   * Whether the Agile Instance should be globally bound (globalThis)
+   * and thus be globally available.
+   * @default false
+   */
   bindGlobal?: boolean;
 }
 
-/**
- * @param waitForMount - If Agile should wait until the component mounts
- */
 export interface AgileConfigInterface {
+  /**
+   * Whether the Subscription Container shouldn't be ready
+   * until the UI-Component it represents has been mounted.
+   * @default true
+   */
   waitForMount: boolean;
 }

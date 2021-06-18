@@ -394,7 +394,7 @@ export class MultiEditor<
   // Get Validator
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * Get Validator of Item based on validateMethods
    * @param key - Key/Name of Item
    */
@@ -429,7 +429,7 @@ export class MultiEditor<
   // Validate
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * Validates Editor and updates its 'isValid' property
    */
   public validate(): boolean {
@@ -451,7 +451,7 @@ export class MultiEditor<
   // Can Assign Status To Item On Change
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * If Status can be assigned on Change
    * @param item - Item to which the Status should get applied
    */
@@ -470,7 +470,7 @@ export class MultiEditor<
   // Can Assign Status To Item On Submit
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * If Status can be assigned on Submit
    * @param item - Item to which the Status should get applied
    */

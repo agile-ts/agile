@@ -12,7 +12,6 @@ import {
   isValidObject,
   PersistentKey,
   ComputedTracker,
-  StateRuntimeJobConfigInterface,
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
@@ -21,19 +20,32 @@ import {
 export class Group<DataType extends Object = DefaultItem> extends State<
   Array<ItemKey>
 > {
-  static rebuildGroupSideEffectKey = 'rebuildGroup';
-  collection: () => Collection<DataType>; // Collection the Group belongs to
+  // Collection the Group belongs to
+  collection: () => Collection<DataType>;
 
-  _output: Array<DataType> = []; // Output of Group
-  _items: Array<() => Item<DataType>> = []; // Items of Group
-  notFoundItemKeys: Array<ItemKey> = []; // Contains all keys of Group that can't be found in Collection
+  static rebuildGroupSideEffectKey = 'rebuildGroup';
+
+  // Item values represented by the Group
+  _output: Array<DataType> = [];
+  // Items represented by the Group
+  _items: Array<() => Item<DataType>> = [];
+
+  // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
+  notFoundItemKeys: Array<ItemKey> = [];
 
   /**
+   * An extension of the State Class that categorizes and preserves the ordering of structured data.
+   * It allows us to cluster together data from a Collection as an array of Item keys.
+   *
+   * Note that a Group doesn't store the actual Items. It only keeps track of the Item keys
+   * and retrieves the fitting Items when needed.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/)
+   *
    * @public
-   * Group - Holds Items of Collection
-   * @param collection - Collection to that the Group belongs
-   * @param initialItems - Initial Key of Items in this Group
-   * @param config - Config
+   * @param collection - Collection to which the Group belongs.
+   * @param initialItems - Key/Name identifiers of the Items to be clustered by the Group.
+   * @param config - Configuration object
    */
   constructor(
     collection: Collection<DataType>,
@@ -43,78 +55,79 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     super(collection.agileInstance(), initialItems || [], config);
     this.collection = () => collection;
 
-    // Add rebuild to sideEffects to rebuild Group on Value Change
+    // Add side effect to Group
+    // that rebuilds the Group whenever the Group value changes
     this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
 
-    // Initial Rebuild
+    // Initial rebuild
     this.rebuild();
   }
 
   /**
+   * Returns the values of the Items clustered by the Group.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#output)
+   *
    * @public
-   * Get Item Values of Group
    */
   public get output(): Array<DataType> {
     ComputedTracker.tracked(this.observer);
-    return this._output;
+    return copy(this._output);
   }
 
-  /**
-   * @public
-   * Set Item Values of Group
-   */
   public set output(value: DataType[]) {
-    this._output = value;
+    LogCodeManager.log('1C:03:00', [this._key]);
   }
 
   /**
+   * Returns the Items clustered by the Group.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#items)
+   *
    * @public
-   * Get Items of Group
    */
   public get items(): Array<Item<DataType>> {
     ComputedTracker.tracked(this.observer);
     return this._items.map((item) => item());
   }
 
-  /**
-   * @public
-   * Set Items of Group
-   */
   public set items(value: Array<Item<DataType>>) {
-    this._items = value.map((item) => () => item);
+    LogCodeManager.log('1C:03:01', [this._key]);
   }
 
-  //=========================================================================================================
-  // Has
-  //=========================================================================================================
   /**
+   * Returns a boolean indicating whether an Item with the specified `itemKey`
+   * is clustered in the Group or not.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods/#has)
+   *
    * @public
-   * Checks if Group contains ItemKey
-   * @param itemKey - ItemKey that gets checked
+   * @param itemKey - Key/Name identifier of the Item.
    */
   public has(itemKey: ItemKey) {
     return this.value.findIndex((key) => key === itemKey) !== -1;
   }
 
-  //=========================================================================================================
-  // Size
-  //=========================================================================================================
   /**
+   * Returns the count of Items clustered by the Group.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#size)
+   *
    * @public
-   * Get size of Group (-> How many Items it contains)
    */
   public get size(): number {
     return this.value.length;
   }
 
-  //=========================================================================================================
-  // Remove
-  //=========================================================================================================
   /**
+   * Removes an Item with the specified key/name identifier from the Group,
+   * if it exists in the Group.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#remove)
+   *
    * @public
-   * Removes ItemKey/s from Group
-   * @param itemKeys - ItemKey/s that get removed from Group
-   * @param config - Config
+   * @param itemKeys - Key/Name identifier/s of the Item/s to be removed.
+   * @param config - Configuration object
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
@@ -125,7 +138,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     const notExistingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
 
-    // Remove ItemKeys from Group
+    // Remove itemKeys from Group
     _itemKeys.forEach((itemKey) => {
       // Check if itemKey exists in Group
       if (!newGroupValue.includes(itemKey)) {
@@ -134,18 +147,19 @@ export class Group<DataType extends Object = DefaultItem> extends State<
         return;
       }
 
-      // Check if ItemKey exists in Collection
+      // Check if itemKey exists in Collection
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
-      // Remove ItemKey from Group
+      // Remove itemKey from Group
       newGroupValue = newGroupValue.filter((key) => key !== itemKey);
     });
 
-    // Return if passed ItemKeys doesn't exist
+    // Return if none of the specified itemKeys exists
     if (notExistingItemKeys.length >= _itemKeys.length) return this;
 
-    // If all removed ItemKeys doesn't exist in Collection -> no rerender necessary since output doesn't change
+    // If all removed itemKeys don't exist in the Collection
+    // -> no rerender necessary since the output won't change
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
@@ -154,14 +168,14 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     return this;
   }
 
-  //=========================================================================================================
-  // Add
-  //=========================================================================================================
   /**
+   * Appends new Item/s to the end of the Group.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#add)
+   *
    * @public
-   * Adds ItemKey/s to Group
-   * @param itemKeys - ItemKey/s that get added to the Group
-   * @param config - Config
+   * @param itemKeys - Key/Name identifier/s of Item/s to be added.
+   * @param config - Configuration object
    */
   public add(
     itemKeys: ItemKey | ItemKey[],
@@ -176,16 +190,15 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       overwrite: false,
     });
 
-    // Add ItemKeys to Group
+    // Add itemKeys to Group
     _itemKeys.forEach((itemKey) => {
-      const existsInGroup = newGroupValue.includes(itemKey);
-
-      // Check if ItemKey exists in Collection
+      // Check if itemKey exists in Collection
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
-      // Remove ItemKey from Group if it should get overwritten and already exists
-      if (existsInGroup) {
+      // Remove itemKey temporary from newGroupValue
+      // if it should be overwritten and already exists in the newGroupValue
+      if (newGroupValue.includes(itemKey)) {
         if (config.overwrite) {
           newGroupValue = newGroupValue.filter((key) => key !== itemKey);
         } else {
@@ -194,14 +207,15 @@ export class Group<DataType extends Object = DefaultItem> extends State<
         }
       }
 
-      // Add new ItemKey to Group
+      // Add new itemKey to Group
       newGroupValue[config.method || 'push'](itemKey);
     });
 
-    // Return if passed ItemKeys already exist
+    // Return if all specified itemKeys already exist
     if (existingItemKeys.length >= _itemKeys.length) return this;
 
-    // If all added ItemKeys doesn't exist in Collection or already exist -> no rerender necessary since output doesn't change
+    // If all added itemKeys don't exist in the Collection
+    // -> no rerender necessary since the output won't change
     if (
       notExistingItemKeysInCollection.concat(existingItemKeys).length >=
       _itemKeys.length
@@ -213,20 +227,20 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     return this;
   }
 
-  //=========================================================================================================
-  // Replace
-  //=========================================================================================================
   /**
+   * Replaces the old `itemKey` with a new specified `itemKey`.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#replace)
+   *
    * @public
-   * Replaces oldItemKey with newItemKey
-   * @param oldItemKey - Old ItemKey
-   * @param newItemKey - New ItemKey
-   * @param config - Config
+   * @param oldItemKey - Old `itemKey` to be replaced.
+   * @param newItemKey - New `itemKey` to replace the before specified old `itemKey`.
+   * @param config - Configuration object
    */
   public replace(
     oldItemKey: ItemKey,
     newItemKey: ItemKey,
-    config: StateRuntimeJobConfigInterface = {}
+    config: StateIngestConfigInterface = {}
   ): this {
     const newGroupValue = copy(this._value);
     newGroupValue.splice(newGroupValue.indexOf(oldItemKey), 1, newItemKey);
@@ -234,20 +248,29 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     return this;
   }
 
-  //=========================================================================================================
-  // Persist
-  //=========================================================================================================
   /**
+   * Preserves the Group `value` in the corresponding external Storage.
+   *
+   * The Group key/name is used as the unique identifier for the Persistent.
+   * If that is not desired or the Group has no unique identifier,
+   * please specify a separate unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
    * @public
-   * Stores Group Value into Agile Storage permanently
-   * @param config - Config
+   * @param config - Configuration object
    */
   public persist(config?: GroupPersistConfigInterface): this;
   /**
+   * Preserves the Group `value` in the corresponding external Storage.
+   *
+   * The specified key is used as the unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
    * @public
-   * Stores Group Value into Agile Storage permanently
-   * @param key - Key/Name of created Persistent (Note: Key required if Group has no set Key!)
-   * @param config - Config
+   * @param key - Key/Name identifier of Persistent.
+   * @param config - Configuration object
    */
   public persist(
     key?: PersistentKey,
@@ -270,12 +293,12 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
     _config = defineConfig(_config, {
       loadValue: true,
-      followCollectionPattern: false,
+      followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null,
     });
 
-    // Create storageItemKey based on Collection Name
+    // Create storageItemKey based on Collection key/name identifier
     if (_config.followCollectionPersistKeyPattern) {
       key = CollectionPersistent.getGroupStorageKey(
         key || this._key,
@@ -283,6 +306,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       );
     }
 
+    // Persist Group
     super.persist(key, {
       loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
@@ -292,30 +316,33 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     return this;
   }
 
-  //=========================================================================================================
-  // Rebuild
-  //=========================================================================================================
   /**
+   * Rebuilds the entire `output` and `items` property of the Group.
+   *
+   * In doing so, it traverses the Group `value` (Item identifiers)
+   * and fetches the fitting Items accordingly.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#rebuild)
+   *
    * @internal
-   * Rebuilds Output and Items of Group
    */
   public rebuild(): this {
-    const notFoundItemKeys: Array<ItemKey> = []; // Item Keys that couldn't be found in Collection
+    const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
     const groupItems: Array<Item<DataType>> = [];
 
-    // Don't rebuild Group if Collection is not properly instantiated
+    // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
-    // contains Items which are essential for a proper rebuild)
+    // contains the Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
 
-    // Create groupItems by finding Item at ItemKey in Collection
+    // Fetch Items from Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
       if (item != null) groupItems.push(item);
       else notFoundItemKeys.push(itemKey);
     });
 
-    // Create groupOutput out of groupItems
+    // Extract Item values from the retrieved Items
     const groupOutput = groupItems.map((item) => {
       return item.getPublicValue();
     });
@@ -329,7 +356,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       );
     }
 
-    this.items = groupItems;
+    this._items = groupItems.map((item) => () => item);
     this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
 
@@ -339,36 +366,43 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
 export type GroupKey = string | number;
 
-/**
- * @param method - Way of adding ItemKey to Group (push, unshift)
- * @param overwrite - If adding ItemKey overwrites old ItemKey (-> otherwise it gets added to the end of the Group)
- * @param background - If adding ItemKey happens in the background (-> not causing any rerender)
- */
 export interface GroupAddConfigInterface extends StateIngestConfigInterface {
+  /**
+   * In which way the `itemKey` should be added to the Group.
+   * - 'push' =  at the end
+   * - 'unshift' = at the beginning
+   * https://www.tutorialspoint.com/what-are-the-differences-between-unshift-and-push-methods-in-javascript
+   * @default 'push'
+   */
   method?: 'unshift' | 'push';
+  /**
+   * If the to add `itemKey` already exists,
+   * whether its position should be overwritten with the position of the new `itemKey`.
+   * @default false
+   */
   overwrite?: boolean;
 }
 
-/**
- * @param background - If removing ItemKey happens in the background (-> not causing any rerender)
- */
-export interface GroupRemoveConfigInterface {
-  background?: boolean;
-}
-
-/**
- * @param key - Key/Name of Group
- * @param isPlaceholder - If Group is initially a Placeholder
- */
 export interface GroupConfigInterface {
+  /**
+   * Key/Name identifier of the Group.
+   * @default undefined
+   */
   key?: GroupKey;
+  /**
+   * Whether the Group should be a placeholder
+   * and therefore should only exist in the background.
+   * @default false
+   */
   isPlaceholder?: boolean;
 }
 
-/**
- * @param useCollectionPattern - If Group storageKey follows the Collection Group StorageKey Pattern
- */
 export interface GroupPersistConfigInterface
   extends StatePersistentConfigInterface {
+  /**
+   * Whether to format the specified Storage key following the Collection Group Storage key pattern.
+   * `_${collectionKey}_group_${groupKey}`
+   * @default true
+   */
   followCollectionPersistKeyPattern?: boolean;
 }

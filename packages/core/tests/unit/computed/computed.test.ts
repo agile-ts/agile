@@ -232,9 +232,9 @@ describe('Computed Tests', () => {
         computed.hardCodedDeps = [dummyObserver3];
         computed.deps = [dummyObserver3]; // normally the hardCodedDeps get automatically added to the deps.. but this time we set the hardCodedProperty after the instantiation
 
-        dummyObserver1.depend = jest.fn();
-        dummyObserver2.depend = jest.fn();
-        dummyObserver3.depend = jest.fn();
+        dummyObserver1.addDependent = jest.fn();
+        dummyObserver2.addDependent = jest.fn();
+        dummyObserver3.addDependent = jest.fn();
         jest.spyOn(ComputedTracker, 'track').mockClear(); // mockClear because otherwise the static mock doesn't get reset after each 'it' test
         jest.spyOn(ComputedTracker, 'getTrackedObservers').mockClear();
       });
@@ -257,9 +257,15 @@ describe('Computed Tests', () => {
           dummyObserver1,
           dummyObserver2,
         ]);
-        expect(dummyObserver1.depend).toHaveBeenCalledWith(computed.observer);
-        expect(dummyObserver2.depend).toHaveBeenCalledWith(computed.observer);
-        expect(dummyObserver3.depend).toHaveBeenCalledWith(computed.observer);
+        expect(dummyObserver1.addDependent).toHaveBeenCalledWith(
+          computed.observer
+        );
+        expect(dummyObserver2.addDependent).toHaveBeenCalledWith(
+          computed.observer
+        );
+        expect(dummyObserver3.addDependent).toHaveBeenCalledWith(
+          computed.observer
+        );
       });
 
       it("should call computeFunction and shouldn't track dependencies the computeFunction depends on (autodetect false)", () => {
@@ -273,9 +279,9 @@ describe('Computed Tests', () => {
         expect(ComputedTracker.getTrackedObservers).not.toHaveBeenCalled();
         expect(computed.hardCodedDeps).toStrictEqual([dummyObserver3]);
         expect(computed.deps).toStrictEqual([dummyObserver3]);
-        expect(dummyObserver1.depend).not.toHaveBeenCalled();
-        expect(dummyObserver2.depend).not.toHaveBeenCalled();
-        expect(dummyObserver3.depend).not.toHaveBeenCalled();
+        expect(dummyObserver1.addDependent).not.toHaveBeenCalled();
+        expect(dummyObserver2.addDependent).not.toHaveBeenCalled();
+        expect(dummyObserver3.addDependent).not.toHaveBeenCalled();
       });
     });
 

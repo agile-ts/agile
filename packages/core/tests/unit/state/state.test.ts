@@ -404,24 +404,25 @@ describe('State Tests', () => {
       beforeEach(() => {
         objectState.ingest = jest.fn();
         numberState.ingest = jest.fn();
+        arrayState.ingest = jest.fn();
         jest.spyOn(Utils, 'flatMerge');
       });
 
-      it("shouldn't patch and ingest passed object based value into a not object based State (default config)", () => {
+      it("shouldn't patch specified object value into a not object based State (default config)", () => {
         numberState.patch({ changed: 'object' });
 
         LogMock.hasLoggedCode('14:03:02');
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
-      it("shouldn't patch and ingest passed not object based value into object based State (default config)", () => {
+      it("shouldn't patch specified non object value into a object based State (default config)", () => {
         objectState.patch('number' as any);
 
         LogMock.hasLoggedCode('00:03:01', ['TargetWithChanges', 'object']);
         expect(objectState.ingest).not.toHaveBeenCalled();
       });
 
-      it('should patch and ingest passed object based value into a object based State (default config)', () => {
+      it('should patch specified object value into a object based State (default config)', () => {
         objectState.patch({ name: 'frank' });
 
         expect(Utils.flatMerge).toHaveBeenCalledWith(
@@ -436,7 +437,7 @@ describe('State Tests', () => {
         expect(objectState.ingest).toHaveBeenCalledWith({});
       });
 
-      it('should patch and ingest passed object based value into a object based State (specific config)', () => {
+      it('should patch specified object value into a object based State (specific config)', () => {
         objectState.patch(
           { name: 'frank' },
           {
@@ -467,6 +468,30 @@ describe('State Tests', () => {
             enabled: false,
           },
         });
+      });
+
+      it('should patch specified array value into a array based State (default config)', () => {
+        arrayState.patch(['hi']);
+
+        expect(Utils.flatMerge).not.toHaveBeenCalled();
+        expect(arrayState.nextStateValue).toStrictEqual(['jeff', 'hi']);
+        expect(arrayState.ingest).toHaveBeenCalledWith({});
+      });
+
+      it('should patch specified array value into a object based State', () => {
+        objectState.patch(['hi'], { addNewProperties: true });
+
+        expect(Utils.flatMerge).toHaveBeenCalledWith(
+          { age: 10, name: 'jeff' },
+          ['hi'],
+          { addNewProperties: true }
+        );
+        expect(objectState.nextStateValue).toStrictEqual({
+          0: 'hi',
+          age: 10,
+          name: 'jeff',
+        });
+        expect(objectState.ingest).toHaveBeenCalledWith({});
       });
     });
 
@@ -506,17 +531,6 @@ describe('State Tests', () => {
         expect(response).toBe(numberState);
         expect(numberState.watchers).not.toHaveProperty('dummyKey');
         LogMock.hasLoggedCode('00:03:01', ['Watcher Callback', 'function']);
-      });
-
-      it("shouldn't add passed watcherFunction to watchers at passed key if passed key is already occupied", () => {
-        numberState.watchers['dummyKey'] = dummyCallbackFunction2;
-
-        const response = numberState.watch('dummyKey', dummyCallbackFunction1);
-
-        expect(response).toBe(numberState);
-        expect(numberState.watchers).toHaveProperty('dummyKey');
-        expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction2);
-        LogMock.hasLoggedCode('14:03:03', ['dummyKey']);
       });
     });
 
@@ -638,20 +652,17 @@ describe('State Tests', () => {
         });
       });
 
-      it('should overwrite existing Persistent', () => {
-        const oldPersistent = new StatePersistent(numberState);
-        numberState.persistent = oldPersistent;
+      it("shouldn't overwrite existing Persistent", () => {
+        const dummyPersistent = new StatePersistent(numberState);
+        numberState.persistent = dummyPersistent;
+        numberState.isPersisted = true;
+        jest.clearAllMocks();
 
         numberState.persist('newPersistentKey');
 
-        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
+        expect(numberState.persistent).toBe(dummyPersistent);
         // expect(numberState.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
-        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: true,
-          storageKeys: [],
-          key: 'newPersistentKey',
-          defaultStorageKey: null,
-        });
+        expect(StatePersistent).not.toHaveBeenCalled();
       });
     });
 
@@ -767,7 +778,7 @@ describe('State Tests', () => {
           3000
         );
         expect(numberState.currentInterval).toStrictEqual(currentInterval);
-        LogMock.hasLoggedCode('14:03:04', [], numberState.currentInterval);
+        LogMock.hasLoggedCode('14:03:03', [], numberState.currentInterval);
       });
 
       it("shouldn't set invalid interval callback function", () => {
@@ -807,16 +818,6 @@ describe('State Tests', () => {
 
         expect(clearInterval).not.toHaveBeenCalled();
         expect(numberState.currentInterval).toBeUndefined();
-      });
-    });
-
-    describe('copy function tests', () => {
-      it('should return a reference free copy of the current State Value', () => {
-        jest.spyOn(Utils, 'copy');
-        const value = numberState.copy();
-
-        expect(value).toBe(10);
-        expect(Utils.copy).toHaveBeenCalledWith(10);
       });
     });
 
@@ -912,22 +913,55 @@ describe('State Tests', () => {
     });
 
     describe('invert function tests', () => {
+      let dummyState: State;
+
       beforeEach(() => {
-        numberState.set = jest.fn();
-        booleanState.set = jest.fn();
+        dummyState = new State(dummyAgile, null);
+
+        dummyState.set = jest.fn();
       });
 
-      it('should invert current value of a boolean based State', () => {
-        booleanState.invert();
+      it('should invert value of the type boolean', () => {
+        dummyState.nextStateValue = false;
 
-        expect(booleanState.set).toHaveBeenCalledWith(true);
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith(true);
       });
 
-      it("shouldn't invert current value if not boolean based State and should print a error", () => {
-        numberState.invert();
+      it('should invert value of the type number', () => {
+        dummyState.nextStateValue = 10;
 
-        expect(numberState.set).not.toHaveBeenCalled();
-        LogMock.hasLoggedCode('14:03:05');
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith(-10);
+      });
+
+      it('should invert value of the type array', () => {
+        dummyState.nextStateValue = ['1', '2', '3'];
+
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith(['3', '2', '1']);
+      });
+
+      it('should invert value of the type string', () => {
+        dummyState.nextStateValue = 'jeff';
+
+        dummyState.invert();
+
+        expect(dummyState.set).toHaveBeenCalledWith('ffej');
+      });
+
+      it("shouldn't invert not invertible types like function, null, undefined, object", () => {
+        dummyState.nextStateValue = () => {
+          // empty
+        };
+
+        dummyState.invert();
+
+        expect(dummyState.set).not.toHaveBeenCalled();
+        LogMock.hasLoggedCode('14:03:04', ['function']);
       });
     });
 

@@ -1,31 +1,35 @@
 import { Agile, Integration, LogCodeManager } from '../internal';
 
 export class Integrations {
+  // Agile Instance the Integrations belongs to
   public agileInstance: () => Agile;
 
-  public integrations: Set<Integration> = new Set(); // All registered Integrations
+  // Registered Integrations
+  public integrations: Set<Integration> = new Set();
 
   /**
+   * The Integrations Class manages all Integrations for an Agile Instance
+   * and provides an interface to easily update
+   * and invoke functions in all registered Integrations.
+   *
    * @internal
-   * Integrations - Manages Integrations of Agile
-   * @param agileInstance - An Instance of Agile
+   * @param agileInstance - Instance of Agile the Integrations belongs to.
    */
   constructor(agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
 
-    // Integrate initial Integrations which are static and got set external
+    // Integrate initial Integrations which were statically set externally
     Agile.initialIntegrations.forEach((integration) =>
       this.integrate(integration)
     );
   }
 
-  //=========================================================================================================
-  // Integrate
-  //=========================================================================================================
   /**
-   * @internal
-   * Integrates Framework(Integration) into Agile
-   * @param integration - Integration/Framework that gets integrated
+   * Integrates the specified Integration into AgileTs
+   * and sets it to ready when the binding was successful.
+   *
+   * @public
+   * @param integration - Integration to be integrated into AgileTs.
    */
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
@@ -34,12 +38,12 @@ export class Integrations {
       return false;
     }
 
-    // Bind Framework to Agile
+    // Bind to integrate Integration to AgileTs
     if (integration.methods.bind)
       integration.ready = await integration.methods.bind(this.agileInstance());
     else integration.ready = true;
 
-    // Integrate Framework
+    // Integrate Integration
     this.integrations.add(integration);
     integration.integrated = true;
 
@@ -48,15 +52,16 @@ export class Integrations {
     return true;
   }
 
-  //=========================================================================================================
-  // Update
-  //=========================================================================================================
   /**
-   * @internal
-   * Updates registered and ready Integrations
-   * -> calls 'updateMethod' in all registered and ready Integrations
-   * @param componentInstance - Component that gets updated
-   * @param updatedData - Properties that differ from the last Value
+   * Updates the specified UI-Component Instance
+   * with the updated data object in all registered Integrations that are ready.
+   *
+   * In doing so, it calls the `updateMethod()` method
+   * in all registered Integrations with the specified parameters.
+   *
+   * @public
+   * @param componentInstance - Component Instance to be updated.
+   * @param updatedData - Data object with updated data.
    */
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
@@ -69,12 +74,11 @@ export class Integrations {
     });
   }
 
-  //=========================================================================================================
-  // Has Integration
-  //=========================================================================================================
   /**
-   * @internal
-   *  Check if at least one Integration got registered
+   * Returns a boolean indicating whether any Integration
+   * has been registered with the Agile Instance or not.
+   *
+   * @public
    */
   public hasIntegration(): boolean {
     return this.integrations.size > 0;

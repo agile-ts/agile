@@ -14,17 +14,24 @@ import {
   SideEffectInterface,
   createArrayFromObject,
   CreateStateRuntimeJobConfigInterface,
+  generateId,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
+  // State the Observer belongs to
   public state: () => State<ValueType>;
-  public nextStateValue: ValueType; // Next State value
+
+  // Next value applied to the State
+  public nextStateValue: ValueType;
 
   /**
+   * A State Observer manages the subscriptions to Subscription Containers (UI-Components)
+   * and dependencies to other Observers (Agile Classes)
+   * for a State Class.
+   *
    * @internal
-   * State Observer - Handles State changes, dependencies (-> Interface to Runtime)
-   * @param state - State
-   * @param config - Config
+   * @param state - Instance of State the Observer belongs to.
+   * @param config - Configuration object
    */
   constructor(
     state: State<ValueType>,
@@ -35,13 +42,16 @@ export class StateObserver<ValueType = any> extends Observer {
     this.nextStateValue = copy(state._value);
   }
 
-  //=========================================================================================================
-  // Ingest
-  //=========================================================================================================
   /**
+   * Passes the State Observer into the runtime wrapped into a Runtime-Job
+   * where it is executed accordingly.
+   *
+   * During the execution the runtime applies the `nextStateValue`
+   * or the `computedValue` (Computed Class) to the State,
+   * updates its dependents and re-renders the UI-Components it is subscribed to.
+   *
    * @internal
-   * Ingests nextStateValue or computedValue into Runtime and applies it to the State
-   * @param config - Config
+   * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): void {
     const state = this.state();
@@ -53,14 +63,16 @@ export class StateObserver<ValueType = any> extends Observer {
     this.ingestValue(newStateValue, config);
   }
 
-  //=========================================================================================================
-  // Ingest Value
-  //=========================================================================================================
   /**
+   * Passes the State Observer into the runtime wrapped into a Runtime-Job
+   * where it is executed accordingly.
+   *
+   * During the execution the runtime applies the specified `newStateValue` to the State,
+   * updates its dependents and re-renders the UI-Components it is subscribed to.
+   *
    * @internal
-   * Ingests new State Value into Runtime and applies it to the State
-   * @param newStateValue - New Value of the State
-   * @param config - Config
+   * @param newStateValue - New value to be applied to the State.
+   * @param config - Configuration object.
    */
   public ingestValue(
     newStateValue: ValueType,
@@ -79,53 +91,62 @@ export class StateObserver<ValueType = any> extends Observer {
       overwrite: false,
     });
 
-    // Force overwriting State because if assigning Value to State, the State shouldn't be a placeholder anymore
+    // Force overwriting the State value if it is a placeholder.
+    // After assigning a value to the State it shouldn't be a placeholder anymore.
     if (state.isPlaceholder) {
       config.force = true;
       config.overwrite = true;
     }
 
-    // Assign next State Value and compute it if necessary
+    // Assign next State value to Observer and compute it if necessary
     this.nextStateValue = state.computeValueMethod
       ? copy(state.computeValueMethod(newStateValue))
       : copy(newStateValue);
 
-    // Check if State Value and new/next Value are equals
+    // Check if current State value and to assign State value are equal
     if (equal(state._value, this.nextStateValue) && !config.force) return;
 
-    // Create Job
+    // Create Runtime-Job
     const job = new StateRuntimeJob(this, {
       storage: config.storage,
       sideEffects: config.sideEffects,
       force: config.force,
       background: config.background,
       overwrite: config.overwrite,
-      key: config.key || this._key,
+      key:
+        config.key ??
+        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
     });
 
+    // Pass created Job into the Runtime
     this.agileInstance().runtime.ingest(job, {
       perform: config.perform,
     });
   }
 
-  //=========================================================================================================
-  // Perform
-  //=========================================================================================================
   /**
+   * Method executed by the Runtime to perform the Runtime-Job,
+   * previously ingested via the `ingest()` or `ingestValue()` method.
+   *
+   * Thereby the previously defined `nextStateValue` is assigned to the State.
+   * Also side effects (like calling watcher callbacks) of a State change are executed.
+   *
    * @internal
-   * Performs Job that holds this Observer
-   * @param job - Job
+   * @param job - Runtime-Job to be performed.
    */
   public perform(job: StateRuntimeJob) {
     const state = job.observer.state();
-    const previousValue = copy(state.getPublicValue());
 
-    // Assign new State Values
+    // Assign new State values
     state.previousStateValue = copy(state._value);
     state._value = copy(job.observer.nextStateValue);
     state.nextStateValue = copy(job.observer.nextStateValue);
 
-    // Overwrite old State Values
+    // TODO think about freezing the State value..
+    // https://www.geeksforgeeks.org/object-freeze-javascript/#:~:text=Object.freeze()%20Method&text=freeze()%20which%20is%20used,the%20prototype%20of%20the%20object.
+    // if (typeof state._value === 'object') Object.freeze(state._value);
+
+    // Overwrite entire State with the newly assigned value
     if (job.config.overwrite) {
       state.initialStateValue = copy(state._value);
       state.previousStateValue = copy(state._value);
@@ -133,35 +154,37 @@ export class StateObserver<ValueType = any> extends Observer {
     }
 
     state.isSet = notEqual(state._value, state.initialStateValue);
-
-    // Execute sideEffects like 'rebuildGroup' or 'rebuildStateStorageValue'
     this.sideEffects(job);
 
-    // Assign Public Value to Observer after sideEffects like 'rebuildGroup',
-    // because sometimes (for instance in a Group State) the publicValue() is not the .value (nextStateValue) property.
-    // The Observer value is at some point the public Value because Integrations like React are using it as return value.
-    // For example 'useAgile()' returns the Observer.value and not the State.value.
+    // Assign public value to the Observer after sideEffects like 'rebuildGroup' were executed.
+    // Because sometimes (for instance in a Group State) the 'publicValue()'
+    // is not the '.value' ('nextStateValue') property.
+    // The Observer value is at some point the public value
+    // since Integrations like React are using it as the return value.
+    // (For example 'useAgile()' returns 'Observer.value' and not 'State.value'.)
+    job.observer.previousValue = copy(job.observer.value);
     job.observer.value = copy(state.getPublicValue());
-    job.observer.previousValue = previousValue;
   }
 
-  //=========================================================================================================
-  // Side Effect
-  //=========================================================================================================
   /**
+   * Performs the side effects of applying the next State value to the State.
+   *
+   * Side effects are, for example, calling the watcher callbacks
+   * or executing the side effects defined in the State Class
+   * like 'rebuildGroup' or 'rebuildStateStorageValue'.
+   *
    * @internal
-   * SideEffects of Job
-   * @param job - Job
+   * @param job - Job that is currently performed.
    */
   public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
 
-    // Call Watchers Functions
+    // Call watcher functions
     for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
         state.watchers[watcherKey](state.getPublicValue(), watcherKey);
 
-    // Call SideEffect Functions
+    // Call side effect functions
     if (job.config?.sideEffects?.enabled) {
       const sideEffectArray = createArrayFromObject<
         SideEffectInterface<State<ValueType>>
@@ -169,6 +192,7 @@ export class StateObserver<ValueType = any> extends Observer {
       sideEffectArray.sort(function (a, b) {
         return b.instance.weight - a.instance.weight;
       });
+
       for (const sideEffect of sideEffectArray) {
         if (isFunction(sideEffect.instance.callback)) {
           if (!job.config.sideEffects.exclude?.includes(sideEffect.key))
@@ -179,14 +203,21 @@ export class StateObserver<ValueType = any> extends Observer {
   }
 }
 
-/**
- * @param dependents - Initial Dependents of State Observer
- * @param subs - Initial Subscriptions of State Observer
- * @param key - Key/Name of State Observer
- */
 export interface CreateStateObserverConfigInterface {
+  /**
+   * Initial Observers to depend on the State Observer.
+   * @default []
+   */
   dependents?: Array<Observer>;
+  /**
+   * Initial Subscription Containers the State Observer is subscribed to.
+   * @default []
+   */
   subs?: Array<SubscriptionContainer>;
+  /**
+   * Key/Name identifier of the State Observer.
+   * @default undefined
+   */
   key?: ObserverKey;
 }
 

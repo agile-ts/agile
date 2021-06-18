@@ -240,26 +240,28 @@ describe('Agile Tests', () => {
       });
 
       it('should create Computed', () => {
-        const computed = agile.createComputed(computedFunction, []);
+        const computed = agile.createComputed(computedFunction, [
+          'dummyDep' as any,
+        ]);
 
         expect(computed).toBeInstanceOf(Computed);
         expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
-          computedDeps: [],
+          computedDeps: ['dummyDep' as any],
         });
       });
 
       it('should create Computed with config', () => {
-        const computed = agile.createComputed(
-          computedFunction,
-          { key: 'jeff', isPlaceholder: false },
-          []
-        );
+        const computed = agile.createComputed(computedFunction, {
+          key: 'jeff',
+          isPlaceholder: false,
+          computedDeps: ['dummyDep' as any],
+        });
 
         expect(computed).toBeInstanceOf(Computed);
         expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
           key: 'jeff',
           isPlaceholder: false,
-          computedDeps: [],
+          computedDeps: ['dummyDep' as any],
         });
       });
     });

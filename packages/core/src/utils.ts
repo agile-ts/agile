@@ -7,18 +7,17 @@ import {
   LogCodeManager,
 } from './internal';
 
-//=========================================================================================================
-// Get Agile Instance
-//=========================================================================================================
 /**
+ * Extracts an Instance of Agile from the specified Instance.
+ * When no valid Agile Instance was found,
+ * it returns the global bound Agile Instance or `undefined`.
+ *
  * @internal
- * Tries to get an Instance of Agile from provided Instance
- * If no agileInstance found it returns the global bound Agile Instance
- * @param instance - Instance that might hold an Agile Instance
+ * @param instance - Instance to extract the Agile Instance from.
  */
 export function getAgileInstance(instance: any): Agile | undefined {
   try {
-    // Try to get agileInstance from passed Instance
+    // Try to get Agile Instance from specified Instance
     if (instance) {
       const _agileInstance = isFunction(instance['agileInstance'])
         ? instance['agileInstance']()
@@ -26,7 +25,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
       if (_agileInstance) return _agileInstance;
     }
 
-    // Return global bound agileInstance
+    // Return global bound Agile Instance
     return globalThis[Agile.globalKey];
   } catch (e) {
     LogCodeManager.log('20:03:00', [], instance);
@@ -35,13 +34,11 @@ export function getAgileInstance(instance: any): Agile | undefined {
   return undefined;
 }
 
-//=========================================================================================================
-// Extract Observers
-//=========================================================================================================
 /**
- * @private
- * Extract Observers from specific Instances
- * @param instances - Instances that will be formatted
+ * Extracts the Observers from the specified Instances.
+ *
+ * @internal
+ * @param instances - Instances to extract the Observers from.
  */
 export function extractObservers(instances: any): Array<Observer | undefined> {
   const instancesArray: Array<Observer | undefined> = [];
@@ -51,13 +48,16 @@ export function extractObservers(instances: any): Array<Observer | undefined> {
 
   // Get Observers from Instances
   for (const instance of tempInstancesArray) {
-    // If Instance is undefined (We have to add undefined to build a proper return value in for instance 'useAgile' later)
-    if (!instance) {
+    // If the Instance equals to 'undefined'
+    // (We have to add 'undefined' to the return value
+    // in order to properly build the return value of,
+    // for example, the 'useAgile()' hook later)
+    if (instance == null) {
       instancesArray.push(undefined);
       continue;
     }
 
-    // If Instance is Collection
+    // If the Instance equals to a Collection
     if (instance instanceof Collection) {
       instancesArray.push(
         instance.getGroupWithReference(instance.config.defaultGroupKey).observer
@@ -65,36 +65,40 @@ export function extractObservers(instances: any): Array<Observer | undefined> {
       continue;
     }
 
-    // If Instance has property that is an Observer
+    // If the Instance contains a property that is an Observer
     if (instance['observer'] && instance['observer'] instanceof Observer) {
       instancesArray.push(instance['observer']);
       continue;
     }
 
-    // If Instance is Observer
+    // If the Instance equals to an Observer
     if (instance instanceof Observer) {
       instancesArray.push(instance);
       continue;
     }
 
-    // Push undefined if no Observer could be found (We have to add undefined to build a proper return value in for instance 'useAgile' later)
+    // Push 'undefined' if no valid Observer was found
+    // (We have to add 'undefined' to the return value
+    // in order to properly build the return value of,
+    // for example, the 'useAgile()' hook later)
     instancesArray.push(undefined);
   }
 
   return instancesArray;
 }
 
-//=========================================================================================================
-// Global Bind
-//=========================================================================================================
 /**
- * @internal
- * Binds passed Instance globally at passed Key
+ * Binds the specified Instance globally at the provided key identifier.
+ *
+ * Learn more about global bound instances:
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
  * https://blog.logrocket.com/what-is-globalthis-why-use-it/
- * @param key - Key/Name of Instance
- * @param instance - Instance
- * @param overwrite - If already existing instance at passed Key gets overwritten
+ *
+ * @public
+ * @param key - Key/Name identifier of the specified Instance.
+ * @param instance - Instance to be bound globally.
+ * @param overwrite - When already an Instance exists globally at the specified key,
+ * whether to overwrite it with the new Instance.
  */
 export function globalBind(
   key: string,
@@ -106,7 +110,6 @@ export function globalBind(
       globalThis[key] = instance;
       return true;
     }
-
     if (globalThis[key] == null) {
       globalThis[key] = instance;
       return true;

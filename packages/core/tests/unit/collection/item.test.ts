@@ -1,16 +1,28 @@
-import { Item, Collection, Agile, StateObserver, State } from '../../../src';
+import {
+  Item,
+  Collection,
+  Agile,
+  StateObserver,
+  State,
+  CollectionPersistent,
+} from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
 describe('Item Tests', () => {
+  interface ItemInterface {
+    id: string;
+    name: string;
+  }
+
   let dummyAgile: Agile;
-  let dummyCollection: Collection;
+  let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
-    dummyCollection = new Collection(dummyAgile);
+    dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
   });
@@ -89,8 +101,44 @@ describe('Item Tests', () => {
     expect(item.selectedBy.size).toBe(0);
   });
 
+  it("should create Item and shouldn't add rebuild Group side effect to it if no itemKey was provided (default config)", () => {
+    // Overwrite addRebuildGroupThatIncludeItemKeySideEffect once to not call it
+    jest
+      .spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect')
+      .mockReturnValueOnce(undefined);
+
+    const dummyData = { name: 'dummyName' };
+    const item = new Item(dummyCollection, dummyData as any);
+
+    expect(item.collection()).toBe(dummyCollection);
+    expect(
+      item.addRebuildGroupThatIncludeItemKeySideEffect
+    ).not.toHaveBeenCalled();
+
+    expect(item._key).toBeUndefined();
+    expect(item.valueType).toBeUndefined();
+    expect(item.isSet).toBeFalsy();
+    expect(item.isPlaceholder).toBeFalsy();
+    expect(item.initialStateValue).toStrictEqual(dummyData);
+    expect(item._value).toStrictEqual(dummyData);
+    expect(item.previousStateValue).toStrictEqual(dummyData);
+    expect(item.nextStateValue).toStrictEqual(dummyData);
+    expect(item.observer).toBeInstanceOf(StateObserver);
+    expect(item.observer.dependents.size).toBe(0);
+    expect(item.observer._key).toBe(
+      dummyData[dummyCollection.config.primaryKey]
+    );
+    expect(item.sideEffects).toStrictEqual({});
+    expect(item.computeValueMethod).toBeUndefined();
+    expect(item.computeExistsMethod).toBeInstanceOf(Function);
+    expect(item.isPersisted).toBeFalsy();
+    expect(item.persistent).toBeUndefined();
+    expect(item.watchers).toStrictEqual({});
+    expect(item.selectedBy.size).toBe(0);
+  });
+
   describe('Item Function Tests', () => {
-    let item: Item;
+    let item: Item<ItemInterface>;
 
     beforeEach(() => {
       item = new Item(dummyCollection, { id: 'dummyId', name: 'dummyName' });
@@ -160,6 +208,104 @@ describe('Item Tests', () => {
             overwrite: false,
           }
         );
+      });
+    });
+
+    describe('persist function tests', () => {
+      beforeEach(() => {
+        jest.spyOn(State.prototype, 'persist');
+      });
+
+      it('should persist Item with formatted itemKey (default config)', () => {
+        item.persist();
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            item._key,
+            dummyCollection._key
+          ),
+          {
+            loadValue: true,
+            storageKeys: [],
+            defaultStorageKey: null,
+          }
+        );
+      });
+
+      it('should persist Item with formatted itemKey (specific config)', () => {
+        item.persist({
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            item._key,
+            dummyCollection._key
+          ),
+          {
+            loadValue: false,
+            storageKeys: ['test1', 'test2'],
+            defaultStorageKey: 'test1',
+          }
+        );
+      });
+
+      it('should persist Item with formatted specified key (default config)', () => {
+        item.persist('dummyKey');
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            'dummyKey',
+            dummyCollection._key
+          ),
+          {
+            loadValue: true,
+            storageKeys: [],
+            defaultStorageKey: null,
+          }
+        );
+      });
+
+      it('should persist Item with formatted specified key (specific config)', () => {
+        item.persist('dummyKey', {
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getItemStorageKey(
+            'dummyKey',
+            dummyCollection._key
+          ),
+          {
+            loadValue: false,
+            storageKeys: ['test1', 'test2'],
+            defaultStorageKey: 'test1',
+          }
+        );
+      });
+
+      it('should persist Item with itemKey (config.followCollectionPersistKeyPattern = false)', () => {
+        item.persist({ followCollectionPersistKeyPattern: false });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(item._key, {
+          loadValue: true,
+          storageKeys: [],
+          defaultStorageKey: null,
+        });
+      });
+
+      it('should persist Item with specified key (config.followCollectionPersistKeyPattern = false)', () => {
+        item.persist('dummyKey', { followCollectionPersistKeyPattern: false });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
+          loadValue: true,
+          storageKeys: [],
+          defaultStorageKey: null,
+        });
       });
     });
 

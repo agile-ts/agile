@@ -74,7 +74,7 @@ export function AgileHOC(
 // Create HOC
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Creates Higher Order Component based on passed React Component that binds the deps to it
  * @param ReactComponent - React Component
  * @param agileInstance - Instance of Agile
@@ -109,16 +109,14 @@ const createHOC = (
     UNSAFE_componentWillMount() {
       // Create Subscription with Observer that have no Indicator and can't be merged into 'this.state' (Rerender will be caused via force Update)
       if (depsWithoutIndicator.length > 0) {
-        this.agileInstance.subController.subscribeWithSubsArray(
-          this,
-          depsWithoutIndicator,
-          { waitForMount: this.waitForMount }
-        );
+        this.agileInstance.subController.subscribe(this, depsWithoutIndicator, {
+          waitForMount: this.waitForMount,
+        });
       }
 
       // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.state')
       if (depsWithIndicator) {
-        const response = this.agileInstance.subController.subscribeWithSubsObject(
+        const response = this.agileInstance.subController.subscribe(
           this,
           depsWithIndicator,
           { waitForMount: this.waitForMount }
@@ -151,7 +149,7 @@ const createHOC = (
 // Format Deps With No Safe Indicator
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from dependencies which might not have an indicator.
  * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
  * @param deps - Dependencies to be formatted
@@ -187,7 +185,7 @@ const formatDepsWithNoSafeIndicator = (
 // Format Deps With Indicator
 //=========================================================================================================
 /**
- * @private
+ * @internal
  * Extract Observers from dependencies which have an indicator through the object property key.
  * @param deps - Dependencies to be formatted
  */
