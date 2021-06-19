@@ -255,6 +255,7 @@ describe('Agile Tests', () => {
           key: 'jeff',
           isPlaceholder: false,
           computedDeps: ['dummyDep' as any],
+          autodetect: true,
         });
 
         expect(computed).toBeInstanceOf(Computed);
@@ -262,6 +263,7 @@ describe('Agile Tests', () => {
           key: 'jeff',
           isPlaceholder: false,
           computedDeps: ['dummyDep' as any],
+          autodetect: true,
         });
       });
     });

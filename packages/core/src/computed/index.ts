@@ -10,14 +10,12 @@ import {
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
+  isAsyncFunction,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
   ComputedValueType
 > {
-  // Agile Instance the Computed belongs to
-  public agileInstance: () => Agile;
-
   public config: ComputedConfigInterface;
 
   // Function to compute the Computed Class value
@@ -55,7 +53,7 @@ export class Computed<ComputedValueType = any> extends State<
     });
     config = defineConfig(config, {
       computedDeps: [],
-      autodetect: true,
+      autodetect: !isAsyncFunction(computeFunction),
     });
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
@@ -69,12 +67,13 @@ export class Computed<ComputedValueType = any> extends State<
     );
     this.deps = new Set(this.hardCodedDeps);
 
-    // Make this Observer depend on the hard coded dep Observers
+    // Make this Observer depend on the specified hard coded dep Observers
     this.deps.forEach((observer) => {
       observer.addDependent(this.observer);
     });
 
-    // Initial recompute to assign initial value and autodetect missing dependencies
+    // Initial recompute to assign the computed initial value to the Computed
+    // and autodetect missing dependencies
     this.recompute({ autodetect: config.autodetect, overwrite: true });
   }
 
@@ -143,7 +142,8 @@ export class Computed<ComputedValueType = any> extends State<
     // Update computeFunction
     this.computeFunction = computeFunction;
 
-    // Recompute to assign new computed value and autodetect missing dependencies
+    // Recompute to assign the new computed value to the Computed
+    // and autodetect missing dependencies
     this.recompute(removeProperties(config, ['overwriteDeps']));
 
     return this;
@@ -178,6 +178,7 @@ export class Computed<ComputedValueType = any> extends State<
           !foundDeps.includes(observer) &&
           !this.hardCodedDeps.includes(observer)
         ) {
+          this.deps.delete(observer);
           observer.removeDependent(this.observer);
         }
       });
@@ -197,24 +198,8 @@ export class Computed<ComputedValueType = any> extends State<
   /**
    * Not usable in Computed Class.
    */
-  public patch() {
-    LogCodeManager.log('19:03:00');
-    return this;
-  }
-
-  /**
-   * Not usable in Computed Class.
-   */
   public persist(): this {
-    LogCodeManager.log('19:03:01');
-    return this;
-  }
-
-  /**
-   * Not usable in Computed Class.
-   */
-  public invert(): this {
-    LogCodeManager.log('19:03:02');
+    LogCodeManager.log('19:03:00');
     return this;
   }
 }
@@ -225,14 +210,18 @@ export type ComputeFunctionType<ComputedValueType = any> = () =>
 
 export interface CreateComputedConfigInterface extends StateConfigInterface {
   /**
-   * Hard-coded dependencies on which the Computed Class should depend.
+   * Hard-coded dependencies the Computed Class should depend on.
    * @default []
    */
   computedDeps?: Array<SubscribableAgileInstancesType>;
   /**
-   * Whether the Computed can automatically detect
-   * used dependencies in the compute method.
-   * @default true
+   * Whether the Computed should automatically detect
+   * used dependencies in the specified compute method.
+   *
+   * Note that the automatic dependency detection does not work
+   * in an asynchronous compute method!
+   *
+   * @default true if the compute method isn't asynchronous, otherwise false
    */
   autodetect?: boolean;
 }
@@ -242,10 +231,10 @@ export interface ComputedConfigInterface {
    * Whether the Computed can automatically detect
    * used dependencies in the compute method.
    *
-   * Note that automatic dependency tracking does not work
-   * in an asynchronous calculation method!
+   * Note that the automatic dependency detection does not work
+   * in an asynchronous compute method!
    *
-   * @default true when compute method isn't async otherwise false
+   * @default true if the compute method isn't asynchronous, otherwise false
    */
   autodetect: boolean;
 }
@@ -255,8 +244,8 @@ export interface ComputeConfigInterface {
    * Whether the Computed can automatically detect
    * used dependencies in the compute method.
    *
-   * Note that automatic dependency tracking does not work
-   * in an asynchronous calculation method!
+   * Note that the automatic dependency detection does not work
+   * in an asynchronous compute method!
    *
    * @default true
    */

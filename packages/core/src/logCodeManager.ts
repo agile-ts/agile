@@ -103,15 +103,9 @@ const logCodeMessages = {
 
   // Computed
   '19:03:00':
-    "The 'patch()' method can't be used in the Computed Class! " +
-    "The Computed Class has a dynamic value which shouldn't be changed manually.",
-  '19:03:01':
     "The 'persist()' method can't be used in the Computed Class! " +
     "The Computed Class has a dynamic value which shouldn't be persisted. " +
     'Consider persisting the values the Computed depends on.',
-  '19:03:02':
-    "The 'invert()' method can't be used in the Computed Class! " +
-    "The Computed Class has a dynamic value which shouldn't be changed manually.",
 
   // Collection Persistent
   '1A:02:00': 'Failed to build unique Item StorageKey!',
