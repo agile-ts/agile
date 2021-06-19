@@ -10,7 +10,6 @@ import {
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
-  isAsyncFunction,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -24,7 +23,7 @@ export class Computed<ComputedValueType = any> extends State<
   // Function to compute the Computed Class value
   public computeFunction: ComputeFunctionType<ComputedValueType>;
   // All dependencies the Computed Class depends on (including hardCoded and automatically detected dependencies)
-  public deps: Array<Observer> = [];
+  public deps: Set<Observer> = new Set();
   // Only hardCoded dependencies the Computed Class depends on
   public hardCodedDeps: Array<Observer> = [];
 
@@ -69,7 +68,12 @@ export class Computed<ComputedValueType = any> extends State<
     this.hardCodedDeps = extractObservers(config.computedDeps).filter(
       (dep): dep is Observer => dep !== undefined
     );
-    this.deps = this.hardCodedDeps;
+    this.deps = new Set(this.hardCodedDeps);
+
+    // Make this Observer depend on the hard coded dep Observers
+    this.deps.forEach((observer) => {
+      observer.addDependent(this.observer);
+    });
 
     // Initial recompute to assign initial value and autodetect missing dependencies
     this.recompute({ autodetect: config.autodetect, overwrite: true });
@@ -115,20 +119,27 @@ export class Computed<ComputedValueType = any> extends State<
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
     deps: Array<SubscribableAgileInstancesType> = [],
-    config: UpdateComputeFunctionConfigInterface = {}
+    config: RecomputeConfigInterface = {}
   ): this {
     config = defineConfig(config, {
-      overwriteDeps: true,
       autodetect: this.config.autodetect,
     });
 
+    // Make this Observer no longer depend on the old dep Observers
+    this.deps.forEach((observer) => {
+      observer.removeDependent(this.observer);
+    });
+
     // Update dependencies of Computed
-    const newDeps = extractObservers(deps).filter(
+    this.hardCodedDeps = extractObservers(deps).filter(
       (dep): dep is Observer => dep !== undefined
     );
-    if (config.overwriteDeps) this.hardCodedDeps = newDeps;
-    else this.hardCodedDeps = this.hardCodedDeps.concat(newDeps);
-    this.deps = this.hardCodedDeps;
+    this.deps = new Set(this.hardCodedDeps);
+
+    // Make this Observer depend on the new hard coded dep Observers
+    this.deps.forEach((observer) => {
+      observer.addDependent(this.observer);
+    });
 
     // Update computeFunction
     this.computeFunction = computeFunction;
@@ -161,15 +172,24 @@ export class Computed<ComputedValueType = any> extends State<
     // Handle auto tracked Observers
     if (config.autodetect) {
       const foundDeps = ComputedTracker.getTrackedObservers();
-      const newDeps: Array<Observer> = [];
-      this.hardCodedDeps.concat(foundDeps).forEach((observer) => {
-        newDeps.push(observer);
 
-        // Make this Observer depend on the found dep Observers
-        observer.addDependent(this.observer);
+      // Clean up old dependencies
+      this.deps.forEach((observer) => {
+        if (
+          !foundDeps.includes(observer) &&
+          !this.hardCodedDeps.includes(observer)
+        ) {
+          observer.removeDependent(this.observer);
+        }
       });
 
-      this.deps = newDeps;
+      // Make this Observer depend on the newly found dep Observers
+      foundDeps.forEach((observer) => {
+        if (!this.deps.has(observer)) {
+          this.deps.add(observer);
+          observer.addDependent(this.observer);
+        }
+      });
     }
 
     return computedValue;
@@ -222,6 +242,10 @@ export interface ComputedConfigInterface {
   /**
    * Whether the Computed can automatically detect
    * used dependencies in the compute method.
+   *
+   * Note that automatic dependency tracking does not work
+   * in an asynchronous calculation method!
+   *
    * @default true when compute method isn't async otherwise false
    */
   autodetect: boolean;
@@ -229,20 +253,15 @@ export interface ComputedConfigInterface {
 
 export interface ComputeConfigInterface {
   /**
-   * Whether to automatically detect used dependencies in the compute method.
+   * Whether the Computed can automatically detect
+   * used dependencies in the compute method.
+   *
+   * Note that automatic dependency tracking does not work
+   * in an asynchronous calculation method!
+   *
    * @default true
    */
   autodetect?: boolean;
-}
-
-export interface UpdateComputeFunctionConfigInterface
-  extends RecomputeConfigInterface {
-  /**
-   * Whether to overwrite the old hard-coded dependencies with the new ones
-   * or merge them into the new ones.
-   * @default false
-   */
-  overwriteDeps?: boolean;
 }
 
 export interface RecomputeConfigInterface

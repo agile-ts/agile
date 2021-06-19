@@ -160,6 +160,16 @@ export class Observer<ValueType = any> {
   public addDependent(observer: Observer): void {
     if (!this.dependents.has(observer)) this.dependents.add(observer);
   }
+
+  /**
+   * Makes the specified Observer no longer depend on the Observer.
+   *
+   * @public
+   * @param observer - Observer to no longer depend on the Observer.
+   */
+  public removeDependent(observer: Observer): void {
+    if (!this.dependents.has(observer)) this.dependents.delete(observer);
+  }
 }
 
 export interface CreateObserverConfigInterface<ValueType = any> {
