@@ -10,6 +10,7 @@ import {
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
+  isAsyncFunction,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -18,8 +19,10 @@ export class Computed<ComputedValueType = any> extends State<
   // Agile Instance the Computed belongs to
   public agileInstance: () => Agile;
 
+  public config: ComputedConfigInterface;
+
   // Function to compute the Computed Class value
-  public computeFunction: () => ComputedValueType;
+  public computeFunction: ComputeFunctionType<ComputedValueType>;
   // All dependencies the Computed Class depends on (including hardCoded and automatically detected dependencies)
   public deps: Array<Observer> = [];
   // Only hardCoded dependencies the Computed Class depends on
@@ -44,18 +47,23 @@ export class Computed<ComputedValueType = any> extends State<
    */
   constructor(
     agileInstance: Agile,
-    computeFunction: () => ComputedValueType,
-    config: ComputedConfigInterface = {}
+    computeFunction: ComputeFunctionType<ComputedValueType>,
+    config: CreateComputedConfigInterface = {}
   ) {
-    super(agileInstance, computeFunction(), {
+    super(agileInstance, null as any, {
       key: config.key,
       dependents: config.dependents,
     });
     config = defineConfig(config, {
       computedDeps: [],
+      autodetect: true,
     });
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
+    this.observer.async = true; // isAsyncFunction(computeFunction); // Not reliable enough
+    this.config = {
+      autodetect: config.autodetect as any,
+    };
 
     // Extract Observer of passed hardcoded dependency instances
     this.hardCodedDeps = extractObservers(config.computedDeps).filter(
@@ -64,7 +72,7 @@ export class Computed<ComputedValueType = any> extends State<
     this.deps = this.hardCodedDeps;
 
     // Initial recompute to assign initial value and autodetect missing dependencies
-    this.recompute({ autodetect: true });
+    this.recompute({ autodetect: config.autodetect, overwrite: true });
   }
 
   /**
@@ -79,10 +87,12 @@ export class Computed<ComputedValueType = any> extends State<
     config = defineConfig(config, {
       autodetect: false,
     });
-    this.observer.ingestValue(
-      this.compute({ autodetect: config.autodetect }),
-      removeProperties(config, ['autodetect'])
-    );
+    this.compute({ autodetect: config.autodetect }).then((result) => {
+      this.observer.ingestValue(
+        result,
+        removeProperties(config, ['autodetect'])
+      );
+    });
     return this;
   }
 
@@ -109,7 +119,7 @@ export class Computed<ComputedValueType = any> extends State<
   ): this {
     config = defineConfig(config, {
       overwriteDeps: true,
-      autodetect: true,
+      autodetect: this.config.autodetect,
     });
 
     // Update dependencies of Computed
@@ -130,21 +140,23 @@ export class Computed<ComputedValueType = any> extends State<
   }
 
   /**
-   * Computes the new value of the Computed Class
+   * Computes and returns the new value of the Computed Class
    * and autodetects used dependencies in the compute function.
    *
    * @internal
    * @param config - Configuration object
    */
-  public compute(config: ComputeConfigInterface = {}): ComputedValueType {
+  public async compute(
+    config: ComputeConfigInterface = {}
+  ): Promise<ComputedValueType> {
     config = defineConfig(config, {
-      autodetect: true,
+      autodetect: this.config.autodetect,
     });
 
     // Start auto tracking of Observers on which the computeFunction might depend
     if (config.autodetect) ComputedTracker.track();
 
-    const computedValue = this.computeFunction();
+    const computedValue = await this.computeFunction();
 
     // Handle auto tracked Observers
     if (config.autodetect) {
@@ -188,12 +200,31 @@ export class Computed<ComputedValueType = any> extends State<
   }
 }
 
-export interface ComputedConfigInterface extends StateConfigInterface {
+export type ComputeFunctionType<ComputedValueType = any> = () =>
+  | ComputedValueType
+  | Promise<ComputedValueType>;
+
+export interface CreateComputedConfigInterface extends StateConfigInterface {
   /**
    * Hard-coded dependencies on which the Computed Class should depend.
    * @default []
    */
   computedDeps?: Array<SubscribableAgileInstancesType>;
+  /**
+   * Whether the Computed can automatically detect
+   * used dependencies in the compute method.
+   * @default true
+   */
+  autodetect?: boolean;
+}
+
+export interface ComputedConfigInterface {
+  /**
+   * Whether the Computed can automatically detect
+   * used dependencies in the compute method.
+   * @default true when compute method isn't async otherwise false
+   */
+  autodetect: boolean;
 }
 
 export interface ComputeConfigInterface {

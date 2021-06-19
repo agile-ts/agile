@@ -21,6 +21,8 @@ import {
   LogCodeManager,
   ComputedConfigInterface,
   SubscribableAgileInstancesType,
+  CreateComputedConfigInterface,
+  ComputeFunctionType,
 } from './internal';
 
 export class Agile {
@@ -195,8 +197,8 @@ export class Agile {
    * @param config - Configuration object
    */
   public createComputed<ComputedValueType = any>(
-    computeFunction: () => ComputedValueType,
-    config?: ComputedConfigInterface
+    computeFunction: ComputeFunctionType<ComputedValueType>,
+    config?: CreateComputedConfigInterface
   ): Computed<ComputedValueType>;
   /**
    * Returns a newly created Computed.
@@ -217,16 +219,16 @@ export class Agile {
    * @param deps - Hard-coded dependencies on which the Computed Class should depend.
    */
   public createComputed<ComputedValueType = any>(
-    computeFunction: () => ComputedValueType,
+    computeFunction: ComputeFunctionType<ComputedValueType>,
     deps?: Array<SubscribableAgileInstancesType>
   ): Computed<ComputedValueType>;
   public createComputed<ComputedValueType = any>(
-    computeFunction: () => ComputedValueType,
+    computeFunction: ComputeFunctionType<ComputedValueType>,
     configOrDeps?:
-      | ComputedConfigInterface
+      | CreateComputedConfigInterface
       | Array<SubscribableAgileInstancesType>
   ): Computed<ComputedValueType> {
-    let _config: ComputedConfigInterface = {};
+    let _config: CreateComputedConfigInterface = {};
 
     if (Array.isArray(configOrDeps)) {
       _config = flatMerge(_config, {

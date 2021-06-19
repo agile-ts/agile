@@ -105,7 +105,7 @@ export class Runtime {
     // Ingest dependents of the Observer into runtime,
     // since they depend on the Observer and therefore have properly changed too
     job.observer.dependents.forEach((observer) =>
-      observer.ingest({ perform: false })
+      observer.ingest({ perform: observer.async })
     );
 
     // Add Job to rerender queue and reset current Job property
