@@ -163,13 +163,17 @@ describe('Observer Tests', () => {
       beforeEach(() => {
         dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
         dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
+
+        observer.dependents = new Set([dummyObserver2]);
       });
 
       it('should add specified Observer to the dependents array', () => {
         observer.addDependent(dummyObserver1);
 
-        expect(observer.dependents.size).toBe(1);
-        expect(observer.dependents.has(dummyObserver2));
+        expect(Array.from(observer.dependents)).toStrictEqual([
+          dummyObserver2,
+          dummyObserver1,
+        ]);
       });
 
       it("shouldn't add specified Observer twice to the dependents array", () => {
@@ -177,8 +181,28 @@ describe('Observer Tests', () => {
 
         observer.addDependent(dummyObserver1);
 
-        expect(observer.dependents.size).toBe(1);
-        expect(observer.dependents.has(dummyObserver1));
+        expect(Array.from(observer.dependents)).toStrictEqual([
+          dummyObserver2,
+          dummyObserver1,
+        ]);
+      });
+    });
+
+    describe('removeDependent function tests', () => {
+      let dummyObserver1: Observer;
+      let dummyObserver2: Observer;
+
+      beforeEach(() => {
+        dummyObserver1 = new Observer(dummyAgile, { key: 'dummyObserver1' });
+        dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
+
+        observer.dependents = new Set([dummyObserver1, dummyObserver2]);
+      });
+
+      it('should remove specified Observer from the dependents array', () => {
+        observer.removeDependent(dummyObserver1);
+
+        expect(Array.from(observer.dependents)).toStrictEqual([dummyObserver2]);
       });
     });
   });

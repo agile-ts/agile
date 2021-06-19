@@ -55,12 +55,14 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public ingest(config: StateIngestConfigInterface = {}): void {
     const state = this.state();
-    let newStateValue: ValueType;
 
-    if (state instanceof Computed) newStateValue = state.compute();
-    else newStateValue = state.nextStateValue;
-
-    this.ingestValue(newStateValue, config);
+    if (state instanceof Computed) {
+      state.compute().then((result) => {
+        this.ingestValue(result, config);
+      });
+    } else {
+      this.ingestValue(state.nextStateValue, config);
+    }
   }
 
   /**
