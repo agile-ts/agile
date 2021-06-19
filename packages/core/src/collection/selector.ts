@@ -39,7 +39,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    */
   constructor(
     collection: Collection<DataType>,
-    itemKey: ItemKey,
+    itemKey: ItemKey | null,
     config: SelectorConfigInterface = {}
   ) {
     config = defineConfig(config, {
@@ -48,14 +48,16 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     super(collection.agileInstance(), undefined, config);
     this.collection = () => collection;
     this._item = undefined;
-    this._itemKey = !config.isPlaceholder
-      ? itemKey
-      : Selector.unknownItemPlaceholderKey;
+    this._itemKey =
+      !config.isPlaceholder && itemKey != null
+        ? itemKey
+        : Selector.unknownItemPlaceholderKey;
     this._key = config?.key;
     this.isPlaceholder = true; // Because hasn't selected any Item yet
 
     // Initial select of the Item
-    if (!config.isPlaceholder) this.select(itemKey, { overwrite: true });
+    if (!config.isPlaceholder && itemKey != null)
+      this.select(itemKey, { overwrite: true });
   }
 
   /**

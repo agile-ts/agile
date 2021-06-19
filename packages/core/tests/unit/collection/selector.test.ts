@@ -35,6 +35,7 @@ describe('Selector Tests', () => {
       overwrite: true,
     });
 
+    // Check if State was called with correct parameters
     expect(selector._key).toBeUndefined();
     expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
@@ -71,6 +72,7 @@ describe('Selector Tests', () => {
       overwrite: true,
     });
 
+    // Check if State was called with correct parameters
     expect(selector._key).toBe('dummyKey');
     expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
@@ -105,6 +107,40 @@ describe('Selector Tests', () => {
     expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
     expect(selector.select).not.toHaveBeenCalled();
 
+    // Check if State was called with correct parameters
+    expect(selector._key).toBeUndefined();
+    expect(selector.valueType).toBeUndefined();
+    expect(selector.isSet).toBeFalsy();
+    expect(selector.isPlaceholder).toBeTruthy();
+    expect(selector.initialStateValue).toBeUndefined();
+    expect(selector._value).toBeUndefined();
+    expect(selector.previousStateValue).toBeUndefined();
+    expect(selector.nextStateValue).toBeUndefined();
+    expect(selector.observer).toBeInstanceOf(StateObserver);
+    expect(selector.observer.dependents.size).toBe(0);
+    expect(selector.observer._key).toBeUndefined();
+    expect(selector.sideEffects).toStrictEqual({});
+    expect(selector.computeValueMethod).toBeUndefined();
+    expect(selector.computeExistsMethod).toBeInstanceOf(Function);
+    expect(selector.isPersisted).toBeFalsy();
+    expect(selector.persistent).toBeUndefined();
+    expect(selector.watchers).toStrictEqual({});
+  });
+
+  it("should create Selector and shouldn't call initial select if specified selector key is null (default config)", () => {
+    // Overwrite select once to not call it
+    jest
+      .spyOn(Selector.prototype, 'select')
+      .mockReturnValueOnce(undefined as any);
+
+    const selector = new Selector(dummyCollection, null);
+
+    expect(selector.collection()).toBe(dummyCollection);
+    expect(selector._item).toBeUndefined();
+    expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey);
+    expect(selector.select).not.toHaveBeenCalled();
+
+    // Check if State was called with correct parameters
     expect(selector._key).toBeUndefined();
     expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
