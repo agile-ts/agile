@@ -59,7 +59,6 @@ export class Computed<ComputedValueType = any> extends State<
     });
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
-    this.observer.async = true; // isAsyncFunction(computeFunction); // Not reliable enough
     this.config = {
       autodetect: config.autodetect as any,
     };
@@ -167,7 +166,7 @@ export class Computed<ComputedValueType = any> extends State<
     // Start auto tracking of Observers on which the computeFunction might depend
     if (config.autodetect) ComputedTracker.track();
 
-    const computedValue = await this.computeFunction();
+    const computedValue = this.computeFunction();
 
     // Handle auto tracked Observers
     if (config.autodetect) {

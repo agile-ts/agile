@@ -23,9 +23,6 @@ export class Observer<ValueType = any> {
   // Subscription Containers (UI-Components) the Observer is subscribed to
   public subscribedTo: Set<SubscriptionContainer> = new Set();
 
-  // Whether the Observer works async
-  public async = false;
-
   // Current value of the Observer
   public value?: ValueType;
   // Previous value of the Observer
