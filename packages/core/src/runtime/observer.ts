@@ -149,7 +149,7 @@ export class Observer<ValueType = any> {
    * Makes the specified Observer depend on the Observer.
    *
    * A dependent Observer is always ingested into the Runtime,
-   * when the Observer it depends on has also been ingested.
+   * when the Observer it depends on has been ingested too.
    *
    * @public
    * @param observer - Observer to depend on the Observer.
@@ -165,7 +165,7 @@ export class Observer<ValueType = any> {
    * @param observer - Observer to no longer depend on the Observer.
    */
   public removeDependent(observer: Observer): void {
-    if (!this.dependents.has(observer)) this.dependents.delete(observer);
+    if (this.dependents.has(observer)) this.dependents.delete(observer);
   }
 }
 

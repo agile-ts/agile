@@ -145,13 +145,7 @@ describe('Runtime Tests', () => {
         expect(dummyJob1.performed).toBeTruthy();
 
         expect(dummyObserver1.ingest).toHaveBeenCalledTimes(1);
-        expect(dummyObserver1.ingest).toHaveBeenCalledWith({
-          perform: false,
-        });
         expect(dummyObserver2.ingest).toHaveBeenCalledTimes(1);
-        expect(dummyObserver2.ingest).toHaveBeenCalledWith({
-          perform: false,
-        });
       });
 
       it(

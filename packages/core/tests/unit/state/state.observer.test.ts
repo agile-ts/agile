@@ -10,6 +10,7 @@ import {
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
+import waitForExpect from 'wait-for-expect';
 
 describe('StateObserver Tests', () => {
   let dummyAgile: Agile;
@@ -133,15 +134,19 @@ describe('StateObserver Tests', () => {
         "should call 'ingestValue' with computed value " +
           'if Observer belongs to a Computed State (default config)',
         () => {
-          dummyComputed.compute = jest.fn(() => 'computedValue');
+          dummyComputed.compute = jest.fn(() =>
+            Promise.resolve('computedValue')
+          );
 
           computedObserver.ingest();
 
-          expect(computedObserver.ingestValue).toHaveBeenCalledWith(
-            'computedValue',
-            {}
-          );
           expect(dummyComputed.compute).toHaveBeenCalled();
+          waitForExpect(() => {
+            expect(computedObserver.ingestValue).toHaveBeenCalledWith(
+              'computedValue',
+              {}
+            );
+          });
         }
       );
     });
