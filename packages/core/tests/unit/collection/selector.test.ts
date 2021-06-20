@@ -542,9 +542,6 @@ describe('Selector Tests', () => {
         expect(selector.unselect).toHaveBeenCalledWith({ background: false });
         expect(selector.rebuildSelector).not.toHaveBeenCalled();
         expect(selector.addSideEffect).not.toHaveBeenCalled();
-
-        expect(dummyItem1.addSideEffect).not.toHaveBeenCalled();
-        // expect(Array.from(dummyItem1.selectedBy)).toStrictEqual([]); // Because 'unselect()' is mocked
       });
 
       describe('test added sideEffect called Selector.rebuildSelectorSideEffectKey', () => {
