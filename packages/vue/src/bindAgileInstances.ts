@@ -6,13 +6,13 @@ import {
   Observer,
   State,
 } from '@agile-ts/core';
-import { isValidObject } from '@agile-ts/utils';
+import { isValidObject, normalizeArray } from '@agile-ts/utils';
 
 export function bindAgileInstances(
   deps: DepsType,
   agile: Agile,
   vueComponent: Vue,
-  observerType = 'value'
+  observerType?: string
 ): { [key: string]: any } {
   let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
@@ -43,28 +43,36 @@ export function bindAgileInstances(
   return {};
 }
 
-//=========================================================================================================
-// Format Deps With No Safe Indicator
-//=========================================================================================================
 /**
+ * Extracts the Observers from the specified dependencies
+ * which have no safe unique indicator key.
+ *
+ * If an indicator could be found
+ * it is added to the `depsWithIndicator` object otherwise to the `depsWithoutIndicator` array.
+ *
+ * What type of Observer is extracted from a dependency
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
  * @internal
- * Extract Observers from dependencies which might not have an indicator.
- * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
- * @param deps - Dependencies to be formatted
+ * @param deps - Dependencies to extract the Observers from
  * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithNoSafeIndicator = (
   deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType,
-  observerType = 'value'
+  observerType?: string
 ): {
   depsWithoutIndicator: Observer[];
   depsWithIndicator: DepsWithIndicatorType;
 } => {
-  const depsArray = extractObservers(deps);
   const depsWithIndicator: DepsWithIndicatorType = {};
-  let depsWithoutIndicator: Observer[] = depsArray
-    .map((dep) => dep[observerType])
-    .filter((dep): dep is Observer => dep !== undefined);
+  let depsWithoutIndicator = extractObserverFromDeps(
+    normalizeArray(deps),
+    observerType
+  );
 
   // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
   depsWithoutIndicator = depsWithoutIndicator.filter((dep) => {
@@ -81,31 +89,94 @@ const formatDepsWithNoSafeIndicator = (
   };
 };
 
-//=========================================================================================================
-// Format Deps With Indicator
-//=========================================================================================================
 /**
+ * Extracts the Observers from the specified dependencies
+ * which have a unique indicator key through the object property key.
+ *
+ * What type of Observer is extracted from a dependency
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
  * @internal
- * Extract Observers from dependencies which have an indicator through the object property key.
- * @param deps - Dependencies to be formatted
+ * @param deps - Dependencies to extract the Observers from
  * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithIndicator = (
   deps: {
     [key: string]: SubscribableAgileInstancesType;
   },
-  observerType = 'value'
+  observerType?: string
 ): DepsWithIndicatorType => {
+  return extractObserverFromDeps(deps, observerType);
+};
+
+/**
+ * Extracts the Observers from the specified dependencies
+ * provided in array shape.
+ *
+ * What type of Observer is extracted from a dependency
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
+ * @internal
+ * @param deps - Dependencies in array shape  to extract the Observers from.
+ * @param observerType - Type of Observer to be extracted.
+ */
+function extractObserverFromDeps<
+  X extends Array<SubscribableAgileInstancesType>
+>(deps: X, observerType?: string): Array<Observer>;
+/**
+ * Extracts the Observers from the specified dependencies
+ * provided in object shape.
+ *
+ * What type of Observer is extracted from a dependency
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
+ * @internal
+ * @param deps - Dependencies in object shape to extract the Observers from.
+ * @param observerType - Type of Observer to be extracted.
+ */
+function extractObserverFromDeps<
+  X extends { [key: string]: SubscribableAgileInstancesType }
+>(deps: X, observerType?: string): DepsWithIndicatorType;
+
+function extractObserverFromDeps<
+  X extends { [key: string]: SubscribableAgileInstancesType },
+  Y extends Array<SubscribableAgileInstancesType>
+>(deps: X | Y, observerType?: string): Array<Observer> | DepsWithIndicatorType {
   const depsWithIndicator: DepsWithIndicatorType = {};
+  const depsWithNoIndicator: Array<Observer> = [];
 
   // Extract Observers from Deps
   for (const depKey in deps) {
-    const observer = extractObservers(deps[depKey])[0][observerType];
-    if (observer != null) depsWithIndicator[depKey] = observer;
+    const extractedObservers = extractObservers(deps[depKey])[0];
+    let observer: Observer | undefined = undefined;
+
+    // Extract Observer at specified type from the fround Observers
+    if (observerType != null && extractedObservers[observerType])
+      observer = extractedObservers[observerType];
+    else {
+      observer = extractedObservers['output'] ?? extractedObservers['value'];
+    }
+
+    if (observer != null) {
+      if (Array.isArray(deps)) depsWithNoIndicator.push(observer);
+      else depsWithIndicator[depKey] = observer;
+    }
   }
 
-  return depsWithIndicator;
-};
+  return Array.isArray(deps) ? depsWithNoIndicator : depsWithIndicator;
+}
 
 type SubscribableAgileInstancesType =
   | State

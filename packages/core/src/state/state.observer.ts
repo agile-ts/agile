@@ -117,7 +117,7 @@ export class StateObserver<ValueType = any> extends Observer {
       overwrite: config.overwrite,
       key:
         config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
+        `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
     });
 
     // Pass created Job into the Runtime

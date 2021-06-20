@@ -104,7 +104,7 @@ export class GroupObserver<DataType = any> extends Observer {
       background: config.background,
       key:
         config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
+        `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
     });
 
     // Pass created Job into the Runtime
