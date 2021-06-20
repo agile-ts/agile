@@ -5,6 +5,7 @@ import {
   normalizeArray,
   isFunction,
   LogCodeManager,
+  SubscribableAgileInstancesType,
 } from './internal';
 
 /**
@@ -35,10 +36,11 @@ export function getAgileInstance(instance: any): Agile | undefined {
 }
 
 /**
- * Extracts the Observers from the specified Instances.
+ * Extracts all Observers from the specified Instance/s
+ * and returns the extracted Observers in the given order.
  *
  * @internal
- * @param instances - Instances to extract the Observers from.
+ * @param instances - Instance/s to extract the Observers from.
  */
 export function extractObservers(
   instances: any
@@ -59,7 +61,6 @@ export function extractObservers(
       continue;
     }
 
-    // TODO add output Observer functionality!!
     // If the Instance equals to a Collection
     if (instance instanceof Collection) {
       instancesArray.push(
@@ -100,9 +101,77 @@ export function extractObservers(
     instancesArray.push({});
   }
 
-  console.log('Extracted Observers', instances, instancesArray); // TODO REMOVE
-
   return instancesArray;
+}
+
+/**
+ * Extracts the most relevant Observers
+ * from the specified Instance/s in array shape
+ * and returns the extracted Observers in the given order.
+ *
+ * What type of Observer is extracted from an Instance
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
+ * @internal
+ * @param instances - Instances in array shape  to extract the Observers from.
+ * @param observerType - Type of Observer to be extracted.
+ */
+function extractRelevantObservers<
+  X extends Array<SubscribableAgileInstancesType>
+>(instances: X, observerType?: string): Array<Observer>;
+/**
+ * Extracts the most relevant Observers
+ * from the specified Instance/s in object shape
+ * and returns the extracted Observers in the given order.
+ *
+ * What type of Observer is extracted from an Instance
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
+ * @internal
+ * @param instances - Instances in object shape to extract the Observers from.
+ * @param observerType - Type of Observer to be extracted.
+ */
+function extractRelevantObservers<
+  X extends { [key: string]: SubscribableAgileInstancesType }
+>(instances: X, observerType?: string): { [key: string]: Observer };
+
+function extractRelevantObservers<
+  X extends { [key: string]: SubscribableAgileInstancesType },
+  Y extends Array<SubscribableAgileInstancesType>
+>(
+  instances: X | Y,
+  observerType?: string
+): Array<Observer> | { [key: string]: Observer } {
+  const depsWithIndicator: { [key: string]: Observer } = {};
+  const depsWithNoIndicator: Array<Observer> = [];
+
+  // Extract Observers from deps
+  for (const depKey in instances) {
+    const extractedObservers = extractObservers(instances[depKey])[0];
+    let observer: Observer | undefined = undefined;
+
+    // Extract Observer at specified type from the fround Observers
+    if (observerType != null && extractedObservers[observerType])
+      observer = extractedObservers[observerType];
+    else {
+      observer = extractedObservers['output'] ?? extractedObservers['value'];
+    }
+
+    if (observer != null) {
+      if (Array.isArray(instances)) depsWithNoIndicator.push(observer);
+      else depsWithIndicator[depKey] = observer;
+    }
+  }
+
+  return Array.isArray(instances) ? depsWithNoIndicator : depsWithIndicator;
 }
 
 /**
