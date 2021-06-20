@@ -489,7 +489,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param config - Configuration object
    */
   public getGroup(
-    groupKey: GroupKey | undefined,
+    groupKey: GroupKey | undefined | null,
     config: HasConfigInterface = {}
   ): Group<DataType> | undefined {
     config = defineConfig(config, {
@@ -662,7 +662,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param config - Configuration object
    */
   public getSelector(
-    selectorKey: SelectorKey | undefined,
+    selectorKey: SelectorKey | undefined | null,
     config: HasConfigInterface = {}
   ): Selector<DataType> | undefined {
     config = defineConfig(config, {
@@ -699,14 +699,10 @@ export class Collection<DataType extends Object = DefaultItem> {
 
     // Create dummy Selector to hold reference
     if (selector == null) {
-      selector = new Selector<DataType>(
-        this,
-        Selector.unknownItemPlaceholderKey,
-        {
-          key: selectorKey,
-          isPlaceholder: true,
-        }
-      );
+      selector = new Selector<DataType>(this, null, {
+        key: selectorKey,
+        isPlaceholder: true,
+      });
       this.selectors[selectorKey] = selector;
     }
 
@@ -773,7 +769,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param config - Configuration object
    */
   public getItem(
-    itemKey: ItemKey | undefined,
+    itemKey: ItemKey | undefined | null,
     config: HasConfigInterface = {}
   ): Item<DataType> | undefined {
     config = defineConfig(config, {

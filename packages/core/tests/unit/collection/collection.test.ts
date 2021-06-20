@@ -1414,7 +1414,10 @@ describe('Collection Tests', () => {
 
         expect(response).toBeInstanceOf(Selector);
         expect(response.isPlaceholder).toBeTruthy();
+        expect(response._item).toBeNull();
+        expect(response._itemKey).toBeNull();
         expect(response._key).toBe('notExistingSelector');
+
         expect(collection.selectors['notExistingSelector']).toBe(response);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
       });

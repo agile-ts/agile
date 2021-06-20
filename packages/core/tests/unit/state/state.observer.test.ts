@@ -133,7 +133,7 @@ describe('StateObserver Tests', () => {
       it(
         "should call 'ingestValue' with computed value " +
           'if Observer belongs to a Computed State (default config)',
-        () => {
+        async () => {
           dummyComputed.compute = jest.fn(() =>
             Promise.resolve('computedValue')
           );
@@ -141,7 +141,7 @@ describe('StateObserver Tests', () => {
           computedObserver.ingest();
 
           expect(dummyComputed.compute).toHaveBeenCalled();
-          waitForExpect(() => {
+          await waitForExpect(() => {
             expect(computedObserver.ingestValue).toHaveBeenCalledWith(
               'computedValue',
               {}

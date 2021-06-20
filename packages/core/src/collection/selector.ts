@@ -8,20 +8,19 @@ import {
   StateRuntimeJobConfigInterface,
 } from '../internal';
 
-export class Selector<DataType extends Object = DefaultItem> extends State<
-  DataType | undefined
-> {
+export class Selector<
+  DataType extends Object = DefaultItem
+> extends State<DataType | null> {
   // Collection the Selector belongs to
   public collection: () => Collection<DataType>;
 
-  static unknownItemPlaceholderKey = '__UNKNOWN__ITEM__KEY__';
   static rebuildSelectorSideEffectKey = 'rebuildSelector';
   static rebuildItemSideEffectKey = 'rebuildItem';
 
   // Item the Selector represents
-  public _item: Item<DataType> | undefined;
+  public _item: Item<DataType> | null;
   // Key/Name identifier of the Item the Selector represents
-  public _itemKey: ItemKey;
+  public _itemKey: ItemKey | null;
 
   /**
    * A Selector represents an Item from a Collection in the long term.
@@ -45,19 +44,15 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     config = defineConfig(config, {
       isPlaceholder: false,
     });
-    super(collection.agileInstance(), undefined, config);
+    super(collection.agileInstance(), null, config);
     this.collection = () => collection;
-    this._item = undefined;
-    this._itemKey =
-      !config.isPlaceholder && itemKey != null
-        ? itemKey
-        : Selector.unknownItemPlaceholderKey;
+    this._item = null;
+    this._itemKey = !config.isPlaceholder && itemKey != null ? itemKey : null;
     this._key = config?.key;
     this.isPlaceholder = true; // Because hasn't selected any Item yet
 
     // Initial select of the Item
-    if (!config.isPlaceholder && itemKey != null)
-      this.select(itemKey, { overwrite: true });
+    if (this._itemKey != null) this.select(itemKey, { overwrite: true });
   }
 
   /**
@@ -67,7 +62,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    *
    * @public
    */
-  public get itemKey(): ItemKey {
+  public get itemKey(): ItemKey | null {
     return this._itemKey;
   }
 
@@ -80,7 +75,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    * @public
    * @param value - New key/name identifier of the Item to be represented by the Selector.
    */
-  public set itemKey(value: ItemKey) {
+  public set itemKey(value: ItemKey | null) {
     this.select(value);
   }
 
@@ -91,7 +86,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    *
    * @public
    */
-  public get item(): Item<DataType> | undefined {
+  public get item(): Item<DataType> | null {
     return this._item;
   }
 
@@ -104,7 +99,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    * @public
    * @param value - New Item to be represented by the Selector.
    */
-  public set item(value: Item<DataType> | undefined) {
+  public set item(value: Item<DataType> | null) {
     if (value?._key) this.select(value._key);
   }
 
@@ -228,16 +223,20 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
     });
 
     // Unselect Item
-    if (item) {
+    if (item != null) {
       item.selectedBy.delete(this._key as any);
       item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
       item.removeSideEffect(Selector.rebuildItemSideEffectKey);
-      if (item.isPlaceholder) delete this.collection().data[this._itemKey];
+      if (
+        item.isPlaceholder &&
+        this._itemKey != null
+      )
+        delete this.collection().data[this._itemKey];
     }
 
     // Reset Selector
-    this._item = undefined;
-    this._itemKey = Selector.unknownItemPlaceholderKey;
+    this._item = null;
+    this._itemKey = null;
     this.rebuildSelector(config);
     this.isPlaceholder = true;
 
@@ -280,7 +279,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
   public rebuildSelector(config: StateRuntimeJobConfigInterface = {}): this {
     // Assign 'undefined' to the Selector value if no Item is set
     if (this._item == null || this._item.isPlaceholder) {
-      this.set(undefined, config);
+      this.set(null, config);
       return this;
     }
 
