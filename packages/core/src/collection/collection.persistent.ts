@@ -156,7 +156,7 @@ export class CollectionPersistent<
 
             // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem)
-              this.collection().assignItem(dummyItem); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
+              this.collection().assignItem(dummyItem, { overwrite: false }); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
           }
         }
       }

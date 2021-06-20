@@ -414,9 +414,9 @@ describe('CollectionPersistent Tests', () => {
               followCollectionPersistKeyPattern: false,
             }
           );
-          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
-            placeholderItem1
-          );
+          expect(
+            dummyCollection.assignItem
+          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: false });
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem2
           ); // Because Item persistent isn't ready
@@ -507,9 +507,9 @@ describe('CollectionPersistent Tests', () => {
               followCollectionPersistKeyPattern: false,
             }
           );
-          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
-            placeholderItem1
-          );
+          expect(
+            dummyCollection.assignItem
+          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: false });
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem3
           ); // Because Item 3 is already present in the Collection

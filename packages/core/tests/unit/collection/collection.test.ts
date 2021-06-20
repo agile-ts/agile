@@ -1414,7 +1414,10 @@ describe('Collection Tests', () => {
 
         expect(response).toBeInstanceOf(Selector);
         expect(response.isPlaceholder).toBeTruthy();
+        expect(response._item).toBeNull();
+        expect(response._itemKey).toBeNull();
         expect(response._key).toBe('notExistingSelector');
+
         expect(collection.selectors['notExistingSelector']).toBe(response);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
       });
@@ -2832,6 +2835,7 @@ describe('Collection Tests', () => {
         dummyItem1.patch = jest.fn();
         toAddDummyItem2.patch = jest.fn();
         collection.rebuildGroupsThatIncludeItemKey = jest.fn();
+        collection.assignData = jest.fn();
       });
 
       it('should assign valid Item to Collection (default config)', () => {
@@ -2847,6 +2851,7 @@ describe('Collection Tests', () => {
             background: false,
           }
         );
+        expect(collection.assignData).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
         expect(toAddDummyItem2._key).toBe('dummyItem2');
@@ -2870,6 +2875,7 @@ describe('Collection Tests', () => {
             background: true,
           }
         );
+        expect(collection.assignData).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
         expect(toAddDummyItem2._key).toBe('dummyItem2');
@@ -2895,6 +2901,7 @@ describe('Collection Tests', () => {
             background: false,
           }
         );
+        expect(collection.assignData).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).toHaveBeenCalledWith(
           { id: 'randomDummyId' },
@@ -2923,6 +2930,7 @@ describe('Collection Tests', () => {
         expect(
           collection.rebuildGroupsThatIncludeItemKey
         ).not.toHaveBeenCalled();
+        expect(collection.assignData).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
         expect(toAddDummyItem2._key).toBe('dummyItem2');
@@ -2944,6 +2952,7 @@ describe('Collection Tests', () => {
         expect(
           collection.rebuildGroupsThatIncludeItemKey
         ).not.toHaveBeenCalled();
+        expect(collection.assignData).toHaveBeenCalledWith(dummyItem1._value);
 
         expect(dummyItem1.patch).not.toHaveBeenCalled();
         expect(dummyItem1._key).toBe('dummyItem1');
@@ -2965,6 +2974,7 @@ describe('Collection Tests', () => {
             background: false,
           }
         );
+        expect(collection.assignData).not.toHaveBeenCalled();
 
         expect(dummyItem1.patch).not.toHaveBeenCalled();
         expect(dummyItem1._key).toBe('dummyItem1');
