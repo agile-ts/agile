@@ -90,6 +90,7 @@ export class StateObserver<ValueType = any> extends Observer {
       force: false,
       storage: true,
       overwrite: false,
+      maxTriesToUpdate: 0,
     });
 
     // Force overwriting the State value if it is a placeholder.
@@ -136,12 +137,13 @@ export class StateObserver<ValueType = any> extends Observer {
    * @param job - Runtime-Job to be performed.
    */
   public perform(job: StateRuntimeJob) {
-    const state = job.observer.state();
+    const observer = job.observer;
+    const state = observer.state();
 
     // Assign new State values
     state.previousStateValue = copy(state._value);
-    state._value = copy(job.observer.nextStateValue);
-    state.nextStateValue = copy(job.observer.nextStateValue);
+    state._value = copy(observer.nextStateValue);
+    state.nextStateValue = copy(observer.nextStateValue);
 
     // TODO think about freezing the State value..
     // https://www.geeksforgeeks.org/object-freeze-javascript/#:~:text=Object.freeze()%20Method&text=freeze()%20which%20is%20used,the%20prototype%20of%20the%20object.
@@ -157,13 +159,8 @@ export class StateObserver<ValueType = any> extends Observer {
     state.isSet = notEqual(state._value, state.initialStateValue);
     this.sideEffects(job);
 
-    // Assign public value to the Observer after sideEffects like 'rebuildGroup' were executed.
-    // Because sometimes (for instance in a Group State) the 'publicValue()'
-    // is not the '.value' ('nextStateValue') property.
-    // The Observer value is at some point the public value
-    // since Integrations like React are using it as the return value.
-    // (For example 'useAgile()' returns 'Observer.value' and not 'State.value'.)
-    job.observer.previousValue = copy(job.observer.value);
+    // Assign public value to the Observer
+    job.observer.previousValue = copy(observer.value);
     job.observer.value = copy(state._value);
   }
 

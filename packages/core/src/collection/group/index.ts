@@ -333,7 +333,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Rebuilds the entire `output` and `items` property of the Group.
+   * Rebuilds the entire `output` and `items` property of the Group
+   * and ingests it into the runtime.
    *
    * In doing so, it traverses the Group `value` (Item identifiers)
    * and fetches the fitting Items accordingly.
@@ -341,8 +342,9 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#rebuild)
    *
    * @internal
+   * @param config - Configuration object
    */
-  public rebuild(): this {
+  public rebuild(config: StateIngestConfigInterface = {}): this {
     const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
     const groupItems: Array<Item<DataType>> = [];
 
@@ -358,11 +360,6 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       else notFoundItemKeys.push(itemKey);
     });
 
-    // Extract Item values from the retrieved Items
-    const groupOutput = groupItems.map((item) => {
-      return item._value;
-    });
-
     // Logging
     if (notFoundItemKeys.length > 0) {
       LogCodeManager.log(
@@ -372,12 +369,10 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       );
     }
 
-    this._items = groupItems.map((item) => () => item);
-    this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
 
-    // TODO Ingest new output into the output Observer
-    this.observers['output'].value = copy(this._output);
+    // Ingest rebuilt Group output into the Runtime
+    this.observers.output.ingestValue(groupItems, config);
 
     return this;
   }
