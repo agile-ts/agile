@@ -40,8 +40,10 @@ export function getAgileInstance(instance: any): Agile | undefined {
  * @internal
  * @param instances - Instances to extract the Observers from.
  */
-export function extractObservers(instances: any): Array<Observer | undefined> {
-  const instancesArray: Array<Observer | undefined> = [];
+export function extractObservers(
+  instances: any
+): Array<{ [key: string]: Observer | undefined }> {
+  const instancesArray: Array<{ [key: string]: Observer | undefined }> = [];
   const tempInstancesArray = normalizeArray(instances, {
     createUndefinedArray: true,
   });
@@ -53,27 +55,41 @@ export function extractObservers(instances: any): Array<Observer | undefined> {
     // in order to properly build the return value of,
     // for example, the 'useAgile()' hook later)
     if (instance == null) {
-      instancesArray.push(undefined);
+      instancesArray.push({});
       continue;
     }
 
+    // TODO add output Observer functionality!!
     // If the Instance equals to a Collection
     if (instance instanceof Collection) {
       instancesArray.push(
-        instance.getGroupWithReference(instance.config.defaultGroupKey).observer
+        instance.getGroupWithReference(instance.config.defaultGroupKey)
+          .observers as any
       );
       continue;
     }
 
     // If the Instance contains a property that is an Observer
     if (instance['observer'] && instance['observer'] instanceof Observer) {
-      instancesArray.push(instance['observer']);
+      instancesArray.push({ value: instance['observer'] });
+      continue;
+    }
+
+    // If the Instance contains a property that includes Observers
+    if (instance['observers']) {
+      const extractedObservers = {};
+      for (const key in instance['observers']) {
+        if (instance['observers'][key] instanceof Observer) {
+          extractedObservers[key] = instance['observers'][key];
+        }
+      }
+      instancesArray.push(extractedObservers);
       continue;
     }
 
     // If the Instance equals to an Observer
     if (instance instanceof Observer) {
-      instancesArray.push(instance);
+      instancesArray.push({ value: instance });
       continue;
     }
 
@@ -81,8 +97,10 @@ export function extractObservers(instances: any): Array<Observer | undefined> {
     // (We have to add 'undefined' to the return value
     // in order to properly build the return value of,
     // for example, the 'useAgile()' hook later)
-    instancesArray.push(undefined);
+    instancesArray.push({});
   }
+
+  console.log('Extracted Observers', instances, instancesArray); // TODO REMOVE
 
   return instancesArray;
 }

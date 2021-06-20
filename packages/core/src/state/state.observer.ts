@@ -4,17 +4,16 @@ import {
   Computed,
   copy,
   defineConfig,
-  ObserverKey,
   equal,
   notEqual,
   isFunction,
-  SubscriptionContainer,
   IngestConfigInterface,
   StateRuntimeJob,
   SideEffectInterface,
   createArrayFromObject,
   CreateStateRuntimeJobConfigInterface,
   generateId,
+  CreateObserverConfigInterface,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -35,7 +34,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   constructor(
     state: State<ValueType>,
-    config: CreateStateObserverConfigInterface = {}
+    config: CreateObserverConfigInterface = {}
   ) {
     super(state.agileInstance(), { ...config, ...{ value: state._value } });
     this.state = () => state;
@@ -165,7 +164,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // since Integrations like React are using it as the return value.
     // (For example 'useAgile()' returns 'Observer.value' and not 'State.value'.)
     job.observer.previousValue = copy(job.observer.value);
-    job.observer.value = copy(state.getPublicValue());
+    job.observer.value = copy(state._value);
   }
 
   /**
@@ -184,7 +183,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // Call watcher functions
     for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state.getPublicValue(), watcherKey);
+        state.watchers[watcherKey](state._value, watcherKey);
 
     // Call side effect functions
     if (job.config?.sideEffects?.enabled) {
@@ -203,24 +202,6 @@ export class StateObserver<ValueType = any> extends Observer {
       }
     }
   }
-}
-
-export interface CreateStateObserverConfigInterface {
-  /**
-   * Initial Observers to depend on the State Observer.
-   * @default []
-   */
-  dependents?: Array<Observer>;
-  /**
-   * Initial Subscription Containers the State Observer is subscribed to.
-   * @default []
-   */
-  subs?: Array<SubscriptionContainer>;
-  /**
-   * Key/Name identifier of the State Observer.
-   * @default undefined
-   */
-  key?: ObserverKey;
 }
 
 export interface StateIngestConfigInterface

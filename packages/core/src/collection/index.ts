@@ -503,7 +503,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (group == null || (!config.notExisting && !group.exists))
       return undefined;
 
-    ComputedTracker.tracked(group.observer);
+    ComputedTracker.tracked(group.observers.value);
     return group;
   }
 
@@ -547,7 +547,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       this.groups[groupKey] = group;
     }
 
-    ComputedTracker.tracked(group.observer);
+    ComputedTracker.tracked(group.observers.value);
     return group;
   }
 
@@ -676,7 +676,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (selector == null || (!config.notExisting && !selector.exists))
       return undefined;
 
-    ComputedTracker.tracked(selector.observer);
+    ComputedTracker.tracked(selector.observers.value);
     return selector;
   }
 
@@ -706,7 +706,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       this.selectors[selectorKey] = selector;
     }
 
-    ComputedTracker.tracked(selector.observer);
+    ComputedTracker.tracked(selector.observers.value);
     return selector;
   }
 
@@ -782,7 +782,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Check if Item exists
     if (item == null || (!config.notExisting && !item.exists)) return undefined;
 
-    ComputedTracker.tracked(item.observer);
+    ComputedTracker.tracked(item.observers.value);
     return item;
   }
 
@@ -804,7 +804,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Create dummy Item to hold reference
     if (item == null) item = this.createPlaceholderItem(itemKey, true);
 
-    ComputedTracker.tracked(item.observer);
+    ComputedTracker.tracked(item.observers.value);
     return item;
   }
 
@@ -837,7 +837,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     )
       this.data[itemKey] = item;
 
-    ComputedTracker.tracked(item.observer);
+    ComputedTracker.tracked(item.observers.value);
     return item;
   }
 

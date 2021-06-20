@@ -15,7 +15,10 @@ import {
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
-} from '../internal';
+  StateObservers,
+  GroupObserver,
+  StateObserver,
+} from '../../internal';
 
 export class Group<DataType extends Object = DefaultItem> extends State<
   Array<ItemKey>
@@ -29,6 +32,10 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   _output: Array<DataType> = [];
   // Items represented by the Group
   _items: Array<() => Item<DataType>> = [];
+
+  // Manages dependencies to other States and subscriptions of UI-Components.
+  // It also serves as an interface to the runtime.
+  public observers: GroupObservers<ItemKey[], DataType> = {} as any;
 
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
   notFoundItemKeys: Array<ItemKey> = [];
@@ -53,6 +60,15 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     config: GroupConfigInterface = {}
   ) {
     super(collection.agileInstance(), initialItems || [], config);
+    // Have to define the observer.value property again,
+    // although it was technically set in the State Parent
+    // https://github.com/microsoft/TypeScript/issues/1617
+    this.observers['value'] = new StateObserver<ItemKey[]>(this, {
+      key: config.key,
+    });
+    this.observers['output'] = new GroupObserver(this, {
+      key: config.key,
+    });
     this.collection = () => collection;
 
     // Add side effect to Group
@@ -71,7 +87,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * @public
    */
   public get output(): Array<DataType> {
-    ComputedTracker.tracked(this.observer);
+    ComputedTracker.tracked(this.observers['output']);
     return copy(this._output);
   }
 
@@ -87,7 +103,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * @public
    */
   public get items(): Array<Item<DataType>> {
-    ComputedTracker.tracked(this.observer);
+    ComputedTracker.tracked(this.observers['output']);
     return this._items.map((item) => item());
   }
 
@@ -344,7 +360,7 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
     // Extract Item values from the retrieved Items
     const groupOutput = groupItems.map((item) => {
-      return item.getPublicValue();
+      return item._value;
     });
 
     // Logging
@@ -360,11 +376,22 @@ export class Group<DataType extends Object = DefaultItem> extends State<
     this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
 
+    // TODO Ingest new output into the output Observer
+    this.observers['output'].value = copy(this._output);
+
     return this;
   }
 }
 
 export type GroupKey = string | number;
+
+export interface GroupObservers<ValueType = any, DataType = any>
+  extends StateObservers<ValueType> {
+  /**
+   * TODO
+   */
+  output: GroupObserver<DataType>;
+}
 
 export interface GroupAddConfigInterface extends StateIngestConfigInterface {
   /**

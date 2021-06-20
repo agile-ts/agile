@@ -43,7 +43,7 @@ export class State<ValueType = any> {
 
   // Manages dependencies to other States and subscriptions of UI-Components.
   // It also serves as an interface to the runtime.
-  public observer: StateObserver<ValueType>;
+  public observers: StateObservers<ValueType> = {} as any;
   // Registered side effects of changing the State value
   public sideEffects: {
     [key: string]: SideEffectInterface<State<ValueType>>;
@@ -90,7 +90,7 @@ export class State<ValueType = any> {
     });
     this.agileInstance = () => agileInstance;
     this._key = config.key;
-    this.observer = new StateObserver<ValueType>(this, {
+    this.observers['value'] = new StateObserver<ValueType>(this, {
       key: config.key,
       dependents: config.dependents,
     });
@@ -128,7 +128,7 @@ export class State<ValueType = any> {
    * @public
    */
   public get value(): ValueType {
-    ComputedTracker.tracked(this.observer);
+    ComputedTracker.tracked(this.observers.value);
     return copy(this._value);
   }
 
@@ -169,8 +169,9 @@ export class State<ValueType = any> {
     // Update State key
     this._key = value;
 
-    // Update key of Observer
-    this.observer._key = value;
+    // Update key of Observers
+    for (const observerKey in this.observers)
+      this.observers[observerKey]._key = value;
 
     // Update key in Persistent (only if oldKey is equal to persistentKey
     // because otherwise the persistentKey is detached from the State key
@@ -212,7 +213,7 @@ export class State<ValueType = any> {
     }
 
     // Ingest the State with the new value into the runtime
-    this.observer.ingestValue(_value, config);
+    this.observers.value.ingestValue(_value, config);
 
     return this;
   }
@@ -230,7 +231,7 @@ export class State<ValueType = any> {
    * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): this {
-    this.observer.ingest(config);
+    this.observers.value.ingest(config);
     return this;
   }
 
@@ -750,19 +751,6 @@ export class State<ValueType = any> {
   }
 
   /**
-   * Returns the public value of the State.
-   *
-   * @internal
-   */
-  public getPublicValue(): ValueType {
-    // If State value is used internally
-    // and output represents the public State value (for instance in Group)
-    if (this['output'] !== undefined) return this['output'];
-
-    return this._value;
-  }
-
-  /**
    * Returns the persistable value of the State.
    *
    * @internal
@@ -773,6 +761,13 @@ export class State<ValueType = any> {
 }
 
 export type StateKey = string | number;
+
+export interface StateObservers<ValueType = any> {
+  /**
+   * TODO
+   */
+  value: StateObserver<ValueType>;
+}
 
 export interface StateConfigInterface {
   /**

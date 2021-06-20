@@ -42,6 +42,7 @@ export * from './computed/computed.tracker';
 // Collection
 export * from './collection';
 export * from './collection/group';
+export * from './collection/group/group.observer';
 export * from './collection/item';
 export * from './collection/selector';
 export * from './collection/collection.persistent';

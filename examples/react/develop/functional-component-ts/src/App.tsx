@@ -106,7 +106,8 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My State Object</h3>
           <p>
-            Deep Name: {stateObject.friends.hans.name} {stateObject.location}
+            Deep Name: {stateObject?.friends?.hans?.name}{' '}
+            {stateObject?.location}
           </p>
           <button
             onClick={() => {
@@ -132,7 +133,7 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My Collection</h3>
           <div>
-            {myGroup.map((item) => (
+            {myGroup?.map((item) => (
               <p key={item.key}>{item.name}</p>
             ))}
           </div>

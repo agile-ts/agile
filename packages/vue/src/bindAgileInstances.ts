@@ -59,9 +59,9 @@ const formatDepsWithNoSafeIndicator = (
 } => {
   const depsArray = extractObservers(deps);
   const depsWithIndicator: DepsWithIndicatorType = {};
-  let depsWithoutIndicator: Observer[] = depsArray.filter(
-    (dep): dep is Observer => dep !== undefined
-  );
+  let depsWithoutIndicator: Observer[] = depsArray
+    .map((dep) => dep['value'])
+    .filter((dep): dep is Observer => dep !== undefined);
 
   // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
   depsWithoutIndicator = depsWithoutIndicator.filter((dep) => {
@@ -93,8 +93,8 @@ const formatDepsWithIndicator = (deps: {
 
   // Extract Observers from Deps
   for (const depKey in deps) {
-    const observer = extractObservers(deps[depKey])[0];
-    if (observer) depsWithIndicator[depKey] = observer;
+    const observer = extractObservers(deps[depKey])[0]['value'];
+    if (observer != null) depsWithIndicator[depKey] = observer;
   }
 
   return depsWithIndicator;

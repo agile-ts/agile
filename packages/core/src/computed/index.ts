@@ -62,14 +62,15 @@ export class Computed<ComputedValueType = any> extends State<
     };
 
     // Extract Observer of passed hardcoded dependency instances
-    this.hardCodedDeps = extractObservers(config.computedDeps).filter(
-      (dep): dep is Observer => dep !== undefined
-    );
+    // TODO support .output
+    this.hardCodedDeps = extractObservers(config.computedDeps)
+      .map((dep) => dep['value'])
+      .filter((dep): dep is Observer => dep !== undefined);
     this.deps = new Set(this.hardCodedDeps);
 
     // Make this Observer depend on the specified hard coded dep Observers
     this.deps.forEach((observer) => {
-      observer.addDependent(this.observer);
+      observer.addDependent(this.observers.value);
     });
 
     // Initial recompute to assign the computed initial value to the Computed
@@ -90,7 +91,7 @@ export class Computed<ComputedValueType = any> extends State<
       autodetect: false,
     });
     this.compute({ autodetect: config.autodetect }).then((result) => {
-      this.observer.ingestValue(
+      this.observers.value.ingestValue(
         result,
         removeProperties(config, ['autodetect'])
       );
@@ -125,18 +126,19 @@ export class Computed<ComputedValueType = any> extends State<
 
     // Make this Observer no longer depend on the old dep Observers
     this.deps.forEach((observer) => {
-      observer.removeDependent(this.observer);
+      observer.removeDependent(this.observers.value);
     });
 
     // Update dependencies of Computed
-    this.hardCodedDeps = extractObservers(deps).filter(
-      (dep): dep is Observer => dep !== undefined
-    );
+    // TODO support .output
+    this.hardCodedDeps = extractObservers(deps)
+      .map((dep) => dep['value'])
+      .filter((dep): dep is Observer => dep !== undefined);
     this.deps = new Set(this.hardCodedDeps);
 
     // Make this Observer depend on the new hard coded dep Observers
     this.deps.forEach((observer) => {
-      observer.addDependent(this.observer);
+      observer.addDependent(this.observers.value);
     });
 
     // Update computeFunction
@@ -179,7 +181,7 @@ export class Computed<ComputedValueType = any> extends State<
           !this.hardCodedDeps.includes(observer)
         ) {
           this.deps.delete(observer);
-          observer.removeDependent(this.observer);
+          observer.removeDependent(this.observers.value);
         }
       });
 
@@ -187,7 +189,7 @@ export class Computed<ComputedValueType = any> extends State<
       foundDeps.forEach((observer) => {
         if (!this.deps.has(observer)) {
           this.deps.add(observer);
-          observer.addDependent(this.observer);
+          observer.addDependent(this.observers.value);
         }
       });
     }
