@@ -87,8 +87,8 @@ export class GroupObserver<DataType = any> extends Observer {
       config.force = true;
     }
 
-    group._items = newGroupItems.map((item) => () => item);
-    group._output = copy(
+    this.nextGroupItems = newGroupItems.map((item) => () => item);
+    this.nextGroupOutput = copy(
       newGroupItems.map((item) => {
         return item._value;
       })

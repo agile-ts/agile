@@ -11,16 +11,17 @@ import { isValidObject } from '@agile-ts/utils';
 export function bindAgileInstances(
   deps: DepsType,
   agile: Agile,
-  vueComponent: Vue
+  vueComponent: Vue,
+  observerType = 'value'
 ): { [key: string]: any } {
   let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
 
   // Format Deps
   if (isValidObject(deps)) {
-    depsWithIndicator = formatDepsWithIndicator(deps as any);
+    depsWithIndicator = formatDepsWithIndicator(deps as any, observerType);
   } else {
-    const response = formatDepsWithNoSafeIndicator(deps as any);
+    const response = formatDepsWithNoSafeIndicator(deps as any, observerType);
     depsWithIndicator = response.depsWithIndicator;
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
@@ -50,9 +51,11 @@ export function bindAgileInstances(
  * Extract Observers from dependencies which might not have an indicator.
  * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
  * @param deps - Dependencies to be formatted
+ * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithNoSafeIndicator = (
-  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
+  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType,
+  observerType = 'value'
 ): {
   depsWithoutIndicator: Observer[];
   depsWithIndicator: DepsWithIndicatorType;
@@ -60,7 +63,7 @@ const formatDepsWithNoSafeIndicator = (
   const depsArray = extractObservers(deps);
   const depsWithIndicator: DepsWithIndicatorType = {};
   let depsWithoutIndicator: Observer[] = depsArray
-    .map((dep) => dep['value'])
+    .map((dep) => dep[observerType])
     .filter((dep): dep is Observer => dep !== undefined);
 
   // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
@@ -85,15 +88,19 @@ const formatDepsWithNoSafeIndicator = (
  * @internal
  * Extract Observers from dependencies which have an indicator through the object property key.
  * @param deps - Dependencies to be formatted
+ * @param observerType - Type of Observer to be extracted.
  */
-const formatDepsWithIndicator = (deps: {
-  [key: string]: SubscribableAgileInstancesType;
-}): DepsWithIndicatorType => {
+const formatDepsWithIndicator = (
+  deps: {
+    [key: string]: SubscribableAgileInstancesType;
+  },
+  observerType = 'value'
+): DepsWithIndicatorType => {
   const depsWithIndicator: DepsWithIndicatorType = {};
 
   // Extract Observers from Deps
   for (const depKey in deps) {
-    const observer = extractObservers(deps[depKey])[0]['value'];
+    const observer = extractObservers(deps[depKey])[0][observerType];
     if (observer != null) depsWithIndicator[depKey] = observer;
   }
 
