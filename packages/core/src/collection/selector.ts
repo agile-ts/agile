@@ -118,7 +118,7 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    * @param config - Configuration object
    */
   public select(
-    itemKey: ItemKey,
+    itemKey: ItemKey | null,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -142,7 +142,9 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
       return this;
 
     // Unselect old Item
-    this.unselect({ background: true });
+    this.unselect({ background: itemKey != null });
+
+    if (itemKey == null) return this;
 
     // Retrieve new Item from Collection
     const newItem = this.collection().getItemWithReference(itemKey);
@@ -252,7 +254,10 @@ export class Selector<DataType extends Object = DefaultItem> extends State<
    * @param itemKey - Key/Name identifier of the Item.
    * @param correctlySelected - Whether the Item has to be selected correctly.
    */
-  public hasSelected(itemKey: ItemKey, correctlySelected = true): boolean {
+  public hasSelected(
+    itemKey: ItemKey | null,
+    correctlySelected = true
+  ): boolean {
     if (correctlySelected) {
       return (
         this._itemKey === itemKey &&

@@ -193,7 +193,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    * @param config - Configuration object
    */
   public Selector(
-    initialKey: ItemKey,
+    initialKey: ItemKey | null,
     config: SelectorConfigInterface = {}
   ): Selector<DataType> {
     if (this.isInstantiated) {
@@ -589,7 +589,7 @@ export class Collection<DataType extends Object = DefaultItem> {
    */
   public createSelector(
     selectorKey: SelectorKey,
-    itemKey: ItemKey
+    itemKey: ItemKey | null
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
     if (!this.isInstantiated) LogCodeManager.log('1B:02:04');
@@ -1425,9 +1425,11 @@ export class Collection<DataType extends Object = DefaultItem> {
     }
 
     // Check if Item already exists
-    if (this.getItem(itemKey) != null) {
-      if (!config.overwrite) return true;
-      else increaseCollectionSize = false;
+    if (this.getItem(itemKey, { notExisting: true }) != null) {
+      if (!config.overwrite) {
+        this.assignData(item._value);
+        return true;
+      } else increaseCollectionSize = false;
     }
 
     // Assign/add Item to Collection

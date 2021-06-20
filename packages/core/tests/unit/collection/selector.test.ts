@@ -272,8 +272,9 @@ describe('Selector Tests', () => {
           expect.any(Function),
           { weight: 100 }
         );
-        expect(dummyItem2.selectedBy.size).toBe(1);
-        expect(dummyItem2.selectedBy.has(selector._key as any));
+        expect(Array.from(dummyItem2.selectedBy)).toStrictEqual([
+          selector._key,
+        ]);
       });
 
       it('should unselect old selected Item and select new Item (specific config)', () => {
@@ -336,8 +337,9 @@ describe('Selector Tests', () => {
         expect(selector.addSideEffect).not.toHaveBeenCalled();
 
         expect(dummyItem1.addSideEffect).not.toHaveBeenCalled();
-        expect(dummyItem1.selectedBy.size).toBe(1);
-        expect(dummyItem1.selectedBy.has(selector._key as any));
+        expect(Array.from(dummyItem1.selectedBy)).toStrictEqual([
+          selector._key,
+        ]);
       });
 
       it('should select selected Item again (config.force = true)', () => {
@@ -397,7 +399,7 @@ describe('Selector Tests', () => {
         expect(selector.addSideEffect).not.toHaveBeenCalled();
 
         expect(dummyItem2.addSideEffect).not.toHaveBeenCalled();
-        expect(dummyItem2.selectedBy.size).toBe(0);
+        expect(Array.from(dummyItem2.selectedBy)).toStrictEqual([]);
       });
 
       it("should unselect old selected Item and select new Item although Collection isn't instantiated (config.force = true)", () => {
@@ -440,8 +442,9 @@ describe('Selector Tests', () => {
           expect.any(Function),
           { weight: 100 }
         );
-        expect(dummyItem2.selectedBy.size).toBe(1);
-        expect(dummyItem2.selectedBy.has(selector._key as any));
+        expect(Array.from(dummyItem2.selectedBy)).toStrictEqual([
+          selector._key,
+        ]);
       });
 
       it('should remove old selected Item, select new Item and overwrite Selector if old Item is placeholder (default config)', async () => {
@@ -481,8 +484,9 @@ describe('Selector Tests', () => {
           expect.any(Function),
           { weight: 100 }
         );
-        expect(dummyItem2.selectedBy.size).toBe(1);
-        expect(dummyItem2.selectedBy.has(selector._key as any));
+        expect(Array.from(dummyItem2.selectedBy)).toStrictEqual([
+          selector._key,
+        ]);
       });
 
       it("should remove old selected Item, select new Item and shouldn't overwrite Selector if old Item is placeholder (config.overwrite = false)", async () => {
@@ -522,8 +526,25 @@ describe('Selector Tests', () => {
           expect.any(Function),
           { weight: 100 }
         );
-        expect(dummyItem2.selectedBy.size).toBe(1);
-        expect(dummyItem2.selectedBy.has(selector._key as any));
+        expect(Array.from(dummyItem2.selectedBy)).toStrictEqual([
+          selector._key,
+        ]);
+      });
+
+      it("shouldn't select null and unselect old Item (default config)", () => {
+        dummyCollection.getItemWithReference = jest.fn(() => dummyItem2);
+
+        selector.select(null);
+
+        expect(dummyCollection.getItemWithReference).not.toHaveBeenCalled();
+        // expect(selector._itemKey).toBe(Selector.unknownItemPlaceholderKey); // Because 'unselect()' is mocked
+        // expect(selector._item).toBeNull(); // Because 'unselect()' is mocked
+        expect(selector.unselect).toHaveBeenCalledWith({ background: false });
+        expect(selector.rebuildSelector).not.toHaveBeenCalled();
+        expect(selector.addSideEffect).not.toHaveBeenCalled();
+
+        expect(dummyItem1.addSideEffect).not.toHaveBeenCalled();
+        // expect(Array.from(dummyItem1.selectedBy)).toStrictEqual([]); // Because 'unselect()' is mocked
       });
 
       describe('test added sideEffect called Selector.rebuildSelectorSideEffectKey', () => {
