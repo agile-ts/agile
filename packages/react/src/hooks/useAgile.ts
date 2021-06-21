@@ -3,7 +3,6 @@ import {
   Agile,
   Collection,
   getAgileInstance,
-  Group,
   Observer,
   State,
   SubscriptionContainerKeyType,
@@ -17,6 +16,7 @@ import {
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
 import { normalizeArray } from '@agile-ts/utils';
+import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
 //=========================================================================================================
 // useAgile
@@ -29,7 +29,7 @@ import { normalizeArray } from '@agile-ts/utils';
 export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
   config?: AgileHookConfigInterface
-): AgileHookArrayType<X>;
+): AgileOutputHookArrayType<X>;
 
 /**
  * React Hook that binds Agile Instance like Collection, State, Computed, .. to a React Functional Component
@@ -39,7 +39,7 @@ export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
 export function useAgile<X extends SubscribableAgileInstancesType>(
   dep: X,
   config?: AgileHookConfigInterface
-): AgileHookType<X>;
+): AgileOutputHookType<X>;
 
 export function useAgile<
   X extends Array<SubscribableAgileInstancesType>,
@@ -47,7 +47,7 @@ export function useAgile<
 >(
   deps: X | Y,
   config: AgileHookConfigInterface = {}
-): AgileHookArrayType<X> | AgileHookType<Y> {
+): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
   config = defineConfig(config, {
     proxyBased: false,
     key: generateId(),
@@ -63,8 +63,10 @@ export function useAgile<
   // Creates Return Value of Hook, depending whether deps are in Array shape or not
   const getReturnValue = (
     depsArray: (Observer | undefined)[]
-  ): AgileHookArrayType<X> | AgileHookType<Y> => {
-    const handleReturn = (dep: Observer | undefined): AgileHookType<Y> => {
+  ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> => {
+    const handleReturn = (
+      dep: Observer | undefined
+    ): AgileOutputHookType<Y> => {
       if (dep == null) return undefined as any;
       const value = dep.value;
 
@@ -87,7 +89,7 @@ export function useAgile<
     // Handle deps array
     return depsArray.map((dep) => {
       return handleReturn(dep);
-    }) as AgileHookArrayType<X>;
+    }) as AgileOutputHookArrayType<X>;
   };
 
   // Trigger State, used to force Component to rerender
@@ -151,35 +153,6 @@ export function useAgile<
   return getReturnValue(depsArray);
 }
 
-// Array Type
-// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
-export type AgileHookArrayType<T> = {
-  [K in keyof T]: T[K] extends Collection<infer U> | Group<infer U>
-    ? U[]
-    : T[K] extends State<infer U> | Observer<infer U>
-    ? U
-    : T[K] extends undefined
-    ? undefined
-    : T[K] extends Collection<infer U> | Group<infer U> | undefined
-    ? U[] | undefined
-    : T[K] extends State<infer U> | Observer<infer U> | undefined
-    ? U | undefined
-    : never;
-};
-
-// No Array Type
-export type AgileHookType<T> = T extends Collection<infer U> | Group<infer U>
-  ? U[]
-  : T extends State<infer U> | Observer<infer U>
-  ? U
-  : T extends undefined
-  ? undefined
-  : T extends Collection<infer U> | Group<infer U> | undefined
-  ? U[] | undefined
-  : T extends State<infer U> | Observer<infer U> | undefined
-  ? U | undefined
-  : never;
-
 export type SubscribableAgileInstancesType =
   | State
   | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
@@ -192,14 +165,10 @@ export type SubscribableAgileInstancesType =
  * @param proxyBased - If useAgile() should only rerender the Component when a used property mutates
  * @param observerTy[e - Type of Observer to be extracted.
  */
-interface AgileHookConfigInterface {
+export interface AgileHookConfigInterface {
   key?: SubscriptionContainerKeyType;
   agileInstance?: Agile;
   proxyBased?: boolean;
   componentId?: ComponentIdType;
   observerType?: string;
-}
-
-interface ProxyTreeMapInterface {
-  [key: string]: ProxyTree;
 }

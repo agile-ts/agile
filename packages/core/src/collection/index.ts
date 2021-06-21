@@ -23,7 +23,10 @@ import {
   PatchOptionConfigInterface,
 } from '../internal';
 
-export class Collection<DataType extends Object = DefaultItem> {
+export class Collection<
+  DataType extends Object = DefaultItem,
+  GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
+> {
   // Agile Instance the Collection belongs to
   public agileInstance: () => Agile;
 
@@ -1470,11 +1473,10 @@ export class Collection<DataType extends Object = DefaultItem> {
         // into the runtime is to rebuilt itself
         // group.rebuild();
 
-        group?.ingest({
+        group?.rebuild({
           background: config?.background,
-          force: true, // because Group value didn't change, only the output might change
           sideEffects: config?.sideEffects,
-          storage: false, // because Group only rebuilds (-> actual persisted value hasn't changed)
+          storage: false,
         });
       }
     }

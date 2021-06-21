@@ -46,4 +46,8 @@ const myCollection10 = useAgile(MY_COLLECTION);
 const myCollection11 = useAgile(
   new Collection<{ id: number; name: string }>(App)
 );
+
+const myGroupValue = useValue(MY_COLLECTION.getGroup('test'));
+const myGroupOutput = useOutput(MY_COLLECTION.getGroup('test'));
+const myGroupAgile = useAgile(MY_COLLECTION.getGroup('test'));
  */

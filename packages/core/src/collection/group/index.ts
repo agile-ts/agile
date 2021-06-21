@@ -20,9 +20,10 @@ import {
   StateObserver,
 } from '../../internal';
 
-export class Group<DataType extends Object = DefaultItem> extends State<
-  Array<ItemKey>
-> {
+export class Group<
+  DataType extends Object = DefaultItem,
+  ValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
+> extends State<Array<ItemKey>> {
   // Collection the Group belongs to
   collection: () => Collection<DataType>;
 
@@ -56,10 +57,10 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    */
   constructor(
     collection: Collection<DataType>,
-    initialItems?: Array<ItemKey>,
+    initialItems: ItemKey[] = [],
     config: GroupConfigInterface = {}
   ) {
-    super(collection.agileInstance(), initialItems || [], config);
+    super(collection.agileInstance(), initialItems, config);
     // Have to define the observer.value property again,
     // although it was technically set in the State Parent
     // https://github.com/microsoft/TypeScript/issues/1617
