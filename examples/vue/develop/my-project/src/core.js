@@ -11,11 +11,9 @@ export const App = new Agile({
 // Create State
 export const MY_STATE = App.createState('World', {
   key: 'my-state',
-})
-  .computeValue((v) => {
-    return `Hello ${v}`;
-  })
-  .persist();
+}).computeValue((v) => {
+  return `Hello ${v}`;
+});
 
 export const MY_COMPUTED = App.createComputed(
   async () => {
