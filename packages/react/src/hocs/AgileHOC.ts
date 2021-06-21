@@ -8,7 +8,8 @@ import {
   Collection,
   isValidObject,
   flatMerge,
-  extractObservers,
+  extractRelevantObservers,
+  normalizeArray,
 } from '@agile-ts/core';
 
 //=========================================================================================================
@@ -145,25 +146,35 @@ const createHOC = (
   };
 };
 
-//=========================================================================================================
-// Format Deps With No Safe Indicator
-//=========================================================================================================
 /**
+ * Extracts the Observers from the specified dependencies
+ * which have no safe unique indicator key.
+ *
+ * If an indicator could be found
+ * it is added to the `depsWithIndicator` object otherwise to the `depsWithoutIndicator` array.
+ *
+ * What type of Observer is extracted from a dependency
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
  * @internal
- * Extract Observers from dependencies which might not have an indicator.
- * If a indicator could be found it will be added to 'depsWithIndicator' otherwise to 'depsWithoutIndicator'.
- * @param deps - Dependencies to be formatted
+ * @param deps - Dependencies to extract the Observers from
+ * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithNoSafeIndicator = (
-  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType
+  deps: Array<SubscribableAgileInstancesType> | SubscribableAgileInstancesType,
+  observerType?: string
 ): {
   depsWithoutIndicator: Observer[];
   depsWithIndicator: DepsWithIndicatorType;
 } => {
-  const depsArray = extractObservers(deps);
   const depsWithIndicator: DepsWithIndicatorType = {};
-  let depsWithoutIndicator: Observer[] = depsArray.filter(
-    (dep): dep is Observer => dep !== undefined
+  let depsWithoutIndicator = extractRelevantObservers(
+    normalizeArray(deps),
+    observerType
   );
 
   // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
@@ -181,26 +192,28 @@ const formatDepsWithNoSafeIndicator = (
   };
 };
 
-//=========================================================================================================
-// Format Deps With Indicator
-//=========================================================================================================
 /**
+ * Extracts the Observers from the specified dependencies
+ * which have a unique indicator key through the object property key.
+ *
+ * What type of Observer is extracted from a dependency
+ * depends on the specified `observerType`.
+ * If no `observerType` is specified, the Observers found in the dependency
+ * are selected in the following `observerType` order.
+ * - 1. `output`
+ * - 2. `value`
+ *
  * @internal
- * Extract Observers from dependencies which have an indicator through the object property key.
- * @param deps - Dependencies to be formatted
+ * @param deps - Dependencies to extract the Observers from
+ * @param observerType - Type of Observer to be extracted.
  */
-const formatDepsWithIndicator = (deps: {
-  [key: string]: SubscribableAgileInstancesType;
-}): DepsWithIndicatorType => {
-  const depsWithIndicator: DepsWithIndicatorType = {};
-
-  // Extract Observers from Deps
-  for (const depKey in deps) {
-    const observer = extractObservers(deps[depKey])[0];
-    if (observer) depsWithIndicator[depKey] = observer;
-  }
-
-  return depsWithIndicator;
+const formatDepsWithIndicator = (
+  deps: {
+    [key: string]: SubscribableAgileInstancesType;
+  },
+  observerType?: string
+): DepsWithIndicatorType => {
+  return extractRelevantObservers(deps, observerType);
 };
 
 // Copy of the HOC class to have an typesafe base in the react.integration

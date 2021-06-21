@@ -4,7 +4,6 @@ import {
   Collection,
   getAgileInstance,
   Group,
-  extractObservers,
   Observer,
   State,
   SubscriptionContainerKeyType,
@@ -13,9 +12,11 @@ import {
   generateId,
   ProxyWeakMapType,
   ComponentIdType,
+  extractRelevantObservers,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
+import { normalizeArray } from '@agile-ts/utils';
 
 //=========================================================================================================
 // useAgile
@@ -47,13 +48,17 @@ export function useAgile<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileHookArrayType<X> | AgileHookType<Y> {
-  const depsArray = extractObservers(deps);
-  const proxyTreeWeakMap = new WeakMap();
   config = defineConfig(config, {
     proxyBased: false,
     key: generateId(),
     agileInstance: null,
+    observerType: undefined,
   });
+  const depsArray = extractRelevantObservers(
+    normalizeArray(deps),
+    config.observerType
+  );
+  const proxyTreeWeakMap = new WeakMap();
 
   // Creates Return Value of Hook, depending whether deps are in Array shape or not
   const getReturnValue = (
@@ -185,12 +190,14 @@ export type SubscribableAgileInstancesType =
  * @param key - Key/Name of SubscriptionContainer that is created
  * @param agileInstance - Instance of Agile
  * @param proxyBased - If useAgile() should only rerender the Component when a used property mutates
+ * @param observerTy[e - Type of Observer to be extracted.
  */
 interface AgileHookConfigInterface {
   key?: SubscriptionContainerKeyType;
   agileInstance?: Agile;
   proxyBased?: boolean;
   componentId?: ComponentIdType;
+  observerType?: string;
 }
 
 interface ProxyTreeMapInterface {

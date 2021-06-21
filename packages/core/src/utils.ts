@@ -5,7 +5,6 @@ import {
   normalizeArray,
   isFunction,
   LogCodeManager,
-  SubscribableAgileInstancesType,
 } from './internal';
 
 /**
@@ -36,15 +35,30 @@ export function getAgileInstance(instance: any): Agile | undefined {
 }
 
 /**
- * Extracts all Observers from the specified Instance/s
- * and returns the extracted Observers in the given order.
+ * Extracts all Observers from the specified Instances
+ * and returns them in the given order.
  *
  * @internal
- * @param instances - Instance/s to extract the Observers from.
+ * @param instances - Instances to extract the Observers from.
+ */
+export function extractObservers(
+  instances: Array<any>
+): Array<{ [key: string]: Observer | undefined }>;
+/**
+ * Extracts all Observers from the specified Instance.
+ *
+ * @internal
+ * @param instances - Instance to extract the Observers from.
  */
 export function extractObservers(
   instances: any
-): Array<{ [key: string]: Observer | undefined }> {
+): { [key: string]: Observer | undefined };
+
+export function extractObservers(
+  instances: any | Array<any>
+):
+  | Array<{ [key: string]: Observer | undefined }>
+  | { [key: string]: Observer | undefined } {
   const instancesArray: Array<{ [key: string]: Observer | undefined }> = [];
   const tempInstancesArray = normalizeArray(instances, {
     createUndefinedArray: true,
@@ -53,9 +67,6 @@ export function extractObservers(
   // Get Observers from Instances
   for (const instance of tempInstancesArray) {
     // If the Instance equals to 'undefined'
-    // (We have to add 'undefined' to the return value
-    // in order to properly build the return value of,
-    // for example, the 'useAgile()' hook later)
     if (instance == null) {
       instancesArray.push({});
       continue;
@@ -94,14 +105,11 @@ export function extractObservers(
       continue;
     }
 
-    // Push 'undefined' if no valid Observer was found
-    // (We have to add 'undefined' to the return value
-    // in order to properly build the return value of,
-    // for example, the 'useAgile()' hook later)
+    // Push empty object if no valid Observer was found
     instancesArray.push({});
   }
 
-  return instancesArray;
+  return Array.isArray(instances) ? instancesArray : instancesArray[0];
 }
 
 /**
@@ -113,16 +121,17 @@ export function extractObservers(
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
- * - 1. `output`
- * - 2. `value`
+ * 1. `output`
+ * 2. `value`
  *
  * @internal
  * @param instances - Instances in array shape  to extract the Observers from.
  * @param observerType - Type of Observer to be extracted.
  */
-function extractRelevantObservers<
-  X extends Array<SubscribableAgileInstancesType>
->(instances: X, observerType?: string): Array<Observer>;
+export function extractRelevantObservers<X extends Array<any>>(
+  instances: X,
+  observerType?: string
+): Array<Observer>;
 /**
  * Extracts the most relevant Observers
  * from the specified Instance/s in object shape
@@ -132,20 +141,21 @@ function extractRelevantObservers<
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
- * - 1. `output`
- * - 2. `value`
+ * 1. `output`
+ * 2. `value`
  *
  * @internal
  * @param instances - Instances in object shape to extract the Observers from.
  * @param observerType - Type of Observer to be extracted.
  */
-function extractRelevantObservers<
-  X extends { [key: string]: SubscribableAgileInstancesType }
->(instances: X, observerType?: string): { [key: string]: Observer };
+export function extractRelevantObservers<X extends { [key: string]: any }>(
+  instances: X,
+  observerType?: string
+): { [key: string]: Observer };
 
-function extractRelevantObservers<
-  X extends { [key: string]: SubscribableAgileInstancesType },
-  Y extends Array<SubscribableAgileInstancesType>
+export function extractRelevantObservers<
+  X extends { [key: string]: any },
+  Y extends Array<any>
 >(
   instances: X | Y,
   observerType?: string
@@ -155,7 +165,7 @@ function extractRelevantObservers<
 
   // Extract Observers from deps
   for (const depKey in instances) {
-    const extractedObservers = extractObservers(instances[depKey])[0];
+    const extractedObservers = extractObservers(instances[depKey]);
     let observer: Observer | undefined = undefined;
 
     // Extract Observer at specified type from the fround Observers

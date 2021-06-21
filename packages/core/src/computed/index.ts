@@ -62,8 +62,9 @@ export class Computed<ComputedValueType = any> extends State<
     };
 
     // Extract Observer of passed hardcoded dependency instances
-    // TODO support .output
-    this.hardCodedDeps = extractObservers(config.computedDeps)
+    this.hardCodedDeps = extractObservers(
+      config.computedDeps as DependableAgileInstancesType[]
+    )
       .map((dep) => dep['value'])
       .filter((dep): dep is Observer => dep !== undefined);
     this.deps = new Set(this.hardCodedDeps);
@@ -117,7 +118,7 @@ export class Computed<ComputedValueType = any> extends State<
    */
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
-    deps: Array<SubscribableAgileInstancesType> = [],
+    deps: Array<DependableAgileInstancesType> = [],
     config: RecomputeConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -130,7 +131,6 @@ export class Computed<ComputedValueType = any> extends State<
     });
 
     // Update dependencies of Computed
-    // TODO support .output
     this.hardCodedDeps = extractObservers(deps)
       .map((dep) => dep['value'])
       .filter((dep): dep is Observer => dep !== undefined);
@@ -215,7 +215,7 @@ export interface CreateComputedConfigInterface extends StateConfigInterface {
    * Hard-coded dependencies the Computed Class should depend on.
    * @default []
    */
-  computedDeps?: Array<SubscribableAgileInstancesType>;
+  computedDeps?: Array<DependableAgileInstancesType>;
   /**
    * Whether the Computed should automatically detect
    * used dependencies in the specified compute method.
@@ -258,4 +258,7 @@ export interface RecomputeConfigInterface
   extends StateIngestConfigInterface,
     ComputeConfigInterface {}
 
-export type SubscribableAgileInstancesType = State | Collection | Observer;
+export type DependableAgileInstancesType =
+  | State
+  | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
+  | Observer;
