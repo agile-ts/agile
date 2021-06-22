@@ -16,7 +16,6 @@ import {
   SelectorMethodType,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { ProxyTree } from '@agile-ts/proxytree';
 import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
@@ -75,9 +74,19 @@ export function useAgile<
       // If proxyBased and value is of type object.
       // Wrap a Proxy around the object to track the used properties
       if (config.proxyBased && isValidObject(value, true)) {
-        const proxyTree = new ProxyTree(value);
-        proxyTreeWeakMap.set(dep, proxyTree);
-        return proxyTree.proxy;
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const proxyPackage = require('@agile-ts/proxytree');
+
+        if (proxyPackage != null) {
+          const proxyTree = new proxyPackage.ProxyTree(value);
+          proxyTreeWeakMap.set(dep, proxyTree);
+          return proxyTree.proxy;
+        } else {
+          console.error(
+            'To use the AgileTs Proxy functionality, ' +
+              'the installation of the `@agile-ts/proxytree` package is required!'
+          );
+        }
       }
 
       // If selector and value is of type object.
@@ -121,6 +130,11 @@ export function useAgile<
       (dep): dep is Observer => dep !== undefined
     );
 
+    // TODO Proxy doesn't work as expected when 'selecting' a not yet existing property
+    //  -> No Proxy Path could be created on the Component mount
+    //  -> No Selector was created based on the Proxy Paths
+    //  -> Component rerenders no matter what property has changed
+    //
     // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
     // by extracting the routes of the Tree
     // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'

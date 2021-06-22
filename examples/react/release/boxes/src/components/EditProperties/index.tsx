@@ -9,35 +9,27 @@ import {
 } from '@chakra-ui/react';
 import _ from 'lodash';
 import { ImageInfo, ImageInfoFallback } from './components/ImageInfo';
-import { useProxy } from '@agile-ts/react';
+import { useProxy, useSelector } from '@agile-ts/react';
 import core from '../../core';
 
 export const EditProperties = () => {
-  // const selectedElementId = useSelector(
-  //   core.ui.SELECTED_ELEMENT,
-  //   (value) => value?.id
-  // );
-  // const selectedElementImage = useSelector(
-  //   core.ui.SELECTED_ELEMENT,
-  //   (value) => value?.image
-  // );
-
-  // TODO useProxy doesn't work here properly
-  const selectedElement = useProxy(core.ui.SELECTED_ELEMENT, {
-    componentId: 'EditProperties',
-  });
-  const selectedElementId = selectedElement?.id;
-  const selectedElementImage = selectedElement?.image;
-
-  const valueObserver = core.ui.SELECTED_ELEMENT.observers.value;
-  console.log(
-    'Value',
-    Array.from(valueObserver.subscribedTo).map((subContainer) => {
-      return subContainer.selectorsWeakMap
-        .get(valueObserver)
-        ?.methods[0](valueObserver.value);
-    })
+  const selectedElementId = useSelector(
+    core.ui.SELECTED_ELEMENT,
+    (value) => value?.id
   );
+  const selectedElementImage = useSelector(
+    core.ui.SELECTED_ELEMENT,
+    (value) => value?.image
+  );
+
+  // TODO useProxy doesn't work here as expected because the selected Elements
+  //  doesn't exist on the creation of the Subscription Container
+  //  -> no Selector was created selecting this property
+  // const selectedElement = useProxy(core.ui.SELECTED_ELEMENT, {
+  //   componentId: 'EditProperties',
+  // });
+  // const selectedElementId = selectedElement?.id;
+  // const selectedElementImage = selectedElement?.image;
 
   if (selectedElementId == null) return null;
 
