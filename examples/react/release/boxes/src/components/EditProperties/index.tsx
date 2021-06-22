@@ -13,9 +13,33 @@ import { useProxy } from '@agile-ts/react';
 import core from '../../core';
 
 export const EditProperties = () => {
-  const selectedElement = useProxy(core.ui.SELECTED_ELEMENT);
+  // const selectedElementId = useSelector(
+  //   core.ui.SELECTED_ELEMENT,
+  //   (value) => value?.id
+  // );
+  // const selectedElementImage = useSelector(
+  //   core.ui.SELECTED_ELEMENT,
+  //   (value) => value?.image
+  // );
 
-  if (selectedElement == null) return null;
+  // TODO useProxy doesn't work here properly
+  const selectedElement = useProxy(core.ui.SELECTED_ELEMENT, {
+    componentId: 'EditProperties',
+  });
+  const selectedElementId = selectedElement?.id;
+  const selectedElementImage = selectedElement?.image;
+
+  const valueObserver = core.ui.SELECTED_ELEMENT.observers.value;
+  console.log(
+    'Value',
+    Array.from(valueObserver.subscribedTo).map((subContainer) => {
+      return subContainer.selectorsWeakMap
+        .get(valueObserver)
+        ?.methods[0](valueObserver.value);
+    })
+  );
+
+  if (selectedElementId == null) return null;
 
   return (
     <Card>
@@ -23,23 +47,23 @@ export const EditProperties = () => {
         <Property
           label="Top"
           path="style.position.top"
-          id={selectedElement.id}
+          id={selectedElementId}
         />
         <Property
           label="Left"
           path="style.position.left"
-          id={selectedElement.id}
+          id={selectedElementId}
         />
       </Section>
       <Section heading="Size">
-        <SizeProperty label="Width" dimension="width" id={selectedElement.id} />
+        <SizeProperty label="Width" dimension="width" id={selectedElementId} />
         <SizeProperty
           label="Height"
           dimension="height"
-          id={selectedElement.id}
+          id={selectedElementId}
         />
       </Section>
-      {selectedElement.image != null && (
+      {selectedElementImage != null && (
         <Section heading="Image">
           <Suspense fallback={<ImageInfoFallback />}>
             <ImageInfo />

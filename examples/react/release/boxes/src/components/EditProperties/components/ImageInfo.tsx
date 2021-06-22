@@ -3,10 +3,10 @@ import { Box, Text, VStack } from '@chakra-ui/layout';
 import { Skeleton } from '@chakra-ui/skeleton';
 import { callApi } from '../../../api';
 import { SELECTED_ELEMENT } from '../../../core/entities/ui/ui.controller';
-import { useAgile } from '@agile-ts/react';
+import { useProxy } from '@agile-ts/react';
 
 export const ImageInfo = () => {
-  const element = useAgile(SELECTED_ELEMENT);
+  const element = useProxy(SELECTED_ELEMENT);
   const [imageInfo, setImageInfo] = useState<{
     author: string;
     url: string;

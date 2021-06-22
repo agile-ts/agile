@@ -4,33 +4,15 @@ import {
   useAgile,
 } from './useAgile';
 import { SelectorMethodType } from '@agile-ts/core';
+import { AgileValueHookType } from './useValue';
 
 export function useSelector<
-  SelectedType extends any,
-  X extends Array<SubscribableAgileInstancesType>
+  X extends SubscribableAgileInstancesType,
+  ValueType extends AgileValueHookType<X>
 >(
-  deps: X | [],
-  selector: SelectorMethodType<SelectedType>,
-  config?: AgileHookConfigInterface
-): Array<SelectedType>;
-
-export function useSelector<
-  SelectedType extends any,
-  X extends SubscribableAgileInstancesType
->(
-  dep: X,
-  selector: SelectorMethodType<SelectedType>,
-  config?: AgileHookConfigInterface
-): SelectedType;
-
-export function useSelector<
-  SelectedType extends any,
-  X extends Array<SubscribableAgileInstancesType>,
-  Y extends SubscribableAgileInstancesType
->(
-  deps: X | Y,
-  selector: SelectorMethodType<SelectedType>,
+  deps: X,
+  selector: SelectorMethodType<ValueType>,
   config: AgileHookConfigInterface = {}
-): Array<SelectedType> | SelectedType {
+): any /* TODO Make this more typesafe!! */ {
   return useAgile(deps as any, { ...config, ...{ selector: selector } }) as any;
 }
