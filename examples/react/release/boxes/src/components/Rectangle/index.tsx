@@ -1,9 +1,8 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { Drag } from '../actionComponents/Drag';
 import { Resize } from '../actionComponents/Resize';
 import { RectangleContainer } from './components/RectangleContainer';
 import { RectangleInner } from './components/RectangleInner';
-import { RectangleLoading } from './components/RectangleLoading';
 import { useAgile, useProxy } from '@agile-ts/react';
 import core from '../../core';
 import { SELECTED_ELEMENT } from '../../core/entities/ui/ui.controller';
@@ -17,8 +16,10 @@ export const Rectangle: React.FC<RectanglePropsInterface> = (props) => {
   const { id } = props;
 
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
-  const element = useAgile(ELEMENT);
-  const selectedElement = useProxy(core.ui.SELECTED_ELEMENT);
+  const element = useAgile(ELEMENT, { componentId: 'Rectangle' });
+  const selectedElement = useProxy(core.ui.SELECTED_ELEMENT, {
+    componentId: 'Rectangle',
+  });
 
   if (element == null) return null;
 

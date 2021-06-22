@@ -1,5 +1,5 @@
 import React from 'react';
-// import { EditProperties } from '../components/EditProperties';
+import { EditProperties } from '../components/EditProperties';
 import { PageContainer } from '../components/PageContainer';
 import { Toolbar } from '../components/Toolbar';
 import { useValue } from '@agile-ts/react';
@@ -8,10 +8,9 @@ import core from '../core';
 
 const Canvas = () => {
   const elementIds = useValue(
-    core.ui.ELEMENTS.getGroupWithReference('default')
+    core.ui.ELEMENTS.getGroupWithReference('default'),
+    { componentId: 'Canvas' }
   );
-
-  console.log('Debug: Rerendered Canvas', elementIds); // TODO REMOVE
 
   return (
     <PageContainer
@@ -19,6 +18,7 @@ const Canvas = () => {
         core.ui.SELECTED_ELEMENT.unselect();
       }}>
       <Toolbar />
+      <EditProperties />
       {elementIds.map((id) => (
         <Rectangle key={id} id={id} />
       ))}

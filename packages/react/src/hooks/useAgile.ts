@@ -12,6 +12,8 @@ import {
   ProxyWeakMapType,
   ComponentIdType,
   extractRelevantObservers,
+  SelectorWeakMapType,
+  SelectorMethodType,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { ProxyTree } from '@agile-ts/proxytree';
@@ -78,6 +80,12 @@ export function useAgile<
         return proxyTree.proxy;
       }
 
+      // If selector and value is of type object.
+      // Return the selected value
+      if (config.selector && isValidObject(value, true)) {
+        return config.selector(value);
+      }
+
       return value;
     };
 
@@ -113,7 +121,7 @@ export function useAgile<
       (dep): dep is Observer => dep !== undefined
     );
 
-    // Build Proxy Path WeakMap Map based on the Proxy Tree WeakMap
+    // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
     // by extracting the routes of the Tree
     // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
     // because the 'useIsomorphicLayoutEffect' is called after the rerender
@@ -130,6 +138,14 @@ export function useAgile<
       }
     }
 
+    // Build Selector WeakMap based on the specified Selector
+    const selectorWeakMap: SelectorWeakMapType = new WeakMap();
+    if (config.selector != null) {
+      for (const observer of observers) {
+        selectorWeakMap.set(observer, { methods: [config.selector] });
+      }
+    }
+
     // Create Callback based Subscription
     const subscriptionContainer = agileInstance.subController.subscribe(
       () => {
@@ -141,6 +157,7 @@ export function useAgile<
         proxyWeakMap,
         waitForMount: false,
         componentId: config.componentId,
+        selectorWeakMap: selectorWeakMap,
       }
     );
 
@@ -169,6 +186,7 @@ export interface AgileHookConfigInterface {
   key?: SubscriptionContainerKeyType;
   agileInstance?: Agile;
   proxyBased?: boolean;
+  selector?: SelectorMethodType;
   componentId?: ComponentIdType;
   observerType?: string;
 }
