@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useAgile, useWatcher, useProxy } from '@agile-ts/react';
+import { useAgile, useWatcher, useProxy, useSelector } from '@agile-ts/react';
 import { useEvent } from '@agile-ts/event';
 import {
   COUNTUP,
@@ -42,6 +42,10 @@ const App = (props: any) => {
     MY_COLLECTION,
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
+
+  const selectedObjectItem = useSelector(STATE_OBJECT, (value) => {
+    return value.age;
+  });
 
   const [stateObject, item2, collection2] = useProxy(
     [STATE_OBJECT, MY_COLLECTION.getItem('id2'), MY_COLLECTION],

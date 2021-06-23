@@ -19,29 +19,38 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
-//=========================================================================================================
-// useAgile
-//=========================================================================================================
 /**
- * React Hook that binds Agile Instances like Collections, States, Computeds, .. to a React Functional Component
- * @param deps - Agile Instances that will be subscribed to this Component
- * @param config - Config
+ * React Hook for binding the most relevant value of multiple Agile Instances
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant value of an Agile Instance mutates.
+ *
+ * @public
+ * @param deps - Agile Instances to be bound to the Functional Component.
+ * @param config - Configuration object.
  */
 export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
   config?: AgileHookConfigInterface
 ): AgileOutputHookArrayType<X>;
-
 /**
- * React Hook that binds Agile Instance like Collection, State, Computed, .. to a React Functional Component
- * @param dep - Agile Instance that will be subscribed to this Component
- * @param config - Config
+ * React Hook for binding the most relevant Agile Instance value
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant value of the Agile Instance mutates.
+ *
+ * @public
+ * @param dep - Agile Instance to be bound to the Functional Component.
+ * @param config - Configuration object.
  */
 export function useAgile<X extends SubscribableAgileInstancesType>(
   dep: X,
   config?: AgileHookConfigInterface
 ): AgileOutputHookType<X>;
-
 export function useAgile<
   X extends Array<SubscribableAgileInstancesType>,
   Y extends SubscribableAgileInstancesType
@@ -190,17 +199,44 @@ export type SubscribableAgileInstancesType =
   | Observer
   | undefined;
 
-/**
- * @param key - Key/Name of SubscriptionContainer that is created
- * @param agileInstance - Instance of Agile
- * @param proxyBased - If useAgile() should only rerender the Component when a used property mutates
- * @param observerTy[e - Type of Observer to be extracted.
- */
 export interface AgileHookConfigInterface {
+  /**
+   * Key/Name identifier of the Subscription Container to be created.
+   * @default undefined
+   */
   key?: SubscriptionContainerKeyType;
+  /**
+   * Instance of Agile the Subscription Container belongs to.
+   * @default `undefined` if no Agile Instance could be extracted from the provided Instances.
+   */
   agileInstance?: Agile;
+  /**
+   * Whether to wrap a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+   * around the bound Agile Instance value object,
+   * to automatically constrain the way the selected Agile Instance
+   * is compared to determine whether the Component needs to be re-rendered
+   * based on the properties used of the object.
+   *
+   * Requires an additional dependency called `@agile-ts/proxytree`!
+   *
+   * @default false
+   */
   proxyBased?: boolean;
+  /**
+   * Equality comparison function
+   * that allows you to customize the way the selected Agile Instance
+   * is compared to determine whether the Component needs to be re-rendered.
+   * @default undefined
+   */
   selector?: SelectorMethodType;
+  /**
+   * Key/Name identifier of UI-Component the Subscription Container is bound to.
+   * @default undefined
+   */
   componentId?: ComponentIdType;
+  /**
+   * What type of Observer to be bound to the UI-Component.
+   * @default undefined
+   */
   observerType?: string;
 }

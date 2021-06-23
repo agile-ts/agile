@@ -764,7 +764,7 @@ export type StateKey = string | number;
 
 export interface StateObservers<ValueType = any> {
   /**
-   * TODO
+   * Observer responsible for the value of the State.
    */
   value: StateObserver<ValueType>;
 }

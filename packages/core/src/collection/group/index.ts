@@ -31,8 +31,6 @@ export class Group<
 
   // Item values represented by the Group
   _output: Array<DataType> = [];
-  // Items represented by the Group
-  _items: Array<() => Item<DataType>> = [];
 
   // Manages dependencies to other States and subscriptions of UI-Components.
   // It also serves as an interface to the runtime.
@@ -94,22 +92,6 @@ export class Group<
 
   public set output(value: DataType[]) {
     LogCodeManager.log('1C:03:00', [this._key]);
-  }
-
-  /**
-   * Returns the Items clustered by the Group.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#items)
-   *
-   * @public
-   */
-  public get items(): Array<Item<DataType>> {
-    ComputedTracker.tracked(this.observers['output']);
-    return this._items.map((item) => item());
-  }
-
-  public set items(value: Array<Item<DataType>>) {
-    LogCodeManager.log('1C:03:01', [this._key]);
   }
 
   /**
@@ -266,6 +248,20 @@ export class Group<
   }
 
   /**
+   * Retrieves all Items of the Group from the corresponding Collection and returns them.
+   * Items that are not present in the Collection are skipped.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#getitems)
+   *
+   * @public
+   */
+  public getItems(): Array<Item<DataType>> {
+    return this.value
+      .map((itemKey) => this.collection().getItem(itemKey))
+      .filter((item): item is Item<DataType> => item !== undefined);
+  }
+
+  /**
    * Preserves the Group `value` in the corresponding external Storage.
    *
    * The Group key/name is used as the unique identifier for the Persistent.
@@ -384,7 +380,7 @@ export type GroupKey = string | number;
 export interface GroupObservers<ValueType = any, DataType = any>
   extends StateObservers<ValueType> {
   /**
-   * TODO
+   * Observer responsible for the output of the Group.
    */
   output: GroupObserver<DataType>;
 }

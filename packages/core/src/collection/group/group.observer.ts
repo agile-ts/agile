@@ -16,8 +16,7 @@ export class GroupObserver<DataType = any> extends Observer {
   public group: () => Group<DataType>;
 
   // Next value applied to the Group
-  public nextGroupItems: (() => Item<DataType>)[];
-  nextGroupOutput: DataType[];
+  public nextGroupOutput: DataType[];
 
   /**
    * A Group Observer manages the subscriptions to Subscription Containers (UI-Components)
@@ -35,7 +34,6 @@ export class GroupObserver<DataType = any> extends Observer {
     super(group.agileInstance(), { ...config, ...{ value: group._output } });
     this.group = () => group;
     this.nextGroupOutput = copy(group._output);
-    this.nextGroupItems = copy(group._items);
   }
 
   /**
@@ -87,7 +85,6 @@ export class GroupObserver<DataType = any> extends Observer {
       config.force = true;
     }
 
-    this.nextGroupItems = newGroupItems.map((item) => () => item);
     this.nextGroupOutput = copy(
       newGroupItems.map((item) => {
         return item._value;
@@ -129,7 +126,6 @@ export class GroupObserver<DataType = any> extends Observer {
 
     // Assign new Group output and items
     group._output = copy(observer.nextGroupOutput);
-    group._items = copy(observer.nextGroupItems);
 
     // Assign public output to the Observer
     job.observer.previousValue = copy(job.observer.value);

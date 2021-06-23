@@ -895,7 +895,7 @@ export class Collection<
       // Because the default Group keeps track of all existing Items.
       // It also does control the Collection output in binding methods like 'useAgile()'
       // and therefore should do it here too.
-      items = defaultGroup?.items || [];
+      items = defaultGroup?.getItems() || [];
     }
 
     return items;
