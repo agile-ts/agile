@@ -90,11 +90,11 @@ export class StateObserver<ValueType = any> extends Observer {
       force: false,
       storage: true,
       overwrite: false,
-      maxTriesToUpdate: 0,
+      maxTriesToUpdate: 3,
     });
 
     // Force overwriting the State value if it is a placeholder.
-    // After assigning a value to the State it shouldn't be a placeholder anymore.
+    // After assigning a value to the State, it is supposed to be no placeholder anymore.
     if (state.isPlaceholder) {
       config.force = true;
       config.overwrite = true;
@@ -118,6 +118,7 @@ export class StateObserver<ValueType = any> extends Observer {
       key:
         config.key ??
         `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
+      maxTriesToUpdate: config.maxTriesToUpdate,
     });
 
     // Pass created Job into the Runtime
@@ -159,7 +160,7 @@ export class StateObserver<ValueType = any> extends Observer {
     state.isSet = notEqual(state._value, state.initialStateValue);
     this.sideEffects(job);
 
-    // Assign public value to the Observer
+    // Assign new public value to the Observer
     job.observer.previousValue = copy(observer.value);
     job.observer.value = copy(state._value);
   }

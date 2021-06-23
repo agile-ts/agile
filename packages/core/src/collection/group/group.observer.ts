@@ -6,9 +6,10 @@ import {
   defineConfig,
   equal,
   generateId,
-  StateIngestConfigInterface,
   RuntimeJob,
   Item,
+  IngestConfigInterface,
+  CreateRuntimeJobConfigInterface,
 } from '../../internal';
 
 export class GroupObserver<DataType = any> extends Observer {
@@ -37,17 +38,17 @@ export class GroupObserver<DataType = any> extends Observer {
   }
 
   /**
-   * Passes the Group Observer into the runtime wrapped into a Runtime-Job
+   * Rebuilds the Group and passes the Group Observer
+   * into the runtime wrapped into a Runtime-Job
    * where it is executed accordingly.
    *
-   * During the execution the runtime applies the rebuilt `nextGroupItems`
-   * and `nextGroupOutput` to the State,
+   * During the execution the runtime applies the rebuilt `nextGroupOutput` to the Group,
    * updates its dependents and re-renders the UI-Components it is subscribed to.
    *
    * @internal
    * @param config - Configuration object
    */
-  public ingest(config: StateIngestConfigInterface = {}): void {
+  public ingest(config: GroupIngestConfigInterface = {}): void {
     this.group().rebuild(config);
   }
 
@@ -55,8 +56,7 @@ export class GroupObserver<DataType = any> extends Observer {
    * Passes the Group Observer into the runtime wrapped into a Runtime-Job
    * where it is executed accordingly.
    *
-   * During the execution the runtime applies the specified `nextGroupItems`
-   * and `nextGroupOutput` to the Group,
+   * During the execution the runtime applies the specified `nextGroupOutput` to the Group,
    * updates its dependents and re-renders the UI-Components it is subscribed to.
    *
    * @internal
@@ -65,7 +65,7 @@ export class GroupObserver<DataType = any> extends Observer {
    */
   public ingestItems(
     newGroupItems: Item<DataType>[],
-    config: StateIngestConfigInterface = {}
+    config: GroupIngestConfigInterface = {}
   ): void {
     const group = this.group();
     config = defineConfig(config, {
@@ -76,22 +76,23 @@ export class GroupObserver<DataType = any> extends Observer {
         exclude: [],
       },
       force: false,
-      maxTriesToUpdate: 0,
+      maxTriesToUpdate: 3,
     });
 
-    // Force overwriting the State value if it is a placeholder.
-    // After assigning a value to the State it shouldn't be a placeholder anymore.
+    // Force overwriting the Group value if it is a placeholder.
+    // After assigning a value to the Group, it is supposed to be no placeholder anymore.
     if (group.isPlaceholder) {
       config.force = true;
     }
 
+    // Assign next Group output to Observer
     this.nextGroupOutput = copy(
       newGroupItems.map((item) => {
         return item._value;
       })
     );
 
-    // Check if current State value and to assign State value are equal
+    // Check if current Group output and to assign Group output are equal
     if (equal(group._output, this.nextGroupOutput) && !config.force) return;
 
     // Create Runtime-Job
@@ -102,6 +103,7 @@ export class GroupObserver<DataType = any> extends Observer {
       key:
         config.key ??
         `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
+      maxTriesToUpdate: config.maxTriesToUpdate,
     });
 
     // Pass created Job into the Runtime
@@ -112,10 +114,9 @@ export class GroupObserver<DataType = any> extends Observer {
 
   /**
    * Method executed by the Runtime to perform the Runtime-Job,
-   * previously ingested via the `ingest()` or `ingestValue()` method.
+   * previously ingested via the `ingest()` or `ingestItems()` method.
    *
-   * Thereby the previously defined `nextGroupItems`
-   * and `nextGroupOutput` are assigned to the Group.
+   * Thereby the previously defined `nextGroupOutput` is assigned to the Group.
    *
    * @internal
    * @param job - Runtime-Job to be performed.
@@ -124,11 +125,15 @@ export class GroupObserver<DataType = any> extends Observer {
     const observer = job.observer as GroupObserver;
     const group = observer.group();
 
-    // Assign new Group output and items
+    // Assign new Group output
     group._output = copy(observer.nextGroupOutput);
 
-    // Assign public output to the Observer
+    // Assign new public output to the Observer
     job.observer.previousValue = copy(job.observer.value);
     job.observer.value = copy(group._output);
   }
 }
+
+export interface GroupIngestConfigInterface
+  extends CreateRuntimeJobConfigInterface,
+    IngestConfigInterface {}
