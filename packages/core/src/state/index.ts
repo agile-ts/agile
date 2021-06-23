@@ -43,7 +43,7 @@ export class State<ValueType = any> {
 
   // Manages dependencies to other States and subscriptions of UI-Components.
   // It also serves as an interface to the runtime.
-  public observers: StateObservers<ValueType> = {} as any;
+  public observers: StateObserversInterface<ValueType> = {} as any;
   // Registered side effects of changing the State value
   public sideEffects: {
     [key: string]: SideEffectInterface<State<ValueType>>;
@@ -762,7 +762,7 @@ export class State<ValueType = any> {
 
 export type StateKey = string | number;
 
-export interface StateObservers<ValueType = any> {
+export interface StateObserversInterface<ValueType = any> {
   /**
    * Observer responsible for the value of the State.
    */

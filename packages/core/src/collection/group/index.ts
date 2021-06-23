@@ -15,7 +15,7 @@ import {
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
-  StateObservers,
+  StateObserversInterface,
   GroupObserver,
   StateObserver,
 } from '../../internal';
@@ -55,11 +55,11 @@ export class Group<
    */
   constructor(
     collection: Collection<DataType>,
-    initialItems: ItemKey[] = [],
+    initialItems: Array<ItemKey> = [],
     config: GroupConfigInterface = {}
   ) {
     super(collection.agileInstance(), initialItems, config);
-    // Have to define the observer.value property again,
+    // Have to redefine the value Observer (observers['value']) again,
     // although it was technically set in the State Parent
     // https://github.com/microsoft/TypeScript/issues/1617
     this.observers['value'] = new StateObserver<ItemKey[]>(this, {
@@ -248,8 +248,8 @@ export class Group<
   }
 
   /**
-   * Retrieves all Items of the Group from the corresponding Collection and returns them.
-   * Items that are not present in the Collection are skipped.
+   * Retrieves all existing Items of the Group from the corresponding Collection and returns them.
+   * Items that aren't present in the Collection are skipped.
    *
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#getitems)
    *
@@ -330,7 +330,7 @@ export class Group<
   }
 
   /**
-   * Rebuilds the entire `output` and `items` property of the Group
+   * Rebuilds the output of the Group
    * and ingests it into the runtime.
    *
    * In doing so, it traverses the Group `value` (Item identifiers)
@@ -369,7 +369,7 @@ export class Group<
     this.notFoundItemKeys = notFoundItemKeys;
 
     // Ingest rebuilt Group output into the Runtime
-    this.observers.output.ingestValue(groupItems, config);
+    this.observers['output'].ingestItems(groupItems, config);
 
     return this;
   }
@@ -378,7 +378,7 @@ export class Group<
 export type GroupKey = string | number;
 
 export interface GroupObservers<ValueType = any, DataType = any>
-  extends StateObservers<ValueType> {
+  extends StateObserversInterface<ValueType> {
   /**
    * Observer responsible for the output of the Group.
    */

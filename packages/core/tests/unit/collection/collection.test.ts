@@ -1117,7 +1117,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyGroup.observer
+          dummyGroup.observers['value']
         );
       });
 
@@ -1146,7 +1146,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyGroup.observer
+          dummyGroup.observers['value']
         );
       });
     });
@@ -1182,7 +1182,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyGroup);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyGroup.observer
+          dummyGroup.observers['value']
         );
       });
 
@@ -1193,7 +1193,9 @@ describe('Collection Tests', () => {
         expect(response.isPlaceholder).toBeTruthy();
         expect(response._key).toBe('notExistingGroup');
         expect(collection.groups['notExistingGroup']).toBe(response);
-        expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          response.observers['value']
+        );
       });
     });
 
@@ -1344,7 +1346,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummySelector.observer
+          dummySelector.observers['value']
         );
       });
 
@@ -1373,7 +1375,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummySelector.observer
+          dummySelector.observers['value']
         );
       });
     });
@@ -1403,7 +1405,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummySelector);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummySelector.observer
+          dummySelector.observers['value']
         );
       });
 
@@ -1419,7 +1421,9 @@ describe('Collection Tests', () => {
         expect(response._key).toBe('notExistingSelector');
 
         expect(collection.selectors['notExistingSelector']).toBe(response);
-        expect(ComputedTracker.tracked).toHaveBeenCalledWith(response.observer);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          response.observers['value']
+        );
       });
     });
 
@@ -1508,7 +1512,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyItem.observer
+          dummyItem.observers['value']
         );
       });
 
@@ -1537,7 +1541,7 @@ describe('Collection Tests', () => {
 
         expect(response).toBe(dummyItem);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyItem.observer
+          dummyItem.observers['value']
         );
       });
     });
@@ -1566,7 +1570,7 @@ describe('Collection Tests', () => {
         expect(response).toBe(dummyItem);
         expect(collection.createPlaceholderItem).not.toHaveBeenCalled();
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          dummyItem.observer
+          dummyItem.observers['value']
         );
       });
 
@@ -1579,7 +1583,7 @@ describe('Collection Tests', () => {
           true
         );
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          placeholderItem.observer
+          placeholderItem.observers['value']
         );
       });
     });
@@ -1610,7 +1614,7 @@ describe('Collection Tests', () => {
 
         expect(ComputedTracker.tracked).toHaveBeenCalledTimes(1);
         expect(ComputedTracker.tracked).not.toHaveBeenCalledWith(
-          dummyItem.observer
+          dummyItem.observers['value']
         );
       });
 
@@ -1628,7 +1632,7 @@ describe('Collection Tests', () => {
 
         expect(ComputedTracker.tracked).toHaveBeenCalledTimes(1);
         expect(ComputedTracker.tracked).not.toHaveBeenCalledWith(
-          dummyItem.observer
+          dummyItem.observers['value']
         );
       });
 
@@ -1647,7 +1651,7 @@ describe('Collection Tests', () => {
 
         expect(ComputedTracker.tracked).toHaveBeenCalledTimes(1);
         expect(ComputedTracker.tracked).not.toHaveBeenCalledWith(
-          dummyItem.observer
+          dummyItem.observers['value']
         );
       });
     });
@@ -1705,6 +1709,7 @@ describe('Collection Tests', () => {
       let dummyItem1: Item<ItemInterface>;
       let dummyItem2: Item<ItemInterface>;
       let dummyItem3: Item<ItemInterface>;
+      let defaultGroup: Group<ItemInterface>;
 
       beforeEach(() => {
         dummyItem1 = new Item(collection, { id: '1', name: 'Jeff' });
@@ -1719,11 +1724,15 @@ describe('Collection Tests', () => {
           ['3']: dummyItem3,
         };
 
-        collection.getDefaultGroup()?.add(['1', '2', '3']);
+        defaultGroup = collection.getDefaultGroup() as any;
+        defaultGroup.add(['1', '2', '3']);
+        jest.spyOn(defaultGroup, 'getItems');
       });
 
       it('should return all existing Items (default config)', () => {
         const items = collection.getAllItems();
+
+        expect(defaultGroup.getItems).toHaveBeenCalled();
 
         expect(items.includes(dummyItem1)).toBeTruthy();
         expect(items.includes(dummyItem2)).toBeFalsy();
@@ -1732,6 +1741,8 @@ describe('Collection Tests', () => {
 
       it('should return all Items (config.notExisting = true)', () => {
         const items = collection.getAllItems({ notExisting: true });
+
+        expect(defaultGroup.getItems).not.toHaveBeenCalled();
 
         expect(items.includes(dummyItem1)).toBeTruthy();
         expect(items.includes(dummyItem2)).toBeTruthy();
@@ -3000,23 +3011,22 @@ describe('Collection Tests', () => {
           dummyGroup2: dummyGroup2,
         };
 
-        dummyGroup1.ingest = jest.fn();
-        dummyGroup2.ingest = jest.fn();
+        dummyGroup1.rebuild = jest.fn();
+        dummyGroup2.rebuild = jest.fn();
       });
 
       it('should call ingest on each Group that includes the passed ItemKey (default config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem1');
 
-        expect(dummyGroup1.ingest).toHaveBeenCalledWith({
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({
           background: false,
-          force: true,
           sideEffects: {
             enabled: true,
             exclude: [],
           },
           storage: false,
         });
-        expect(dummyGroup2.ingest).not.toHaveBeenCalled();
+        expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
       });
 
       it('should call ingest on each Group that includes the passed ItemKey (specific config)', () => {
@@ -3027,17 +3037,15 @@ describe('Collection Tests', () => {
           },
         });
 
-        expect(dummyGroup1.ingest).toHaveBeenCalledWith({
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({
           background: true,
-          force: true,
           sideEffects: {
             enabled: false,
           },
           storage: false,
         });
-        expect(dummyGroup2.ingest).toHaveBeenCalledWith({
+        expect(dummyGroup2.rebuild).toHaveBeenCalledWith({
           background: true,
-          force: true,
           sideEffects: {
             enabled: false,
           },

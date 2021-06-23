@@ -12,10 +12,10 @@ import {
 } from '../../internal';
 
 export class GroupObserver<DataType = any> extends Observer {
-  // State the Observer belongs to
+  // Group the Observer belongs to
   public group: () => Group<DataType>;
 
-  // Next value applied to the Group
+  // Next output applied to the Group
   public nextGroupOutput: DataType[];
 
   /**
@@ -63,7 +63,7 @@ export class GroupObserver<DataType = any> extends Observer {
    * @param newGroupItems - New Group Items to be applied to the Group.
    * @param config - Configuration object.
    */
-  public ingestValue(
+  public ingestItems(
     newGroupItems: Item<DataType>[],
     config: StateIngestConfigInterface = {}
   ): void {

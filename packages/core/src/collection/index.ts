@@ -506,7 +506,7 @@ export class Collection<
     if (group == null || (!config.notExisting && !group.exists))
       return undefined;
 
-    ComputedTracker.tracked(group.observers.value);
+    ComputedTracker.tracked(group.observers['value']);
     return group;
   }
 
@@ -550,7 +550,7 @@ export class Collection<
       this.groups[groupKey] = group;
     }
 
-    ComputedTracker.tracked(group.observers.value);
+    ComputedTracker.tracked(group.observers['value']);
     return group;
   }
 
@@ -679,7 +679,7 @@ export class Collection<
     if (selector == null || (!config.notExisting && !selector.exists))
       return undefined;
 
-    ComputedTracker.tracked(selector.observers.value);
+    ComputedTracker.tracked(selector.observers['value']);
     return selector;
   }
 
@@ -709,7 +709,7 @@ export class Collection<
       this.selectors[selectorKey] = selector;
     }
 
-    ComputedTracker.tracked(selector.observers.value);
+    ComputedTracker.tracked(selector.observers['value']);
     return selector;
   }
 
@@ -785,7 +785,7 @@ export class Collection<
     // Check if Item exists
     if (item == null || (!config.notExisting && !item.exists)) return undefined;
 
-    ComputedTracker.tracked(item.observers.value);
+    ComputedTracker.tracked(item.observers['value']);
     return item;
   }
 
@@ -807,7 +807,7 @@ export class Collection<
     // Create dummy Item to hold reference
     if (item == null) item = this.createPlaceholderItem(itemKey, true);
 
-    ComputedTracker.tracked(item.observers.value);
+    ComputedTracker.tracked(item.observers['value']);
     return item;
   }
 
@@ -840,7 +840,7 @@ export class Collection<
     )
       this.data[itemKey] = item;
 
-    ComputedTracker.tracked(item.observers.value);
+    ComputedTracker.tracked(item.observers['value']);
     return item;
   }
 
