@@ -7,6 +7,7 @@ import {
   Observer,
   Collection,
   StateObserver,
+  GroupObserver,
 } from '../../src';
 import { LogMock } from '../helper/logMock';
 
@@ -62,49 +63,117 @@ describe('Utils Tests', () => {
   });
 
   describe('extractObservers function tests', () => {
+    // Observer 1
     let dummyObserver: Observer;
+
+    // Observer 2
     let dummyObserver2: Observer;
+
+    // State with one Observer
     let dummyStateObserver: StateObserver;
     let dummyState: State;
-    let dummyDefaultGroupObserver: StateObserver;
+
+    // State with multiple Observer
+    let dummyStateWithMultipleObserver: State;
+    let dummyStateValueObserver: StateObserver;
+    let dummyStateRandomObserver: StateObserver;
+
+    // Collection
     let dummyCollection: Collection;
+    let dummyDefaultGroupValueObserver: StateObserver;
+    let dummyDefaultGroupOutputObserver: GroupObserver;
 
     beforeEach(() => {
+      // Observer 1
       dummyObserver = new Observer(dummyAgile);
+
+      // Observer 2
       dummyObserver2 = new Observer(dummyAgile);
 
-      dummyState = new State(dummyAgile, undefined);
+      // State with one Observer
+      dummyState = new State(dummyAgile, null);
       dummyStateObserver = new StateObserver(dummyState);
-      dummyState.observer = dummyStateObserver;
+      dummyState.observers['value'] = dummyStateObserver;
 
+      // State with multiple Observer
+      dummyStateWithMultipleObserver = new State(dummyAgile, null);
+      dummyStateValueObserver = new StateObserver(dummyState);
+      dummyStateWithMultipleObserver.observers[
+        'value'
+      ] = dummyStateValueObserver;
+      dummyStateRandomObserver = new StateObserver(dummyState);
+      dummyStateWithMultipleObserver.observers[
+        'random'
+      ] = dummyStateRandomObserver;
+
+      // Collection
       dummyCollection = new Collection(dummyAgile);
       const defaultGroup =
         dummyCollection.groups[dummyCollection.config.defaultGroupKey];
-      dummyDefaultGroupObserver = new StateObserver(defaultGroup);
-      defaultGroup.observer = dummyDefaultGroupObserver;
+      dummyDefaultGroupValueObserver = new StateObserver(defaultGroup);
+      defaultGroup.observers['value'] = dummyDefaultGroupValueObserver;
+      dummyDefaultGroupOutputObserver = new GroupObserver(defaultGroup);
+      defaultGroup.observers['output'] = dummyDefaultGroupOutputObserver;
+    });
+
+    it('should extract Observer from passed Instance', () => {
+      const response = extractObservers(dummyState);
+
+      expect(response).toStrictEqual({ value: dummyStateObserver });
     });
 
     it('should extract Observers from passed Instances', () => {
       const response = extractObservers([
+        // Observer 1
         dummyObserver,
+
+        // State with one Observer
         dummyState,
+
         undefined,
         {},
+
+        // State with multiple Observer
+        dummyStateWithMultipleObserver,
+
         { observer: 'fake' },
+
+        // Collection
         dummyCollection,
+
+        // Observer 2
         { observer: dummyObserver2 },
       ]);
 
       expect(response).toStrictEqual([
-        dummyObserver,
-        dummyStateObserver,
-        undefined,
-        undefined,
-        undefined,
-        dummyDefaultGroupObserver,
-        dummyObserver2,
+        // Observer 1
+        { value: dummyObserver },
+
+        // State with one Observer
+        { value: dummyStateObserver },
+
+        {},
+        {},
+
+        // State with multiple Observer
+        { value: dummyStateValueObserver, random: dummyStateRandomObserver },
+
+        {},
+
+        // Collection
+        {
+          value: dummyDefaultGroupValueObserver,
+          output: dummyDefaultGroupOutputObserver,
+        },
+
+        // Observer 2
+        { value: dummyObserver2 },
       ]);
     });
+  });
+
+  describe('extractRelevantObservers function tests', () => {
+    // TODO
   });
 
   describe('globalBind function tests', () => {
