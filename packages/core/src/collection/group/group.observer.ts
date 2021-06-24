@@ -80,7 +80,7 @@ export class GroupObserver<DataType = any> extends Observer {
     });
 
     // Force overwriting the Group value if it is a placeholder.
-    // After assigning a value to the Group, it is supposed to be no placeholder anymore.
+    // After assigning a value to the Group, the Group is supposed to be no placeholder anymore.
     if (group.isPlaceholder) {
       config.force = true;
     }
@@ -128,7 +128,7 @@ export class GroupObserver<DataType = any> extends Observer {
     // Assign new Group output
     group._output = copy(observer.nextGroupOutput);
 
-    // Assign new public output to the Observer
+    // Assign new public output to the Observer (output used by the Integrations)
     job.observer.previousValue = copy(job.observer.value);
     job.observer.value = copy(group._output);
   }

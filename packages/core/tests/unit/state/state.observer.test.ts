@@ -168,7 +168,7 @@ describe('StateObserver Tests', () => {
         () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe(`${stateObserver._key}_randomKey`);
+            expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -255,7 +255,7 @@ describe('StateObserver Tests', () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyState._value = 'updatedDummyValue';
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe(`${stateObserver._key}_randomKey`);
+            expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -285,7 +285,7 @@ describe('StateObserver Tests', () => {
       it('should ingest placeholder State into the Runtime (default config)', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(`${stateObserver._key}_randomKey`);
+          expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
           expect(job.observer).toBe(stateObserver);
           expect(job.config).toStrictEqual({
             background: false,
@@ -360,7 +360,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeTruthy();
 
-        expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.value).toBe('newValue');
         expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
@@ -382,7 +382,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.isSet).toBeFalsy();
         expect(dummyState.isPlaceholder).toBeFalsy();
 
-        expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.value).toBe('newValue');
         expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
@@ -404,7 +404,7 @@ describe('StateObserver Tests', () => {
           expect(dummyState.nextStateValue).toBe('newValue');
           expect(dummyState.isSet).toBeFalsy();
 
-          expect(stateObserver.value).toBe('newPublicValue');
+          expect(stateObserver.value).toBe('newValue');
           expect(stateObserver.previousValue).toBe('dummyValue');
           expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
         }

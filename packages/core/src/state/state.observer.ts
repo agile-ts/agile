@@ -13,7 +13,8 @@ import {
   createArrayFromObject,
   CreateStateRuntimeJobConfigInterface,
   generateId,
-  CreateObserverConfigInterface,
+  SubscriptionContainer,
+  ObserverKey,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -34,7 +35,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   constructor(
     state: State<ValueType>,
-    config: CreateObserverConfigInterface = {}
+    config: CreateStateObserverConfigInterface = {}
   ) {
     super(state.agileInstance(), { ...config, ...{ value: state._value } });
     this.state = () => state;
@@ -94,7 +95,7 @@ export class StateObserver<ValueType = any> extends Observer {
     });
 
     // Force overwriting the State value if it is a placeholder.
-    // After assigning a value to the State, it is supposed to be no placeholder anymore.
+    // After assigning a value to the State, the State is supposed to be no placeholder anymore.
     if (state.isPlaceholder) {
       config.force = true;
       config.overwrite = true;
@@ -160,7 +161,7 @@ export class StateObserver<ValueType = any> extends Observer {
     state.isSet = notEqual(state._value, state.initialStateValue);
     this.sideEffects(job);
 
-    // Assign new public value to the Observer
+    // Assign new public value to the Observer (value used by the Integrations)
     job.observer.previousValue = copy(observer.value);
     job.observer.value = copy(state._value);
   }
@@ -200,6 +201,24 @@ export class StateObserver<ValueType = any> extends Observer {
       }
     }
   }
+}
+
+export interface CreateStateObserverConfigInterface {
+  /**
+   * Initial Observers to depend on the Observer.
+   * @default []
+   */
+  dependents?: Array<Observer>;
+  /**
+   * Initial Subscription Containers the Observer is subscribed to.
+   * @default []
+   */
+  subs?: Array<SubscriptionContainer>;
+  /**
+   * Key/Name identifier of the Observer.
+   * @default undefined
+   */
+  key?: ObserverKey;
 }
 
 export interface StateIngestConfigInterface
