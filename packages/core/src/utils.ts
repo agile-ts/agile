@@ -66,7 +66,7 @@ export function extractObservers(
 
   // Get Observers from Instances
   for (const instance of tempInstancesArray) {
-    // If the Instance equals to 'undefined'
+    // If the Instance equals to 'null' or 'undefined'
     if (instance == null) {
       instancesArray.push({});
       continue;
@@ -87,7 +87,7 @@ export function extractObservers(
       continue;
     }
 
-    // If the Instance contains a property that includes Observers
+    // If the Instance contains a property that contains multiple Observers
     if (instance['observers']) {
       const extractedObservers = {};
       for (const key in instance['observers']) {
@@ -131,7 +131,7 @@ export function extractObservers(
 export function extractRelevantObservers<X extends Array<any>>(
   instances: X,
   observerType?: string
-): Array<Observer>;
+): Array<Observer | undefined>;
 /**
  * Extracts the most relevant Observers
  * from the specified Instance/s in object shape
@@ -151,7 +151,7 @@ export function extractRelevantObservers<X extends Array<any>>(
 export function extractRelevantObservers<X extends { [key: string]: any }>(
   instances: X,
   observerType?: string
-): { [key: string]: Observer };
+): { [key: string]: Observer | undefined };
 
 export function extractRelevantObservers<
   X extends { [key: string]: any },
@@ -159,26 +159,25 @@ export function extractRelevantObservers<
 >(
   instances: X | Y,
   observerType?: string
-): Array<Observer> | { [key: string]: Observer } {
-  const depsWithIndicator: { [key: string]: Observer } = {};
-  const depsWithNoIndicator: Array<Observer> = [];
+): Array<Observer | undefined> | { [key: string]: Observer | undefined } {
+  const depsWithIndicator: { [key: string]: Observer | undefined } = {};
+  const depsWithNoIndicator: Array<Observer | undefined> = [];
 
   // Extract Observers from deps
   for (const depKey in instances) {
     const extractedObservers = extractObservers(instances[depKey]);
     let observer: Observer | undefined = undefined;
 
-    // Extract Observer at specified type from the fround Observers
+    // Extract Observer at specified type
     if (observerType != null && extractedObservers[observerType])
       observer = extractedObservers[observerType];
-    else {
-      observer = extractedObservers['output'] ?? extractedObservers['value'];
-    }
 
-    if (observer != null) {
-      if (Array.isArray(instances)) depsWithNoIndicator.push(observer);
-      else depsWithIndicator[depKey] = observer;
-    }
+    // Extract most relevant Observer
+    if (observerType == null)
+      observer = extractedObservers['output'] ?? extractedObservers['value'];
+
+    if (Array.isArray(instances)) depsWithNoIndicator.push(observer);
+    else depsWithIndicator[depKey] = observer;
   }
 
   return Array.isArray(instances) ? depsWithNoIndicator : depsWithIndicator;

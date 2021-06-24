@@ -1,7 +1,6 @@
 import {
   globalBind,
   getAgileInstance,
-  extractObservers,
   Agile,
   State,
   Observer,
@@ -9,6 +8,7 @@ import {
   StateObserver,
   GroupObserver,
 } from '../../src';
+import * as Utils from '../../src/utils';
 import { LogMock } from '../helper/logMock';
 
 describe('Utils Tests', () => {
@@ -117,13 +117,13 @@ describe('Utils Tests', () => {
     });
 
     it('should extract Observer from passed Instance', () => {
-      const response = extractObservers(dummyState);
+      const response = Utils.extractObservers(dummyState);
 
       expect(response).toStrictEqual({ value: dummyStateObserver });
     });
 
     it('should extract Observers from passed Instances', () => {
-      const response = extractObservers([
+      const response = Utils.extractObservers([
         // Observer 1
         dummyObserver,
 
@@ -173,7 +173,146 @@ describe('Utils Tests', () => {
   });
 
   describe('extractRelevantObservers function tests', () => {
-    // TODO
+    // State with one Observer
+    let dummyStateObserver: StateObserver;
+    let dummyState: State;
+
+    // State with multiple Observer
+    let dummyStateWithMultipleObserver: State;
+    let dummyStateValueObserver: StateObserver;
+    let dummyStateRandomObserver: StateObserver;
+
+    // Collection
+    let dummyCollection: Collection;
+    let dummyDefaultGroupValueObserver: StateObserver;
+    let dummyDefaultGroupOutputObserver: GroupObserver;
+
+    beforeEach(() => {
+      // State with one Observer
+      dummyState = new State(dummyAgile, null);
+      dummyStateObserver = new StateObserver(dummyState);
+      dummyState.observers['value'] = dummyStateObserver;
+
+      // State with multiple Observer
+      dummyStateWithMultipleObserver = new State(dummyAgile, null);
+      dummyStateValueObserver = new StateObserver(dummyState);
+      dummyStateWithMultipleObserver.observers[
+        'value'
+      ] = dummyStateValueObserver;
+      dummyStateRandomObserver = new StateObserver(dummyState);
+      dummyStateWithMultipleObserver.observers[
+        'random'
+      ] = dummyStateRandomObserver;
+
+      // Collection
+      dummyCollection = new Collection(dummyAgile);
+      const defaultGroup =
+        dummyCollection.groups[dummyCollection.config.defaultGroupKey];
+      dummyDefaultGroupValueObserver = new StateObserver(defaultGroup);
+      defaultGroup.observers['value'] = dummyDefaultGroupValueObserver;
+      dummyDefaultGroupOutputObserver = new GroupObserver(defaultGroup);
+      defaultGroup.observers['output'] = dummyDefaultGroupOutputObserver;
+
+      jest.spyOn(Utils, 'extractObservers');
+    });
+
+    it('should extract Observers at the specified observerType (array shape)', () => {
+      const response = Utils.extractRelevantObservers(
+        [
+          dummyState,
+          dummyStateWithMultipleObserver,
+          undefined,
+          dummyCollection,
+        ],
+        'output'
+      );
+
+      expect(response).toStrictEqual([
+        undefined,
+        undefined,
+        undefined,
+        dummyDefaultGroupOutputObserver,
+      ]);
+
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyState);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(
+      //   dummyStateWithMultipleObserver
+      // );
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(undefined);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
+    });
+
+    it('should extract the most relevant Observer (array shape)', () => {
+      const response = Utils.extractRelevantObservers([
+        dummyState,
+        dummyStateWithMultipleObserver,
+        undefined,
+        dummyCollection,
+      ]);
+
+      expect(response).toStrictEqual([
+        dummyStateObserver,
+        dummyStateValueObserver,
+        undefined,
+        dummyDefaultGroupOutputObserver,
+      ]);
+
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyState);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(
+      //   dummyStateWithMultipleObserver
+      // );
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(undefined);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
+    });
+
+    it('should extract Observers at the specified observerType (object shape)', () => {
+      const response = Utils.extractRelevantObservers(
+        {
+          dummyState,
+          dummyStateWithMultipleObserver,
+          undefinedObserver: undefined,
+          dummyCollection,
+        },
+        'output'
+      );
+
+      expect(response).toStrictEqual({
+        dummyState: undefined,
+        dummyStateWithMultipleObserver: undefined,
+        undefinedObserver: undefined,
+        dummyCollection: dummyDefaultGroupOutputObserver,
+      });
+
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyState);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(
+      //   dummyStateWithMultipleObserver
+      // );
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(undefined);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
+    });
+
+    it('should extract the most relevant Observer (object shape)', () => {
+      const response = Utils.extractRelevantObservers({
+        dummyState,
+        dummyStateWithMultipleObserver,
+        undefinedObserver: undefined,
+        dummyCollection,
+      });
+
+      expect(response).toStrictEqual({
+        dummyState: dummyStateObserver,
+        dummyStateWithMultipleObserver: dummyStateValueObserver,
+        undefinedObserver: undefined,
+        dummyCollection: dummyDefaultGroupOutputObserver,
+      });
+
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyState);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(
+      //   dummyStateWithMultipleObserver
+      // );
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(undefined);
+      // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
+    });
   });
 
   describe('globalBind function tests', () => {
