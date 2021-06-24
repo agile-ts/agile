@@ -128,7 +128,7 @@ export class State<ValueType = any> {
    * @public
    */
   public get value(): ValueType {
-    ComputedTracker.tracked(this.observers.value);
+    ComputedTracker.tracked(this.observers['value']);
     return copy(this._value);
   }
 
@@ -176,7 +176,7 @@ export class State<ValueType = any> {
     // Update key in Persistent (only if oldKey is equal to persistentKey
     // because otherwise the persistentKey is detached from the State key
     // -> not managed by State anymore)
-    if (value && this.persistent?._key === oldKey)
+    if (value != null && this.persistent?._key === oldKey)
       this.persistent?.setKey(value);
 
     return this;
@@ -213,7 +213,7 @@ export class State<ValueType = any> {
     }
 
     // Ingest the State with the new value into the runtime
-    this.observers.value.ingestValue(_value, config);
+    this.observers['value'].ingestValue(_value, config);
 
     return this;
   }
@@ -231,7 +231,7 @@ export class State<ValueType = any> {
    * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): this {
-    this.observers.value.ingest(config);
+    this.observers['value'].ingest(config);
     return this;
   }
 

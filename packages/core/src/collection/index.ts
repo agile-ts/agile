@@ -146,7 +146,7 @@ export class Collection<
     // Update key in Persistent (only if oldKey is equal to persistentKey
     // because otherwise the persistentKey is detached from the Collection key
     // -> not managed by Collection anymore)
-    if (value && this.persistent?._key === oldKey)
+    if (value != null && this.persistent?._key === oldKey)
       this.persistent?.setKey(value);
 
     return this;

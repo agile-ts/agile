@@ -57,8 +57,10 @@ describe('Group Tests', () => {
     expect(group.previousStateValue).toStrictEqual([]);
     expect(group.nextStateValue).toStrictEqual([]);
     expect(group.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(group.observers['value'].dependents)).toStrictEqual([]);
     expect(group.observers['value']._key).toBeUndefined();
     expect(group.observers['output']).toBeInstanceOf(GroupObserver);
+    expect(Array.from(group.observers['output'].dependents)).toStrictEqual([]);
     expect(group.observers['output']._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
@@ -95,8 +97,10 @@ describe('Group Tests', () => {
     expect(group.previousStateValue).toStrictEqual([]);
     expect(group.nextStateValue).toStrictEqual([]);
     expect(group.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(group.observers['value'].dependents)).toStrictEqual([]);
     expect(group.observers['value']._key).toBe('dummyKey');
     expect(group.observers['output']).toBeInstanceOf(GroupObserver);
+    expect(Array.from(group.observers['output'].dependents)).toStrictEqual([]);
     expect(group.observers['output']._key).toBe('dummyKey');
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();

@@ -38,9 +38,9 @@ describe('State Tests', () => {
     expect(state._value).toBe('coolValue');
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
-    expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.dependents.size).toBe(0);
-    expect(state.observer._key).toBeUndefined();
+    expect(state.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
+    expect(state.observers['value']._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeValueMethod).toBeUndefined();
     expect(state.computeExistsMethod).toBeInstanceOf(Function);
@@ -69,10 +69,11 @@ describe('State Tests', () => {
     expect(state._value).toBe('coolValue');
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
-    expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.dependents.size).toBe(1);
-    expect(state.observer.dependents.has(dummyObserver)).toBeTruthy();
-    expect(state.observer._key).toBe('coolState');
+    expect(state.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(state.observers['value'].dependents)).toStrictEqual([
+      dummyObserver,
+    ]);
+    expect(state.observers['value']._key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeValueMethod).toBeUndefined();
     expect(state.computeExistsMethod).toBeInstanceOf(Function);
@@ -96,9 +97,9 @@ describe('State Tests', () => {
     expect(state._value).toBe('coolValue');
     expect(state.previousStateValue).toBe('coolValue');
     expect(state.nextStateValue).toBe('coolValue');
-    expect(state.observer).toBeInstanceOf(StateObserver);
-    expect(state.observer.dependents.size).toBe(0);
-    expect(state.observer._key).toBeUndefined();
+    expect(state.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
+    expect(state.observers['value']._key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
     expect(state.computeValueMethod).toBeUndefined();
     expect(state.computeExistsMethod).toBeInstanceOf(Function);
@@ -153,7 +154,7 @@ describe('State Tests', () => {
 
         expect(value).toBe(10);
         expect(ComputedTracker.tracked).toHaveBeenCalledWith(
-          numberState.observer
+          numberState.observers['value']
         );
       });
     });
@@ -175,8 +176,12 @@ describe('State Tests', () => {
     });
 
     describe('setKey function tests', () => {
+      let dummyOutputObserver: Observer;
+
       beforeEach(() => {
+        dummyOutputObserver = new StateObserver(numberState, { key: 'oldKey' });
         numberState.persistent = new StatePersistent(numberState);
+        numberState.observers['output'] = dummyOutputObserver;
 
         numberState.persistent.setKey = jest.fn();
       });
@@ -188,7 +193,8 @@ describe('State Tests', () => {
         numberState.setKey('newKey');
 
         expect(numberState._key).toBe('newKey');
-        expect(numberState.observer._key).toBe('newKey');
+        expect(numberState.observers['value']._key).toBe('newKey');
+        expect(numberState.observers['output']._key).toBe('newKey');
         expect(numberState.persistent?.setKey).toHaveBeenCalledWith('newKey');
       });
 
@@ -198,7 +204,8 @@ describe('State Tests', () => {
         numberState.setKey('newKey');
 
         expect(numberState._key).toBe('newKey');
-        expect(numberState.observer._key).toBe('newKey');
+        expect(numberState.observers['value']._key).toBe('newKey');
+        expect(numberState.observers['output']._key).toBe('newKey');
         expect(numberState.persistent?.setKey).not.toHaveBeenCalled();
       });
 
@@ -209,14 +216,15 @@ describe('State Tests', () => {
         numberState.setKey(undefined);
 
         expect(numberState._key).toBeUndefined();
-        expect(numberState.observer._key).toBeUndefined();
+        expect(numberState.observers['value']._key).toBeUndefined();
+        expect(numberState.observers['output']._key).toBeUndefined();
         expect(numberState.persistent?.setKey).not.toHaveBeenCalled();
       });
     });
 
     describe('set function tests', () => {
       beforeEach(() => {
-        jest.spyOn(numberState.observer, 'ingestValue');
+        jest.spyOn(numberState.observers['value'], 'ingestValue');
       });
 
       it('should ingestValue if value has correct type (default config)', () => {
@@ -224,9 +232,12 @@ describe('State Tests', () => {
 
         LogMock.hasNotLogged('warn');
         LogMock.hasNotLogged('error');
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          force: false,
-        });
+        expect(numberState.observers['value'].ingestValue).toHaveBeenCalledWith(
+          20,
+          {
+            force: false,
+          }
+        );
       });
 
       it('should ingestValue if passed function returns value with correct type (default config)', () => {
@@ -234,9 +245,12 @@ describe('State Tests', () => {
 
         LogMock.hasNotLogged('warn');
         LogMock.hasNotLogged('error');
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(30, {
-          force: false,
-        });
+        expect(numberState.observers['value'].ingestValue).toHaveBeenCalledWith(
+          30,
+          {
+            force: false,
+          }
+        );
       });
 
       it('should ingestValue if value has correct type (specific config)', () => {
@@ -250,14 +264,17 @@ describe('State Tests', () => {
 
         LogMock.hasNotLogged('warn');
         LogMock.hasNotLogged('error');
-        expect(numberState.observer.ingestValue).toHaveBeenCalledWith(20, {
-          sideEffects: {
-            enabled: false,
-          },
-          background: true,
-          storage: false,
-          force: false,
-        });
+        expect(numberState.observers['value'].ingestValue).toHaveBeenCalledWith(
+          20,
+          {
+            sideEffects: {
+              enabled: false,
+            },
+            background: true,
+            storage: false,
+            force: false,
+          }
+        );
       });
 
       it("shouldn't ingestValue if value hasn't correct type (default config)", () => {
@@ -267,7 +284,9 @@ describe('State Tests', () => {
 
         LogMock.hasNotLogged('warn');
         LogMock.hasLoggedCode('14:03:00', ['string', 'number']);
-        expect(numberState.observer.ingestValue).not.toHaveBeenCalled();
+        expect(
+          numberState.observers['value'].ingestValue
+        ).not.toHaveBeenCalled();
       });
 
       it("should ingestValue if value hasn't correct type (config.force = true)", () => {
@@ -278,7 +297,7 @@ describe('State Tests', () => {
         LogMock.hasNotLogged('error');
         LogMock.hasLoggedCode('14:02:00', ['string', 'number']);
         expect(
-          numberState.observer.ingestValue
+          numberState.observers['value'].ingestValue
         ).toHaveBeenCalledWith('coolValue', { force: true });
       });
 
@@ -288,20 +307,20 @@ describe('State Tests', () => {
         LogMock.hasNotLogged('warn');
         LogMock.hasNotLogged('error');
         expect(
-          numberState.observer.ingestValue
+          numberState.observers['value'].ingestValue
         ).toHaveBeenCalledWith('coolValue', { force: false });
       });
     });
 
     describe('ingest function tests', () => {
       beforeEach(() => {
-        numberState.observer.ingest = jest.fn();
+        numberState.observers['value'].ingest = jest.fn();
       });
 
       it('should call ingest function in Observer (default config)', () => {
         numberState.ingest();
 
-        expect(numberState.observer.ingest).toHaveBeenCalledWith({});
+        expect(numberState.observers['value'].ingest).toHaveBeenCalledWith({});
       });
 
       it('should call ingest function in Observer (specific config)', () => {
@@ -310,7 +329,7 @@ describe('State Tests', () => {
           background: true,
         });
 
-        expect(numberState.observer.ingest).toHaveBeenCalledWith({
+        expect(numberState.observers['value'].ingest).toHaveBeenCalledWith({
           background: true,
           force: true,
         });
@@ -1073,18 +1092,6 @@ describe('State Tests', () => {
 
       it('should return true if State has no defined Type', () => {
         expect(numberState.hasCorrectType('stringValue')).toBeTruthy();
-      });
-    });
-
-    describe('getPublicValue function tests', () => {
-      it('should return value of State', () => {
-        expect(numberState.getPublicValue()).toBe(10);
-      });
-
-      it('should return output of State', () => {
-        numberState['output'] = 99;
-
-        expect(numberState.getPublicValue()).toBe(99);
       });
     });
   });
