@@ -19,6 +19,11 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
+// https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-var-requires.md
+// https://stackoverflow.com/questions/27722576/can-i-specify-optional-module-dependencies-in-npm-package-json
+// https://stackoverflow.com/questions/14164610/requirejs-optional-dependency
+import proxyPackage = require('@agile-ts/proxytree');
+
 /**
  * React Hook for binding the most relevant value of multiple Agile Instances
  * (like the Collection's output or the State's value)
@@ -80,22 +85,19 @@ export function useAgile<
       if (dep == null) return undefined as any;
       const value = dep.value;
 
-      // If proxyBased and value is of type object.
-      // Wrap a Proxy around the object to track the used properties
-      if (config.proxyBased && isValidObject(value, true)) {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const proxyPackage = require('@agile-ts/proxytree');
-
-        if (proxyPackage != null) {
+      if (proxyPackage != null) {
+        // If proxyBased and value is of type object.
+        // Wrap a Proxy around the object to track the used properties
+        if (config.proxyBased && isValidObject(value, true)) {
           const proxyTree = new proxyPackage.ProxyTree(value);
           proxyTreeWeakMap.set(dep, proxyTree);
           return proxyTree.proxy;
-        } else {
-          console.error(
-            'To use the AgileTs Proxy functionality, ' +
-              'the installation of the `@agile-ts/proxytree` package is required!'
-          );
         }
+      } else {
+        console.error(
+          'To use the AgileTs Proxy functionality, ' +
+            'the installation of an additional package called `@agile-ts/proxytree` is required!'
+        );
       }
 
       // If selector and value is of type object.
@@ -124,8 +126,13 @@ export function useAgile<
   useIsomorphicLayoutEffect(() => {
     let agileInstance = config.agileInstance;
 
+    // https://github.com/microsoft/TypeScript/issues/20812
+    const observers: Observer[] = depsArray.filter(
+      (dep): dep is Observer => dep !== undefined
+    );
+
     // Try to get Agile Instance
-    if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
+    if (!agileInstance) agileInstance = getAgileInstance(observers[0]);
     if (!agileInstance || !agileInstance.subController) {
       Agile.logger.error(
         'Failed to subscribe Component with deps because of missing valid Agile Instance.',
@@ -134,15 +141,11 @@ export function useAgile<
       return;
     }
 
-    // https://github.com/microsoft/TypeScript/issues/20812
-    const observers: Observer[] = depsArray.filter(
-      (dep): dep is Observer => dep !== undefined
-    );
-
     // TODO Proxy doesn't work as expected when 'selecting' a not yet existing property
-    //  -> No Proxy Path could be created on the Component mount
-    //  -> No Selector was created based on the Proxy Paths
-    //  -> Component rerenders no matter what property has changed
+    //  For example the user selects 'user.data.name' but 'user' is undefined
+    //  -> No Proxy Path could be created on the Component mount, since the to select property doesn't exist
+    //  -> Selector was created based on a no complete Proxy Paths
+    //  -> Component re-renders no matter what property has changed
     //
     // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
     // by extracting the routes of the Tree
@@ -150,7 +153,7 @@ export function useAgile<
     // because the 'useIsomorphicLayoutEffect' is called after the rerender
     // -> In the Component used paths got successfully tracked
     const proxyWeakMap: ProxyWeakMapType = new WeakMap();
-    if (config.proxyBased) {
+    if (config.proxyBased && proxyPackage != null) {
       for (const observer of observers) {
         const proxyTree = proxyTreeWeakMap.get(observer);
         if (proxyTree != null) {

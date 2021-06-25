@@ -38,6 +38,16 @@ export function getAgileInstance(instance: any): Agile | undefined {
  * Extracts all Observers from the specified Instances
  * and returns them in the given order.
  *
+ * ```
+ * const response = extractObservers([myState, myGroup, undefined]);
+ * console.log(response); // See below
+ * {
+ *   {value: Observer},
+ *   {value: Observer, output: Observer},
+ *   {}
+ * }
+ * ```
+ *
  * @internal
  * @param instances - Instances to extract the Observers from.
  */
@@ -47,34 +57,41 @@ export function extractObservers(
 /**
  * Extracts all Observers from the specified Instance.
  *
+ * ```
+ * const response = extractObservers(myState);
+ * console.log(response); // See below
+ * {
+ *  value: Observer
+ * }
+ * ```
+ *
  * @internal
  * @param instances - Instance to extract the Observers from.
  */
 export function extractObservers(
   instances: any
 ): { [key: string]: Observer | undefined };
-
 export function extractObservers(
   instances: any | Array<any>
 ):
   | Array<{ [key: string]: Observer | undefined }>
   | { [key: string]: Observer | undefined } {
-  const instancesArray: Array<{ [key: string]: Observer | undefined }> = [];
+  const observers: Array<{ [key: string]: Observer | undefined }> = [];
   const tempInstancesArray = normalizeArray(instances, {
     createUndefinedArray: true,
   });
 
-  // Get Observers from Instances
+  // Extract Observers from specified Instances
   for (const instance of tempInstancesArray) {
     // If the Instance equals to 'null' or 'undefined'
     if (instance == null) {
-      instancesArray.push({});
+      observers.push({});
       continue;
     }
 
     // If the Instance equals to a Collection
     if (instance instanceof Collection) {
-      instancesArray.push(
+      observers.push(
         instance.getGroupWithReference(instance.config.defaultGroupKey)
           .observers as any
       );
@@ -83,7 +100,7 @@ export function extractObservers(
 
     // If the Instance contains a property that is an Observer
     if (instance['observer'] && instance['observer'] instanceof Observer) {
-      instancesArray.push({ value: instance['observer'] });
+      observers.push({ value: instance['observer'] });
       continue;
     }
 
@@ -95,21 +112,21 @@ export function extractObservers(
           extractedObservers[key] = instance['observers'][key];
         }
       }
-      instancesArray.push(extractedObservers);
+      observers.push(extractedObservers);
       continue;
     }
 
     // If the Instance equals to an Observer
     if (instance instanceof Observer) {
-      instancesArray.push({ value: instance });
+      observers.push({ value: instance });
       continue;
     }
 
     // Push empty object if no valid Observer was found
-    instancesArray.push({});
+    observers.push({});
   }
 
-  return Array.isArray(instances) ? instancesArray : instancesArray[0];
+  return Array.isArray(instances) ? observers : observers[0];
 }
 
 /**
@@ -117,7 +134,7 @@ export function extractObservers(
  * from the specified Instance/s in array shape
  * and returns the extracted Observers in the given order.
  *
- * What type of Observer is extracted from an Instance
+ * What type of Observer is extracted from an Instance,
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
@@ -137,7 +154,7 @@ export function extractRelevantObservers<X extends Array<any>>(
  * from the specified Instance/s in object shape
  * and returns the extracted Observers in the given order.
  *
- * What type of Observer is extracted from an Instance
+ * What type of Observer is extracted from an Instance,
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
@@ -169,7 +186,7 @@ export function extractRelevantObservers<
     let observer: Observer | undefined = undefined;
 
     // Extract Observer at specified type
-    if (observerType != null && extractedObservers[observerType])
+    if (observerType != null && extractedObservers[observerType] != null)
       observer = extractedObservers[observerType];
 
     // Extract most relevant Observer
@@ -188,7 +205,6 @@ export function extractRelevantObservers<
  *
  * Learn more about global bound instances:
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
- * https://blog.logrocket.com/what-is-globalthis-why-use-it/
  *
  * @public
  * @param key - Key/Name identifier of the specified Instance.

@@ -116,13 +116,13 @@ describe('Utils Tests', () => {
       defaultGroup.observers['output'] = dummyDefaultGroupOutputObserver;
     });
 
-    it('should extract Observer from passed Instance', () => {
+    it('should extract Observer from specified Instance', () => {
       const response = Utils.extractObservers(dummyState);
 
       expect(response).toStrictEqual({ value: dummyStateObserver });
     });
 
-    it('should extract Observers from passed Instances', () => {
+    it('should extract Observers from specified Instances', () => {
       const response = Utils.extractObservers([
         // Observer 1
         dummyObserver,
@@ -216,7 +216,7 @@ describe('Utils Tests', () => {
       jest.spyOn(Utils, 'extractObservers');
     });
 
-    it('should extract Observers at the specified observerType (array shape)', () => {
+    it('should extract Observers at the specified observerType from the Instances (array shape)', () => {
       const response = Utils.extractRelevantObservers(
         [
           dummyState,
@@ -242,7 +242,7 @@ describe('Utils Tests', () => {
       // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
     });
 
-    it('should extract the most relevant Observer (array shape)', () => {
+    it('should extract the most relevant Observer from the Instances (array shape)', () => {
       const response = Utils.extractRelevantObservers([
         dummyState,
         dummyStateWithMultipleObserver,
@@ -265,7 +265,7 @@ describe('Utils Tests', () => {
       // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
     });
 
-    it('should extract Observers at the specified observerType (object shape)', () => {
+    it('should extract Observers at the specified observerType from the Instances (object shape)', () => {
       const response = Utils.extractRelevantObservers(
         {
           dummyState,
@@ -291,7 +291,7 @@ describe('Utils Tests', () => {
       // expect(Utils.extractObservers).toHaveBeenCalledWith(dummyCollection);
     });
 
-    it('should extract the most relevant Observer (object shape)', () => {
+    it('should extract the most relevant Observer from the Instances (object shape)', () => {
       const response = Utils.extractRelevantObservers({
         dummyState,
         dummyStateWithMultipleObserver,
@@ -322,13 +322,13 @@ describe('Utils Tests', () => {
       globalThis[dummyKey] = undefined;
     });
 
-    it('should bind instance at key globally (default config)', () => {
+    it('should bind Instance globally at the specified key (default config)', () => {
       globalBind(dummyKey, 'dummyInstance');
 
       expect(globalThis[dummyKey]).toBe('dummyInstance');
     });
 
-    it("shouldn't overwrite already existing instance at key (default config)", () => {
+    it("shouldn't overwrite already globally bound Instance at the same key (default config)", () => {
       globalBind(dummyKey, 'I am first!');
 
       globalBind(dummyKey, 'dummyInstance');
@@ -336,7 +336,7 @@ describe('Utils Tests', () => {
       expect(globalThis[dummyKey]).toBe('I am first!');
     });
 
-    it('should overwrite already existing instance at key (overwrite = true)', () => {
+    it('should overwrite already globally bound Instance at the same key (overwrite = true)', () => {
       globalBind(dummyKey, 'I am first!');
 
       globalBind(dummyKey, 'dummyInstance', true);
