@@ -19,7 +19,7 @@ import {
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
-import proxyPackage = optionalRequire('@agile-ts/proxytree');
+const proxyPackage = optionalRequire('@agile-ts/proxytree');
 
 /**
  * React Hook for binding the most relevant value of multiple Agile Instances
@@ -72,7 +72,8 @@ export function useAgile<
   );
   const proxyTreeWeakMap = new WeakMap();
 
-  // Creates Return Value of Hook, depending whether deps are in Array shape or not
+  // Builds return value,
+  // depending on whether the deps were provided in array shape or not
   const getReturnValue = (
     depsArray: (Observer | undefined)[]
   ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> => {
@@ -128,7 +129,7 @@ export function useAgile<
       (dep): dep is Observer => dep !== undefined
     );
 
-    // Try to get Agile Instance
+    // Try to extract Agile Instance from the specified Instance/s
     if (!agileInstance) agileInstance = getAgileInstance(observers[0]);
     if (!agileInstance || !agileInstance.subController) {
       Agile.logger.error(
@@ -145,10 +146,10 @@ export function useAgile<
     //  -> Component re-renders no matter what property has changed
     //
     // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
-    // by extracting the routes of the Tree
+    // by extracting the routes of the Tree.
     // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
-    // because the 'useIsomorphicLayoutEffect' is called after the rerender
-    // -> In the Component used paths got successfully tracked
+    // because the 'useIsomorphicLayoutEffect' is called after the rerender.
+    // -> In the UI-Component used paths got successfully tracked
     const proxyWeakMap: ProxyWeakMapType = new WeakMap();
     if (config.proxyBased && proxyPackage != null) {
       for (const observer of observers) {
@@ -161,7 +162,7 @@ export function useAgile<
       }
     }
 
-    // Build Selector WeakMap based on the specified Selector
+    // Build Selector WeakMap based on the specified selector methods
     const selectorWeakMap: SelectorWeakMapType = new WeakMap();
     if (config.selector != null) {
       for (const observer of observers) {
@@ -184,7 +185,7 @@ export function useAgile<
       }
     );
 
-    // Unsubscribe Callback based Subscription on Unmount
+    // Unsubscribe Callback based Subscription on unmount
     return () => {
       agileInstance?.subController.unsubscribe(subscriptionContainer);
     };

@@ -12,15 +12,18 @@ import {
   normalizeArray,
 } from '@agile-ts/core';
 
-//=========================================================================================================
-// AgileHOC
-//=========================================================================================================
 /**
+ * Higher order Component for binding the most relevant value of multiple Agile Instances
+ * (like the Collection's output or the State's value)
+ * to a React Class Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant value of an Agile Instance mutates.
+ *
  * @public
- * React HOC that binds Agile Instance like Collection, State, Computed, .. to a React Functional or Class Component
- * @param reactComponent - React Component to which the deps get bound
- * @param deps - Agile Instances that gets bind to the React Component
- * @param agileInstance - Agile Instance
+ * @param reactComponent - React Component to which the specified deps should be bound.
+ * @param deps - Agile Instances to be bound to the Functional Component.
+ * @param agileInstance - Instance of Agile the React Component belongs to.
  */
 export function AgileHOC(
   reactComponent: ComponentClass<any, any>,
@@ -30,7 +33,7 @@ export function AgileHOC(
   let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
 
-  // Format Deps
+  // Format deps
   if (isValidObject(deps)) {
     depsWithIndicator = formatDepsWithIndicator(deps as any);
   } else {
@@ -39,16 +42,13 @@ export function AgileHOC(
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
 
-  // Try to get Agile Instance
+  // Try to extract Agile Instance from the specified Instance/s
   if (!agileInstance) {
-    // From deps without Indicator
     if (depsWithoutIndicator.length > 0) {
       for (const dep of depsWithoutIndicator) {
         if (!agileInstance) agileInstance = getAgileInstance(dep);
       }
     }
-
-    // From deps with Indicator
     if (!agileInstance) {
       for (const depKey in depsWithIndicator) {
         if (!agileInstance)
@@ -56,8 +56,6 @@ export function AgileHOC(
       }
     }
   }
-
-  // If no Agile Instance found drop Error
   if (!agileInstance || !agileInstance.subController) {
     Agile.logger.error('Failed to subscribe Component with deps', deps);
     return reactComponent;
@@ -71,16 +69,15 @@ export function AgileHOC(
   );
 }
 
-//=========================================================================================================
-// Create HOC
-//=========================================================================================================
 /**
+ * Wraps a Higher order Component around the specified React Component
+ * to bind the provided dependencies with and without indicator to the Component.
+ *
  * @internal
- * Creates Higher Order Component based on passed React Component that binds the deps to it
- * @param ReactComponent - React Component
- * @param agileInstance - Instance of Agile
- * @param depsWithoutIndicator - Deps that have no Indicator
- * @param depsWithIndicator - Deps that have an Indicator and get merged into the props of the React Component
+ * @param ReactComponent - React Component to wrap the HOC around.
+ * @param agileInstance - Instance of Agile the React Component belongs to.
+ * @param depsWithoutIndicator - Dependencies that have no safe unique key/name indicator.
+ * @param depsWithIndicator - Dependencies that have a unique key/name indicator.
  */
 const createHOC = (
   ReactComponent: ComponentClass<any, any>,
@@ -94,8 +91,8 @@ const createHOC = (
 
     public componentSubscriptionContainers: Array<
       ComponentSubscriptionContainer
-    > = []; // Will be set and used in sub.ts
-    public agileProps = {}; // Props from Agile (get merged into normal Props)
+    > = []; // Represents all Subscription Container subscribed to this Component (set by subController)
+    public agileProps = {}; // Props of subscribed Agile Instances (are merged into the normal props)
 
     constructor(props: any) {
       super(props);
@@ -103,19 +100,23 @@ const createHOC = (
       this.waitForMount = agileInstance.config.waitForMount;
     }
 
-    // We have to go the 'UNSAFE' way because the constructor of a React Component gets called twice
-    // And because of that the subscriptionContainers get created twice (not clean)
-    // We could generate a id for each component but this would also happen in the constructor so idk
+    // We have to go the 'UNSAFE' way because the 'constructor' of a React Component is called twice.
+    // Thus it would create the corresponding Subscription Container twice.
     // https://github.com/facebook/react/issues/12906
     UNSAFE_componentWillMount() {
-      // Create Subscription with Observer that have no Indicator and can't be merged into 'this.state' (Rerender will be caused via force Update)
+      // Create Subscription with Observers
+      // that have no unique key/name indicator
+      // and thus can't be merged into the 'this.state' property.
+      // (Re-render will be enforced via a force update)
       if (depsWithoutIndicator.length > 0) {
         this.agileInstance.subController.subscribe(this, depsWithoutIndicator, {
           waitForMount: this.waitForMount,
         });
       }
 
-      // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.state')
+      // Create Subscription with Observers
+      // that have a unique key/name indicator.
+      // (Rerender will be enforced via mutating the 'this.state' property)
       if (depsWithIndicator) {
         const response = this.agileInstance.subController.subscribe(
           this,
@@ -123,8 +124,6 @@ const createHOC = (
           { waitForMount: this.waitForMount }
         );
         this.agileProps = response.props;
-
-        // Merge depsWith Indicator into this.state
         this.setState(flatMerge(this.state || {}, depsWithIndicator));
       }
     }
@@ -148,20 +147,21 @@ const createHOC = (
 
 /**
  * Extracts the Observers from the specified dependencies
- * which have no safe unique indicator key.
+ * which probably have no safe unique indicator key/name.
  *
- * If an indicator could be found
- * it is added to the `depsWithIndicator` object otherwise to the `depsWithoutIndicator` array.
+ * If a unique key/name indicator could be found
+ * the extracted Observer is added to the `depsWithIndicator` object
+ * and otherwise to the `depsWithoutIndicator` array.
  *
- * What type of Observer is extracted from a dependency
+ * What type of Observer is extracted from a dependency,
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
- * - 1. `output`
- * - 2. `value`
+ * 1. `output`
+ * 2. `value`
  *
  * @internal
- * @param deps - Dependencies to extract the Observers from
+ * @param deps - Dependencies to extract the Observers from.
  * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithNoSafeIndicator = (
@@ -177,7 +177,7 @@ const formatDepsWithNoSafeIndicator = (
     observerType
   );
 
-  // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
+  // Try to extract a unique key/name identifiers from the extracted Observers
   depsWithoutIndicator = depsWithoutIndicator.filter((dep) => {
     if (dep && dep['key']) {
       depsWithIndicator[dep['key']] = dep;
@@ -194,17 +194,17 @@ const formatDepsWithNoSafeIndicator = (
 
 /**
  * Extracts the Observers from the specified dependencies
- * which have a unique indicator key through the object property key.
+ * which have a unique key/name identifier through the object property key.
  *
- * What type of Observer is extracted from a dependency
+ * What type of Observer is extracted from a dependency,
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
- * - 1. `output`
- * - 2. `value`
+ * 1. `output`
+ * 2. `value`
  *
  * @internal
- * @param deps - Dependencies to extract the Observers from
+ * @param deps - Dependencies to extract the Observers from.
  * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithIndicator = (
@@ -216,9 +216,10 @@ const formatDepsWithIndicator = (
   return extractRelevantObservers(deps, observerType);
 };
 
-// Copy of the HOC class to have an typesafe base in the react.integration
+// Copy of the HOC Class to have a typesafe base in the React Integration
 export class AgileReactComponent extends React.Component {
-  // public agileInstance: () => Agile;
+  // @ts-ignore
+  public agileInstance: Agile;
   public componentSubscriptionContainers: Array<
     ComponentSubscriptionContainer
   > = [];

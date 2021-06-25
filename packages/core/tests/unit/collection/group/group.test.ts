@@ -48,6 +48,7 @@ describe('Group Tests', () => {
     expect(group._output).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
 
+    // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
@@ -88,6 +89,7 @@ describe('Group Tests', () => {
     expect(group._output).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
 
+    // Check if State was called with correct parameters
     expect(group._key).toBe('dummyKey');
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
@@ -125,6 +127,7 @@ describe('Group Tests', () => {
     expect(group._output).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
 
+    // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
