@@ -157,6 +157,7 @@ const logCodeMessages = {
   // Utils
   '20:03:00': 'Failed to get Agile Instance from',
   '20:03:01': "Failed to create global Instance at '${0}'",
+  '20:03:02': "Required module '${0}' couldn't be retrieved!",
 
   // General
   '00:03:00':

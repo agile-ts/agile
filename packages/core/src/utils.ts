@@ -201,6 +201,26 @@ export function extractRelevantObservers<
 }
 
 /**
+ * Retrieves the module with the specified key/name identifier
+ * and returns `null` if the module couldn't be found.
+ *
+ * @param moduleName - Key/Name identifier of the module to be retrieved.
+ * @param error - Whether to print an error, when the module couldn't be retrieved.
+ */
+export function optionalRequire<PackageType = any>(
+  moduleName: string,
+  error = true
+): PackageType | null {
+  let requiredPackage = null;
+  try {
+    requiredPackage = require(moduleName);
+  } catch (e) {
+    if (error) LogCodeManager.log('20:03:02', [moduleName]);
+  }
+  return requiredPackage;
+}
+
+/**
  * Binds the specified Instance globally at the provided key identifier.
  *
  * Learn more about global bound instances:

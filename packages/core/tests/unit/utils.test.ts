@@ -315,6 +315,43 @@ describe('Utils Tests', () => {
     });
   });
 
+  describe('optionalRequire function tests', () => {
+    beforeEach(() => {
+      jest.resetModules();
+    });
+
+    it("should return null if to retrieve package doesn't exist (error = false)", () => {
+      const response = Utils.optionalRequire('@notExisting/package', false);
+
+      expect(response).toBeNull();
+      LogMock.hasNotLoggedCode('20:03:02', ['@notExisting/package']);
+    });
+
+    it("should return null and print error if to retrieve package doesn't exist (error = true)", () => {
+      const response = Utils.optionalRequire('@notExisting/package', true);
+
+      expect(response).toBeNull();
+      LogMock.hasLoggedCode('20:03:02', ['@notExisting/package']);
+    });
+
+    it('should return package if to retrieve package exists', () => {
+      // Create fake package
+      const notExistingPackage = 'hehe fake package';
+      jest.mock(
+        '@notExisting/package',
+        () => {
+          return notExistingPackage;
+        },
+        { virtual: true }
+      );
+
+      const response = Utils.optionalRequire('@notExisting/package');
+
+      expect(response).toBe(notExistingPackage);
+      LogMock.hasNotLoggedCode('20:03:02', ['@notExisting/package']);
+    });
+  });
+
   describe('globalBind function tests', () => {
     const dummyKey = 'myDummyKey';
 

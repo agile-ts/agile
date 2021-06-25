@@ -14,15 +14,12 @@ import {
   extractRelevantObservers,
   SelectorWeakMapType,
   SelectorMethodType,
+  optionalRequire,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
-
-// https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-var-requires.md
-// https://stackoverflow.com/questions/27722576/can-i-specify-optional-module-dependencies-in-npm-package-json
-// https://stackoverflow.com/questions/14164610/requirejs-optional-dependency
-import proxyPackage = require('@agile-ts/proxytree');
+import proxyPackage = optionalRequire('@agile-ts/proxytree');
 
 /**
  * React Hook for binding the most relevant value of multiple Agile Instances
@@ -95,8 +92,8 @@ export function useAgile<
         }
       } else {
         console.error(
-          'To use the AgileTs Proxy functionality, ' +
-            'the installation of an additional package called `@agile-ts/proxytree` is required!'
+          'In order to use the AgileTs proxy functionality, ' +
+            `the installation of the additional package called '@agile-ts/proxytree' is required!`
         );
       }
 
