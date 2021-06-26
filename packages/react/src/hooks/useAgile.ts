@@ -84,19 +84,19 @@ export function useAgile<
       if (dep == null) return undefined as any;
       const value = dep.value;
 
-      if (proxyPackage != null) {
-        // If proxyBased and the value is of the type object.
-        // Wrap a Proxy around the object to track the accessed properties.
-        if (config.proxyBased && isValidObject(value, true)) {
+      // If proxyBased and the value is of the type object.
+      // Wrap a Proxy around the object to track the accessed properties.
+      if (config.proxyBased && isValidObject(value, true)) {
+        if (proxyPackage != null) {
           const proxyTree = new proxyPackage.ProxyTree(value);
           proxyTreeWeakMap.set(dep, proxyTree);
           return proxyTree.proxy;
+        } else {
+          console.error(
+            'In order to use the Agile proxy functionality, ' +
+              `the installation of an additional package called '@agile-ts/proxytree' is required!`
+          );
         }
-      } else {
-        console.error(
-          'In order to use the Agile proxy functionality, ' +
-            `the installation of an additional package called '@agile-ts/proxytree' is required!`
-        );
       }
 
       // If specified selector function and the value is of type object.
