@@ -22,32 +22,32 @@ import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 const proxyPackage = optionalRequire('@agile-ts/proxytree');
 
 /**
- * React Hook for binding the most relevant value of multiple Agile Instances
+ * A React Hook for binding the most relevant value of multiple Agile Instances
  * (like the Collection's output or the State's value)
  * to a React Functional Component.
  *
  * This binding ensures that the Component re-renders
- * whenever the most relevant value of an Agile Instance mutates.
+ * whenever the most relevant Observer of an Agile Instance mutates.
  *
  * @public
  * @param deps - Agile Instances to be bound to the Functional Component.
- * @param config - Configuration object.
+ * @param config - Configuration object
  */
 export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
   config?: AgileHookConfigInterface
 ): AgileOutputHookArrayType<X>;
 /**
- * React Hook for binding the most relevant Agile Instance value
+ * A React Hook for binding the most relevant Agile Instance value
  * (like the Collection's output or the State's value)
  * to a React Functional Component.
  *
  * This binding ensures that the Component re-renders
- * whenever the most relevant value of the Agile Instance mutates.
+ * whenever the most relevant Observer of the Agile Instance mutates.
  *
  * @public
  * @param dep - Agile Instance to be bound to the Functional Component.
- * @param config - Configuration object.
+ * @param config - Configuration object
  */
 export function useAgile<X extends SubscribableAgileInstancesType>(
   dep: X,
@@ -61,9 +61,10 @@ export function useAgile<
   config: AgileHookConfigInterface = {}
 ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
   config = defineConfig(config, {
-    proxyBased: false,
     key: generateId(),
+    proxyBased: false,
     agileInstance: null,
+    componentId: undefined,
     observerType: undefined,
   });
   const depsArray = extractRelevantObservers(
@@ -84,8 +85,8 @@ export function useAgile<
       const value = dep.value;
 
       if (proxyPackage != null) {
-        // If proxyBased and value is of type object.
-        // Wrap a Proxy around the object to track the used properties
+        // If proxyBased and the value is of the type object.
+        // Wrap a Proxy around the object to track the accessed properties.
         if (config.proxyBased && isValidObject(value, true)) {
           const proxyTree = new proxyPackage.ProxyTree(value);
           proxyTreeWeakMap.set(dep, proxyTree);
@@ -93,13 +94,15 @@ export function useAgile<
         }
       } else {
         console.error(
-          'In order to use the AgileTs proxy functionality, ' +
-            `the installation of the additional package called '@agile-ts/proxytree' is required!`
+          'In order to use the Agile proxy functionality, ' +
+            `the installation of an additional package called '@agile-ts/proxytree' is required!`
         );
       }
 
-      // If selector and value is of type object.
-      // Return the selected value
+      // If specified selector function and the value is of type object.
+      // Return the selected value.
+      // (Destroys the type of the useAgile hook,
+      // however the type is adjusted in the useSelector hook)
       if (config.selector && isValidObject(value, true)) {
         return config.selector(value);
       }
@@ -107,12 +110,12 @@ export function useAgile<
       return value;
     };
 
-    // Handle single dep
+    // Handle single dep return value
     if (depsArray.length === 1 && !Array.isArray(deps)) {
       return handleReturn(depsArray[0]);
     }
 
-    // Handle deps array
+    // Handle deps array return value
     return depsArray.map((dep) => {
       return handleReturn(dep);
     }) as AgileOutputHookArrayType<X>;
@@ -139,17 +142,17 @@ export function useAgile<
       return;
     }
 
-    // TODO Proxy doesn't work as expected when 'selecting' a not yet existing property
-    //  For example the user selects 'user.data.name' but 'user' is undefined
-    //  -> No Proxy Path could be created on the Component mount, since the to select property doesn't exist
-    //  -> Selector was created based on a no complete Proxy Paths
-    //  -> Component re-renders no matter what property has changed
+    // TODO Proxy doesn't work as expected when 'selecting' a not yet existing property.
+    //  For example you select the 'user.data.name' property, but the 'user' object is undefined.
+    //  -> No correct Proxy Path could be created on the Component mount, since the to select property doesn't exist
+    //  -> Selector was created based on the not complete Proxy Path
+    //  -> Component re-renders to often
     //
     // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
-    // by extracting the routes of the Tree.
+    // by extracting the routes from the Proxy Tree.
     // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
     // because the 'useIsomorphicLayoutEffect' is called after the rerender.
-    // -> In the UI-Component used paths got successfully tracked
+    // -> All used paths in the UI-Component were successfully tracked.
     const proxyWeakMap: ProxyWeakMapType = new WeakMap();
     if (config.proxyBased && proxyPackage != null) {
       for (const observer of observers) {
@@ -162,7 +165,7 @@ export function useAgile<
       }
     }
 
-    // Build Selector WeakMap based on the specified selector methods
+    // Build Selector WeakMap based on the specified selector method
     const selectorWeakMap: SelectorWeakMapType = new WeakMap();
     if (config.selector != null) {
       for (const observer of observers) {
@@ -216,9 +219,9 @@ export interface AgileHookConfigInterface {
    * around the bound Agile Instance value object,
    * to automatically constrain the way the selected Agile Instance
    * is compared to determine whether the Component needs to be re-rendered
-   * based on the properties used of the object.
+   * based on the object's used properties.
    *
-   * Requires an additional dependency called `@agile-ts/proxytree`!
+   * Requires an additional package called `@agile-ts/proxytree`!
    *
    * @default false
    */
@@ -231,12 +234,20 @@ export interface AgileHookConfigInterface {
    */
   selector?: SelectorMethodType;
   /**
-   * Key/Name identifier of UI-Component the Subscription Container is bound to.
+   * Key/Name identifier of the UI-Component the Subscription Container is bound to.
+   *
+   * Note that setting this property can destroy the useAgile type.
+   * -> should only be used internal!
+   *
    * @default undefined
    */
   componentId?: ComponentIdType;
   /**
    * What type of Observer to be bound to the UI-Component.
+   *
+   * Note that setting this property can destroy the useAgile type.
+   * -> should only be used internal!
+   *
    * @default undefined
    */
   observerType?: string;

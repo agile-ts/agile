@@ -17,7 +17,7 @@ export function bindAgileInstances(
   let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
 
-  // Format Deps
+  // Format deps
   if (isValidObject(deps)) {
     depsWithIndicator = formatDepsWithIndicator(deps as any, observerType);
   } else {
@@ -26,14 +26,19 @@ export function bindAgileInstances(
     depsWithoutIndicator = response.depsWithoutIndicator;
   }
 
-  // Create Subscription with Observer that have no Indicator and can't be merged into the 'sharedState' (Rerender will be caused via force Update)
+  // Create Subscription with extracted Observers
+  // that have no unique key/name indicator
+  // and thus can't be merged into the 'sharedState' property.
+  // (Re-render will be enforced via a force update)
   if (depsWithoutIndicator.length > 0) {
     agile.subController.subscribe(vueComponent, depsWithoutIndicator, {
       waitForMount: false,
     });
   }
 
-  // Create Subscription with Observer that have an Indicator (Rerender will be cause via mutating 'this.$data.sharedState')
+  // Create Subscription with extracted Observers
+  // that have a unique key/name indicator.
+  // (Rerender will be enforced via mutating the 'this.$data.sharedState' property)
   if (depsWithIndicator) {
     return agile.subController.subscribe(vueComponent, depsWithIndicator, {
       waitForMount: false,
@@ -45,20 +50,21 @@ export function bindAgileInstances(
 
 /**
  * Extracts the Observers from the specified dependencies
- * which have no safe unique indicator key.
+ * which probably have no safe unique indicator key/name.
  *
- * If an indicator could be found
- * it is added to the `depsWithIndicator` object otherwise to the `depsWithoutIndicator` array.
+ * If a unique key/name indicator could be found
+ * the extracted Observer is added to the `depsWithIndicator` object
+ * and otherwise to the `depsWithoutIndicator` array.
  *
- * What type of Observer is extracted from a dependency
+ * What type of Observer is extracted from a dependency,
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
- * - 1. `output`
- * - 2. `value`
+ * 1. `output`
+ * 2. `value`
  *
  * @internal
- * @param deps - Dependencies to extract the Observers from
+ * @param deps - Dependencies in array shape to extract the Observers from.
  * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithNoSafeIndicator = (
@@ -68,15 +74,18 @@ const formatDepsWithNoSafeIndicator = (
   depsWithoutIndicator: Observer[];
   depsWithIndicator: DepsWithIndicatorType;
 } => {
-  const depsWithIndicator: DepsWithIndicatorType = {};
-  let depsWithoutIndicator = extractRelevantObservers(
+  const depsArray = extractRelevantObservers(
     normalizeArray(deps),
     observerType
   );
+  const depsWithIndicator: DepsWithIndicatorType = {};
+  let depsWithoutIndicator: Observer[] = depsArray.filter(
+    (dep): dep is Observer => dep !== undefined
+  );
 
-  // Add deps with key to 'depsWithIndicator' and remove them from 'depsWithoutIndicator'
+  // Try to extract a unique key/name identifiers from the extracted Observers
   depsWithoutIndicator = depsWithoutIndicator.filter((dep) => {
-    if (dep && dep['key']) {
+    if (dep && dep['key'] != null) {
       depsWithIndicator[dep['key']] = dep;
       return false;
     }
@@ -91,17 +100,18 @@ const formatDepsWithNoSafeIndicator = (
 
 /**
  * Extracts the Observers from the specified dependencies
- * which have a unique indicator key through the object property key.
+ * which have a unique key/name identifier
+ * through the object property key.
  *
- * What type of Observer is extracted from a dependency
+ * What type of Observer is extracted from a dependency,
  * depends on the specified `observerType`.
  * If no `observerType` is specified, the Observers found in the dependency
  * are selected in the following `observerType` order.
- * - 1. `output`
- * - 2. `value`
+ * 1. `output`
+ * 2. `value`
  *
  * @internal
- * @param deps - Dependencies to extract the Observers from
+ * @param deps - Dependencies in object shape to extract the Observers from.
  * @param observerType - Type of Observer to be extracted.
  */
 const formatDepsWithIndicator = (
@@ -110,7 +120,13 @@ const formatDepsWithIndicator = (
   },
   observerType?: string
 ): DepsWithIndicatorType => {
-  return extractRelevantObservers(deps, observerType);
+  const depsObject = extractRelevantObservers(deps, observerType);
+  const depsWithIndicator: DepsWithIndicatorType = {};
+  for (const key in depsObject) {
+    const observer = depsObject[key];
+    if (observer != null) depsWithIndicator[key] = observer;
+  }
+  return depsWithIndicator;
 };
 
 type SubscribableAgileInstancesType =
