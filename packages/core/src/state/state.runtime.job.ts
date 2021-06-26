@@ -34,6 +34,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
       force: false,
       storage: true,
       overwrite: false,
+      maxTriesToUpdate: 3,
     });
 
     this.config = {
@@ -42,6 +43,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
       sideEffects: config.sideEffects,
       storage: config.storage,
       overwrite: config.overwrite,
+      maxTriesToUpdate: config.maxTriesToUpdate,
     };
   }
 }

@@ -6,6 +6,7 @@ import {
   State,
   ComputedTracker,
 } from '../../../src';
+import * as Utils from '../../../src/utils';
 import { LogMock } from '../../helper/logMock';
 import waitForExpect from 'wait-for-expect';
 
@@ -19,6 +20,7 @@ describe('Computed Tests', () => {
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Computed.prototype, 'recompute');
+    jest.spyOn(Utils, 'extractRelevantObservers');
   });
 
   it('should create Computed with a not async compute method (default config)', () => {
@@ -30,6 +32,7 @@ describe('Computed Tests', () => {
     expect(computed.config).toStrictEqual({ autodetect: true });
     expect(Array.from(computed.deps)).toStrictEqual([]);
     expect(computed.hardCodedDeps).toStrictEqual([]);
+    expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([]);
 
     expect(computed.recompute).toHaveBeenCalledWith({
       autodetect: computed.config.autodetect,
@@ -45,9 +48,11 @@ describe('Computed Tests', () => {
     expect(computed._value).toBe(null);
     expect(computed.previousStateValue).toBe(null);
     expect(computed.nextStateValue).toBe(null);
-    expect(computed.observer).toBeInstanceOf(StateObserver);
-    expect(computed.observer.dependents.size).toBe(0);
-    expect(computed.observer._key).toBeUndefined();
+    expect(computed.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(computed.observers['value'].dependents)).toStrictEqual(
+      []
+    );
+    expect(computed.observers['value']._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeValueMethod).toBeUndefined();
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
@@ -64,7 +69,7 @@ describe('Computed Tests', () => {
     const dummyState = new State(dummyAgile, undefined);
     const dummyStateObserver = new StateObserver(dummyState);
     dummyStateObserver.addDependent = jest.fn();
-    dummyState.observer = dummyStateObserver;
+    dummyState.observers['value'] = dummyStateObserver;
     const computedFunction = () => 'computedValue';
 
     const computed = new Computed(dummyAgile, computedFunction, {
@@ -84,6 +89,11 @@ describe('Computed Tests', () => {
       dummyObserver2,
       dummyStateObserver,
     ]);
+    expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([
+      dummyObserver2,
+      undefined,
+      dummyState,
+    ]);
 
     expect(computed.recompute).toHaveBeenCalledWith({
       autodetect: computed.config.autodetect,
@@ -91,9 +101,11 @@ describe('Computed Tests', () => {
     });
 
     expect(dummyObserver1.addDependent).not.toHaveBeenCalled(); // Because no Computed dependent
-    expect(dummyObserver2.addDependent).toHaveBeenCalledWith(computed.observer);
+    expect(dummyObserver2.addDependent).toHaveBeenCalledWith(
+      computed.observers['value']
+    );
     expect(dummyStateObserver.addDependent).toHaveBeenCalledWith(
-      computed.observer
+      computed.observers['value']
     );
 
     // Check if State was called with correct parameters
@@ -105,10 +117,11 @@ describe('Computed Tests', () => {
     expect(computed._value).toBe(null);
     expect(computed.previousStateValue).toBe(null);
     expect(computed.nextStateValue).toBe(null);
-    expect(computed.observer).toBeInstanceOf(StateObserver);
-    expect(computed.observer.dependents.size).toBe(1);
-    expect(computed.observer.dependents.has(dummyObserver1)).toBeTruthy();
-    expect(computed.observer._key).toBe('coolComputed');
+    expect(computed.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(computed.observers['value'].dependents)).toStrictEqual([
+      dummyObserver1,
+    ]);
+    expect(computed.observers['value']._key).toBe('coolComputed');
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeValueMethod).toBeUndefined();
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
@@ -126,6 +139,7 @@ describe('Computed Tests', () => {
     expect(computed.config).toStrictEqual({ autodetect: false });
     expect(Array.from(computed.deps)).toStrictEqual([]);
     expect(computed.hardCodedDeps).toStrictEqual([]);
+    expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([]);
 
     expect(computed.recompute).toHaveBeenCalledWith({
       autodetect: computed.config.autodetect,
@@ -141,9 +155,11 @@ describe('Computed Tests', () => {
     expect(computed._value).toBe(null);
     expect(computed.previousStateValue).toBe(null);
     expect(computed.nextStateValue).toBe(null);
-    expect(computed.observer).toBeInstanceOf(StateObserver);
-    expect(computed.observer.dependents.size).toBe(0);
-    expect(computed.observer._key).toBeUndefined();
+    expect(computed.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(computed.observers['value'].dependents)).toStrictEqual(
+      []
+    );
+    expect(computed.observers['value']._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
     expect(computed.computeValueMethod).toBeUndefined();
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
@@ -162,7 +178,7 @@ describe('Computed Tests', () => {
 
     describe('recompute function tests', () => {
       beforeEach(() => {
-        computed.observer.ingestValue = jest.fn();
+        computed.observers['value'].ingestValue = jest.fn();
       });
 
       it('should ingest Computed Class into the Runtime (default config)', async () => {
@@ -172,7 +188,7 @@ describe('Computed Tests', () => {
 
         expect(computed.compute).toHaveBeenCalledWith({ autodetect: false });
         await waitForExpect(() => {
-          expect(computed.observer.ingestValue).toHaveBeenCalledWith(
+          expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
             'jeff',
             {}
           );
@@ -194,14 +210,17 @@ describe('Computed Tests', () => {
 
         expect(computed.compute).toHaveBeenCalledWith({ autodetect: true });
         await waitForExpect(() => {
-          expect(computed.observer.ingestValue).toHaveBeenCalledWith('jeff', {
-            background: true,
-            sideEffects: {
-              enabled: false,
-            },
-            force: false,
-            key: 'jeff',
-          });
+          expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
+            'jeff',
+            {
+              background: true,
+              sideEffects: {
+                enabled: false,
+              },
+              force: false,
+              key: 'jeff',
+            }
+          );
         });
       });
     });
@@ -226,7 +245,7 @@ describe('Computed Tests', () => {
         dummyStateObserver = new StateObserver(dummyState);
         dummyStateObserver.removeDependent = jest.fn();
         dummyStateObserver.addDependent = jest.fn();
-        dummyState.observer = dummyStateObserver;
+        dummyState.observers['value'] = dummyStateObserver;
 
         computed.hardCodedDeps = [oldDummyObserver];
         computed.deps = new Set([oldDummyObserver]);
@@ -253,9 +272,14 @@ describe('Computed Tests', () => {
           autodetect: computed.config.autodetect,
         });
 
+        expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([
+          dummyState,
+          dummyObserver,
+        ]);
+
         // Make this Observer no longer depend on the old dep Observers
         expect(oldDummyObserver.removeDependent).toHaveBeenCalledWith(
-          computed.observer
+          computed.observers['value']
         );
         expect(dummyStateObserver.removeDependent).not.toHaveBeenCalled();
         expect(dummyObserver.removeDependent).not.toHaveBeenCalled();
@@ -263,10 +287,10 @@ describe('Computed Tests', () => {
         // Make this Observer depend on the new hard coded dep Observers
         expect(oldDummyObserver.addDependent).not.toHaveBeenCalled();
         expect(dummyStateObserver.addDependent).toHaveBeenCalledWith(
-          computed.observer
+          computed.observers['value']
         );
         expect(dummyObserver.addDependent).toHaveBeenCalledWith(
-          computed.observer
+          computed.observers['value']
         );
       });
 
@@ -304,9 +328,14 @@ describe('Computed Tests', () => {
           autodetect: false,
         });
 
+        expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([
+          dummyState,
+          dummyObserver,
+        ]);
+
         // Make this Observer no longer depend on the old dep Observers
         expect(oldDummyObserver.removeDependent).toHaveBeenCalledWith(
-          computed.observer
+          computed.observers['value']
         );
         expect(dummyStateObserver.removeDependent).not.toHaveBeenCalled();
         expect(dummyObserver.removeDependent).not.toHaveBeenCalled();
@@ -314,10 +343,10 @@ describe('Computed Tests', () => {
         // Make this Observer depend on the new hard coded dep Observers
         expect(oldDummyObserver.addDependent).not.toHaveBeenCalled();
         expect(dummyStateObserver.addDependent).toHaveBeenCalledWith(
-          computed.observer
+          computed.observers['value']
         );
         expect(dummyObserver.addDependent).toHaveBeenCalledWith(
-          computed.observer
+          computed.observers['value']
         );
       });
     });
@@ -382,15 +411,15 @@ describe('Computed Tests', () => {
           expect(dummyObserver2.removeDependent).not.toHaveBeenCalled();
           expect(dummyObserver3.removeDependent).not.toHaveBeenCalled();
           expect(dummyObserver4.removeDependent).toHaveBeenCalledWith(
-            computed.observer
+            computed.observers['value']
           );
 
           // Make this Observer depend on the newly found dep Observers
           expect(dummyObserver1.addDependent).toHaveBeenCalledWith(
-            computed.observer
+            computed.observers['value']
           );
           expect(dummyObserver2.addDependent).toHaveBeenCalledWith(
-            computed.observer
+            computed.observers['value']
           );
           expect(dummyObserver3.addDependent).not.toHaveBeenCalled(); // Because Computed already depends on the 'dummyObserver3'
           expect(dummyObserver4.addDependent).not.toHaveBeenCalled();

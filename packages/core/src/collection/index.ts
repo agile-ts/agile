@@ -23,7 +23,10 @@ import {
   PatchOptionConfigInterface,
 } from '../internal';
 
-export class Collection<DataType extends Object = DefaultItem> {
+export class Collection<
+  DataType extends Object = DefaultItem,
+  GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
+> {
   // Agile Instance the Collection belongs to
   public agileInstance: () => Agile;
 
@@ -143,7 +146,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Update key in Persistent (only if oldKey is equal to persistentKey
     // because otherwise the persistentKey is detached from the Collection key
     // -> not managed by Collection anymore)
-    if (value && this.persistent?._key === oldKey)
+    if (value != null && this.persistent?._key === oldKey)
       this.persistent?.setKey(value);
 
     return this;
@@ -503,7 +506,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (group == null || (!config.notExisting && !group.exists))
       return undefined;
 
-    ComputedTracker.tracked(group.observer);
+    ComputedTracker.tracked(group.observers['value']);
     return group;
   }
 
@@ -547,7 +550,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       this.groups[groupKey] = group;
     }
 
-    ComputedTracker.tracked(group.observer);
+    ComputedTracker.tracked(group.observers['value']);
     return group;
   }
 
@@ -676,7 +679,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     if (selector == null || (!config.notExisting && !selector.exists))
       return undefined;
 
-    ComputedTracker.tracked(selector.observer);
+    ComputedTracker.tracked(selector.observers['value']);
     return selector;
   }
 
@@ -706,7 +709,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       this.selectors[selectorKey] = selector;
     }
 
-    ComputedTracker.tracked(selector.observer);
+    ComputedTracker.tracked(selector.observers['value']);
     return selector;
   }
 
@@ -782,7 +785,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Check if Item exists
     if (item == null || (!config.notExisting && !item.exists)) return undefined;
 
-    ComputedTracker.tracked(item.observer);
+    ComputedTracker.tracked(item.observers['value']);
     return item;
   }
 
@@ -804,7 +807,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     // Create dummy Item to hold reference
     if (item == null) item = this.createPlaceholderItem(itemKey, true);
 
-    ComputedTracker.tracked(item.observer);
+    ComputedTracker.tracked(item.observers['value']);
     return item;
   }
 
@@ -837,7 +840,7 @@ export class Collection<DataType extends Object = DefaultItem> {
     )
       this.data[itemKey] = item;
 
-    ComputedTracker.tracked(item.observer);
+    ComputedTracker.tracked(item.observers['value']);
     return item;
   }
 
@@ -892,7 +895,7 @@ export class Collection<DataType extends Object = DefaultItem> {
       // Because the default Group keeps track of all existing Items.
       // It also does control the Collection output in binding methods like 'useAgile()'
       // and therefore should do it here too.
-      items = defaultGroup?.items || [];
+      items = defaultGroup?.getItems() || [];
     }
 
     return items;
@@ -1470,11 +1473,10 @@ export class Collection<DataType extends Object = DefaultItem> {
         // into the runtime is to rebuilt itself
         // group.rebuild();
 
-        group?.ingest({
+        group?.rebuild({
           background: config?.background,
-          force: true, // because Group value didn't change, only the output might change
           sideEffects: config?.sideEffects,
-          storage: false, // because Group only rebuilds (-> actual persisted value hasn't changed)
+          storage: false,
         });
       }
     }

@@ -44,9 +44,11 @@ describe('Selector Tests', () => {
     expect(selector._value).toBeNull();
     expect(selector.previousStateValue).toBeNull();
     expect(selector.nextStateValue).toBeNull();
-    expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.dependents.size).toBe(0);
-    expect(selector.observer._key).toBeUndefined();
+    expect(selector.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(selector.observers['value'].dependents)).toStrictEqual(
+      []
+    );
+    expect(selector.observers['value']._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeValueMethod).toBeUndefined();
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
@@ -81,9 +83,11 @@ describe('Selector Tests', () => {
     expect(selector._value).toBeNull();
     expect(selector.previousStateValue).toBeNull();
     expect(selector.nextStateValue).toBeNull();
-    expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.dependents.size).toBe(0);
-    expect(selector.observer._key).toBe('dummyKey');
+    expect(selector.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(selector.observers['value'].dependents)).toStrictEqual(
+      []
+    );
+    expect(selector.observers['value']._key).toBe('dummyKey');
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeValueMethod).toBeUndefined();
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
@@ -116,9 +120,11 @@ describe('Selector Tests', () => {
     expect(selector._value).toBeNull();
     expect(selector.previousStateValue).toBeNull();
     expect(selector.nextStateValue).toBeNull();
-    expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.dependents.size).toBe(0);
-    expect(selector.observer._key).toBeUndefined();
+    expect(selector.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(selector.observers['value'].dependents)).toStrictEqual(
+      []
+    );
+    expect(selector.observers['value']._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeValueMethod).toBeUndefined();
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
@@ -149,9 +155,11 @@ describe('Selector Tests', () => {
     expect(selector._value).toBeNull();
     expect(selector.previousStateValue).toBeNull();
     expect(selector.nextStateValue).toBeNull();
-    expect(selector.observer).toBeInstanceOf(StateObserver);
-    expect(selector.observer.dependents.size).toBe(0);
-    expect(selector.observer._key).toBeUndefined();
+    expect(selector.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(selector.observers['value'].dependents)).toStrictEqual(
+      []
+    );
+    expect(selector.observers['value']._key).toBeUndefined();
     expect(selector.sideEffects).toStrictEqual({});
     expect(selector.computeValueMethod).toBeUndefined();
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);

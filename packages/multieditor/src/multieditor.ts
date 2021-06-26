@@ -114,7 +114,7 @@ export class MultiEditor<
     const deps: Array<Observer> = [];
     for (const key in this.data) {
       const item = this.data[key];
-      deps.push(item.observer);
+      deps.push(item.observers['value']);
       deps.push(item.status.observer);
     }
     return deps;
@@ -132,7 +132,7 @@ export class MultiEditor<
     const deps: Array<Observer> = [];
     const item = this.getItemById(key);
     if (item) {
-      deps.push(item.observer);
+      deps.push(item.observers['value']);
       deps.push(item.status.observer);
     }
     return deps;

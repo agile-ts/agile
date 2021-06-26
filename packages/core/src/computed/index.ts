@@ -11,6 +11,7 @@ import {
   removeProperties,
   LogCodeManager,
   isAsyncFunction,
+  extractRelevantObservers,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -62,14 +63,14 @@ export class Computed<ComputedValueType = any> extends State<
     };
 
     // Extract Observer of passed hardcoded dependency instances
-    this.hardCodedDeps = extractObservers(config.computedDeps).filter(
-      (dep): dep is Observer => dep !== undefined
-    );
+    this.hardCodedDeps = extractRelevantObservers(
+      config.computedDeps as DependableAgileInstancesType[]
+    ).filter((dep): dep is Observer => dep !== undefined);
     this.deps = new Set(this.hardCodedDeps);
 
     // Make this Observer depend on the specified hard coded dep Observers
     this.deps.forEach((observer) => {
-      observer.addDependent(this.observer);
+      observer.addDependent(this.observers['value']);
     });
 
     // Initial recompute to assign the computed initial value to the Computed
@@ -90,7 +91,7 @@ export class Computed<ComputedValueType = any> extends State<
       autodetect: false,
     });
     this.compute({ autodetect: config.autodetect }).then((result) => {
-      this.observer.ingestValue(
+      this.observers['value'].ingestValue(
         result,
         removeProperties(config, ['autodetect'])
       );
@@ -116,7 +117,7 @@ export class Computed<ComputedValueType = any> extends State<
    */
   public updateComputeFunction(
     computeFunction: () => ComputedValueType,
-    deps: Array<SubscribableAgileInstancesType> = [],
+    deps: Array<DependableAgileInstancesType> = [],
     config: RecomputeConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -125,18 +126,18 @@ export class Computed<ComputedValueType = any> extends State<
 
     // Make this Observer no longer depend on the old dep Observers
     this.deps.forEach((observer) => {
-      observer.removeDependent(this.observer);
+      observer.removeDependent(this.observers['value']);
     });
 
     // Update dependencies of Computed
-    this.hardCodedDeps = extractObservers(deps).filter(
+    this.hardCodedDeps = extractRelevantObservers(deps).filter(
       (dep): dep is Observer => dep !== undefined
     );
     this.deps = new Set(this.hardCodedDeps);
 
     // Make this Observer depend on the new hard coded dep Observers
     this.deps.forEach((observer) => {
-      observer.addDependent(this.observer);
+      observer.addDependent(this.observers['value']);
     });
 
     // Update computeFunction
@@ -179,7 +180,7 @@ export class Computed<ComputedValueType = any> extends State<
           !this.hardCodedDeps.includes(observer)
         ) {
           this.deps.delete(observer);
-          observer.removeDependent(this.observer);
+          observer.removeDependent(this.observers['value']);
         }
       });
 
@@ -187,7 +188,7 @@ export class Computed<ComputedValueType = any> extends State<
       foundDeps.forEach((observer) => {
         if (!this.deps.has(observer)) {
           this.deps.add(observer);
-          observer.addDependent(this.observer);
+          observer.addDependent(this.observers['value']);
         }
       });
     }
@@ -213,7 +214,7 @@ export interface CreateComputedConfigInterface extends StateConfigInterface {
    * Hard-coded dependencies the Computed Class should depend on.
    * @default []
    */
-  computedDeps?: Array<SubscribableAgileInstancesType>;
+  computedDeps?: Array<DependableAgileInstancesType>;
   /**
    * Whether the Computed should automatically detect
    * used dependencies in the specified compute method.
@@ -256,4 +257,7 @@ export interface RecomputeConfigInterface
   extends StateIngestConfigInterface,
     ComputeConfigInterface {}
 
-export type SubscribableAgileInstancesType = State | Collection | Observer;
+export type DependableAgileInstancesType =
+  | State
+  | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
+  | Observer;

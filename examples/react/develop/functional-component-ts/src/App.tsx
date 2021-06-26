@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useAgile, useWatcher, useProxy } from '@agile-ts/react';
+import { useAgile, useWatcher, useProxy, useSelector } from '@agile-ts/react';
 import { useEvent } from '@agile-ts/event';
 import {
   COUNTUP,
@@ -42,6 +42,10 @@ const App = (props: any) => {
     MY_COLLECTION,
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
+
+  const selectedObjectItem = useSelector(STATE_OBJECT, (value) => {
+    return value.age;
+  });
 
   const [stateObject, item2, collection2] = useProxy(
     [STATE_OBJECT, MY_COLLECTION.getItem('id2'), MY_COLLECTION],
@@ -106,7 +110,8 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My State Object</h3>
           <p>
-            Deep Name: {stateObject.friends.hans.name} {stateObject.location}
+            Deep Name: {stateObject?.friends?.hans?.name}{' '}
+            {stateObject?.location}
           </p>
           <button
             onClick={() => {
@@ -132,7 +137,7 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My Collection</h3>
           <div>
-            {myGroup.map((item) => (
+            {myGroup?.map((item) => (
               <p key={item.key}>{item.name}</p>
             ))}
           </div>

@@ -4,17 +4,17 @@ import {
   Computed,
   copy,
   defineConfig,
-  ObserverKey,
   equal,
   notEqual,
   isFunction,
-  SubscriptionContainer,
   IngestConfigInterface,
   StateRuntimeJob,
   SideEffectInterface,
   createArrayFromObject,
   CreateStateRuntimeJobConfigInterface,
   generateId,
+  SubscriptionContainer,
+  ObserverKey,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -91,10 +91,11 @@ export class StateObserver<ValueType = any> extends Observer {
       force: false,
       storage: true,
       overwrite: false,
+      maxTriesToUpdate: 3,
     });
 
     // Force overwriting the State value if it is a placeholder.
-    // After assigning a value to the State it shouldn't be a placeholder anymore.
+    // After assigning a value to the State, the State is supposed to be no placeholder anymore.
     if (state.isPlaceholder) {
       config.force = true;
       config.overwrite = true;
@@ -117,7 +118,8 @@ export class StateObserver<ValueType = any> extends Observer {
       overwrite: config.overwrite,
       key:
         config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
+        `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
+      maxTriesToUpdate: config.maxTriesToUpdate,
     });
 
     // Pass created Job into the Runtime
@@ -137,12 +139,13 @@ export class StateObserver<ValueType = any> extends Observer {
    * @param job - Runtime-Job to be performed.
    */
   public perform(job: StateRuntimeJob) {
-    const state = job.observer.state();
+    const observer = job.observer;
+    const state = observer.state();
 
     // Assign new State values
     state.previousStateValue = copy(state._value);
-    state._value = copy(job.observer.nextStateValue);
-    state.nextStateValue = copy(job.observer.nextStateValue);
+    state._value = copy(observer.nextStateValue);
+    state.nextStateValue = copy(observer.nextStateValue);
 
     // TODO think about freezing the State value..
     // https://www.geeksforgeeks.org/object-freeze-javascript/#:~:text=Object.freeze()%20Method&text=freeze()%20which%20is%20used,the%20prototype%20of%20the%20object.
@@ -158,14 +161,9 @@ export class StateObserver<ValueType = any> extends Observer {
     state.isSet = notEqual(state._value, state.initialStateValue);
     this.sideEffects(job);
 
-    // Assign public value to the Observer after sideEffects like 'rebuildGroup' were executed.
-    // Because sometimes (for instance in a Group State) the 'publicValue()'
-    // is not the '.value' ('nextStateValue') property.
-    // The Observer value is at some point the public value
-    // since Integrations like React are using it as the return value.
-    // (For example 'useAgile()' returns 'Observer.value' and not 'State.value'.)
-    job.observer.previousValue = copy(job.observer.value);
-    job.observer.value = copy(state.getPublicValue());
+    // Assign new public value to the Observer (value used by the Integrations)
+    job.observer.previousValue = copy(observer.value);
+    job.observer.value = copy(state._value);
   }
 
   /**
@@ -184,7 +182,7 @@ export class StateObserver<ValueType = any> extends Observer {
     // Call watcher functions
     for (const watcherKey in state.watchers)
       if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state.getPublicValue(), watcherKey);
+        state.watchers[watcherKey](state._value, watcherKey);
 
     // Call side effect functions
     if (job.config?.sideEffects?.enabled) {
@@ -207,17 +205,17 @@ export class StateObserver<ValueType = any> extends Observer {
 
 export interface CreateStateObserverConfigInterface {
   /**
-   * Initial Observers to depend on the State Observer.
+   * Initial Observers to depend on the Observer.
    * @default []
    */
   dependents?: Array<Observer>;
   /**
-   * Initial Subscription Containers the State Observer is subscribed to.
+   * Initial Subscription Containers the Observer is subscribed to.
    * @default []
    */
   subs?: Array<SubscriptionContainer>;
   /**
-   * Key/Name identifier of the State Observer.
+   * Key/Name identifier of the Observer.
    * @default undefined
    */
   key?: ObserverKey;

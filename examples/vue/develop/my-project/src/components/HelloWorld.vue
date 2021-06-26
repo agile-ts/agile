@@ -8,7 +8,7 @@
       <div>{{todo.name}}</div>
       <button @click='removeTodo(todo.id)'>Remove</button>
     </div>
-
+    <div>{{sharedState.todoValues}}</div>
   </div>
 </template>
 
@@ -23,6 +23,12 @@ export default {
   },
   data: function () {
     return {
+      // ...this.bindAgileOutputs({
+      //   todos: TODOS
+      // }),
+      ...this.bindAgileValues({
+        todoValues: TODOS
+      }),
       ...this.bindAgileInstances({
         todos: TODOS
       }),

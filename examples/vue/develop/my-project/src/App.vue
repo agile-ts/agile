@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
     <p>myState: {{ sharedState.myState }}</p>
-    <p>myComputed: {{ sharedState.myComputed }}</p>
+    <p>myComputed (async): {{ sharedState.myComputed }}</p>
     <button v-on:click="changeMyState">Change State</button>
     <HelloWorld msg="Welcome to Your Vue.js App with AgileTs!" />
   </div>

@@ -15,11 +15,15 @@ import {
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
-} from '../internal';
+  StateObserversInterface,
+  GroupObserver,
+  StateObserver,
+} from '../../internal';
 
-export class Group<DataType extends Object = DefaultItem> extends State<
-  Array<ItemKey>
-> {
+export class Group<
+  DataType extends Object = DefaultItem,
+  ValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
+> extends State<Array<ItemKey>> {
   // Collection the Group belongs to
   collection: () => Collection<DataType>;
 
@@ -27,8 +31,10 @@ export class Group<DataType extends Object = DefaultItem> extends State<
 
   // Item values represented by the Group
   _output: Array<DataType> = [];
-  // Items represented by the Group
-  _items: Array<() => Item<DataType>> = [];
+
+  // Manages dependencies to other States and subscriptions of UI-Components.
+  // It also serves as an interface to the runtime.
+  public observers: GroupObservers<ItemKey[], DataType> = {} as any;
 
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
   notFoundItemKeys: Array<ItemKey> = [];
@@ -49,10 +55,19 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    */
   constructor(
     collection: Collection<DataType>,
-    initialItems?: Array<ItemKey>,
+    initialItems: Array<ItemKey> = [],
     config: GroupConfigInterface = {}
   ) {
-    super(collection.agileInstance(), initialItems || [], config);
+    super(collection.agileInstance(), initialItems, config);
+    // Have to redefine the value Observer (observers['value']) again,
+    // although it was technically set in the State Parent
+    // https://github.com/microsoft/TypeScript/issues/1617
+    this.observers['value'] = new StateObserver<ItemKey[]>(this, {
+      key: config.key,
+    });
+    this.observers['output'] = new GroupObserver(this, {
+      key: config.key,
+    });
     this.collection = () => collection;
 
     // Add side effect to Group
@@ -71,28 +86,12 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * @public
    */
   public get output(): Array<DataType> {
-    ComputedTracker.tracked(this.observer);
+    ComputedTracker.tracked(this.observers['output']);
     return copy(this._output);
   }
 
   public set output(value: DataType[]) {
     LogCodeManager.log('1C:03:00', [this._key]);
-  }
-
-  /**
-   * Returns the Items clustered by the Group.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/collection/group/properties#items)
-   *
-   * @public
-   */
-  public get items(): Array<Item<DataType>> {
-    ComputedTracker.tracked(this.observer);
-    return this._items.map((item) => item());
-  }
-
-  public set items(value: Array<Item<DataType>>) {
-    LogCodeManager.log('1C:03:01', [this._key]);
   }
 
   /**
@@ -249,6 +248,20 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
+   * Retrieves all existing Items of the Group from the corresponding Collection and returns them.
+   * Items that aren't present in the Collection are skipped.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#getitems)
+   *
+   * @public
+   */
+  public getItems(): Array<Item<DataType>> {
+    return this.value
+      .map((itemKey) => this.collection().getItem(itemKey))
+      .filter((item): item is Item<DataType> => item !== undefined);
+  }
+
+  /**
    * Preserves the Group `value` in the corresponding external Storage.
    *
    * The Group key/name is used as the unique identifier for the Persistent.
@@ -317,7 +330,8 @@ export class Group<DataType extends Object = DefaultItem> extends State<
   }
 
   /**
-   * Rebuilds the entire `output` and `items` property of the Group.
+   * Rebuilds the output of the Group
+   * and ingests it into the runtime.
    *
    * In doing so, it traverses the Group `value` (Item identifiers)
    * and fetches the fitting Items accordingly.
@@ -325,8 +339,9 @@ export class Group<DataType extends Object = DefaultItem> extends State<
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#rebuild)
    *
    * @internal
+   * @param config - Configuration object
    */
-  public rebuild(): this {
+  public rebuild(config: StateIngestConfigInterface = {}): this {
     const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
     const groupItems: Array<Item<DataType>> = [];
 
@@ -342,11 +357,6 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       else notFoundItemKeys.push(itemKey);
     });
 
-    // Extract Item values from the retrieved Items
-    const groupOutput = groupItems.map((item) => {
-      return item.getPublicValue();
-    });
-
     // Logging
     if (notFoundItemKeys.length > 0) {
       LogCodeManager.log(
@@ -356,15 +366,24 @@ export class Group<DataType extends Object = DefaultItem> extends State<
       );
     }
 
-    this._items = groupItems.map((item) => () => item);
-    this._output = groupOutput;
     this.notFoundItemKeys = notFoundItemKeys;
+
+    // Ingest rebuilt Group output into the Runtime
+    this.observers['output'].ingestItems(groupItems, config);
 
     return this;
   }
 }
 
 export type GroupKey = string | number;
+
+export interface GroupObservers<ValueType = any, DataType = any>
+  extends StateObserversInterface<ValueType> {
+  /**
+   * Observer responsible for the output of the Group.
+   */
+  output: GroupObserver<DataType>;
+}
 
 export interface GroupAddConfigInterface extends StateIngestConfigInterface {
   /**

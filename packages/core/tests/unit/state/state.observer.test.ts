@@ -30,6 +30,8 @@ describe('StateObserver Tests', () => {
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe('dummyValue');
     expect(stateObserver.state()).toBe(dummyState);
+
+    // Check if Observer was called with correct parameters
     expect(stateObserver.value).toBe('dummyValue');
     expect(stateObserver.previousValue).toBe('dummyValue');
     expect(stateObserver._key).toBeUndefined();
@@ -52,6 +54,8 @@ describe('StateObserver Tests', () => {
     expect(stateObserver).toBeInstanceOf(StateObserver);
     expect(stateObserver.nextStateValue).toBe('dummyValue');
     expect(stateObserver.state()).toBe(dummyState);
+
+    // Check if Observer was called with correct parameters
     expect(stateObserver.value).toBe('dummyValue');
     expect(stateObserver.previousValue).toBe('dummyValue');
     expect(stateObserver._key).toBe('testKey');
@@ -116,6 +120,7 @@ describe('StateObserver Tests', () => {
           },
           background: true,
           perform: false,
+          maxTriesToUpdate: 5,
         });
 
         expect(stateObserver.ingestValue).toHaveBeenCalledWith('nextValue', {
@@ -127,6 +132,7 @@ describe('StateObserver Tests', () => {
           },
           background: true,
           perform: false,
+          maxTriesToUpdate: 5,
         });
       });
 
@@ -161,9 +167,8 @@ describe('StateObserver Tests', () => {
           "if the new value isn't equal to the current value (default config)",
         () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
-
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe(`${stateObserver._key}_randomKey`);
+            expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -174,6 +179,7 @@ describe('StateObserver Tests', () => {
               force: false,
               storage: true,
               overwrite: false,
+              maxTriesToUpdate: 3,
             });
           });
 
@@ -204,6 +210,7 @@ describe('StateObserver Tests', () => {
               force: true,
               storage: true,
               overwrite: true,
+              maxTriesToUpdate: 5,
             });
           });
 
@@ -215,6 +222,7 @@ describe('StateObserver Tests', () => {
             },
             overwrite: true,
             key: 'dummyJob',
+            maxTriesToUpdate: 5,
           });
 
           expect(stateObserver.nextStateValue).toBe('updatedDummyValue');
@@ -247,7 +255,7 @@ describe('StateObserver Tests', () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyState._value = 'updatedDummyValue';
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe(`${stateObserver._key}_randomKey`);
+            expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -258,6 +266,7 @@ describe('StateObserver Tests', () => {
               force: true,
               storage: true,
               overwrite: false,
+              maxTriesToUpdate: 3,
             });
           });
 
@@ -276,7 +285,7 @@ describe('StateObserver Tests', () => {
       it('should ingest placeholder State into the Runtime (default config)', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(`${stateObserver._key}_randomKey`);
+          expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
           expect(job.observer).toBe(stateObserver);
           expect(job.config).toStrictEqual({
             background: false,
@@ -287,6 +296,7 @@ describe('StateObserver Tests', () => {
             force: true,
             storage: true,
             overwrite: true,
+            maxTriesToUpdate: 3,
           });
         });
         dummyState.isPlaceholder = true;
@@ -303,8 +313,8 @@ describe('StateObserver Tests', () => {
       });
 
       it(
-        'should ingest the State into the Runtime and compute the new value ' +
-          'if the State compute function is set (default config)',
+        'should ingest the State into the Runtime and compute its new value ' +
+          'if the State has a set compute function (default config)',
         () => {
           dummyState.computeValueMethod = (value) => `cool value '${value}'`;
 
@@ -341,9 +351,6 @@ describe('StateObserver Tests', () => {
         dummyJob.observer.value = 'dummyValue';
         dummyState.initialStateValue = 'initialValue';
         dummyState._value = 'dummyValue';
-        dummyState.getPublicValue = jest
-          .fn()
-          .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -353,7 +360,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.nextStateValue).toBe('newValue');
         expect(dummyState.isSet).toBeTruthy();
 
-        expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.value).toBe('newValue');
         expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
@@ -365,9 +372,6 @@ describe('StateObserver Tests', () => {
         dummyState.isPlaceholder = true;
         dummyState.initialStateValue = 'overwriteValue';
         dummyState._value = 'dummyValue';
-        dummyState.getPublicValue = jest
-          .fn()
-          .mockReturnValueOnce('newPublicValue');
 
         stateObserver.perform(dummyJob);
 
@@ -378,7 +382,7 @@ describe('StateObserver Tests', () => {
         expect(dummyState.isSet).toBeFalsy();
         expect(dummyState.isPlaceholder).toBeFalsy();
 
-        expect(stateObserver.value).toBe('newPublicValue');
+        expect(stateObserver.value).toBe('newValue');
         expect(stateObserver.previousValue).toBe('dummyValue');
         expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
       });
@@ -391,9 +395,6 @@ describe('StateObserver Tests', () => {
           dummyJob.observer.value = 'dummyValue';
           dummyState.initialStateValue = 'newValue';
           dummyState._value = 'dummyValue';
-          dummyState.getPublicValue = jest
-            .fn()
-            .mockReturnValueOnce('newPublicValue');
 
           stateObserver.perform(dummyJob);
 
@@ -403,7 +404,7 @@ describe('StateObserver Tests', () => {
           expect(dummyState.nextStateValue).toBe('newValue');
           expect(dummyState.isSet).toBeFalsy();
 
-          expect(stateObserver.value).toBe('newPublicValue');
+          expect(stateObserver.value).toBe('newValue');
           expect(stateObserver.previousValue).toBe('dummyValue');
           expect(stateObserver.sideEffects).toHaveBeenCalledWith(dummyJob);
         }

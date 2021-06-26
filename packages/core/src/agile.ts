@@ -19,8 +19,7 @@ import {
   StateConfigInterface,
   flatMerge,
   LogCodeManager,
-  ComputedConfigInterface,
-  SubscribableAgileInstancesType,
+  DependableAgileInstancesType,
   CreateComputedConfigInterface,
   ComputeFunctionType,
 } from './internal';
@@ -220,13 +219,13 @@ export class Agile {
    */
   public createComputed<ComputedValueType = any>(
     computeFunction: ComputeFunctionType<ComputedValueType>,
-    deps?: Array<SubscribableAgileInstancesType>
+    deps?: Array<DependableAgileInstancesType>
   ): Computed<ComputedValueType>;
   public createComputed<ComputedValueType = any>(
     computeFunction: ComputeFunctionType<ComputedValueType>,
     configOrDeps?:
       | CreateComputedConfigInterface
-      | Array<SubscribableAgileInstancesType>
+      | Array<DependableAgileInstancesType>
   ): Computed<ComputedValueType> {
     let _config: CreateComputedConfigInterface = {};
 

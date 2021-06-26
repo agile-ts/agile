@@ -46,6 +46,7 @@ describe('RuntimeJob Tests', () => {
         force: false,
         storage: true,
         overwrite: false,
+        maxTriesToUpdate: 3,
       });
       expect(job.rerender).toBeTruthy();
       expect(job.performed).toBeFalsy();
@@ -67,6 +68,7 @@ describe('RuntimeJob Tests', () => {
           enabled: false,
         },
         force: true,
+        maxTriesToUpdate: 5,
       });
 
       expect(job._key).toBe('dummyJob');
@@ -79,6 +81,7 @@ describe('RuntimeJob Tests', () => {
         force: true,
         storage: true,
         overwrite: false,
+        maxTriesToUpdate: 5,
       });
       expect(job.rerender).toBeTruthy();
       expect(job.performed).toBeFalsy();
@@ -105,6 +108,7 @@ describe('RuntimeJob Tests', () => {
         force: false,
         storage: true,
         overwrite: false,
+        maxTriesToUpdate: 3,
       });
       expect(job.rerender).toBeFalsy();
       expect(job.performed).toBeFalsy();
@@ -133,6 +137,7 @@ describe('RuntimeJob Tests', () => {
         force: false,
         storage: true,
         overwrite: false,
+        maxTriesToUpdate: 3,
       });
       expect(job.rerender).toBeFalsy();
       expect(job.performed).toBeFalsy();
