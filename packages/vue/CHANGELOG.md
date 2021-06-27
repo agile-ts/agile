@@ -1,5 +1,42 @@
 # @agile-ts/vue
 
+## 1.0.0
+
+### Minor Changes
+
+- 855a921: #### :rocket: New Feature
+
+  - `core`, `multieditor`, `react`, `vue`
+    - [#161](https://github.com/agile-ts/agile/pull/161) Subscribe to Group value or output ([@bennodev19](https://github.com/bennodev19))
+  - `core`
+    - [#160](https://github.com/agile-ts/agile/pull/160) added null option to Selector ([@bennodev19](https://github.com/bennodev19))
+    - [#159](https://github.com/agile-ts/agile/pull/159) make compute method async compatible ([@bennodev19](https://github.com/bennodev19))
+
+  #### :bug: Bug Fix
+
+  - `core`
+    - [#152](https://github.com/agile-ts/agile/pull/152) Fix remove selected Item loop ([@bennodev19](https://github.com/bennodev19))
+
+  #### :nail_care: Polish
+
+  - `core`, `multieditor`, `react`, `vue`
+    - [#161](https://github.com/agile-ts/agile/pull/161) Subscribe to Group value or output ([@bennodev19](https://github.com/bennodev19))
+  - `core`, `cra-template-agile-typescript`, `cra-template-agile`, `event`, `logger`, `multieditor`, `proxytree`, `react`, `utils`, `vue`
+    - [#153](https://github.com/agile-ts/agile/pull/153) refactor core descriptions ([@bennodev19](https://github.com/bennodev19))
+  - `core`, `event`, `react`, `vue`
+    - [#154](https://github.com/agile-ts/agile/pull/154) Optimise Runtime ([@bennodev19](https://github.com/bennodev19))
+  - `core`, `proxytree`
+    - [#150](https://github.com/agile-ts/agile/pull/150) Outsource log messages ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+### Patch Changes
+
+- Updated dependencies [855a921]
+  - @agile-ts/core@0.1.0
+
 ## 0.0.5
 
 ### Patch Changes

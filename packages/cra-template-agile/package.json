@@ -1,6 +1,6 @@
 {
   "name": "cra-template-agile",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -20,8 +20,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "@agile-ts/core": "^0.0.17",
-    "@agile-ts/react": "^0.0.18"
+    "@agile-ts/core": "^0.1.0",
+    "@agile-ts/react": "^1.0.0"
   },
   "publishConfig": {
     "access": "public"
