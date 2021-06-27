@@ -1,6 +1,6 @@
 # @agile-ts/multieditor
 
-## 1.0.0
+## 0.0.18
 
 ### Patch Changes
 
