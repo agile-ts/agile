@@ -215,7 +215,10 @@ export function optionalRequire<PackageType = any>(
   try {
     requiredPackage = require(moduleName);
   } catch (e) {
-    if (error) LogCodeManager.log('20:03:02', [moduleName]);
+    if (error) {
+      LogCodeManager.log('20:03:02', [moduleName]);
+      console.log(e);
+    }
   }
   return requiredPackage;
 }

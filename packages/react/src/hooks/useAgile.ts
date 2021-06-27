@@ -14,12 +14,18 @@ import {
   extractRelevantObservers,
   SelectorWeakMapType,
   SelectorMethodType,
-  optionalRequire,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
-const proxyPackage = optionalRequire('@agile-ts/proxytree');
+
+// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
+let proxyPackage: any = null;
+try {
+  proxyPackage = require('@agile-ts/proxytree');
+} catch (e) {
+  // empty catch block
+}
 
 /**
  * A React Hook for binding the most relevant value of multiple Agile Instances
@@ -88,7 +94,8 @@ export function useAgile<
       // Wrap a Proxy around the object to track the accessed properties.
       if (config.proxyBased && isValidObject(value, true)) {
         if (proxyPackage != null) {
-          const proxyTree = new proxyPackage.ProxyTree(value);
+          const { ProxyTree } = proxyPackage;
+          const proxyTree = new ProxyTree(value);
           proxyTreeWeakMap.set(dep, proxyTree);
           return proxyTree.proxy;
         } else {
