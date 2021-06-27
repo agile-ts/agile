@@ -24,9 +24,10 @@ export const RectangleInner: React.FC<RectangleInnerPropsInterface> = (
       setIsLoading(true);
       core.ui.getImageDimensions(element.image.src).then((response) => {
         setIsLoading(false);
-        ELEMENT?.patch({
-          style: { ...{ size: response }, ...ELEMENT?.value.style },
-        });
+        if (ELEMENT != null) {
+          ELEMENT.nextStateValue.style.size = response;
+          ELEMENT?.ingest();
+        }
       });
     } else {
       setIsLoading(false);

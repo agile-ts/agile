@@ -1,6 +1,6 @@
 module.exports = [
   {
     path: 'dist/*',
-    limit: '20 kB',
+    limit: '2 kB',
   },
 ];
