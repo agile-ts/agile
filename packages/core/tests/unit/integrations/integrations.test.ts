@@ -1,12 +1,12 @@
 import { Agile, Integration, Integrations } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Integrations Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     Agile.initialIntegrations = [];
@@ -99,9 +99,10 @@ describe('Integrations Tests', () => {
         expect(dummyIntegration1.ready).toBeFalsy();
         expect(dummyIntegration1.integrated).toBeFalsy();
 
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: Failed to integrate framework! Invalid Integration!',
-          dummyIntegration1._key
+        LogMock.hasLoggedCode(
+          '18:03:00',
+          [dummyIntegration1._key],
+          dummyIntegration1
         );
       });
     });
@@ -128,9 +129,7 @@ describe('Integrations Tests', () => {
           dummyUpdatedData
         );
 
-        expect(console.warn).toHaveBeenCalledWith(
-          "Agile Warn: Integration 'dummyIntegration1' isn't ready yet!"
-        );
+        LogMock.hasLoggedCode('18:02:00', ['dummyIntegration1']);
       });
     });
 

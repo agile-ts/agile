@@ -1,7 +1,7 @@
 import { Branch, BranchKey, DefaultProxyTreeObject } from './branch';
 import { isObject } from './utils';
 
-export class ProxyTree<T extends object = DefaultProxyTreeObject> {
+export class ProxyTree<T extends Object = DefaultProxyTreeObject> {
   public rootBranch: Branch<T>; // Root Branch of the proxy tree
   public proxy: T; // Target object wrapped in proxy
 
@@ -21,7 +21,7 @@ export class ProxyTree<T extends object = DefaultProxyTreeObject> {
    * Creates a new Branch of the ProxyTree which represents the passed target object.
    * @param target - Target Object
    */
-  public createBranch<X extends object = DefaultProxyTreeObject>(
+  public createBranch<X extends Object = DefaultProxyTreeObject>(
     target: X
   ): Branch<X> | null {
     if (!isObject(target)) {

@@ -5,7 +5,7 @@ import {
   State,
   Integration,
 } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 // jest.mock("../../../src/runtime/runtime.job"); // Can't mock RuntimeJob because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
@@ -17,7 +17,7 @@ describe('RuntimeJob Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyIntegration = new Integration({
@@ -27,94 +27,123 @@ describe('RuntimeJob Tests', () => {
     dummyObserver = new StateObserver(dummyState);
   });
 
-  it('should create RuntimeJob with Agile that has integrations (default config)', () => {
-    dummyAgile.integrate(dummyIntegration);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has a registered Integration (default config)',
+    () => {
+      dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver);
+      const job = new StateRuntimeJob(dummyObserver);
 
-    expect(job._key).toBeUndefined();
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeTruthy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBeUndefined();
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: false,
+        sideEffects: {
+          enabled: true,
+          exclude: [],
+        },
+        force: false,
+        storage: true,
+        overwrite: false,
+        maxTriesToUpdate: 3,
+      });
+      expect(job.rerender).toBeTruthy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 
-  it('should create RuntimeJob with Agile that has integrations (specific config)', () => {
-    dummyAgile.integrate(dummyIntegration);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has a registered Integration (specific config)',
+    () => {
+      dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver, {
-      key: 'dummyJob',
-      sideEffects: {
-        enabled: false,
-      },
-      force: true,
-    });
+      const job = new StateRuntimeJob(dummyObserver, {
+        key: 'dummyJob',
+        sideEffects: {
+          enabled: false,
+        },
+        force: true,
+        maxTriesToUpdate: 5,
+      });
 
-    expect(job._key).toBe('dummyJob');
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: false,
-      sideEffects: {
-        enabled: false,
-      },
-      force: true,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeTruthy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBe('dummyJob');
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: false,
+        sideEffects: {
+          enabled: false,
+        },
+        force: true,
+        storage: true,
+        overwrite: false,
+        maxTriesToUpdate: 5,
+      });
+      expect(job.rerender).toBeTruthy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 
-  it('should create RuntimeJob with Agile that has no integrations (default config)', () => {
-    const job = new StateRuntimeJob(dummyObserver);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has no registered Integration (default config)',
+    () => {
+      const job = new StateRuntimeJob(dummyObserver);
 
-    expect(job._key).toBeUndefined();
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeFalsy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBeUndefined();
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: false,
+        sideEffects: {
+          enabled: true,
+          exclude: [],
+        },
+        force: false,
+        storage: true,
+        overwrite: false,
+        maxTriesToUpdate: 3,
+      });
+      expect(job.rerender).toBeFalsy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 
-  it('should create RuntimeJob and Agile that has integrations (config.background = true)', () => {
-    dummyAgile.integrate(dummyIntegration);
+  it(
+    'should create StateRuntimeJob ' +
+      'with a specified Agile Instance that has a registered Integrations (config.background = true)',
+    () => {
+      dummyAgile.integrate(dummyIntegration);
 
-    const job = new StateRuntimeJob(dummyObserver, { background: true });
+      const job = new StateRuntimeJob(dummyObserver, { background: true });
 
-    expect(job._key).toBeUndefined();
-    expect(job.observer).toBe(dummyObserver);
-    expect(job.config).toStrictEqual({
-      background: true,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
-      storage: true,
-      overwrite: false,
-    });
-    expect(job.rerender).toBeFalsy();
-    expect(job.performed).toBeFalsy();
-    expect(job.subscriptionContainersToUpdate.size).toBe(0);
-  });
+      expect(job._key).toBeUndefined();
+      expect(job.observer).toBe(dummyObserver);
+      expect(job.config).toStrictEqual({
+        background: true,
+        sideEffects: {
+          enabled: true,
+          exclude: [],
+        },
+        force: false,
+        storage: true,
+        overwrite: false,
+        maxTriesToUpdate: 3,
+      });
+      expect(job.rerender).toBeFalsy();
+      expect(job.performed).toBeFalsy();
+      expect(Array.from(job.subscriptionContainersToUpdate)).toStrictEqual([]);
+      expect(job.timesTriedToUpdateCount).toBe(0);
+      expect(job.performed).toBeFalsy();
+    }
+  );
 });

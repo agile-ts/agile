@@ -1,12 +1,12 @@
 import { ComputedTracker, Observer, Agile } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('ComputedTracker Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 

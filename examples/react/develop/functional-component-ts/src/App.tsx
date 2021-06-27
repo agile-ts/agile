@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useAgile, useWatcher, useProxy } from '@agile-ts/react';
+import { useAgile, useWatcher, useProxy, useSelector } from '@agile-ts/react';
 import { useEvent } from '@agile-ts/event';
 import {
   COUNTUP,
+  externalCreatedItem,
   MY_COLLECTION,
   MY_COMPUTED,
   MY_EVENT,
@@ -12,7 +13,7 @@ import {
   MY_STATE_3,
   STATE_OBJECT,
 } from './core';
-import { generateId, globalBind } from '@agile-ts/core';
+import { generateId, globalBind, Item } from '@agile-ts/core';
 
 let rerenderCount = 0;
 let rerenderCountInCountupView = 0;
@@ -42,11 +43,14 @@ const App = (props: any) => {
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
 
-  const [stateObject, item2, collection2] = useProxy([
-    STATE_OBJECT,
-    MY_COLLECTION.getItem('id2'),
-    MY_COLLECTION,
-  ]);
+  const selectedObjectItem = useSelector(STATE_OBJECT, (value) => {
+    return value.age;
+  });
+
+  const [stateObject, item2, collection2] = useProxy(
+    [STATE_OBJECT, MY_COLLECTION.getItem('id2'), MY_COLLECTION],
+    { key: 'useProxy' }
+  );
 
   console.log('Item1: ', item2?.name);
   console.log('Collection: ', collection2.slice(0, 2));
@@ -106,7 +110,8 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My State Object</h3>
           <p>
-            Deep Name: {stateObject.friends.hans.name} {stateObject.location}
+            Deep Name: {stateObject?.friends?.hans?.name}{' '}
+            {stateObject?.location}
           </p>
           <button
             onClick={() => {
@@ -132,13 +137,21 @@ const App = (props: any) => {
         <div className={'Container'}>
           <h3 className={'Title'}>My Collection</h3>
           <div>
-            {myGroup.map((item) => (
-              <p key={item.id}>{item.name}</p>
+            {myGroup?.map((item) => (
+              <p key={item.key}>{item.name}</p>
             ))}
           </div>
           <button
-            onClick={() => MY_COLLECTION.collect({ id: 'id3', name: 'Test3' })}>
+            onClick={() =>
+              MY_COLLECTION.collect({ key: 'id3', name: 'Test3' })
+            }>
             Collect
+          </button>
+          <button
+            onClick={() =>
+              MY_COLLECTION.collect(externalCreatedItem, ['myGroup'])
+            }>
+            Collect external Item
           </button>
           <button onClick={() => MY_COLLECTION.getGroup('myGroup')?.add('id3')}>
             Add to myGroup
@@ -146,7 +159,7 @@ const App = (props: any) => {
           <button
             onClick={() =>
               MY_COLLECTION.update('id3', {
-                id: 'newId3',
+                key: 'newId3',
                 name: 'Test3_Changed',
               })
             }>

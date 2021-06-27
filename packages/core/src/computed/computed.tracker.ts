@@ -4,40 +4,45 @@ export class ComputedTracker {
   static isTracking = false;
   static trackedObservers: Set<Observer> = new Set();
 
-  //=========================================================================================================
-  // Track
-  //=========================================================================================================
   /**
+   * Helper Class for automatic tracking used Observers (dependencies) in a compute function.
+   *
    * @internal
-   * Starts tracking Observers
+   */
+  constructor() {
+    // empty
+  }
+
+  /**
+   * Activates Computed Tracker to globally track used Observers.
+   *
+   * @internal
    */
   static track(): void {
     this.isTracking = true;
   }
 
-  //=========================================================================================================
-  // Tracked
-  //=========================================================================================================
   /**
+   * Tracks the passed Observer and caches it
+   * when the Computed Tracker is actively tracking.
+   *
    * @internal
-   * Adds passed Observer to tracked Observers, if ComputedTracker is currently tracking
    * @param observer - Observer
    */
   static tracked(observer: Observer) {
     if (this.isTracking) this.trackedObservers.add(observer);
   }
 
-  //=========================================================================================================
-  // Get Tracked Observers
-  //=========================================================================================================
   /**
+   * Returns the latest tracked Observers
+   * and stops the Computed Tracker from tracking any more Observers.
+   *
    * @internal
-   * Returns tracked Observers and stops tracking anymore Observers
    */
   static getTrackedObservers(): Array<Observer> {
     const trackedObservers = Array.from(this.trackedObservers);
 
-    // Reset tracking
+    // Reset Computed Tracker
     this.isTracking = false;
     this.trackedObservers = new Set();
 

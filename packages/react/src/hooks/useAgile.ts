@@ -3,92 +3,129 @@ import {
   Agile,
   Collection,
   getAgileInstance,
-  Group,
-  extractObservers,
   Observer,
   State,
   SubscriptionContainerKeyType,
   defineConfig,
   isValidObject,
-  ProxyKeyMapInterface,
   generateId,
+  ProxyWeakMapType,
+  ComponentIdType,
+  extractRelevantObservers,
+  SelectorWeakMapType,
+  SelectorMethodType,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { ProxyTree } from '@agile-ts/proxytree';
+import { normalizeArray } from '@agile-ts/utils';
+import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
-//=========================================================================================================
-// useAgile
-//=========================================================================================================
+// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
+let proxyPackage: any = null;
+try {
+  proxyPackage = require('@agile-ts/proxytree');
+} catch (e) {
+  // empty catch block
+}
+
 /**
- * React Hook that binds Agile Instances like Collections, States, Computeds, .. to a React Functional Component
- * @param deps - Agile Instances that will be subscribed to this Component
- * @param config - Config
+ * A React Hook for binding the most relevant value of multiple Agile Instances
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant Observer of an Agile Instance mutates.
+ *
+ * @public
+ * @param deps - Agile Instances to be bound to the Functional Component.
+ * @param config - Configuration object
  */
 export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
   config?: AgileHookConfigInterface
-): AgileHookArrayType<X>;
-
+): AgileOutputHookArrayType<X>;
 /**
- * React Hook that binds Agile Instance like Collection, State, Computed, .. to a React Functional Component
- * @param dep - Agile Instance that will be subscribed to this Component
- * @param config - Config
+ * A React Hook for binding the most relevant Agile Instance value
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant Observer of the Agile Instance mutates.
+ *
+ * @public
+ * @param dep - Agile Instance to be bound to the Functional Component.
+ * @param config - Configuration object
  */
 export function useAgile<X extends SubscribableAgileInstancesType>(
   dep: X,
   config?: AgileHookConfigInterface
-): AgileHookType<X>;
-
+): AgileOutputHookType<X>;
 export function useAgile<
   X extends Array<SubscribableAgileInstancesType>,
   Y extends SubscribableAgileInstancesType
 >(
   deps: X | Y,
   config: AgileHookConfigInterface = {}
-): AgileHookArrayType<X> | AgileHookType<Y> {
-  const depsArray = extractObservers(deps);
-  const proxyTreeMap: ProxyTreeMapInterface = {};
+): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
   config = defineConfig(config, {
-    proxyBased: false,
     key: generateId(),
+    proxyBased: false,
     agileInstance: null,
+    componentId: undefined,
+    observerType: undefined,
   });
+  const depsArray = extractRelevantObservers(
+    normalizeArray(deps),
+    config.observerType
+  );
+  const proxyTreeWeakMap = new WeakMap();
 
-  // Creates Return Value of Hook, depending if deps are in Array shape or not
+  // Builds return value,
+  // depending on whether the deps were provided in array shape or not
   const getReturnValue = (
-    depsArray: (State | Observer | undefined)[]
-  ): AgileHookArrayType<X> | AgileHookType<Y> => {
+    depsArray: (Observer | undefined)[]
+  ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> => {
     const handleReturn = (
-      dep: State | Observer | undefined
-    ): AgileHookType<Y> => {
-      const value = dep?.value;
-      const depKey = dep?.key;
+      dep: Observer | undefined
+    ): AgileOutputHookType<Y> => {
+      if (dep == null) return undefined as any;
+      const value = dep.value;
 
-      // If proxyBased and value is object wrap Proxy around it to track used properties
+      // If proxyBased and the value is of the type object.
+      // Wrap a Proxy around the object to track the accessed properties.
       if (config.proxyBased && isValidObject(value, true)) {
-        if (depKey) {
+        if (proxyPackage != null) {
+          const { ProxyTree } = proxyPackage;
           const proxyTree = new ProxyTree(value);
-          proxyTreeMap[depKey] = proxyTree;
+          proxyTreeWeakMap.set(dep, proxyTree);
           return proxyTree.proxy;
+        } else {
+          console.error(
+            'In order to use the Agile proxy functionality, ' +
+              `the installation of an additional package called '@agile-ts/proxytree' is required!`
+          );
         }
-        Agile.logger.warn(
-          'Keep in mind that without a key no Proxy can be wrapped around the dependency value!',
-          dep
-        );
       }
 
-      return dep?.value;
+      // If specified selector function and the value is of type object.
+      // Return the selected value.
+      // (Destroys the type of the useAgile hook,
+      // however the type is adjusted in the useSelector hook)
+      if (config.selector && isValidObject(value, true)) {
+        return config.selector(value);
+      }
+
+      return value;
     };
 
-    // Handle single dep
+    // Handle single dep return value
     if (depsArray.length === 1 && !Array.isArray(deps)) {
       return handleReturn(depsArray[0]);
     }
 
-    // Handle dep array
+    // Handle deps array return value
     return depsArray.map((dep) => {
       return handleReturn(dep);
-    }) as AgileHookArrayType<X>;
+    }) as AgileOutputHookArrayType<X>;
   };
 
   // Trigger State, used to force Component to rerender
@@ -97,8 +134,13 @@ export function useAgile<
   useIsomorphicLayoutEffect(() => {
     let agileInstance = config.agileInstance;
 
-    // Try to get Agile Instance
-    if (!agileInstance) agileInstance = getAgileInstance(depsArray[0]);
+    // https://github.com/microsoft/TypeScript/issues/20812
+    const observers: Observer[] = depsArray.filter(
+      (dep): dep is Observer => dep !== undefined
+    );
+
+    // Try to extract Agile Instance from the specified Instance/s
+    if (!agileInstance) agileInstance = getAgileInstance(observers[0]);
     if (!agileInstance || !agileInstance.subController) {
       Agile.logger.error(
         'Failed to subscribe Component with deps because of missing valid Agile Instance.',
@@ -107,32 +149,53 @@ export function useAgile<
       return;
     }
 
-    // https://github.com/microsoft/TypeScript/issues/20812
-    const observers: Observer[] = depsArray.filter(
-      (dep): dep is Observer => dep !== undefined
-    );
+    // TODO Proxy doesn't work as expected when 'selecting' a not yet existing property.
+    //  For example you select the 'user.data.name' property, but the 'user' object is undefined.
+    //  -> No correct Proxy Path could be created on the Component mount, since the to select property doesn't exist
+    //  -> Selector was created based on the not complete Proxy Path
+    //  -> Component re-renders to often
+    //
+    // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
+    // by extracting the routes from the Proxy Tree.
+    // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
+    // because the 'useIsomorphicLayoutEffect' is called after the rerender.
+    // -> All used paths in the UI-Component were successfully tracked.
+    const proxyWeakMap: ProxyWeakMapType = new WeakMap();
+    if (config.proxyBased && proxyPackage != null) {
+      for (const observer of observers) {
+        const proxyTree = proxyTreeWeakMap.get(observer);
+        if (proxyTree != null) {
+          proxyWeakMap.set(observer, {
+            paths: proxyTree.getUsedRoutes() as any,
+          });
+        }
+      }
+    }
 
-    // Build Proxy Key Map
-    const proxyKeyMap: ProxyKeyMapInterface = {};
-    if (config.proxyBased) {
-      for (const proxyTreeKey in proxyTreeMap) {
-        const proxyTree = proxyTreeMap[proxyTreeKey];
-        proxyKeyMap[proxyTreeKey] = {
-          paths: proxyTree.getUsedRoutes() as any,
-        };
+    // Build Selector WeakMap based on the specified selector method
+    const selectorWeakMap: SelectorWeakMapType = new WeakMap();
+    if (config.selector != null) {
+      for (const observer of observers) {
+        selectorWeakMap.set(observer, { methods: [config.selector] });
       }
     }
 
     // Create Callback based Subscription
-    const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
+    const subscriptionContainer = agileInstance.subController.subscribe(
       () => {
         forceRender();
       },
       observers,
-      { key: config.key, proxyKeyMap, waitForMount: false }
+      {
+        key: config.key,
+        proxyWeakMap,
+        waitForMount: false,
+        componentId: config.componentId,
+        selectorWeakMap: selectorWeakMap,
+      }
     );
 
-    // Unsubscribe Callback based Subscription on Unmount
+    // Unsubscribe Callback based Subscription on unmount
     return () => {
       agileInstance?.subController.unsubscribe(subscriptionContainer);
     };
@@ -141,52 +204,58 @@ export function useAgile<
   return getReturnValue(depsArray);
 }
 
-// Array Type
-// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
-export type AgileHookArrayType<T> = {
-  [K in keyof T]: T[K] extends Collection<infer U> | Group<infer U>
-    ? U[]
-    : T[K] extends State<infer U> | Observer<infer U>
-    ? U
-    : T[K] extends undefined
-    ? undefined
-    : T[K] extends Collection<infer U> | Group<infer U> | undefined
-    ? U[] | undefined
-    : T[K] extends State<infer U> | Observer<infer U> | undefined
-    ? U | undefined
-    : never;
-};
-
-// No Array Type
-export type AgileHookType<T> = T extends Collection<infer U> | Group<infer U>
-  ? U[]
-  : T extends State<infer U> | Observer<infer U>
-  ? U
-  : T extends undefined
-  ? undefined
-  : T extends Collection<infer U> | Group<infer U> | undefined
-  ? U[] | undefined
-  : T extends State<infer U> | Observer<infer U> | undefined
-  ? U | undefined
-  : never;
-
 export type SubscribableAgileInstancesType =
   | State
   | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
 
-/**
- * @param key - Key/Name of SubscriptionContainer that is created
- * @param agileInstance - Instance of Agile
- * @param proxyBased - If useAgile() should only rerender the Component when a used property mutates
- */
-interface AgileHookConfigInterface {
+export interface AgileHookConfigInterface {
+  /**
+   * Key/Name identifier of the Subscription Container to be created.
+   * @default undefined
+   */
   key?: SubscriptionContainerKeyType;
+  /**
+   * Instance of Agile the Subscription Container belongs to.
+   * @default `undefined` if no Agile Instance could be extracted from the provided Instances.
+   */
   agileInstance?: Agile;
+  /**
+   * Whether to wrap a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+   * around the bound Agile Instance value object,
+   * to automatically constrain the way the selected Agile Instance
+   * is compared to determine whether the Component needs to be re-rendered
+   * based on the object's used properties.
+   *
+   * Requires an additional package called `@agile-ts/proxytree`!
+   *
+   * @default false
+   */
   proxyBased?: boolean;
-}
-
-interface ProxyTreeMapInterface {
-  [key: string]: ProxyTree;
+  /**
+   * Equality comparison function
+   * that allows you to customize the way the selected Agile Instance
+   * is compared to determine whether the Component needs to be re-rendered.
+   * @default undefined
+   */
+  selector?: SelectorMethodType;
+  /**
+   * Key/Name identifier of the UI-Component the Subscription Container is bound to.
+   *
+   * Note that setting this property can destroy the useAgile type.
+   * -> should only be used internal!
+   *
+   * @default undefined
+   */
+  componentId?: ComponentIdType;
+  /**
+   * What type of Observer to be bound to the UI-Component.
+   *
+   * Note that setting this property can destroy the useAgile type.
+   * -> should only be used internal!
+   *
+   * @default undefined
+   */
+  observerType?: string;
 }

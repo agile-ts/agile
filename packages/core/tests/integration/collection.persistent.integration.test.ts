@@ -1,5 +1,5 @@
 import { Agile, Item } from '../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../helper/logMock';
 
 describe('Collection Persist Function Tests', () => {
   const myStorage: any = {};
@@ -34,8 +34,8 @@ describe('Collection Persist Function Tests', () => {
   }
 
   beforeEach(() => {
+    LogMock.mockLogs();
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
   });
 
   describe('Collection', () => {

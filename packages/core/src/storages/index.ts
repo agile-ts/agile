@@ -6,20 +6,28 @@ import {
   StorageKey,
   StorageItemKey,
   notEqual,
+  LogCodeManager,
 } from '../internal';
 
 export class Storages {
+  // Agile Instance the Storages belongs to
   public agileInstance: () => Agile;
 
   public config: StoragesConfigInterface;
-  public storages: { [key: string]: Storage } = {}; // All registered Storages
+
+  // Registered Storages
+  public storages: { [key: string]: Storage } = {};
+  // Persistent from Instances (for example States) that were persisted
   public persistentInstances: Set<Persistent> = new Set();
 
   /**
+   * The Storages Class manages all external Storages for an Agile Instance
+   * and provides an interface to easily store,
+   * load and remove values from multiple Storages at once.
+   *
    * @internal
-   * Storages - Manages Storages of Agile
-   * @param agileInstance - An Instance of Agile
-   * @param config - Config
+   * @param agileInstance - Instance of Agile the Storages belongs to.
+   * @param config - Configuration object
    */
   constructor(
     agileInstance: Agile,
@@ -34,23 +42,19 @@ export class Storages {
     if (config.localStorage) this.instantiateLocalStorage();
   }
 
-  //=========================================================================================================
-  // Instantiate Local Storage
-  //=========================================================================================================
   /**
+   * Instantiates and registers the
+   * [Local Storage](https://developer.mozilla.org/de/docs/Web/API/Window/localStorage).
+   *
+   * Note that the Local Storage is only available in a web environment.
+   *
    * @internal
-   * Instantiates Local Storage
    */
   public instantiateLocalStorage(): boolean {
-    // Check if Local Storage is Available
     if (!Storages.localStorageAvailable()) {
-      Agile.logger.warn(
-        'Local Storage is here not available, to use Storage functionalities like persist please provide a custom Storage!'
-      );
+      LogCodeManager.log('11:02:00');
       return false;
     }
-
-    // Create and register Local Storage
     const _localStorage = new Storage({
       key: 'localStorage',
       async: false,
@@ -63,14 +67,14 @@ export class Storages {
     return this.register(_localStorage, { default: true });
   }
 
-  //=========================================================================================================
-  // Register
-  //=========================================================================================================
   /**
-   * @internal
-   * Register new Storage as Agile Storage
-   * @param storage - new Storage
-   * @param config - Config
+   * Registers the specified Storage with AgileTs
+   * and updates the Persistent Instances that have already attempted
+   * to use the previously unregistered Storage.
+   *
+   * @public
+   * @param storage - Storage to be registered with AgileTs.
+   * @param config - Configuration object
    */
   public register(
     storage: Storage,
@@ -80,18 +84,13 @@ export class Storages {
 
     // Check if Storage already exists
     if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
-      Agile.logger.error(
-        `Storage with the key/name '${storage.key}' already exists`
-      );
+      LogCodeManager.log('11:03:00', [storage.key]);
       return false;
     }
 
-    // Set first added Storage as default Storage
-    if (!hasRegisteredAnyStorage && config.default === false) {
-      Agile.logger.warn(
-        'Be aware that Agile has to assign the first added Storage as default Storage!'
-      );
-    }
+    // Assign Storage as default Storage if it is the first one added
+    if (!hasRegisteredAnyStorage && config.default === false)
+      LogCodeManager.log('11:02:01');
     if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
@@ -99,15 +98,17 @@ export class Storages {
     if (config.default) this.config.defaultStorageKey = storage.key;
 
     this.persistentInstances.forEach((persistent) => {
-      // Revalidate Persistent that includes the newly registered StorageKey
+      // Revalidate Persistent, which contains key/name identifier of the newly registered Storage
       if (persistent.storageKeys.includes(storage.key)) {
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
         return;
       }
 
-      // If persistent has no default StorageKey (reassign StorageKeys since this registered Storage might be tagged as default Storage)
-      if (!persistent.config.defaultStorageKey) {
+      // If Persistent has no default Storage key,
+      // reassign Storage keys since the now registered Storage
+      // might be tagged as default Storage of AgileTs
+      if (persistent.config.defaultStorageKey == null) {
         persistent.assignStorageKeys();
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
@@ -117,150 +118,149 @@ export class Storages {
     return true;
   }
 
-  //=========================================================================================================
-  // Get Storage
-  //=========================================================================================================
   /**
-   * @internal
-   * Get Storage at Key/Name
-   * @param storageKey - Key/Name of Storage
+   * Retrieves a single Storage with the specified key/name identifier
+   * from the Storages Class.
+   *
+   * If the to retrieve Storage doesn't exist, `undefined` is returned.
+   *
+   * @public
+   * @param storageKey - Key/Name identifier of the Storage.
    */
   public getStorage(
     storageKey: StorageKey | undefined | null
   ): Storage | undefined {
     if (!storageKey) return undefined;
     const storage = this.storages[storageKey];
-
-    // Check if Storage exists
     if (!storage) {
-      Agile.logger.error(
-        `Storage with the key/name '${storageKey}' doesn't exist!`
-      );
+      LogCodeManager.log('11:03:01', [storageKey]);
       return undefined;
     }
-
-    // Check if Storage is ready
     if (!storage.ready) {
-      Agile.logger.error(
-        `Storage with the key/name '${storageKey}' isn't ready yet!`
-      );
+      LogCodeManager.log('11:03:02', [storageKey]);
       return undefined;
     }
-
     return storage;
   }
 
-  //=========================================================================================================
-  // Get
-  //=========================================================================================================
   /**
-   * @internal
-   * Gets value at provided Key
-   * @param key - Key of Storage property
-   * @param storageKey - Key/Name of Storage from which the Item is fetched (if not provided default Storage will be used)
+   * Retrieves the stored value at the specified Storage Item key
+   * from the defined external Storage (`storageKey`).
+   *
+   * When no Storage has been specified,
+   * the value is retrieved from the default Storage.
+   *
+   * @public
+   * @param storageItemKey - Key/Name identifier of the value to be retrieved.
+   * @param storageKey - Key/Name identifier of the external Storage
+   * from which the value is to be retrieved.
    */
   public get<GetType = any>(
-    key: StorageItemKey,
+    storageItemKey: StorageItemKey,
     storageKey?: StorageKey
   ): Promise<GetType | undefined> {
     if (!this.hasStorage()) {
-      Agile.logger.error(
-        'No Storage found! Please provide at least one Storage.'
-      );
+      LogCodeManager.log('11:03:03');
       return Promise.resolve(undefined);
     }
 
-    // Call get Method in specific Storage
+    // Call get method on specified Storage
     if (storageKey) {
       const storage = this.getStorage(storageKey);
-      if (storage) return storage.get<GetType>(key);
+      if (storage) return storage.get<GetType>(storageItemKey);
     }
 
-    // Call get Method in default Storage
+    // Call get method on default Storage
     const defaultStorage = this.getStorage(this.config.defaultStorageKey);
-    return defaultStorage?.get<GetType>(key) || Promise.resolve(undefined);
+    return (
+      defaultStorage?.get<GetType>(storageItemKey) || Promise.resolve(undefined)
+    );
   }
 
-  //=========================================================================================================
-  // Set
-  //=========================================================================================================
   /**
-   * @internal
-   * Saves/Updates value at provided Key
-   * @param key - Key of Storage property
-   * @param value - new Value that gets set at provided Key
-   * @param storageKeys - Key/Name of Storages where the Value gets set (if not provided default Storage will be used)
+   * Stores or updates the value at the specified Storage Item key
+   * in the defined external Storages (`storageKeys`).
+   *
+   * When no Storage has been specified,
+   * the value is stored/updated in the default Storage.
+   *
+   * @public
+   * @param storageItemKey - Key/Name identifier of the value to be stored.
+   * @param value - Value to be stored in an external Storage.
+   * @param storageKeys - Key/Name identifier of the external Storage
+   * where the value is to be stored.
    */
   public set(
-    key: StorageItemKey,
+    storageItemKey: StorageItemKey,
     value: any,
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      Agile.logger.error(
-        'No Storage found! Please provide at least one Storage.'
-      );
+      LogCodeManager.log('11:03:04');
       return;
     }
 
-    // Call set Method in specific Storages
-    if (storageKeys) {
+    // Call set method on specified Storages
+    if (storageKeys != null) {
       for (const storageKey of storageKeys)
-        this.getStorage(storageKey)?.set(key, value);
+        this.getStorage(storageKey)?.set(storageItemKey, value);
       return;
     }
 
-    // Call set Method in default Storage
+    // Call set method on default Storage
     const defaultStorage = this.getStorage(this.config.defaultStorageKey);
-    defaultStorage?.set(key, value);
+    defaultStorage?.set(storageItemKey, value);
   }
 
-  //=========================================================================================================
-  // Remove
-  //=========================================================================================================
   /**
-   * @internal
-   * Removes value at provided Key
-   * @param key - Key of Storage property
-   * @param storageKeys - Key/Name of Storages where the Value gets removed (if not provided default Storage will be used)
+   * Removes the value at the specified Storage Item key
+   * from the defined external Storages (`storageKeys`).
+   *
+   * When no Storage has been specified,
+   * the value is removed from the default Storage.
+   *
+   * @public
+   * @param storageItemKey - Key/Name identifier of the value to be removed.
+   * @param storageKeys - Key/Name identifier of the external Storage
+   * from which the value is to be removed.
    */
-  public remove(key: StorageItemKey, storageKeys?: StorageKey[]): void {
+  public remove(
+    storageItemKey: StorageItemKey,
+    storageKeys?: StorageKey[]
+  ): void {
     if (!this.hasStorage()) {
-      Agile.logger.error(
-        'No Storage found! Please provide at least one Storage.'
-      );
+      LogCodeManager.log('11:03:05');
       return;
     }
 
-    // Call remove Method in specific Storages
+    // Call remove method on specified Storages
     if (storageKeys) {
       for (const storageKey of storageKeys)
-        this.getStorage(storageKey)?.remove(key);
+        this.getStorage(storageKey)?.remove(storageItemKey);
       return;
     }
 
-    // Call remove Method in default Storage
+    // Call remove method on default Storage
     const defaultStorage = this.getStorage(this.config.defaultStorageKey);
-    defaultStorage?.remove(key);
+    defaultStorage?.remove(storageItemKey);
   }
 
-  //=========================================================================================================
-  // Has Storage
-  //=========================================================================================================
   /**
-   * @internal
-   * Check if at least one Storage got registered
+   * Returns a boolean indicating whether any Storage
+   * has been registered with the Agile Instance or not.
+   *
+   * @public
    */
   public hasStorage(): boolean {
     return notEqual(this.storages, {});
   }
 
-  //=========================================================================================================
-  // Local Storage Available
-  //=========================================================================================================
   /**
-   * @internal
-   * Checks if localStorage is available in this Environment
+   * Returns a boolean indication whether the
+   * [Local Storage](https://developer.mozilla.org/de/docs/Web/API/Window/localStorage)
+   * is available in the current environment.
+   *
+   * @public
    */
   static localStorageAvailable(): boolean {
     try {
@@ -273,25 +273,59 @@ export class Storages {
   }
 }
 
-/**
- * @param localStorage - If Local Storage should be instantiated
- * @param defaultStorage - Default Storage Key
- */
 export interface CreateStoragesConfigInterface {
+  /**
+   * Whether to register the Local Storage by default.
+   * Note that the Local Storage is only available in a web environment.
+   * @default false
+   */
   localStorage?: boolean;
+  /**
+   * Key/Name identifier of the default Storage.
+   *
+   * The default Storage represents the default Storage of the Storages Class,
+   * on which executed actions are performed if no specific Storage was specified.
+   *
+   * Also, the persisted value is loaded from the default Storage by default,
+   * since only one persisted value can be applied.
+   * If the loading of the value from the default Storage failed,
+   * an attempt is made to load the value from the remaining Storages.
+   *
+   * @default undefined
+   */
   defaultStorageKey?: StorageKey;
 }
 
-/**
- * @param defaultStorage - Default Storage Key
- */
 export interface StoragesConfigInterface {
+  /**
+   * Key/Name identifier of the default Storage.
+   *
+   * The default Storage represents the default Storage of the Storages Class,
+   * on which executed actions are performed if no specific Storage was specified.
+   *
+   * Also, the persisted value is loaded from the default Storage by default,
+   * since only one persisted value can be applied.
+   * If the loading of the value from the default Storage failed,
+   * an attempt is made to load the value from the remaining Storages.
+   *
+   * @default undefined
+   */
   defaultStorageKey: StorageKey | null;
 }
 
-/**
- * @param default - If the registered Storage gets the default Storage
- */
 export interface RegisterConfigInterface {
+  /**
+   * Whether the to register Storage should become the default Storage.
+   *
+   * The default Storage represents the default Storage of the Storages Class,
+   * on which executed actions are performed if no specific Storage was specified.
+   *
+   * Also, the persisted value is loaded from the default Storage by default,
+   * since only one persisted value can be applied.
+   * If the loading of the value from the default Storage failed,
+   * an attempt is made to load the value from the remaining Storages.
+   *
+   * @default false
+   */
   default?: boolean;
 }

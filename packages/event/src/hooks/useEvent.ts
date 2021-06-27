@@ -27,7 +27,7 @@ export function useEvent<E extends Event<any>>(
     }
 
     // Create Callback based Subscription
-    const subscriptionContainer = agileInstance.subController.subscribeWithSubsArray(
+    const subscriptionContainer = agileInstance.subController.subscribe(
       () => {
         forceRender();
       },

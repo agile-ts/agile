@@ -7,8 +7,9 @@ import {
   Item,
   State,
   CollectionPersistent,
-} from '../../../src';
-import mockConsole from 'jest-mock-console';
+  GroupObserver,
+} from '../../../../src';
+import { LogMock } from '../../../helper/logMock';
 
 describe('Group Tests', () => {
   interface ItemInterface {
@@ -21,7 +22,7 @@ describe('Group Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
@@ -45,9 +46,9 @@ describe('Group Tests', () => {
 
     expect(group.collection()).toBe(dummyCollection);
     expect(group._output).toStrictEqual([]);
-    expect(group._items).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
 
+    // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
@@ -56,9 +57,12 @@ describe('Group Tests', () => {
     expect(group._value).toStrictEqual([]);
     expect(group.previousStateValue).toStrictEqual([]);
     expect(group.nextStateValue).toStrictEqual([]);
-    expect(group.observer).toBeInstanceOf(StateObserver);
-    expect(group.observer.dependents.size).toBe(0);
-    expect(group.observer._key).toBeUndefined();
+    expect(group.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(group.observers['value'].dependents)).toStrictEqual([]);
+    expect(group.observers['value']._key).toBeUndefined();
+    expect(group.observers['output']).toBeInstanceOf(GroupObserver);
+    expect(Array.from(group.observers['output'].dependents)).toStrictEqual([]);
+    expect(group.observers['output']._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
@@ -83,9 +87,9 @@ describe('Group Tests', () => {
 
     expect(group.collection()).toBe(dummyCollection);
     expect(group._output).toStrictEqual([]);
-    expect(group._items).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
 
+    // Check if State was called with correct parameters
     expect(group._key).toBe('dummyKey');
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
@@ -94,9 +98,12 @@ describe('Group Tests', () => {
     expect(group._value).toStrictEqual([]);
     expect(group.previousStateValue).toStrictEqual([]);
     expect(group.nextStateValue).toStrictEqual([]);
-    expect(group.observer).toBeInstanceOf(StateObserver);
-    expect(group.observer.dependents.size).toBe(0);
-    expect(group.observer._key).toBe('dummyKey');
+    expect(group.observers['value']).toBeInstanceOf(StateObserver);
+    expect(Array.from(group.observers['value'].dependents)).toStrictEqual([]);
+    expect(group.observers['value']._key).toBe('dummyKey');
+    expect(group.observers['output']).toBeInstanceOf(GroupObserver);
+    expect(Array.from(group.observers['output'].dependents)).toStrictEqual([]);
+    expect(group.observers['output']._key).toBe('dummyKey');
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
@@ -118,9 +125,9 @@ describe('Group Tests', () => {
 
     expect(group.collection()).toBe(dummyCollection);
     expect(group._output).toStrictEqual([]);
-    expect(group._items).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
 
+    // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
     expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
@@ -129,9 +136,10 @@ describe('Group Tests', () => {
     expect(group._value).toStrictEqual(['test1', 'test2', 'test3']);
     expect(group.previousStateValue).toStrictEqual(['test1', 'test2', 'test3']);
     expect(group.nextStateValue).toStrictEqual(['test1', 'test2', 'test3']);
-    expect(group.observer).toBeInstanceOf(StateObserver);
-    expect(group.observer.dependents.size).toBe(0);
-    expect(group.observer._key).toBeUndefined();
+    expect(group.observers['value']).toBeInstanceOf(StateObserver);
+    expect(group.observers['value']._key).toBeUndefined();
+    expect(group.observers['output']).toBeInstanceOf(GroupObserver);
+    expect(group.observers['output']._key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
@@ -177,46 +185,23 @@ describe('Group Tests', () => {
           { id: '1', name: 'Frank' },
           { id: '2', name: 'Hans' },
         ]);
-        expect(ComputedTracker.tracked).toHaveBeenCalledWith(group.observer);
+        expect(ComputedTracker.tracked).toHaveBeenCalledWith(
+          group.observers['output']
+        );
       });
     });
 
     describe('output set function tests', () => {
-      it('should set output to passed value', () => {
+      it("shouldn't set output to passed value and print error", () => {
+        group._output = null as any;
+
         group.output = [
           { id: '12', name: 'Hans der 3' },
           { id: '99', name: 'Frank' },
         ];
 
-        expect(group._output).toStrictEqual([
-          { id: '12', name: 'Hans der 3' },
-          { id: '99', name: 'Frank' },
-        ]);
-      });
-    });
-
-    describe('item get function tests', () => {
-      beforeEach(() => {
-        jest.spyOn(ComputedTracker, 'tracked');
-      });
-
-      it('should return items of Group and call ComputedTracker.tracked', () => {
-        group._items = [() => dummyItem1, () => dummyItem2];
-
-        const response = group.items;
-
-        expect(response).toStrictEqual([dummyItem1, dummyItem2]);
-        expect(ComputedTracker.tracked).toHaveBeenCalledWith(group.observer);
-      });
-    });
-
-    describe('item set function tests', () => {
-      it('should set items to passed value', () => {
-        group.items = [dummyItem1, dummyItem2];
-
-        expect(group._items.length).toBe(2);
-        expect(group._items[0]()).toBe(dummyItem1);
-        expect(group._items[1]()).toBe(dummyItem2);
+        expect(group._output).toStrictEqual(null);
+        expect(LogMock.hasLoggedCode('1C:03:00', [group._key]));
       });
     });
 
@@ -255,7 +240,6 @@ describe('Group Tests', () => {
       it('should remove Item from Group not in background (default config)', () => {
         group.remove('dummyItem1Key');
 
-        expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
           {}
@@ -265,7 +249,6 @@ describe('Group Tests', () => {
       it('should remove Item from Group in background (config.background = true)', () => {
         group.remove('dummyItem1Key', { background: true });
 
-        expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
           { background: true }
@@ -275,16 +258,12 @@ describe('Group Tests', () => {
       it("shouldn't remove not existing Item from Group (default config)", () => {
         group.remove('notExistingKey');
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingKey' in Group 'groupKey'!"
-        );
         expect(group.set).not.toHaveBeenCalled();
       });
 
       it("should remove Item from Group that doesn't exist in Collection in background (default config)", () => {
         group.remove('dummyItem3Key');
 
-        expect(console.error).not.toHaveBeenCalled();
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
           { background: true }
@@ -294,18 +273,12 @@ describe('Group Tests', () => {
       it('should remove Items from Group not in background (default config)', () => {
         group.remove(['dummyItem1Key', 'notExistingItemKey', 'dummyItem3Key']);
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
-        );
         expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {});
       });
 
       it("should remove Items from Group in background if passing not existing Item and Item that doesn't exist in Collection (default config)", () => {
         group.remove(['notExistingItemKey', 'dummyItem3Key']);
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Couldn't find ItemKey 'notExistingItemKey' in Group 'groupKey'!"
-        );
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
           { background: true }
@@ -425,61 +398,25 @@ describe('Group Tests', () => {
       });
     });
 
+    describe('getItems function tests', () => {
+      beforeEach(() => {
+        group._value = ['dummyItem1Key', 'dummyItem3Key', 'dummyItem2Key'];
+      });
+
+      it('should return all existing Items of the Group', () => {
+        const items = group.getItems();
+
+        expect(items).toStrictEqual([dummyItem1, dummyItem2]);
+      });
+    });
+
     describe('persist function tests', () => {
       beforeEach(() => {
         jest.spyOn(State.prototype, 'persist');
       });
 
-      it('should persist Group with GroupKey (default config)', () => {
+      it('should persist Group with formatted groupKey (default config)', () => {
         group.persist();
-
-        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
-      });
-
-      it('should persist Group with GroupKey (specific config)', () => {
-        group.persist({
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-
-        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-      });
-
-      it('should persist Group with passed Key (default config)', () => {
-        group.persist('dummyKey');
-
-        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
-      });
-
-      it('should persist Group with passed Key (specific config)', () => {
-        group.persist('dummyKey', {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-
-        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          defaultStorageKey: 'test1',
-        });
-      });
-
-      it('should persist Group with formatted GroupKey (config.followCollectionPersistKeyPattern)', () => {
-        group.persist({ followCollectionPersistKeyPattern: true });
 
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
@@ -494,8 +431,28 @@ describe('Group Tests', () => {
         );
       });
 
-      it('should persist Group with formatted passed Key (config.followCollectionPersistKeyPattern)', () => {
-        group.persist('dummyKey', { followCollectionPersistKeyPattern: true });
+      it('should persist Group with formatted groupKey (specific config)', () => {
+        group.persist({
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getGroupStorageKey(
+            group._key,
+            dummyCollection._key
+          ),
+          {
+            loadValue: false,
+            storageKeys: ['test1', 'test2'],
+            defaultStorageKey: 'test1',
+          }
+        );
+      });
+
+      it('should persist Group with formatted specified key (default config)', () => {
+        group.persist('dummyKey');
 
         expect(State.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
@@ -509,28 +466,97 @@ describe('Group Tests', () => {
           }
         );
       });
+
+      it('should persist Group with formatted specified key (specific config)', () => {
+        group.persist('dummyKey', {
+          loadValue: false,
+          storageKeys: ['test1', 'test2'],
+          defaultStorageKey: 'test1',
+        });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(
+          CollectionPersistent.getGroupStorageKey(
+            'dummyKey',
+            dummyCollection._key
+          ),
+          {
+            loadValue: false,
+            storageKeys: ['test1', 'test2'],
+            defaultStorageKey: 'test1',
+          }
+        );
+      });
+
+      it('should persist Group with groupKey (config.followCollectionPersistKeyPattern = false)', () => {
+        group.persist({ followCollectionPersistKeyPattern: false });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
+          loadValue: true,
+          storageKeys: [],
+          defaultStorageKey: null,
+        });
+      });
+
+      it('should persist Group with specified key (config.followCollectionPersistKeyPattern = false)', () => {
+        group.persist('dummyKey', { followCollectionPersistKeyPattern: false });
+
+        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
+          loadValue: true,
+          storageKeys: [],
+          defaultStorageKey: null,
+        });
+      });
     });
 
     describe('rebuild function tests', () => {
       beforeEach(() => {
         group._value = ['dummyItem1Key', 'dummyItem3Key', 'dummyItem2Key'];
+        group.observers['output'].ingestItems = jest.fn();
       });
 
-      it('should build Group output and items and set notFoundItemKeys to not found Item Keys', () => {
+      it('should ingest the built Group output and set notFoundItemKeys to the not found Item Keys (default config)', () => {
         group.rebuild();
 
-        expect(
-          console.warn
-        ).toHaveBeenCalledWith(
-          `Agile Warn: Couldn't find some Items in Collection '${dummyCollection._key}' (${group._key})`,
+        expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
+        expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
+        expect(group.observers['output'].ingestItems).toHaveBeenCalledWith(
+          [dummyItem1, dummyItem2],
+          {}
+        );
+
+        LogMock.hasLoggedCode(
+          '1C:02:00',
+          [dummyCollection._key, group._key],
           ['dummyItem3Key']
         );
+      });
+
+      it('should ingest the built Group output and set notFoundItemKeys to the not found Item Keys (specific config)', () => {
+        group.rebuild({ storage: true, overwrite: true, background: false });
+
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
-        expect(group.items).toStrictEqual([dummyItem1, dummyItem2]);
-        expect(group._output).toStrictEqual([
-          dummyItem1._value,
-          dummyItem2._value,
-        ]);
+        expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
+        expect(group.observers['output'].ingestItems).toHaveBeenCalledWith(
+          [dummyItem1, dummyItem2],
+          { storage: true, overwrite: true, background: false }
+        );
+
+        LogMock.hasLoggedCode(
+          '1C:02:00',
+          [dummyCollection._key, group._key],
+          ['dummyItem3Key']
+        );
+      });
+
+      it("shouldn't intest the build Group output if the Collection was not properly instantiated", () => {
+        dummyCollection.isInstantiated = false;
+
+        group.rebuild();
+
+        expect(group.notFoundItemKeys).toStrictEqual([]);
+        expect(group._output).toStrictEqual([]);
+        expect(group.observers['output'].ingestItems).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
     });
   });

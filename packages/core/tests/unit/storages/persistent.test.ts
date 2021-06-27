@@ -1,12 +1,12 @@
 import { Agile, Persistent, Storage } from '../../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../helper/logMock';
 
 describe('Persistent Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
@@ -96,6 +96,8 @@ describe('Persistent Tests', () => {
 
     beforeEach(() => {
       persistent = new Persistent(dummyAgile);
+
+      jest.clearAllMocks(); // Because creating Persistent executes some mocks
     });
 
     describe('key set function tests', () => {
@@ -113,6 +115,74 @@ describe('Persistent Tests', () => {
         persistent._key = 'dummyKey';
 
         expect(persistent.key).toBe('dummyKey');
+      });
+    });
+
+    describe('setKey function tests', () => {
+      beforeEach(() => {
+        persistent.removePersistedValue = jest.fn();
+        persistent.persistValue = jest.fn();
+        persistent.initialLoading = jest.fn();
+      });
+
+      it('should update key with valid key in ready Persistent', async () => {
+        persistent.ready = true;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(true);
+
+        await persistent.setKey('newKey');
+
+        expect(persistent._key).toBe('newKey');
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).not.toHaveBeenCalled();
+        expect(persistent.persistValue).toHaveBeenCalledWith('newKey');
+        expect(persistent.removePersistedValue).toHaveBeenCalledWith(
+          'dummyKey'
+        );
+      });
+
+      it('should update key with not valid key in ready Persistent', async () => {
+        persistent.ready = true;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(false);
+
+        await persistent.setKey();
+
+        expect(persistent._key).toBe(Persistent.placeHolderKey);
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).not.toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.removePersistedValue).toHaveBeenCalledWith(
+          'dummyKey'
+        );
+      });
+
+      it('should update key with valid key in not ready Persistent', async () => {
+        persistent.ready = false;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(true);
+
+        await persistent.setKey('newKey');
+
+        expect(persistent._key).toBe('newKey');
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.removePersistedValue).not.toHaveBeenCalled();
+      });
+
+      it('should update key with not valid key in not ready Persistent', async () => {
+        persistent.ready = false;
+        persistent._key = 'dummyKey';
+        jest.spyOn(persistent, 'validatePersistent').mockReturnValueOnce(false);
+
+        await persistent.setKey();
+
+        expect(persistent._key).toBe(Persistent.placeHolderKey);
+        expect(persistent.validatePersistent).toHaveBeenCalled();
+        expect(persistent.initialLoading).not.toHaveBeenCalled();
+        expect(persistent.persistValue).not.toHaveBeenCalled();
+        expect(persistent.removePersistedValue).not.toHaveBeenCalled();
       });
     });
 
@@ -152,9 +222,7 @@ describe('Persistent Tests', () => {
         expect(isValid).toBeFalsy();
         expect(persistent.ready).toBeFalsy();
 
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance.'
-        );
+        LogMock.hasLoggedCode('12:03:00');
       });
 
       it('should return false and print error if set key and no set StorageKeys', () => {
@@ -165,9 +233,7 @@ describe('Persistent Tests', () => {
         expect(isValid).toBeFalsy();
         expect(persistent.ready).toBeFalsy();
 
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No persist Storage Key found! Please provide at least one Storage Key.'
-        );
+        LogMock.hasLoggedCode('12:03:01');
       });
 
       it('should return false and print error if no set key and set StorageKeys', () => {
@@ -179,9 +245,7 @@ describe('Persistent Tests', () => {
         expect(isValid).toBeFalsy();
         expect(persistent.ready).toBeFalsy();
 
-        expect(console.error).toHaveBeenCalledWith(
-          'Agile Error: No valid persist Key found! Please provide a Key or assign one to the parent instance.'
-        );
+        LogMock.hasLoggedCode('12:03:00');
       });
 
       it('should return false and print error if set key and set StorageKeys but no existing Storage at storageKeys', () => {
@@ -193,9 +257,7 @@ describe('Persistent Tests', () => {
         expect(isValid).toBeFalsy();
         expect(persistent.ready).toBeFalsy();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: Storage 'test' doesn't exist yet. Please provide only existing StorageKeys!"
-        );
+        LogMock.hasLoggedCode('12:03:00');
       });
 
       it('should return true if set key and set StorageKeys', () => {
@@ -237,7 +299,7 @@ describe('Persistent Tests', () => {
           'test3',
         ]);
         expect(persistent.config.defaultStorageKey).toBe('test1');
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
       it('should assign passed StorageKeys and set passed defaultStorageKey as default StorageKey', () => {
@@ -249,26 +311,24 @@ describe('Persistent Tests', () => {
           'test3',
         ]);
         expect(persistent.config.defaultStorageKey).toBe('test3');
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
 
-      it('should assign passed StorageKeys and set not existing defaultStorageKey as default StorageKey, push it into storageKeys and print warning', () => {
-        persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test4');
+      it(
+        'should assign passed StorageKeys, set passed defaultStorageKey as default StorageKey' +
+          'and push defaultStorageKey into storageKeys',
+        () => {
+          persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test4');
 
-        expect(persistent.storageKeys).toStrictEqual([
-          'test1',
-          'test2',
-          'test3',
-          'test4',
-        ]);
-        expect(persistent.config.defaultStorageKey).toBe('test4');
-        expect(
-          console.warn
-        ).toHaveBeenCalledWith(
-          "Agile Warn: Default Storage Key 'test4' isn't contained in storageKeys!",
-          ['test1', 'test2', 'test3', 'test4']
-        );
-      });
+          expect(persistent.storageKeys).toStrictEqual([
+            'test1',
+            'test2',
+            'test3',
+            'test4',
+          ]);
+          expect(persistent.config.defaultStorageKey).toBe('test4');
+        }
+      );
 
       it('should try to get default StorageKey from Agile if no StorageKey got passed', () => {
         dummyAgile.storages.register(
@@ -293,7 +353,7 @@ describe('Persistent Tests', () => {
 
         expect(persistent.storageKeys).toStrictEqual(['storage1']);
         expect(persistent.config.defaultStorageKey).toBe('storage1');
-        expect(console.warn).not.toHaveBeenCalled();
+        LogMock.hasNotLogged('warn');
       });
     });
 
@@ -329,9 +389,7 @@ describe('Persistent Tests', () => {
       it('should print error', () => {
         persistent.loadPersistedValue();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: 'loadPersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
-        );
+        LogMock.hasLoggedCode('00:03:00', ['loadPersistedValue', 'Persistent']);
       });
     });
 
@@ -339,9 +397,7 @@ describe('Persistent Tests', () => {
       it('should print error', () => {
         persistent.persistValue();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: 'persistValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
-        );
+        LogMock.hasLoggedCode('00:03:00', ['persistValue', 'Persistent']);
       });
     });
 
@@ -349,9 +405,10 @@ describe('Persistent Tests', () => {
       it('should print error', () => {
         persistent.removePersistedValue();
 
-        expect(console.error).toHaveBeenCalledWith(
-          "Agile Error: 'removePersistedValue' function isn't Set in Persistent! Be aware that Persistent is no stand alone class!"
-        );
+        LogMock.hasLoggedCode('00:03:00', [
+          'removePersistedValue',
+          'Persistent',
+        ]);
       });
 
       describe('formatKey function tests', () => {

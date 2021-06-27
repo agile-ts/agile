@@ -114,7 +114,7 @@ export class MultiEditor<
     const deps: Array<Observer> = [];
     for (const key in this.data) {
       const item = this.data[key];
-      deps.push(item.observer);
+      deps.push(item.observers['value']);
       deps.push(item.status.observer);
     }
     return deps;
@@ -132,7 +132,7 @@ export class MultiEditor<
     const deps: Array<Observer> = [];
     const item = this.getItemById(key);
     if (item) {
-      deps.push(item.observer);
+      deps.push(item.observers['value']);
       deps.push(item.status.observer);
     }
     return deps;
@@ -394,7 +394,7 @@ export class MultiEditor<
   // Get Validator
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * Get Validator of Item based on validateMethods
    * @param key - Key/Name of Item
    */
@@ -429,7 +429,7 @@ export class MultiEditor<
   // Validate
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * Validates Editor and updates its 'isValid' property
    */
   public validate(): boolean {
@@ -451,7 +451,7 @@ export class MultiEditor<
   // Can Assign Status To Item On Change
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * If Status can be assigned on Change
    * @param item - Item to which the Status should get applied
    */
@@ -470,7 +470,7 @@ export class MultiEditor<
   // Can Assign Status To Item On Submit
   //=========================================================================================================
   /**
-   * @private
+   * @internal
    * If Status can be assigned on Submit
    * @param item - Item to which the Status should get applied
    */

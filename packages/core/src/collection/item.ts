@@ -1,25 +1,37 @@
 import {
   State,
   Collection,
-  DefaultItem,
   StateKey,
   StateRuntimeJobConfigInterface,
   defineConfig,
+  SelectorKey,
+  PersistentKey,
+  isValidObject,
+  CollectionPersistent,
+  StatePersistentConfigInterface,
+  DefaultItem,
 } from '../internal';
 
-export class Item<DataType extends object = DefaultItem> extends State<
+export class Item<DataType extends Object = DefaultItem> extends State<
   DataType
 > {
-  static updateGroupSideEffectKey = 'rebuildGroup';
-  public isSelected = false; // If Item is selected by a Selector
+  // Collection the Group belongs to
   public collection: () => Collection<DataType>;
 
+  static updateGroupSideEffectKey = 'rebuildGroup';
+
+  // Key/Name identifiers of Selectors which have selected the Item
+  public selectedBy: Set<SelectorKey> = new Set();
+
   /**
+   * An extension of the State Class that represents a single data object of a Collection.
+   *
+   * It can be used independently, but is always synchronized with the Collection.
+   *
    * @public
-   * Item of Collection
-   * @param collection - Collection to which the Item belongs
-   * @param data - Data that the Item holds
-   * @param config - Config
+   * @param collection - Collection to which the Item belongs.
+   * @param data - Data object to be represented by the Item.
+   * @param config - Configuration object
    */
   constructor(
     collection: Collection<DataType>,
@@ -28,24 +40,23 @@ export class Item<DataType extends object = DefaultItem> extends State<
   ) {
     super(collection.agileInstance(), data, {
       isPlaceholder: config.isPlaceholder,
-      key: data[collection.config.primaryKey], // Set Key/Name of Item to primaryKey of Data
+      key: data[collection.config.primaryKey], // Set key/name of Item to identifier at primaryKey property
     });
     this.collection = () => collection;
 
-    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
-    this.addRebuildGroupThatIncludeItemKeySideEffect(
-      this._key != null ? this._key : 'unknown'
-    );
+    // Add side effect to Item
+    // that rebuilds all Groups containing the Item whenever it changes
+    if (this._key != null) {
+      this.addRebuildGroupThatIncludeItemKeySideEffect(this._key);
+    }
   }
 
-  //=========================================================================================================
-  // Set Key
-  //=========================================================================================================
   /**
+   * Updates the key/name identifier of Item.
+   *
    * @internal
-   * Updates Key/Name of State
-   * @param value - New Key/Name of State
-   * @param config - Config
+   * @param value - New key/name identifier.
+   * @param config - Configuration object
    */
   public setKey(
     value: StateKey | undefined,
@@ -64,47 +75,122 @@ export class Item<DataType extends object = DefaultItem> extends State<
     });
     if (value == null) return this;
 
-    // Remove old rebuildGroupsThatIncludeItemKey sideEffect
+    // Update 'rebuildGroupsThatIncludeItemKey' side effect to the new itemKey
     this.removeSideEffect(Item.updateGroupSideEffectKey);
-
-    // Add rebuildGroupsThatIncludeItemKey to sideEffects to rebuild Groups that include this Item if it mutates
     this.addRebuildGroupThatIncludeItemKeySideEffect(value);
 
-    // Update ItemKey in ItemValue (After updating the sideEffect because otherwise it calls the old sideEffect)
-    this.patch(
-      { [this.collection().config.primaryKey]: value },
-      {
-        sideEffects: config.sideEffects,
-        background: config.background,
-        force: config.force,
-        storage: config.storage,
-        overwrite: config.overwrite,
-      }
-    );
+    // Update itemKey in Item value
+    // (After updating the side effect, because otherwise it would call the old side effect)
+    this.patch({ [this.collection().config.primaryKey]: value }, config);
+
     return this;
   }
 
-  //=========================================================================================================
-  // Add Rebuild Group That Include ItemKey SideEffect
-  //=========================================================================================================
   /**
+   * Preserves the Item `value` in the corresponding external Storage.
+   *
+   * The Item key/name is used as the unique identifier for the Persistent.
+   * If that is not desired or the Item has no unique identifier,
+   * please specify a separate unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
+   * @public
+   * @param config - Configuration object
+   */
+  public persist(config?: ItemPersistConfigInterface): this;
+  /**
+   * Preserves the Item `value` in the corresponding external Storage.
+   *
+   * The specified key is used as the unique identifier for the Persistent.
+   *
+   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
+   *
+   * @public
+   * @param key - Key/Name identifier of Persistent.
+   * @param config - Configuration object
+   */
+  public persist(
+    key?: PersistentKey,
+    config?: ItemPersistConfigInterface
+  ): this;
+  public persist(
+    keyOrConfig: PersistentKey | ItemPersistConfigInterface = {},
+    config: ItemPersistConfigInterface = {}
+  ): this {
+    let _config: ItemPersistConfigInterface;
+    let key: PersistentKey | undefined;
+
+    if (isValidObject(keyOrConfig)) {
+      _config = keyOrConfig as ItemPersistConfigInterface;
+      key = this._key;
+    } else {
+      _config = config || {};
+      key = keyOrConfig as PersistentKey;
+    }
+
+    _config = defineConfig(_config, {
+      loadValue: true,
+      followCollectionPersistKeyPattern: true,
+      storageKeys: [],
+      defaultStorageKey: null,
+    });
+
+    // Create storageItemKey based on Collection key/name identifier
+    if (_config.followCollectionPersistKeyPattern) {
+      key = CollectionPersistent.getItemStorageKey(
+        key || this._key,
+        this.collection()._key
+      );
+    }
+
+    // Persist Item
+    super.persist(key, {
+      loadValue: _config.loadValue,
+      storageKeys: _config.storageKeys,
+      defaultStorageKey: _config.defaultStorageKey,
+    });
+
+    return this;
+  }
+
+  /**
+   * Adds side effect to Item
+   * that rebuilds all Groups containing the specified Item identifier
+   * whenever the Item changes.
+   *
    * @internal
-   * Adds rebuildGroupThatIncludeItemKey to the Item sideEffects
-   * @param itemKey - ItemKey at which the groups has to rebuild
+   * @param itemKey - Item identifier that has to be contained in Groups.
    */
   public addRebuildGroupThatIncludeItemKeySideEffect(itemKey: StateKey) {
     this.addSideEffect<Item<DataType>>(
       Item.updateGroupSideEffectKey,
-      (instance, config) =>
-        instance.collection().rebuildGroupsThatIncludeItemKey(itemKey, config),
+      (instance, config) => {
+        // TODO optimise this because currently the whole Group rebuilds
+        //  although only one Item value has changed which definitely needs no complete rebuild
+        //   https://github.com/agile-ts/agile/issues/113
+        instance.collection().rebuildGroupsThatIncludeItemKey(itemKey, config);
+      },
       { weight: 100 }
     );
   }
 }
 
-/**
- * @param isPlaceholder - If Item is initially a Placeholder
- */
 export interface ItemConfigInterface {
+  /**
+   * Whether the Item should be a placeholder
+   * and therefore should only exist in the background.
+   * @default false
+   */
   isPlaceholder?: boolean;
+}
+
+export interface ItemPersistConfigInterface
+  extends StatePersistentConfigInterface {
+  /**
+   * Whether to format the specified Storage key following the Collection Item Storage key pattern.
+   * `_${collectionKey}_item_${itemKey}`
+   * @default true
+   */
+  followCollectionPersistKeyPattern?: boolean;
 }

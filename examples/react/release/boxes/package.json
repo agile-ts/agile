@@ -1,0 +1,57 @@
+{
+  "name": "boxes",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@agile-ts/api": "file:.yalc/@agile-ts/api",
+    "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/event": "file:.yalc/@agile-ts/event",
+    "@agile-ts/multieditor": "file:.yalc/@agile-ts/multieditor",
+    "@agile-ts/proxytree": "file:.yalc/@agile-ts/proxytree",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@chakra-ui/react": "^1.6.3",
+    "@emotion/react": "^11.4.0",
+    "@emotion/styled": "^11.3.0",
+    "framer-motion": "^4.1.17",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-draggable": "^4.4.3",
+    "react-feather": "^2.0.9",
+    "react-resizable": "^3.0.4",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.1.2",
+    "web-vitals": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-resizable": "^1.7.2",
+    "@types/react-router-dom": "^5.1.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "install:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/api @agile-ts/multieditor @agile-ts/event @agile-ts/proxytree & yarn install"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

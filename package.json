@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.12.0",
+    "@size-limit/file": "^4.12.0",
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.7",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
@@ -62,11 +63,13 @@
     "lerna-changelog": "^1.0.1",
     "nodemon": "^2.0.6",
     "prettier": "2.1.2",
+    "size-limit": "^4.12.0",
     "ts-jest": "^26.4.4",
     "ts-node": "^8.10.2",
     "tsc-watch": "^4.1.0",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "wait-for-expect": "^3.0.2"
   },
   "workspaces": [
     "packages/*"
