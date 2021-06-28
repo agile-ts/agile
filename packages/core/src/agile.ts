@@ -23,6 +23,12 @@ import {
   CreateComputedConfigInterface,
   ComputeFunctionType,
 } from './internal';
+import {
+  createCollection,
+  createComputed,
+  createState,
+  createStorage,
+} from './index';
 
 export class Agile {
   public config: AgileConfigInterface;
@@ -49,6 +55,9 @@ export class Agile {
 
   // Identifier used to bind an Agile Instance globally
   static globalKey = '__agile__';
+
+  // Shared Agile Instance that is used when no Agile Instance was specified
+  static shared = new Agile();
 
   /**
    * The Agile Class is the main Instance of AgileTs
@@ -128,7 +137,7 @@ export class Agile {
    * @param config - Configuration object
    */
   public createStorage(config: CreateStorageConfigInterface): Storage {
-    return new Storage(config);
+    return createStorage({ ...config, ...{ agileInstance: this } });
   }
 
   /**
@@ -150,7 +159,10 @@ export class Agile {
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ): State<ValueType> {
-    return new State<ValueType>(this, initialValue, config);
+    return createState<ValueType>(initialValue, {
+      ...config,
+      ...{ agileInstance: this },
+    });
   }
 
   /**
@@ -174,7 +186,7 @@ export class Agile {
   public createCollection<DataType extends Object = DefaultItem>(
     config?: CollectionConfig<DataType>
   ): Collection<DataType> {
-    return new Collection<DataType>(this, config);
+    return createCollection<DataType>(config, this);
   }
 
   /**
@@ -232,12 +244,14 @@ export class Agile {
     if (Array.isArray(configOrDeps)) {
       _config = flatMerge(_config, {
         computedDeps: configOrDeps,
+        agileInstance: this,
       });
     } else {
-      if (configOrDeps) _config = configOrDeps;
+      if (configOrDeps)
+        _config = { ...configOrDeps, ...{ agileInstance: this } };
     }
 
-    return new Computed<ComputedValueType>(this, computeFunction, _config);
+    return createComputed<ComputedValueType>(computeFunction, _config);
   }
 
   /**
