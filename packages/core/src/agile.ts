@@ -23,6 +23,7 @@ import {
   CreateComputedConfigInterface,
   ComputeFunctionType,
   removeProperties,
+  shared,
 } from './internal';
 
 export class Agile {
@@ -50,9 +51,6 @@ export class Agile {
 
   // Identifier used to bind an Agile Instance globally
   static globalKey = '__agile__';
-
-  // Shared Agile Instance that is used when no Agile Instance was specified
-  static shared = new Agile();
 
   /**
    * The Agile Class is the main Instance of AgileTs
@@ -351,7 +349,7 @@ export function createState<ValueType = any>(
   config: CreateStateConfigInterfaceWithAgile = {}
 ): State<ValueType> {
   config = defineConfig(config, {
-    agileInstance: Agile.shared,
+    agileInstance: shared,
   });
   return new State<ValueType>(
     config.agileInstance as any,
@@ -381,7 +379,7 @@ export function createState<ValueType = any>(
  */
 export function createCollection<DataType extends Object = DefaultItem>(
   config?: CollectionConfig<DataType>,
-  agileInstance: Agile = Agile.shared
+  agileInstance: Agile = shared
 ): Collection<DataType> {
   return new Collection<DataType>(agileInstance, config);
 }
@@ -447,7 +445,7 @@ export function createComputed<ComputedValueType = any>(
   }
 
   _config = defineConfig(_config, {
-    agileInstance: Agile.shared,
+    agileInstance: shared,
   });
 
   return new Computed<ComputedValueType>(

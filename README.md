@@ -1,6 +1,6 @@
  <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
 
-> Global, simple, spacy State and Logic Framework
+> Global State and Logic Framework
 
  <br />
 
@@ -45,15 +45,17 @@
 // 1️⃣ Create Instance of AgileTs
 const App = new Agile();
 
-// 2️⃣ Create State with help of before defined Agile Instance
+// 2️⃣ Create State with the initial value "Hello Friend!"
 const MY_FIRST_STATE = App.createState("Hello Friend!");
 
 
 // -- MyComponent.whatever ------------------------------------------
 
-// 3️⃣ Bind initialized State to desired UI-Component
-// And wolla, it's reactive. Everytime the State mutates the Component rerenders
-const myFirstState = useAgile(MY_FIRST_STATE); // Returns value of State ("Hello Friend!")
+// 3️⃣ Bind initialized State to the desired UI-Component.
+// And wolla, the Component is reactive. 
+// Everytime the State mutates the Component re-renders.
+const myFirstState = useAgile(MY_FIRST_STATE);
+console.log(myFirstState); // Returns "Hello Friend!"
 ```
 Want to learn more? Check out our [Quick Start Guides](https://agile-ts.org/docs/Installation.md).
 
@@ -75,59 +77,69 @@ More examples can be found in the [Example Section](https://agile-ts.org/docs/ex
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
-AgileTs is a global, simple, well-tested State Management Framework implemented in Typescript.
+AgileTs is a global State and Logic Framework implemented in Typescript.
 It offers a reimagined API that focuses on **developer experience**
-and allows you to **easily** manage your States.
-Besides States, AgileTs offers some other powerful APIs that make your life easier.
+and allows you to **easily** and **flexible** manage your application States globally.
+Besides [States](https://agile-ts.org/docs/core/state),
+AgileTs offers some other powerful APIs that make your life easier,
+such as [Collections](https://agile-ts.org/docs/core/collection)
+or [Computed States](https://agile-ts.org/docs/core/computed).
 The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
 
 Write minimalistic, boilerplate-free code that captures your intent.
 ```ts
-const MY_STATE = App.createState('frank'); // Create State
-MY_STATE.set('jeff'); // Update State value
-MY_STATE.undo(); // Undo latest State value change
-MY_STATE.is({hello: "jeff"}); // Check if State has the value '{hello: "jeff"}'
-MY_STATE.watch((value) => {console.log(value);}); // Watch on State changes
+// Create State with inital value 'frank'
+const MY_STATE = createState('frank');
+
+// Update State value from 'frank' to 'jeff'
+MY_STATE.set('jeff');
+
+// Undo latest State value change
+MY_STATE.undo();
+
+// Reset State value to its initial value
+MY_STATE.reset();
+
+// Permanently store State value in an external Storage
+MY_STATE.persist("storage-key"); 
 ```
-
-**Some more straightforward syntax examples:**
-
-- Store State in any Storage, like the [Local Storage](https://www.w3schools.com/html/html5_webstorage.asp)
-  ```ts
-  MY_STATE.persist("storage-key");
-  ```
-- Create a reactive Array of States
-  ```ts
-  const MY_COLLECTION = App.createCollection();
-  MY_COLLECTION.collect({id: 1, name: "Frank"});
-  MY_COLLECTION.collect({id: 2, name: "Dieter"});
-  MY_COLLECTION.update(1, {name: "Jeff"});
-  ```
-- Compute State depending on other States
-  ```ts
-  const MY_INTRODUCTION = App.createComputed(() => {
-     return `Hello I am '${MY_NAME.vale}' and I use ${MY_STATE_MANAGER.value} for State Management.`;
-  });
-  ```
 
 ### 🤸‍ Flexible
 
-- Works in nearly any UI-Layer. Check [here](https://agile-ts.org/docs/Frameworks) if your preferred Framework is supported too.
-- Surly behaves with the workflow which suits you best. No need for _reducers_, _actions_, ..
-- Has **0** external dependencies
+- Works in nearly any UI-Framework (currently supported are React, React-Native and Vue).
+- Surly behaves with the workflow that suits you best.
+  No need for _reducers_, _actions_, ..
+- Has **0** external dependencies.
 
 ### ⛳️ Centralize
 
-AgileTs is designed to take all business logic out of UI-Components and put them in a central place, often called `core`.
-The benefit of keeping logic separate to UI-Components is to make your code more decoupled, portable, scalable, and above all, easily testable.
+AgileTs is designed to take all business logic out of the UI-Components
+and put them in a central place, often called `core`.
+The benefit of keeping logic separate to UI-Components,
+is to make your code more decoupled, portable, scalable,
+and above all, easily testable.
 
 ### 🎯 Easy to Use
 
 Learn the powerful tools of AgileTs in a short amount of time. An excellent place to start are
 our [Quick Start Guides](https://agile-ts.org/docs/Installation), or if you don't like to follow any tutorials,
 you can jump straight into our [Example](https://agile-ts.org/docs/examples/Introduction) Section.
+
+### 👾 Extra Utilities
+
+The AgileTs package includes some other powerful APIs,
+which are included in the `core` package or have to be installed separately.
+
+#### Collection
+TODO
+
+#### Computed
+TODO
+
+#### Multieditor [WIP]
+TODO
 
 
 <br />
