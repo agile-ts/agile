@@ -1,4 +1,4 @@
-import Agile, { Integration } from '@agile-ts/core';
+import Agile, { Integration, Integrations } from '@agile-ts/core';
 import Vue from 'vue';
 import { bindAgileInstances, DepsType } from './bindAgileInstances';
 
@@ -80,6 +80,6 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
     return Promise.resolve(true);
   },
 });
-Agile.initialIntegrations.push(vueIntegration);
+Integrations.initialIntegration.push(vueIntegration);
 
 export default vueIntegration;
