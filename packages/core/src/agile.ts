@@ -38,15 +38,13 @@ export class Agile {
 
   // Integrations (UI-Frameworks) that are integrated into AgileTs
   public integrations: Integrations;
-  // External added Integrations that are to integrate into AgileTs when it is instantiated
-  static initialIntegrations: Integration[] = [];
 
   // Static AgileTs Logger with the default config
   // (-> is overwritten by the last created Agile Instance)
   static logger = new Logger({
     prefix: 'Agile',
     active: true,
-    level: Logger.level.WARN,
+    level: Logger.level.SUCCESS,
   });
 
   // Identifier used to bind an Agile Instance globally
@@ -88,7 +86,7 @@ export class Agile {
     config.logConfig = defineConfig(config.logConfig, {
       prefix: 'Agile',
       active: true,
-      level: Logger.level.WARN,
+      level: Logger.level.SUCCESS,
       canUseCustomStyles: true,
       allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
     });
@@ -102,8 +100,13 @@ export class Agile {
       localStorage: config.localStorage,
     });
 
+    // Setup listener to be notified when a external registered Integration was added
+    Integrations.onRegisteredExternalIntegration((integration) => {
+      this.integrate(integration);
+    });
+
     // Assign customized Logger config to the static Logger
-    Agile.logger = new Logger(config.logConfig);
+    this.configureLogger(config.logConfig);
 
     LogCodeManager.log('10:00:00', [], this, Agile.logger);
 
@@ -112,6 +115,24 @@ export class Agile {
     // if it couldn't find any Agile Instance in the specified Instance.
     if (config.bindGlobal)
       if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
+  }
+
+  /**
+   * Configures the logging behaviour of AgileTs.
+   *
+   * @public
+   * @param config - Configuration object
+   */
+  public configureLogger(config: CreateLoggerConfigInterface = {}): this {
+    config = defineConfig(config, {
+      prefix: 'Agile',
+      active: true,
+      level: Logger.level.SUCCESS,
+      canUseCustomStyles: true,
+      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
+    });
+    Agile.logger = new Logger(config);
+    return this;
   }
 
   /**
