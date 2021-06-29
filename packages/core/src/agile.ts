@@ -24,6 +24,7 @@ import {
   ComputeFunctionType,
   removeProperties,
   shared,
+  runsOnServer,
 } from './internal';
 
 export class Agile {
@@ -113,7 +114,7 @@ export class Agile {
     // Create a global instance of the Agile Instance.
     // Why? 'getAgileInstance()' returns the global Agile Instance
     // if it couldn't find any Agile Instance in the specified Instance.
-    if (config.bindGlobal)
+    if (config.bindGlobal && !runsOnServer)
       if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
   }
 
@@ -124,6 +125,10 @@ export class Agile {
    * @param config - Configuration object
    */
   public configureLogger(config: CreateLoggerConfigInterface = {}): this {
+    if (runsOnServer) {
+      Agile.logger = new Logger({ active: false });
+      return this;
+    }
     config = defineConfig(config, {
       prefix: 'Agile',
       active: true,
