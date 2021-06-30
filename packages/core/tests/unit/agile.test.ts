@@ -13,13 +13,42 @@ import {
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
 
-jest.mock('../../src/runtime/index');
-jest.mock('../../src/runtime/subscription/sub.controller');
-jest.mock('../../src/storages/index');
-jest.mock('../../src/integrations/index');
+// https://github.com/facebook/jest/issues/5023
+// https://medium.com/@masonlgoetz/mock-static-class-methods-in-jest-1ceda967b47f
+// https://gist.github.com/virgs/d9c50e878fc69832c01f8085f2953f12
+jest.mock('../../src/integrations', () => {
+  const mockedInstances = {
+    Integrations: jest.fn().mockImplementation(() => {
+      return {
+        integrate: jest.fn(),
+      };
+    }),
+  };
+  // @ts-ignore
+  mockedInstances.Integrations.onRegisteredExternalIntegration = jest.fn();
+  return mockedInstances;
+});
+jest.mock('../../src/runtime', () => {
+  return {
+    Runtime: jest.fn(),
+  };
+});
+jest.mock('../../src/runtime/subscription/sub.controller', () => {
+  return {
+    SubController: jest.fn(),
+  };
+});
+jest.mock('../../src/storages', () => {
+  return {
+    Storages: jest.fn(),
+  };
+});
 jest.mock('../../src/storages/storage');
-jest.mock('../../src/collection/index');
-jest.mock('../../src/computed/index');
+jest.mock('../../src/collection');
+jest.mock('../../src/computed');
+// Can't mock State because mocks get instantiated before everything else
+// -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
+// jest.mock("../../src/state/index");
 /* Can't mock Logger because I somehow can't overwrite a static get method
 jest.mock("../../src/logger/index", () => {
   return class {
@@ -37,7 +66,6 @@ jest.mock("../../src/logger/index", () => {
   };
 });
  */
-// jest.mock("../../src/state/index"); // Can't mock State because mocks get instantiated before everything else -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
 
 describe('Agile Tests', () => {
   const RuntimeMock = Runtime as jest.MockedClass<typeof Runtime>;

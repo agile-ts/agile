@@ -15,6 +15,10 @@ export * from './logCodeManager';
 // Agile
 export * from './agile';
 
+// Integrations
+export * from './integrations';
+export * from './integrations/integration';
+
 // Runtime
 export * from './runtime';
 export * from './runtime/observer';
@@ -46,10 +50,6 @@ export * from './collection/group/group.observer';
 export * from './collection/item';
 export * from './collection/selector';
 export * from './collection/collection.persistent';
-
-// Integrations
-export * from './integrations';
-export * from './integrations/integration';
 
 // Shared
 export * from './shared';
