@@ -30,6 +30,9 @@ import {
 export class Agile {
   public config: AgileConfigInterface;
 
+  // Key/Name identifier of Agile Instance
+  public key?: AgileKey;
+
   // Queues and executes incoming Observer-based Jobs
   public runtime: Runtime;
   // Manages and simplifies the subscription to UI-Components
@@ -87,6 +90,7 @@ export class Agile {
     this.config = {
       waitForMount: config.waitForMount as any,
     };
+    this.key = config.key;
     this.integrations = new Integrations(this);
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
@@ -151,7 +155,7 @@ export class Agile {
    * @param config - Configuration object
    */
   public createStorage(config: CreateStorageConfigInterface): Storage {
-    return createStorage({ ...config, ...{ agileInstance: this } });
+    return createStorage(config);
   }
 
   /**
@@ -476,6 +480,8 @@ export function createComputed<ComputedValueType = any>(
   );
 }
 
+export type AgileKey = string | number;
+
 export interface CreateAgileSubInstanceInterface {
   /**
    * Instance of Agile the Instance belongs to.
@@ -521,6 +527,11 @@ export interface CreateAgileConfigInterface {
    * @default false
    */
   bindGlobal?: boolean;
+  /**
+   * Key/Name identifier of Agile Instance.
+   * @default undefined
+   */
+  key?: AgileKey;
 }
 
 export interface AgileConfigInterface {

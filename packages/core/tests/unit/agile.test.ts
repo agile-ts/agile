@@ -15,20 +15,6 @@ import { LogMock } from '../helper/logMock';
 import * as Utils from '../../src/utils';
 
 // https://github.com/facebook/jest/issues/5023
-// https://medium.com/@masonlgoetz/mock-static-class-methods-in-jest-1ceda967b47f
-// https://gist.github.com/virgs/d9c50e878fc69832c01f8085f2953f12
-jest.mock('../../src/integrations', () => {
-  const mockedInstances = {
-    Integrations: jest.fn().mockImplementation(() => {
-      return {
-        integrate: jest.fn(),
-      };
-    }),
-  };
-  // @ts-ignore
-  mockedInstances.Integrations.onRegisteredExternalIntegration = jest.fn();
-  return mockedInstances;
-});
 jest.mock('../../src/runtime', () => {
   return {
     Runtime: jest.fn(),
@@ -44,12 +30,34 @@ jest.mock('../../src/storages', () => {
     Storages: jest.fn(),
   };
 });
+
+// https://gist.github.com/virgs/d9c50e878fc69832c01f8085f2953f12
+// https://medium.com/@masonlgoetz/mock-static-class-methods-in-jest-1ceda967b47f
+jest.mock('../../src/integrations', () => {
+  const mockedInstances = {
+    // https://jestjs.io/docs/mock-function-api#mockfnmockimplementationfn
+    Integrations: jest.fn().mockImplementation(() => {
+      return {
+        integrate: jest.fn(),
+        hasIntegration: jest.fn(),
+      };
+    }),
+  };
+  // @ts-ignore
+  mockedInstances.Integrations.onRegisteredExternalIntegration = jest.fn();
+  return mockedInstances;
+});
+
 jest.mock('../../src/storages/storage');
 jest.mock('../../src/collection');
 jest.mock('../../src/computed');
-// Can't mock State because mocks get instantiated before everything else
-// -> I got the good old not loaded Object error https://github.com/kentcdodds/how-jest-mocking-works
-// jest.mock("../../src/state/index");
+
+// https://github.com/facebook/jest/issues/5023
+jest.mock('../../src/state', () => {
+  return {
+    State: jest.fn(),
+  };
+});
 
 describe('Agile Tests', () => {
   const RuntimeMock = Runtime as jest.MockedClass<typeof Runtime>;
@@ -84,6 +92,7 @@ describe('Agile Tests', () => {
     expect(agile.config).toStrictEqual({
       waitForMount: true,
     });
+    expect(agile.key).toBeUndefined();
     expect(IntegrationsMock).toHaveBeenCalledWith(agile);
     // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock
     expect(RuntimeMock).toHaveBeenCalledWith(agile);
@@ -113,12 +122,14 @@ describe('Agile Tests', () => {
         timestamp: true,
       },
       bindGlobal: true,
+      key: 'jeff',
     });
 
     // Check if Agile properties got instantiated properly
     expect(agile.config).toStrictEqual({
       waitForMount: false,
     });
+    expect(agile.key).toBe('jeff');
     expect(IntegrationsMock).toHaveBeenCalledWith(agile);
     // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock
     expect(RuntimeMock).toHaveBeenCalledWith(agile);
@@ -358,6 +369,10 @@ describe('Agile Tests', () => {
     });
 
     describe('hasStorage function tests', () => {
+      beforeEach(() => {
+        agile.storages.hasStorage = jest.fn();
+      });
+
       it('should check if Agile has any registered Storage', () => {
         agile.hasStorage();
 
