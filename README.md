@@ -42,22 +42,20 @@
 ```tsx
 // -- core.js ------------------------------------------
 
-// 1️⃣ Create Instance of AgileTs
-const App = new Agile();
-
-// 2️⃣ Create State with the initial value "Hello Friend!"
-const MY_FIRST_STATE = App.createState("Hello Friend!");
+// 1️⃣ Create State with the initial value "Hello Friend!"
+const MY_FIRST_STATE = createState("Hello Friend!");
 
 
 // -- MyComponent.whatever ------------------------------------------
 
-// 3️⃣ Bind initialized State to the desired UI-Component.
+// 2️⃣ Bind initialized State to the desired UI-Component.
 // And wolla, the Component is reactive. 
 // Everytime the State mutates the Component re-renders.
 const myFirstState = useAgile(MY_FIRST_STATE);
 console.log(myFirstState); // Returns "Hello Friend!"
 ```
-Want to learn more? Check out our [Quick Start Guides](https://agile-ts.org/docs/Installation.md).
+Want to learn how to implement AgileTs in your preferred UI-Framework?
+Check out our [Quick Start Guides](https://agile-ts.org/docs/Installation.md).
 
 ### ⛳️ Sandbox
 Test AgileTs yourself in a [codesandbox](https://codesandbox.io/s/agilets-first-state-f12cz).
@@ -79,11 +77,11 @@ More examples can be found in the [Example Section](https://agile-ts.org/docs/ex
 
 AgileTs is a global State and Logic Framework implemented in Typescript.
 It offers a reimagined API that focuses on **developer experience**
-and allows you to **easily** and **flexible** manage your application States globally.
+and allows you to **easily** and **flexible** manage your application States.
 Besides [States](https://agile-ts.org/docs/core/state),
 AgileTs offers some other powerful APIs that make your life easier,
 such as [Collections](https://agile-ts.org/docs/core/collection)
-or [Computed States](https://agile-ts.org/docs/core/computed).
+and [Computed States](https://agile-ts.org/docs/core/computed).
 The philosophy behind AgileTs is simple:
 
 ### 🚅 Straightforward
@@ -123,23 +121,10 @@ and above all, easily testable.
 
 ### 🎯 Easy to Use
 
-Learn the powerful tools of AgileTs in a short amount of time. An excellent place to start are
-our [Quick Start Guides](https://agile-ts.org/docs/Installation), or if you don't like to follow any tutorials,
-you can jump straight into our [Example](https://agile-ts.org/docs/examples/Introduction) Section.
-
-### 👾 Extra Utilities
-
-The AgileTs package includes some other powerful APIs,
-which are included in the `core` package or have to be installed separately.
-
-#### Collection
-TODO
-
-#### Computed
-TODO
-
-#### Multieditor [WIP]
-TODO
+Learn the powerful tools of AgileTs in a short amount of time. 
+An excellent place to start are our [Quick Start Guides](https://agile-ts.org/docs/Installation), 
+or if you don't like to follow any tutorials,
+you can jump straight into our [Example Section](https://agile-ts.org/docs/examples/Introduction).
 
 
 <br />
@@ -148,17 +133,18 @@ TODO
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation"/>
 
-In order to properly use AgileTs, in a UI-Framework, we need to install **two** packages.
+In order to use AgileTs in a UI-Framework, we need to install two packages.
 
-- The [`core`](https://agile-ts.org/docs/core) package, which contains the State Management Logic of AgileTs
+- The [`core`](https://agile-ts.org/docs/core) package contains the State Management Logic of AgileTs
   and therefore offers powerful classes such as the [`State Class`](https://agile-ts.org/docs/core/state).
   ```
   npm install @agile-ts/core
   ```
 
-- And on the other hand, a _fitting Integration_ for your preferred UI-Framework. 
-  In my case, the [React Integration](https://www.npmjs.com/package/@agile-ts/react).
-  Check [here](https://agile-ts.org/docs/frameworks) if your desired Framework is supported, too.
+- A _fitting Integration_ for the UI-Framework of your choice, on the other hand,
+  is an interface to the actual UI and provides useful functionalities 
+  to bind States to UI-Components for reactivity.
+  I prefer React, so let's go with the [React Integration](https://www.npmjs.com/package/@agile-ts/react) for now.
   ```
   npm install @agile-ts/react
   ```
@@ -170,10 +156,11 @@ In order to properly use AgileTs, in a UI-Framework, we need to install **two** 
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/documentation_header.png" alt="Documentation"/>
 
-Sounds AgileTs interesting to you?
-Checkout our **[documentation](https://agile-ts.org/docs/introduction)**, to learn more.
-And I promise you. You will be able to use AgileTs in no time.
-If you have any further questions, don't hesitate to join our [Community Discord](https://discord.gg/T9GzreAwPH).
+Does AgileTs sound interesting to you?
+Take a look at our **[documentation](https://agile-ts.org/docs/introduction)**, 
+to learn more about its functionalities and how it works exactly.
+If you have any further questions, 
+don't hesitate to join our [Community Discord](https://discord.gg/T9GzreAwPH).
 
 
 <br />
@@ -196,17 +183,17 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/packages_of_agile.png" alt="Packages of Agile"/>
 
-| Name                                                                     |                                                                               Latest Version                                                                                | Description                               |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | State Manager                             |
-| [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                         |
-| [@agile-ts/vue](/packages/vue)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/vue.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/vue)                                     | Vue Integration                           |
-| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based API                         |
-| [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                       |
-| [@agile-ts/event](/packages/event)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/event.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/event)                                 | Handy class for emitting UI Events        |
-| [@agile-ts/logger](/packages/logger)                                     |               [![badge](https://img.shields.io/npm/v/@agile-ts/logger.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/logger)                               | Manages the logging of AgileTs            |
-| [@agile-ts/utils](/packages/utils)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/utils.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/utils)                                 | Util functions of AgileTs                 |
-| [@agile-ts/proxytree](/packages/proxytree)                               |               [![badge](https://img.shields.io/npm/v/@agile-ts/proxytree.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/proxytree)                         | Create Proxy Tree                         |
+| Name                                                                     |                                                                               Latest Version                                                                                | Description                                 |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [@agile-ts/core](/packages/core)                                         |               [![badge](https://img.shields.io/npm/v/@agile-ts/core.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/core)                                   | State Manager Logic                         |
+| [@agile-ts/react](/packages/react)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/react.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/react)                                 | React Integration                           |
+| [@agile-ts/vue](/packages/vue)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/vue.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/vue)                                     | Vue Integration                             |
+| [@agile-ts/api](/packages/api)                                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/api.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/api)                                     | Promise based API                           |
+| [@agile-ts/multieditor](/packages/multieditor)                           |               [![badge](https://img.shields.io/npm/v/@agile-ts/multieditor.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/multieditor)                     | Simple Form Manager                         |
+| [@agile-ts/event](/packages/event)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/event.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/event)                                 | Handy class for emitting UI Events          |
+| [@agile-ts/logger](/packages/logger)                                     |               [![badge](https://img.shields.io/npm/v/@agile-ts/logger.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/logger)                               | Logging API of AgileTs                      |
+| [@agile-ts/utils](/packages/utils)                                       |               [![badge](https://img.shields.io/npm/v/@agile-ts/utils.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/utils)                                 | Utilities of AgileTs                        |
+| [@agile-ts/proxytree](/packages/proxytree)                               |               [![badge](https://img.shields.io/npm/v/@agile-ts/proxytree.svg?style=flat-square)](https://www.npmjs.com/package/@agile-ts/proxytree)                         | Proxy Tree for tracking accessed properties |                         |
 
 <br />
 
@@ -214,4 +201,6 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/credits_header.png" alt="Credits"/>
 
-AgileTs is inspired by [MVVM Frameworks](https://de.wikipedia.org/wiki/Model_View_ViewModel) like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
+AgileTs is inspired by [MVVM Frameworks](https://de.wikipedia.org/wiki/Model_View_ViewModel) 
+like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
+For the API, we were mainly inspired by [Svelte](https://svelte.dev/).
