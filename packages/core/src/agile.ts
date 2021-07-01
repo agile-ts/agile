@@ -84,13 +84,6 @@ export class Agile {
       logConfig: {},
       bindGlobal: false,
     });
-    config.logConfig = defineConfig(config.logConfig, {
-      prefix: 'Agile',
-      active: true,
-      level: Logger.level.SUCCESS,
-      canUseCustomStyles: true,
-      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
-    });
     this.config = {
       waitForMount: config.waitForMount as any,
     };
@@ -114,8 +107,10 @@ export class Agile {
     // Create a global instance of the Agile Instance.
     // Why? 'getAgileInstance()' returns the global Agile Instance
     // if it couldn't find any Agile Instance in the specified Instance.
-    if (config.bindGlobal && !runsOnServer)
-      if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
+    if (config.bindGlobal)
+      if (!globalBind(Agile.globalKey, this)) {
+        LogCodeManager.log('10:02:00');
+      }
   }
 
   /**
@@ -125,7 +120,7 @@ export class Agile {
    * @param config - Configuration object
    */
   public configureLogger(config: CreateLoggerConfigInterface = {}): this {
-    if (runsOnServer) {
+    if (runsOnServer()) {
       Agile.logger = new Logger({ active: false });
       return this;
     }

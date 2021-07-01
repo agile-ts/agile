@@ -53,8 +53,3 @@ export * from './collection/collection.persistent';
 
 // Shared
 export * from './shared';
-
-export const runsOnServer =
-  typeof window !== 'undefined' &&
-  typeof window.document !== 'undefined' &&
-  typeof window.document.createElement !== 'undefined';

@@ -254,3 +254,16 @@ export function globalBind(
   }
   return false;
 }
+
+/**
+ * Returns a boolean indicating whether AgileTs is currently running on a server.
+ *
+ * @public
+ */
+export const runsOnServer = (): boolean => {
+  return (
+    typeof window === 'undefined' ||
+    typeof window.document === 'undefined' ||
+    typeof window.document.createElement === 'undefined'
+  );
+};
