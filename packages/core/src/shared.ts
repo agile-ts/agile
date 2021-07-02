@@ -12,17 +12,32 @@ import {
   flatMerge,
   Logger,
   removeProperties,
+  runsOnServer,
   State,
   StateConfigInterface,
   Storage,
 } from './internal';
 
-// Shared Agile Instance that is used when no Agile Instance was specified
+/**
+ * Shared Agile Instance that is used when no Agile Instance was specified
+ */
 // eslint-disable-next-line prefer-const
-export let shared = new Agile({
+let sharedAgileInstance = new Agile({
   key: 'shared',
-  logConfig: { level: Logger.level.WARN },
+  logConfig: { prefix: 'Agile', level: Logger.level.WARN, active: true },
+  localStorage: !runsOnServer(),
 });
+export { sharedAgileInstance as shared };
+
+/**
+ * Assigns a new Agile Instance as the shared Agile Instance.
+ *
+ * @param agileInstance - Agile Instance to become the new shared Agile Instance.
+ */
+// https://stackoverflow.com/questions/32558514/javascript-es6-export-const-vs-export-let
+export function assignSharedAgileInstance(agileInstance: Agile): void {
+  sharedAgileInstance = agileInstance;
+}
 
 /**
  * Returns a newly created Storage.
@@ -63,7 +78,7 @@ export function createState<ValueType = any>(
   config: CreateStateConfigInterfaceWithAgile = {}
 ): State<ValueType> {
   config = defineConfig(config, {
-    agileInstance: shared,
+    agileInstance: sharedAgileInstance,
   });
   return new State<ValueType>(
     config.agileInstance as any,
@@ -93,7 +108,7 @@ export function createState<ValueType = any>(
  */
 export function createCollection<DataType extends Object = DefaultItem>(
   config?: CollectionConfig<DataType>,
-  agileInstance: Agile = shared
+  agileInstance: Agile = sharedAgileInstance
 ): Collection<DataType> {
   return new Collection<DataType>(agileInstance, config);
 }
@@ -159,7 +174,7 @@ export function createComputed<ComputedValueType = any>(
   }
 
   _config = defineConfig(_config, {
-    agileInstance: shared,
+    agileInstance: sharedAgileInstance,
   });
 
   return new Computed<ComputedValueType>(

@@ -10,6 +10,7 @@ import {
   createCollection,
   createComputed,
 } from '../../src';
+import { LogMock } from '../helper/logMock';
 
 jest.mock('../../src/storages/storage');
 jest.mock('../../src/collection');
@@ -23,6 +24,11 @@ jest.mock('../../src/state', () => {
 });
 
 describe('Shared Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    LogMock.mockLogs();
+  });
+
   describe('createStorage function tests', () => {
     const StorageMock = Storage as jest.MockedClass<typeof Storage>;
 

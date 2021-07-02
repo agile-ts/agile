@@ -5,6 +5,7 @@ import {
   Collection,
   StateObserver,
   GroupObserver,
+  assignSharedAgileInstance,
 } from '../../src';
 import * as Utils from '../../src/utils';
 import { LogMock } from '../helper/logMock';
@@ -24,34 +25,54 @@ describe('Utils Tests', () => {
 
   describe('getAgileInstance function tests', () => {
     beforeEach(() => {
+      assignSharedAgileInstance(dummyAgile);
       globalThis[Agile.globalKey] = dummyAgile;
     });
 
-    it('should get agileInstance from State', () => {
+    it('should return Agile Instance from State', () => {
       const dummyState = new State(dummyAgile, 'dummyValue');
 
       expect(Utils.getAgileInstance(dummyState)).toBe(dummyAgile);
     });
 
-    it('should get agileInstance from Collection', () => {
+    it('should return Agile Instance from Collection', () => {
       const dummyCollection = new Collection(dummyAgile);
 
       expect(Utils.getAgileInstance(dummyCollection)).toBe(dummyAgile);
     });
 
-    it('should get agileInstance from Observer', () => {
+    it('should return Agile Instance from Observer', () => {
       const dummyObserver = new Observer(dummyAgile);
 
       expect(Utils.getAgileInstance(dummyObserver)).toBe(dummyAgile);
     });
 
-    it('should get agileInstance from globalThis if passed instance holds no agileInstance', () => {
-      expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
-    });
+    it(
+      'should return shared Agile Instance' +
+        'if specified Instance contains no valid Agile Instance',
+      () => {
+        expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
+      }
+    );
 
-    it('should print error if something went wrong', () => {
+    it(
+      'should return Agile Instance from globalThis' +
+        'if specified Instance contains no valid Agile Instance' +
+        'and no shared Agile Instance was specified',
+      () => {
+        // Destroy shared Agile Instance
+        assignSharedAgileInstance(undefined as any);
+
+        expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
+      }
+    );
+
+    it('should print error if no Agile Instance could be retrieved', () => {
       // @ts-ignore | Destroy globalThis
       globalThis = undefined;
+
+      // Destroy shared Agile Instance
+      assignSharedAgileInstance(undefined as any);
 
       const response = Utils.getAgileInstance('weiredInstance');
 

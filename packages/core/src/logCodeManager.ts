@@ -33,7 +33,7 @@ const logCodeMessages = {
 
   // Storages
   '11:02:00':
-    "The 'Local Storage' is not available in your current environment." +
+    "The 'Local Storage' is not available in your current environment. " +
     "To use the '.persist()' functionality, please provide a custom Storage!",
   '11:02:01':
     'The first allocated Storage for AgileTs must be set as the default Storage!',
