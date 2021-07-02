@@ -39,15 +39,15 @@ export class Agile {
   // Handles the permanent persistence of Agile Classes
   public storages: Storages;
 
-  // Integrations (UI-Frameworks) that are integrated into AgileTs
+  // Integrations (UI-Frameworks) that are integrated into the Agile Instance
   public integrations: Integrations;
 
-  // Static AgileTs Logger with the default config
+  // Static Agile Logger with the default config
   // (-> is overwritten by the last created Agile Instance)
   static logger = new Logger({
     prefix: 'Agile',
     active: true,
-    level: Logger.level.SUCCESS,
+    level: Logger.level.WARN,
   });
 
   // Identifier used to bind an Agile Instance globally
@@ -99,12 +99,12 @@ export class Agile {
     });
 
     if (config.autoIntegrate) {
-      // Integration to be integrated initially
+      // Integrate Integrations to be initially integrated
       Integrations.initialIntegrations.forEach((integration) => {
         this.integrate(integration);
       });
 
-      // Setup listener to be notified when a external registered Integration was added
+      // Setup listener to be notified when an external registered Integration was added
       Integrations.onRegisteredExternalIntegration((integration) => {
         this.integrate(integration);
       });

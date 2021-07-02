@@ -5,6 +5,7 @@ import {
   normalizeArray,
   isFunction,
   LogCodeManager,
+  shared,
 } from './internal';
 
 /**
@@ -23,6 +24,11 @@ export function getAgileInstance(instance: any): Agile | undefined {
         ? instance['agileInstance']()
         : instance['agileInstance'];
       if (_agileInstance) return _agileInstance;
+    }
+
+    // Try to get shared Agile Instance
+    if (shared instanceof Agile) {
+      return shared;
     }
 
     // Return global bound Agile Instance
