@@ -103,7 +103,7 @@ export class Agile {
     if (config.autoIntegrate) {
       // Integrate Integrations to be initially integrated
       Integrations.initialIntegrations.forEach((integration) => {
-        this.integrate(integration);
+        if (integration instanceof Integration) this.integrate(integration);
       });
 
       // Setup listener to be notified when an external registered Integration was added

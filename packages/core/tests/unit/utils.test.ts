@@ -413,7 +413,7 @@ describe('Utils Tests', () => {
   describe('runsOnServer function tests', () => {
     it("should return 'false' if the current environment isn't a server", () => {
       // eslint-disable-next-line no-global-assign
-      window = {
+      global.window = {
         document: {
           createElement: 'isSet' as any,
         } as any,
@@ -424,7 +424,7 @@ describe('Utils Tests', () => {
 
     it("should return 'true' if the current environment is a server", () => {
       // eslint-disable-next-line no-global-assign
-      window = undefined as any;
+      global.window = undefined as any;
 
       expect(Utils.runsOnServer()).toBeTruthy();
     });
