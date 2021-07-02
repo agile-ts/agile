@@ -15,5 +15,6 @@ module.exports = {
     'ts-jest': {
       tsconfig: '<rootDir>/packages/tsconfig.default.json',
     },
+    __DEV__: true,
   },
 };

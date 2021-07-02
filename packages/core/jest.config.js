@@ -8,4 +8,8 @@ module.exports = {
   roots: [`<rootDir>/packages/${packageName}`],
   name: packageName,
   displayName: packageName,
+  globals: {
+    ...baseConfig.globals,
+    ...{ window: {} }, // https://stackoverflow.com/questions/46274889/jest-test-fails-with-window-is-not-defined
+  },
 };

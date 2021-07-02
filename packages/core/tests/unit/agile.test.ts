@@ -12,7 +12,6 @@ import {
 } from '../../src';
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
-import * as Utils from '../../src/utils';
 
 // https://github.com/facebook/jest/issues/5023
 jest.mock('../../src/runtime', () => {
@@ -175,27 +174,7 @@ describe('Agile Tests', () => {
     });
 
     describe('configureLogger function tests', () => {
-      it('should overwrite the static Logger with a new Logger Instance (runsOnServer = true)', () => {
-        jest.spyOn(Utils, 'runsOnServer').mockReturnValueOnce(true);
-        Agile.logger.config = 'outdated' as any;
-
-        agile.configureLogger({
-          active: true,
-          level: 0,
-        });
-
-        expect(Agile.logger.config).toStrictEqual({
-          canUseCustomStyles: true,
-          level: 0,
-          prefix: '',
-          timestamp: false,
-        });
-        expect(Agile.logger.isActive).toBeFalsy();
-        expect(Agile.logger.allowedTags).toStrictEqual([]);
-      });
-
       it('should overwrite the static Logger with a new Logger Instance (runsOnServer = false)', () => {
-        jest.spyOn(Utils, 'runsOnServer').mockReturnValueOnce(false);
         Agile.logger.config = 'outdated' as any;
 
         agile.configureLogger({
@@ -332,6 +311,10 @@ describe('Agile Tests', () => {
     });
 
     describe('registerStorage function tests', () => {
+      beforeEach(() => {
+        agile.storages.register = jest.fn();
+      });
+
       it('should register provided Storage', () => {
         const dummyStorage = new Storage({
           prefix: 'test',

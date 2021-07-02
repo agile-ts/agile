@@ -1,6 +1,4 @@
 import {
-  globalBind,
-  getAgileInstance,
   Agile,
   State,
   Observer,
@@ -32,30 +30,30 @@ describe('Utils Tests', () => {
     it('should get agileInstance from State', () => {
       const dummyState = new State(dummyAgile, 'dummyValue');
 
-      expect(getAgileInstance(dummyState)).toBe(dummyAgile);
+      expect(Utils.getAgileInstance(dummyState)).toBe(dummyAgile);
     });
 
     it('should get agileInstance from Collection', () => {
       const dummyCollection = new Collection(dummyAgile);
 
-      expect(getAgileInstance(dummyCollection)).toBe(dummyAgile);
+      expect(Utils.getAgileInstance(dummyCollection)).toBe(dummyAgile);
     });
 
     it('should get agileInstance from Observer', () => {
       const dummyObserver = new Observer(dummyAgile);
 
-      expect(getAgileInstance(dummyObserver)).toBe(dummyAgile);
+      expect(Utils.getAgileInstance(dummyObserver)).toBe(dummyAgile);
     });
 
     it('should get agileInstance from globalThis if passed instance holds no agileInstance', () => {
-      expect(getAgileInstance('weiredInstance')).toBe(dummyAgile);
+      expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
     });
 
     it('should print error if something went wrong', () => {
       // @ts-ignore | Destroy globalThis
       globalThis = undefined;
 
-      const response = getAgileInstance('weiredInstance');
+      const response = Utils.getAgileInstance('weiredInstance');
 
       expect(response).toBeUndefined();
       LogMock.hasLoggedCode('20:03:00', [], 'weiredInstance');
@@ -360,23 +358,23 @@ describe('Utils Tests', () => {
     });
 
     it('should bind Instance globally at the specified key (default config)', () => {
-      globalBind(dummyKey, 'dummyInstance');
+      Utils.globalBind(dummyKey, 'dummyInstance');
 
       expect(globalThis[dummyKey]).toBe('dummyInstance');
     });
 
     it("shouldn't overwrite already globally bound Instance at the same key (default config)", () => {
-      globalBind(dummyKey, 'I am first!');
+      Utils.globalBind(dummyKey, 'I am first!');
 
-      globalBind(dummyKey, 'dummyInstance');
+      Utils.globalBind(dummyKey, 'dummyInstance');
 
       expect(globalThis[dummyKey]).toBe('I am first!');
     });
 
     it('should overwrite already globally bound Instance at the same key (overwrite = true)', () => {
-      globalBind(dummyKey, 'I am first!');
+      Utils.globalBind(dummyKey, 'I am first!');
 
-      globalBind(dummyKey, 'dummyInstance', true);
+      Utils.globalBind(dummyKey, 'dummyInstance', true);
 
       expect(globalThis[dummyKey]).toBe('dummyInstance');
     });
@@ -385,9 +383,29 @@ describe('Utils Tests', () => {
       // @ts-ignore | Destroy globalThis
       globalThis = undefined;
 
-      globalBind(dummyKey, 'dummyInstance');
+      Utils.globalBind(dummyKey, 'dummyInstance');
 
       LogMock.hasLoggedCode('20:03:01', [dummyKey]);
+    });
+  });
+
+  describe('runsOnServer function tests', () => {
+    it("should return 'false' if the current environment isn't a server", () => {
+      // eslint-disable-next-line no-global-assign
+      window = {
+        document: {
+          createElement: 'isSet' as any,
+        } as any,
+      } as any;
+
+      expect(Utils.runsOnServer()).toBeFalsy();
+    });
+
+    it("should return 'true' if the current environment is a server", () => {
+      // eslint-disable-next-line no-global-assign
+      window = undefined as any;
+
+      expect(Utils.runsOnServer()).toBeTruthy();
     });
   });
 });

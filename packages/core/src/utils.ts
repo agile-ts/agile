@@ -261,9 +261,9 @@ export function globalBind(
  * @public
  */
 export const runsOnServer = (): boolean => {
-  return (
-    typeof window === 'undefined' ||
-    typeof window.document === 'undefined' ||
-    typeof window.document.createElement === 'undefined'
+  return !(
+    typeof window !== 'undefined' &&
+    typeof window.document !== 'undefined' &&
+    typeof window.document.createElement !== 'undefined'
   );
 };

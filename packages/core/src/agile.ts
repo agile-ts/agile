@@ -24,7 +24,6 @@ import {
   ComputeFunctionType,
   removeProperties,
   shared,
-  runsOnServer,
 } from './internal';
 
 export class Agile {
@@ -124,10 +123,6 @@ export class Agile {
    * @param config - Configuration object
    */
   public configureLogger(config: CreateLoggerConfigInterface = {}): this {
-    if (runsOnServer()) {
-      Agile.logger = new Logger({ active: false });
-      return this;
-    }
     config = defineConfig(config, {
       prefix: 'Agile',
       active: true,
