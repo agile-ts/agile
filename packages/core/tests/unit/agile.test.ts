@@ -10,16 +10,20 @@ import {
   Logger,
   Storages,
   Integration,
-  shared,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
-import * as AgileFile from '../../src/agile';
+import * as Shared from '../../src/shared';
 
 // https://github.com/facebook/jest/issues/5023
 jest.mock('../../src/runtime', () => {
   return {
-    Runtime: jest.fn(),
+    // https://jestjs.io/docs/mock-function-api#mockfnmockimplementationfn
+    Runtime: jest.fn().mockImplementation(() => {
+      return {
+        ingest: jest.fn(),
+      };
+    }),
   };
 });
 jest.mock('../../src/runtime/subscription/sub.controller', () => {
@@ -50,17 +54,6 @@ jest.mock('../../src/integrations', () => {
   // @ts-ignore
   mockedInstances.Integrations.initialIntegrations = [];
   return mockedInstances;
-});
-
-jest.mock('../../src/storages/storage');
-jest.mock('../../src/collection');
-jest.mock('../../src/computed');
-
-// https://github.com/facebook/jest/issues/5023
-jest.mock('../../src/state', () => {
-  return {
-    State: jest.fn(),
-  };
 });
 
 describe('Agile Tests', () => {
@@ -106,7 +99,7 @@ describe('Agile Tests', () => {
     expect(IntegrationsMock).toHaveBeenCalledWith(agile);
     // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock
     expect(RuntimeMock).toHaveBeenCalledWith(agile);
-    expect(agile.runtime).toBeInstanceOf(Runtime);
+    // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
     expect(StoragesMock).toHaveBeenCalledWith(agile, {
@@ -148,7 +141,7 @@ describe('Agile Tests', () => {
     expect(IntegrationsMock).toHaveBeenCalledWith(agile);
     // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock
     expect(RuntimeMock).toHaveBeenCalledWith(agile);
-    expect(agile.runtime).toBeInstanceOf(Runtime);
+    // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
     expect(StoragesMock).toHaveBeenCalledWith(agile, {
@@ -225,7 +218,7 @@ describe('Agile Tests', () => {
 
     describe('createStorage function tests', () => {
       beforeEach(() => {
-        jest.spyOn(AgileFile, 'createStorage');
+        jest.spyOn(Shared, 'createStorage');
       });
 
       it('should call createStorage', () => {
@@ -248,20 +241,20 @@ describe('Agile Tests', () => {
         const response = agile.createStorage(storageConfig);
 
         expect(response).toBeInstanceOf(Storage);
-        expect(AgileFile.createStorage).toHaveBeenCalledWith(storageConfig);
+        expect(Shared.createStorage).toHaveBeenCalledWith(storageConfig);
       });
     });
 
     describe('createState function tests', () => {
       beforeEach(() => {
-        jest.spyOn(AgileFile, 'createState');
+        jest.spyOn(Shared, 'createState');
       });
 
       it('should call createState with the Agile Instance it was called on', () => {
         const response = agile.createState('jeff', { key: 'jeffState' });
 
         expect(response).toBeInstanceOf(State);
-        expect(AgileFile.createState).toHaveBeenCalledWith({
+        expect(Shared.createState).toHaveBeenCalledWith('jeff', {
           key: 'jeffState',
           agileInstance: agile,
         });
@@ -270,7 +263,7 @@ describe('Agile Tests', () => {
 
     describe('createCollection function tests', () => {
       beforeEach(() => {
-        jest.spyOn(AgileFile, 'createCollection');
+        jest.spyOn(Shared, 'createCollection');
       });
 
       it('should call createCollection with the Agile Instance it was called on', () => {
@@ -284,7 +277,7 @@ describe('Agile Tests', () => {
         const response = agile.createCollection(collectionConfig);
 
         expect(response).toBeInstanceOf(Collection);
-        expect(AgileFile.createCollection).toHaveBeenCalledWith(
+        expect(Shared.createCollection).toHaveBeenCalledWith(
           collectionConfig,
           agile
         );
@@ -297,7 +290,7 @@ describe('Agile Tests', () => {
       };
 
       beforeEach(() => {
-        jest.spyOn(AgileFile, 'createComputed');
+        jest.spyOn(Shared, 'createComputed');
       });
 
       it('should call createComputed with the Agile Instance it was called on (default config)', () => {
@@ -306,7 +299,7 @@ describe('Agile Tests', () => {
         ]);
 
         expect(response).toBeInstanceOf(Computed);
-        expect(AgileFile.createComputed).toHaveBeenCalledWith({
+        expect(Shared.createComputed).toHaveBeenCalledWith(computedFunction, {
           computedDeps: ['dummyDep' as any],
           agileInstance: agile,
         });
@@ -323,7 +316,7 @@ describe('Agile Tests', () => {
         const response = agile.createComputed(computedFunction, computedConfig);
 
         expect(response).toBeInstanceOf(Computed);
-        expect(AgileFile.createComputed).toHaveBeenCalledWith({
+        expect(Shared.createComputed).toHaveBeenCalledWith(computedFunction, {
           ...computedConfig,
           ...{
             agileInstance: agile,
@@ -394,168 +387,6 @@ describe('Agile Tests', () => {
 
         expect(agile.storages.hasStorage).toHaveBeenCalled();
       });
-    });
-  });
-
-  describe('createStorage function tests', () => {
-    const StorageMock = Storage as jest.MockedClass<typeof Storage>;
-
-    beforeEach(() => {
-      StorageMock.mockClear();
-    });
-
-    it('should create Storage', () => {
-      const storageConfig = {
-        prefix: 'test',
-        methods: {
-          get: () => {
-            /* empty function */
-          },
-          set: () => {
-            /* empty function */
-          },
-          remove: () => {
-            /* empty function */
-          },
-        },
-        key: 'myTestStorage',
-      };
-
-      const storage = AgileFile.createStorage(storageConfig);
-
-      expect(storage).toBeInstanceOf(Storage);
-      expect(StorageMock).toHaveBeenCalledWith(storageConfig);
-    });
-  });
-
-  describe('createState function tests', () => {
-    const StateMock = State as jest.MockedClass<typeof State>;
-
-    it('should create State with the shared Agile Instance', () => {
-      const state = AgileFile.createState('testValue', {
-        key: 'myCoolState',
-      });
-
-      expect(state).toBeInstanceOf(State);
-      expect(StateMock).toHaveBeenCalledWith(shared, 'testValue', {
-        key: 'myCoolState',
-      });
-    });
-
-    it('should create State with a specified Agile Instance', () => {
-      const agile = new Agile();
-
-      const state = AgileFile.createState('testValue', {
-        key: 'myCoolState',
-        agileInstance: agile,
-      });
-
-      expect(state).toBeInstanceOf(State);
-      expect(StateMock).toHaveBeenCalledWith(agile, 'testValue', {
-        key: 'myCoolState',
-      });
-    });
-  });
-
-  describe('createCollection function tests', () => {
-    const CollectionMock = Collection as jest.MockedClass<typeof Collection>;
-
-    beforeEach(() => {
-      CollectionMock.mockClear();
-    });
-
-    it('should create Collection with the shared Agile Instance', () => {
-      const collectionConfig = {
-        selectors: ['test', 'test1'],
-        groups: ['test2', 'test10'],
-        defaultGroupKey: 'frank',
-        key: 'myCoolCollection',
-      };
-
-      const collection = AgileFile.createCollection(collectionConfig);
-
-      expect(collection).toBeInstanceOf(Collection);
-      expect(CollectionMock).toHaveBeenCalledWith(shared, collectionConfig);
-    });
-
-    it('should create Collection with a specified Agile Instance', () => {
-      const agile = new Agile();
-      const collectionConfig = {
-        selectors: ['test', 'test1'],
-        groups: ['test2', 'test10'],
-        defaultGroupKey: 'frank',
-        key: 'myCoolCollection',
-      };
-
-      const collection = AgileFile.createCollection(collectionConfig, agile);
-
-      expect(collection).toBeInstanceOf(Collection);
-      expect(CollectionMock).toHaveBeenCalledWith(agile, collectionConfig);
-    });
-  });
-
-  describe('createComputed function tests', () => {
-    const ComputedMock = Computed as jest.MockedClass<typeof Computed>;
-    const computedFunction = () => {
-      // empty
-    };
-
-    beforeEach(() => {
-      ComputedMock.mockClear();
-    });
-
-    it('should create Computed with the shared Agile Instance (default config)', () => {
-      const response = AgileFile.createComputed(computedFunction, [
-        'dummyDep' as any,
-      ]);
-
-      expect(response).toBeInstanceOf(Computed);
-      expect(ComputedMock).toHaveBeenCalledWith(shared, computedFunction, {
-        computedDeps: ['dummyDep' as any],
-      });
-    });
-
-    it('should create Computed with the shared Agile Instance (specific config)', () => {
-      const computedConfig = {
-        key: 'jeff',
-        isPlaceholder: false,
-        computedDeps: ['dummyDep' as any],
-        autodetect: true,
-      };
-
-      const response = AgileFile.createComputed(
-        computedFunction,
-        computedConfig
-      );
-
-      expect(response).toBeInstanceOf(Computed);
-      expect(ComputedMock).toHaveBeenCalledWith(
-        shared,
-        computedFunction,
-        computedConfig
-      );
-    });
-
-    it('should create Computed with a specified Agile Instance (specific config)', () => {
-      const agile = new Agile();
-      const computedConfig = {
-        key: 'jeff',
-        isPlaceholder: false,
-        computedDeps: ['dummyDep' as any],
-        autodetect: true,
-      };
-
-      const response = AgileFile.createComputed(computedFunction, {
-        ...computedConfig,
-        ...{ agileInstance: agile },
-      });
-
-      expect(response).toBeInstanceOf(Computed);
-      expect(ComputedMock).toHaveBeenCalledWith(
-        agile,
-        computedFunction,
-        computedConfig
-      );
     });
   });
 });
