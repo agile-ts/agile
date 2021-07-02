@@ -18,10 +18,11 @@ export class Integrations {
       target[property] = value;
 
       // Executed external registered Integrations callbacks
-      if (value instanceof Integration)
+      if (value instanceof Integration) {
         registeredExternalIntegrationsCallbacks.forEach((callback) =>
           callback(value)
         );
+      }
 
       return true;
     },

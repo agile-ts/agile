@@ -85,6 +85,7 @@ export class Agile {
       waitForMount: true,
       logConfig: {},
       bindGlobal: false,
+      autoIntegrate: true,
     });
     this.config = {
       waitForMount: config.waitForMount as any,
@@ -97,10 +98,17 @@ export class Agile {
       localStorage: config.localStorage,
     });
 
-    // Setup listener to be notified when a external registered Integration was added
-    Integrations.onRegisteredExternalIntegration((integration) => {
-      this.integrate(integration);
-    });
+    if (config.autoIntegrate) {
+      // Integration to be integrated initially
+      Integrations.initialIntegrations.forEach((integration) => {
+        this.integrate(integration);
+      });
+
+      // Setup listener to be notified when a external registered Integration was added
+      Integrations.onRegisteredExternalIntegration((integration) => {
+        this.integrate(integration);
+      });
+    }
 
     // Assign customized Logger config to the static Logger
     this.configureLogger(config.logConfig);
@@ -527,6 +535,13 @@ export interface CreateAgileConfigInterface {
    * @default undefined
    */
   key?: AgileKey;
+  /**
+   * Whether external added Integrations are integrated automatically.
+   * For example, when the package '@agile-ts/react' was installed,
+   * whether to automatically integrate the 'reactIntegration' into the Agile Instance.
+   * @default true
+   */
+  autoIntegrate?: boolean;
 }
 
 export interface AgileConfigInterface {

@@ -9,7 +9,6 @@ describe('Integrations Tests', () => {
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
-    Agile.initialIntegrations = [];
 
     jest.spyOn(Integrations.prototype, 'integrate');
   });
@@ -17,27 +16,7 @@ describe('Integrations Tests', () => {
   it('should create Integrations', () => {
     const integrations = new Integrations(dummyAgile);
 
-    expect(integrations.integrations.size).toBe(0);
-  });
-
-  it('should create Integrations and integrate Agile initialIntegrations', async () => {
-    const dummyIntegration1 = new Integration({
-      key: 'initialIntegration1',
-    });
-    const dummyIntegration2 = new Integration({
-      key: 'initialIntegration2',
-    });
-    Agile.initialIntegrations.push(dummyIntegration1);
-    Agile.initialIntegrations.push(dummyIntegration2);
-
-    const integrations = new Integrations(dummyAgile);
-
-    expect(integrations.integrations.size).toBe(2);
-    expect(integrations.integrations.has(dummyIntegration1)).toBeTruthy();
-    expect(integrations.integrations.has(dummyIntegration2)).toBeTruthy();
-
-    expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration1);
-    expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration2);
+    expect(Array.from(integrations.integrations)).toStrictEqual([]);
   });
 
   describe('Integrations Function Tests', () => {
@@ -52,6 +31,34 @@ describe('Integrations Tests', () => {
       });
       dummyIntegration2 = new Integration({
         key: 'dummyIntegration2',
+      });
+    });
+
+    describe('onRegisteredExternalIntegration', () => {
+      let dummyIntegration1: Integration;
+      let dummyIntegration2: Integration;
+
+      beforeEach(() => {
+        dummyIntegration1 = new Integration({
+          key: 'initialIntegration1',
+        });
+        dummyIntegration2 = new Integration({
+          key: 'initialIntegration2',
+        });
+      });
+
+      it('should register callback and fire it, when an external Integration was added', () => {
+        const callback = jest.fn();
+
+        Integrations.onRegisteredExternalIntegration(callback);
+
+        Integrations.initialIntegrations.push(dummyIntegration1);
+        Integrations.initialIntegrations.push(undefined as any);
+        Integrations.initialIntegrations.push(dummyIntegration2);
+
+        expect(callback).toHaveBeenCalledTimes(2);
+        expect(callback).toHaveBeenCalledWith(dummyIntegration1);
+        expect(callback).toHaveBeenCalledWith(dummyIntegration2);
       });
     });
 
