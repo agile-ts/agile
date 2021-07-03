@@ -14,10 +14,11 @@ describe('Runtime Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
+
+    jest.clearAllMocks();
   });
 
   it('should create Runtime', () => {

@@ -9,7 +9,6 @@ import {
   Collection,
   Logger,
   Storages,
-  Integration,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
@@ -66,10 +65,7 @@ describe('Agile Tests', () => {
     typeof Integrations
   >;
 
-  let dummyIntegration: Integration;
-
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     // Clear specified mocks
@@ -81,25 +77,25 @@ describe('Agile Tests', () => {
     // Reset globalThis
     globalThis[Agile.globalKey] = undefined;
 
-    dummyIntegration = new Integration({ key: 'dummyIntegrationKey' });
-
     jest.spyOn(Agile.prototype, 'configureLogger');
     jest.spyOn(Agile.prototype, 'integrate');
+
+    jest.clearAllMocks();
   });
 
-  it('should instantiate Agile with initialIntegrations (default config)', () => {
-    Integrations.initialIntegrations = [dummyIntegration];
-
+  it('should instantiate Agile (default config)', () => {
     const agile = new Agile();
 
     expect(agile.config).toStrictEqual({
       waitForMount: true,
     });
     expect(agile.key).toBeUndefined();
-    expect(IntegrationsMock).toHaveBeenCalledWith(agile);
-    // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock
+    expect(IntegrationsMock).toHaveBeenCalledWith(agile, {
+      autoIntegrate: true,
+    });
+    // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock (mockImplementation)
     expect(RuntimeMock).toHaveBeenCalledWith(agile);
-    // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock
+    // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock (mockImplementation)
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
     expect(StoragesMock).toHaveBeenCalledWith(agile, {
@@ -108,18 +104,11 @@ describe('Agile Tests', () => {
     expect(agile.storages).toBeInstanceOf(Storages);
     expect(agile.configureLogger).toHaveBeenCalledWith({});
 
-    expect(Integrations.onRegisteredExternalIntegration).toHaveBeenCalledWith(
-      expect.any(Function)
-    );
-    expect(agile.integrate).toHaveBeenCalledWith(dummyIntegration);
-
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBeUndefined();
   });
 
-  it('should instantiate Agile with initialIntegrations (specific config)', () => {
-    Integrations.initialIntegrations = [dummyIntegration];
-
+  it('should instantiate Agile (specific config)', () => {
     const agile = new Agile({
       waitForMount: false,
       localStorage: false,
@@ -138,10 +127,12 @@ describe('Agile Tests', () => {
       waitForMount: false,
     });
     expect(agile.key).toBe('jeff');
-    expect(IntegrationsMock).toHaveBeenCalledWith(agile);
-    // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock
+    expect(IntegrationsMock).toHaveBeenCalledWith(agile, {
+      autoIntegrate: false,
+    });
+    // expect(agile.integrations).toBeInstanceOf(Integrations); // Because 'Integrations' is completely overwritten with a mock (mockImplementation)
     expect(RuntimeMock).toHaveBeenCalledWith(agile);
-    // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock
+    // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock (mockImplementation)
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
     expect(StoragesMock).toHaveBeenCalledWith(agile, {
@@ -155,17 +146,14 @@ describe('Agile Tests', () => {
       timestamp: true,
     });
 
-    expect(Integrations.onRegisteredExternalIntegration).not.toHaveBeenCalled();
-    expect(agile.integrate).not.toHaveBeenCalled();
-
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBe(agile);
   });
 
   it(
     'should instantiate second Agile Instance ' +
-      'and print warning when an attempt is made to set the second Instance globally ' +
-      'if the previously defined instance has also been set globally',
+      'and print warning when an attempt is made to set the second Agile Instance globally ' +
+      'although the previously defined Agile Instance is already globally set',
     () => {
       const agile1 = new Agile({
         bindGlobal: true,

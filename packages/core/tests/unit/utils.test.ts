@@ -14,13 +14,14 @@ describe('Utils Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
     // @ts-ignore | Reset globalThis
     globalThis = {};
+
+    jest.clearAllMocks();
   });
 
   describe('getAgileInstance function tests', () => {
@@ -48,7 +49,7 @@ describe('Utils Tests', () => {
     });
 
     it(
-      'should return shared Agile Instance' +
+      'should return shared Agile Instance ' +
         'if specified Instance contains no valid Agile Instance',
       () => {
         expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
@@ -56,9 +57,9 @@ describe('Utils Tests', () => {
     );
 
     it(
-      'should return Agile Instance from globalThis' +
+      'should return globally bound Agile Instance' +
         'if specified Instance contains no valid Agile Instance' +
-        'and no shared Agile Instance was specified',
+        'and no shared Agile Instance is specified',
       () => {
         // Destroy shared Agile Instance
         assignSharedAgileInstance(undefined as any);
@@ -412,7 +413,6 @@ describe('Utils Tests', () => {
 
   describe('runsOnServer function tests', () => {
     it("should return 'false' if the current environment isn't a server", () => {
-      // eslint-disable-next-line no-global-assign
       global.window = {
         document: {
           createElement: 'isSet' as any,
@@ -423,7 +423,6 @@ describe('Utils Tests', () => {
     });
 
     it("should return 'true' if the current environment is a server", () => {
-      // eslint-disable-next-line no-global-assign
       global.window = undefined as any;
 
       expect(Utils.runsOnServer()).toBeTruthy();

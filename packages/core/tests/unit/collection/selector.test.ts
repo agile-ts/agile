@@ -11,13 +11,14 @@ describe('Selector Tests', () => {
   let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Selector.prototype, 'select');
+
+    jest.clearAllMocks();
   });
 
   it('should create Selector and call initial select (default config)', () => {

@@ -16,7 +16,6 @@ describe('RuntimeJob Tests', () => {
   let dummyObserver: StateObserver;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -25,6 +24,8 @@ describe('RuntimeJob Tests', () => {
     });
     dummyState = new State(dummyAgile, 'dummyValue');
     dummyObserver = new StateObserver(dummyState);
+
+    jest.clearAllMocks();
   });
 
   it(

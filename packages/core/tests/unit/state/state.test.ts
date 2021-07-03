@@ -15,12 +15,13 @@ describe('State Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(State.prototype, 'set');
+
+    jest.clearAllMocks();
   });
 
   it('should create State and should call initial set (default config)', () => {

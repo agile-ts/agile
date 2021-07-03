@@ -3,8 +3,8 @@ import { LogMock } from '../../../core/tests/helper/logMock';
 
 describe('EventJob Tests', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
+    jest.clearAllMocks();
   });
 
   it('should create EventJob (without keys)', () => {

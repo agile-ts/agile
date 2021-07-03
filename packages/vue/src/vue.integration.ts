@@ -80,6 +80,6 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
     return Promise.resolve(true);
   },
 });
-Integrations.initialIntegrations.push(vueIntegration);
+Integrations.addInitialIntegration.push(vueIntegration);
 
 export default vueIntegration;

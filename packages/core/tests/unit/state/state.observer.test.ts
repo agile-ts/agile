@@ -17,11 +17,12 @@ describe('StateObserver Tests', () => {
   let dummyState: State;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });
+
+    jest.clearAllMocks();
   });
 
   it('should create State Observer (default config)', () => {

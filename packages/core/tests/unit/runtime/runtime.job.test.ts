@@ -7,7 +7,6 @@ describe('RuntimeJob Tests', () => {
   let dummyObserver: Observer;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -15,6 +14,8 @@ describe('RuntimeJob Tests', () => {
       key: 'myIntegration',
     });
     dummyObserver = new Observer(dummyAgile);
+
+    jest.clearAllMocks();
   });
 
   it(

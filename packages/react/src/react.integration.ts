@@ -24,6 +24,6 @@ const reactIntegration = new Integration<typeof React, AgileReactComponent>({
     }
   },
 });
-Integrations.initialIntegrations.push(reactIntegration);
+Integrations.addInitialIntegration.push(reactIntegration);
 
 export default reactIntegration;

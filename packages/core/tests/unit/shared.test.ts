@@ -9,6 +9,7 @@ import {
   createState,
   createCollection,
   createComputed,
+  assignSharedAgileInstance,
 } from '../../src';
 import { LogMock } from '../helper/logMock';
 
@@ -24,9 +25,25 @@ jest.mock('../../src/state', () => {
 });
 
 describe('Shared Tests', () => {
+  let sharedAgileInstance: Agile;
+
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
+
+    sharedAgileInstance = new Agile();
+    assignSharedAgileInstance(sharedAgileInstance);
+
+    jest.clearAllMocks();
+  });
+
+  describe('assignSharedAgileInstance function tests', () => {
+    it('should assign the specified Agile Instance as new shared Agile Instance', () => {
+      const newAgileInstance = new Agile({ key: 'notShared' });
+
+      assignSharedAgileInstance(newAgileInstance);
+
+      expect(shared).toBe(newAgileInstance);
+    });
   });
 
   describe('createStorage function tests', () => {
@@ -69,7 +86,7 @@ describe('Shared Tests', () => {
       });
 
       expect(state).toBeInstanceOf(State);
-      expect(StateMock).toHaveBeenCalledWith(shared, 'testValue', {
+      expect(StateMock).toHaveBeenCalledWith(sharedAgileInstance, 'testValue', {
         key: 'myCoolState',
       });
     });
@@ -107,7 +124,10 @@ describe('Shared Tests', () => {
       const collection = createCollection(collectionConfig);
 
       expect(collection).toBeInstanceOf(Collection);
-      expect(CollectionMock).toHaveBeenCalledWith(shared, collectionConfig);
+      expect(CollectionMock).toHaveBeenCalledWith(
+        sharedAgileInstance,
+        collectionConfig
+      );
     });
 
     it('should create Collection with a specified Agile Instance', () => {
@@ -140,9 +160,13 @@ describe('Shared Tests', () => {
       const response = createComputed(computedFunction, ['dummyDep' as any]);
 
       expect(response).toBeInstanceOf(Computed);
-      expect(ComputedMock).toHaveBeenCalledWith(shared, computedFunction, {
-        computedDeps: ['dummyDep' as any],
-      });
+      expect(ComputedMock).toHaveBeenCalledWith(
+        sharedAgileInstance,
+        computedFunction,
+        {
+          computedDeps: ['dummyDep' as any],
+        }
+      );
     });
 
     it('should create Computed with the shared Agile Instance (specific config)', () => {
@@ -157,7 +181,7 @@ describe('Shared Tests', () => {
 
       expect(response).toBeInstanceOf(Computed);
       expect(ComputedMock).toHaveBeenCalledWith(
-        shared,
+        sharedAgileInstance,
         computedFunction,
         computedConfig
       );

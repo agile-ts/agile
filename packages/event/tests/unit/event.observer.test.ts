@@ -7,11 +7,12 @@ describe('EventObserver Tests', () => {
   let dummyEvent: Event;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyEvent = new Event(dummyAgile);
+
+    jest.clearAllMocks();
   });
 
   it('should create EventObserver (default config)', () => {

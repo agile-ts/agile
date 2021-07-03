@@ -19,18 +19,17 @@ import {
 } from './internal';
 
 /**
- * Shared Agile Instance that is used when no Agile Instance was specified
+ * Shared Agile Instance that is used when no Agile Instance was specified.
  */
-// eslint-disable-next-line prefer-const
 let sharedAgileInstance = new Agile({
   key: 'shared',
   logConfig: { prefix: 'Agile', level: Logger.level.WARN, active: true },
   localStorage: !runsOnServer(),
 });
-export { sharedAgileInstance as shared };
+export const shared = sharedAgileInstance;
 
 /**
- * Assigns a new Agile Instance as the shared Agile Instance.
+ * Assigns the specified Agile Instance as the shared Agile Instance.
  *
  * @param agileInstance - Agile Instance to become the new shared Agile Instance.
  */

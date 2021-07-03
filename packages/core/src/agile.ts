@@ -26,6 +26,7 @@ import {
   createState,
   createCollection,
   createComputed,
+  IntegrationsConfigInterface,
 } from './internal';
 
 export class Agile {
@@ -93,24 +94,14 @@ export class Agile {
       waitForMount: config.waitForMount as any,
     };
     this.key = config.key;
-    this.integrations = new Integrations(this);
+    this.integrations = new Integrations(this, {
+      autoIntegrate: config.autoIntegrate,
+    });
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
     this.storages = new Storages(this, {
       localStorage: config.localStorage,
     });
-
-    if (config.autoIntegrate) {
-      // Integrate Integrations to be initially integrated
-      Integrations.initialIntegrations.forEach((integration) => {
-        if (integration instanceof Integration) this.integrate(integration);
-      });
-
-      // Setup listener to be notified when an external registered Integration was added
-      Integrations.onRegisteredExternalIntegration((integration) => {
-        this.integrate(integration);
-      });
-    }
 
     // Assign customized Logger config to the static Logger
     this.configureLogger(config.logConfig);
@@ -342,7 +333,8 @@ export class Agile {
 
 export type AgileKey = string | number;
 
-export interface CreateAgileConfigInterface {
+export interface CreateAgileConfigInterface
+  extends IntegrationsConfigInterface {
   /**
    * Configures the logging behaviour of AgileTs.
    * @default {
@@ -372,17 +364,10 @@ export interface CreateAgileConfigInterface {
    */
   bindGlobal?: boolean;
   /**
-   * Key/Name identifier of Agile Instance.
+   * Key/Name identifier of the Agile Instance.
    * @default undefined
    */
   key?: AgileKey;
-  /**
-   * Whether external added Integrations are integrated automatically.
-   * For example, when the package '@agile-ts/react' was installed,
-   * whether to automatically integrate the 'reactIntegration' into the Agile Instance.
-   * @default true
-   */
-  autoIntegrate?: boolean;
 }
 
 export interface AgileConfigInterface {
