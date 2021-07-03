@@ -26,7 +26,7 @@ let sharedAgileInstance = new Agile({
   logConfig: { prefix: 'Agile', level: Logger.level.WARN, active: true },
   localStorage: !runsOnServer(),
 });
-export const shared = sharedAgileInstance;
+export { sharedAgileInstance as shared };
 
 /**
  * Assigns the specified Agile Instance as the shared Agile Instance.

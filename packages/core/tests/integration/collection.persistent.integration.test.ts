@@ -17,16 +17,7 @@ describe('Collection Persist Function Tests', () => {
       delete myStorage[key];
     }),
   };
-
-  // Define Agile with Storage
-  const App = new Agile({ localStorage: false });
-  App.registerStorage(
-    App.createStorage({
-      key: 'testStorage',
-      prefix: 'test',
-      methods: storageMethods,
-    })
-  );
+  let App: Agile;
 
   interface User {
     id: number;
@@ -36,6 +27,15 @@ describe('Collection Persist Function Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
     jest.clearAllMocks();
+
+    App = new Agile({ localStorage: false });
+    App.registerStorage(
+      App.createStorage({
+        key: 'testStorage',
+        prefix: 'test',
+        methods: storageMethods,
+      })
+    );
   });
 
   describe('Collection', () => {
