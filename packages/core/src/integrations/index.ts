@@ -1,4 +1,8 @@
-import { Agile, Integration, LogCodeManager } from '../internal';
+import { Agile, defineConfig, Integration, LogCodeManager } from '../internal';
+
+const onRegisterInitialIntegrationCallbacks: ((
+  integration: Integration
+) => void)[] = [];
 
 export class Integrations {
   // Agile Instance the Integrations belongs to
@@ -7,6 +11,39 @@ export class Integrations {
   // Registered Integrations
   public integrations: Set<Integration> = new Set();
 
+  // External added Integrations
+  // that are to integrate into each created Agile Instance
+  static initialIntegrations: Integration[] = [];
+
+  /**
+   * Adds an external Integration to be registered in each Agile Instance created.
+   *
+   * @public
+   * @param integration - Integration to be registered in each Agile Instance created.
+   */
+  static addInitialIntegration(integration: Integration): void {
+    if (integration instanceof Integration) {
+      // Executed external registered Integration callbacks
+      onRegisterInitialIntegrationCallbacks.forEach((callback) =>
+        callback(integration)
+      );
+
+      Integrations.initialIntegrations.push(integration);
+    }
+  }
+
+  /**
+   * Fires on each external added Integration.
+   *
+   * @public
+   * @param callback - Callback to be fired when an Integration was added externally.
+   */
+  static onRegisterInitialIntegration(
+    callback: (integration: Integration) => void
+  ): void {
+    onRegisterInitialIntegrationCallbacks.push(callback);
+  }
+
   /**
    * The Integrations Class manages all Integrations for an Agile Instance
    * and provides an interface to easily update
@@ -14,14 +51,25 @@ export class Integrations {
    *
    * @internal
    * @param agileInstance - Instance of Agile the Integrations belongs to.
+   * @param config - Configuration object
    */
-  constructor(agileInstance: Agile) {
+  constructor(agileInstance: Agile, config: IntegrationsConfigInterface = {}) {
+    config = defineConfig(config, {
+      autoIntegrate: true,
+    });
     this.agileInstance = () => agileInstance;
 
-    // Integrate initial Integrations which were statically set externally
-    Agile.initialIntegrations.forEach((integration) =>
-      this.integrate(integration)
-    );
+    if (config.autoIntegrate) {
+      // Integrate Integrations to be initially integrated
+      Integrations.initialIntegrations.forEach((integration) => {
+        this.integrate(integration);
+      });
+
+      // Setup listener to be notified when an external registered Integration was added
+      Integrations.onRegisterInitialIntegration((integration) => {
+        this.integrate(integration);
+      });
+    }
   }
 
   /**
@@ -33,7 +81,7 @@ export class Integrations {
    */
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
-    if (!integration._key) {
+    if (integration._key == null) {
       LogCodeManager.log('18:03:00', [integration._key], integration);
       return false;
     }
@@ -83,4 +131,15 @@ export class Integrations {
   public hasIntegration(): boolean {
     return this.integrations.size > 0;
   }
+}
+
+export interface IntegrationsConfigInterface {
+  /**
+   * Whether external added Integrations
+   * are to integrate automatically into the Integrations Class.
+   * For example, when the package '@agile-ts/react' was installed,
+   * whether to automatically integrate the 'reactIntegration'.
+   * @default true
+   */
+  autoIntegrate?: boolean;
 }

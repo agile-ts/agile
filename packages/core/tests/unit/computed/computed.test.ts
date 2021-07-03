@@ -14,13 +14,14 @@ describe('Computed Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Computed.prototype, 'recompute');
     jest.spyOn(Utils, 'extractRelevantObservers');
+
+    jest.clearAllMocks();
   });
 
   it('should create Computed with a not async compute method (default config)', () => {

@@ -3,56 +3,104 @@ import { LogMock } from '../../helper/logMock';
 
 describe('Integrations Tests', () => {
   let dummyAgile: Agile;
+  let dummyIntegration1: Integration;
+  let dummyIntegration2: Integration;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
-    Agile.initialIntegrations = [];
+    dummyIntegration1 = new Integration({
+      key: 'dummyIntegration1',
+    });
+    dummyIntegration2 = new Integration({
+      key: 'dummyIntegration2',
+    });
+
+    Integrations.initialIntegrations = [];
 
     jest.spyOn(Integrations.prototype, 'integrate');
+    jest.spyOn(Integrations, 'onRegisterInitialIntegration');
+
+    jest.clearAllMocks();
   });
 
-  it('should create Integrations', () => {
-    const integrations = new Integrations(dummyAgile);
-
-    expect(integrations.integrations.size).toBe(0);
-  });
-
-  it('should create Integrations and integrate Agile initialIntegrations', async () => {
-    const dummyIntegration1 = new Integration({
-      key: 'initialIntegration1',
-    });
-    const dummyIntegration2 = new Integration({
-      key: 'initialIntegration2',
-    });
-    Agile.initialIntegrations.push(dummyIntegration1);
-    Agile.initialIntegrations.push(dummyIntegration2);
+  it('should create Integrations with the before specified initial Integrations (default config)', () => {
+    Integrations.initialIntegrations = [dummyIntegration1, dummyIntegration2];
 
     const integrations = new Integrations(dummyAgile);
 
-    expect(integrations.integrations.size).toBe(2);
-    expect(integrations.integrations.has(dummyIntegration1)).toBeTruthy();
-    expect(integrations.integrations.has(dummyIntegration2)).toBeTruthy();
+    expect(Array.from(integrations.integrations)).toStrictEqual([
+      dummyIntegration1,
+      dummyIntegration2,
+    ]);
 
+    expect(Integrations.onRegisterInitialIntegration).toHaveBeenCalledWith(
+      expect.any(Function)
+    );
     expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration1);
     expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration2);
   });
 
+  it('should create Integrations without the before specified initial Integrations (specific config)', () => {
+    Integrations.initialIntegrations = [dummyIntegration1, dummyIntegration2];
+
+    const integrations = new Integrations(dummyAgile, { autoIntegrate: false });
+
+    expect(Array.from(integrations.integrations)).toStrictEqual([]);
+
+    expect(Integrations.onRegisterInitialIntegration).not.toHaveBeenCalled();
+    expect(integrations.integrate).not.toHaveBeenCalled();
+  });
+
   describe('Integrations Function Tests', () => {
     let integrations: Integrations;
-    let dummyIntegration1: Integration;
-    let dummyIntegration2: Integration;
 
     beforeEach(() => {
       integrations = new Integrations(dummyAgile);
-      dummyIntegration1 = new Integration({
-        key: 'dummyIntegration1',
+    });
+
+    describe('onRegisterInitialIntegration function tests', () => {
+      it('should register specified onRegisterInitialIntegration callback', () => {
+        // Nothing to testable
       });
-      dummyIntegration2 = new Integration({
-        key: 'dummyIntegration2',
+    });
+
+    describe('addInitialIntegration function tests', () => {
+      const callback1 = jest.fn();
+      const callback2 = jest.fn();
+
+      beforeEach(() => {
+        Integrations.onRegisterInitialIntegration(callback1);
+        Integrations.onRegisterInitialIntegration(callback2);
       });
+      it(
+        'should add valid Integration to the initialIntegrations array ' +
+          'and fire the onRegisterInitialIntegration callbacks',
+        () => {
+          Integrations.addInitialIntegration(dummyIntegration1);
+
+          expect(callback1).toHaveBeenCalledTimes(1);
+          expect(callback1).toHaveBeenCalledWith(dummyIntegration1);
+          expect(callback2).toHaveBeenCalledTimes(1);
+          expect(callback2).toHaveBeenCalledWith(dummyIntegration1);
+          expect(Integrations.initialIntegrations).toStrictEqual([
+            dummyIntegration1,
+          ]);
+        }
+      );
+
+      it(
+        "shouldn't add invalid Integration to the initialIntegrations array " +
+          "and shouldn't fire the onRegisterInitialIntegration callbacks",
+        () => {
+          Integrations.addInitialIntegration(undefined as any);
+
+          expect(callback1).not.toHaveBeenCalled();
+          expect(callback2).not.toHaveBeenCalled();
+          expect(Integrations.initialIntegrations).toStrictEqual([]);
+        }
+      );
     });
 
     describe('integrate function tests', () => {

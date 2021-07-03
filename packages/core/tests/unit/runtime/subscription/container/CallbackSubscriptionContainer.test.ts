@@ -15,7 +15,6 @@ describe('CallbackSubscriptionContainer Tests', () => {
   let dummyProxyWeakMap: ProxyWeakMapType;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile();
@@ -23,6 +22,8 @@ describe('CallbackSubscriptionContainer Tests', () => {
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
     dummySelectorWeakMap = new WeakMap();
     dummyProxyWeakMap = new WeakMap();
+
+    jest.clearAllMocks();
   });
 
   it('should create CallbackSubscriptionContainer', () => {

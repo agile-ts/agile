@@ -5,6 +5,7 @@ import {
   normalizeArray,
   isFunction,
   LogCodeManager,
+  shared,
 } from './internal';
 
 /**
@@ -23,6 +24,11 @@ export function getAgileInstance(instance: any): Agile | undefined {
         ? instance['agileInstance']()
         : instance['agileInstance'];
       if (_agileInstance) return _agileInstance;
+    }
+
+    // Try to get shared Agile Instance
+    if (shared instanceof Agile) {
+      return shared;
     }
 
     // Return global bound Agile Instance
@@ -254,3 +260,16 @@ export function globalBind(
   }
   return false;
 }
+
+/**
+ * Returns a boolean indicating whether AgileTs is currently running on a server.
+ *
+ * @public
+ */
+export const runsOnServer = (): boolean => {
+  return !(
+    typeof window !== 'undefined' &&
+    typeof window.document !== 'undefined' &&
+    typeof window.document.createElement !== 'undefined'
+  );
+};

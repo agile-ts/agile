@@ -22,10 +22,18 @@ import {
   DependableAgileInstancesType,
   CreateComputedConfigInterface,
   ComputeFunctionType,
+  createStorage,
+  createState,
+  createCollection,
+  createComputed,
+  IntegrationsConfigInterface,
 } from './internal';
 
 export class Agile {
   public config: AgileConfigInterface;
+
+  // Key/Name identifier of Agile Instance
+  public key?: AgileKey;
 
   // Queues and executes incoming Observer-based Jobs
   public runtime: Runtime;
@@ -34,12 +42,10 @@ export class Agile {
   // Handles the permanent persistence of Agile Classes
   public storages: Storages;
 
-  // Integrations (UI-Frameworks) that are integrated into AgileTs
+  // Integrations (UI-Frameworks) that are integrated into the Agile Instance
   public integrations: Integrations;
-  // External added Integrations that are to integrate into AgileTs when it is instantiated
-  static initialIntegrations: Integration[] = [];
 
-  // Static AgileTs Logger with the default config
+  // Static Agile Logger with the default config
   // (-> is overwritten by the last created Agile Instance)
   static logger = new Logger({
     prefix: 'Agile',
@@ -82,18 +88,15 @@ export class Agile {
       waitForMount: true,
       logConfig: {},
       bindGlobal: false,
-    });
-    config.logConfig = defineConfig(config.logConfig, {
-      prefix: 'Agile',
-      active: true,
-      level: Logger.level.WARN,
-      canUseCustomStyles: true,
-      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
+      autoIntegrate: true,
     });
     this.config = {
       waitForMount: config.waitForMount as any,
     };
-    this.integrations = new Integrations(this);
+    this.key = config.key;
+    this.integrations = new Integrations(this, {
+      autoIntegrate: config.autoIntegrate,
+    });
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
     this.storages = new Storages(this, {
@@ -101,7 +104,7 @@ export class Agile {
     });
 
     // Assign customized Logger config to the static Logger
-    Agile.logger = new Logger(config.logConfig);
+    this.configureLogger(config.logConfig);
 
     LogCodeManager.log('10:00:00', [], this, Agile.logger);
 
@@ -109,7 +112,27 @@ export class Agile {
     // Why? 'getAgileInstance()' returns the global Agile Instance
     // if it couldn't find any Agile Instance in the specified Instance.
     if (config.bindGlobal)
-      if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
+      if (!globalBind(Agile.globalKey, this)) {
+        LogCodeManager.log('10:02:00');
+      }
+  }
+
+  /**
+   * Configures the logging behaviour of AgileTs.
+   *
+   * @public
+   * @param config - Configuration object
+   */
+  public configureLogger(config: CreateLoggerConfigInterface = {}): this {
+    config = defineConfig(config, {
+      prefix: 'Agile',
+      active: true,
+      level: Logger.level.SUCCESS,
+      canUseCustomStyles: true,
+      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
+    });
+    Agile.logger = new Logger(config);
+    return this;
   }
 
   /**
@@ -128,7 +151,7 @@ export class Agile {
    * @param config - Configuration object
    */
   public createStorage(config: CreateStorageConfigInterface): Storage {
-    return new Storage(config);
+    return createStorage(config);
   }
 
   /**
@@ -150,7 +173,10 @@ export class Agile {
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ): State<ValueType> {
-    return new State<ValueType>(this, initialValue, config);
+    return createState<ValueType>(initialValue, {
+      ...config,
+      ...{ agileInstance: this },
+    });
   }
 
   /**
@@ -174,7 +200,7 @@ export class Agile {
   public createCollection<DataType extends Object = DefaultItem>(
     config?: CollectionConfig<DataType>
   ): Collection<DataType> {
-    return new Collection<DataType>(this, config);
+    return createCollection<DataType>(config, this);
   }
 
   /**
@@ -232,12 +258,14 @@ export class Agile {
     if (Array.isArray(configOrDeps)) {
       _config = flatMerge(_config, {
         computedDeps: configOrDeps,
+        agileInstance: this,
       });
     } else {
-      if (configOrDeps) _config = configOrDeps;
+      if (configOrDeps)
+        _config = { ...configOrDeps, ...{ agileInstance: this } };
     }
 
-    return new Computed<ComputedValueType>(this, computeFunction, _config);
+    return createComputed<ComputedValueType>(computeFunction, _config);
   }
 
   /**
@@ -303,7 +331,10 @@ export class Agile {
   }
 }
 
-export interface CreateAgileConfigInterface {
+export type AgileKey = string | number;
+
+export interface CreateAgileConfigInterface
+  extends IntegrationsConfigInterface {
   /**
    * Configures the logging behaviour of AgileTs.
    * @default {
@@ -332,6 +363,11 @@ export interface CreateAgileConfigInterface {
    * @default false
    */
   bindGlobal?: boolean;
+  /**
+   * Key/Name identifier of the Agile Instance.
+   * @default undefined
+   */
+  key?: AgileKey;
 }
 
 export interface AgileConfigInterface {

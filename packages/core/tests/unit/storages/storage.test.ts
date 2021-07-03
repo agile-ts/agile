@@ -5,7 +5,6 @@ describe('Storage Tests', () => {
   let dummyStorageMethods;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyStorageMethods = {
@@ -16,6 +15,8 @@ describe('Storage Tests', () => {
 
     // https://codewithhugo.com/jest-stub-mock-spy-set-clear/
     jest.spyOn(Storage.prototype, 'validate');
+
+    jest.clearAllMocks();
   });
 
   it('should create not async Storage with normal Storage Methods (default config)', () => {

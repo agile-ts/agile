@@ -5,12 +5,13 @@ describe('Persistent Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
+
+    jest.clearAllMocks();
   });
 
   it('should create Persistent (default config)', () => {

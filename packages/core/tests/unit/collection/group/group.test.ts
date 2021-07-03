@@ -21,7 +21,6 @@ describe('Group Tests', () => {
   let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -31,6 +30,8 @@ describe('Group Tests', () => {
 
     jest.spyOn(Group.prototype, 'rebuild');
     jest.spyOn(Group.prototype, 'addSideEffect');
+
+    jest.clearAllMocks();
   });
 
   it('should create Group with no initialItems (default config)', () => {

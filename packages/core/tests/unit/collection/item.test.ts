@@ -18,13 +18,14 @@ describe('Item Tests', () => {
   let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
+
+    jest.clearAllMocks();
   });
 
   it('should create Item (default config)', () => {

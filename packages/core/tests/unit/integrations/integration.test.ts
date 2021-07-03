@@ -3,8 +3,8 @@ import { LogMock } from '../../helper/logMock';
 
 describe('Integration Tests', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
+    jest.clearAllMocks();
   });
 
   it('should create Integration', () => {

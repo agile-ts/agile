@@ -4,16 +4,20 @@
 
 // !! All internal Agile modules must be imported from here!!
 
-// Logger
-export * from '@agile-ts/logger';
-export * from './logCodeManager';
-
 // Utils
 export * from './utils';
 export * from '@agile-ts/utils';
 
+// Logger
+export * from '@agile-ts/logger';
+export * from './logCodeManager';
+
 // Agile
 export * from './agile';
+
+// Integrations
+export * from './integrations';
+export * from './integrations/integration';
 
 // Runtime
 export * from './runtime';
@@ -47,6 +51,5 @@ export * from './collection/item';
 export * from './collection/selector';
 export * from './collection/collection.persistent';
 
-// Integrations
-export * from './integrations';
-export * from './integrations/integration';
+// Shared
+export * from './shared';

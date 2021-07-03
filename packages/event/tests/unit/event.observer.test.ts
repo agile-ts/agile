@@ -1,17 +1,18 @@
 import { EventObserver, Event } from '../../src';
 import { Agile, Observer, SubscriptionContainer } from '@agile-ts/core';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../../core/tests/helper/logMock';
 
 describe('EventObserver Tests', () => {
   let dummyAgile: Agile;
   let dummyEvent: Event;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
+    LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
     dummyEvent = new Event(dummyAgile);
+
+    jest.clearAllMocks();
   });
 
   it('should create EventObserver (default config)', () => {
