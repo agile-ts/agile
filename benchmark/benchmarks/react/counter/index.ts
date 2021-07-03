@@ -1,8 +1,9 @@
-import Benchmark, { Suite, Options } from 'benchmark';
 import ReactDOM from 'react-dom';
+import Benchmark, { Suite, Options } from 'benchmark';
 
 // Files to run the Benchmark on
 import agilets from './bench/agilets';
+import hookstate from './bench/hookstate';
 import jotai from './bench/jotai';
 import mobx from './bench/mobx';
 import recoil from './bench/recoil';
@@ -52,6 +53,7 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
 // Add Tests to the Benchmark Test Suite
 suite
   .add('AgileTs', configTest(agilets))
+  // .add('Hookstate', configTest(hookstate)) // Commented out because it crashes the test (idk why)
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))
   .add('Recoil', configTest(recoil))

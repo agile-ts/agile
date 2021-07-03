@@ -20,6 +20,7 @@
   "dependencies": {
     "@agile-ts/core": "^0.1.0",
     "@agile-ts/react": "^0.1.0",
+    "@hookstate/core": "^3.0.8",
     "@reduxjs/toolkit": "^1.6.0",
     "benchmark": "^2.1.4",
     "colorette": "^1.2.2",
