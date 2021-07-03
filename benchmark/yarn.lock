@@ -2,8 +2,10 @@
 # yarn lockfile v1
 
 
-"@agile-ts/core@file:.yalc/@agile-ts/core":
+"@agile-ts/core@^0.1.0":
   version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@agile-ts/core/-/core-0.1.0.tgz#11f048f06288b78a0f5841b4b8ee62c0f9863f75"
+  integrity sha512-+SeukkYXVwv9WFnk7/P/NCqNHFdywQNnSxGdcHAh1jSFeofofcP+aqp5oaEYf/4A73qe1yDF6vr7wMz0q0Zz4w==
   dependencies:
     "@agile-ts/logger" "^0.0.5"
     "@agile-ts/utils" "^0.0.5"
@@ -15,8 +17,10 @@
   dependencies:
     "@agile-ts/utils" "^0.0.5"
 
-"@agile-ts/react@file:.yalc/@agile-ts/react":
+"@agile-ts/react@^0.1.0":
   version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@agile-ts/react/-/react-0.1.0.tgz#338ef6c562eae473f1328fb6727b4ae2aa9b4fc4"
+  integrity sha512-CzQE69LBIT8Ynk0M570TTKhA1KCQoR/RM/sNWh72De88W1yOw+BUtff5APsJPv+3we04zy7dz9KwIYjR4VbQLA==
 
 "@agile-ts/utils@^0.0.5":
   version "0.0.5"
@@ -30,7 +34,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@reduxjs/toolkit@^1.5.1":
+"@reduxjs/toolkit@^1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-1.6.0.tgz#0a17c6941c57341f8b31e982352b495ab69d5add"
   integrity sha512-eGL50G+Vj5AG5uD0lineb6rRtbs96M8+hxbcwkHpZ8LQcmt0Bm33WyBSnj5AweLkjQ7ZP+KFRDHiLMznljRQ3A==
@@ -276,10 +280,10 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
-jotai@^0.16.0:
-  version "0.16.11"
-  resolved "https://registry.yarnpkg.com/jotai/-/jotai-0.16.11.tgz#efeaf0311513cf41d5c82b7009f8381d518cbc41"
-  integrity sha512-EPBeDSBc4FwbFRArRjcI6IsHrVkba771mSOFTN3M4r5rU3ZcZMDFLElZScZVr6w1kgrEXvaMm59VAyEB3QUEbA==
+jotai@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.1.2.tgz#3f211e0c03c74e95ea6fd7a69c1d2b65731009bf"
+  integrity sha512-dni4wtgYGG+s9YbOJN7lcfrrhxiD6bH1SN00Pnl0F2htgOXmjxqkGlFzw02OK0Rw35wGNzBfDTJVtbGD9wHOhg==
 
 jpeg-js@^0.4.2:
   version "0.4.3"
@@ -325,14 +329,14 @@ mobx-react-lite@^3.2.0:
   resolved "https://registry.yarnpkg.com/mobx-react-lite/-/mobx-react-lite-3.2.0.tgz#331d7365a6b053378dfe9c087315b4e41c5df69f"
   integrity sha512-q5+UHIqYCOpBoFm/PElDuOhbcatvTllgRp3M1s+Hp5j0Z6XNgDbgqxawJ0ZAUEyKM8X1zs70PCuhAIzX1f4Q/g==
 
-mobx-react@^7.1.0:
+mobx-react@^7.2.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-7.2.0.tgz#241e925e963bb83a31d269f65f9f379e37ecbaeb"
   integrity sha512-KHUjZ3HBmZlNnPd1M82jcdVsQRDlfym38zJhZEs33VxyVQTvL77hODCArq6+C1P1k/6erEeo2R7rpE7ZeOL7dg==
   dependencies:
     mobx-react-lite "^3.2.0"
 
-mobx@^6.2.0:
+mobx@^6.3.2:
   version "6.3.2"
   resolved "https://registry.yarnpkg.com/mobx/-/mobx-6.3.2.tgz#125590961f702a572c139ab69392bea416d2e51b"
   integrity sha512-xGPM9dIE1qkK9Nrhevp0gzpsmELKU4MFUJRORW/jqxVFIHHWIoQrjDjL8vkwoJYY3C2CeVJqgvl38hgKTalTWg==
@@ -449,7 +453,7 @@ react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-redux@^7.2.3:
+react-redux@^7.2.4:
   version "7.2.4"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-7.2.4.tgz#1ebb474032b72d806de2e0519cd07761e222e225"
   integrity sha512-hOQ5eOSkEJEXdpIKbnRyl04LhaWabkDPV+Ix97wqQX3T3d2NQ8DUblNXXtNMavc7DpswyQM6xfaN4HQDKNY2JA==
@@ -469,10 +473,10 @@ react@^17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-recoil@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/recoil/-/recoil-0.2.0.tgz#69344b5bec3129272560d8d9d6001ada3ee4d80c"
-  integrity sha512-VOJfYVQ3VgmfS7L5tV9QdOR+AJhvll8yGr1+3nJPCqADulImuScGZ2sJtejPps3zfTu/o98y5kO4lje8Tx6XHw==
+recoil@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/recoil/-/recoil-0.3.1.tgz#40ef544160d19d76e25de8929d7e512eace13b90"
+  integrity sha512-KNA3DRqgxX4rRC8E7fc6uIw7BACmMPuraIYy+ejhE8tsw7w32CetMm8w7AMZa34wzanKKkev3vl3H7Z4s0QSiA==
   dependencies:
     hamt_plus "1.0.2"
 
@@ -481,7 +485,7 @@ redux-thunk@^2.3.0:
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.3.0.tgz#51c2c19a185ed5187aaa9a2d08b666d0d6467622"
   integrity sha512-km6dclyFnmcvxhAcrQV2AkZmPQjzPDjgVlQtR0EQjxZPyJ0BnMf3in1ryuR8A2qU0HldVRfxYXbFSKlI3N7Slw==
 
-redux@^4.0.0, redux@^4.0.5, redux@^4.1.0:
+redux@^4.0.0, redux@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.0.tgz#eb049679f2f523c379f1aff345c8612f294c88d4"
   integrity sha512-uI2dQN43zqLWCt6B/BMGRMY6db7TTY4qeHHfGeKb3EOhmOKjU3KdWvNLJyqaHRksv/ErdNH7cFZWg9jXtewy4g==
@@ -535,7 +539,7 @@ typescript@^4.3.5:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.5.tgz#4d1c37cc16e893973c45a06886b7113234f119f4"
   integrity sha512-DqQgihaQ9cUrskJo9kIyW/+g0Vxsk8cDtZ52a3NGh0YNTfpUSArXSohyUGnvbPazEPLu398C0UxmKSOrPumUzA==
 
-valtio@^1.0.3:
+valtio@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.0.6.tgz#b316deea5537d254a141e2e5af1692d9eae2f60f"
   integrity sha512-ylCis9IkcE7b92XjMb3ebdJgLvJEFJ2NjfuD01QNr98pVOhRa5WsW4LSykFgbO4W7ftrZtO8jN4svZL0XlD77w==

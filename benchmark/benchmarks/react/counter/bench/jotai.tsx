@@ -6,7 +6,14 @@ const countAtom = atom(0);
 
 const App = () => {
   const [count, setCount] = useAtom(countAtom);
-  return <h1 onClick={() => setCount((state) => state + 1)}>{count}</h1>;
+  return (
+    <h1
+      onClick={() => {
+        setCount((v) => v + 1);
+      }}>
+      {count}
+    </h1>
+  );
 };
 
 export default function (target: HTMLElement) {

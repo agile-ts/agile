@@ -11,7 +11,7 @@ const App = () => {
   const count = useStore((state) => state.count);
   const increment = useStore((state) => state.increment);
 
-  return <h1 onClick={() => increment()}>{count}</h1>;
+  return <h1 onClick={increment}>{count}</h1>;
 };
 
 export default function (target: HTMLElement) {
