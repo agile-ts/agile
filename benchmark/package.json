@@ -40,11 +40,11 @@
     "jotai": "^0.16.0",
     "mobx": "^6.2.0",
     "mobx-react": "^7.1.0",
-    "pullstate": "^1.22.1",
     "react-redux": "^7.2.3",
     "recoil": "^0.2.0",
     "redux": "^4.0.5",
-    "valtio": "^1.0.3"
+    "valtio": "^1.0.3",
+    "zustand": "^3.5.5"
   },
   "bugs": {
     "url": "https://github.com/agile-ts/agile/issues"
