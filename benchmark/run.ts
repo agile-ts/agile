@@ -6,7 +6,7 @@ import playwright from 'playwright';
 dotenv.config();
 
 // https://nodejs.org/docs/latest/api/process.html#process_process_argv
-// Extract entry from the executed command
+// Extract entry (at third parameter) from the executed command
 // yarn run ./path/to/entry -> './path/to/entry' is extracted
 const entry = process.argv.slice(2)[0];
 if (entry == null) {
@@ -16,7 +16,8 @@ if (entry == null) {
 }
 
 const startBenchmark = async () => {
-  // Bundle Benchmark Test and launch the server on which they are executed
+  // Bundle Benchmark Test Suite
+  // and launch the server on which the Test Suite is executed
   const server = await esbuild.serve(
     {
       servedir: 'public',
@@ -39,12 +40,12 @@ const startBenchmark = async () => {
 
   console.log(`Server is running at port: ${server.port}`);
 
-  // Launch Chrome as browser to run the benchmarks in
+  // Launch Chrome as browser to run the Benchmark Test Suite in
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Option to open and test the benchmarks in the browser manually
+  // Option to open and test the Benchmark Test Suite in the browser manually
   if (process.env.MANUAL_BENCHMARK === 'true') {
     console.log(
       `Open the Browser at '${serverUrl}' to run the tests manually.`
@@ -65,7 +66,7 @@ const startBenchmark = async () => {
     console.log(...message);
   });
 
-  // Open url the server is running on
+  // Open the url the server is running on
   await page.goto(serverUrl);
 
   // Wait for tests to be executed (indicator is when 'window.TESTS.ended' is set to true)
@@ -80,7 +81,7 @@ const startBenchmark = async () => {
     }
   );
 
-  // Close Browser and stop server
+  // Close browser and stop server
   await browser.close();
   server.stop();
 };

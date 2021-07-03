@@ -15,40 +15,41 @@ import zustand from './bench/zustand';
 // Benchmark.js requires an instance of itself globally
 window.Benchmark = Benchmark;
 
-// Create new Benchmark test suite
+// Create new Benchmark Test Suite
 const suite = new Suite('Count');
 
-// Retrieve the Element to render the Benchmark in
+// Retrieve the Element to render the Benchmark Test Suite in
 const target = document.getElementById('bench')!;
 
 // Increment Element
 let increment: HTMLHeadingElement;
 
-// Configures a Benchmark test
+// Configures a single Benchmark Test
 function configTest(renderElement: (target: HTMLElement) => void): Options {
   return {
     fn() {
+      // Execute increment action
       increment.click();
     },
     onStart() {
-      // Render Benchmark Component in the target Element
+      // Render React Component in the target Element
       renderElement(target);
 
-      // Retrieve Increment Element
+      // Retrieve Element to execute the increment action on
       increment = target.querySelector('h1')!;
     },
     onComplete() {
-      // Set 'output' in the Benchmark
+      // Set 'output' in the Benchmark itself to print it later
       (this as any).output = parseInt(target.innerText, 10);
 
-      // Unmount Component
+      // Unmount React Component
       ReactDOM.unmountComponentAtNode(target);
       target.innerHTML = '';
     },
   };
 }
 
-// Add Tests to Benchmark Suite
+// Add Tests to the Benchmark Test Suite
 suite
   .add('AgileTs', configTest(agilets))
   .add('Jotai', configTest(jotai))
@@ -70,9 +71,9 @@ suite
     console.log(`Fastest is ${this.filter('fastest').map('name')}`);
 
     // @ts-ignore
-    // Notify server to end the Benchmark
+    // Notify server that the Benchmark Test Suite has ended
     window.TEST.ended = true;
   })
 
-  // Run Benchmark Suite
+  // Run Benchmark Test Suite
   .run({ async: true });
