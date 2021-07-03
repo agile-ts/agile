@@ -1,48 +1,47 @@
-import ReactDOM from 'react-dom';
 import Benchmark, { Suite, Options } from 'benchmark';
+import ReactDOM from 'react-dom';
 
 // Files to run the Benchmark on
-import agilets from './bench/agilets';
+import agileCollection from './bench/agile/collection';
+import agileState from './bench/agile/state';
+import agileNestedState from './bench/agile/nestedState';
 import hookstate from './bench/hookstate';
 import jotai from './bench/jotai';
 import mobx from './bench/mobx';
 import recoil from './bench/recoil';
 import redux from './bench/redux';
-import reduxToolkit from './bench/redux-toolkit';
 import valtio from './bench/valtio';
-import zustand from './bench/zustand';
 
 // @ts-ignore
 // Benchmark.js requires an instance of itself globally
 window.Benchmark = Benchmark;
 
 // Create new Benchmark Test Suite
-const suite = new Suite('Count');
+const suite = new Suite('1000 Fields');
 
 // Retrieve the Element to render the Benchmark Test Suite in
 const target = document.getElementById('bench')!;
-
-// Increment Element
-let increment: HTMLHeadingElement;
 
 // Configures a single Benchmark Test
 function configTest(renderElement: (target: HTMLElement) => void): Options {
   return {
     fn() {
-      // Execute increment action
-      increment.click();
+      // Retrieve Input field to update
+      const fieldToUpdate = Math.floor(Math.random() * 1000);
+      const input = target.querySelectorAll('input')[fieldToUpdate];
+
+      // Update retrieved Input value
+      const evt = document.createEvent('HTMLEvents');
+      evt.initEvent('input', true, true);
+      input.value = '' + Math.random();
+      (input as any)._valueTracker.setValue(Math.random());
+      input.dispatchEvent(evt);
     },
     onStart() {
       // Render React Component in the target Element
       renderElement(target);
-
-      // Retrieve Element to execute the increment action on
-      increment = target.querySelector('h1')!;
     },
     onComplete() {
-      // Set 'output' in the Benchmark itself to print it later
-      (this as any).output = parseInt(target.innerText, 10);
-
       // Unmount React Component
       ReactDOM.unmountComponentAtNode(target);
       target.innerHTML = '';
@@ -52,15 +51,15 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
 
 // Add Tests to the Benchmark Test Suite
 suite
-  .add('AgileTs', configTest(agilets))
+  // .add('Agile Collection', configTest(agileCollection))
+  // .add('Agile State', configTest(agileState))
+  .add('Agile nested State', configTest(agileNestedState))
   .add('Hookstate', configTest(hookstate))
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))
   .add('Recoil', configTest(recoil))
   .add('Redux', configTest(redux))
-  .add('Redux-Toolkit', configTest(reduxToolkit))
   .add('Valtio', configTest(valtio))
-  .add('Zustand', configTest(zustand))
 
   // Add Listener
   .on('start', function (this: any) {
