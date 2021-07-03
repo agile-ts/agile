@@ -1,4 +1,5 @@
 {
+  "name": "agile",
   "private": true,
   "author": "BennoDev",
   "license": "MIT",
@@ -73,6 +74,5 @@
   },
   "workspaces": [
     "packages/*"
-  ],
-  "name": "agile"
+  ]
 }
