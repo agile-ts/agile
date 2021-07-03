@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Agile, Logger } from '@agile-ts/core';
+import { Agile, Logger, State } from '@agile-ts/core';
 import { useAgile } from '@agile-ts/react';
 
 const AgileApp = new Agile({ logConfig: { level: Logger.level.ERROR } });
@@ -11,8 +11,8 @@ const FIELDS = AgileApp.createState(
   )
 );
 
-function Field({ index }: { index: number }) {
-  const name = useAgile(FIELDS.value[index]);
+function Field({ field }: { field: State<string> }) {
+  const name = useAgile(field);
 
   return (
     <div>
@@ -21,7 +21,7 @@ function Field({ index }: { index: number }) {
       <input
         value={name}
         onChange={(e) => {
-          FIELDS.value[index].set(e.target.value);
+          field.set(e.target.value);
         }}
       />
     </div>
@@ -37,7 +37,7 @@ function App() {
       </div>
       <br />
       {fields.map((field, index) => (
-        <Field key={index} index={index} />
+        <Field key={index} field={field} />
       ))}
     </div>
   );
