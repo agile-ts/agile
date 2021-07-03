@@ -17,6 +17,20 @@ but it is better than nothing.
 8. Recoil         x 14,351 ops/sec ±1.55% (65 runs sampled)
 ```
 
+## 1000 Fields
+
+```ts
+1. Agile nested State  x 9,687 ops/sec ±2.46% (52 runs sampled)
+2. Hookstate           x 5,170 ops/sec ±5.77% (31 runs sampled)
+3. Jotai               x 4,578 ops/sec ±5.49% (57 runs sampled)
+4. Recoil              x 3,790 ops/sec ±3.74% (55 runs sampled)
+5. Agile State         x 1,480 ops/sec ±1.39% (12 runs sampled)
+6. Agile Collection    x 498 ops/sec ±1.81% (61 runs sampled)
+7. Redux               x 150 ops/sec ±1.72% (59 runs sampled)
+8. Mobx                x 143 ops/sec ±0.92% (57 runs sampled)
+9. Valtio              x 37.44 ops/sec ±5.17% (42 runs sampled)
+```
+
 ## 🏃 Running Benchmarks
 
 The Benchmark tests run on top of the [`benchmark.js` library](https://github.com/bestiejs/benchmark.js/)

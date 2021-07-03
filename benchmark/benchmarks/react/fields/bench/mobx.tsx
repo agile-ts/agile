@@ -1,7 +1,7 @@
-import { action, observable } from 'mobx';
-import { observer } from 'mobx-react';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { action, observable } from 'mobx';
+import { observer } from 'mobx-react';
 
 const appState = observable({
   fields: Array.from(Array(1000).keys()).map((i) => `Field #${i + 1}`),

@@ -51,8 +51,8 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
 
 // Add Tests to the Benchmark Test Suite
 suite
-  // .add('Agile Collection', configTest(agileCollection))
-  // .add('Agile State', configTest(agileState))
+  .add('Agile Collection', configTest(agileCollection))
+  .add('Agile State', configTest(agileState))
   .add('Agile nested State', configTest(agileNestedState))
   .add('Hookstate', configTest(hookstate))
   .add('Jotai', configTest(jotai))

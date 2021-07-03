@@ -1,8 +1,7 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
-import { combineReducers, createStore } from 'redux';
-import { Provider, useDispatch, useSelector } from 'react-redux';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 
 const fieldsSlice = createSlice({
   name: 'fields',
