@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { atom, RecoilRoot, useRecoilState } from 'recoil';
+import { atom, RecoilRoot, RecoilState, useRecoilState } from 'recoil';
 
 const fields = Array.from(Array(1000).keys()).map((i) =>
   atom({ key: `field-${i}`, default: `Field #${i + 1}` })
@@ -11,8 +11,8 @@ const fieldsStore = atom({
   default: fields,
 });
 
-function Field({ index }: { index: number }) {
-  const [name, rename] = useRecoilState(fields[index]);
+function Field({ field }: { field: RecoilState<string> }) {
+  const [name, rename] = useRecoilState(field);
 
   return (
     <div>
@@ -33,7 +33,7 @@ function App() {
       </div>
       <br />
       {fields.map((field, index) => (
-        <Field key={index} index={index} />
+        <Field key={index} field={field} />
       ))}
     </div>
   );

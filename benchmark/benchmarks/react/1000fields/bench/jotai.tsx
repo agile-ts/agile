@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { atom, useAtom } from 'jotai';
+import { atom, useAtom, Atom } from 'jotai';
 
 const fields = Array.from(Array(1000).keys()).map((i) =>
   atom(`Field #${i + 1}`)
@@ -8,8 +8,8 @@ const fields = Array.from(Array(1000).keys()).map((i) =>
 
 const fieldsStore = atom(fields);
 
-function Field({ index }: { index: number }) {
-  const [name, rename] = useAtom(fields[index]);
+function Field({ field }: { field: Atom<string> }) {
+  const [name, rename] = useAtom(field);
 
   return (
     <div>
@@ -30,7 +30,7 @@ function App() {
       </div>
       <br />
       {fields.map((field, index) => (
-        <Field key={index} index={index} />
+        <Field key={index} field={field} />
       ))}
     </div>
   );

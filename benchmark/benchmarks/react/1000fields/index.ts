@@ -16,8 +16,11 @@ import valtio from './bench/valtio';
 // Benchmark.js requires an instance of itself globally
 window.Benchmark = Benchmark;
 
+// TODO figure out how to pass this count into the tests
+const fieldsCount = 1000;
+
 // Create new Benchmark Test Suite
-const suite = new Suite('1000 Fields');
+const suite = new Suite(`${fieldsCount} Fields`);
 
 // Retrieve the Element to render the Benchmark Test Suite in
 const target = document.getElementById('bench')!;
@@ -27,7 +30,7 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
   return {
     fn() {
       // Retrieve Input field to update
-      const fieldToUpdate = Math.floor(Math.random() * 1000);
+      const fieldToUpdate = Math.floor(Math.random() * fieldsCount);
       const input = target.querySelectorAll('input')[fieldToUpdate];
 
       // Update retrieved Input value
@@ -66,7 +69,10 @@ suite
     console.log(`Starting ${this.name}`);
   })
   .on('cycle', (event: any) => {
-    console.log(String(event.target));
+    console.log(
+      String(event.target),
+      `renderCount: ${event.target.renderCount}`
+    );
   })
   .on('complete', function (this: any) {
     console.log(`Fastest is ${this.filter('fastest').map('name')}`);

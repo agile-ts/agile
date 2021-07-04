@@ -67,7 +67,7 @@ suite
     console.log(`Starting ${this.name}`);
   })
   .on('cycle', (event: any) => {
-    console.log(String(event.target));
+    console.log(String(event.target), `[Count: ${event.target.output}]`);
   })
   .on('complete', function (this: any) {
     console.log(`Fastest is ${this.filter('fastest').map('name')}`);
