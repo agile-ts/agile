@@ -106,7 +106,7 @@ MY_STATE.persist("storage-key");
 
 ### 🤸‍ Flexible
 
-- Works in nearly any UI-Framework (currently supported are React, React-Native and Vue).
+- Works in nearly any UI-Framework (currently supported are [React](https://reactjs.org/), [React-Native](https://reactnative.dev/) and [Vue](https://vuejs.org/)).
 - Surly behaves with the workflow that suits you best.
   No need for _reducers_, _actions_, ..
 - Has **0** external dependencies.
@@ -115,16 +115,19 @@ MY_STATE.persist("storage-key");
 
 AgileTs is designed to take all business logic out of the UI-Components
 and put them in a central place, often called `core`.
-The benefit of keeping logic separate to UI-Components,
-is to make your code more decoupled, portable, scalable,
+The advantage of keeping logic separate to UI-Components,
+is that your code is more decoupled, portable, scalable,
 and above all, easily testable.
+
+Learn more about ways to centralize your application logic with AgileTs
+in our [Style Guides](https://agile-ts.org/docs/style-guide).
 
 ### 🎯 Easy to Use
 
-Learn the powerful tools of AgileTs in a short amount of time. 
-An excellent place to start are our [Quick Start Guides](https://agile-ts.org/docs/Installation), 
-or if you don't like to follow any tutorials,
-you can jump straight into our [Example Section](https://agile-ts.org/docs/examples/Introduction).
+Learn the powerful tools of AgileTs in a short period of time.
+An excellent place to start are our [Quick Start Guides](https://agile-ts.org/docs/Installation),
+or if you don't like to follow tutorials,
+you can jump straight into the [Example Section](https://agile-ts.org/docs/examples/Introduction).
 
 
 <br />
@@ -133,10 +136,10 @@ you can jump straight into our [Example Section](https://agile-ts.org/docs/examp
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/installation_header.png" alt="Installation"/>
 
-In order to use AgileTs in a UI-Framework, we need to install two packages.
+In order to use AgileTs in a UI-Framework, we need to install **two packages**.
 
 - The [`core`](https://agile-ts.org/docs/core) package contains the State Management Logic of AgileTs
-  and therefore offers powerful classes such as the [`State Class`](https://agile-ts.org/docs/core/state).
+  and therefore provides powerful classes like the [`State Class`](https://agile-ts.org/docs/core/state).
   ```
   npm install @agile-ts/core
   ```
@@ -158,9 +161,37 @@ In order to use AgileTs in a UI-Framework, we need to install two packages.
 
 Does AgileTs sound interesting to you?
 Take a look at our **[documentation](https://agile-ts.org/docs/introduction)**, 
-to learn more about its functionalities and how it works exactly.
+to learn more about its functionalities and capabilities.
 If you have any further questions, 
-don't hesitate to join our [Community Discord](https://discord.gg/T9GzreAwPH).
+feel free to join our [Community Discord](https://discord.gg/T9GzreAwPH).
+We will be happy to help you.
+
+- Overview
+  - [Introduction](https://agile-ts.org/docs/introduction/)
+  - [Installation](https://agile-ts.org/docs/installation)  
+  - [Style Guides](https://agile-ts.org/docs/style-guide)
+  - [Supported Frameworks](https://agile-ts.org/docs/frameworks)
+  - [Contributing](https://agile-ts.org/docs/contributing)
+- Quick Start
+  - [React](https://agile-ts.org/docs/quick-start/react)
+  - [Vue](https://agile-ts.org/docs/quick-start/vue)
+  - [Angular](https://agile-ts.org/docs/quick-start/angular)
+- Packages
+  - [core](https://agile-ts.org/docs/core)
+    - [Agile Instance](https://agile-ts.org/docs/core/agile-instance)
+    - [State](https://agile-ts.org/docs/core/state)
+    - [Collection](https://agile-ts.org/docs/core/collection)
+    - [Computed](https://agile-ts.org/docs/core/computed)
+    - [Storage](https://agile-ts.org/docs/core/storage)
+    - [Integration](https://agile-ts.org/docs/core/integration)
+  - [react](https://agile-ts.org/docs/react)
+    - [React Hooks](https://agile-ts.org/docs/react/hooks)
+    - [AgileHOC](https://agile-ts.org/docs/react/AgileHOC)
+- Examples
+  - [React](https://agile-ts.org/docs/examples/react)
+  - [React-Native](https://agile-ts.org/docs/examples/react-native)  
+  - [Vue](https://agile-ts.org/docs/examples/vue)
+- [Typescript Interfaces](https://agile-ts.org/docs/interfaces)  
 
 
 <br />
@@ -203,4 +234,3 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 
 AgileTs is inspired by [MVVM Frameworks](https://de.wikipedia.org/wiki/Model_View_ViewModel) 
 like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
-For the API, we were mainly inspired by [Svelte](https://svelte.dev/).
