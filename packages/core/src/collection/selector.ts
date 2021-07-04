@@ -227,10 +227,7 @@ export class Selector<
       item.selectedBy.delete(this._key as any);
       item.removeSideEffect(Selector.rebuildSelectorSideEffectKey);
       item.removeSideEffect(Selector.rebuildItemSideEffectKey);
-      if (
-        item.isPlaceholder &&
-        this._itemKey != null
-      )
+      if (item.isPlaceholder && this._itemKey != null)
         delete this.collection().data[this._itemKey];
     }
 
