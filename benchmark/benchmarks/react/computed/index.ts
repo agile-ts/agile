@@ -36,7 +36,14 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
     },
     onComplete() {
       // Set 'output' in the Benchmark itself to print it later
-      (this as any).output = parseInt(target.innerText, 10);
+      (this as any).output = parseInt(
+        (target.querySelector('h1') as any)?.innerText,
+        10
+      );
+      (this as any).computedOutput = parseInt(
+        (target.querySelector('p') as any)?.innerText,
+        10
+      );
 
       // Unmount React Component
       ReactDOM.unmountComponentAtNode(target);
@@ -57,7 +64,10 @@ suite
     console.log(`Starting ${this.name}`);
   })
   .on('cycle', (event: any) => {
-    console.log(String(event.target));
+    console.log(
+      String(event.target),
+      `[Count: ${event.target.output}, ComputedCount: ${event.target.computedOutput}]`
+    );
   })
   .on('complete', function (this: any) {
     console.log(`Fastest is ${this.filter('fastest').map('name')}`);

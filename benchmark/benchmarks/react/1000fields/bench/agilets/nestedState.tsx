@@ -11,8 +11,12 @@ const FIELDS = AgileApp.createState(
   )
 );
 
+let updatedFieldsCount = 0;
+
 function Field({ field }: { field: State<string> }) {
   const name = useAgile(field);
+
+  updatedFieldsCount++;
 
   return (
     <div>
@@ -22,6 +26,9 @@ function Field({ field }: { field: State<string> }) {
         value={name}
         onChange={(e) => {
           field.set(e.target.value);
+          (document.getElementById(
+            'updatedFieldsCount'
+          ) as any).innerText = updatedFieldsCount;
         }}
       />
     </div>
@@ -39,6 +46,7 @@ function App() {
       {fields.map((field, index) => (
         <Field key={index} field={field} />
       ))}
+      <div id={'updatedFieldsCount'} />
     </div>
   );
 }

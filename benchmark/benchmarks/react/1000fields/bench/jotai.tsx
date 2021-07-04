@@ -8,14 +8,26 @@ const fields = Array.from(Array(1000).keys()).map((i) =>
 
 const fieldsStore = atom(fields);
 
+let updatedFieldsCount = 0;
+
 function Field({ field }: { field: Atom<string> }) {
   const [name, rename] = useAtom(field);
+
+  updatedFieldsCount++;
 
   return (
     <div>
       Last {`<Field>`} render at: {new Date().toISOString()}
       &nbsp;
-      <input value={name} onChange={(e) => rename(e.target.value)} />
+      <input
+        value={name}
+        onChange={(e) => {
+          rename(e.target.value);
+          (document.getElementById(
+            'updatedFieldsCount'
+          ) as any).innerText = updatedFieldsCount;
+        }}
+      />
     </div>
   );
 }
@@ -32,6 +44,7 @@ function App() {
       {fields.map((field, index) => (
         <Field key={index} field={field} />
       ))}
+      <div id={'updatedFieldsCount'} />
     </div>
   );
 }

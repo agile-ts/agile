@@ -45,6 +45,11 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
       renderElement(target);
     },
     onComplete() {
+      (this as any).updatedFieldsCount = parseInt(
+        (document.getElementById('updatedFieldsCount') as any)?.innerText,
+        10
+      );
+
       // Unmount React Component
       ReactDOM.unmountComponentAtNode(target);
       target.innerHTML = '';
@@ -71,7 +76,7 @@ suite
   .on('cycle', (event: any) => {
     console.log(
       String(event.target),
-      `renderCount: ${event.target.renderCount}`
+      `[updatedFieldsCount: ${event.target.updatedFieldsCount}]`
     );
   })
   .on('complete', function (this: any) {
