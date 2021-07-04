@@ -31,6 +31,15 @@ but it is better than nothing.
 9. Valtio              x 37.44 ops/sec ±5.17% (42 runs sampled)
 ```
 
+## Computed
+
+```ts
+Agile Hard Coded     x 23,201 ops/sec ±1.39% (64 runs sampled)
+Agile Auto Tracking  x 22,661 ops/sec ±3.31% (60 runs sampled)
+Jotai                x 18,489 ops/sec ±5.43% (62 runs sampled)
+Recoil               x 10,312 ops/sec ±2.57% (64 runs sampled)
+```
+
 ## 🏃 Running Benchmarks
 
 The Benchmark tests run on top of the [`benchmark.js` library](https://github.com/bestiejs/benchmark.js/)

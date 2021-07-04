@@ -21,7 +21,7 @@ const startBenchmark = async () => {
   const server = await esbuild.serve(
     {
       servedir: 'public',
-      port: 3000,
+      port: 3003,
       host: '127.0.0.1', // localhost
     },
     {
