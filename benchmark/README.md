@@ -4,6 +4,9 @@ The `Benchmark Test Suites` are supposed to showcase where AgileTs is roughly lo
 I know a counter doesn't really show real world app performance, 
 but it is better than nothing.
 
+### What do the results from benchmark js mean?
+https://stackoverflow.com/questions/28524653/what-do-the-results-from-benchmark-js-mean
+
 ## Counter Benchmark
 
 ```ts

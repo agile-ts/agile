@@ -123,10 +123,12 @@ export class Runtime {
     } else {
       this.isPerformingJobs = false;
       if (this.jobsToRerender.length > 0) {
-        // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
-        setTimeout(() => {
-          this.updateSubscribers();
-        });
+        if (this.agileInstance().config.bucket) {
+          // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
+          setTimeout(() => {
+            this.updateSubscribers();
+          });
+        } else this.updateSubscribers();
       }
     }
   }

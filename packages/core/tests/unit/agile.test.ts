@@ -88,6 +88,7 @@ describe('Agile Tests', () => {
 
     expect(agile.config).toStrictEqual({
       waitForMount: true,
+      bucket: true,
     });
     expect(agile.key).toBeUndefined();
     expect(IntegrationsMock).toHaveBeenCalledWith(agile, {
@@ -111,6 +112,7 @@ describe('Agile Tests', () => {
   it('should instantiate Agile (specific config)', () => {
     const agile = new Agile({
       waitForMount: false,
+      bucket: false,
       localStorage: false,
       logConfig: {
         level: Logger.level.DEBUG,
@@ -125,6 +127,7 @@ describe('Agile Tests', () => {
 
     expect(agile.config).toStrictEqual({
       waitForMount: false,
+      bucket: false,
     });
     expect(agile.key).toBe('jeff');
     expect(IntegrationsMock).toHaveBeenCalledWith(agile, {

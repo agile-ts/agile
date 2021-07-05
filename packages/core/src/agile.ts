@@ -89,9 +89,11 @@ export class Agile {
       logConfig: {},
       bindGlobal: false,
       autoIntegrate: true,
+      bucket: true,
     });
     this.config = {
       waitForMount: config.waitForMount as any,
+      bucket: config.bucket as any,
     };
     this.key = config.key;
     this.integrations = new Integrations(this, {
@@ -368,6 +370,15 @@ export interface CreateAgileConfigInterface
    * @default undefined
    */
   key?: AgileKey;
+  /**
+   * Whether to put render events into "The bucket" of the browser,
+   * where all events are first put in wait for the UI thread
+   * to be done with whatever it's doing.
+   *
+   * [Learn more](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
+   * @default true
+   */
+  bucket?: boolean;
 }
 
 export interface AgileConfigInterface {
@@ -377,4 +388,13 @@ export interface AgileConfigInterface {
    * @default true
    */
   waitForMount: boolean;
+  /**
+   * Whether to put render events into "The bucket" of the browser,
+   * where all events are first put in wait for the UI thread
+   * to be done with whatever it's doing.
+   *
+   * [Learn more](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
+   * @default true
+   */
+  bucket: boolean;
 }
