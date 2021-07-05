@@ -1,15 +1,23 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createState, useHookstate, State } from '@hookstate/core';
+import { createStore, WritableStore } from 'nanostores';
+import { useStore } from 'nanostores/react';
 
-const fields = createState(
-  Array.from(Array.from(Array(1000).keys()).map((i) => `Field #${i + 1} value`))
-);
+const fieldsStore = createStore<WritableStore<string>[]>(() => {
+  const fields = Array.from(Array(1000).keys()).map((i) => {
+    const fieldStore = createStore<string>(() => {
+      fieldsStore.set(`Field #${i + 1}` as any);
+    });
+    return fieldStore;
+  });
+
+  fieldsStore.set(fields);
+});
 
 let updatedFieldsCount = 0;
 
-function Field({ field }: { field: State<string> }) {
-  const name = useHookstate(field);
+function Field({ field }: { field: WritableStore<string> }) {
+  const name = useStore(field);
 
   updatedFieldsCount++;
 
@@ -18,9 +26,9 @@ function Field({ field }: { field: State<string> }) {
       Last {`<Field>`} render at: {new Date().toISOString()}
       &nbsp;
       <input
-        value={name.get()}
+        value={name}
         onChange={(e) => {
-          name.set(e.target.value);
+          field.set(e.target.value);
           (document.getElementById(
             'updatedFieldsCount'
           ) as any).innerText = updatedFieldsCount;
@@ -31,14 +39,14 @@ function Field({ field }: { field: State<string> }) {
 }
 
 function App() {
-  const state = useHookstate(fields);
+  const fields = useStore(fieldsStore);
   return (
     <div>
       <div>
         Last {`<App>`} render at: {new Date().toISOString()}
       </div>
       <br />
-      {state.map((field, index) => (
+      {fields.map((field, index) => (
         <Field key={index} field={field} />
       ))}
       <div id={'updatedFieldsCount'} />
@@ -47,5 +55,5 @@ function App() {
 }
 
 export default function (target: HTMLElement) {
-  ReactDom.render(<App key={'hookstate'} />, target);
+  ReactDom.render(<App key={'nanostores'} />, target);
 }

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import { atom, RecoilRoot, RecoilState, useRecoilState } from 'recoil';
 
 const fields = Array.from(Array(1000).keys()).map((i) =>

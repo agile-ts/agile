@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import { Agile, Logger } from '@agile-ts/core';
 import { useProxy, useSelector } from '@agile-ts/react';
 

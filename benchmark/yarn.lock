@@ -351,6 +351,11 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+nanostores@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/nanostores/-/nanostores-0.3.3.tgz#3f6a858d3e2700c70c7942301380550f66a8e9ee"
+  integrity sha512-+MemxV/HzzTPJQCvzEmwfIFMAIcDEiod37A5F1ERyKQqtm6hbEfuNokfmJfecYM2gjunlPdPHA5lQ9cwHHSYNg==
+
 object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"

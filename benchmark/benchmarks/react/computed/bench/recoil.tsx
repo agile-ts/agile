@@ -7,25 +7,34 @@ import {
   selector,
   useRecoilValue,
 } from 'recoil';
+import { useAtom } from 'jotai';
 
-const counterState = atom({
-  key: 'counterState',
+const countState = atom({
+  key: 'countState',
   default: 0,
 });
-const computedCounterState = selector({
-  key: 'computedCounterState',
+const computedCountState = selector({
+  key: 'computedCountState',
   get: ({ get }) => {
-    return get(counterState) * 5;
+    return get(countState) * 5;
   },
 });
 
+const CountView = () => {
+  const [count, setCount] = useRecoilState(countState);
+  return <h1 onClick={() => setCount((v) => v + 1)}>{count}</h1>;
+};
+
+const ComputedCountView = () => {
+  const computedCount = useRecoilValue(computedCountState);
+  return <p>{computedCount}</p>;
+};
+
 const App = () => {
-  const [count, setCount] = useRecoilState(counterState);
-  const computedCount = useRecoilValue(computedCounterState);
   return (
     <div>
-      <h1 onClick={() => setCount((v) => v + 1)}>{count}</h1>
-      <p>{computedCount}</p>
+      <CountView />
+      <ComputedCountView />
     </div>
   );
 };

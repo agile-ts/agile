@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 

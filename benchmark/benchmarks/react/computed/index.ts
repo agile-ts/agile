@@ -5,6 +5,7 @@ import Benchmark, { Suite, Options } from 'benchmark';
 import agileAutoTracking from './bench/agilets/autoTracking';
 import agileHardCoded from './bench/agilets/hardCoded';
 import jotai from './bench/jotai';
+import nanostores from './bench/nanostores';
 import recoil from './bench/recoil';
 
 // @ts-ignore
@@ -55,8 +56,9 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
 // Add Tests to the Benchmark Test Suite
 suite
   .add('Agile Auto Tracking', configTest(agileAutoTracking))
-  .add('Agile Hard Coded', configTest(agileAutoTracking))
+  .add('Agile Hard Coded', configTest(agileHardCoded))
   .add('Jotai', configTest(jotai))
+  .add('Nano Stores', configTest(nanostores))
   .add('Recoil', configTest(recoil))
 
   // Add Listener

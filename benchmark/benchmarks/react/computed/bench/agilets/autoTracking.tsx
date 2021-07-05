@@ -9,12 +9,21 @@ const COMPUTED_COUNT = AgileApp.createComputed(() => {
   return COUNT.value * 5;
 });
 
+const CountView = () => {
+  const count = useAgile(COUNT);
+  return <h1 onClick={() => COUNT.set((state) => state + 1)}>{count}</h1>;
+};
+
+const ComputedCountView = () => {
+  const computedCount = useAgile(COMPUTED_COUNT);
+  return <p>{computedCount}</p>;
+};
+
 const App = () => {
-  const [count, computedCount] = useAgile([COUNT, COMPUTED_COUNT]);
   return (
     <div>
-      <h1 onClick={() => COUNT.set((state) => state + 1)}>{count}</h1>
-      <p>{computedCount}</p>
+      <CountView />
+      <ComputedCountView />
     </div>
   );
 };

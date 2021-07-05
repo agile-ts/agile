@@ -6,6 +6,7 @@ import agilets from './bench/agilets';
 import hookstate from './bench/hookstate';
 import jotai from './bench/jotai';
 import mobx from './bench/mobx';
+import nanostores from './bench/nanostores';
 import recoil from './bench/recoil';
 import redux from './bench/redux';
 import reduxToolkit from './bench/redux-toolkit';
@@ -56,6 +57,7 @@ suite
   .add('Hookstate', configTest(hookstate))
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))
+  .add('Nano Stores', configTest(nanostores))
   .add('Recoil', configTest(recoil))
   .add('Redux', configTest(redux))
   .add('Redux-Toolkit', configTest(reduxToolkit))
