@@ -2,42 +2,60 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import { proxy, useSnapshot } from 'valtio';
 
-const state = proxy({
-  fields: Array.from(Array(1000).keys()).map((i) => `Field #${i + 1}`),
-});
+export default function (target: HTMLElement, fieldsCount: number) {
+  const state = proxy({
+    fields: Array.from(Array(fieldsCount).keys()).map((i) => `Field #${i + 1}`),
+  });
 
-function Field({ index }: { index: number }) {
-  const { fields } = useSnapshot(state);
-  const name = fields[index];
+  let updatedFieldsCount = 0;
+  let renderFieldsCount = 0;
 
-  return (
-    <div>
-      Last {`<Field>`} render at: {new Date().toISOString()}
-      &nbsp;
-      <input
-        value={name}
-        onChange={(e) => (state.fields[index] = e.target.value)}
-      />
-    </div>
-  );
-}
+  function Field({ index }: { index: number }) {
+    const { fields } = useSnapshot(state);
+    const name = fields[index];
 
-function App() {
-  const { fields } = useSnapshot(state, { sync: true });
+    renderFieldsCount++;
 
-  return (
-    <div>
+    return (
       <div>
-        Last {`<App>`} render at: {new Date().toISOString()}
-      </div>
-      <br />
-      {fields.map((field, index) => (
-        <Field key={index} index={index} />
-      ))}
-    </div>
-  );
-}
+        Last {`<Field>`} render at: {new Date().toISOString()}
+        &nbsp;
+        <input
+          value={name}
+          onChange={(e) => {
+            state.fields[index] = e.target.value;
 
-export default function (target: HTMLElement) {
+            updatedFieldsCount++;
+
+            (document.getElementById(
+              'updatedFieldsCount'
+            ) as any).innerText = updatedFieldsCount;
+            (document.getElementById(
+              'renderFieldsCount'
+            ) as any).innerText = renderFieldsCount;
+          }}
+        />
+      </div>
+    );
+  }
+
+  function App() {
+    const { fields } = useSnapshot(state, { sync: true });
+
+    return (
+      <div>
+        <div>
+          Last {`<App>`} render at: {new Date().toISOString()}
+        </div>
+        <br />
+        {fields.map((field, index) => (
+          <Field key={index} index={index} />
+        ))}
+        <div id={'updatedFieldsCount'} />
+        <div id={'renderFieldsCount'} />
+      </div>
+    );
+  }
+
   ReactDom.render(<App key={'valtio'} />, target);
 }

@@ -17,8 +17,7 @@ import valtio from './bench/valtio';
 // Benchmark.js requires an instance of itself globally
 window.Benchmark = Benchmark;
 
-// TODO figure out how to pass this count into the tests
-const fieldsCount = 1000;
+const fieldsCount = 1;
 
 // Create new Benchmark Test Suite
 const suite = new Suite(`${fieldsCount} Fields`);
@@ -27,7 +26,9 @@ const suite = new Suite(`${fieldsCount} Fields`);
 const target = document.getElementById('bench')!;
 
 // Configures a single Benchmark Test
-function configTest(renderElement: (target: HTMLElement) => void): Options {
+function configTest(
+  renderElement: (target: HTMLElement, fieldsCount: number) => void
+): Options {
   return {
     fn() {
       // Retrieve Input field to update
@@ -43,11 +44,15 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
     },
     onStart() {
       // Render React Component in the target Element
-      renderElement(target);
+      renderElement(target, fieldsCount);
     },
     onComplete() {
       (this as any).updatedFieldsCount = parseInt(
         (document.getElementById('updatedFieldsCount') as any)?.innerText,
+        10
+      );
+      (this as any).renderFieldsCount = parseInt(
+        (document.getElementById('renderFieldsCount') as any)?.innerText,
         10
       );
 
@@ -78,7 +83,7 @@ suite
   .on('cycle', (event: any) => {
     console.log(
       String(event.target),
-      `[updatedFieldsCount: ${event.target.updatedFieldsCount}]`
+      `[updatedFieldsCount: ${event.target.updatedFieldsCount}, renderFieldsCount: ${event.target.renderFieldsCount}]`
     );
   })
   .on('complete', function (this: any) {

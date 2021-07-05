@@ -3,47 +3,65 @@ import ReactDom from 'react-dom';
 import { Agile, Logger } from '@agile-ts/core';
 import { useAgile, useValue } from '@agile-ts/react';
 
-const AgileApp = new Agile({ logConfig: { level: Logger.level.ERROR } });
+export default function (target: HTMLElement, fieldsCount: number) {
+  const AgileApp = new Agile({ logConfig: { level: Logger.level.ERROR } });
 
-const FIELDS = AgileApp.createCollection({
-  initialData: Array.from(Array(1000).keys()).map((i) => ({
-    id: i,
-    name: `Field #${i + 1}`,
-  })),
-});
+  const FIELDS = AgileApp.createCollection({
+    initialData: Array.from(Array(fieldsCount).keys()).map((i) => ({
+      id: i,
+      name: `Field #${i + 1}`,
+    })),
+  });
 
-function Field({ index }: { index: number | string }) {
-  const ITEM = FIELDS.getItem(index);
-  const item = useAgile(ITEM);
+  let updatedFieldsCount = 0;
+  let renderFieldsCount = 0;
 
-  return (
-    <div>
-      Last {`<Field>`} render at: {new Date().toISOString()}
-      &nbsp;
-      <input
-        value={item?.name}
-        onChange={(e) => ITEM?.patch({ name: e.target.value })}
-      />
-    </div>
-  );
-}
+  function Field({ index }: { index: number | string }) {
+    const ITEM = FIELDS.getItem(index);
+    const item = useAgile(ITEM);
 
-function App() {
-  const fieldKeys = useValue(FIELDS);
+    renderFieldsCount++;
 
-  return (
-    <div>
+    return (
       <div>
-        Last {`<App>`} render at: {new Date().toISOString()}
-      </div>
-      <br />
-      {fieldKeys.map((key, i) => (
-        <Field key={i} index={key} />
-      ))}
-    </div>
-  );
-}
+        Last {`<Field>`} render at: {new Date().toISOString()}
+        &nbsp;
+        <input
+          value={item?.name}
+          onChange={(e) => {
+            ITEM?.patch({ name: e.target.value });
 
-export default function (target: HTMLElement) {
+            updatedFieldsCount++;
+
+            (document.getElementById(
+              'updatedFieldsCount'
+            ) as any).innerText = updatedFieldsCount;
+            (document.getElementById(
+              'renderFieldsCount'
+            ) as any).innerText = renderFieldsCount;
+          }}
+        />
+      </div>
+    );
+  }
+
+  function App() {
+    const fieldKeys = useValue(FIELDS);
+
+    return (
+      <div>
+        <div>
+          Last {`<App>`} render at: {new Date().toISOString()}
+        </div>
+        <br />
+        {fieldKeys.map((key, i) => (
+          <Field key={i} index={key} />
+        ))}
+        <div id={'updatedFieldsCount'} />
+        <div id={'renderFieldsCount'} />
+      </div>
+    );
+  }
+
   ReactDom.render(<App key={'agilets-collection'} />, target);
 }

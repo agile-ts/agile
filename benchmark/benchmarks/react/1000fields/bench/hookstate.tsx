@@ -2,50 +2,60 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import { createState, useHookstate, State } from '@hookstate/core';
 
-const fields = createState(
-  Array.from(Array.from(Array(1000).keys()).map((i) => `Field #${i + 1} value`))
-);
-
-let updatedFieldsCount = 0;
-
-function Field({ field }: { field: State<string> }) {
-  const name = useHookstate(field);
-
-  updatedFieldsCount++;
-
-  return (
-    <div>
-      Last {`<Field>`} render at: {new Date().toISOString()}
-      &nbsp;
-      <input
-        value={name.get()}
-        onChange={(e) => {
-          name.set(e.target.value);
-          (document.getElementById(
-            'updatedFieldsCount'
-          ) as any).innerText = updatedFieldsCount;
-        }}
-      />
-    </div>
+export default function (target: HTMLElement, fieldsCount: number) {
+  const fields = createState(
+    Array.from(
+      Array.from(Array(fieldsCount).keys()).map((i) => `Field #${i + 1} value`)
+    )
   );
-}
 
-function App() {
-  const state = useHookstate(fields);
-  return (
-    <div>
+  let updatedFieldsCount = 0;
+  let renderFieldsCount = 0;
+
+  function Field({ field }: { field: State<string> }) {
+    const name = useHookstate(field);
+
+    renderFieldsCount++;
+
+    return (
       <div>
-        Last {`<App>`} render at: {new Date().toISOString()}
-      </div>
-      <br />
-      {state.map((field, index) => (
-        <Field key={index} field={field} />
-      ))}
-      <div id={'updatedFieldsCount'} />
-    </div>
-  );
-}
+        Last {`<Field>`} render at: {new Date().toISOString()}
+        &nbsp;
+        <input
+          value={name.get()}
+          onChange={(e) => {
+            name.set(e.target.value);
 
-export default function (target: HTMLElement) {
+            updatedFieldsCount++;
+
+            (document.getElementById(
+              'updatedFieldsCount'
+            ) as any).innerText = updatedFieldsCount;
+            (document.getElementById(
+              'renderFieldsCount'
+            ) as any).innerText = renderFieldsCount;
+          }}
+        />
+      </div>
+    );
+  }
+
+  function App() {
+    const state = useHookstate(fields);
+    return (
+      <div>
+        <div>
+          Last {`<App>`} render at: {new Date().toISOString()}
+        </div>
+        <br />
+        {state.map((field, index) => (
+          <Field key={index} field={field} />
+        ))}
+        <div id={'updatedFieldsCount'} />
+        <div id={'renderFieldsCount'} />
+      </div>
+    );
+  }
+
   ReactDom.render(<App key={'hookstate'} />, target);
 }
