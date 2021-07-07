@@ -5,6 +5,9 @@ import ReactDOM from 'react-dom';
 import agileCollection from './bench/agilets/collection';
 import agileState from './bench/agilets/state';
 import agileNestedState from './bench/agilets/nestedState';
+import pulseCollection from './bench/pulsejs/collection';
+import pulseState from './bench/pulsejs/state';
+import pulseNestedState from './bench/pulsejs/nestedState';
 import hookstate from './bench/hookstate';
 import jotai from './bench/jotai';
 import mobx from './bench/mobx';
@@ -17,7 +20,7 @@ import valtio from './bench/valtio';
 // Benchmark.js requires an instance of itself globally
 window.Benchmark = Benchmark;
 
-const fieldsCount = 1;
+const fieldsCount = 1000;
 
 // Create new Benchmark Test Suite
 const suite = new Suite(`${fieldsCount} Fields`);
@@ -68,6 +71,9 @@ suite
   .add('Agile Collection', configTest(agileCollection))
   .add('Agile State', configTest(agileState))
   .add('Agile nested State', configTest(agileNestedState))
+  .add('Pulse Collection', configTest(pulseCollection))
+  .add('Pulse State', configTest(pulseState))
+  .add('Pulse nested State', configTest(pulseNestedState))
   .add('Hookstate', configTest(hookstate))
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))

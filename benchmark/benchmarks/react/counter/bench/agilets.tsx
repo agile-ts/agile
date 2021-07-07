@@ -1,15 +1,12 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { Agile, Logger } from '@agile-ts/core';
+import { createState } from '@agile-ts/core';
 import { useAgile } from '@agile-ts/react';
 
-const AgileApp = new Agile({
-  logConfig: { level: Logger.level.ERROR },
-});
-const COUNT = AgileApp.createState(0);
+const COUNT = createState(0);
 
 const App = () => {
-  const count = useAgile(COUNT);
+  const count = useAgile(COUNT, undefined);
   return <h1 onClick={() => COUNT.set((state) => state + 1)}>{count}</h1>;
 };
 

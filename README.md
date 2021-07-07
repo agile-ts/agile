@@ -66,7 +66,7 @@ It's only one click away. Just select your preferred Framework below.
 - [Vue](https://codesandbox.io/s/agilets-first-state-i5xxs)
 - Angular (coming soon)
 
-More examples can be found in the [Example Section](https://agile-ts.org/docs/examples).
+More examples can be found in the [Example section](https://agile-ts.org/docs/examples).
 
 
 <br />
@@ -119,7 +119,7 @@ The advantage of keeping logic separate to UI-Components,
 is that your code is more decoupled, portable, scalable,
 and above all, easily testable.
 
-Learn more about ways to centralize your application logic with AgileTs
+You can learn more about ways to centralize your application logic with AgileTs
 in our [Style Guides](https://agile-ts.org/docs/style-guide).
 
 ### 🎯 Easy to Use
@@ -127,7 +127,7 @@ in our [Style Guides](https://agile-ts.org/docs/style-guide).
 Learn the powerful tools of AgileTs in a short period of time.
 An excellent place to start are our [Quick Start Guides](https://agile-ts.org/docs/Installation),
 or if you don't like to follow tutorials,
-you can jump straight into the [Example Section](https://agile-ts.org/docs/examples/Introduction).
+you can jump straight into the [Example section](https://agile-ts.org/docs/examples/Introduction).
 
 
 <br />

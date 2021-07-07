@@ -2,10 +2,8 @@
 # yarn lockfile v1
 
 
-"@agile-ts/core@^0.1.0":
+"@agile-ts/core@file:.yalc/@agile-ts/core":
   version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@agile-ts/core/-/core-0.1.0.tgz#11f048f06288b78a0f5841b4b8ee62c0f9863f75"
-  integrity sha512-+SeukkYXVwv9WFnk7/P/NCqNHFdywQNnSxGdcHAh1jSFeofofcP+aqp5oaEYf/4A73qe1yDF6vr7wMz0q0Zz4w==
   dependencies:
     "@agile-ts/logger" "^0.0.5"
     "@agile-ts/utils" "^0.0.5"
@@ -17,10 +15,8 @@
   dependencies:
     "@agile-ts/utils" "^0.0.5"
 
-"@agile-ts/react@^0.1.0":
+"@agile-ts/react@file:.yalc/@agile-ts/react":
   version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@agile-ts/react/-/react-0.1.0.tgz#338ef6c562eae473f1328fb6727b4ae2aa9b4fc4"
-  integrity sha512-CzQE69LBIT8Ynk0M570TTKhA1KCQoR/RM/sNWh72De88W1yOw+BUtff5APsJPv+3we04zy7dz9KwIYjR4VbQLA==
 
 "@agile-ts/utils@^0.0.5":
   version "0.0.5"
@@ -38,6 +34,16 @@
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/@hookstate/core/-/core-3.0.8.tgz#d6838153d6d43c2f35cfca475c31248192564e62"
   integrity sha512-blQagGIVIbNoUiNCRrvaXqFmUe7WGMY35ok/LENfl2pcIsLBjkreYIZiaSFi83tkycwq7ZOmcQz/R1nvLKhH8w==
+
+"@pulsejs/core@^4.0.0-beta.3":
+  version "4.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@pulsejs/core/-/core-4.0.0-beta.3.tgz#a19c983093dbc516ee3dcda4dee92917c77fd4cc"
+  integrity sha512-nYSckFFTPt8/8wZpEaFqKsSc1xd+eT7t3TSB3acy6yEQjbkQ1T2CL5tyNGL4tzT3Bher6LHkipDy0tMi5PsPUg==
+
+"@pulsejs/react@^4.0.0-beta.3":
+  version "4.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@pulsejs/react/-/react-4.0.0-beta.3.tgz#d25bf1e969b8749d0f098f6e2ac066364f8c1fe1"
+  integrity sha512-QuO/UoBTL+5ObCTje3nvrMqrifPujWtbHpVMJMnWnZGrL88hiSivaWGvqzaU0BsIE3R6WQHZTJNDvBR8sXFIEQ==
 
 "@reduxjs/toolkit@^1.6.0":
   version "1.6.0"

@@ -50,7 +50,7 @@ export class Agile {
   static logger = new Logger({
     prefix: 'Agile',
     active: true,
-    level: Logger.level.WARN,
+    level: Logger.level.ERROR,
   });
 
   // Identifier used to bind an Agile Instance globally
@@ -375,7 +375,7 @@ export interface CreateAgileConfigInterface
    * where all events are first put in wait for the UI thread
    * to be done with whatever it's doing.
    *
-   * [Learn more](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
+   * [Learn more..](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
    * @default true
    */
   bucket?: boolean;
@@ -393,7 +393,7 @@ export interface AgileConfigInterface {
    * where all events are first put in wait for the UI thread
    * to be done with whatever it's doing.
    *
-   * [Learn more](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
+   * [Learn more..](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
    * @default true
    */
   bucket: boolean;

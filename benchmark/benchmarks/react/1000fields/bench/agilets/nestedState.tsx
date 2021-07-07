@@ -1,16 +1,12 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Agile, Logger, State } from '@agile-ts/core';
+import { createState, State } from '@agile-ts/core';
 import { useAgile } from '@agile-ts/react';
 
 export default function (target: HTMLElement, fieldsCount: number) {
-  const AgileApp = new Agile({
-    logConfig: { level: Logger.level.ERROR },
-  });
-
-  const FIELDS = AgileApp.createState(
+  const FIELDS = createState(
     Array.from(Array(fieldsCount).keys()).map((i) =>
-      AgileApp.createState(`Field #${i + 1}`)
+      createState(`Field #${i + 1}`)
     )
   );
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createState } from '@agile-ts/core';
-import { useAgile } from '@agile-ts/react';
+import { state } from '@pulsejs/core';
+import { usePulse } from '@pulsejs/react';
 
 export default function (target: HTMLElement, fieldsCount: number) {
-  const FIELDS = createState(
+  const FIELDS = state(
     Array.from(Array(fieldsCount).keys()).map((i) => `Field #${i + 1}`)
   );
 
@@ -12,7 +12,7 @@ export default function (target: HTMLElement, fieldsCount: number) {
   let renderFieldsCount = 0;
 
   function Field({ index }: { index: number }) {
-    const fields = useAgile(FIELDS);
+    const fields = usePulse(FIELDS);
 
     renderFieldsCount++;
 
@@ -23,8 +23,8 @@ export default function (target: HTMLElement, fieldsCount: number) {
         <input
           value={fields[index]}
           onChange={(e) => {
-            FIELDS.nextStateValue[index] = e.target.value;
-            FIELDS.ingest();
+            FIELDS.nextState[index] = e.target.value;
+            FIELDS.set();
 
             updatedFieldsCount++;
 

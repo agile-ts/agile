@@ -1,18 +1,18 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createState } from '@agile-ts/core';
-import { useAgile } from '@agile-ts/react';
+import { state, State } from '@pulsejs/core';
+import { usePulse } from '@pulsejs/react';
 
 export default function (target: HTMLElement, fieldsCount: number) {
-  const FIELDS = createState(
-    Array.from(Array(fieldsCount).keys()).map((i) => `Field #${i + 1}`)
+  const FIELDS = state(
+    Array.from(Array(fieldsCount).keys()).map((i) => state(`Field #${i + 1}`))
   );
 
   let updatedFieldsCount = 0;
   let renderFieldsCount = 0;
 
-  function Field({ index }: { index: number }) {
-    const fields = useAgile(FIELDS);
+  function Field({ field }: { field: State<string> }) {
+    const name = usePulse(field);
 
     renderFieldsCount++;
 
@@ -21,10 +21,9 @@ export default function (target: HTMLElement, fieldsCount: number) {
         Last {`<Field>`} render at: {new Date().toISOString()}
         &nbsp;
         <input
-          value={fields[index]}
+          value={name}
           onChange={(e) => {
-            FIELDS.nextStateValue[index] = e.target.value;
-            FIELDS.ingest();
+            field.set(e.target.value);
 
             updatedFieldsCount++;
 
@@ -41,14 +40,15 @@ export default function (target: HTMLElement, fieldsCount: number) {
   }
 
   function App() {
+    const fields = usePulse(FIELDS);
     return (
       <div>
         <div>
           Last {`<App>`} render at: {new Date().toISOString()}
         </div>
         <br />
-        {FIELDS.value.map((field, index) => (
-          <Field key={index} index={index} />
+        {fields.map((field, index) => (
+          <Field key={index} field={field} />
         ))}
         <div id={'updatedFieldsCount'} />
         <div id={'renderFieldsCount'} />
@@ -56,5 +56,5 @@ export default function (target: HTMLElement, fieldsCount: number) {
     );
   }
 
-  ReactDom.render(<App key={'agilets-state'} />, target);
+  ReactDom.render(<App key={'agilets-nested-state'} />, target);
 }

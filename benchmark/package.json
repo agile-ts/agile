@@ -19,9 +19,11 @@
     "url": "git+https://github.com/agile-ts/agile.git"
   },
   "dependencies": {
-    "@agile-ts/core": "^0.1.0",
-    "@agile-ts/react": "^0.1.0",
+    "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react",
     "@hookstate/core": "^3.0.8",
+    "@pulsejs/core": "^4.0.0-beta.3",
+    "@pulsejs/react": "^4.0.0-beta.3",
     "@reduxjs/toolkit": "^1.6.0",
     "benchmark": "^2.1.4",
     "colorette": "^1.2.2",

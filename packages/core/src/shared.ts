@@ -23,7 +23,7 @@ import {
  */
 let sharedAgileInstance = new Agile({
   key: 'shared',
-  logConfig: { prefix: 'Agile', level: Logger.level.WARN, active: true },
+  logConfig: { prefix: 'Agile', level: Logger.level.ERROR, active: true },
   localStorage: !runsOnServer(),
 });
 export { sharedAgileInstance as shared };

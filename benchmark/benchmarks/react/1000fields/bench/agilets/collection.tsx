@@ -1,12 +1,10 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { Agile, Logger } from '@agile-ts/core';
+import { createCollection } from '@agile-ts/core';
 import { useAgile, useValue } from '@agile-ts/react';
 
 export default function (target: HTMLElement, fieldsCount: number) {
-  const AgileApp = new Agile({ logConfig: { level: Logger.level.ERROR } });
-
-  const FIELDS = AgileApp.createCollection({
+  const FIELDS = createCollection({
     initialData: Array.from(Array(fieldsCount).keys()).map((i) => ({
       id: i,
       name: `Field #${i + 1}`,

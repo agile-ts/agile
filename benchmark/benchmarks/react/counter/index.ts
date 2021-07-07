@@ -7,6 +7,7 @@ import hookstate from './bench/hookstate';
 import jotai from './bench/jotai';
 import mobx from './bench/mobx';
 import nanostores from './bench/nanostores';
+import pulsejs from './bench/pulsejs';
 import recoil from './bench/recoil';
 import redux from './bench/redux';
 import reduxToolkit from './bench/redux-toolkit';
@@ -58,6 +59,7 @@ suite
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))
   .add('Nano Stores', configTest(nanostores))
+  .add('PulseJs', configTest(pulsejs))
   .add('Recoil', configTest(recoil))
   .add('Redux', configTest(redux))
   .add('Redux-Toolkit', configTest(reduxToolkit))
