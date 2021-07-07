@@ -180,9 +180,8 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
 ): string {
   let result = logCodeMessages[logCode] ?? `'${logCode}' is a unknown logCode!`;
 
-  for (const i in replacers) {
-    // https://stackoverflow.com/questions/41438656/why-do-i-get-cannot-read-property-tostring-of-undefined
-    result = result.split('${' + i + '}').join(replacers[i] + '');
+  for (let i = 0; i < replacers.length; i++) {
+    result = result.replace('${' + i + '}', replacers[i]);
   }
 
   return result;
@@ -203,6 +202,8 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   replacers: any[] = [],
   ...data: any[]
 ): void {
+  if (!Agile.logger.isActive) return;
+
   const codes = logCode.split(':');
   if (codes.length === 3)
     Agile.logger[logCodeTypes[codes[1]]](getLog(logCode, replacers), ...data);

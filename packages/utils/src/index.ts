@@ -8,19 +8,15 @@
  * @param value - Array/Object that gets copied
  */
 export function copy<T = any>(value: T): T {
-  // Extra checking '!value' because 'typeof null === object'
-  if (!value) return value;
-
   // Ignore everything that is no object or array
-  const valConstructorName = Object.getPrototypeOf(value).constructor.name;
-  if (!['object', 'array'].includes(valConstructorName.toLowerCase()))
-    return value;
+  // (Extra checking 'value == null' because 'typeof null === object')
+  if (value == null || typeof value !== 'object') return value;
 
   let temp;
   const newObject: any = Array.isArray(value) ? [] : {};
   for (const property in value) {
     temp = value[property];
-    newObject[property] = typeof temp === 'object' ? copy(temp) : temp;
+    newObject[property] = copy(temp);
   }
   return newObject as T;
 }
@@ -223,7 +219,14 @@ export function flatMerge<DataType = Object>(
  * @param value2 - Second Value
  */
 export function equal(value1: any, value2: any): boolean {
-  return value1 === value2 || JSON.stringify(value1) === JSON.stringify(value2);
+  return (
+    value1 === value2 ||
+    // Checking if 'value1' and 'value2' is typeof object before
+    // using the JSON.stringify comparison to optimize the performance
+    (typeof value1 === 'object' &&
+      typeof value2 === 'object' &&
+      JSON.stringify(value1) === JSON.stringify(value2))
+  );
 }
 
 //=========================================================================================================
