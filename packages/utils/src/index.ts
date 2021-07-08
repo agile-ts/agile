@@ -8,9 +8,16 @@
  * @param value - Array/Object that gets copied
  */
 export function copy<T = any>(value: T): T {
-  // Ignore everything that is no object or array
-  // (Extra checking 'value == null' because 'typeof null === object')
+  // Extra checking 'value == null' because 'typeof null === object'
   if (value == null || typeof value !== 'object') return value;
+
+  // Ignore everything that is no object or array but has the type of an object (e.g. classes)
+  const valConstructorName = Object.getPrototypeOf(value).constructor.name;
+  if (
+    valConstructorName.toLowerCase() !== 'object' &&
+    valConstructorName.toLowerCase() !== 'array'
+  )
+    return value;
 
   let temp;
   const newObject: any = Array.isArray(value) ? [] : {};

@@ -21,13 +21,13 @@ describe('Shared Tests', () => {
 
     it('should create Event with the shared Agile Instance', () => {
       const event = createEvent({
-        key: 'myCoolState',
+        key: 'myCoolEvent',
         delay: 10,
       });
 
       expect(event).toBeInstanceOf(Event);
       expect(EventMock).toHaveBeenCalledWith(sharedAgileInstance, {
-        key: 'myCoolState',
+        key: 'myCoolEvent',
         delay: 10,
       });
     });
@@ -36,14 +36,14 @@ describe('Shared Tests', () => {
       const agile = new Agile();
 
       const event = createEvent({
-        key: 'myCoolState',
+        key: 'myCoolEvent',
         delay: 10,
         agileInstance: agile,
       });
 
       expect(event).toBeInstanceOf(Event);
       expect(EventMock).toHaveBeenCalledWith(agile, {
-        key: 'myCoolState',
+        key: 'myCoolEvent',
         delay: 10,
       });
     });
