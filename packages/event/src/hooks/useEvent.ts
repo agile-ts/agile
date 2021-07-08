@@ -23,7 +23,7 @@ export function useEvent<E extends Event<any>>(
     // Get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(event);
     if (!agileInstance || !agileInstance.subController) {
-      LogCodeManager.logger?.error(
+      LogCodeManager.getLogger()?.error(
         'Failed to subscribe Component with deps',
         event
       );

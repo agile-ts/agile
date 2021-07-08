@@ -208,27 +208,20 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   replacers: any[] = [],
   ...data: any[]
 ): void {
-  console.debug(
-    'log()',
-    LogCodeManager.logger,
-    LogCodeManager.logger?.isActive,
-    logCode,
-    replacers
-  ); // TODO REMOVE
-  if (!LogCodeManager.logger?.isActive) return;
-  const logType = logCodeTypes[`${logCode.charAt(3)}${logCode.charAt(4)}`];
-  console.debug('LogType:', logType); // TODO REMOVE
+  const logger = LogCodeManager.getLogger();
+  if (!logger?.isActive) return;
+  const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
   // Handle logging without Logger
-  if (LogCodeManager.logger == null) {
+  if (logger == null) {
     if (logType === 'error' || logType === 'warn')
       console[logType](getLog(logCode, replacers));
     return;
   }
 
   // Handle logging with Logger
-  LogCodeManager.logger[logType](getLog(logCode, replacers), ...data);
+  logger[logType](getLog(logCode, replacers), ...data);
 }
 
 /**
@@ -248,30 +241,19 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   replacers: any[] = [],
   ...data: any[]
 ): void {
-  console.debug(
-    'logIfTags()',
-    LogCodeManager.logger,
-    LogCodeManager.logger?.isActive,
-    tags,
-    logCode,
-    replacers
-  ); // TODO REMOVE
-  if (!LogCodeManager.logger?.isActive) return;
-  const logType = logCodeTypes[`${logCode.charAt(3)}${logCode.charAt(4)}`];
-  console.debug('LogType:', logType); // TODO REMOVE
+  const logger = LogCodeManager.getLogger();
+  if (!logger?.isActive) return;
+  const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
-  // Handle logging with Logger
-  if (LogCodeManager.logger == null) {
-    if (logType === 'error' || logType === 'warn')
-      console[logType](getLog(logCode, replacers));
+  // Handle logging without Logger
+  if (logger == null) {
+    // Log nothing since if a log has a tag it is probably not so important
     return;
   }
 
-  // Handle logging without Logger
-  LogCodeManager.logger.if
-    .tag(tags)
-    [logType](getLog(logCode, replacers), ...data);
+  // Handle logging with Logger
+  logger.if.tag(tags)[logType](getLog(logCode, replacers), ...data);
 }
 
 /**
@@ -285,7 +267,11 @@ export const LogCodeManager = {
   log,
   logCodeLogTypes: logCodeTypes,
   logCodeMessages: logCodeMessages,
-  logger: loggerPackage?.sharedAgileLogger ?? null,
+  // Not doing 'logger: loggerPackage?.sharedAgileLogger'
+  // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
+  getLogger: () => {
+    return loggerPackage?.sharedAgileLogger ?? null;
+  },
   logIfTags,
 };
 

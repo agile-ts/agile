@@ -123,7 +123,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
-      LogCodeManager.logger?.error(
+      LogCodeManager.getLogger()?.error(
         'A Event Callback Function has to be typeof Function!'
       );
       return this;
@@ -131,7 +131,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
-      LogCodeManager.logger?.error(
+      LogCodeManager.getLogger()?.error(
         `Event Callback Function with the key/name '${key}' already exists!`
       );
       return this;

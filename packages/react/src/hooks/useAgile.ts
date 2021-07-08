@@ -143,7 +143,7 @@ export function useAgile<
     // Try to extract Agile Instance from the specified Instance/s
     if (!agileInstance) agileInstance = getAgileInstance(observers[0]);
     if (!agileInstance || !agileInstance.subController) {
-      LogCodeManager.logger?.error(
+      LogCodeManager.getLogger()?.error(
         'Failed to subscribe Component with deps because of missing valid Agile Instance.',
         deps
       );
@@ -192,7 +192,7 @@ export function useAgile<
         proxyWeakMap,
         waitForMount: false,
         componentId: config.componentId,
-        selectorWeakMap: selectorWeakMap,
+        selectorWeakMap,
       }
     );
 

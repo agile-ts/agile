@@ -11,8 +11,8 @@
     "test:counter": "yarn test ./benchmarks/react/counter",
     "test:1000fields": "yarn test ./benchmarks/react/1000fields",
     "test:computed": "yarn test ./benchmarks/react/computed",
-    "install:local:agile": "yalc add @agile-ts/core @agile-ts/react",
-    "install:public:agile": "yarn add @agile-ts/core @agile-ts/react"
+    "install:local:agile": "yalc add @agile-ts/core @agile-ts/react & yarn install",
+    "install:public:agile": "yarn add @agile-ts/core @agile-ts/react & yarn install"
   },
   "repository": {
     "type": "git",
