@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Agile,
   getAgileInstance,
+  LogCodeManager,
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
 import { Event, EventCallbackFunction } from '../internal';
@@ -22,7 +23,10 @@ export function useEvent<E extends Event<any>>(
     // Get Agile Instance
     if (!agileInstance) agileInstance = getAgileInstance(event);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error('Failed to subscribe Component with deps', event);
+      LogCodeManager.logger?.error(
+        'Failed to subscribe Component with deps',
+        event
+      );
       return;
     }
 

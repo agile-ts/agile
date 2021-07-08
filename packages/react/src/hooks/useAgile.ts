@@ -14,9 +14,10 @@ import {
   extractRelevantObservers,
   SelectorWeakMapType,
   SelectorMethodType,
+  LogCodeManager,
+  normalizeArray,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
 // TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
@@ -142,7 +143,7 @@ export function useAgile<
     // Try to extract Agile Instance from the specified Instance/s
     if (!agileInstance) agileInstance = getAgileInstance(observers[0]);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error(
+      LogCodeManager.logger?.error(
         'Failed to subscribe Component with deps because of missing valid Agile Instance.',
         deps
       );

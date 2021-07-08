@@ -10,6 +10,7 @@ import {
   flatMerge,
   extractRelevantObservers,
   normalizeArray,
+  LogCodeManager,
 } from '@agile-ts/core';
 
 /**
@@ -57,7 +58,10 @@ export function AgileHOC(
     }
   }
   if (!agileInstance || !agileInstance.subController) {
-    Agile.logger.error('Failed to subscribe Component with deps', deps);
+    LogCodeManager.logger.error(
+      'Failed to subscribe Component with deps',
+      deps
+    );
     return reactComponent;
   }
 

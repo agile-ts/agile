@@ -44,8 +44,15 @@
     "@agile-ts/utils": "file:../utils"
   },
   "dependencies": {
-    "@agile-ts/utils": "^0.0.5",
+    "@agile-ts/utils": "^0.0.5"
+  },
+  "peerDependencies": {
     "@agile-ts/logger": "^0.0.5"
+  },
+  "peerDependenciesMeta": {
+    "@agile-ts/logger": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"

@@ -1,4 +1,10 @@
-import { Agile } from './agile';
+// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
+export let loggerPackage: any = null;
+try {
+  loggerPackage = require('@agile-ts/logger');
+} catch (e) {
+  // empty catch block
+}
 
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
@@ -202,11 +208,70 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   replacers: any[] = [],
   ...data: any[]
 ): void {
-  if (!Agile.logger.isActive) return;
+  console.debug(
+    'log()',
+    LogCodeManager.logger,
+    LogCodeManager.logger?.isActive,
+    logCode,
+    replacers
+  ); // TODO REMOVE
+  if (!LogCodeManager.logger?.isActive) return;
+  const logType = logCodeTypes[`${logCode.charAt(3)}${logCode.charAt(4)}`];
+  console.debug('LogType:', logType); // TODO REMOVE
+  if (typeof logType !== 'string') return;
 
-  const codes = logCode.split(':');
-  if (codes.length === 3)
-    Agile.logger[logCodeTypes[codes[1]]](getLog(logCode, replacers), ...data);
+  // Handle logging without Logger
+  if (LogCodeManager.logger == null) {
+    if (logType === 'error' || logType === 'warn')
+      console[logType](getLog(logCode, replacers));
+    return;
+  }
+
+  // Handle logging with Logger
+  LogCodeManager.logger[logType](getLog(logCode, replacers), ...data);
+}
+
+/**
+ * Logs the log message according to the specified log code
+ * with the Agile Logger if the provided tags are active.
+ *
+ * @internal
+ * @param tags - Tags to be active to log the logCode.
+ * @param logCode - Log code of the message to be returned.
+ * @param replacers - Instances that replace these '${x}' placeholders based on the index
+ * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
+ * @param data - Data to be attached to the end of the log message.
+ */
+function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
+  tags: string[],
+  logCode: T,
+  replacers: any[] = [],
+  ...data: any[]
+): void {
+  console.debug(
+    'logIfTags()',
+    LogCodeManager.logger,
+    LogCodeManager.logger?.isActive,
+    tags,
+    logCode,
+    replacers
+  ); // TODO REMOVE
+  if (!LogCodeManager.logger?.isActive) return;
+  const logType = logCodeTypes[`${logCode.charAt(3)}${logCode.charAt(4)}`];
+  console.debug('LogType:', logType); // TODO REMOVE
+  if (typeof logType !== 'string') return;
+
+  // Handle logging with Logger
+  if (LogCodeManager.logger == null) {
+    if (logType === 'error' || logType === 'warn')
+      console[logType](getLog(logCode, replacers));
+    return;
+  }
+
+  // Handle logging without Logger
+  LogCodeManager.logger.if
+    .tag(tags)
+    [logType](getLog(logCode, replacers), ...data);
 }
 
 /**
@@ -220,6 +285,8 @@ export const LogCodeManager = {
   log,
   logCodeLogTypes: logCodeTypes,
   logCodeMessages: logCodeMessages,
+  logger: loggerPackage?.sharedAgileLogger ?? null,
+  logIfTags,
 };
 
 export type LogCodesArrayType<T> = {

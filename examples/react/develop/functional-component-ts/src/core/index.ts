@@ -1,12 +1,13 @@
-import { Agile, clone, Item, Logger } from '@agile-ts/core';
+import { Agile, clone, Item } from '@agile-ts/core';
 import Event from '@agile-ts/event';
+import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
 
 export const myStorage: any = {};
 
 export const App = new Agile({
-  logConfig: { level: Logger.level.DEBUG },
   localStorage: true,
 });
+assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 
 // Register custom second Storage
 App.registerStorage(
