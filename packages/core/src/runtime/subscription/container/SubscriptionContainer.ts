@@ -111,8 +111,6 @@ export class SubscriptionContainer {
     config: SubscriptionContainerConfigInterface = {}
   ) {
     config = defineConfig(config, {
-      proxyWeakMap: new WeakMap(),
-      selectorWeakMap: new WeakMap(),
       key: generateId(),
     });
 

@@ -161,8 +161,9 @@ export function useAgile<
     // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
     // because the 'useIsomorphicLayoutEffect' is called after the rerender.
     // -> All used paths in the UI-Component were successfully tracked.
-    const proxyWeakMap: ProxyWeakMapType = new WeakMap();
+    let proxyWeakMap: ProxyWeakMapType | undefined = undefined;
     if (config.proxyBased && proxyPackage != null) {
+      proxyWeakMap = new WeakMap();
       for (const observer of observers) {
         const proxyTree = proxyTreeWeakMap.get(observer);
         if (proxyTree != null) {
@@ -174,8 +175,9 @@ export function useAgile<
     }
 
     // Build Selector WeakMap based on the specified selector method
-    const selectorWeakMap: SelectorWeakMapType = new WeakMap();
+    let selectorWeakMap: SelectorWeakMapType | undefined = undefined;
     if (config.selector != null) {
+      selectorWeakMap = new WeakMap();
       for (const observer of observers) {
         selectorWeakMap.set(observer, { methods: [config.selector] });
       }

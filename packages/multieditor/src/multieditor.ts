@@ -4,6 +4,7 @@ import {
   copy,
   defineConfig,
   getAgileInstance,
+  LogCodeManager,
   Observer,
 } from '@agile-ts/core';
 import {
@@ -52,7 +53,7 @@ export class MultiEditor<
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
-      Agile.logger.error(
+      LogCodeManager.getLogger()?.error(
         'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!'
       );
     this.agileInstance = () => agileInstance as any;
@@ -247,9 +248,9 @@ export class MultiEditor<
     this.submitted = true;
 
     // Logging
-    Agile.logger.if
-      .tag(['multieditor'])
-      .info(`Submit MultiEditor '${this.key}'`, this.isValid);
+    // Agile.logger.if
+    //   .tag(['multieditor'])
+    //   .info(`Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
     if (!this.isValid) return false;
@@ -354,7 +355,9 @@ export class MultiEditor<
    */
   public getItemById(key: ItemKey): Item<DataType> | undefined {
     if (!Object.prototype.hasOwnProperty.call(this.data, key)) {
-      Agile.logger.error(`Editor Item '${key}' does not exists!`);
+      LogCodeManager.getLogger()?.error(
+        `Editor Item '${key}' does not exists!`
+      );
       return undefined;
     }
     return this.data[key];
