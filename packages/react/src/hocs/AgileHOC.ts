@@ -58,7 +58,7 @@ export function AgileHOC(
     }
   }
   if (!agileInstance || !agileInstance.subController) {
-    LogCodeManager.getLogger().error(
+    LogCodeManager.getLogger()?.error(
       'Failed to subscribe Component with deps',
       deps
     );

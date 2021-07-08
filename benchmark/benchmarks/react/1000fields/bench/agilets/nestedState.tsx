@@ -27,7 +27,7 @@ export default function (target: HTMLElement, fieldsCount: number) {
         <input
           value={name}
           onChange={(e) => {
-            // field.set(e.target.value);
+            field.set(e.target.value);
 
             updatedFieldsCount++;
 

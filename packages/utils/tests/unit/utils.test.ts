@@ -15,12 +15,12 @@ import {
   createArrayFromObject,
   removeProperties,
 } from '../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../../core/tests/helper/logMock';
 
 describe('Utils Tests', () => {
   beforeEach(() => {
+    LogMock.mockLogs();
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
   });
 
   describe('copy function tests', () => {

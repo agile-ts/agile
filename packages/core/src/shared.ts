@@ -184,7 +184,7 @@ export function createComputed<ComputedValueType = any>(
 export interface CreateAgileSubInstanceInterface {
   /**
    * Instance of Agile the Instance belongs to.
-   * @default Agile.shared
+   * @default sharedAgileInstance
    */
   agileInstance?: Agile;
 }

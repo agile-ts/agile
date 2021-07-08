@@ -7,7 +7,6 @@ import {
   Storage,
   Computed,
   Collection,
-  Logger,
   Storages,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
@@ -77,7 +76,6 @@ describe('Agile Tests', () => {
     // Reset globalThis
     globalThis[Agile.globalKey] = undefined;
 
-    jest.spyOn(Agile.prototype, 'configureLogger');
     jest.spyOn(Agile.prototype, 'integrate');
 
     jest.clearAllMocks();
@@ -100,10 +98,9 @@ describe('Agile Tests', () => {
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
     expect(StoragesMock).toHaveBeenCalledWith(agile, {
-      localStorage: true,
+      localStorage: false,
     });
     expect(agile.storages).toBeInstanceOf(Storages);
-    expect(agile.configureLogger).toHaveBeenCalledWith({});
 
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBeUndefined();
@@ -113,13 +110,7 @@ describe('Agile Tests', () => {
     const agile = new Agile({
       waitForMount: false,
       bucket: false,
-      localStorage: false,
-      logConfig: {
-        level: Logger.level.DEBUG,
-        active: false,
-        prefix: 'Jeff',
-        timestamp: true,
-      },
+      localStorage: true,
       bindGlobal: true,
       key: 'jeff',
       autoIntegrate: false,
@@ -139,15 +130,9 @@ describe('Agile Tests', () => {
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
     expect(StoragesMock).toHaveBeenCalledWith(agile, {
-      localStorage: false,
+      localStorage: true,
     });
     expect(agile.storages).toBeInstanceOf(Storages);
-    expect(agile.configureLogger).toHaveBeenCalledWith({
-      active: false,
-      level: Logger.level.DEBUG,
-      prefix: 'Jeff',
-      timestamp: true,
-    });
 
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBe(agile);
@@ -180,31 +165,6 @@ describe('Agile Tests', () => {
     beforeEach(() => {
       agile = new Agile();
       jest.clearAllMocks(); // Because creating the Agile Instance calls some mocks
-    });
-
-    describe('configureLogger function tests', () => {
-      it('should overwrite the static Logger with a new Logger Instance', () => {
-        Agile.logger.config = 'outdated' as any;
-
-        agile.configureLogger({
-          active: true,
-          level: 0,
-        });
-
-        expect(Agile.logger.config).toStrictEqual({
-          canUseCustomStyles: true,
-          level: 0,
-          prefix: 'Agile',
-          timestamp: false,
-        });
-        expect(Agile.logger.isActive).toBeTruthy();
-        expect(Agile.logger.allowedTags).toStrictEqual([
-          'runtime',
-          'storage',
-          'subscription',
-          'multieditor',
-        ]);
-      });
     });
 
     describe('createStorage function tests', () => {
