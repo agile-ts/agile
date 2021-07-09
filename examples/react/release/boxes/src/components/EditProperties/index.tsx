@@ -136,8 +136,8 @@ const Property = ({
   id: number | string;
 }) => {
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
-  const element = useProxy(ELEMENT, { componentId: 'Property' });
-  console.log('Element', ELEMENT);
+  const element = useProxy(ELEMENT, { componentId: 'Property', deps: [id] });
+
   return (
     <PropertyInput
       label={label}
