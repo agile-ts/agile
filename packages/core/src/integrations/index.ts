@@ -42,6 +42,9 @@ export class Integrations {
     callback: (integration: Integration) => void
   ): void {
     onRegisterInitialIntegrationCallbacks.push(callback);
+    Integrations.initialIntegrations.forEach((integration) => {
+      callback(integration);
+    });
   }
 
   /**
@@ -60,11 +63,6 @@ export class Integrations {
     this.agileInstance = () => agileInstance;
 
     if (config.autoIntegrate) {
-      // Integrate Integrations to be initially integrated
-      Integrations.initialIntegrations.forEach((integration) => {
-        this.integrate(integration);
-      });
-
       // Setup listener to be notified when an external registered Integration was added
       Integrations.onRegisterInitialIntegration((integration) => {
         this.integrate(integration);
@@ -82,7 +80,11 @@ export class Integrations {
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
     if (integration._key == null) {
-      LogCodeManager.log('18:03:00', [integration._key], integration);
+      LogCodeManager.log(
+        '18:03:00',
+        [integration._key, this.agileInstance().key],
+        integration
+      );
       return false;
     }
 
@@ -95,7 +97,11 @@ export class Integrations {
     this.integrations.add(integration);
     integration.integrated = true;
 
-    LogCodeManager.log('18:00:00', [integration._key], integration);
+    LogCodeManager.log(
+      '18:00:00',
+      [integration._key, this.agileInstance().key],
+      integration
+    );
 
     return true;
   }

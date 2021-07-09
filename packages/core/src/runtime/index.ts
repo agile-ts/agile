@@ -28,6 +28,8 @@ export class Runtime {
   // Whether the `jobQueue` is currently being actively processed
   public isPerformingJobs = false;
 
+  private bucketTimeout: NodeJS.Timeout | null = null;
+
   /**
    * The Runtime queues and executes incoming Observer-based Jobs
    * to prevent [race conditions](https://en.wikipedia.org/wiki/Race_condition#:~:text=A%20race%20condition%20or%20race,the%20possible%20behaviors%20is%20undesirable.)
@@ -120,10 +122,16 @@ export class Runtime {
       this.isPerformingJobs = false;
       if (this.jobsToRerender.length > 0) {
         if (this.agileInstance().config.bucket) {
-          // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
-          setTimeout(() => {
-            this.updateSubscribers();
-          });
+          // Check if an bucket timeout is active, if so don't call a new one,
+          // since if the active timeout is called it will also proceed Jobs
+          // that were not added before the call
+          if (this.bucketTimeout == null) {
+            // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
+            this.bucketTimeout = setTimeout(() => {
+              this.bucketTimeout = null;
+              this.updateSubscribers();
+            });
+          }
         } else this.updateSubscribers();
       }
     }

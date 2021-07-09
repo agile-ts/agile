@@ -103,10 +103,10 @@ const logCodeMessages = {
     "The 'perform()' method isn't set in Observer but need to be set! Observer is no stand alone class.",
 
   // Integrations
-  '18:00:00': "Integrated '${0}' into AgileTs",
+  '18:00:00': "Integrated '${0}' into AgileTs '${1}'",
   '18:02:00':
     "Can't call the 'update()' method on a not ready Integration '${0}'!",
-  '18:03:00': "Failed to integrate Framework '${0}'!",
+  '18:03:00': "Failed to integrate Framework '${0}' into AgileTs '${1}'!",
 
   // Computed
   '19:03:00':

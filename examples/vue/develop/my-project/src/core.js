@@ -1,19 +1,22 @@
-import { Agile, globalBind, Logger } from '@agile-ts/core';
-import vueIntegration from '@agile-ts/vue';
+import { Agile, assignSharedAgileInstance, globalBind } from '@agile-ts/core';
+import { Logger, assignSharedAgileLoggerConfig } from '@agile-ts/logger';
+import '@agile-ts/vue';
+
+assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 
 // Create Agile Instance
-export const App = new Agile({
-  logConfig: { level: Logger.level.DEBUG },
-}).integrate(vueIntegration);
+export const App = new Agile({ localStorage: true });
+assignSharedAgileInstance(App);
 
 // console.debug('hi'); // Doesn't work here idk why
 
 // Create State
 export const MY_STATE = App.createState('World', {
   key: 'my-state',
-}).computeValue((v) => {
-  return `Hello ${v}`;
-});
+})
+  .computeValue((v) => {
+    return `Hello ${v}`;
+  });
 
 export const MY_COMPUTED = App.createComputed(
   async () => {
