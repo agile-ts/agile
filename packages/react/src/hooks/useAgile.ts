@@ -73,6 +73,7 @@ export function useAgile<
     agileInstance: null,
     componentId: undefined,
     observerType: undefined,
+    deps: [],
   });
   const depsArray = extractRelevantObservers(
     normalizeArray(deps),
@@ -202,7 +203,7 @@ export function useAgile<
     return () => {
       agileInstance?.subController.unsubscribe(subscriptionContainer);
     };
-  }, []);
+  }, config.deps);
 
   return getReturnValue(depsArray);
 }
@@ -261,4 +262,13 @@ export interface AgileHookConfigInterface {
    * @default undefined
    */
   observerType?: string;
+  /**
+   * Dependencies that determine, in addition to unmounting and remounting the React-Component,
+   * when the specified Agile Sub Instances should be re-subscribed to the React-Component.
+   *
+   * [Github issue](https://github.com/agile-ts/agile/issues/170)
+   *
+   * @default []
+   */
+  deps?: any[];
 }
