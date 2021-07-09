@@ -65,6 +65,7 @@ const logCodeMessages = {
     "The Storage with the key/name '${1}' doesn't exists!`",
 
   // Storage
+  '13:00:00': "Registered new Storage '${0}'.",
   '13:01:00': "GET value at key '${1}' from Storage '${0}'.",
   '13:01:01': "SET value at key '${1}' in Storage '${0}'.",
   '13:01:02': "REMOVE value at key '${1}' from Storage '${0}'.",

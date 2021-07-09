@@ -115,6 +115,8 @@ export class Storages {
       }
     });
 
+    LogCodeManager.log('13:00:00', [storage.key], storage);
+
     return true;
   }
 

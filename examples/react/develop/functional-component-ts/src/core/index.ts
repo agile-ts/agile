@@ -4,10 +4,10 @@ import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
 
 export const myStorage: any = {};
 
+assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 export const App = new Agile({
   localStorage: true,
 });
-assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 
 // Register custom second Storage
 App.registerStorage(
