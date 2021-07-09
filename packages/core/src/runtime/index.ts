@@ -28,7 +28,8 @@ export class Runtime {
   // Whether the `jobQueue` is currently being actively processed
   public isPerformingJobs = false;
 
-  private bucketTimeout: NodeJS.Timeout | null = null;
+  // Current 'bucket' timeout 'scheduled' for updating the Subscribers (UI-Components)
+  public bucketTimeout: NodeJS.Timeout | null = null;
 
   /**
    * The Runtime queues and executes incoming Observer-based Jobs

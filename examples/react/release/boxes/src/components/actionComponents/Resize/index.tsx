@@ -40,8 +40,6 @@ export const Resize: React.FC<ResizePropsInterface> = (props) => {
       width={size.width}
       height={size.height}
       onResize={(_, { size: newSize, handle }) => {
-        console.debug('onResize', size);
-
         let topDiff = 0;
         if (handle.includes('n')) {
           topDiff = size.height - newSize.height;

@@ -187,6 +187,7 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
 ): string {
   let result = logCodeMessages[logCode] ?? `'${logCode}' is a unknown logCode!`;
 
+  // Replace '${x}' with the specified replacer instances
   for (let i = 0; i < replacers.length; i++) {
     result = result.replace('${' + i + '}', replacers[i]);
   }
@@ -196,7 +197,7 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
 
 /**
  * Logs the log message according to the specified log code
- * with the Agile Logger.
+ * with the Agile Logger if installed or the normal console.
  *
  * @internal
  * @param logCode - Log code of the message to be returned.
@@ -227,7 +228,7 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
 
 /**
  * Logs the log message according to the specified log code
- * with the Agile Logger if the provided tags are active.
+ * with the Agile Logger if installed and the provided tags are active.
  *
  * @internal
  * @param tags - Tags to be active to log the logCode.

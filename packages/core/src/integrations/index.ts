@@ -12,14 +12,14 @@ export class Integrations {
   public integrations: Set<Integration> = new Set();
 
   // External added Integrations
-  // that are to integrate into each created Agile Instance
+  // that are to integrate into not yet existing Agile Instances
   static initialIntegrations: Integration[] = [];
 
   /**
-   * Adds an external Integration to be registered in each Agile Instance created.
+   * Registers the specified Integration in each existing or not-yet created Agile Instance.
    *
    * @public
-   * @param integration - Integration to be registered in each Agile Instance created.
+   * @param integration - Integration to be registered in each Agile Instance.
    */
   static addInitialIntegration(integration: Integration): void {
     if (integration instanceof Integration) {
@@ -36,7 +36,7 @@ export class Integrations {
    * Fires on each external added Integration.
    *
    * @public
-   * @param callback - Callback to be fired when an Integration was added externally.
+   * @param callback - Callback to be fired when an Integration was externally added.
    */
   static onRegisterInitialIntegration(
     callback: (integration: Integration) => void

@@ -31,6 +31,7 @@ describe('Runtime Tests', () => {
     expect(runtime.jobsToRerender).toStrictEqual([]);
     expect(Array.from(runtime.notReadyJobsToRerender)).toStrictEqual([]);
     expect(runtime.isPerformingJobs).toBeFalsy();
+    expect(runtime.bucketTimeout).toBeNull();
   });
 
   describe('Runtime Function Tests', () => {
@@ -112,10 +113,11 @@ describe('Runtime Tests', () => {
 
       it(
         "should perform specified Job and all remaining Jobs in the 'jobQueue' " +
-          "and call 'updateSubscribers' in a setTimeout " +
+          "and call 'updateSubscribers' in a setTimeout (bucket) " +
           'if at least one performed Job needs to rerender (config.bucket = true)',
         async () => {
           runtime.agileInstance().config.bucket = true;
+          runtime.bucketTimeout = null;
           runtime.jobQueue.push(dummyJob2);
           runtime.jobQueue.push(dummyJob3);
 
@@ -131,10 +133,12 @@ describe('Runtime Tests', () => {
           expect(runtime.isPerformingJobs).toBeFalsy(); // because Jobs were performed
           expect(runtime.jobQueue).toStrictEqual([]);
           expect(runtime.jobsToRerender).toStrictEqual([dummyJob1, dummyJob2]);
+          expect(runtime.bucketTimeout).not.toBeNull();
 
           // Because 'updateSubscribers' is called in a timeout
           await waitForExpect(() => {
             expect(runtime.updateSubscribers).toHaveBeenCalledTimes(1);
+            expect(runtime.bucketTimeout).toBeNull();
           });
         }
       );
@@ -145,12 +149,32 @@ describe('Runtime Tests', () => {
           'if at least one performed Job needs to rerender (config.bucket = false)',
         async () => {
           runtime.agileInstance().config.bucket = false;
+          runtime.bucketTimeout = null;
           runtime.jobQueue.push(dummyJob2);
           runtime.jobQueue.push(dummyJob3);
 
           runtime.perform(dummyJob1);
 
+          expect(runtime.bucketTimeout).toBeNull();
+
           expect(runtime.updateSubscribers).toHaveBeenCalledTimes(1);
+        }
+      );
+
+      it(
+        "should perform specified Job and all remaining Jobs in the 'jobQueue' " +
+          "and shouldn't call 'updateSubscribers' although at least one performed Job needs to rerender" +
+          'if a bucket timeout is already active (config.bucket = true)',
+        async () => {
+          runtime.agileInstance().config.bucket = true;
+          runtime.bucketTimeout = 'notNull' as any;
+          runtime.jobQueue.push(dummyJob2);
+          runtime.jobQueue.push(dummyJob3);
+
+          runtime.perform(dummyJob1);
+
+          expect(runtime.bucketTimeout).toBe('notNull');
+          expect(runtime.updateSubscribers).not.toHaveBeenCalled();
         }
       );
 
@@ -185,9 +209,7 @@ describe('Runtime Tests', () => {
           expect(runtime.isPerformingJobs).toBeFalsy(); // because Jobs were performed
           expect(runtime.jobQueue).toStrictEqual([]);
           expect(runtime.jobsToRerender).toStrictEqual([]);
-
-          // Sleep 5ms because updateSubscribers is called in a timeout
-          await new Promise((resolve) => setTimeout(resolve, 5));
+          expect(runtime.bucketTimeout).toBeNull();
 
           expect(runtime.updateSubscribers).not.toHaveBeenCalled();
         }
