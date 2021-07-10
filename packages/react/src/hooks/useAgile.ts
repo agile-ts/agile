@@ -6,7 +6,6 @@ import {
   Observer,
   State,
   SubscriptionContainerKeyType,
-  defineConfig,
   isValidObject,
   generateId,
   ProxyWeakMapType,
@@ -67,14 +66,15 @@ export function useAgile<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
-  config = defineConfig(config, {
+  config = {
     key: generateId(),
     proxyBased: false,
-    agileInstance: null,
+    agileInstance: null as any,
     componentId: undefined,
     observerType: undefined,
     deps: [],
-  });
+    ...config,
+  };
   const depsArray = extractRelevantObservers(
     normalizeArray(deps),
     config.observerType

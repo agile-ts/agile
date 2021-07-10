@@ -1,5 +1,4 @@
 import {
-  defineConfig,
   generateId,
   includesArray,
   isFunction,
@@ -23,14 +22,15 @@ export class Logger {
    */
   constructor(config: LoggerConfig = {}) {
     let _config = typeof config === 'function' ? config(this) : config;
-    _config = defineConfig(_config, {
+    _config = {
       prefix: '',
       allowedTags: [],
       canUseCustomStyles: true,
       active: true,
       level: 0,
       timestamp: false,
-    });
+      ..._config,
+    };
     this.isActive = _config.active as any;
     this.allowedTags = _config.allowedTags as any;
     this.config = {
@@ -313,10 +313,12 @@ export class Logger {
    * @param loggerCategory - Logger Category
    */
   public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
-    loggerCategory = defineConfig(loggerCategory, {
+    loggerCategory = {
       prefix: '',
+      // @ts-ignore
       level: 0,
-    });
+      ...loggerCategory,
+    };
     this.loggerCategories[loggerCategory.key] = loggerCategory;
   }
 
@@ -365,9 +367,10 @@ export class Logger {
       _config = config as LoggerWatcherConfigInterface;
     }
 
-    _config = defineConfig(_config, {
+    _config = {
       level: 0,
-    });
+      ..._config,
+    };
 
     // Check if Callback is a Function
     if (!isFunction(_config.callback)) {

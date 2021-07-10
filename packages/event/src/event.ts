@@ -1,6 +1,5 @@
 import {
   Agile,
-  defineConfig,
   generateId,
   isFunction,
   LogCodeManager,
@@ -34,14 +33,15 @@ export class Event<PayloadType = DefaultEventPayload> {
    */
   constructor(agileInstance: Agile, config: CreateEventConfigInterface = {}) {
     this.agileInstance = () => agileInstance;
-    config = defineConfig<CreateEventConfigInterface>(config, {
+    config = {
       enabled: true,
       rerender: false,
       maxUses: undefined,
       delay: undefined,
       overlap: false,
       dependents: [],
-    });
+      ...config,
+    };
     this._key = config.key;
     this.observer = new EventObserver(this, {
       key: config.key,

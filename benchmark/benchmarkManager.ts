@@ -37,9 +37,7 @@ export function endBenchmarkLog(
   results: CycleResultInterface[],
   fastest: string[]
 ): void {
-  console.log(
-    `{white ..End Benchmark "{magenta.bold ${testSuiteName}}"..}\n\n`
-  );
+  console.log(`{white ..End Benchmark "{magenta.bold ${testSuiteName}}"}\n\n`);
 
   results.sort((a, b) => {
     if (a.opsInSec < b.opsInSec) return 1;
@@ -57,7 +55,7 @@ export function endBenchmarkLog(
       .padEnd(20, '.')
       .replace(/(\.+)$/, '{red $1}')}}{yellow ${
       cycleResult.opsInSec
-    } ops/se} ±${cycleResult.failRate} (${
+    } ops/se} {gray ±${cycleResult.failRate}%} (${
       cycleResult.ranSampleCount
     } runs sampled)`;
 

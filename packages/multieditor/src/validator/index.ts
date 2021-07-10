@@ -1,11 +1,4 @@
-import {
-  Agile,
-  copy,
-  defineConfig,
-  generateId,
-  isFunction,
-  LogCodeManager,
-} from '@agile-ts/core';
+import { copy, generateId, isFunction, LogCodeManager } from '@agile-ts/core';
 import {
   DataObject,
   MultiEditor,
@@ -25,9 +18,10 @@ export class Validator<DataType = any> {
    * @param config - Config
    */
   constructor(config: ValidatorConfigInterface = {}) {
-    this.config = defineConfig(config, {
+    this.config = {
       prefix: 'default',
-    });
+      ...config,
+    };
     this._key = this.config.key;
   }
 

@@ -2,7 +2,6 @@ import { Status, StatusInterface } from '../internal';
 import {
   Agile,
   copy,
-  defineConfig,
   equal,
   IngestConfigInterface,
   Observer,
@@ -45,7 +44,7 @@ export class StatusObserver extends Observer {
    * @param config - Config
    */
   public assign(config: StatusIngestConfigInterface = {}): void {
-    config = defineConfig(config, {
+    config = {
       perform: true,
       background: false,
       sideEffects: {
@@ -53,7 +52,8 @@ export class StatusObserver extends Observer {
         exclude: [],
       },
       force: false,
-    });
+      ...config,
+    };
 
     // Set Next Status Value
     this.nextValue = copy(this.status().nextValue);

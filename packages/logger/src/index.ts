@@ -1,5 +1,4 @@
 import { CreateLoggerConfigInterface, Logger } from './logger';
-import { defineConfig } from '@agile-ts/utils';
 
 const defaultLogConfig = {
   prefix: 'Agile',
@@ -23,7 +22,7 @@ let sharedAgileLogger = new Logger(defaultLogConfig);
 function assignSharedAgileLoggerConfig(
   config: CreateLoggerConfigInterface = {}
 ): Logger {
-  config = defineConfig(config, defaultLogConfig);
+  config = { ...defaultLogConfig, ...config };
   sharedAgileLogger = new Logger(config);
   return sharedAgileLogger;
 }

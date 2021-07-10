@@ -88,9 +88,10 @@ export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
   config: { createUndefinedArray?: boolean } = {}
 ): Array<DataType> {
-  config = defineConfig(config, {
+  config = {
     createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
-  });
+    ...config,
+  };
   if (items == null && !config.createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
@@ -143,34 +144,6 @@ export function isJsonString(value: any): boolean {
 }
 
 //=========================================================================================================
-// Define Config
-//=========================================================================================================
-/**
- * @internal
- * Merges default values/properties into config object
- * @param config - Config object that receives default values
- * @param defaults - Default values object that gets merged into config object
- * @param overwriteUndefinedProperties - If undefined Properties in config gets overwritten by the default value
- */
-export function defineConfig<ConfigInterface = Object>(
-  config: ConfigInterface,
-  defaults: Object,
-  overwriteUndefinedProperties?: boolean
-): ConfigInterface {
-  if (overwriteUndefinedProperties === undefined)
-    overwriteUndefinedProperties = true;
-
-  if (overwriteUndefinedProperties) {
-    const finalConfig = { ...defaults, ...config };
-    for (const key in finalConfig)
-      if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
-    return finalConfig;
-  }
-
-  return { ...defaults, ...config };
-}
-
-//=========================================================================================================
 // Flat Merge
 //=========================================================================================================
 /**
@@ -194,9 +167,10 @@ export function flatMerge<DataType = Object>(
   changes: Object,
   config: FlatMergeConfigInterface = {}
 ): DataType {
-  config = defineConfig(config, {
+  config = {
     addNewProperties: true,
-  });
+    ...config,
+  };
 
   // Copy Source to avoid References
   const _source = copy<DataType>(source);

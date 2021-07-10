@@ -1,6 +1,5 @@
 import {
   CreateAgileSubInstanceInterface,
-  defineConfig,
   removeProperties,
   shared,
 } from '@agile-ts/core';
@@ -13,9 +12,10 @@ import {
 export function createEvent<PayloadType = DefaultEventPayload>(
   config: CreateEventConfigInterfaceWithAgile = {}
 ): Event<PayloadType> {
-  config = defineConfig(config, {
+  config = {
     agileInstance: shared,
-  });
+    ...config,
+  };
   return new Event<PayloadType>(
     config.agileInstance as any,
     removeProperties(config, ['agileInstance'])
