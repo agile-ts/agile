@@ -145,7 +145,7 @@ export class CollectionPersistent<
           // that it was loaded completely and exists at all
           dummyItem?.persist(itemStorageKey, {
             loadValue: false,
-            defaultStorageKey: this.config.defaultStorageKey || undefined,
+            defaultStorageKey: this.config.defaultStorageKey as any,
             storageKeys: this.storageKeys,
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
