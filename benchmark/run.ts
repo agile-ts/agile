@@ -17,7 +17,7 @@ if (entry == null) {
 }
 
 const startBenchmark = async () => {
-  console.log(chalk.blue('Starting the benchmark server..'));
+  console.log(chalk.blue('Starting the benchmark server..\n'));
 
   // Bundle Benchmark Test Suite
   // and launch the server on which the Test Suite is executed
@@ -42,9 +42,9 @@ const startBenchmark = async () => {
   const serverUrl = `http://${server.host}:${server.port}`;
 
   console.log(
-    chalk.cyan(
-      `Server is running at port: ${chalk.magenta.bold(server.port)}\n`
-    )
+    `${chalk.blue('[i]')} ${chalk.gray(
+      `Server is running at port: ${chalk.blueBright.bold(server.port)}`
+    )}`
   );
 
   // Launch Chrome as browser to run the Benchmark Test Suite in
@@ -56,12 +56,14 @@ const startBenchmark = async () => {
   if (process.env.MANUAL_BENCHMARK === 'true') {
     console.log(
       `${chalk.blue('[i]')} ${chalk.gray(
-        `Benchmark is running at ${chalk.blue.bold(serverUrl)}`
+        `Benchmark is running at ${chalk.blueBright.bold(serverUrl)}`
       )}`
     );
 
     await server.wait;
   }
+
+  console.log('\n');
 
   // Setup 'pageerror' listener to throw occurring errors in the local console
   // https://playwright.dev/docs/api/class-page/#page-event-page-error

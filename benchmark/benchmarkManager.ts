@@ -19,12 +19,16 @@ export function getCycleResult(event: any): CycleResultInterface {
 }
 
 export function startBenchmarkLog(testSuiteName: string): void {
-  console.log(`{white Starting Benchmark "{cyan.bold ${testSuiteName}}"..}`);
+  console.log(`{white Starting Benchmark "{magenta.bold ${testSuiteName}}"..}`);
 }
 
-export function cycleLog(cycleResult: CycleResultInterface): void {
+export function cycleLog(
+  cycleResult: CycleResultInterface,
+  ...addition: any[]
+): void {
   console.log(
-    `{gray ..Proceeded {green.bold ${cycleResult.name}} - {yellow ${cycleResult.opsInSec} ops/sec}}`
+    `{gray ..Proceeded {green.bold ${cycleResult.name}} - {yellow ${cycleResult.opsInSec} ops/sec}}`,
+    ...addition
   );
 }
 
@@ -33,7 +37,9 @@ export function endBenchmarkLog(
   results: CycleResultInterface[],
   fastest: string[]
 ): void {
-  console.log(`{white ..End Benchmark "{cyan.bold ${testSuiteName}}"..}\n\n`);
+  console.log(
+    `{white ..End Benchmark "{magenta.bold ${testSuiteName}}"..}\n\n`
+  );
 
   results.sort((a, b) => {
     if (a.opsInSec < b.opsInSec) return 1;
@@ -48,7 +54,7 @@ export function endBenchmarkLog(
     const cycleString = `{bold.bgGreen ${
       i + 1
     }.} {bold.blue ${cycleResult.name
-      .padEnd(15, '.')
+      .padEnd(20, '.')
       .replace(/(\.+)$/, '{red $1}')}}{yellow ${
       cycleResult.opsInSec
     } ops/se} ±${cycleResult.failRate} (${

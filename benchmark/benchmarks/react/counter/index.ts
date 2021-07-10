@@ -81,7 +81,7 @@ suite
   })
   .on('cycle', (event: any) => {
     const cycleResult = getCycleResult(event);
-    cycleLog(cycleResult);
+    cycleLog(cycleResult, `[Count: ${event.target.output}]`);
     results.push(cycleResult);
   })
   .on('complete', function (this: any) {

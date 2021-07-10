@@ -15,6 +15,13 @@ import nanostores from './bench/nanostores';
 import recoil from './bench/recoil';
 import redux from './bench/redux';
 import valtio from './bench/valtio';
+import {
+  cycleLog,
+  CycleResultInterface,
+  endBenchmarkLog,
+  getCycleResult,
+  startBenchmarkLog,
+} from '../../../benchmarkManager';
 
 // @ts-ignore
 // Benchmark.js requires an instance of itself globally
@@ -66,14 +73,16 @@ function configTest(
   };
 }
 
+const results: CycleResultInterface[] = [];
+
 // Add Tests to the Benchmark Test Suite
 suite
   .add('Agile Collection', configTest(agileCollection))
   .add('Agile State', configTest(agileState))
   .add('Agile nested State', configTest(agileNestedState))
   .add('Pulse Collection', configTest(pulseCollection))
-  .add('Pulse State', configTest(pulseState))
-  .add('Pulse nested State', configTest(pulseNestedState))
+  // .add('Pulse State', configTest(pulseState))
+  // .add('Pulse nested State', configTest(pulseNestedState))
   .add('Hookstate', configTest(hookstate))
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))
@@ -84,16 +93,18 @@ suite
 
   // Add Listener
   .on('start', function (this: any) {
-    console.log(`Starting ${this.name}`);
+    startBenchmarkLog(this.name);
   })
   .on('cycle', (event: any) => {
-    console.log(
-      String(event.target),
+    const cycleResult = getCycleResult(event);
+    cycleLog(
+      cycleResult,
       `[updatedFieldsCount: ${event.target.updatedFieldsCount}, renderFieldsCount: ${event.target.renderFieldsCount}]`
     );
+    results.push(cycleResult);
   })
   .on('complete', function (this: any) {
-    console.log(`Fastest is ${this.filter('fastest').map('name')}`);
+    endBenchmarkLog(this.name, results, this.filter('fastest').map('name'));
 
     // @ts-ignore
     // Notify server that the Benchmark Test Suite has ended
