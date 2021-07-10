@@ -10,20 +10,19 @@ https://stackoverflow.com/questions/28524653/what-do-the-results-from-benchmark-
 ## Counter Benchmark
 
 ```ts
-1. PulseJs.............41599 ops/se ±1.04 (61 runs sampled)
-2. AgileTs.............40847 ops/se ±2.55 (61 runs sampled)
-3. Nano Stores.........32107 ops/se ±1.27 (64 runs sampled)
-4. Zustand.............29314 ops/se ±1.40 (62 runs sampled)
-5. Redux...............29111 ops/se ±1.29 (66 runs sampled)
-6. Hookstate...........28380 ops/se ±4.79 (61 runs sampled)
-7. Mobx................27800 ops/se ±2.89 (64 runs sampled)
-8. Jotai...............22926 ops/se ±4.17 (64 runs sampled)
-9. Redux-Toolkit.......22157 ops/se ±2.26 (65 runs sampled)
-10. Valtio..............20401 ops/se ±1.30 (63 runs sampled)
-11. Recoil..............13943 ops/se ±5.10 (59 runs sampled)
+1. AgileTs.............43028 ops/se ±2.45 (63 runs sampled)
+2. PulseJs.............41086 ops/se ±2.60 (63 runs sampled)
+3. Nano Stores.........31933 ops/se ±1.27 (63 runs sampled)
+4. Zustand.............29329 ops/se ±1.30 (62 runs sampled)
+5. Redux...............28845 ops/se ±2.47 (61 runs sampled)
+6. Hookstate...........27555 ops/se ±5.00 (59 runs sampled)
+7. Mobx................27427 ops/se ±3.69 (62 runs sampled)
+8. Redux-Toolkit.......22191 ops/se ±1.06 (65 runs sampled)
+9. Jotai...............22157 ops/se ±4.10 (63 runs sampled)
+10. Valtio..............21089 ops/se ±0.77 (63 runs sampled)
+11. Recoil..............13926 ops/se ±2.12 (62 runs sampled)
 
-Fastest is PulseJs
-
+Fastest is AgileTs
 ```
 
 ## 1000 Fields

@@ -6,7 +6,6 @@ import {
   CallbackSubscriptionContainer,
   isFunction,
   SubscriptionContainerConfigInterface,
-  defineConfig,
   removeProperties,
   LogCodeManager,
 } from '../../internal';
@@ -113,9 +112,10 @@ export class SubController {
         subscriptionContainer: SubscriptionContainer;
         props: { [key: string]: Observer['value'] };
       } {
-    config = defineConfig(config, {
+    config = {
       waitForMount: this.agileInstance().config.waitForMount,
-    });
+      ...config,
+    };
 
     // Create Subscription Container based on specified 'integrationInstance'
     const subscriptionContainer = isFunction(integrationInstance)

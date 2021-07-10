@@ -13,7 +13,6 @@ import {
   Storages,
   CreateStorageConfigInterface,
   RegisterConfigInterface,
-  defineConfig,
   StateConfigInterface,
   flatMerge,
   LogCodeManager,
@@ -73,14 +72,14 @@ export class Agile {
    * @param config - Configuration object
    */
   constructor(config: CreateAgileConfigInterface = {}) {
-    config = defineConfig(config, {
+    config = {
       localStorage: false,
       waitForMount: true,
-      logConfig: {},
       bindGlobal: false,
       autoIntegrate: true,
       bucket: true,
-    });
+      ...config,
+    };
     this.config = {
       waitForMount: config.waitForMount as any,
       bucket: config.bucket as any,

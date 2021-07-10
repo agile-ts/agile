@@ -1,4 +1,4 @@
-import { Agile, defineConfig, Integration, LogCodeManager } from '../internal';
+import { Agile, Integration, LogCodeManager } from '../internal';
 
 const onRegisterInitialIntegrationCallbacks: ((
   integration: Integration
@@ -57,9 +57,10 @@ export class Integrations {
    * @param config - Configuration object
    */
   constructor(agileInstance: Agile, config: IntegrationsConfigInterface = {}) {
-    config = defineConfig(config, {
+    config = {
       autoIntegrate: true,
-    });
+      ...config,
+    };
     this.agileInstance = () => agileInstance;
 
     if (config.autoIntegrate) {

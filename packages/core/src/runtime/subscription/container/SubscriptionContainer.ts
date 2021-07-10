@@ -1,9 +1,4 @@
-import {
-  defineConfig,
-  generateId,
-  isValidObject,
-  Observer,
-} from '../../../internal';
+import { generateId, isValidObject, Observer } from '../../../internal';
 
 export class SubscriptionContainer {
   /**
@@ -110,9 +105,10 @@ export class SubscriptionContainer {
     subs: Array<Observer> | { [key: string]: Observer },
     config: SubscriptionContainerConfigInterface = {}
   ) {
-    config = defineConfig(config, {
+    config = {
       key: generateId(),
-    });
+      ...config,
+    };
 
     this.subscribers = new Set();
     this.key = config.key;

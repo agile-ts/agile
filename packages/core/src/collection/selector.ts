@@ -1,7 +1,6 @@
 import {
   Collection,
   DefaultItem,
-  defineConfig,
   Item,
   ItemKey,
   State,
@@ -41,9 +40,10 @@ export class Selector<
     itemKey: ItemKey | null,
     config: SelectorConfigInterface = {}
   ) {
-    config = defineConfig(config, {
+    config = {
       isPlaceholder: false,
-    });
+      ...config,
+    };
     super(collection.agileInstance(), null, config);
     this.collection = () => collection;
     this._item = null;
@@ -116,7 +116,7 @@ export class Selector<
     itemKey: ItemKey | null,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    config = {
       background: false,
       sideEffects: {
         enabled: true,
@@ -125,7 +125,8 @@ export class Selector<
       force: false,
       overwrite: this._item?.isPlaceholder ?? false,
       storage: true,
-    });
+      ...config,
+    };
 
     // Don't select Item if Collection is not correctly instantiated yet
     // (because only after a successful instantiation the Collection

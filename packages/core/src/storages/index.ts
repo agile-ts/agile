@@ -1,7 +1,6 @@
 import {
   Agile,
   Storage,
-  defineConfig,
   Persistent,
   StorageKey,
   StorageItemKey,
@@ -34,10 +33,11 @@ export class Storages {
     config: CreateStoragesConfigInterface = {}
   ) {
     this.agileInstance = () => agileInstance;
-    config = defineConfig(config, {
+    config = {
       localStorage: false,
-      defaultStorageKey: null,
-    });
+      defaultStorageKey: null as any,
+      ...config,
+    };
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
     if (config.localStorage) this.instantiateLocalStorage();
   }

@@ -4,7 +4,6 @@ import {
   RuntimeJob,
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
-  defineConfig,
   notEqual,
   LogCodeManager,
 } from '../internal';
@@ -67,9 +66,10 @@ export class Runtime {
    * @param config - Configuration object
    */
   public ingest(job: RuntimeJob, config: IngestConfigInterface = {}): void {
-    config = defineConfig(config, {
+    config = {
       perform: !this.isPerformingJobs,
-    });
+      ...config,
+    };
 
     // Add specified Job to the queue
     this.jobQueue.push(job);
@@ -181,9 +181,13 @@ export class Runtime {
   public extractToUpdateSubscriptionContainer(
     jobs: Array<RuntimeJob>
   ): Array<SubscriptionContainer> {
+    // https://medium.com/@bretcameron/how-to-make-your-code-faster-using-javascript-sets-b432457a4a77
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
-    jobs.forEach((job) => {
+    // Using for loop for performance optimization
+    // https://stackoverflow.com/questions/43821759/why-array-foreach-is-slower-than-for-loop-in-javascript
+    for (let i = 0; i < jobs.length; i++) {
+      const job = jobs[i];
       job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
         let updateSubscriptionContainer = true;
 
@@ -235,7 +239,7 @@ export class Runtime {
 
         job.subscriptionContainersToUpdate.delete(subscriptionContainer);
       });
-    });
+    }
 
     return Array.from(subscriptionsToUpdate);
   }
@@ -252,7 +256,11 @@ export class Runtime {
   public updateSubscriptionContainer(
     subscriptionsToUpdate: Array<SubscriptionContainer>
   ): void {
-    subscriptionsToUpdate.forEach((subscriptionContainer) => {
+    // Using for loop for performance optimization
+    // https://stackoverflow.com/questions/43821759/why-array-foreach-is-slower-than-for-loop-in-javascript
+    for (let i = 0; i < subscriptionsToUpdate.length; i++) {
+      const subscriptionContainer = subscriptionsToUpdate[i];
+
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
         subscriptionContainer.callback();
@@ -265,7 +273,7 @@ export class Runtime {
         );
 
       subscriptionContainer.updatedSubscribers.clear();
-    });
+    }
 
     LogCodeManager.logIfTags(
       ['runtime'],

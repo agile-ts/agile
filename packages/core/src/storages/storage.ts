@@ -1,6 +1,5 @@
 import {
   isJsonString,
-  defineConfig,
   isAsyncFunction,
   isFunction,
   LogCodeManager,
@@ -27,10 +26,11 @@ export class Storage {
    * @param config - Configuration object
    */
   constructor(config: CreateStorageConfigInterface) {
-    config = defineConfig(config, {
+    config = {
       prefix: 'agile',
       async: false,
-    });
+      ...config,
+    };
     this.key = config.key;
     this.methods = config.methods;
     this.config = {

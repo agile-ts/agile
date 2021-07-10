@@ -3,7 +3,6 @@ import {
   CollectionKey,
   CreatePersistentConfigInterface,
   DefaultItem,
-  defineConfig,
   Group,
   GroupKey,
   ItemKey,
@@ -37,11 +36,12 @@ export class CollectionPersistent<
     super(collection.agileInstance(), {
       instantiate: false,
     });
-    config = defineConfig(config, {
+    config = {
       instantiate: true,
       storageKeys: [],
-      defaultStorageKey: null,
-    });
+      defaultStorageKey: null as any,
+      ...config,
+    };
     this.collection = () => collection;
     this.instantiatePersistent({
       key: config.key,
