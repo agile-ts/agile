@@ -43,7 +43,7 @@ Therefore, we have created a table that shows which versions fit together withou
 
 | @agile-ts/vue    | @agile-ts/core          | NPM Version              | Supported Vue   versions |
 | ---------------- | ----------------------- | ------------------------ | -------------------------|
-| v0.0.01+         | v0.0.16+                | v6+                      | 2.x (3.x not tested)     |
+| v0.1.1+          | v0.1.1+                 | v6+                      | 2.x (3.x not tested)     |
 
 _Older Versions aren't supported anymore_
 
