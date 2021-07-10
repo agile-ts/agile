@@ -1,12 +1,5 @@
 import ReactDOM from 'react-dom';
 import Benchmark, { Suite, Options } from 'benchmark';
-
-// Files to run the Benchmark on
-import agileAutoTracking from './bench/agilets/autoTracking';
-import agileHardCoded from './bench/agilets/hardCoded';
-import jotai from './bench/jotai';
-import nanostores from './bench/nanostores';
-import recoil from './bench/recoil';
 import {
   cycleLog,
   CycleResultInterface,
@@ -14,6 +7,13 @@ import {
   getCycleResult,
   startBenchmarkLog,
 } from '../../../benchmarkManager';
+
+// Files to run the Benchmark on
+import agileAutoTracking from './bench/agilets/autoTracking';
+import agileHardCoded from './bench/agilets/hardCoded';
+import jotai from './bench/jotai';
+import nanostores from './bench/nanostores';
+import recoil from './bench/recoil';
 
 // @ts-ignore
 // Benchmark.js requires an instance of itself globally

@@ -1,5 +1,12 @@
-import Benchmark, { Suite, Options } from 'benchmark';
 import ReactDOM from 'react-dom';
+import Benchmark, { Suite, Options } from 'benchmark';
+import {
+  cycleLog,
+  CycleResultInterface,
+  endBenchmarkLog,
+  getCycleResult,
+  startBenchmarkLog,
+} from '../../../benchmarkManager';
 
 // Files to run the Benchmark on
 import agileCollection from './bench/agilets/collection';
@@ -15,13 +22,6 @@ import nanostores from './bench/nanostores';
 import recoil from './bench/recoil';
 import redux from './bench/redux';
 import valtio from './bench/valtio';
-import {
-  cycleLog,
-  CycleResultInterface,
-  endBenchmarkLog,
-  getCycleResult,
-  startBenchmarkLog,
-} from '../../../benchmarkManager';
 
 // @ts-ignore
 // Benchmark.js requires an instance of itself globally
