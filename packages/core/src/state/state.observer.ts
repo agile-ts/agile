@@ -3,7 +3,6 @@ import {
   State,
   Computed,
   copy,
-  defineConfig,
   equal,
   notEqual,
   isFunction,
@@ -81,7 +80,7 @@ export class StateObserver<ValueType = any> extends Observer {
     config: StateIngestConfigInterface = {}
   ): void {
     const state = this.state();
-    config = defineConfig(config, {
+    config = {
       perform: true,
       background: false,
       sideEffects: {
@@ -92,7 +91,8 @@ export class StateObserver<ValueType = any> extends Observer {
       storage: true,
       overwrite: false,
       maxTriesToUpdate: 3,
-    });
+      ...config,
+    };
 
     // Force overwriting the State value if it is a placeholder.
     // After assigning a value to the State, the State is supposed to be no placeholder anymore.

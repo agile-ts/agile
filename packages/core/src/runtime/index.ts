@@ -4,7 +4,6 @@ import {
   RuntimeJob,
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
-  defineConfig,
   notEqual,
   LogCodeManager,
 } from '../internal';
@@ -27,6 +26,9 @@ export class Runtime {
 
   // Whether the `jobQueue` is currently being actively processed
   public isPerformingJobs = false;
+
+  // Current 'bucket' timeout 'scheduled' for updating the Subscribers (UI-Components)
+  public bucketTimeout: NodeJS.Timeout | null = null;
 
   /**
    * The Runtime queues and executes incoming Observer-based Jobs
@@ -64,16 +66,15 @@ export class Runtime {
    * @param config - Configuration object
    */
   public ingest(job: RuntimeJob, config: IngestConfigInterface = {}): void {
-    config = defineConfig(config, {
+    config = {
       perform: !this.isPerformingJobs,
-    });
+      ...config,
+    };
 
     // Add specified Job to the queue
     this.jobQueue.push(job);
 
-    Agile.logger.if
-      .tag(['runtime'])
-      .info(LogCodeManager.getLog('16:01:00', [job._key]), job);
+    LogCodeManager.logIfTags(['runtime'], '16:01:00', [job._key], job);
 
     // Run first Job from the queue
     if (config.perform) {
@@ -110,9 +111,7 @@ export class Runtime {
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 
-    Agile.logger.if
-      .tag(['runtime'])
-      .info(LogCodeManager.getLog('16:01:01', [job._key]), job);
+    LogCodeManager.logIfTags(['runtime'], '16:01:01', [job._key], job);
 
     // Perform Jobs as long as Jobs are left in the queue.
     // If no Job is left start updating (re-rendering) Subscription Container (UI-Components)
@@ -123,10 +122,18 @@ export class Runtime {
     } else {
       this.isPerformingJobs = false;
       if (this.jobsToRerender.length > 0) {
-        // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
-        setTimeout(() => {
-          this.updateSubscribers();
-        });
+        if (this.agileInstance().config.bucket) {
+          // Check if an bucket timeout is active, if so don't call a new one,
+          // since if the active timeout is called it will also proceed Jobs
+          // that were not added before the call
+          if (this.bucketTimeout == null) {
+            // https://stackoverflow.com/questions/9083594/call-settimeout-without-delay
+            this.bucketTimeout = setTimeout(() => {
+              this.bucketTimeout = null;
+              this.updateSubscribers();
+            });
+          }
+        } else this.updateSubscribers();
       }
     }
   }
@@ -174,9 +181,13 @@ export class Runtime {
   public extractToUpdateSubscriptionContainer(
     jobs: Array<RuntimeJob>
   ): Array<SubscriptionContainer> {
+    // https://medium.com/@bretcameron/how-to-make-your-code-faster-using-javascript-sets-b432457a4a77
     const subscriptionsToUpdate = new Set<SubscriptionContainer>();
 
-    jobs.forEach((job) => {
+    // Using for loop for performance optimization
+    // https://stackoverflow.com/questions/43821759/why-array-foreach-is-slower-than-for-loop-in-javascript
+    for (let i = 0; i < jobs.length; i++) {
+      const job = jobs[i];
       job.subscriptionContainersToUpdate.forEach((subscriptionContainer) => {
         let updateSubscriptionContainer = true;
 
@@ -228,7 +239,7 @@ export class Runtime {
 
         job.subscriptionContainersToUpdate.delete(subscriptionContainer);
       });
-    });
+    }
 
     return Array.from(subscriptionsToUpdate);
   }
@@ -245,7 +256,11 @@ export class Runtime {
   public updateSubscriptionContainer(
     subscriptionsToUpdate: Array<SubscriptionContainer>
   ): void {
-    subscriptionsToUpdate.forEach((subscriptionContainer) => {
+    // Using for loop for performance optimization
+    // https://stackoverflow.com/questions/43821759/why-array-foreach-is-slower-than-for-loop-in-javascript
+    for (let i = 0; i < subscriptionsToUpdate.length; i++) {
+      const subscriptionContainer = subscriptionsToUpdate[i];
+
       // Call 'callback function' if Callback based Subscription
       if (subscriptionContainer instanceof CallbackSubscriptionContainer)
         subscriptionContainer.callback();
@@ -258,11 +273,14 @@ export class Runtime {
         );
 
       subscriptionContainer.updatedSubscribers.clear();
-    });
+    }
 
-    Agile.logger.if
-      .tag(['runtime'])
-      .info(LogCodeManager.getLog('16:01:02'), subscriptionsToUpdate);
+    LogCodeManager.logIfTags(
+      ['runtime'],
+      '16:01:02',
+      [],
+      subscriptionsToUpdate
+    );
   }
 
   /**

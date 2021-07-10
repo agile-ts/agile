@@ -5,12 +5,13 @@ describe('Storages Tests', () => {
   let dummyAgile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
     jest.spyOn(Storages.prototype, 'instantiateLocalStorage');
+
+    jest.clearAllMocks();
   });
 
   it('should create Storages (default config)', () => {

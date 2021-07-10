@@ -6,7 +6,6 @@ import {
   Observer,
   State,
   SubscriptionContainerKeyType,
-  defineConfig,
   isValidObject,
   generateId,
   ProxyWeakMapType,
@@ -14,9 +13,10 @@ import {
   extractRelevantObservers,
   SelectorWeakMapType,
   SelectorMethodType,
+  LogCodeManager,
+  normalizeArray,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { normalizeArray } from '@agile-ts/utils';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
 // TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
@@ -66,13 +66,15 @@ export function useAgile<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
-  config = defineConfig(config, {
+  config = {
     key: generateId(),
     proxyBased: false,
-    agileInstance: null,
+    agileInstance: null as any,
     componentId: undefined,
     observerType: undefined,
-  });
+    deps: [],
+    ...config,
+  };
   const depsArray = extractRelevantObservers(
     normalizeArray(deps),
     config.observerType
@@ -142,7 +144,7 @@ export function useAgile<
     // Try to extract Agile Instance from the specified Instance/s
     if (!agileInstance) agileInstance = getAgileInstance(observers[0]);
     if (!agileInstance || !agileInstance.subController) {
-      Agile.logger.error(
+      LogCodeManager.getLogger()?.error(
         'Failed to subscribe Component with deps because of missing valid Agile Instance.',
         deps
       );
@@ -160,8 +162,9 @@ export function useAgile<
     // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
     // because the 'useIsomorphicLayoutEffect' is called after the rerender.
     // -> All used paths in the UI-Component were successfully tracked.
-    const proxyWeakMap: ProxyWeakMapType = new WeakMap();
+    let proxyWeakMap: ProxyWeakMapType | undefined = undefined;
     if (config.proxyBased && proxyPackage != null) {
+      proxyWeakMap = new WeakMap();
       for (const observer of observers) {
         const proxyTree = proxyTreeWeakMap.get(observer);
         if (proxyTree != null) {
@@ -173,8 +176,9 @@ export function useAgile<
     }
 
     // Build Selector WeakMap based on the specified selector method
-    const selectorWeakMap: SelectorWeakMapType = new WeakMap();
+    let selectorWeakMap: SelectorWeakMapType | undefined = undefined;
     if (config.selector != null) {
+      selectorWeakMap = new WeakMap();
       for (const observer of observers) {
         selectorWeakMap.set(observer, { methods: [config.selector] });
       }
@@ -191,7 +195,7 @@ export function useAgile<
         proxyWeakMap,
         waitForMount: false,
         componentId: config.componentId,
-        selectorWeakMap: selectorWeakMap,
+        selectorWeakMap,
       }
     );
 
@@ -199,7 +203,7 @@ export function useAgile<
     return () => {
       agileInstance?.subController.unsubscribe(subscriptionContainer);
     };
-  }, []);
+  }, config.deps);
 
   return getReturnValue(depsArray);
 }
@@ -258,4 +262,13 @@ export interface AgileHookConfigInterface {
    * @default undefined
    */
   observerType?: string;
+  /**
+   * Dependencies that determine, in addition to unmounting and remounting the React-Component,
+   * when the specified Agile Sub Instances should be re-subscribed to the React-Component.
+   *
+   * [Github issue](https://github.com/agile-ts/agile/issues/170)
+   *
+   * @default []
+   */
+  deps?: any[];
 }

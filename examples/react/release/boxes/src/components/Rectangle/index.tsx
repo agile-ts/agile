@@ -3,7 +3,7 @@ import { Drag } from '../actionComponents/Drag';
 import { Resize } from '../actionComponents/Resize';
 import { RectangleContainer } from './components/RectangleContainer';
 import { RectangleInner } from './components/RectangleInner';
-import { useAgile, useProxy } from '@agile-ts/react';
+import { useAgile } from '@agile-ts/react';
 import core from '../../core';
 import { SELECTED_ELEMENT } from '../../core/entities/ui/ui.controller';
 import { ElementStyleInterface } from '../../core/entities/ui/ui.interfaces';
@@ -24,7 +24,7 @@ export const Rectangle: React.FC<RectanglePropsInterface> = (props) => {
     {
       componentId: 'Rectangle',
     }
-  );
+  ) as string | number;
 
   if (element == null) return null;
 

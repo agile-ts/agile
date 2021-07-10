@@ -1,4 +1,10 @@
-import { Agile } from './agile';
+// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
+export let loggerPackage: any = null;
+try {
+  loggerPackage = require('@agile-ts/logger');
+} catch (e) {
+  // empty catch block
+}
 
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
@@ -33,7 +39,7 @@ const logCodeMessages = {
 
   // Storages
   '11:02:00':
-    "The 'Local Storage' is not available in your current environment." +
+    "The 'Local Storage' is not available in your current environment. " +
     "To use the '.persist()' functionality, please provide a custom Storage!",
   '11:02:01':
     'The first allocated Storage for AgileTs must be set as the default Storage!',
@@ -59,6 +65,7 @@ const logCodeMessages = {
     "The Storage with the key/name '${1}' doesn't exists!`",
 
   // Storage
+  '13:00:00': "Registered new Storage '${0}'.",
   '13:01:00': "GET value at key '${1}' from Storage '${0}'.",
   '13:01:01': "SET value at key '${1}' in Storage '${0}'.",
   '13:01:02': "REMOVE value at key '${1}' from Storage '${0}'.",
@@ -96,10 +103,10 @@ const logCodeMessages = {
     "The 'perform()' method isn't set in Observer but need to be set! Observer is no stand alone class.",
 
   // Integrations
-  '18:00:00': "Integrated '${0}' into AgileTs",
+  '18:00:00': "Integrated '${0}' into AgileTs '${1}'",
   '18:02:00':
     "Can't call the 'update()' method on a not ready Integration '${0}'!",
-  '18:03:00': "Failed to integrate Framework '${0}'!",
+  '18:03:00': "Failed to integrate Framework '${0}' into AgileTs '${1}'!",
 
   // Computed
   '19:03:00':
@@ -180,9 +187,9 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
 ): string {
   let result = logCodeMessages[logCode] ?? `'${logCode}' is a unknown logCode!`;
 
-  for (const i in replacers) {
-    // https://stackoverflow.com/questions/41438656/why-do-i-get-cannot-read-property-tostring-of-undefined
-    result = result.split('${' + i + '}').join(replacers[i] + '');
+  // Replace '${x}' with the specified replacer instances
+  for (let i = 0; i < replacers.length; i++) {
+    result = result.replace('${' + i + '}', replacers[i]);
   }
 
   return result;
@@ -190,7 +197,7 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
 
 /**
  * Logs the log message according to the specified log code
- * with the Agile Logger.
+ * with the Agile Logger if installed or the normal console.
  *
  * @internal
  * @param logCode - Log code of the message to be returned.
@@ -203,9 +210,52 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   replacers: any[] = [],
   ...data: any[]
 ): void {
-  const codes = logCode.split(':');
-  if (codes.length === 3)
-    Agile.logger[logCodeTypes[codes[1]]](getLog(logCode, replacers), ...data);
+  const logger = LogCodeManager.getLogger();
+  if (!logger?.isActive) return;
+  const logType = logCodeTypes[logCode.substr(3, 2)];
+  if (typeof logType !== 'string') return;
+
+  // Handle logging without Logger
+  if (logger == null) {
+    if (logType === 'error' || logType === 'warn')
+      console[logType](getLog(logCode, replacers));
+    return;
+  }
+
+  // Handle logging with Logger
+  logger[logType](getLog(logCode, replacers), ...data);
+}
+
+/**
+ * Logs the log message according to the specified log code
+ * with the Agile Logger if installed and the provided tags are active.
+ *
+ * @internal
+ * @param tags - Tags to be active to log the logCode.
+ * @param logCode - Log code of the message to be returned.
+ * @param replacers - Instances that replace these '${x}' placeholders based on the index
+ * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
+ * @param data - Data to be attached to the end of the log message.
+ */
+function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
+  tags: string[],
+  logCode: T,
+  replacers: any[] = [],
+  ...data: any[]
+): void {
+  const logger = LogCodeManager.getLogger();
+  if (!logger?.isActive) return;
+  const logType = logCodeTypes[logCode.substr(3, 2)];
+  if (typeof logType !== 'string') return;
+
+  // Handle logging without Logger
+  if (logger == null) {
+    // Log nothing since if a log has a tag it is probably not so important
+    return;
+  }
+
+  // Handle logging with Logger
+  logger.if.tag(tags)[logType](getLog(logCode, replacers), ...data);
 }
 
 /**
@@ -219,6 +269,12 @@ export const LogCodeManager = {
   log,
   logCodeLogTypes: logCodeTypes,
   logCodeMessages: logCodeMessages,
+  // Not doing 'logger: loggerPackage?.sharedAgileLogger'
+  // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
+  getLogger: () => {
+    return loggerPackage?.sharedAgileLogger ?? null;
+  },
+  logIfTags,
 };
 
 export type LogCodesArrayType<T> = {

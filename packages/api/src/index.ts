@@ -1,4 +1,4 @@
-import { clone, copy, defineConfig, isValidObject } from '@agile-ts/utils';
+import { clone, copy, isValidObject } from '@agile-ts/utils';
 
 export default class API {
   public config: ApiConfig;
@@ -113,7 +113,7 @@ export default class API {
 
     // Configure request Options
     const config = copy(this.config);
-    config.options = defineConfig(options, config.options || {});
+    config.options = { ...config.options, ...options };
     config.options.method = method;
     if (!config.options.headers) config.options.headers = {};
 

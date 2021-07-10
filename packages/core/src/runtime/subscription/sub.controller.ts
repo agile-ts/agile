@@ -6,7 +6,6 @@ import {
   CallbackSubscriptionContainer,
   isFunction,
   SubscriptionContainerConfigInterface,
-  defineConfig,
   removeProperties,
   LogCodeManager,
 } from '../../internal';
@@ -113,9 +112,10 @@ export class SubController {
         subscriptionContainer: SubscriptionContainer;
         props: { [key: string]: Observer['value'] };
       } {
-    config = defineConfig(config, {
+    config = {
       waitForMount: this.agileInstance().config.waitForMount,
-    });
+      ...config,
+    };
 
     // Create Subscription Container based on specified 'integrationInstance'
     const subscriptionContainer = isFunction(integrationInstance)
@@ -165,9 +165,12 @@ export class SubController {
     if (subscriptionInstance instanceof CallbackSubscriptionContainer) {
       unsub(subscriptionInstance);
       this.callbackSubs.delete(subscriptionInstance);
-      Agile.logger.if
-        .tag(['runtime', 'subscription'])
-        .info(LogCodeManager.getLog('15:01:00'), subscriptionInstance);
+      LogCodeManager.logIfTags(
+        ['subscription'],
+        '15:01:00',
+        [],
+        subscriptionInstance
+      );
       return;
     }
 
@@ -175,9 +178,12 @@ export class SubController {
     if (subscriptionInstance instanceof ComponentSubscriptionContainer) {
       unsub(subscriptionInstance);
       this.componentSubs.delete(subscriptionInstance);
-      Agile.logger.if
-        .tag(['runtime', 'subscription'])
-        .info(LogCodeManager.getLog('15:01:01'), subscriptionInstance);
+      LogCodeManager.logIfTags(
+        ['subscription'],
+        '15:01:01',
+        [],
+        subscriptionInstance
+      );
       return;
     }
 
@@ -191,9 +197,12 @@ export class SubController {
         (subContainer) => {
           unsub(subContainer as ComponentSubscriptionContainer);
           this.componentSubs.delete(subContainer);
-          Agile.logger.if
-            .tag(['runtime', 'subscription'])
-            .info(LogCodeManager.getLog('15:01:01'), subscriptionInstance);
+          LogCodeManager.logIfTags(
+            ['subscription'],
+            '15:01:01',
+            [],
+            subscriptionInstance
+          );
         }
       );
       return;
@@ -241,9 +250,12 @@ export class SubController {
         componentSubscriptionContainer,
       ];
 
-    Agile.logger.if
-      .tag(['runtime', 'subscription'])
-      .info(LogCodeManager.getLog('15:01:02'), componentSubscriptionContainer);
+    LogCodeManager.logIfTags(
+      ['subscription'],
+      '15:01:02',
+      [],
+      componentSubscriptionContainer
+    );
 
     return componentSubscriptionContainer;
   }
@@ -270,9 +282,12 @@ export class SubController {
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;
 
-    Agile.logger.if
-      .tag(['runtime', 'subscription'])
-      .info(LogCodeManager.getLog('15:01:03'), callbackSubscriptionContainer);
+    LogCodeManager.logIfTags(
+      ['subscription'],
+      '15:01:03',
+      [],
+      callbackSubscriptionContainer
+    );
 
     return callbackSubscriptionContainer;
   }

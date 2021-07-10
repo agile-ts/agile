@@ -22,7 +22,7 @@ const logTypes = {
 };
 
 function mockLogs(mockArg?: LogTypes[]): void {
-  const _mockArg = mockArg ?? ['warn', 'error'];
+  const _mockArg = mockArg ?? ['warn', 'error', 'log'];
   mockConsole(_mockArg);
 }
 

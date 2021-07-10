@@ -1,7 +1,6 @@
 import {
   clone,
   copy,
-  defineConfig,
   equal,
   flatMerge,
   generateId,
@@ -15,12 +14,12 @@ import {
   createArrayFromObject,
   removeProperties,
 } from '../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../../core/tests/helper/logMock';
 
 describe('Utils Tests', () => {
   beforeEach(() => {
+    LogMock.mockLogs();
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
   });
 
   describe('copy function tests', () => {
@@ -256,58 +255,6 @@ describe('Utils Tests', () => {
       );
       expect(isJsonString(10)).toBeFalsy();
       expect(isJsonString({ name: 'John', age: 31 })).toBeFalsy();
-    });
-  });
-
-  describe('defineConfig function tests', () => {
-    it('should merge defaults into config and overwrite undefined properties (default config)', () => {
-      const config = {
-        allowLogging: true,
-        loops: 10,
-        isHuman: undefined,
-      };
-      expect(
-        defineConfig(config, {
-          allowLogging: false,
-          loops: 15,
-          isHuman: true,
-          isRobot: false,
-          name: 'jeff',
-        })
-      ).toStrictEqual({
-        allowLogging: true,
-        loops: 10,
-        isHuman: true,
-        isRobot: false,
-        name: 'jeff',
-      });
-    });
-
-    it("should merge defaults into config and shouldn't overwrite undefined properties (overwriteUndefinedProperties = false)", () => {
-      const config = {
-        allowLogging: true,
-        loops: 10,
-        isHuman: undefined,
-      };
-      expect(
-        defineConfig(
-          config,
-          {
-            allowLogging: false,
-            loops: 15,
-            isHuman: true,
-            isRobot: false,
-            name: 'jeff',
-          },
-          false
-        )
-      ).toStrictEqual({
-        allowLogging: true,
-        loops: 10,
-        isHuman: undefined,
-        isRobot: false,
-        name: 'jeff',
-      });
     });
   });
 

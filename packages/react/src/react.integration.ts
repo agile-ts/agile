@@ -1,4 +1,4 @@
-import { Agile, flatMerge, Integration } from '@agile-ts/core';
+import { flatMerge, Integration, Integrations } from '@agile-ts/core';
 import { AgileReactComponent } from './hocs/AgileHOC';
 import React from 'react';
 
@@ -24,6 +24,6 @@ const reactIntegration = new Integration<typeof React, AgileReactComponent>({
     }
   },
 });
-Agile.initialIntegrations.push(reactIntegration);
+Integrations.addInitialIntegration(reactIntegration);
 
 export default reactIntegration;

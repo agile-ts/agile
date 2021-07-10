@@ -1,9 +1,7 @@
 import {
   isJsonString,
-  defineConfig,
   isAsyncFunction,
   isFunction,
-  Agile,
   LogCodeManager,
 } from '../internal';
 
@@ -28,10 +26,11 @@ export class Storage {
    * @param config - Configuration object
    */
   constructor(config: CreateStorageConfigInterface) {
-    config = defineConfig(config, {
+    config = {
       prefix: 'agile',
       async: false,
-    });
+      ...config,
+    };
     this.key = config.key;
     this.methods = config.methods;
     this.config = {
@@ -89,12 +88,12 @@ export class Storage {
     const res = this.methods.get(this.getStorageKey(key));
     const _res = isJsonString(res) ? JSON.parse(res) : res;
 
-    Agile.logger.if
-      .tag(['storage'])
-      .info(
-        LogCodeManager.getLog('13:01:00', [this.key, this.getStorageKey(key)]),
-        _res
-      );
+    LogCodeManager.logIfTags(
+      ['storage'],
+      '13:01:00',
+      [this.key, this.getStorageKey(key)],
+      _res
+    );
 
     return _res;
   }
@@ -122,15 +121,12 @@ export class Storage {
         .then((res: any) => {
           const _res = isJsonString(res) ? JSON.parse(res) : res;
 
-          Agile.logger.if
-            .tag(['storage'])
-            .info(
-              LogCodeManager.getLog('13:01:00', [
-                this.key,
-                this.getStorageKey(key),
-              ]),
-              _res
-            );
+          LogCodeManager.logIfTags(
+            ['storage'],
+            '13:01:00',
+            [this.key, this.getStorageKey(key)],
+            _res
+          );
 
           resolve(_res);
         })
@@ -149,12 +145,10 @@ export class Storage {
   public set(key: StorageItemKey, value: any): void {
     if (!this.ready || !this.methods.set) return;
 
-    Agile.logger.if
-      .tag(['storage'])
-      .info(
-        LogCodeManager.getLog('13:01:01', [this.key, this.getStorageKey(key)]),
-        value
-      );
+    LogCodeManager.logIfTags(['storage'], '13:01:01', [
+      this.key,
+      this.getStorageKey(key),
+    ]);
 
     this.methods.set(this.getStorageKey(key), JSON.stringify(value));
   }
@@ -169,11 +163,10 @@ export class Storage {
   public remove(key: StorageItemKey): void {
     if (!this.ready || !this.methods.remove) return;
 
-    Agile.logger.if
-      .tag(['storage'])
-      .info(
-        LogCodeManager.getLog('13:01:02', [this.key, this.getStorageKey(key)])
-      );
+    LogCodeManager.logIfTags(['storage'], '13:01:02', [
+      this.key,
+      this.getStorageKey(key),
+    ]);
 
     this.methods.remove(this.getStorageKey(key));
   }

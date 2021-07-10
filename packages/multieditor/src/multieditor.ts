@@ -2,8 +2,8 @@ import {
   Agile,
   ComputeValueMethod,
   copy,
-  defineConfig,
   getAgileInstance,
+  LogCodeManager,
   Observer,
 } from '@agile-ts/core';
 import {
@@ -52,19 +52,20 @@ export class MultiEditor<
   ) {
     if (!agileInstance) agileInstance = getAgileInstance(null);
     if (!agileInstance)
-      Agile.logger.error(
+      LogCodeManager.getLogger()?.error(
         'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!'
       );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === 'function' ? config(this) : config;
-    _config = defineConfig(_config, {
+    _config = {
       fixedProperties: [],
       editableProperties: Object.keys(_config.data),
       validateMethods: {},
       computeMethods: {},
       reValidateMode: 'onSubmit',
       validate: 'editable',
-    });
+      ..._config,
+    };
     this._key = _config?.key;
     this.onSubmit = _config.onSubmit as any;
     this.fixedProperties = _config.fixedProperties as any;
@@ -166,9 +167,10 @@ export class MultiEditor<
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    config = defineConfig(config, {
+    config = {
       background: true,
-    });
+      ...config,
+    };
 
     // Apply changes to Item
     item.set(value, config);
@@ -193,10 +195,11 @@ export class MultiEditor<
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    config = defineConfig(config, {
+    config = {
       background: false,
       reset: true,
-    });
+      ...config,
+    };
 
     // Update initial Value
     item.initialStateValue = copy(value);
@@ -227,10 +230,11 @@ export class MultiEditor<
     config: SubmitConfigInterface<OnSubmitConfigType> = {}
   ): Promise<SubmitReturnType | false> {
     const preparedData: DataObject<DataType> = {};
-    config = defineConfig(config, {
+    config = {
       assignToInitial: true,
       onSubmitConfig: undefined,
-    });
+      ...config,
+    };
 
     // Assign Statuses to Items
     for (const key in this.data) {
@@ -247,9 +251,9 @@ export class MultiEditor<
     this.submitted = true;
 
     // Logging
-    Agile.logger.if
-      .tag(['multieditor'])
-      .info(`Submit MultiEditor '${this.key}'`, this.isValid);
+    // Agile.logger.if
+    //   .tag(['multieditor'])
+    //   .info(`Submit MultiEditor '${this.key}'`, this.isValid);
 
     // Check if Editor is Valid
     if (!this.isValid) return false;
@@ -354,7 +358,9 @@ export class MultiEditor<
    */
   public getItemById(key: ItemKey): Item<DataType> | undefined {
     if (!Object.prototype.hasOwnProperty.call(this.data, key)) {
-      Agile.logger.error(`Editor Item '${key}' does not exists!`);
+      LogCodeManager.getLogger()?.error(
+        `Editor Item '${key}' does not exists!`
+      );
       return undefined;
     }
     return this.data[key];

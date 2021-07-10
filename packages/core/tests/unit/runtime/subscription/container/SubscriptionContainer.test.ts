@@ -16,7 +16,6 @@ describe('SubscriptionContainer Tests', () => {
   let dummyProxyWeakMap: ProxyWeakMapType;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile();
@@ -24,6 +23,8 @@ describe('SubscriptionContainer Tests', () => {
     dummyObserver2 = new Observer(dummyAgile, { key: 'dummyObserver2' });
     dummySelectorWeakMap = new WeakMap();
     dummyProxyWeakMap = new WeakMap();
+
+    jest.clearAllMocks();
   });
 
   it('should create SubscriptionContainer with passed subs array (default config)', () => {

@@ -1,10 +1,10 @@
 import { EventJob } from '../../src';
-import mockConsole from 'jest-mock-console';
+import { LogMock } from '../../../core/tests/helper/logMock';
 
 describe('EventJob Tests', () => {
   beforeEach(() => {
+    LogMock.mockLogs();
     jest.clearAllMocks();
-    mockConsole(['error', 'warn']);
   });
 
   it('should create EventJob (without keys)', () => {

@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@agile-ts/api": "file:.yalc/@agile-ts/api",
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
-    "@agile-ts/event": "file:.yalc/@agile-ts/event",
-    "@agile-ts/multieditor": "file:.yalc/@agile-ts/multieditor",
+    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@agile-ts/proxytree": "file:.yalc/@agile-ts/proxytree",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
     "@chakra-ui/react": "^1.6.3",
@@ -35,7 +33,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "install:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/api @agile-ts/multieditor @agile-ts/event @agile-ts/proxytree & yarn install"
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/proxytree @agile-ts/logger & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/proxytree @agile-ts/logger & yarn install"
   },
   "eslintConfig": {
     "extends": [

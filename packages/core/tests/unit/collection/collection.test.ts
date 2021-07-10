@@ -22,7 +22,6 @@ describe('Collection Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -30,6 +29,8 @@ describe('Collection Tests', () => {
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
     jest.spyOn(Collection.prototype, 'collect');
+
+    jest.clearAllMocks();
   });
 
   it('should create Collection (default config)', () => {

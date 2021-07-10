@@ -1,0 +1,59 @@
+{
+  "name": "benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "author": "BennoDev",
+  "license": "MIT",
+  "homepage": "https://agile-ts.org/",
+  "description": "Benchmark Tests",
+  "scripts": {
+    "test": "node -r esbuild-register run.ts",
+    "test:counter": "yarn test ./benchmarks/react/counter",
+    "test:1000fields": "yarn test ./benchmarks/react/1000fields",
+    "test:computed": "yarn test ./benchmarks/react/computed",
+    "test:defineConfig": "yarn test ./benchmarks/typescript/defineConfig",
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react & yarn install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agile-ts/agile.git"
+  },
+  "dependencies": {
+    "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@hookstate/core": "^3.0.8",
+    "@pulsejs/core": "^4.0.0-beta.3",
+    "@pulsejs/react": "^4.0.0-beta.3",
+    "@reduxjs/toolkit": "^1.6.0",
+    "benchmark": "^2.1.4",
+    "chalk": "^4.1.1",
+    "colorette": "^1.2.2",
+    "dotenv": "^10.0.0",
+    "esbuild": "^0.12.14",
+    "esbuild-register": "^2.6.0",
+    "jotai": "^1.1.2",
+    "lodash": "^4.17.21",
+    "mobx": "^6.3.2",
+    "mobx-react": "^7.2.0",
+    "nanostores": "^0.3.3",
+    "playwright": "^1.12.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4",
+    "recoil": "^0.3.1",
+    "redux": "^4.1.0",
+    "typescript": "^4.3.5",
+    "valtio": "^1.0.6",
+    "zustand": "^3.5.5"
+  },
+  "devDependencies": {
+    "@types/benchmark": "^2.1.0",
+    "@types/node": "^16.0.0",
+    "@types/react": "^17.0.13",
+    "@types/react-dom": "^17.0.8"
+  },
+  "bugs": {
+    "url": "https://github.com/agile-ts/agile/issues"
+  }
+}

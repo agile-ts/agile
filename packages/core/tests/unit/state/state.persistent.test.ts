@@ -12,7 +12,6 @@ describe('StatePersistent Tests', () => {
   let dummyState: State;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -20,6 +19,8 @@ describe('StatePersistent Tests', () => {
 
     jest.spyOn(StatePersistent.prototype, 'instantiatePersistent');
     jest.spyOn(StatePersistent.prototype, 'initialLoading');
+
+    jest.clearAllMocks();
   });
 
   it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {

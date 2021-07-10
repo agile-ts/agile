@@ -24,7 +24,6 @@ describe('GroupObserver Tests', () => {
   let dummyItem2: Item<ItemInterface>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -40,6 +39,8 @@ describe('GroupObserver Tests', () => {
       id: 'dummyItem2Key',
       name: 'jeff',
     });
+
+    jest.clearAllMocks();
   });
 
   it('should create Group Observer (default config)', () => {

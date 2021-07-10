@@ -13,19 +13,24 @@ import {
   Storages,
   CreateStorageConfigInterface,
   RegisterConfigInterface,
-  defineConfig,
-  Logger,
-  CreateLoggerConfigInterface,
   StateConfigInterface,
   flatMerge,
   LogCodeManager,
   DependableAgileInstancesType,
   CreateComputedConfigInterface,
   ComputeFunctionType,
+  createStorage,
+  createState,
+  createCollection,
+  createComputed,
+  IntegrationsConfigInterface,
 } from './internal';
 
 export class Agile {
   public config: AgileConfigInterface;
+
+  // Key/Name identifier of Agile Instance
+  public key?: AgileKey;
 
   // Queues and executes incoming Observer-based Jobs
   public runtime: Runtime;
@@ -34,18 +39,8 @@ export class Agile {
   // Handles the permanent persistence of Agile Classes
   public storages: Storages;
 
-  // Integrations (UI-Frameworks) that are integrated into AgileTs
+  // Integrations (UI-Frameworks) that are integrated into the Agile Instance
   public integrations: Integrations;
-  // External added Integrations that are to integrate into AgileTs when it is instantiated
-  static initialIntegrations: Integration[] = [];
-
-  // Static AgileTs Logger with the default config
-  // (-> is overwritten by the last created Agile Instance)
-  static logger = new Logger({
-    prefix: 'Agile',
-    active: true,
-    level: Logger.level.WARN,
-  });
 
   // Identifier used to bind an Agile Instance globally
   static globalKey = '__agile__';
@@ -77,39 +72,37 @@ export class Agile {
    * @param config - Configuration object
    */
   constructor(config: CreateAgileConfigInterface = {}) {
-    config = defineConfig(config, {
-      localStorage: true,
+    config = {
+      localStorage: false,
       waitForMount: true,
-      logConfig: {},
       bindGlobal: false,
-    });
-    config.logConfig = defineConfig(config.logConfig, {
-      prefix: 'Agile',
-      active: true,
-      level: Logger.level.WARN,
-      canUseCustomStyles: true,
-      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
-    });
+      autoIntegrate: true,
+      bucket: true,
+      ...config,
+    };
     this.config = {
       waitForMount: config.waitForMount as any,
+      bucket: config.bucket as any,
     };
-    this.integrations = new Integrations(this);
+    this.key = config.key;
+    this.integrations = new Integrations(this, {
+      autoIntegrate: config.autoIntegrate,
+    });
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
     this.storages = new Storages(this, {
       localStorage: config.localStorage,
     });
 
-    // Assign customized Logger config to the static Logger
-    Agile.logger = new Logger(config.logConfig);
-
-    LogCodeManager.log('10:00:00', [], this, Agile.logger);
+    LogCodeManager.log('10:00:00', [], this);
 
     // Create a global instance of the Agile Instance.
     // Why? 'getAgileInstance()' returns the global Agile Instance
     // if it couldn't find any Agile Instance in the specified Instance.
     if (config.bindGlobal)
-      if (!globalBind(Agile.globalKey, this)) LogCodeManager.log('10:02:00');
+      if (!globalBind(Agile.globalKey, this)) {
+        LogCodeManager.log('10:02:00');
+      }
   }
 
   /**
@@ -128,7 +121,7 @@ export class Agile {
    * @param config - Configuration object
    */
   public createStorage(config: CreateStorageConfigInterface): Storage {
-    return new Storage(config);
+    return createStorage(config);
   }
 
   /**
@@ -150,7 +143,10 @@ export class Agile {
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ): State<ValueType> {
-    return new State<ValueType>(this, initialValue, config);
+    return createState<ValueType>(initialValue, {
+      ...config,
+      ...{ agileInstance: this },
+    });
   }
 
   /**
@@ -174,7 +170,7 @@ export class Agile {
   public createCollection<DataType extends Object = DefaultItem>(
     config?: CollectionConfig<DataType>
   ): Collection<DataType> {
-    return new Collection<DataType>(this, config);
+    return createCollection<DataType>(config, this);
   }
 
   /**
@@ -232,12 +228,14 @@ export class Agile {
     if (Array.isArray(configOrDeps)) {
       _config = flatMerge(_config, {
         computedDeps: configOrDeps,
+        agileInstance: this,
       });
     } else {
-      if (configOrDeps) _config = configOrDeps;
+      if (configOrDeps)
+        _config = { ...configOrDeps, ...{ agileInstance: this } };
     }
 
-    return new Computed<ComputedValueType>(this, computeFunction, _config);
+    return createComputed<ComputedValueType>(computeFunction, _config);
   }
 
   /**
@@ -303,18 +301,10 @@ export class Agile {
   }
 }
 
-export interface CreateAgileConfigInterface {
-  /**
-   * Configures the logging behaviour of AgileTs.
-   * @default {
-      prefix: 'Agile',
-      active: true,
-      level: Logger.level.WARN,
-      canUseCustomStyles: true,
-      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
-    }
-   */
-  logConfig?: CreateLoggerConfigInterface;
+export type AgileKey = string | number;
+
+export interface CreateAgileConfigInterface
+  extends IntegrationsConfigInterface {
   /**
    * Whether the Subscription Container shouldn't be ready
    * until the UI-Component it represents has been mounted.
@@ -323,7 +313,7 @@ export interface CreateAgileConfigInterface {
   waitForMount?: boolean;
   /**
    * Whether the Local Storage should be registered as a Agile Storage by default.
-   * @default true
+   * @default false
    */
   localStorage?: boolean;
   /**
@@ -332,6 +322,20 @@ export interface CreateAgileConfigInterface {
    * @default false
    */
   bindGlobal?: boolean;
+  /**
+   * Key/Name identifier of the Agile Instance.
+   * @default undefined
+   */
+  key?: AgileKey;
+  /**
+   * Whether to put render events into "The bucket" of the browser,
+   * where all events are first put in wait for the UI thread
+   * to be done with whatever it's doing.
+   *
+   * [Learn more..](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
+   * @default true
+   */
+  bucket?: boolean;
 }
 
 export interface AgileConfigInterface {
@@ -341,4 +345,13 @@ export interface AgileConfigInterface {
    * @default true
    */
   waitForMount: boolean;
+  /**
+   * Whether to put render events into "The bucket" of the browser,
+   * where all events are first put in wait for the UI thread
+   * to be done with whatever it's doing.
+   *
+   * [Learn more..](https://stackoverflow.com/questions/9083594/call-settimeout-without-delay)
+   * @default true
+   */
+  bucket: boolean;
 }

@@ -11,16 +11,17 @@ import _ from 'lodash';
 import { ImageInfo, ImageInfoFallback } from './components/ImageInfo';
 import { useProxy, useSelector } from '@agile-ts/react';
 import core from '../../core';
+import { ElementImageInterface } from '../../core/entities/ui/ui.interfaces';
 
 export const EditProperties = () => {
   const selectedElementId = useSelector(
     core.ui.SELECTED_ELEMENT,
     (value) => value?.id
-  );
+  ) as number | string;
   const selectedElementImage = useSelector(
     core.ui.SELECTED_ELEMENT,
     (value) => value?.image
-  );
+  ) as ElementImageInterface;
 
   // TODO useProxy doesn't work here as expected because the selected Elements
   //  doesn't exist on the creation of the Subscription Container
@@ -135,7 +136,8 @@ const Property = ({
   id: number | string;
 }) => {
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
-  const element = useProxy(ELEMENT, { componentId: 'Property' });
+  const element = useProxy(ELEMENT, { componentId: 'Property', deps: [id] });
+
   return (
     <PropertyInput
       label={label}

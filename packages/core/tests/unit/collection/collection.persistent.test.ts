@@ -20,7 +20,6 @@ describe('CollectionPersistent Tests', () => {
   let dummyCollection: Collection<ItemInterface>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -30,6 +29,8 @@ describe('CollectionPersistent Tests', () => {
 
     jest.spyOn(CollectionPersistent.prototype, 'instantiatePersistent');
     jest.spyOn(CollectionPersistent.prototype, 'initialLoading');
+
+    jest.clearAllMocks();
   });
 
   it('should create CollectionPersistent and should call initialLoading if Persistent is ready (default config)', () => {

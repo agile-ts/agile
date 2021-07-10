@@ -1,12 +1,11 @@
 import {
-  globalBind,
-  getAgileInstance,
   Agile,
   State,
   Observer,
   Collection,
   StateObserver,
   GroupObserver,
+  assignSharedAgileInstance,
 } from '../../src';
 import * as Utils from '../../src/utils';
 import { LogMock } from '../helper/logMock';
@@ -15,47 +14,68 @@ describe('Utils Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
 
     // @ts-ignore | Reset globalThis
     globalThis = {};
+
+    jest.clearAllMocks();
   });
 
   describe('getAgileInstance function tests', () => {
     beforeEach(() => {
+      assignSharedAgileInstance(dummyAgile);
       globalThis[Agile.globalKey] = dummyAgile;
     });
 
-    it('should get agileInstance from State', () => {
+    it('should return Agile Instance from State', () => {
       const dummyState = new State(dummyAgile, 'dummyValue');
 
-      expect(getAgileInstance(dummyState)).toBe(dummyAgile);
+      expect(Utils.getAgileInstance(dummyState)).toBe(dummyAgile);
     });
 
-    it('should get agileInstance from Collection', () => {
+    it('should return Agile Instance from Collection', () => {
       const dummyCollection = new Collection(dummyAgile);
 
-      expect(getAgileInstance(dummyCollection)).toBe(dummyAgile);
+      expect(Utils.getAgileInstance(dummyCollection)).toBe(dummyAgile);
     });
 
-    it('should get agileInstance from Observer', () => {
+    it('should return Agile Instance from Observer', () => {
       const dummyObserver = new Observer(dummyAgile);
 
-      expect(getAgileInstance(dummyObserver)).toBe(dummyAgile);
+      expect(Utils.getAgileInstance(dummyObserver)).toBe(dummyAgile);
     });
 
-    it('should get agileInstance from globalThis if passed instance holds no agileInstance', () => {
-      expect(getAgileInstance('weiredInstance')).toBe(dummyAgile);
-    });
+    it(
+      'should return shared Agile Instance ' +
+        'if specified Instance contains no valid Agile Instance',
+      () => {
+        expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
+      }
+    );
 
-    it('should print error if something went wrong', () => {
+    it(
+      'should return globally bound Agile Instance' +
+        'if specified Instance contains no valid Agile Instance' +
+        'and no shared Agile Instance is specified',
+      () => {
+        // Destroy shared Agile Instance
+        assignSharedAgileInstance(undefined as any);
+
+        expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
+      }
+    );
+
+    it('should print error if no Agile Instance could be retrieved', () => {
       // @ts-ignore | Destroy globalThis
       globalThis = undefined;
 
-      const response = getAgileInstance('weiredInstance');
+      // Destroy shared Agile Instance
+      assignSharedAgileInstance(undefined as any);
+
+      const response = Utils.getAgileInstance('weiredInstance');
 
       expect(response).toBeUndefined();
       LogMock.hasLoggedCode('20:03:00', [], 'weiredInstance');
@@ -360,23 +380,23 @@ describe('Utils Tests', () => {
     });
 
     it('should bind Instance globally at the specified key (default config)', () => {
-      globalBind(dummyKey, 'dummyInstance');
+      Utils.globalBind(dummyKey, 'dummyInstance');
 
       expect(globalThis[dummyKey]).toBe('dummyInstance');
     });
 
     it("shouldn't overwrite already globally bound Instance at the same key (default config)", () => {
-      globalBind(dummyKey, 'I am first!');
+      Utils.globalBind(dummyKey, 'I am first!');
 
-      globalBind(dummyKey, 'dummyInstance');
+      Utils.globalBind(dummyKey, 'dummyInstance');
 
       expect(globalThis[dummyKey]).toBe('I am first!');
     });
 
     it('should overwrite already globally bound Instance at the same key (overwrite = true)', () => {
-      globalBind(dummyKey, 'I am first!');
+      Utils.globalBind(dummyKey, 'I am first!');
 
-      globalBind(dummyKey, 'dummyInstance', true);
+      Utils.globalBind(dummyKey, 'dummyInstance', true);
 
       expect(globalThis[dummyKey]).toBe('dummyInstance');
     });
@@ -385,9 +405,27 @@ describe('Utils Tests', () => {
       // @ts-ignore | Destroy globalThis
       globalThis = undefined;
 
-      globalBind(dummyKey, 'dummyInstance');
+      Utils.globalBind(dummyKey, 'dummyInstance');
 
       LogMock.hasLoggedCode('20:03:01', [dummyKey]);
+    });
+  });
+
+  describe('runsOnServer function tests', () => {
+    it("should return 'false' if the current environment isn't a server", () => {
+      global.window = {
+        document: {
+          createElement: 'isSet' as any,
+        } as any,
+      } as any;
+
+      expect(Utils.runsOnServer()).toBeFalsy();
+    });
+
+    it("should return 'true' if the current environment is a server", () => {
+      global.window = undefined as any;
+
+      expect(Utils.runsOnServer()).toBeTruthy();
     });
   });
 });

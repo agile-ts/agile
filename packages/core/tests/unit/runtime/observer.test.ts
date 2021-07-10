@@ -15,7 +15,6 @@ describe('Observer Tests', () => {
   let dummySubscription2: SubscriptionContainer;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile();
@@ -26,6 +25,8 @@ describe('Observer Tests', () => {
 
     jest.spyOn(dummySubscription1, 'addSubscription');
     jest.spyOn(dummySubscription2, 'addSubscription');
+
+    jest.clearAllMocks();
   });
 
   it('should create Observer (default config)', () => {

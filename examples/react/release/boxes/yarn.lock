@@ -2,42 +2,26 @@
 # yarn lockfile v1
 
 
-"@agile-ts/api@file:.yalc/@agile-ts/api":
-  version "0.0.18"
-  dependencies:
-    "@agile-ts/utils" "^0.0.4"
-
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.0.17"
+  version "0.1.0"
   dependencies:
-    "@agile-ts/logger" "^0.0.4"
-    "@agile-ts/utils" "^0.0.4"
+    "@agile-ts/utils" "^0.0.5"
 
-"@agile-ts/event@file:.yalc/@agile-ts/event":
-  version "0.0.7"
+"@agile-ts/logger@file:.yalc/@agile-ts/logger":
+  version "0.0.5"
+  dependencies:
+    "@agile-ts/utils" "^0.0.5"
 
-"@agile-ts/logger@^0.0.4":
+"@agile-ts/proxytree@file:.yalc/@agile-ts/proxytree":
   version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@agile-ts/logger/-/logger-0.0.4.tgz#7f4d82ef8f03b13089af0878c360575c43f0962d"
-  integrity sha512-qm0obAKqJMaPKM+c76gktRXyw3OL1v39AnhMZ0FBGwJqHWU+fLRkCzlQwjaROCr3F1XP01Lc/Ls3efF0WzyEPw==
-  dependencies:
-    "@agile-ts/utils" "^0.0.4"
-
-"@agile-ts/multieditor@file:.yalc/@agile-ts/multieditor":
-  version "0.0.17"
-
-"@agile-ts/proxytree@^0.0.3", "@agile-ts/proxytree@file:.yalc/@agile-ts/proxytree":
-  version "0.0.3"
 
 "@agile-ts/react@file:.yalc/@agile-ts/react":
-  version "0.0.18"
-  dependencies:
-    "@agile-ts/proxytree" "^0.0.3"
+  version "0.1.0"
 
-"@agile-ts/utils@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.4.tgz#66e9536e561796489a37155da6b74ce2dc482697"
-  integrity sha512-GiZyTYmCm4j2N57oDjeMuPpfQdgn9clb0Cxpfuwi2Bq5T/KPXlaROLsVGwHLjwwT+NX7xxr5qNJH8pZTnHnYRQ==
+"@agile-ts/utils@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.5.tgz#23cc83e60eb6b15734247fac1d77f1fd629ffdb6"
+  integrity sha512-R86X9MjMty14eoQ4djulZSdHf9mIF9dPcj4g+SABqdA6AqbewS0/BQGNGR5p6gXhqc4+mT8rzkutywdPnMUNfA==
 
 "@babel/code-frame@7.10.4":
   version "7.10.4"

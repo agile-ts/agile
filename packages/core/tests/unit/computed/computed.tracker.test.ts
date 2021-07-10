@@ -5,7 +5,6 @@ describe('ComputedTracker Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     LogMock.mockLogs();
 
     dummyAgile = new Agile({ localStorage: false });
@@ -13,6 +12,8 @@ describe('ComputedTracker Tests', () => {
     // Reset ComputedTracker (because it works static)
     ComputedTracker.isTracking = false;
     ComputedTracker.trackedObservers = new Set();
+
+    jest.clearAllMocks();
   });
 
   describe('ComputedTracker Function Tests', () => {
