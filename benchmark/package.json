@@ -26,6 +26,7 @@
     "@pulsejs/react": "^4.0.0-beta.3",
     "@reduxjs/toolkit": "^1.6.0",
     "benchmark": "^2.1.4",
+    "chalk": "^4.1.1",
     "colorette": "^1.2.2",
     "dotenv": "^10.0.0",
     "esbuild": "^0.12.14",

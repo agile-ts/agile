@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import esbuild from 'esbuild';
 import playwright from 'playwright';
+import chalk from 'chalk';
 
 // Loads environment variables from the '.env' file
 dotenv.config();
@@ -16,6 +17,8 @@ if (entry == null) {
 }
 
 const startBenchmark = async () => {
+  console.log(chalk.blue('Starting the benchmark server..'));
+
   // Bundle Benchmark Test Suite
   // and launch the server on which the Test Suite is executed
   const server = await esbuild.serve(
@@ -38,7 +41,11 @@ const startBenchmark = async () => {
   );
   const serverUrl = `http://${server.host}:${server.port}`;
 
-  console.log(`Server is running at port: ${server.port}`);
+  console.log(
+    chalk.cyan(
+      `Server is running at port: ${chalk.magenta.bold(server.port)}\n`
+    )
+  );
 
   // Launch Chrome as browser to run the Benchmark Test Suite in
   const browser = await playwright.chromium.launch();
@@ -48,7 +55,9 @@ const startBenchmark = async () => {
   // Option to open and test the Benchmark Test Suite in the browser manually
   if (process.env.MANUAL_BENCHMARK === 'true') {
     console.log(
-      `Open the Browser at '${serverUrl}' to run the tests manually.`
+      `${chalk.blue('[i]')} ${chalk.gray(
+        `Benchmark is running at ${chalk.blue.bold(serverUrl)}`
+      )}`
     );
 
     await server.wait;
@@ -63,7 +72,17 @@ const startBenchmark = async () => {
   // Setup 'console' listener to transfer the browser logs into the local console
   // https://playwright.dev/docs/api/class-page/#page-event-console
   page.on('console', (...message) => {
-    console.log(...message);
+    const stringMessages = message.map((m) => m.text());
+    const colorMessage = stringMessages[0];
+    stringMessages.shift(); // Remove 'colorMessage' (first argument) from 'stringMessages' array
+
+    // Parse color message to work in chalck
+    // https://stackoverflow.com/questions/56526522/gulp-chalk-pass-string-template-through-method
+    const parsedColorMessage = [colorMessage];
+    // @ts-ignore
+    parsedColorMessage.raw = [colorMessage];
+
+    console.log(chalk(parsedColorMessage), ...stringMessages);
   });
 
   // Open the url the server is running on

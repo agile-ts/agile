@@ -13,6 +13,13 @@ import redux from './bench/redux';
 import reduxToolkit from './bench/redux-toolkit';
 import valtio from './bench/valtio';
 import zustand from './bench/zustand';
+import {
+  cycleLog,
+  CycleResultInterface,
+  endBenchmarkLog,
+  getCycleResult,
+  startBenchmarkLog,
+} from '../../../benchmarkManager';
 
 // @ts-ignore
 // Benchmark.js requires an instance of itself globally
@@ -52,6 +59,8 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
   };
 }
 
+const results: CycleResultInterface[] = [];
+
 // Add Tests to the Benchmark Test Suite
 suite
   .add('AgileTs', configTest(agilets))
@@ -68,13 +77,15 @@ suite
 
   // Add Listener
   .on('start', function (this: any) {
-    console.log(`Starting ${this.name}`);
+    startBenchmarkLog(this.name);
   })
   .on('cycle', (event: any) => {
-    console.log(String(event.target), `[Count: ${event.target.output}]`);
+    const cycleResult = getCycleResult(event);
+    cycleLog(cycleResult);
+    results.push(cycleResult);
   })
   .on('complete', function (this: any) {
-    console.log(`Fastest is ${this.filter('fastest').map('name')}`);
+    endBenchmarkLog(this.name, results, this.filter('fastest').map('name'));
 
     // @ts-ignore
     // Notify server that the Benchmark Test Suite has ended

@@ -12,11 +12,10 @@ export function copy<T = any>(value: T): T {
   if (value == null || typeof value !== 'object') return value;
 
   // Ignore everything that is no object or array but has the type of an object (e.g. classes)
-  const valConstructorName = Object.getPrototypeOf(value).constructor.name;
-  if (
-    valConstructorName.toLowerCase() !== 'object' &&
-    valConstructorName.toLowerCase() !== 'array'
-  )
+  const valConstructorName = Object.getPrototypeOf(
+    value
+  ).constructor.name.toLowerCase();
+  if (valConstructorName !== 'object' && valConstructorName !== 'array')
     return value;
 
   let temp;
