@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/event",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -33,7 +33,7 @@
   },
   "peerDependencies": {
     "react": "^16.13.1",
-    "@agile-ts/core": "^0.1.0"
+    "@agile-ts/core": "^0.1.1"
   },
   "publishConfig": {
     "access": "public"
