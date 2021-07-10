@@ -8,19 +8,21 @@
  * @param value - Array/Object that gets copied
  */
 export function copy<T = any>(value: T): T {
-  // Extra checking '!value' because 'typeof null === object'
-  if (!value) return value;
+  // Extra checking 'value == null' because 'typeof null === object'
+  if (value == null || typeof value !== 'object') return value;
 
-  // Ignore everything that is no object or array
-  const valConstructorName = Object.getPrototypeOf(value).constructor.name;
-  if (!['object', 'array'].includes(valConstructorName.toLowerCase()))
+  // Ignore everything that is no object or array but has the type of an object (e.g. classes)
+  const valConstructorName = Object.getPrototypeOf(
+    value
+  ).constructor.name.toLowerCase();
+  if (valConstructorName !== 'object' && valConstructorName !== 'array')
     return value;
 
   let temp;
   const newObject: any = Array.isArray(value) ? [] : {};
   for (const property in value) {
     temp = value[property];
-    newObject[property] = typeof temp === 'object' ? copy(temp) : temp;
+    newObject[property] = copy(temp);
   }
   return newObject as T;
 }
@@ -86,9 +88,10 @@ export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
   config: { createUndefinedArray?: boolean } = {}
 ): Array<DataType> {
-  config = defineConfig(config, {
+  config = {
     createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
-  });
+    ...config,
+  };
   if (items == null && !config.createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
@@ -141,34 +144,6 @@ export function isJsonString(value: any): boolean {
 }
 
 //=========================================================================================================
-// Define Config
-//=========================================================================================================
-/**
- * @internal
- * Merges default values/properties into config object
- * @param config - Config object that receives default values
- * @param defaults - Default values object that gets merged into config object
- * @param overwriteUndefinedProperties - If undefined Properties in config gets overwritten by the default value
- */
-export function defineConfig<ConfigInterface = Object>(
-  config: ConfigInterface,
-  defaults: Object,
-  overwriteUndefinedProperties?: boolean
-): ConfigInterface {
-  if (overwriteUndefinedProperties === undefined)
-    overwriteUndefinedProperties = true;
-
-  if (overwriteUndefinedProperties) {
-    const finalConfig = { ...defaults, ...config };
-    for (const key in finalConfig)
-      if (finalConfig[key] === undefined) finalConfig[key] = defaults[key];
-    return finalConfig;
-  }
-
-  return { ...defaults, ...config };
-}
-
-//=========================================================================================================
 // Flat Merge
 //=========================================================================================================
 /**
@@ -192,9 +167,10 @@ export function flatMerge<DataType = Object>(
   changes: Object,
   config: FlatMergeConfigInterface = {}
 ): DataType {
-  config = defineConfig(config, {
+  config = {
     addNewProperties: true,
-  });
+    ...config,
+  };
 
   // Copy Source to avoid References
   const _source = copy<DataType>(source);
@@ -223,7 +199,14 @@ export function flatMerge<DataType = Object>(
  * @param value2 - Second Value
  */
 export function equal(value1: any, value2: any): boolean {
-  return value1 === value2 || JSON.stringify(value1) === JSON.stringify(value2);
+  return (
+    value1 === value2 ||
+    // Checking if 'value1' and 'value2' is typeof object before
+    // using the JSON.stringify comparison to optimize the performance
+    (typeof value1 === 'object' &&
+      typeof value2 === 'object' &&
+      JSON.stringify(value1) === JSON.stringify(value2))
+  );
 }
 
 //=========================================================================================================

@@ -9,7 +9,6 @@ export * from './utils';
 export * from '@agile-ts/utils';
 
 // Logger
-export * from '@agile-ts/logger';
 export * from './logCodeManager';
 
 // Agile

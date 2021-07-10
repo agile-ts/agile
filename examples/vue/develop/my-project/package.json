@@ -6,10 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "install:agile": "yalc add @agile-ts/core @agile-ts/vue & yarn install"
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/vue @agile-ts/logger & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/vue @agile-ts/logger & yarn install"
   },
   "dependencies": {
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@agile-ts/vue": "file:.yalc/@agile-ts/vue",
     "core-js": "^3.6.5",
     "vue": "^2.6.11"

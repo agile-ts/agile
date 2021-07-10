@@ -4,6 +4,10 @@
 
 // !! All internal Agile Editor modules must be imported from here!!
 
+// Event
 export * from './event.job';
 export * from './event.observer';
 export * from './event';
+
+// Shared
+export * from './shared';

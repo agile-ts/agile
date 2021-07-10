@@ -10,6 +10,6 @@ import { runsOnServer } from '@agile-ts/core';
 // is created synchronously, otherwise a store update may occur before the
 // subscription is created and an inconsistent state may be observed
 
-export const useIsomorphicLayoutEffect = runsOnServer()
+export const useIsomorphicLayoutEffect = !runsOnServer()
   ? useLayoutEffect
   : useEffect;

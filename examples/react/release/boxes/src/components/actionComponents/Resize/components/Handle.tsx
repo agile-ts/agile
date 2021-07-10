@@ -10,13 +10,14 @@ type Position = {
   bottom?: number | string;
 };
 
-interface HandlePropsInterface {
+export interface HandlePropsInterface {
   placement: ResizeHandle;
   visible: boolean;
+  innerRef?: any;
 }
 
 export const Handle: React.FC<HandlePropsInterface> = (props) => {
-  const { placement, visible } = props;
+  const { placement, visible, innerRef } = props;
 
   const size = 10;
   const position: Position = {};
@@ -34,6 +35,7 @@ export const Handle: React.FC<HandlePropsInterface> = (props) => {
 
   return (
     <Box
+      ref={innerRef}
       position="absolute"
       style={{
         ...position,

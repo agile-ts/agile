@@ -1,8 +1,4 @@
-import {
-  defineConfig,
-  State,
-  StateRuntimeJobConfigInterface,
-} from '@agile-ts/core';
+import { State, StateRuntimeJobConfigInterface } from '@agile-ts/core';
 import { MultiEditor, Validator, Status, ItemKey } from './internal';
 
 export class Item<DataType = any> extends State<DataType> {
@@ -31,9 +27,10 @@ export class Item<DataType = any> extends State<DataType> {
     super(editor.agileInstance(), data, {
       key: key,
     });
-    config = defineConfig(config, {
+    config = {
       canBeEdited: true,
-    });
+      ...config,
+    };
     this.editor = () => editor;
     this.validator = editor.getValidator(key);
     this.config = config;

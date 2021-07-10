@@ -1,5 +1,12 @@
 import ReactDOM from 'react-dom';
 import Benchmark, { Suite, Options } from 'benchmark';
+import {
+  cycleLog,
+  CycleResultInterface,
+  endBenchmarkLog,
+  getCycleResult,
+  startBenchmarkLog,
+} from '../../../benchmarkManager';
 
 // Files to run the Benchmark on
 import agileAutoTracking from './bench/agilets/autoTracking';
@@ -13,7 +20,7 @@ import recoil from './bench/recoil';
 window.Benchmark = Benchmark;
 
 // Create new Benchmark Test Suite
-const suite = new Suite('Count');
+const suite = new Suite('Computed');
 
 // Retrieve the Element to render the Benchmark Test Suite in
 const target = document.getElementById('bench')!;
@@ -53,6 +60,8 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
   };
 }
 
+const results: CycleResultInterface[] = [];
+
 // Add Tests to the Benchmark Test Suite
 suite
   .add('Agile Auto Tracking', configTest(agileAutoTracking))
@@ -63,16 +72,18 @@ suite
 
   // Add Listener
   .on('start', function (this: any) {
-    console.log(`Starting ${this.name}`);
+    startBenchmarkLog(this.name);
   })
   .on('cycle', (event: any) => {
-    console.log(
-      String(event.target),
+    const cycleResult = getCycleResult(event);
+    cycleLog(
+      cycleResult,
       `[Count: ${event.target.output}, ComputedCount: ${event.target.computedOutput}]`
     );
+    results.push(cycleResult);
   })
   .on('complete', function (this: any) {
-    console.log(`Fastest is ${this.filter('fastest').map('name')}`);
+    endBenchmarkLog(this.name, results, this.filter('fastest').map('name'));
 
     // @ts-ignore
     // Notify server that the Benchmark Test Suite has ended

@@ -16,8 +16,7 @@
 
 ## ⏰ Short Example
 ```ts
-const App = new Agile();
-const MY_EVENT = new Event(App);
+const MY_EVENT = createEvent();
 MY_EVENT.on((data) => {console.log("hello there " + data.name)}); // Print 'hello there jeff' if Event gets triggered
 MY_EVENT.trigger({name: "jeff"}); // Trigger Event
 ```

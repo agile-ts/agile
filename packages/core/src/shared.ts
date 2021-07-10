@@ -7,10 +7,8 @@ import {
   CreateComputedConfigInterface,
   CreateStorageConfigInterface,
   DefaultItem,
-  defineConfig,
   DependableAgileInstancesType,
   flatMerge,
-  Logger,
   removeProperties,
   runsOnServer,
   State,
@@ -23,7 +21,6 @@ import {
  */
 let sharedAgileInstance = new Agile({
   key: 'shared',
-  logConfig: { prefix: 'Agile', level: Logger.level.ERROR, active: true },
   localStorage: !runsOnServer(),
 });
 export { sharedAgileInstance as shared };
@@ -76,9 +73,10 @@ export function createState<ValueType = any>(
   initialValue: ValueType,
   config: CreateStateConfigInterfaceWithAgile = {}
 ): State<ValueType> {
-  config = defineConfig(config, {
+  config = {
     agileInstance: sharedAgileInstance,
-  });
+    ...config,
+  };
   return new State<ValueType>(
     config.agileInstance as any,
     initialValue,
@@ -172,9 +170,10 @@ export function createComputed<ComputedValueType = any>(
     if (configOrDeps) _config = configOrDeps;
   }
 
-  _config = defineConfig(_config, {
+  _config = {
     agileInstance: sharedAgileInstance,
-  });
+    ..._config,
+  };
 
   return new Computed<ComputedValueType>(
     _config.agileInstance as any,
@@ -186,7 +185,7 @@ export function createComputed<ComputedValueType = any>(
 export interface CreateAgileSubInstanceInterface {
   /**
    * Instance of Agile the Instance belongs to.
-   * @default Agile.shared
+   * @default sharedAgileInstance
    */
   agileInstance?: Agile;
 }

@@ -13,9 +13,6 @@ import {
   Storages,
   CreateStorageConfigInterface,
   RegisterConfigInterface,
-  defineConfig,
-  Logger,
-  CreateLoggerConfigInterface,
   StateConfigInterface,
   flatMerge,
   LogCodeManager,
@@ -44,14 +41,6 @@ export class Agile {
 
   // Integrations (UI-Frameworks) that are integrated into the Agile Instance
   public integrations: Integrations;
-
-  // Static Agile Logger with the default config
-  // (-> is overwritten by the last created Agile Instance)
-  static logger = new Logger({
-    prefix: 'Agile',
-    active: true,
-    level: Logger.level.ERROR,
-  });
 
   // Identifier used to bind an Agile Instance globally
   static globalKey = '__agile__';
@@ -83,14 +72,14 @@ export class Agile {
    * @param config - Configuration object
    */
   constructor(config: CreateAgileConfigInterface = {}) {
-    config = defineConfig(config, {
-      localStorage: true,
+    config = {
+      localStorage: false,
       waitForMount: true,
-      logConfig: {},
       bindGlobal: false,
       autoIntegrate: true,
       bucket: true,
-    });
+      ...config,
+    };
     this.config = {
       waitForMount: config.waitForMount as any,
       bucket: config.bucket as any,
@@ -105,10 +94,7 @@ export class Agile {
       localStorage: config.localStorage,
     });
 
-    // Assign customized Logger config to the static Logger
-    this.configureLogger(config.logConfig);
-
-    LogCodeManager.log('10:00:00', [], this, Agile.logger);
+    LogCodeManager.log('10:00:00', [], this);
 
     // Create a global instance of the Agile Instance.
     // Why? 'getAgileInstance()' returns the global Agile Instance
@@ -117,24 +103,6 @@ export class Agile {
       if (!globalBind(Agile.globalKey, this)) {
         LogCodeManager.log('10:02:00');
       }
-  }
-
-  /**
-   * Configures the logging behaviour of AgileTs.
-   *
-   * @public
-   * @param config - Configuration object
-   */
-  public configureLogger(config: CreateLoggerConfigInterface = {}): this {
-    config = defineConfig(config, {
-      prefix: 'Agile',
-      active: true,
-      level: Logger.level.SUCCESS,
-      canUseCustomStyles: true,
-      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
-    });
-    Agile.logger = new Logger(config);
-    return this;
   }
 
   /**
@@ -338,17 +306,6 @@ export type AgileKey = string | number;
 export interface CreateAgileConfigInterface
   extends IntegrationsConfigInterface {
   /**
-   * Configures the logging behaviour of AgileTs.
-   * @default {
-      prefix: 'Agile',
-      active: true,
-      level: Logger.level.WARN,
-      canUseCustomStyles: true,
-      allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
-    }
-   */
-  logConfig?: CreateLoggerConfigInterface;
-  /**
    * Whether the Subscription Container shouldn't be ready
    * until the UI-Component it represents has been mounted.
    * @default true
@@ -356,7 +313,7 @@ export interface CreateAgileConfigInterface
   waitForMount?: boolean;
   /**
    * Whether the Local Storage should be registered as a Agile Storage by default.
-   * @default true
+   * @default false
    */
   localStorage?: boolean;
   /**

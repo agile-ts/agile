@@ -3,7 +3,6 @@ import {
   Group,
   CreateObserverConfigInterface,
   copy,
-  defineConfig,
   equal,
   generateId,
   RuntimeJob,
@@ -68,7 +67,7 @@ export class GroupObserver<DataType = any> extends Observer {
     config: GroupIngestConfigInterface = {}
   ): void {
     const group = this.group();
-    config = defineConfig(config, {
+    config = {
       perform: true,
       background: false,
       sideEffects: {
@@ -77,7 +76,8 @@ export class GroupObserver<DataType = any> extends Observer {
       },
       force: false,
       maxTriesToUpdate: 3,
-    });
+      ...config,
+    };
 
     // Force overwriting the Group value if it is a placeholder.
     // After assigning a value to the Group, the Group is supposed to be no placeholder anymore.

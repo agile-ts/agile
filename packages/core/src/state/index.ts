@@ -2,7 +2,6 @@ import {
   Agile,
   StorageKey,
   copy,
-  defineConfig,
   flatMerge,
   isValidObject,
   StateObserver,
@@ -84,10 +83,11 @@ export class State<ValueType = any> {
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ) {
-    config = defineConfig(config, {
+    config = {
       dependents: [],
       isPlaceholder: false,
-    });
+      ...config,
+    };
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.observers['value'] = new StateObserver<ValueType>(this, {
@@ -196,9 +196,10 @@ export class State<ValueType = any> {
     value: ValueType | ((value: ValueType) => ValueType),
     config: StateIngestConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    config = {
       force: false,
-    });
+      ...config,
+    };
     const _value = isFunction(value)
       ? (value as any)(copy(this._value))
       : value;
@@ -299,9 +300,10 @@ export class State<ValueType = any> {
     targetWithChanges: Object,
     config: PatchConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    config = {
       addNewProperties: true,
-    });
+      ...config,
+    };
 
     // Check if the given conditions are suitable for a patch action
     if (!isValidObject(this.nextStateValue, true)) {
@@ -467,11 +469,12 @@ export class State<ValueType = any> {
       key = keyOrConfig as PersistentKey;
     }
 
-    _config = defineConfig(_config, {
+    _config = {
       loadValue: true,
       storageKeys: [],
-      defaultStorageKey: null,
-    });
+      defaultStorageKey: null as any,
+      ..._config,
+    };
 
     // Check if State is already persisted
     if (this.persistent != null && this.isPersisted) return this;
@@ -697,9 +700,10 @@ export class State<ValueType = any> {
     callback: SideEffectFunctionType<Instance>,
     config: AddSideEffectConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    config = {
       weight: 10,
-    });
+      ...config,
+    };
     if (!isFunction(callback)) {
       LogCodeManager.log('00:03:01', ['Side Effect Callback', 'function']);
       return this;

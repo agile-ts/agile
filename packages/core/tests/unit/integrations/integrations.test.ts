@@ -38,11 +38,12 @@ describe('Integrations Tests', () => {
     expect(Integrations.onRegisterInitialIntegration).toHaveBeenCalledWith(
       expect.any(Function)
     );
+    expect(integrations.integrate).toHaveBeenCalledTimes(2);
     expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration1);
     expect(integrations.integrate).toHaveBeenCalledWith(dummyIntegration2);
   });
 
-  it('should create Integrations without the before specified initial Integrations (specific config)', () => {
+  it('should create Integrations without the before specified initial Integrations (autoIntegrate = false)', () => {
     Integrations.initialIntegrations = [dummyIntegration1, dummyIntegration2];
 
     const integrations = new Integrations(dummyAgile, { autoIntegrate: false });
@@ -61,9 +62,27 @@ describe('Integrations Tests', () => {
     });
 
     describe('onRegisterInitialIntegration function tests', () => {
-      it('should register specified onRegisterInitialIntegration callback', () => {
-        // Nothing to testable
+      let callback;
+      beforeEach(() => {
+        callback = jest.fn();
       });
+
+      it(
+        'should register specified onRegisterInitialIntegration callback ' +
+          'and call it for each tracked initial Integrations',
+        () => {
+          Integrations.initialIntegrations = [
+            dummyIntegration1,
+            dummyIntegration2,
+          ];
+
+          Integrations.onRegisterInitialIntegration(callback);
+
+          expect(callback).toHaveBeenCalledTimes(2);
+          expect(callback).toHaveBeenCalledWith(dummyIntegration1);
+          expect(callback).toHaveBeenCalledWith(dummyIntegration2);
+        }
+      );
     });
 
     describe('addInitialIntegration function tests', () => {
@@ -74,6 +93,7 @@ describe('Integrations Tests', () => {
         Integrations.onRegisterInitialIntegration(callback1);
         Integrations.onRegisterInitialIntegration(callback2);
       });
+
       it(
         'should add valid Integration to the initialIntegrations array ' +
           'and fire the onRegisterInitialIntegration callbacks',
@@ -149,7 +169,7 @@ describe('Integrations Tests', () => {
 
         LogMock.hasLoggedCode(
           '18:03:00',
-          [dummyIntegration1._key],
+          [dummyIntegration1._key, dummyAgile.key],
           dummyIntegration1
         );
       });

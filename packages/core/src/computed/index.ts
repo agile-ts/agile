@@ -1,12 +1,10 @@
 import {
   State,
   Agile,
-  defineConfig,
   Observer,
   StateConfigInterface,
   ComputedTracker,
   Collection,
-  extractObservers,
   StateIngestConfigInterface,
   removeProperties,
   LogCodeManager,
@@ -52,10 +50,11 @@ export class Computed<ComputedValueType = any> extends State<
       key: config.key,
       dependents: config.dependents,
     });
-    config = defineConfig(config, {
+    config = {
       computedDeps: [],
       autodetect: !isAsyncFunction(computeFunction),
-    });
+      ...config,
+    };
     this.agileInstance = () => agileInstance;
     this.computeFunction = computeFunction;
     this.config = {
@@ -87,9 +86,10 @@ export class Computed<ComputedValueType = any> extends State<
    * @param config - Configuration object
    */
   public recompute(config: RecomputeConfigInterface = {}): this {
-    config = defineConfig(config, {
+    config = {
       autodetect: false,
-    });
+      ...config,
+    };
     this.compute({ autodetect: config.autodetect }).then((result) => {
       this.observers['value'].ingestValue(
         result,
@@ -120,9 +120,10 @@ export class Computed<ComputedValueType = any> extends State<
     deps: Array<DependableAgileInstancesType> = [],
     config: RecomputeConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
+    config = {
       autodetect: this.config.autodetect,
-    });
+      ...config,
+    };
 
     // Make this Observer no longer depend on the old dep Observers
     this.deps.forEach((observer) => {
@@ -160,9 +161,10 @@ export class Computed<ComputedValueType = any> extends State<
   public async compute(
     config: ComputeConfigInterface = {}
   ): Promise<ComputedValueType> {
-    config = defineConfig(config, {
+    config = {
       autodetect: this.config.autodetect,
-    });
+      ...config,
+    };
 
     // Start auto tracking of Observers on which the computeFunction might depend
     if (config.autodetect) ComputedTracker.track();

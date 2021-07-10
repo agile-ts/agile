@@ -1,5 +1,12 @@
 import ReactDOM from 'react-dom';
 import Benchmark, { Suite, Options } from 'benchmark';
+import {
+  cycleLog,
+  CycleResultInterface,
+  endBenchmarkLog,
+  getCycleResult,
+  startBenchmarkLog,
+} from '../../../benchmarkManager';
 
 // Files to run the Benchmark on
 import agilets from './bench/agilets';
@@ -52,29 +59,33 @@ function configTest(renderElement: (target: HTMLElement) => void): Options {
   };
 }
 
+const results: CycleResultInterface[] = [];
+
 // Add Tests to the Benchmark Test Suite
 suite
   .add('AgileTs', configTest(agilets))
-  .add('Hookstate', configTest(hookstate))
-  .add('Jotai', configTest(jotai))
-  .add('Mobx', configTest(mobx))
-  .add('Nano Stores', configTest(nanostores))
-  .add('PulseJs', configTest(pulsejs))
-  .add('Recoil', configTest(recoil))
-  .add('Redux', configTest(redux))
-  .add('Redux-Toolkit', configTest(reduxToolkit))
-  .add('Valtio', configTest(valtio))
-  .add('Zustand', configTest(zustand))
+  // .add('Hookstate', configTest(hookstate))
+  // .add('Jotai', configTest(jotai))
+  // .add('Mobx', configTest(mobx))
+  // .add('Nano Stores', configTest(nanostores))
+  // .add('PulseJs', configTest(pulsejs))
+  // .add('Recoil', configTest(recoil))
+  // .add('Redux', configTest(redux))
+  // .add('Redux-Toolkit', configTest(reduxToolkit))
+  // .add('Valtio', configTest(valtio))
+  // .add('Zustand', configTest(zustand))
 
   // Add Listener
   .on('start', function (this: any) {
-    console.log(`Starting ${this.name}`);
+    startBenchmarkLog(this.name);
   })
   .on('cycle', (event: any) => {
-    console.log(String(event.target), `[Count: ${event.target.output}]`);
+    const cycleResult = getCycleResult(event);
+    cycleLog(cycleResult, `[Count: ${event.target.output}]`);
+    results.push(cycleResult);
   })
   .on('complete', function (this: any) {
-    console.log(`Fastest is ${this.filter('fastest').map('name')}`);
+    endBenchmarkLog(this.name, results, this.filter('fastest').map('name'));
 
     // @ts-ignore
     // Notify server that the Benchmark Test Suite has ended
