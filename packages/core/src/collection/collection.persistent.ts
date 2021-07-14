@@ -128,35 +128,49 @@ export class CollectionPersistent<
           _storageItemKey
         );
 
-        // Persist and therefore load already present Item
+        // Persist an already present Item and load its value manually to be 100% sure
+        // that it was loaded completely
         if (item != null) {
           item.persist(itemStorageKey, {
+            loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey || undefined,
             storageKeys: this.storageKeys,
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
+          if (item?.persistent?.ready) await item.persistent.initialLoading();
         }
-        // Persist and therefore load not present Item
+        // Persist an already present placeholder Item
+        // or create a new placeholder Item to load the value in
+        // and load its value manually to be 100% sure
+        // that it was loaded completely.
+        // After a successful loading assign the now valid Item to the Collection.
         else {
-          // Create temporary placeholder Item in which the Item value will be loaded
-          const dummyItem = this.collection().createPlaceholderItem(itemKey);
-
-          // Persist dummy Item and load its value manually to be 100% sure
-          // that it was loaded completely and exists at all
-          dummyItem?.persist(itemStorageKey, {
+          const placeholderItem = this.collection().getItemWithReference(
+            itemKey
+          );
+          placeholderItem?.persist(itemStorageKey, {
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey as any,
             storageKeys: this.storageKeys,
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
-          if (dummyItem?.persistent?.ready) {
-            const loadedPersistedValueIntoItem = await dummyItem.persistent.loadPersistedValue(
-              itemStorageKey
-            ); // TODO FIRST GROUP REBUILD (by assigning loaded value to Item)
+          if (placeholderItem?.persistent?.ready) {
+            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue(); // TODO FIRST GROUP REBUILD (by assigning loaded value to Item)
 
             // If successfully loaded Item value, assign Item to Collection
-            if (loadedPersistedValueIntoItem)
-              this.collection().assignItem(dummyItem, { overwrite: false }); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
+            if (loadedPersistedValueIntoItem) {
+              this.collection().assignItem(placeholderItem, {
+                overwrite: true, // Overwrite to overwrite the existing placeholder Item, if one exists
+              }); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
+
+              placeholderItem.isPersisted = true;
+
+              // Manually increase Collection size,
+              // since these Items already exist in the Collection (because of 'getItemWithReference()')
+              // but were placeholder before the persisted value got loaded
+              // -> Collection size wasn't increased in 'assignItem()'
+              this.collection().size += 1;
+            }
           }
         }
       }

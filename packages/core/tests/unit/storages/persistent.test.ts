@@ -291,19 +291,22 @@ describe('Persistent Tests', () => {
     });
 
     describe('assignStorageKeys function tests', () => {
-      it('should assign passed StorageKeys and set first one as default StorageKey if no default Storage Key passed', () => {
-        persistent.assignStorageKeys(['test1', 'test2', 'test3']);
+      it(
+        'should assign specified StorageKeys and set first one as default StorageKey ' +
+          'if no default Storage Key was specified',
+        () => {
+          persistent.assignStorageKeys(['test1', 'test2', 'test3']);
 
-        expect(persistent.storageKeys).toStrictEqual([
-          'test1',
-          'test2',
-          'test3',
-        ]);
-        expect(persistent.config.defaultStorageKey).toBe('test1');
-        LogMock.hasNotLogged('warn');
-      });
+          expect(persistent.storageKeys).toStrictEqual([
+            'test1',
+            'test2',
+            'test3',
+          ]);
+          expect(persistent.config.defaultStorageKey).toBe('test1');
+        }
+      );
 
-      it('should assign passed StorageKeys and set passed defaultStorageKey as default StorageKey', () => {
+      it('should assign specified StorageKeys and assign specified defaultStorageKey as default StorageKey', () => {
         persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test3');
 
         expect(persistent.storageKeys).toStrictEqual([
@@ -312,12 +315,11 @@ describe('Persistent Tests', () => {
           'test3',
         ]);
         expect(persistent.config.defaultStorageKey).toBe('test3');
-        LogMock.hasNotLogged('warn');
       });
 
       it(
-        'should assign passed StorageKeys, set passed defaultStorageKey as default StorageKey' +
-          'and push defaultStorageKey into storageKeys',
+        'should assign specified StorageKeys, set specified defaultStorageKey as default StorageKey' +
+          "and push defaultStorageKey into storageKeys if it isn't included there",
         () => {
           persistent.assignStorageKeys(['test1', 'test2', 'test3'], 'test4');
 
@@ -331,31 +333,45 @@ describe('Persistent Tests', () => {
         }
       );
 
-      it('should try to get default StorageKey from Agile if no StorageKey got passed', () => {
-        dummyAgile.storages.register(
-          new Storage({
-            key: 'storage1',
-            methods: {
-              get: () => {
-                /* empty function */
+      it(
+        'should try to get default StorageKey from Agile if no StorageKey was specified ' +
+          'and assign it as StorageKey, if it is a valid StorageKey',
+        () => {
+          dummyAgile.storages.register(
+            new Storage({
+              key: 'storage1',
+              methods: {
+                get: () => {
+                  /* empty function */
+                },
+                set: () => {
+                  /* empty function */
+                },
+                remove: () => {
+                  /* empty function */
+                },
               },
-              set: () => {
-                /* empty function */
-              },
-              remove: () => {
-                /* empty function */
-              },
-            },
-          }),
-          { default: true }
-        );
+            }),
+            { default: true }
+          );
 
-        persistent.assignStorageKeys();
+          persistent.assignStorageKeys();
 
-        expect(persistent.storageKeys).toStrictEqual(['storage1']);
-        expect(persistent.config.defaultStorageKey).toBe('storage1');
-        LogMock.hasNotLogged('warn');
-      });
+          expect(persistent.storageKeys).toStrictEqual(['storage1']);
+          expect(persistent.config.defaultStorageKey).toBe('storage1');
+        }
+      );
+
+      it(
+        'should try to get default StorageKey from Agile if no StorageKey was specified ' +
+          "and shouldn't assign it as StorageKey, if it is no valid StorageKey",
+        () => {
+          persistent.assignStorageKeys();
+
+          expect(persistent.storageKeys).toStrictEqual([]);
+          expect(persistent.config.defaultStorageKey).toBeNull();
+        }
+      );
     });
 
     describe('initialLoading function tests', () => {
