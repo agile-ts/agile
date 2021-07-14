@@ -72,13 +72,12 @@ export class Collection<
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
-    _config = {
+    _config = defineConfig(_config, {
       primaryKey: 'id',
       groups: {},
       selectors: {},
       defaultGroupKey: 'default',
-      ..._config,
-    };
+    });
     this._key = _config.key;
     this.config = {
       defaultGroupKey: _config.defaultGroupKey as any,

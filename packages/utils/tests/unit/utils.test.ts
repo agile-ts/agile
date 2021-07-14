@@ -268,6 +268,7 @@ describe('Utils Tests', () => {
           allowLogging: true,
           loops: 10,
           isHuman: undefined,
+          notDefinedConfig: 'jeff',
         };
         expect(
           defineConfig(config, {
@@ -276,6 +277,10 @@ describe('Utils Tests', () => {
             isHuman: true,
             isRobot: false,
             name: 'jeff',
+            nested: {
+              frank: 'hans',
+              jeff: 'dieter',
+            },
           })
         ).toStrictEqual({
           allowLogging: true,
@@ -283,6 +288,11 @@ describe('Utils Tests', () => {
           isHuman: true,
           isRobot: false,
           name: 'jeff',
+          notDefinedConfig: 'jeff',
+          nested: {
+            frank: 'hans',
+            jeff: 'dieter',
+          },
         });
       }
     );
@@ -295,6 +305,7 @@ describe('Utils Tests', () => {
           allowLogging: true,
           loops: 10,
           isHuman: undefined,
+          notDefinedConfig: 'jeff',
         };
         expect(
           defineConfig(
@@ -305,6 +316,10 @@ describe('Utils Tests', () => {
               isHuman: true,
               isRobot: false,
               name: 'jeff',
+              nested: {
+                frank: 'hans',
+                jeff: 'dieter',
+              },
             },
             false
           )
@@ -314,6 +329,11 @@ describe('Utils Tests', () => {
           isHuman: undefined,
           isRobot: false,
           name: 'jeff',
+          notDefinedConfig: 'jeff',
+          nested: {
+            frank: 'hans',
+            jeff: 'dieter',
+          },
         });
       }
     );

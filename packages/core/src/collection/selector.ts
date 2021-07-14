@@ -163,15 +163,15 @@ export class Selector<
       Selector.rebuildItemSideEffectKey,
       (instance, config) => {
         if (!instance._item?.isPlaceholder)
-          instance._item?.set(
-            instance._value as any,
-            defineConfig(config, {
+          instance._item?.set(instance._value as any, {
+            ...config,
+            ...{
               sideEffects: {
                 enabled: true,
                 exclude: [Selector.rebuildSelectorSideEffectKey], // Exclude to avoid endless loops
               },
-            })
-          );
+            },
+          });
       },
       { weight: 90 }
     );
