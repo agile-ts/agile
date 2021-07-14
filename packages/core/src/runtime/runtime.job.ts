@@ -1,7 +1,7 @@
-import { Observer, SubscriptionContainer } from '../internal';
+import { defineConfig, Observer, SubscriptionContainer } from '../internal';
 
 export class RuntimeJob<ObserverType extends Observer = Observer> {
-  public config: RuntimeJobConfigInterface = {};
+  public config: RuntimeJobConfigInterface;
 
   // Key/Name identifier of the Runtime Job
   public _key?: RuntimeJobKey;
@@ -32,7 +32,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
     observer: ObserverType,
     config: CreateRuntimeJobConfigInterface = {}
   ) {
-    config = {
+    config = defineConfig(config, {
       background: false,
       sideEffects: {
         enabled: true,
@@ -40,8 +40,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       },
       force: false,
       maxTriesToUpdate: 3,
-      ...config,
-    }; // Not using 'defineConfig' for performance optimization
+    });
 
     this.config = {
       background: config.background,

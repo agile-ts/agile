@@ -1,4 +1,5 @@
 import {
+  defineConfig,
   RuntimeJob,
   RuntimeJobConfigInterface,
   RuntimeJobKey,
@@ -6,7 +7,7 @@ import {
 } from '../internal';
 
 export class StateRuntimeJob extends RuntimeJob<StateObserver> {
-  public config: StateRuntimeJobConfigInterface = {};
+  public config: StateRuntimeJobConfigInterface;
 
   /**
    * A State Runtime Job is sent to the Runtime on behalf of the State Observer it represents.
@@ -24,7 +25,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
     config: CreateStateRuntimeJobConfigInterface = {}
   ) {
     super(observer, config);
-    config = {
+    config = defineConfig(config, {
       background: false,
       sideEffects: {
         enabled: true,
@@ -34,8 +35,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
       storage: true,
       overwrite: false,
       maxTriesToUpdate: 3,
-      ...config,
-    }; // Not using 'defineConfig' for performance optimization
+    });
 
     this.config = {
       background: config.background,
