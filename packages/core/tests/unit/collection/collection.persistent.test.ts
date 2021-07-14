@@ -306,7 +306,7 @@ describe('CollectionPersistent Tests', () => {
           );
           expect(
             dummyDefaultGroup.persistent?.initialLoading
-          ).toHaveBeenCalled();
+          ).toHaveBeenCalledTimes(1);
 
           // Dummy Item 3
           expect(dummyItem3.persist).toHaveBeenCalledWith(
@@ -321,7 +321,9 @@ describe('CollectionPersistent Tests', () => {
               followCollectionPersistKeyPattern: false,
             }
           );
-          expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalled();
+          expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalledTimes(
+            1
+          );
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
             collectionPersistent._key
@@ -342,7 +344,6 @@ describe('CollectionPersistent Tests', () => {
           placeholderItem1.persist = jest.fn(function () {
             placeholderItem1.persistent = new StatePersistent(placeholderItem1);
             placeholderItem1.persistent.ready = true;
-            placeholderItem1.persistent.initialLoading = jest.fn();
             placeholderItem1.persistent.loadPersistedValue = jest
               .fn()
               .mockReturnValueOnce(true);
@@ -351,14 +352,12 @@ describe('CollectionPersistent Tests', () => {
           placeholderItem2.persist = jest.fn(function () {
             placeholderItem2.persistent = new StatePersistent(placeholderItem2);
             placeholderItem2.persistent.ready = false;
-            placeholderItem2.persistent.initialLoading = jest.fn();
             placeholderItem2.persistent.loadPersistedValue = jest.fn();
             return null as any;
           });
           placeholderItem3.persist = jest.fn(function () {
             placeholderItem3.persistent = new StatePersistent(placeholderItem3);
             placeholderItem3.persistent.ready = true;
-            placeholderItem3.persistent.initialLoading = jest.fn();
             placeholderItem3.persistent.loadPersistedValue = jest
               .fn()
               .mockReturnValueOnce(false);
@@ -397,7 +396,7 @@ describe('CollectionPersistent Tests', () => {
           );
           expect(
             dummyDefaultGroup.persistent?.initialLoading
-          ).toHaveBeenCalled();
+          ).toHaveBeenCalledTimes(1);
 
           // Placeholder Item 1
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
@@ -416,8 +415,8 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(
-            placeholderItem1?.persistent?.initialLoading
-          ).not.toHaveBeenCalled();
+            placeholderItem1?.persistent?.loadPersistedValue
+          ).toHaveBeenCalledTimes(1);
           expect(
             dummyCollection.assignItem
           ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
@@ -440,7 +439,7 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(
-            placeholderItem2?.persistent?.initialLoading
+            placeholderItem2?.persistent?.loadPersistedValue
           ).not.toHaveBeenCalled();
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem2
@@ -464,8 +463,8 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(
-            placeholderItem3?.persistent?.initialLoading
-          ).not.toHaveBeenCalled();
+            placeholderItem3?.persistent?.loadPersistedValue
+          ).toHaveBeenCalledTimes(1);
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem3
           ); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
@@ -493,7 +492,6 @@ describe('CollectionPersistent Tests', () => {
           placeholderItem1.persist = jest.fn(function () {
             placeholderItem1.persistent = new StatePersistent(placeholderItem1);
             placeholderItem1.persistent.ready = true;
-            placeholderItem1.persistent.initialLoading = jest.fn();
             placeholderItem1.persistent.loadPersistedValue = jest
               .fn()
               .mockReturnValueOnce(true);
@@ -532,7 +530,7 @@ describe('CollectionPersistent Tests', () => {
           );
           expect(
             dummyDefaultGroup.persistent?.initialLoading
-          ).toHaveBeenCalled();
+          ).toHaveBeenCalledTimes(1);
 
           // Dummy Item 3
           expect(dummyItem3.persist).toHaveBeenCalledWith(
@@ -544,7 +542,9 @@ describe('CollectionPersistent Tests', () => {
               followCollectionPersistKeyPattern: false,
             }
           );
-          expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalled();
+          expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalledTimes(
+            1
+          );
           expect(dummyCollection.getItemWithReference).not.toHaveBeenCalledWith(
             '3'
           ); // Because Item 3 is already present in the Collection
@@ -566,8 +566,8 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(
-            placeholderItem1?.persistent?.initialLoading
-          ).not.toHaveBeenCalled();
+            placeholderItem1?.persistent?.loadPersistedValue
+          ).toHaveBeenCalledTimes(1);
           expect(
             dummyCollection.assignItem
           ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });

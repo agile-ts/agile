@@ -155,9 +155,7 @@ export class CollectionPersistent<
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
           if (placeholderItem?.persistent?.ready) {
-            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue(
-              itemStorageKey
-            ); // TODO FIRST GROUP REBUILD (by assigning loaded value to Item)
+            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue(); // TODO FIRST GROUP REBUILD (by assigning loaded value to Item)
 
             // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem) {
@@ -168,9 +166,9 @@ export class CollectionPersistent<
               placeholderItem.isPersisted = true;
 
               // Manually increase Collection size,
-              // since these Items already exist in the Collection
+              // since these Items already exist in the Collection (because of 'getItemWithReference()')
               // but were placeholder before the persisted value got loaded
-              // -> Collection size wasn't increased yet
+              // -> Collection size wasn't increased in 'assignItem()'
               this.collection().size += 1;
             }
           }
