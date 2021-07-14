@@ -300,7 +300,6 @@ describe('Persistent Tests', () => {
           'test3',
         ]);
         expect(persistent.config.defaultStorageKey).toBe('test1');
-        LogMock.hasNotLogged('warn');
       });
 
       it('should assign passed StorageKeys and set passed defaultStorageKey as default StorageKey', () => {
@@ -312,7 +311,6 @@ describe('Persistent Tests', () => {
           'test3',
         ]);
         expect(persistent.config.defaultStorageKey).toBe('test3');
-        LogMock.hasNotLogged('warn');
       });
 
       it(
@@ -331,31 +329,45 @@ describe('Persistent Tests', () => {
         }
       );
 
-      it('should try to get default StorageKey from Agile if no StorageKey got passed', () => {
-        dummyAgile.storages.register(
-          new Storage({
-            key: 'storage1',
-            methods: {
-              get: () => {
-                /* empty function */
+      it(
+        'should try to get default StorageKey from Agile if no StorageKey got passed ' +
+          'and assign it, if it is an valid StorageKey ',
+        () => {
+          dummyAgile.storages.register(
+            new Storage({
+              key: 'storage1',
+              methods: {
+                get: () => {
+                  /* empty function */
+                },
+                set: () => {
+                  /* empty function */
+                },
+                remove: () => {
+                  /* empty function */
+                },
               },
-              set: () => {
-                /* empty function */
-              },
-              remove: () => {
-                /* empty function */
-              },
-            },
-          }),
-          { default: true }
-        );
+            }),
+            { default: true }
+          );
 
-        persistent.assignStorageKeys();
+          persistent.assignStorageKeys();
 
-        expect(persistent.storageKeys).toStrictEqual(['storage1']);
-        expect(persistent.config.defaultStorageKey).toBe('storage1');
-        LogMock.hasNotLogged('warn');
-      });
+          expect(persistent.storageKeys).toStrictEqual(['storage1']);
+          expect(persistent.config.defaultStorageKey).toBe('storage1');
+        }
+      );
+
+      it(
+        'should try to get default StorageKey from Agile if no StorageKey got passed ' +
+          "and shouldn't assign it, if it is no valid StorageKey ",
+        () => {
+          persistent.assignStorageKeys();
+
+          expect(persistent.storageKeys).toStrictEqual([]);
+          expect(persistent.config.defaultStorageKey).toBeNull();
+        }
+      );
     });
 
     describe('initialLoading function tests', () => {

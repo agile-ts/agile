@@ -307,7 +307,6 @@ describe('CollectionPersistent Tests', () => {
           expect(
             dummyDefaultGroup.persistent?.initialLoading
           ).toHaveBeenCalled();
-          expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
           // Dummy Item 3
           expect(dummyItem3.persist).toHaveBeenCalledWith(
@@ -323,7 +322,6 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalled();
-          expect(dummyItem3.isPersisted).toBeTruthy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
             collectionPersistent._key
@@ -400,7 +398,6 @@ describe('CollectionPersistent Tests', () => {
           expect(
             dummyDefaultGroup.persistent?.initialLoading
           ).toHaveBeenCalled();
-          expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
           // Placeholder Item 1
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
@@ -424,6 +421,7 @@ describe('CollectionPersistent Tests', () => {
           expect(
             dummyCollection.assignItem
           ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+          expect(placeholderItem1.isPersisted).toBeTruthy();
 
           // Placeholder Item 2
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
@@ -447,6 +445,7 @@ describe('CollectionPersistent Tests', () => {
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem2
           ); // Because Item persistent isn't ready
+          expect(placeholderItem2.isPersisted).toBeFalsy();
 
           // Placeholder Item 3
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
@@ -470,6 +469,7 @@ describe('CollectionPersistent Tests', () => {
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem3
           ); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
+          expect(placeholderItem3.isPersisted).toBeFalsy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
             collectionPersistent._key
@@ -533,7 +533,6 @@ describe('CollectionPersistent Tests', () => {
           expect(
             dummyDefaultGroup.persistent?.initialLoading
           ).toHaveBeenCalled();
-          expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
           // Dummy Item 3
           expect(dummyItem3.persist).toHaveBeenCalledWith(
@@ -546,7 +545,6 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalled();
-          expect(dummyItem3.isPersisted).toBeTruthy();
           expect(dummyCollection.getItemWithReference).not.toHaveBeenCalledWith(
             '3'
           ); // Because Item 3 is already present in the Collection
@@ -573,6 +571,7 @@ describe('CollectionPersistent Tests', () => {
           expect(
             dummyCollection.assignItem
           ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+          expect(placeholderItem1.isPersisted).toBeTruthy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
             'dummyKey'

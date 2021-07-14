@@ -112,16 +112,6 @@ export class CollectionPersistent<
       if (defaultGroup.persistent?.ready)
         await defaultGroup.persistent.initialLoading();
 
-      // Is overkill I guess, because what happens if the Group isn't persisted,
-      // well then something wen wrong because the 'Collection' is persisted (see above 'isPersisted')
-      // if (
-      //   !defaultGroup.persistent?.ready ||
-      //   !(await defaultGroup.persistent.loadPersistedValue(
-      //     defaultGroupStorageKey
-      //   ))
-      // )
-      //   return false;
-
       // TODO rebuild the default Group once at the end when all Items were loaded into the Collection
       //  because otherwise it rebuilds the Group for each loaded Item
       //  (-> warnings are printed for all not yet loaded Items when rebuilding the Group)
@@ -174,6 +164,8 @@ export class CollectionPersistent<
               this.collection().assignItem(placeholderItem, {
                 overwrite: true, // Overwrite to overwrite the existing placeholder Item, if one exists
               }); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
+
+              placeholderItem.isPersisted = true;
 
               // Manually increase Collection size,
               // since these Items already exist in the Collection
