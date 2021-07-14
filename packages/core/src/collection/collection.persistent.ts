@@ -112,6 +112,16 @@ export class CollectionPersistent<
       if (defaultGroup.persistent?.ready)
         await defaultGroup.persistent.initialLoading();
 
+      // Is overkill I guess, because what happens if the Group isn't persisted,
+      // well then something wen wrong because the 'Collection' is persisted (see above 'isPersisted')
+      // if (
+      //   !defaultGroup.persistent?.ready ||
+      //   !(await defaultGroup.persistent.loadPersistedValue(
+      //     defaultGroupStorageKey
+      //   ))
+      // )
+      //   return false;
+
       // TODO rebuild the default Group once at the end when all Items were loaded into the Collection
       //  because otherwise it rebuilds the Group for each loaded Item
       //  (-> warnings are printed for all not yet loaded Items when rebuilding the Group)
@@ -137,9 +147,7 @@ export class CollectionPersistent<
             storageKeys: this.storageKeys,
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
-          if (item?.persistent?.ready) {
-            await item.persistent.loadPersistedValue(itemStorageKey);
-          }
+          if (item?.persistent?.ready) await item.persistent.initialLoading();
         }
         // Persist an already present placeholder Item
         // or create a new placeholder Item to load the value in

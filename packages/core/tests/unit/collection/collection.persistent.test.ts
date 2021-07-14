@@ -183,22 +183,34 @@ describe('CollectionPersistent Tests', () => {
         id: '1',
         name: 'frank',
       });
-      dummyItem1.persistent = new StatePersistent(dummyItem1);
       dummyItem1.persist = jest.fn();
+      dummyItem1.persistent = new StatePersistent(dummyItem1);
+      if (dummyItem1.persistent) {
+        dummyItem1.persistent.ready = true;
+        dummyItem1.persistent.initialLoading = jest.fn();
+      }
 
       dummyItem2 = new Item<ItemInterface>(dummyCollection, {
         id: '2',
         name: 'dieter',
       });
-      dummyItem2.persistent = new StatePersistent(dummyItem2);
       dummyItem2.persist = jest.fn();
+      dummyItem2.persistent = new StatePersistent(dummyItem2);
+      if (dummyItem2.persistent) {
+        dummyItem2.persistent.ready = true;
+        dummyItem2.persistent.initialLoading = jest.fn();
+      }
 
       dummyItem3 = new Item<ItemInterface>(dummyCollection, {
         id: '3',
         name: 'hans',
       });
-      dummyItem3.persistent = new StatePersistent(dummyItem3);
       dummyItem3.persist = jest.fn();
+      dummyItem3.persistent = new StatePersistent(dummyItem3);
+      if (dummyItem3.persistent) {
+        dummyItem3.persistent.ready = true;
+        dummyItem3.persistent.initialLoading = jest.fn();
+      }
 
       dummyItem4WithoutPersistent = new Item<ItemInterface>(dummyCollection, {
         id: '4',
@@ -230,8 +242,10 @@ describe('CollectionPersistent Tests', () => {
 
         placeholderItem1 = dummyCollection.createPlaceholderItem('1');
         placeholderItem1.persist = jest.fn();
+
         placeholderItem2 = dummyCollection.createPlaceholderItem('2');
         placeholderItem2.persist = jest.fn();
+
         placeholderItem3 = dummyCollection.createPlaceholderItem('3');
         placeholderItem3.persist = jest.fn();
 
@@ -255,94 +269,18 @@ describe('CollectionPersistent Tests', () => {
         dummyAgile.storages.get = jest.fn();
       });
 
-      it('should load default Group and apply persisted value to Items that are already present in the Collection (persistentKey)', async () => {
-        collectionPersistent.ready = true;
-        dummyCollection.data = {
-          ['3']: dummyItem3,
-        };
-        dummyAgile.storages.get = jest
-          .fn()
-          .mockReturnValueOnce(Promise.resolve(true));
-        dummyDefaultGroup._value = ['3'];
-
-        const response = await collectionPersistent.loadPersistedValue();
-
-        expect(response).toBeTruthy();
-        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
-          collectionPersistent._key,
-          collectionPersistent.config.defaultStorageKey
-        );
-
-        expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
-        expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
-            dummyDefaultGroup._key,
-            collectionPersistent._key
-          ),
-          {
-            loadValue: false,
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
-        expect(dummyDefaultGroup.persistent?.initialLoading).toHaveBeenCalled();
-        expect(dummyDefaultGroup.isPersisted).toBeTruthy();
-
-        expect(dummyItem3.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            '3',
-            collectionPersistent._key
-          ),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
-
-        expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
-          collectionPersistent._key
-        );
-      });
-
       it(
-        'should load default Group ' +
-          "and create/add persisted Items that aren't present in the Collection yet (persistentKey)",
+        'should load default Group and apply persisted value to Items ' +
+          'that are already present in the Collection (persistentKey)',
         async () => {
           collectionPersistent.ready = true;
-          dummyCollection.data = {};
+          dummyCollection.data = {
+            ['3']: dummyItem3,
+          };
           dummyAgile.storages.get = jest
             .fn()
             .mockReturnValueOnce(Promise.resolve(true));
-          placeholderItem1.persist = jest.fn(function () {
-            placeholderItem1.persistent = new StatePersistent(placeholderItem1);
-            placeholderItem1.persistent.ready = true;
-            placeholderItem1.persistent.loadPersistedValue = jest
-              .fn()
-              .mockReturnValueOnce(true);
-            return null as any;
-          });
-          placeholderItem2.persist = jest.fn(function () {
-            placeholderItem2.persistent = new StatePersistent(placeholderItem2);
-            placeholderItem2.persistent.ready = false;
-            placeholderItem2.persistent.loadPersistedValue = jest.fn();
-            return null as any;
-          });
-          placeholderItem3.persist = jest.fn(function () {
-            placeholderItem3.persistent = new StatePersistent(placeholderItem3);
-            placeholderItem3.persistent.ready = true;
-            placeholderItem3.persistent.loadPersistedValue = jest
-              .fn()
-              .mockReturnValueOnce(false);
-            return null as any;
-          });
-          dummyCollection.createPlaceholderItem = jest
-            .fn()
-            .mockReturnValueOnce(placeholderItem1)
-            .mockReturnValueOnce(placeholderItem2)
-            .mockReturnValueOnce(placeholderItem3);
-          dummyDefaultGroup._value = ['1', '2', '3'];
+          dummyDefaultGroup._value = ['3'];
 
           const response = await collectionPersistent.loadPersistedValue();
 
@@ -352,6 +290,7 @@ describe('CollectionPersistent Tests', () => {
             collectionPersistent.config.defaultStorageKey
           );
 
+          // Default Group
           expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
           expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
             CollectionPersistent.getGroupStorageKey(
@@ -370,14 +309,102 @@ describe('CollectionPersistent Tests', () => {
           ).toHaveBeenCalled();
           expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
-          expect(dummyCollection.createPlaceholderItem).toHaveBeenCalledWith(
+          // Dummy Item 3
+          expect(dummyItem3.persist).toHaveBeenCalledWith(
+            CollectionPersistent.getItemStorageKey(
+              '3',
+              collectionPersistent._key
+            ),
+            {
+              loadValue: false,
+              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+              storageKeys: collectionPersistent.storageKeys,
+              followCollectionPersistKeyPattern: false,
+            }
+          );
+          expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalled();
+          expect(dummyItem3.isPersisted).toBeTruthy();
+
+          expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
+            collectionPersistent._key
+          );
+        }
+      );
+
+      it(
+        'should load default Group and create/add persisted Items ' +
+          "that aren't present in the Collection yet (persistentKey)",
+        async () => {
+          collectionPersistent.ready = true;
+          dummyCollection.data = {};
+          dummyCollection.size = 0;
+          dummyAgile.storages.get = jest
+            .fn()
+            .mockReturnValueOnce(Promise.resolve(true));
+          placeholderItem1.persist = jest.fn(function () {
+            placeholderItem1.persistent = new StatePersistent(placeholderItem1);
+            placeholderItem1.persistent.ready = true;
+            placeholderItem1.persistent.initialLoading = jest.fn();
+            placeholderItem1.persistent.loadPersistedValue = jest
+              .fn()
+              .mockReturnValueOnce(true);
+            return null as any;
+          });
+          placeholderItem2.persist = jest.fn(function () {
+            placeholderItem2.persistent = new StatePersistent(placeholderItem2);
+            placeholderItem2.persistent.ready = false;
+            placeholderItem2.persistent.initialLoading = jest.fn();
+            placeholderItem2.persistent.loadPersistedValue = jest.fn();
+            return null as any;
+          });
+          placeholderItem3.persist = jest.fn(function () {
+            placeholderItem3.persistent = new StatePersistent(placeholderItem3);
+            placeholderItem3.persistent.ready = true;
+            placeholderItem3.persistent.initialLoading = jest.fn();
+            placeholderItem3.persistent.loadPersistedValue = jest
+              .fn()
+              .mockReturnValueOnce(false);
+            return null as any;
+          });
+          dummyCollection.getItemWithReference = jest
+            .fn()
+            .mockReturnValueOnce(placeholderItem1)
+            .mockReturnValueOnce(placeholderItem2)
+            .mockReturnValueOnce(placeholderItem3);
+          dummyDefaultGroup._value = ['1', '2', '3'];
+
+          const response = await collectionPersistent.loadPersistedValue();
+
+          expect(response).toBeTruthy();
+          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+            collectionPersistent._key,
+            collectionPersistent.config.defaultStorageKey
+          );
+
+          expect(dummyCollection.size).toBe(1); // Because only placeholder Item 1 was added
+
+          // Default Group
+          expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
+          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
+            CollectionPersistent.getGroupStorageKey(
+              dummyDefaultGroup._key,
+              collectionPersistent._key
+            ),
+            {
+              loadValue: false,
+              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+              storageKeys: collectionPersistent.storageKeys,
+              followCollectionPersistKeyPattern: false,
+            }
+          );
+          expect(
+            dummyDefaultGroup.persistent?.initialLoading
+          ).toHaveBeenCalled();
+          expect(dummyDefaultGroup.isPersisted).toBeTruthy();
+
+          // Placeholder Item 1
+          expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
             '1'
-          );
-          expect(dummyCollection.createPlaceholderItem).toHaveBeenCalledWith(
-            '2'
-          );
-          expect(dummyCollection.createPlaceholderItem).toHaveBeenCalledWith(
-            '3'
           );
           expect(placeholderItem1.persist).toHaveBeenCalledWith(
             CollectionPersistent.getItemStorageKey(
@@ -391,6 +418,17 @@ describe('CollectionPersistent Tests', () => {
               followCollectionPersistKeyPattern: false,
             }
           );
+          expect(
+            placeholderItem1?.persistent?.initialLoading
+          ).not.toHaveBeenCalled();
+          expect(
+            dummyCollection.assignItem
+          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+
+          // Placeholder Item 2
+          expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+            '2'
+          );
           expect(placeholderItem2.persist).toHaveBeenCalledWith(
             CollectionPersistent.getItemStorageKey(
               '2',
@@ -402,6 +440,17 @@ describe('CollectionPersistent Tests', () => {
               storageKeys: collectionPersistent.storageKeys,
               followCollectionPersistKeyPattern: false,
             }
+          );
+          expect(
+            placeholderItem2?.persistent?.initialLoading
+          ).not.toHaveBeenCalled();
+          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
+            placeholderItem2
+          ); // Because Item persistent isn't ready
+
+          // Placeholder Item 3
+          expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
+            '3'
           );
           expect(placeholderItem3.persist).toHaveBeenCalledWith(
             CollectionPersistent.getItemStorageKey(
@@ -416,11 +465,8 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(
-            dummyCollection.assignItem
-          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: false });
-          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
-            placeholderItem2
-          ); // Because Item persistent isn't ready
+            placeholderItem3?.persistent?.initialLoading
+          ).not.toHaveBeenCalled();
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
             placeholderItem3
           ); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
@@ -440,18 +486,20 @@ describe('CollectionPersistent Tests', () => {
           dummyCollection.data = {
             ['3']: dummyItem3,
           };
+          dummyCollection.size = 1;
           dummyAgile.storages.get = jest
             .fn()
             .mockReturnValueOnce(Promise.resolve(true));
           placeholderItem1.persist = jest.fn(function () {
             placeholderItem1.persistent = new StatePersistent(placeholderItem1);
             placeholderItem1.persistent.ready = true;
+            placeholderItem1.persistent.initialLoading = jest.fn();
             placeholderItem1.persistent.loadPersistedValue = jest
               .fn()
               .mockReturnValueOnce(true);
             return null as any;
           });
-          dummyCollection.createPlaceholderItem = jest
+          dummyCollection.getItemWithReference = jest
             .fn()
             .mockReturnValueOnce(placeholderItem1);
           dummyDefaultGroup._value = ['1', '3'];
@@ -466,6 +514,9 @@ describe('CollectionPersistent Tests', () => {
             collectionPersistent.config.defaultStorageKey
           );
 
+          expect(dummyCollection.size).toBe(2); // Because only placeholder Item 1 was added
+
+          // Default Group
           expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
           expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
             CollectionPersistent.getGroupStorageKey(
@@ -484,19 +535,27 @@ describe('CollectionPersistent Tests', () => {
           ).toHaveBeenCalled();
           expect(dummyDefaultGroup.isPersisted).toBeTruthy();
 
+          // Dummy Item 3
           expect(dummyItem3.persist).toHaveBeenCalledWith(
             CollectionPersistent.getItemStorageKey('3', 'dummyKey'),
             {
+              loadValue: false,
               defaultStorageKey: collectionPersistent.config.defaultStorageKey,
               storageKeys: collectionPersistent.storageKeys,
               followCollectionPersistKeyPattern: false,
             }
           );
+          expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalled();
+          expect(dummyItem3.isPersisted).toBeTruthy();
+          expect(dummyCollection.getItemWithReference).not.toHaveBeenCalledWith(
+            '3'
+          ); // Because Item 3 is already present in the Collection
+          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
+            placeholderItem3
+          ); // Because Item 3 is already present in the Collection
 
-          expect(
-            dummyCollection.createPlaceholderItem
-          ).not.toHaveBeenCalledWith('3'); // Because Item 3 is already present in the Collection
-          expect(dummyCollection.createPlaceholderItem).toHaveBeenCalledWith(
+          // Placeholder Item 1
+          expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
             '1'
           );
           expect(placeholderItem1.persist).toHaveBeenCalledWith(
@@ -509,11 +568,11 @@ describe('CollectionPersistent Tests', () => {
             }
           );
           expect(
+            placeholderItem1?.persistent?.initialLoading
+          ).not.toHaveBeenCalled();
+          expect(
             dummyCollection.assignItem
-          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: false });
-          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
-            placeholderItem3
-          ); // Because Item 3 is already present in the Collection
+          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
             'dummyKey'
