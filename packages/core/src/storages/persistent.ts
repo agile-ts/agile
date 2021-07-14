@@ -1,4 +1,10 @@
-import { Agile, copy, LogCodeManager, StorageKey } from '../internal';
+import {
+  Agile,
+  copy,
+  defineConfig,
+  LogCodeManager,
+  StorageKey,
+} from '../internal';
 
 export class Persistent {
   // Agile Instance the Persistent belongs to
@@ -38,12 +44,11 @@ export class Persistent {
   ) {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
-    config = {
+    config = defineConfig(config, {
       instantiate: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ...config,
-    };
+    });
     this.agileInstance().storages.persistentInstances.add(this);
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
 

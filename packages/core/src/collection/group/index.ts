@@ -17,6 +17,7 @@ import {
   StateObserversInterface,
   GroupObserver,
   StateObserver,
+  defineConfig,
 } from '../../internal';
 
 export class Group<
@@ -183,11 +184,10 @@ export class Group<
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
-    config = {
+    defineConfig(config, {
       method: 'push',
       overwrite: false,
-      ...config,
-    };
+    });
 
     // Add itemKeys to Group
     _itemKeys.forEach((itemKey) => {
@@ -304,13 +304,12 @@ export class Group<
       key = keyOrConfig as PersistentKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Create storageItemKey based on Collection key/name identifier
     if (_config.followCollectionPersistKeyPattern) {

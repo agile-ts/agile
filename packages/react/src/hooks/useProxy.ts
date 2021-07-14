@@ -4,6 +4,7 @@ import {
   useAgile,
 } from './useAgile';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
+import { defineConfig } from '@agile-ts/core';
 
 export function useProxy<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
@@ -22,5 +23,10 @@ export function useProxy<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
-  return useAgile(deps as any, { ...config, ...{ proxyBased: true } });
+  return useAgile(
+    deps as any,
+    defineConfig(config, {
+      proxyBased: true,
+    })
+  );
 }

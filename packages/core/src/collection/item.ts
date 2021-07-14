@@ -9,6 +9,7 @@ import {
   CollectionPersistent,
   StatePersistentConfigInterface,
   DefaultItem,
+  defineConfig,
 } from '../internal';
 
 export class Item<DataType extends Object = DefaultItem> extends State<
@@ -62,7 +63,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
     config: StateRuntimeJobConfigInterface = {}
   ): this {
     super.setKey(value);
-    config = {
+    config = defineConfig(config, {
       sideEffects: {
         enabled: true,
         exclude: [],
@@ -71,8 +72,7 @@ export class Item<DataType extends Object = DefaultItem> extends State<
       force: false,
       storage: true,
       overwrite: false,
-      ...config,
-    };
+    });
     if (value == null) return this;
 
     // Update 'rebuildGroupsThatIncludeItemKey' side effect to the new itemKey
@@ -129,13 +129,12 @@ export class Item<DataType extends Object = DefaultItem> extends State<
       key = keyOrConfig as PersistentKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Create storageItemKey based on Collection key/name identifier
     if (_config.followCollectionPersistKeyPattern) {

@@ -13,6 +13,7 @@ import {
   notEqual,
   createArrayFromObject,
   removeProperties,
+  defineConfig,
 } from '../../src';
 import { LogMock } from '../../../core/tests/helper/logMock';
 
@@ -256,6 +257,86 @@ describe('Utils Tests', () => {
       expect(isJsonString(10)).toBeFalsy();
       expect(isJsonString({ name: 'John', age: 31 })).toBeFalsy();
     });
+  });
+
+  describe('defineConfig function tests', () => {
+    it(
+      'should merge the defaults object into the config object ' +
+        'and overwrite undefined properties (default config)',
+      () => {
+        const config = {
+          allowLogging: true,
+          loops: 10,
+          isHuman: undefined,
+          notDefinedConfig: 'jeff',
+        };
+        expect(
+          defineConfig(config, {
+            allowLogging: false,
+            loops: 15,
+            isHuman: true,
+            isRobot: false,
+            name: 'jeff',
+            nested: {
+              frank: 'hans',
+              jeff: 'dieter',
+            },
+          })
+        ).toStrictEqual({
+          allowLogging: true,
+          loops: 10,
+          isHuman: true,
+          isRobot: false,
+          name: 'jeff',
+          notDefinedConfig: 'jeff',
+          nested: {
+            frank: 'hans',
+            jeff: 'dieter',
+          },
+        });
+      }
+    );
+
+    it(
+      'should merge the defaults object into the config object ' +
+        "and shouldn't overwrite undefined properties (overwriteUndefinedProperties = false)",
+      () => {
+        const config = {
+          allowLogging: true,
+          loops: 10,
+          isHuman: undefined,
+          notDefinedConfig: 'jeff',
+        };
+        expect(
+          defineConfig(
+            config,
+            {
+              allowLogging: false,
+              loops: 15,
+              isHuman: true,
+              isRobot: false,
+              name: 'jeff',
+              nested: {
+                frank: 'hans',
+                jeff: 'dieter',
+              },
+            },
+            false
+          )
+        ).toStrictEqual({
+          allowLogging: true,
+          loops: 10,
+          isHuman: undefined,
+          isRobot: false,
+          name: 'jeff',
+          notDefinedConfig: 'jeff',
+          nested: {
+            frank: 'hans',
+            jeff: 'dieter',
+          },
+        });
+      }
+    );
   });
 
   describe('flatMerge function tests', () => {

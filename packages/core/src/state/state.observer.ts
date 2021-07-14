@@ -14,6 +14,7 @@ import {
   generateId,
   SubscriptionContainer,
   ObserverKey,
+  defineConfig,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -36,7 +37,12 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
-    super(state.agileInstance(), { ...config, ...{ value: state._value } });
+    super(
+      state.agileInstance(),
+      defineConfig(config, {
+        value: state._value,
+      })
+    );
     this.state = () => state;
     this.nextStateValue = copy(state._value);
   }
@@ -80,7 +86,7 @@ export class StateObserver<ValueType = any> extends Observer {
     config: StateIngestConfigInterface = {}
   ): void {
     const state = this.state();
-    config = {
+    config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: {
@@ -91,8 +97,7 @@ export class StateObserver<ValueType = any> extends Observer {
       storage: true,
       overwrite: false,
       maxTriesToUpdate: 3,
-      ...config,
-    };
+    });
 
     // Force overwriting the State value if it is a placeholder.
     // After assigning a value to the State, the State is supposed to be no placeholder anymore.

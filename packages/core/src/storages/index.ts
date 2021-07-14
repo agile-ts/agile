@@ -6,6 +6,7 @@ import {
   StorageItemKey,
   notEqual,
   LogCodeManager,
+  defineConfig,
 } from '../internal';
 
 export class Storages {
@@ -33,11 +34,10 @@ export class Storages {
     config: CreateStoragesConfigInterface = {}
   ) {
     this.agileInstance = () => agileInstance;
-    config = {
+    config = defineConfig(config, {
       localStorage: false,
       defaultStorageKey: null as any,
-      ...config,
-    };
+    });
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
     if (config.localStorage) this.instantiateLocalStorage();
   }

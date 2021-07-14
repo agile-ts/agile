@@ -9,6 +9,7 @@ import {
   Item,
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
+  defineConfig,
 } from '../../internal';
 
 export class GroupObserver<DataType = any> extends Observer {
@@ -31,7 +32,10 @@ export class GroupObserver<DataType = any> extends Observer {
     group: Group<DataType>,
     config: CreateObserverConfigInterface = {}
   ) {
-    super(group.agileInstance(), { ...config, ...{ value: group._output } });
+    super(
+      group.agileInstance(),
+      defineConfig(config, { value: group._output })
+    );
     this.group = () => group;
     this.nextGroupOutput = copy(group._output);
   }
@@ -67,7 +71,7 @@ export class GroupObserver<DataType = any> extends Observer {
     config: GroupIngestConfigInterface = {}
   ): void {
     const group = this.group();
-    config = {
+    config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: {
@@ -76,8 +80,7 @@ export class GroupObserver<DataType = any> extends Observer {
       },
       force: false,
       maxTriesToUpdate: 3,
-      ...config,
-    };
+    });
 
     // Force overwriting the Group value if it is a placeholder.
     // After assigning a value to the Group, the Group is supposed to be no placeholder anymore.
