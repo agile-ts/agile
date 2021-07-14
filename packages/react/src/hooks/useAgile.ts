@@ -15,6 +15,7 @@ import {
   SelectorMethodType,
   LogCodeManager,
   normalizeArray,
+  defineConfig,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
@@ -66,15 +67,14 @@ export function useAgile<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
-  config = {
+  config = defineConfig(config, {
     key: generateId(),
     proxyBased: false,
     agileInstance: null as any,
     componentId: undefined,
     observerType: undefined,
     deps: [],
-    ...config,
-  };
+  });
   const depsArray = extractRelevantObservers(
     normalizeArray(deps),
     config.observerType

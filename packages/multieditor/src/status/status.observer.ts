@@ -8,6 +8,7 @@ import {
   ObserverKey,
   RuntimeJob,
   RuntimeJobConfigInterface,
+  defineConfig,
 } from '@agile-ts/core';
 
 export class StatusObserver extends Observer {
@@ -44,7 +45,7 @@ export class StatusObserver extends Observer {
    * @param config - Config
    */
   public assign(config: StatusIngestConfigInterface = {}): void {
-    config = {
+    config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: {
@@ -52,8 +53,7 @@ export class StatusObserver extends Observer {
         exclude: [],
       },
       force: false,
-      ...config,
-    };
+    });
 
     // Set Next Status Value
     this.nextValue = copy(this.status().nextValue);

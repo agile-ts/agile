@@ -1,4 +1,10 @@
-import { Collection, Group, Observer, State } from '@agile-ts/core';
+import {
+  Collection,
+  Group,
+  Observer,
+  State,
+  defineConfig,
+} from '@agile-ts/core';
 import {
   AgileHookConfigInterface,
   SubscribableAgileInstancesType,
@@ -22,10 +28,12 @@ export function useValue<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileValueHookArrayType<X> | AgileValueHookType<Y> {
-  return useAgile(deps as any, {
-    ...config,
-    ...{ observerType: 'value' },
-  }) as any;
+  return useAgile(
+    deps as any,
+    defineConfig(config, {
+      observerType: 'value',
+    })
+  ) as any;
 }
 
 // Array Type

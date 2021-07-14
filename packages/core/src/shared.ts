@@ -7,6 +7,7 @@ import {
   CreateComputedConfigInterface,
   CreateStorageConfigInterface,
   DefaultItem,
+  defineConfig,
   DependableAgileInstancesType,
   flatMerge,
   removeProperties,
@@ -73,10 +74,9 @@ export function createState<ValueType = any>(
   initialValue: ValueType,
   config: CreateStateConfigInterfaceWithAgile = {}
 ): State<ValueType> {
-  config = {
+  config = defineConfig(config, {
     agileInstance: sharedAgileInstance,
-    ...config,
-  };
+  });
   return new State<ValueType>(
     config.agileInstance as any,
     initialValue,

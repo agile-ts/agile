@@ -3,7 +3,7 @@ import {
   SubscribableAgileInstancesType,
   useAgile,
 } from './useAgile';
-import { SelectorMethodType } from '@agile-ts/core';
+import { SelectorMethodType, defineConfig } from '@agile-ts/core';
 import { AgileValueHookType } from './useValue';
 
 export function useSelector<
@@ -31,5 +31,10 @@ export function useSelector<
   selector: SelectorMethodType<ValueType>,
   config: AgileHookConfigInterface = {}
 ): ReturnType {
-  return useAgile(deps as any, { ...config, ...{ selector: selector } }) as any;
+  return useAgile(
+    deps as any,
+    defineConfig(config, {
+      selector: selector,
+    })
+  ) as any;
 }

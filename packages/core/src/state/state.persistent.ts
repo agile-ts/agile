@@ -1,5 +1,6 @@
 import {
   CreatePersistentConfigInterface,
+  defineConfig,
   Persistent,
   PersistentKey,
   State,
@@ -25,12 +26,11 @@ export class StatePersistent<ValueType = any> extends Persistent {
     super(state.agileInstance(), {
       instantiate: false,
     });
-    config = {
+    config = defineConfig(config, {
       instantiate: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ...config,
-    };
+    });
     this.state = () => state;
     this.instantiatePersistent({
       key: config.key,

@@ -1,6 +1,7 @@
 import {
   Collection,
   DefaultItem,
+  defineConfig,
   Item,
   ItemKey,
   State,
@@ -40,10 +41,9 @@ export class Selector<
     itemKey: ItemKey | null,
     config: SelectorConfigInterface = {}
   ) {
-    config = {
+    config = defineConfig(config, {
       isPlaceholder: false,
-      ...config,
-    };
+    });
     super(collection.agileInstance(), null, config);
     this.collection = () => collection;
     this._item = null;
@@ -116,7 +116,7 @@ export class Selector<
     itemKey: ItemKey | null,
     config: StateRuntimeJobConfigInterface = {}
   ): this {
-    config = {
+    config = defineConfig(config, {
       background: false,
       sideEffects: {
         enabled: true,
@@ -125,8 +125,7 @@ export class Selector<
       force: false,
       overwrite: this._item?.isPlaceholder ?? false,
       storage: true,
-      ...config,
-    };
+    });
 
     // Don't select Item if Collection is not correctly instantiated yet
     // (because only after a successful instantiation the Collection
@@ -164,15 +163,15 @@ export class Selector<
       Selector.rebuildItemSideEffectKey,
       (instance, config) => {
         if (!instance._item?.isPlaceholder)
-          instance._item?.set(instance._value as any, {
-            ...config,
-            ...{
+          instance._item?.set(
+            instance._value as any,
+            defineConfig(config, {
               sideEffects: {
                 enabled: true,
                 exclude: [Selector.rebuildSelectorSideEffectKey], // Exclude to avoid endless loops
               },
-            },
-          });
+            })
+          );
       },
       { weight: 90 }
     );

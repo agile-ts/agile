@@ -1,4 +1,5 @@
 import {
+  defineConfig,
   RuntimeJob,
   RuntimeJobConfigInterface,
   RuntimeJobKey,
@@ -24,7 +25,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
     config: CreateStateRuntimeJobConfigInterface = {}
   ) {
     super(observer, config);
-    config = {
+    config = defineConfig(config, {
       background: false,
       sideEffects: {
         enabled: true,
@@ -34,8 +35,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
       storage: true,
       overwrite: false,
       maxTriesToUpdate: 3,
-      ...config,
-    };
+    });
 
     this.config = {
       background: config.background,

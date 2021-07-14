@@ -5,6 +5,7 @@ import {
   getAgileInstance,
   LogCodeManager,
   Observer,
+  defineConfig,
 } from '@agile-ts/core';
 import {
   Item,
@@ -167,10 +168,9 @@ export class MultiEditor<
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    config = {
+    config = defineConfig(config, {
       background: true,
-      ...config,
-    };
+    });
 
     // Apply changes to Item
     item.set(value, config);
@@ -195,11 +195,10 @@ export class MultiEditor<
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    config = {
+    config = defineConfig(config, {
       background: false,
       reset: true,
-      ...config,
-    };
+    });
 
     // Update initial Value
     item.initialStateValue = copy(value);
@@ -230,11 +229,10 @@ export class MultiEditor<
     config: SubmitConfigInterface<OnSubmitConfigType> = {}
   ): Promise<SubmitReturnType | false> {
     const preparedData: DataObject<DataType> = {};
-    config = {
+    config = defineConfig(config, {
       assignToInitial: true,
       onSubmitConfig: undefined,
-      ...config,
-    };
+    });
 
     // Assign Statuses to Items
     for (const key in this.data) {

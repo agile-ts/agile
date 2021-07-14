@@ -13,6 +13,7 @@ import {
   notEqual,
   createArrayFromObject,
   removeProperties,
+  defineConfig,
 } from '../../src';
 import { LogMock } from '../../../core/tests/helper/logMock';
 
@@ -256,6 +257,66 @@ describe('Utils Tests', () => {
       expect(isJsonString(10)).toBeFalsy();
       expect(isJsonString({ name: 'John', age: 31 })).toBeFalsy();
     });
+  });
+
+  describe('defineConfig function tests', () => {
+    it(
+      'should merge the defaults object into the config object ' +
+        'and overwrite undefined properties (default config)',
+      () => {
+        const config = {
+          allowLogging: true,
+          loops: 10,
+          isHuman: undefined,
+        };
+        expect(
+          defineConfig(config, {
+            allowLogging: false,
+            loops: 15,
+            isHuman: true,
+            isRobot: false,
+            name: 'jeff',
+          })
+        ).toStrictEqual({
+          allowLogging: true,
+          loops: 10,
+          isHuman: true,
+          isRobot: false,
+          name: 'jeff',
+        });
+      }
+    );
+
+    it(
+      'should merge the defaults object into the config object ' +
+        "and shouldn't overwrite undefined properties (overwriteUndefinedProperties = false)",
+      () => {
+        const config = {
+          allowLogging: true,
+          loops: 10,
+          isHuman: undefined,
+        };
+        expect(
+          defineConfig(
+            config,
+            {
+              allowLogging: false,
+              loops: 15,
+              isHuman: true,
+              isRobot: false,
+              name: 'jeff',
+            },
+            false
+          )
+        ).toStrictEqual({
+          allowLogging: true,
+          loops: 10,
+          isHuman: undefined,
+          isRobot: false,
+          name: 'jeff',
+        });
+      }
+    );
   });
 
   describe('flatMerge function tests', () => {

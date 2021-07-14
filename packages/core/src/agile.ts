@@ -24,6 +24,7 @@ import {
   createCollection,
   createComputed,
   IntegrationsConfigInterface,
+  defineConfig,
 } from './internal';
 
 export class Agile {
@@ -72,14 +73,13 @@ export class Agile {
    * @param config - Configuration object
    */
   constructor(config: CreateAgileConfigInterface = {}) {
-    config = {
+    config = defineConfig(config, {
       localStorage: false,
       waitForMount: true,
       bindGlobal: false,
       autoIntegrate: true,
       bucket: true,
-      ...config,
-    };
+    });
     this.config = {
       waitForMount: config.waitForMount as any,
       bucket: config.bucket as any,
@@ -143,10 +143,12 @@ export class Agile {
     initialValue: ValueType,
     config: StateConfigInterface = {}
   ): State<ValueType> {
-    return createState<ValueType>(initialValue, {
-      ...config,
-      ...{ agileInstance: this },
-    });
+    return createState<ValueType>(
+      initialValue,
+      defineConfig(config, {
+        agileInstance: this,
+      })
+    );
   }
 
   /**
@@ -232,7 +234,9 @@ export class Agile {
       });
     } else {
       if (configOrDeps)
-        _config = { ...configOrDeps, ...{ agileInstance: this } };
+        _config = defineConfig(configOrDeps, {
+          agileInstance: this,
+        });
     }
 
     return createComputed<ComputedValueType>(computeFunction, _config);
