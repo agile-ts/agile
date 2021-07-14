@@ -304,13 +304,12 @@ export class Group<
       key = keyOrConfig as PersistentKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Create storageItemKey based on Collection key/name identifier
     if (_config.followCollectionPersistKeyPattern) {

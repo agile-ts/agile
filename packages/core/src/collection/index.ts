@@ -963,12 +963,11 @@ export class Collection<
       key = keyOrConfig as StorageKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Check if Collection is already persisted
     if (this.persistent != null && this.isPersisted) return this;

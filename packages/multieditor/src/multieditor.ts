@@ -58,15 +58,14 @@ export class MultiEditor<
       );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === 'function' ? config(this) : config;
-    _config = {
+    _config = defineConfig(_config, {
       fixedProperties: [],
       editableProperties: Object.keys(_config.data),
       validateMethods: {},
       computeMethods: {},
       reValidateMode: 'onSubmit',
       validate: 'editable',
-      ..._config,
-    };
+    });
     this._key = _config?.key;
     this.onSubmit = _config.onSubmit as any;
     this.fixedProperties = _config.fixedProperties as any;

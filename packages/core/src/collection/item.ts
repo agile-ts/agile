@@ -129,13 +129,12 @@ export class Item<DataType extends Object = DefaultItem> extends State<
       key = keyOrConfig as PersistentKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       followCollectionPersistKeyPattern: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Create storageItemKey based on Collection key/name identifier
     if (_config.followCollectionPersistKeyPattern) {

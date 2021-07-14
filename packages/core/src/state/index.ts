@@ -467,12 +467,11 @@ export class State<ValueType = any> {
       key = keyOrConfig as PersistentKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Check if State is already persisted
     if (this.persistent != null && this.isPersisted) return this;

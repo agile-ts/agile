@@ -228,7 +228,7 @@ export class Agile {
     let _config: CreateComputedConfigInterface = {};
 
     if (Array.isArray(configOrDeps)) {
-      _config = flatMerge(_config, {
+      _config = defineConfig(_config, {
         computedDeps: configOrDeps,
         agileInstance: this,
       });
