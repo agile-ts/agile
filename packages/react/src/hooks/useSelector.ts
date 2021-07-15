@@ -11,13 +11,13 @@ export function useSelector<
   X extends SubscribableAgileInstancesType,
   ValueType extends AgileValueHookType<X>
 >(
-  deps: X,
+  dep: X,
   selector: SelectorMethodType<ValueType>,
   config?: AgileHookConfigInterface
 ): ReturnType;
 
 export function useSelector<ValueType = any, ReturnType = any>(
-  deps: SubscribableAgileInstancesType,
+  dep: SubscribableAgileInstancesType,
   selector: SelectorMethodType<ValueType>,
   config?: AgileHookConfigInterface
 ): ReturnType;
@@ -27,12 +27,12 @@ export function useSelector<
   ValueType extends AgileValueHookType<X>,
   ReturnType = any
 >(
-  deps: X,
+  dep: X,
   selector: SelectorMethodType<ValueType>,
   config: AgileHookConfigInterface = {}
 ): ReturnType {
   return useAgile(
-    deps as any,
+    dep as any,
     defineConfig(config, {
       selector: selector,
     })

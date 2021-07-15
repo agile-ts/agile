@@ -2,8 +2,9 @@ import {
   AgileHookConfigInterface,
   SubscribableAgileInstancesType,
   useAgile,
+  AgileOutputHookArrayType,
+  AgileOutputHookType,
 } from './useAgile';
-import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 import { defineConfig } from '@agile-ts/core';
 
 export function useProxy<X extends Array<SubscribableAgileInstancesType>>(

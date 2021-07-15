@@ -16,9 +16,9 @@ import {
   LogCodeManager,
   normalizeArray,
   defineConfig,
+  Group,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { AgileOutputHookArrayType, AgileOutputHookType } from './useOutput';
 
 // TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
 let proxyPackage: any = null;
@@ -241,15 +241,15 @@ export interface AgileHookConfigInterface {
    * Equality comparison function
    * that allows you to customize the way the selected Agile Instance
    * is compared to determine whether the Component needs to be re-rendered.
+   *
+   *  * Note that setting this property can destroy the useAgile type.
+   * -> should only be used internal!
+   *
    * @default undefined
    */
   selector?: SelectorMethodType;
   /**
    * Key/Name identifier of the UI-Component the Subscription Container is bound to.
-   *
-   * Note that setting this property can destroy the useAgile type.
-   * -> should only be used internal!
-   *
    * @default undefined
    */
   componentId?: ComponentIdType;
@@ -272,3 +272,34 @@ export interface AgileHookConfigInterface {
    */
   deps?: any[];
 }
+
+// Array Type
+// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
+export type AgileOutputHookArrayType<T> = {
+  [K in keyof T]: T[K] extends Collection<infer U> | Group<infer U>
+    ? U[]
+    : T[K] extends State<infer U> | Observer<infer U>
+    ? U
+    : T[K] extends undefined
+    ? undefined
+    : T[K] extends Collection<infer U> | Group<infer U> | undefined
+    ? U[] | undefined
+    : T[K] extends State<infer U> | Observer<infer U> | undefined
+    ? U | undefined
+    : never;
+};
+
+// No Array Type
+export type AgileOutputHookType<T> = T extends
+  | Collection<infer U>
+  | Group<infer U>
+  ? U[]
+  : T extends State<infer U> | Observer<infer U>
+  ? U
+  : T extends undefined
+  ? undefined
+  : T extends Collection<infer U> | Group<infer U> | undefined
+  ? U[] | undefined
+  : T extends State<infer U> | Observer<infer U> | undefined
+  ? U | undefined
+  : never;
