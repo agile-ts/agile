@@ -1,5 +1,27 @@
 # Change Log
 
+## 0.1.2
+
+### Patch Changes
+
+- 2f2724f: #### :bug: Bug Fix
+
+  - `core`
+    - [#176](https://github.com/agile-ts/agile/pull/176) Fix persisting dynamically added items ([@bennodev19](https://github.com/bennodev19))
+
+  #### :nail_care: Polish
+
+  - `api`, `core`, `event`, `logger`, `multieditor`, `react`, `utils`
+    - [#177](https://github.com/agile-ts/agile/pull/177) Optimize default configurations ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+- Updated dependencies [2f2724f]
+  - @agile-ts/logger@0.0.7
+  - @agile-ts/utils@0.0.7
+
 ## 0.1.1
 
 ### Patch Changes
