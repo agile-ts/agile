@@ -8,6 +8,7 @@ import {
   SubscriptionContainerConfigInterface,
   removeProperties,
   LogCodeManager,
+  defineConfig,
 } from '../../internal';
 
 export class SubController {
@@ -112,10 +113,9 @@ export class SubController {
         subscriptionContainer: SubscriptionContainer;
         props: { [key: string]: Observer['value'] };
       } {
-    config = {
+    config = defineConfig(config, {
       waitForMount: this.agileInstance().config.waitForMount,
-      ...config,
-    };
+    });
 
     // Create Subscription Container based on specified 'integrationInstance'
     const subscriptionContainer = isFunction(integrationInstance)

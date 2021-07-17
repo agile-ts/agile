@@ -7,6 +7,7 @@ import {
   CreateRuntimeJobConfigInterface,
   LogCodeManager,
   generateId,
+  defineConfig,
 } from '../internal';
 
 export type ObserverKey = string | number;
@@ -59,11 +60,10 @@ export class Observer<ValueType = any> {
     agileInstance: Agile,
     config: CreateObserverConfigInterface<ValueType> = {}
   ) {
-    config = {
+    config = defineConfig(config, {
       dependents: [],
       subs: [],
-      ...config,
-    };
+    });
     this.agileInstance = () => agileInstance;
     this._key = config.key;
     this.value = config.value;
@@ -104,7 +104,7 @@ export class Observer<ValueType = any> {
    * @param config - Configuration object
    */
   public ingest(config: ObserverIngestConfigInterface = {}): void {
-    config = {
+    config = defineConfig(config, {
       perform: true,
       background: false,
       sideEffects: {
@@ -112,8 +112,7 @@ export class Observer<ValueType = any> {
         exclude: [],
       },
       force: false,
-      ...config,
-    };
+    });
 
     // Create Runtime-Job
     const job = new RuntimeJob(this, {

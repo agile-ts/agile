@@ -1,4 +1,10 @@
-import { Agile, copy, LogCodeManager, StorageKey } from '../internal';
+import {
+  Agile,
+  copy,
+  defineConfig,
+  LogCodeManager,
+  StorageKey,
+} from '../internal';
 
 export class Persistent {
   // Agile Instance the Persistent belongs to
@@ -38,12 +44,11 @@ export class Persistent {
   ) {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
-    config = {
+    config = defineConfig(config, {
       instantiate: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ...config,
-    };
+    });
     this.agileInstance().storages.persistentInstances.add(this);
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
 
@@ -143,7 +148,7 @@ export class Persistent {
     }
 
     // Validate Storage keys
-    if (!this.config.defaultStorageKey || this.storageKeys.length <= 0) {
+    if (this.config.defaultStorageKey == null || this.storageKeys.length <= 0) {
       LogCodeManager.log('12:03:01');
       isValid = false;
     }
@@ -179,15 +184,18 @@ export class Persistent {
     const _storageKeys = copy(storageKeys);
 
     // Assign specified default Storage key to the 'storageKeys' array
-    if (defaultStorageKey && !_storageKeys.includes(defaultStorageKey))
+    if (defaultStorageKey != null && !_storageKeys.includes(defaultStorageKey))
       _storageKeys.push(defaultStorageKey);
 
     // Assign the default Storage key of the Agile Instance to the 'storageKeys' array
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      this.config.defaultStorageKey = storages.config.defaultStorageKey as any;
-      _storageKeys.push(storages.config.defaultStorageKey as any);
+      const defaultStorageKey = storages.config.defaultStorageKey;
+      if (defaultStorageKey != null) {
+        this.config.defaultStorageKey = defaultStorageKey;
+        _storageKeys.push(storages.config.defaultStorageKey as any);
+      }
     } else {
       this.config.defaultStorageKey = defaultStorageKey ?? _storageKeys[0];
     }

@@ -20,6 +20,7 @@ import {
   isFunction,
   LogCodeManager,
   PatchOptionConfigInterface,
+  defineConfig,
 } from '../internal';
 
 export class Collection<
@@ -71,13 +72,12 @@ export class Collection<
   constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
-    _config = {
+    _config = defineConfig(_config, {
       primaryKey: 'id',
       groups: {},
       selectors: {},
       defaultGroupKey: 'default',
-      ..._config,
-    };
+    });
     this._key = _config.key;
     this.config = {
       defaultGroupKey: _config.defaultGroupKey as any,
@@ -304,13 +304,12 @@ export class Collection<
     const _groupKeys = normalizeArray<GroupKey>(groupKeys);
     const defaultGroupKey = this.config.defaultGroupKey;
     const primaryKey = this.config.primaryKey;
-    config = {
+    config = defineConfig(config, {
       method: 'push',
       background: false,
       patch: false,
       select: false,
-      ...config,
-    };
+    });
 
     // Add default groupKey, since all Items are added to the default Group
     if (!_groupKeys.includes(defaultGroupKey)) _groupKeys.push(defaultGroupKey);
@@ -374,11 +373,10 @@ export class Collection<
   ): Item<DataType> | undefined {
     const item = this.getItem(itemKey, { notExisting: true });
     const primaryKey = this.config.primaryKey;
-    config = {
+    config = defineConfig(config, {
       patch: true,
       background: false,
-      ...config,
-    };
+    });
 
     // Check if the given conditions are suitable for a update action
     if (item == null) {
@@ -498,10 +496,9 @@ export class Collection<
     groupKey: GroupKey | undefined | null,
     config: HasConfigInterface = {}
   ): Group<DataType> | undefined {
-    config = {
+    config = defineConfig(config, {
       notExisting: false,
-      ...config,
-    };
+    });
 
     // Retrieve Group
     const group = groupKey ? this.groups[groupKey] : undefined;
@@ -672,10 +669,9 @@ export class Collection<
     selectorKey: SelectorKey | undefined | null,
     config: HasConfigInterface = {}
   ): Selector<DataType> | undefined {
-    config = {
+    config = defineConfig(config, {
       notExisting: false,
-      ...config,
-    };
+    });
 
     // Get Selector
     const selector = selectorKey ? this.selectors[selectorKey] : undefined;
@@ -780,10 +776,9 @@ export class Collection<
     itemKey: ItemKey | undefined | null,
     config: HasConfigInterface = {}
   ): Item<DataType> | undefined {
-    config = {
+    config = defineConfig(config, {
       notExisting: false,
-      ...config,
-    };
+    });
 
     // Get Item
     const item = itemKey != null ? this.data[itemKey] : undefined;
@@ -885,10 +880,9 @@ export class Collection<
    * @param config - Configuration object
    */
   public getAllItems(config: HasConfigInterface = {}): Array<Item<DataType>> {
-    config = {
+    config = defineConfig(config, {
       notExisting: false,
-      ...config,
-    };
+    });
 
     const defaultGroup = this.getDefaultGroup();
     let items: Array<Item<DataType>> = [];
@@ -969,12 +963,11 @@ export class Collection<
       key = keyOrConfig as StorageKey;
     }
 
-    _config = {
+    _config = defineConfig(_config, {
       loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
-      ..._config,
-    };
+    });
 
     // Check if Collection is already persisted
     if (this.persistent != null && this.isPersisted) return this;
@@ -1113,10 +1106,9 @@ export class Collection<
     config: UpdateItemKeyConfigInterface = {}
   ): boolean {
     const item = this.getItem(oldItemKey, { notExisting: true });
-    config = {
+    config = defineConfig(config, {
       background: false,
-      ...config,
-    };
+    });
 
     if (item == null || oldItemKey === newItemKey) return false;
 
@@ -1286,11 +1278,10 @@ export class Collection<
     itemKeys: ItemKey | Array<ItemKey>,
     config: RemoveItemsConfigInterface = {}
   ): this {
-    config = {
+    config = defineConfig(config, {
       notExisting: false,
       removeSelector: false,
-      ...config,
-    };
+    });
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
 
     _itemKeys.forEach((itemKey) => {
@@ -1349,11 +1340,10 @@ export class Collection<
     data: DataType,
     config: AssignDataConfigInterface = {}
   ): boolean {
-    config = {
+    config = defineConfig(config, {
       patch: false,
       background: false,
-      ...config,
-    };
+    });
     const _data = copy(data); // Copy data object to get rid of reference
     const primaryKey = this.config.primaryKey;
 
@@ -1408,11 +1398,10 @@ export class Collection<
     item: Item<DataType>,
     config: AssignItemConfigInterface = {}
   ): boolean {
-    config = {
+    config = defineConfig(config, {
       overwrite: false,
       background: false,
-      ...config,
-    };
+    });
     const primaryKey = this.config.primaryKey;
     let itemKey = item._value[primaryKey];
     let increaseCollectionSize = true;
@@ -1469,14 +1458,13 @@ export class Collection<
     itemKey: ItemKey,
     config: RebuildGroupsThatIncludeItemKeyConfigInterface = {}
   ): void {
-    config = {
+    config = defineConfig(config, {
       background: false,
       sideEffects: {
         enabled: true,
         exclude: [],
       },
-      ...config,
-    };
+    });
 
     // Rebuild Groups that include itemKey
     for (const groupKey in this.groups) {

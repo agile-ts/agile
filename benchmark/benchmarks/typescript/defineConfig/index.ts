@@ -10,6 +10,7 @@ import {
 // Files to run the Benchmark on
 import * as referencer from './bench/referencer';
 import * as spreader from './bench/spreader';
+import * as spreadReferencer from './bench/spreadReferencer';
 
 interface ConfigInterface {
   x1?: boolean;
@@ -56,6 +57,16 @@ suite
   .add('Spreader', function () {
     let config = defaultConfig;
     config = spreader.defineConfig(config, {
+      x1: false,
+      x2: 'jeff',
+      x3: 10,
+      x4: false,
+      x5: 'hans',
+    });
+  })
+  .add('SpreadReferencer', function () {
+    let config = defaultConfig;
+    config = spreadReferencer.defineConfig(config, {
       x1: false,
       x2: 'jeff',
       x3: 10,

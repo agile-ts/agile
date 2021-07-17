@@ -59,7 +59,7 @@ const logCodeMessages = {
   '12:03:00':
     'No valid persist Key found! Provide a valid key or assign one to the parent instance.',
   '12:03:01':
-    'No persist Storage Key found! Please specify at least one Storage Key.',
+    'No valid persist Storage Key found! Please specify at least one Storage Key to use the persist functionality.',
   '12:03:02':
     "Couldn't validate Persistent '${0}'." +
     "The Storage with the key/name '${1}' doesn't exists!`",
@@ -211,14 +211,14 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   ...data: any[]
 ): void {
   const logger = LogCodeManager.getLogger();
-  if (!logger?.isActive) return;
+  if (logger != null && !logger.isActive) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
   // Handle logging without Logger
   if (logger == null) {
     if (logType === 'error' || logType === 'warn')
-      console[logType](getLog(logCode, replacers));
+      console[logType](`Agile: ${getLog(logCode, replacers)}`);
     return;
   }
 
@@ -244,7 +244,7 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   ...data: any[]
 ): void {
   const logger = LogCodeManager.getLogger();
-  if (!logger?.isActive) return;
+  if (logger != null && !logger.isActive) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 

@@ -6,6 +6,7 @@ import {
   ComponentSubscriptionContainer,
   notEqual,
   LogCodeManager,
+  defineConfig,
 } from '../internal';
 
 export class Runtime {
@@ -66,10 +67,9 @@ export class Runtime {
    * @param config - Configuration object
    */
   public ingest(job: RuntimeJob, config: IngestConfigInterface = {}): void {
-    config = {
+    config = defineConfig(config, {
       perform: !this.isPerformingJobs,
-      ...config,
-    };
+    });
 
     // Add specified Job to the queue
     this.jobQueue.push(job);

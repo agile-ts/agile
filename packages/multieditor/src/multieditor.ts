@@ -5,6 +5,7 @@ import {
   getAgileInstance,
   LogCodeManager,
   Observer,
+  defineConfig,
 } from '@agile-ts/core';
 import {
   Item,
@@ -57,15 +58,14 @@ export class MultiEditor<
       );
     this.agileInstance = () => agileInstance as any;
     let _config = typeof config === 'function' ? config(this) : config;
-    _config = {
+    _config = defineConfig(_config, {
       fixedProperties: [],
       editableProperties: Object.keys(_config.data),
       validateMethods: {},
       computeMethods: {},
       reValidateMode: 'onSubmit',
       validate: 'editable',
-      ..._config,
-    };
+    });
     this._key = _config?.key;
     this.onSubmit = _config.onSubmit as any;
     this.fixedProperties = _config.fixedProperties as any;
@@ -167,10 +167,9 @@ export class MultiEditor<
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    config = {
+    config = defineConfig(config, {
       background: true,
-      ...config,
-    };
+    });
 
     // Apply changes to Item
     item.set(value, config);
@@ -195,11 +194,10 @@ export class MultiEditor<
   ): this {
     const item = this.getItemById(key);
     if (!item) return this;
-    config = {
+    config = defineConfig(config, {
       background: false,
       reset: true,
-      ...config,
-    };
+    });
 
     // Update initial Value
     item.initialStateValue = copy(value);
@@ -230,11 +228,10 @@ export class MultiEditor<
     config: SubmitConfigInterface<OnSubmitConfigType> = {}
   ): Promise<SubmitReturnType | false> {
     const preparedData: DataObject<DataType> = {};
-    config = {
+    config = defineConfig(config, {
       assignToInitial: true,
       onSubmitConfig: undefined,
-      ...config,
-    };
+    });
 
     // Assign Statuses to Items
     for (const key in this.data) {

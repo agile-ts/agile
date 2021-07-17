@@ -7,6 +7,7 @@ import {
   CreateComputedConfigInterface,
   CreateStorageConfigInterface,
   DefaultItem,
+  defineConfig,
   DependableAgileInstancesType,
   flatMerge,
   removeProperties,
@@ -73,10 +74,9 @@ export function createState<ValueType = any>(
   initialValue: ValueType,
   config: CreateStateConfigInterfaceWithAgile = {}
 ): State<ValueType> {
-  config = {
+  config = defineConfig(config, {
     agileInstance: sharedAgileInstance,
-    ...config,
-  };
+  });
   return new State<ValueType>(
     config.agileInstance as any,
     initialValue,
@@ -163,17 +163,14 @@ export function createComputed<ComputedValueType = any>(
   let _config: CreateComputedConfigInterfaceWithAgile = {};
 
   if (Array.isArray(configOrDeps)) {
-    _config = flatMerge(_config, {
+    _config = defineConfig(_config, {
       computedDeps: configOrDeps,
     });
   } else {
     if (configOrDeps) _config = configOrDeps;
   }
 
-  _config = {
-    agileInstance: sharedAgileInstance,
-    ..._config,
-  };
+  _config = defineConfig(_config, { agileInstance: sharedAgileInstance });
 
   return new Computed<ComputedValueType>(
     _config.agileInstance as any,

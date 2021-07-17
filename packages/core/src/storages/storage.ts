@@ -3,6 +3,7 @@ import {
   isAsyncFunction,
   isFunction,
   LogCodeManager,
+  defineConfig,
 } from '../internal';
 
 export class Storage {
@@ -26,11 +27,10 @@ export class Storage {
    * @param config - Configuration object
    */
   constructor(config: CreateStorageConfigInterface) {
-    config = {
+    config = defineConfig(config, {
       prefix: 'agile',
       async: false,
-      ...config,
-    };
+    });
     this.key = config.key;
     this.methods = config.methods;
     this.config = {

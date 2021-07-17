@@ -6,6 +6,7 @@ import {
   Observer,
 } from '@agile-ts/core';
 import { EventObserver, EventJob } from './internal';
+import { defineConfig } from '@agile-ts/utils';
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;
@@ -33,15 +34,14 @@ export class Event<PayloadType = DefaultEventPayload> {
    */
   constructor(agileInstance: Agile, config: CreateEventConfigInterface = {}) {
     this.agileInstance = () => agileInstance;
-    config = {
+    config = defineConfig(config, {
       enabled: true,
       rerender: false,
       maxUses: undefined,
       delay: undefined,
       overlap: false,
       dependents: [],
-      ...config,
-    };
+    });
     this._key = config.key;
     this.observer = new EventObserver(this, {
       key: config.key,

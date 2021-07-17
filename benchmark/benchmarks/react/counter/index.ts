@@ -64,16 +64,16 @@ const results: CycleResultInterface[] = [];
 // Add Tests to the Benchmark Test Suite
 suite
   .add('AgileTs', configTest(agilets))
-  // .add('Hookstate', configTest(hookstate))
-  // .add('Jotai', configTest(jotai))
-  // .add('Mobx', configTest(mobx))
-  // .add('Nano Stores', configTest(nanostores))
-  // .add('PulseJs', configTest(pulsejs))
-  // .add('Recoil', configTest(recoil))
-  // .add('Redux', configTest(redux))
-  // .add('Redux-Toolkit', configTest(reduxToolkit))
-  // .add('Valtio', configTest(valtio))
-  // .add('Zustand', configTest(zustand))
+  .add('Hookstate', configTest(hookstate))
+  .add('Jotai', configTest(jotai))
+  .add('Mobx', configTest(mobx))
+  .add('Nano Stores', configTest(nanostores))
+  .add('PulseJs', configTest(pulsejs))
+  .add('Recoil', configTest(recoil))
+  .add('Redux', configTest(redux))
+  .add('Redux-Toolkit', configTest(reduxToolkit))
+  .add('Valtio', configTest(valtio))
+  .add('Zustand', configTest(zustand))
 
   // Add Listener
   .on('start', function (this: any) {
