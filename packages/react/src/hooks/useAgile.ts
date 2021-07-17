@@ -37,7 +37,7 @@ try {
  * whenever the most relevant Observer of an Agile Instance mutates.
  *
  * @public
- * @param deps - Agile Instances to be bound to the Functional Component.
+ * @param deps - Agile Sub Instances to be bound to the Functional Component.
  * @param config - Configuration object
  */
 export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
@@ -53,7 +53,7 @@ export function useAgile<X extends Array<SubscribableAgileInstancesType>>(
  * whenever the most relevant Observer of the Agile Instance mutates.
  *
  * @public
- * @param dep - Agile Instance to be bound to the Functional Component.
+ * @param dep - Agile Sub Instance to be bound to the Functional Component.
  * @param config - Configuration object
  */
 export function useAgile<X extends SubscribableAgileInstancesType>(

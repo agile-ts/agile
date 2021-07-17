@@ -23,7 +23,7 @@ import {
  *
  * @public
  * @param reactComponent - React Component to which the specified deps should be bound.
- * @param deps - Agile Instances to be bound to the Class Component.
+ * @param deps - Agile Sub Instances to be bound to the Class Component.
  * @param agileInstance - Instance of Agile the React Component belongs to.
  */
 export function AgileHOC(

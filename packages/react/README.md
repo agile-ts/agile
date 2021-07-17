@@ -28,7 +28,7 @@ This ensures that AgileTs will re-render the Component when the bound State chan
 It also provides some other valuable functionalities
 that optimize the workflow with AgileTs in a React project.
 
-A distinction is made between `Functional` and `Class` React Components.
+A distinction is made between `Functional` and `Class` Components.
 As we prefer to use [`React Hooks`](https://reactjs.org/docs/hooks-intro.html) in Functional Components,
 however, Hooks aren't supported in Class Components.
 Therefore, we have created alternatives for Class Components
