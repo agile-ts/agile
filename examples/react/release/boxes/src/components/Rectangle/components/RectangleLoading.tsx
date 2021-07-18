@@ -2,7 +2,13 @@ import React from 'react';
 import { Box, Spinner } from '@chakra-ui/react';
 import core from '../../../core';
 
-export const RectangleLoading = ({ selected }: { selected: boolean }) => {
+export interface RectangleLoadingProps {
+  selected: boolean;
+}
+
+export const RectangleLoading: React.FC<RectangleLoadingProps> = (props) => {
+  const { selected } = props;
+
   return (
     <Box
       position="absolute"

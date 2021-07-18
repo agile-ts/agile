@@ -9,11 +9,11 @@ import { SELECTED_ELEMENT } from '../../core/entities/ui/ui.controller';
 import { ElementStyleInterface } from '../../core/entities/ui/ui.interfaces';
 import { useSelector } from '@agile-ts/react/dist/hooks/useSelector';
 
-export interface RectanglePropsInterface {
+export interface RectangleProps {
   id: string | number;
 }
 
-export const Rectangle: React.FC<RectanglePropsInterface> = (props) => {
+export const Rectangle: React.FC<RectangleProps> = (props) => {
   const { id } = props;
 
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
@@ -25,39 +25,35 @@ export const Rectangle: React.FC<RectanglePropsInterface> = (props) => {
       componentId: 'Rectangle',
     }
   ) as string | number;
+  const selected = selectedElementId === element?.id;
 
-  if (element == null) return null;
-
-  const selected = selectedElementId === element.id;
+  // Check if Element exists
+  if (element == null || ELEMENT == null) return null;
 
   return (
     <RectangleContainer
       position={element.style.position}
       size={element.style.size}
       onSelect={() => {
-        if (SELECTED_ELEMENT.itemKey !== id) SELECTED_ELEMENT.select(id);
+        core.ui.selectElement(id);
       }}>
       <Resize
         selected={selected}
         position={element.style.position}
         size={element.style.size}
         onResize={(style: ElementStyleInterface) => {
-          console.log('onResize', style);
+          console.log('onResize', style); // TODO REMOVE
           ELEMENT?.patch({ style: style });
         }}
         lockAspectRatio={element.image !== undefined}>
         <Drag
           position={element.style.position}
           onDrag={(position) => {
-            ELEMENT?.patch({
-              style: {
-                ...ELEMENT?.value.style,
-                position,
-              },
-            });
+            ELEMENT.nextStateValue.style.position = position;
+            ELEMENT.ingest();
           }}>
           <div>
-            <RectangleInner selected={selected} id={id} />
+            <RectangleInner id={id} selected={selected} />
           </div>
         </Drag>
       </Resize>

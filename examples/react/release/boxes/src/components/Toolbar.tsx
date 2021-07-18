@@ -1,8 +1,8 @@
 import React from 'react';
 import { Icon, IconButton, VStack } from '@chakra-ui/react';
+// @ts-ignore
 import { Image, Square } from 'react-feather';
 import core from '../core';
-import { generateId } from '@agile-ts/core';
 
 export const Toolbar = () => {
   return (
@@ -17,21 +17,14 @@ export const Toolbar = () => {
       spacing={2}>
       <IconButton
         onClick={() => {
-          core.ui.ELEMENTS.collect({
-            id: generateId(),
-            style: core.ui.defaultElementStyle,
-          });
+          core.ui.addDefaultElement();
         }}
         aria-label="Add rectangle"
         icon={<Icon style={{ width: 24, height: 24 }} as={Square} />}
       />
       <IconButton
         onClick={() => {
-          core.ui.ELEMENTS.collect({
-            id: generateId(),
-            style: core.ui.defaultElementStyle,
-            image: core.ui.getRandomImage(),
-          });
+          core.ui.addDefaultElement(true);
         }}
         aria-label="Add image"
         icon={<Icon style={{ width: 24, height: 24 }} as={Image} />}

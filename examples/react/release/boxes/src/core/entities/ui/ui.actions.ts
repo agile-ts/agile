@@ -1,5 +1,35 @@
 import { apiUrl } from '../../../api';
-import { ElementImageInterface } from './ui.interfaces';
+import { ElementImageInterface, ElementStyleInterface } from './ui.interfaces';
+import { generateId } from '@agile-ts/core';
+import {
+  defaultElementStyle,
+  SELECTED_ELEMENT,
+  ELEMENTS,
+} from './ui.controller';
+
+export const addDefaultElement = (image: boolean = false) => {
+  if (image) addElement(defaultElementStyle, getRandomImage());
+  else addElement(defaultElementStyle);
+};
+
+export const addElement = (
+  style: ElementStyleInterface,
+  image?: ElementImageInterface
+) => {
+  ELEMENTS.collect({
+    id: generateId(),
+    style,
+    image,
+  });
+};
+
+export const selectElement = (id: string | number) => {
+  if (SELECTED_ELEMENT.itemKey !== id) SELECTED_ELEMENT.select(id);
+};
+
+export const unselectSelectedElement = () => {
+  SELECTED_ELEMENT.unselect();
+};
 
 export const getBorderColor = (visible: boolean) => {
   return visible ? '#CCC' : 'transparent';
