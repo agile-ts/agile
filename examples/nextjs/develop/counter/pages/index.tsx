@@ -1,14 +1,16 @@
-import Head from "next/head";
-import Counter from "../components/Counter";
+import Head from 'next/head';
+import Counter from '../components/Counter';
 
-export default function Home() {
+const Home = () => {
   return (
-    <div >
+    <div>
       <Head>
         <title>Counter</title>
-        <meta name={'keywords'} content={'counter, agilets'}/>
+        <meta name={'keywords'} content={'counter, agilets'} />
       </Head>
-        <Counter />
+      <Counter />
     </div>
-  )
-}
+  );
+};
+
+export default Home;
