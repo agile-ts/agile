@@ -1,8 +1,8 @@
 {
   "package": {
     "dependencies": {
-      "@agile-ts/core": "^0.0.13",
-      "@agile-ts/react": "^0.0.13",
+      "@agile-ts/core": "^0.1.2",
+      "@agile-ts/react": "^0.1.2",
       "web-vitals": "^1.0.1"
     },
     "devDependencies": {

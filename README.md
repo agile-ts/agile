@@ -64,7 +64,7 @@ It's only one click away. Just select your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - [React-Native](https://snack.expo.io/@bennodev/agilets-first-state)
 - [Vue](https://codesandbox.io/s/agilets-first-state-i5xxs)
-- Angular (coming soon)
+- Svelte (coming soon)
 
 More examples can be found in the [Example section](https://agile-ts.org/docs/examples).
 
@@ -175,7 +175,6 @@ We will be happy to help you.
 - Quick Start
   - [React](https://agile-ts.org/docs/quick-start/react)
   - [Vue](https://agile-ts.org/docs/quick-start/vue)
-  - [Angular](https://agile-ts.org/docs/quick-start/angular)
 - Packages
   - [core](https://agile-ts.org/docs/core)
     - [Agile Instance](https://agile-ts.org/docs/core/agile-instance)
