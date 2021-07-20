@@ -5,7 +5,7 @@ import Button from './components/Button';
 
 import styles from './Stopwatch.module.css';
 
-const Stopwatch: React.FC = () => {
+const Stopwatch = () => {
   const [time, state] = useAgile([StopwatchCore.TIME, StopwatchCore.STATE]);
 
   // Restart Stopwatch when the persisted value has been loaded

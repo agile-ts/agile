@@ -3,7 +3,7 @@ import Stopwatch from '../../components/Stopwatch';
 
 import styles from './Home.module.css';
 
-const Home: React.FC = () => {
+function Home() {
   return (
     <div className={styles.container}>
       {/* Header */}
@@ -19,7 +19,7 @@ const Home: React.FC = () => {
       {/* Stopwatch */}
       <p className={styles.getStartedText}>
         Get started by editing{' '}
-        <code className={styles.code}>core/index.ts</code>
+        <code className={styles.code}>core/index.js</code>
       </p>
       <Stopwatch />
 
@@ -43,6 +43,6 @@ const Home: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Home;

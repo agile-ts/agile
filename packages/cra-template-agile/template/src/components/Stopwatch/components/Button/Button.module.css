@@ -1,0 +1,11 @@
+.button {
+    margin: 1rem 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    width: 100px;
+    border-radius: 5px;
+    transition: background 1s;
+    cursor: pointer;
+    background: transparent;
+}
