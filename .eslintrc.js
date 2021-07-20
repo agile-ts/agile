@@ -15,13 +15,14 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
+  plugins: ['@typescript-eslint', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     allowImportExportEverywhere: true,
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  ignorePatterns: ['.eslintrc.js'],
   rules: {
     'func-names': OFF,
     '@typescript-eslint/no-explicit-any': OFF,
