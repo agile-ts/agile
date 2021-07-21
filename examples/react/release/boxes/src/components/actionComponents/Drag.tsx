@@ -12,13 +12,14 @@ export const Drag: React.FC<DragProps> = (props) => {
 
   return (
     <DraggableCore
+      cancel={'.react-resizable-handle'}
       onDrag={(e: any) => {
         onDrag({
           left: e.movementX + position.left,
           top: e.movementY + position.top,
         });
       }}>
-      {children}
+      <div>{children}</div>
     </DraggableCore>
   );
 };

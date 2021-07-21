@@ -1,4 +1,4 @@
-import { apiUrl } from '../../../api';
+import { apiUrl, callApi } from '../../../api';
 import { ElementImageInterface, ElementStyleInterface } from './ui.interfaces';
 import { generateId } from '@agile-ts/core';
 import {
@@ -14,17 +14,23 @@ export const addDefaultElement = (image: boolean = false) => {
 
 export const addElement = (
   style: ElementStyleInterface,
-  image?: ElementImageInterface
+  image?: ElementImageInterface,
+  select = true
 ) => {
+  const id = generateId();
   ELEMENTS.collect({
-    id: generateId(),
+    id,
     style,
     image,
   });
+  if (select) selectElement(id);
 };
 
 export const selectElement = (id: string | number) => {
-  if (SELECTED_ELEMENT.itemKey !== id) SELECTED_ELEMENT.select(id);
+  if (SELECTED_ELEMENT.itemKey !== id) {
+    console.log('Select Element', id);
+    SELECTED_ELEMENT.select(id);
+  }
 };
 
 export const unselectSelectedElement = () => {
@@ -32,7 +38,13 @@ export const unselectSelectedElement = () => {
 };
 
 export const getBorderColor = (visible: boolean) => {
-  return visible ? '#CCC' : 'transparent';
+  return visible ? '#000000' : 'transparent';
+};
+
+export const fetchImage = async (imageId: number): Promise<any> => {
+  return callApi('image-details', {
+    queryParams: { seed: imageId },
+  });
 };
 
 /**

@@ -5,7 +5,6 @@ import { RectangleContainer } from './components/RectangleContainer';
 import { RectangleInner } from './components/RectangleInner';
 import { useAgile } from '@agile-ts/react';
 import core from '../../core';
-import { SELECTED_ELEMENT } from '../../core/entities/ui/ui.controller';
 import { ElementStyleInterface } from '../../core/entities/ui/ui.interfaces';
 import { useSelector } from '@agile-ts/react/dist/hooks/useSelector';
 
@@ -52,9 +51,7 @@ export const Rectangle: React.FC<RectangleProps> = (props) => {
             ELEMENT.nextStateValue.style.position = position;
             ELEMENT.ingest();
           }}>
-          <div>
-            <RectangleInner id={id} selected={selected} />
-          </div>
+          <RectangleInner id={id} selected={selected} />
         </Drag>
       </Resize>
     </RectangleContainer>

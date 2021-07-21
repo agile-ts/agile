@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/layout';
 import { Skeleton } from '@chakra-ui/skeleton';
-import { callApi } from '../../../api';
 import { SELECTED_ELEMENT } from '../../../core/entities/ui/ui.controller';
 import { useProxy } from '@agile-ts/react';
+import core from '../../../core';
 
 export const ImageInfo = () => {
   const element = useProxy(SELECTED_ELEMENT);
@@ -13,10 +13,9 @@ export const ImageInfo = () => {
   } | null>(null);
 
   useEffect(() => {
-    if (element?.image) {
-      callApi('image-details', {
-        queryParams: { seed: element.image.id },
-      }).then((value) => {
+    const imageId = element?.image?.id;
+    if (imageId != null) {
+      core.ui.fetchImage(imageId).then((value) => {
         setImageInfo(value);
       });
     }

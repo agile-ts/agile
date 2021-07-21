@@ -22,7 +22,7 @@ export const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (element?.image != null) {
+    if (element?.image?.src != null) {
       // Fetch Image size
       const loadImage = async (image: ElementImageInterface) => {
         setIsLoading(true);
@@ -37,7 +37,7 @@ export const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
     } else {
       setIsLoading(false);
     }
-  }, [element?.image]);
+  }, [element?.image?.src]);
 
   if (isLoading || element == null)
     return <RectangleLoading selected={selected} />;
@@ -50,12 +50,13 @@ export const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
       width="100%"
       height="100%"
       display="flex"
-      padding="2px">
+      padding="2px"
+      backgroundColor="red">
       <Box
         flex="1"
         border="3px dashed #101010"
         borderRadius="255px 15px 225px 15px/15px 225px 15px 255px"
-        backgroundColor="white"
+        backgroundColor="green"
         backgroundImage={`url('${element.image?.src}')`}
         backgroundSize="cover"
         textAlign="center">

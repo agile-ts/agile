@@ -11,27 +11,27 @@ type Position = {
 };
 
 export interface HandlePropsInterface {
-  placement: ResizeHandle;
+  handleAxis: ResizeHandle;
   visible: boolean;
   innerRef?: any;
 }
 
-export const Handle: React.FC<HandlePropsInterface> = (props) => {
-  const { placement, visible, innerRef } = props;
+const Handle: React.FC<HandlePropsInterface> = (props) => {
+  const { handleAxis, visible, innerRef } = props;
 
   const size = 10;
   const position: Position = {};
 
-  if (placement.startsWith('n')) position.top = 0;
-  if (placement.startsWith('s')) position.bottom = 0;
-  if (placement.includes('w')) position.left = 0;
-  if (placement.includes('e')) position.right = 0;
+  if (handleAxis.startsWith('n')) position.top = 0;
+  if (handleAxis.startsWith('s')) position.bottom = 0;
+  if (handleAxis.includes('w')) position.left = 0;
+  if (handleAxis.includes('e')) position.right = 0;
 
-  if (placement === 'n' || placement === 's') position.left = '50%';
-  if (placement === 'e' || placement === 'w') position.top = '50%';
+  if (handleAxis === 'n' || handleAxis === 's') position.left = '50%';
+  if (handleAxis === 'e' || handleAxis === 'w') position.top = '50%';
 
-  let cursor = `${placement}-resize`;
-  if (placement === 'n' || placement === 's') cursor = 'ns-resize';
+  let cursor = `${handleAxis}-resize`;
+  if (handleAxis === 'n' || handleAxis === 's') cursor = 'ns-resize';
 
   return (
     <Box
@@ -50,3 +50,5 @@ export const Handle: React.FC<HandlePropsInterface> = (props) => {
     />
   );
 };
+
+export default Handle;

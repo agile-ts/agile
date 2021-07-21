@@ -1,9 +1,9 @@
 import React from 'react';
-import { Resizable, ResizeHandle } from 'react-resizable';
-import { Handle, HandlePropsInterface } from './components/Handle';
+import { Resizable, ResizeHandle as ResizeHandleType } from 'react-resizable';
+import Handle from './components/Handle';
 import { ElementStyleInterface } from '../../../core/entities/ui/ui.interfaces';
 
-const handlePlacements: ResizeHandle[] = [
+const handlePlacements: ResizeHandleType[] = [
   'n',
   's',
   'e',
@@ -31,7 +31,8 @@ export const Resize: React.FC<ResizePropsInterface> = (props) => {
   } = props;
 
   // https://github.com/react-grid-layout/react-resizable#custom-react-component
-  const WrappedHandle = React.forwardRef((props: HandlePropsInterface, ref) => (
+  // https://github.com/react-grid-layout/react-resizable#functional-components
+  const WrappedHandle = React.forwardRef((props: any, ref) => (
     <Handle innerRef={ref} {...props} />
   ));
 
@@ -40,6 +41,8 @@ export const Resize: React.FC<ResizePropsInterface> = (props) => {
       width={size.width}
       height={size.height}
       onResize={(_, { size: newSize, handle }) => {
+        console.log('onResize', size);
+
         let topDiff = 0;
         if (handle.includes('n')) {
           topDiff = size.height - newSize.height;
@@ -62,9 +65,8 @@ export const Resize: React.FC<ResizePropsInterface> = (props) => {
         });
       }}
       resizeHandles={handlePlacements}
-      handle={(placement) => (
-        <WrappedHandle placement={placement} visible={selected} />
-      )}
+      // The handle (dot) to resize the Component
+      handle={<WrappedHandle visible={selected} />}
       lockAspectRatio={lockAspectRatio}>
       <div>{children}</div>
     </Resizable>
