@@ -6,8 +6,10 @@ import App from './App';
 import './global.css';
 
 ReactDOM.render(
-  <ChakraProvider>
-    <App />
-  </ChakraProvider>,
+  <React.StrictMode>
+    <ChakraProvider>
+      <App />
+    </ChakraProvider>{' '}
+  </React.StrictMode>,
   document.getElementById('root')
 );

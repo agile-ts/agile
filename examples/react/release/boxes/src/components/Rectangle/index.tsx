@@ -41,7 +41,6 @@ export const Rectangle: React.FC<RectangleProps> = (props) => {
         position={element.style.position}
         size={element.style.size}
         onResize={(style: ElementStyleInterface) => {
-          console.log('onResize', style); // TODO REMOVE
           ELEMENT?.patch({ style: style });
         }}
         lockAspectRatio={element.image !== undefined}>

@@ -30,19 +30,11 @@ export const Resize: React.FC<ResizePropsInterface> = (props) => {
     lockAspectRatio,
   } = props;
 
-  // https://github.com/react-grid-layout/react-resizable#custom-react-component
-  // https://github.com/react-grid-layout/react-resizable#functional-components
-  const WrappedHandle = React.forwardRef((props: any, ref) => (
-    <Handle innerRef={ref} {...props} />
-  ));
-
   return (
     <Resizable
       width={size.width}
       height={size.height}
       onResize={(_, { size: newSize, handle }) => {
-        console.log('onResize', size);
-
         let topDiff = 0;
         if (handle.includes('n')) {
           topDiff = size.height - newSize.height;
@@ -66,7 +58,15 @@ export const Resize: React.FC<ResizePropsInterface> = (props) => {
       }}
       resizeHandles={handlePlacements}
       // The handle (dot) to resize the Component
-      handle={<WrappedHandle visible={selected} />}
+      // TODO Make this work in the latest 'react-resizeable' version.. (-> upgrade from 1.x to 3.x)
+      // handle={(handleAxis: ResizeHandleType, ref: any) => (
+      //   <Handle handleAxis={handleAxis} innerRef={ref} visible={selected} />
+      // )}
+      handle={(handleAxis: ResizeHandleType) => (
+        <div>
+          <Handle handleAxis={handleAxis} visible={selected} />
+        </div>
+      )}
       lockAspectRatio={lockAspectRatio}>
       <div>{children}</div>
     </Resizable>

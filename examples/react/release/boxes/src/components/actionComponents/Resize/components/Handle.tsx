@@ -21,7 +21,9 @@ const Handle: React.FC<HandlePropsInterface> = (props) => {
 
   const size = 10;
   const position: Position = {};
+  let cursor = 'default';
 
+  // Calculate handle position
   if (handleAxis.startsWith('n')) position.top = 0;
   if (handleAxis.startsWith('s')) position.bottom = 0;
   if (handleAxis.includes('w')) position.left = 0;
@@ -30,11 +32,12 @@ const Handle: React.FC<HandlePropsInterface> = (props) => {
   if (handleAxis === 'n' || handleAxis === 's') position.left = '50%';
   if (handleAxis === 'e' || handleAxis === 'w') position.top = '50%';
 
-  let cursor = `${handleAxis}-resize`;
+  cursor = `${handleAxis}-resize`;
   if (handleAxis === 'n' || handleAxis === 's') cursor = 'ns-resize';
 
   return (
     <Box
+      className={`handle-${handleAxis}`}
       ref={innerRef}
       position="absolute"
       style={{
