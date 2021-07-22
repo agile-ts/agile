@@ -8,7 +8,7 @@ const Card: React.FC = ({ children }) => (
 export default Card;
 
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   top: 20px;
   right: 20px;
   background: #ffffff;

@@ -40,7 +40,6 @@ export default RectangleInner;
 const Container = styled.div<{ borderColor: string }>`
   display: flex;
   position: absolute;
-  padding: 3px;
   border: ${(props) => `1px solid ${props.borderColor}`};
   width: 100%;
   height: 100%;

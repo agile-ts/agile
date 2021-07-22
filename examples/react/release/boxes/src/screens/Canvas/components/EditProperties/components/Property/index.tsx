@@ -1,4 +1,4 @@
-import core from '../../../../core';
+import core from '../../../../../../core';
 import { useProxy } from '@agile-ts/react';
 import lodash from 'lodash';
 import React from 'react';

@@ -1,8 +1,8 @@
 import React from 'react';
 import ImageInfo from './components/ImageInfo';
 import { useSelector } from '@agile-ts/react';
-import core from '../../core';
-import { ElementImageInterface } from '../../core/entities/ui/ui.interfaces';
+import core from '../../../../core';
+import { ElementImageInterface } from '../../../../core/entities/ui/ui.interfaces';
 import Card from './components/Card';
 import Section from './components/Section';
 import Property from './components/Property';

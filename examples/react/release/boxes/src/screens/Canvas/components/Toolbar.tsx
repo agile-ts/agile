@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Square } from 'react-feather';
-import core from '../core';
+import core from '../../../core';
 import styled from 'styled-components';
 
 const Toolbar = () => {
@@ -29,7 +29,7 @@ export default Toolbar;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 20px;
   background: #ffffff;

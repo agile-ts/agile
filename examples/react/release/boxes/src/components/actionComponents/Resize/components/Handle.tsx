@@ -25,9 +25,9 @@ const Handle: React.FC<HandlePropsInterface> = (props) => {
 
   // Calculate handle position
   if (handleAxis.startsWith('n')) position.top = 0;
-  if (handleAxis.startsWith('s')) position.bottom = -8;
+  if (handleAxis.startsWith('s')) position.bottom = 0;
   if (handleAxis.includes('w')) position.left = 0;
-  if (handleAxis.includes('e')) position.right = -8;
+  if (handleAxis.includes('e')) position.right = 0;
 
   if (handleAxis === 'n' || handleAxis === 's') position.left = '50%';
   if (handleAxis === 'e' || handleAxis === 'w') position.top = '50%';

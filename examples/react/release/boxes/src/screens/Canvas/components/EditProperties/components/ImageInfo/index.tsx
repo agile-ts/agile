@@ -1,7 +1,7 @@
 import React from 'react';
-import { SELECTED_ELEMENT } from '../../../../core/entities/ui/ui.controller';
+import { SELECTED_ELEMENT } from '../../../../../../core/entities/ui/ui.controller';
 import { useProxy } from '@agile-ts/react';
-import core from '../../../../core';
+import core from '../../../../../../core';
 import Info from './components/Info';
 import styled from 'styled-components';
 

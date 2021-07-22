@@ -144,6 +144,28 @@ export const unselectSelectedElement = () => {
   SELECTED_ELEMENT.unselect();
 };
 
+export const deleteSelectedElement = () => {
+  const toRemoveElementKey = SELECTED_ELEMENT.itemKey;
+  if (toRemoveElementKey != null)
+    ELEMENTS.remove(toRemoveElementKey).everywhere();
+};
+
+export const assignDefaultElementStyle = (
+  windowWidth?: number,
+  windowHeight?: number
+) => {
+  if (windowWidth != null && windowHeight != null) {
+    core.ui.defaultElementStyle.position = {
+      left: Math.floor(
+        windowWidth / 2 - core.ui.defaultElementStyle.size.width / 2
+      ),
+      top: Math.floor(
+        windowHeight / 2 - core.ui.defaultElementStyle.size.height / 2
+      ),
+    };
+  }
+};
+
 export const getBorderColor = (visible: boolean) => {
   return visible ? '#000000' : 'rgba(0, 0, 0, 0)';
 };
