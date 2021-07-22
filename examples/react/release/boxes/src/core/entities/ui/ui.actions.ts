@@ -6,6 +6,7 @@ import {
   SELECTED_ELEMENT,
   ELEMENTS,
 } from './ui.controller';
+import core from '../../index';
 
 export const addDefaultElement = (image: boolean = false) => {
   if (image) addElement(defaultElementStyle, getRandomImage());
@@ -28,8 +29,114 @@ export const addElement = (
 
 export const selectElement = (id: string | number) => {
   if (SELECTED_ELEMENT.itemKey !== id) {
-    console.log('Select Element', id);
     SELECTED_ELEMENT.select(id);
+  }
+};
+
+export const updateElementStyle = (
+  id: string | number,
+  style: ElementStyleInterface
+) => {
+  const element = ELEMENTS.getItem(id);
+  if (element) {
+    element.nextStateValue.style = style;
+    element.ingest();
+  }
+};
+
+export const updateElementSize = (
+  id: string | number,
+  size: ElementStyleInterface['size']
+) => {
+  const element = ELEMENTS.getItem(id);
+  if (element) {
+    element.nextStateValue.style.size = size;
+    element.ingest();
+  }
+};
+
+export const updateElementWidth = (
+  id: string | number,
+  newWidth: number,
+  aspectRatio?: boolean
+) => {
+  const element = ELEMENTS.getItem(id);
+
+  if (element) {
+    if (aspectRatio == null) aspectRatio = !!element.value.image;
+    if (aspectRatio) {
+      const { width, height } = element.value.style.size;
+      const ar = width / height;
+
+      element.nextStateValue.style.size = {
+        width: newWidth,
+        height: Math.round(newWidth / ar),
+      };
+    } else {
+      element.nextStateValue.style.size.width = newWidth;
+    }
+    element.ingest();
+  }
+};
+
+export const updateElementHeight = (
+  id: string | number,
+  newHeight: number,
+  aspectRatio?: boolean
+) => {
+  const element = ELEMENTS.getItem(id);
+
+  if (element) {
+    if (aspectRatio == null) aspectRatio = !!element.value.image;
+    if (aspectRatio) {
+      const { width, height } = element.value.style.size;
+      const ar = width / height;
+
+      element.nextStateValue.style.size = {
+        height: newHeight,
+        width: Math.round(newHeight * ar),
+      };
+    } else {
+      element.nextStateValue.style.size.height = newHeight;
+    }
+    element.ingest();
+  }
+};
+
+export const updateElementPosition = (
+  id: string | number,
+  position: ElementStyleInterface['position']
+) => {
+  const element = ELEMENTS.getItem(id);
+  if (element) {
+    element.nextStateValue.style.position = position;
+    element.ingest();
+  }
+};
+
+export const updateElementX = (id: string | number, x: number) => {
+  const element = ELEMENTS.getItem(id);
+  if (element) {
+    element.nextStateValue.style.position.left = x;
+    element.ingest();
+  }
+};
+
+export const updateElementY = (id: string | number, y: number) => {
+  const element = ELEMENTS.getItem(id);
+  if (element) {
+    element.nextStateValue.style.position.top = y;
+    element.ingest();
+  }
+};
+
+export const applyImageDimensions = async (id: string | number) => {
+  const element = ELEMENTS.getItem(id);
+  if (element && element.value.image?.src) {
+    element.nextStateValue.style.size = await core.ui.getImageDimensions(
+      element.value.image.src
+    );
+    element.ingest();
   }
 };
 
@@ -38,7 +145,7 @@ export const unselectSelectedElement = () => {
 };
 
 export const getBorderColor = (visible: boolean) => {
-  return visible ? '#000000' : 'transparent';
+  return visible ? '#000000' : 'rgba(0, 0, 0, 0)';
 };
 
 export const fetchImage = async (imageId: number): Promise<any> => {

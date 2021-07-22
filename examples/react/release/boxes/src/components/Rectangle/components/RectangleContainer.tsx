@@ -8,9 +8,7 @@ type RectangleContainerProps = {
   onSelect: () => void;
 };
 
-export const RectangleContainer: React.FC<RectangleContainerProps> = (
-  props
-) => {
+const RectangleContainer: React.FC<RectangleContainerProps> = (props) => {
   const { children, size, position, onSelect } = props;
 
   return (
@@ -22,6 +20,8 @@ export const RectangleContainer: React.FC<RectangleContainerProps> = (
     </Container>
   );
 };
+
+export default RectangleContainer;
 
 const Container = styled.div`
   position: absolute;

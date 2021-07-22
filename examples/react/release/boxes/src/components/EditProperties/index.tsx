@@ -1,16 +1,13 @@
-import React, { Suspense } from 'react';
-// @ts-ignore
-import _ from 'lodash';
-import { ImageInfo, ImageInfoFallback } from './components/ImageInfo';
+import React from 'react';
+import ImageInfo from './components/ImageInfo';
 import { useSelector } from '@agile-ts/react';
 import core from '../../core';
 import { ElementImageInterface } from '../../core/entities/ui/ui.interfaces';
-import Card from '../Card';
+import Card from './components/Card';
 import Section from './components/Section';
 import Property from './components/Property';
-import SizeProperty from './components/SizeProperty';
 
-export const EditProperties = () => {
+const EditProperties: React.FC = () => {
   const selectedElementId = useSelector(
     core.ui.SELECTED_ELEMENT,
     (value) => value?.id
@@ -38,28 +35,46 @@ export const EditProperties = () => {
           label="Top"
           path="style.position.top"
           id={selectedElementId}
+          onChange={(newValue) => {
+            core.ui.updateElementY(selectedElementId, newValue);
+          }}
         />
         <Property
           label="Left"
           path="style.position.left"
           id={selectedElementId}
+          onChange={(newValue) => {
+            core.ui.updateElementX(selectedElementId, newValue);
+          }}
         />
       </Section>
       <Section heading="Size">
-        <SizeProperty label="Width" dimension="width" id={selectedElementId} />
-        <SizeProperty
-          label="Height"
-          dimension="height"
+        <Property
+          label="Width"
+          path="style.size.width"
           id={selectedElementId}
+          onChange={(newValue) => {
+            core.ui.updateElementWidth(selectedElementId, newValue);
+          }}
+        />
+        <Property
+          label="Height"
+          path="style.size.height"
+          id={selectedElementId}
+          onChange={(newValue) => {
+            core.ui.updateElementHeight(selectedElementId, newValue);
+          }}
         />
       </Section>
       {selectedElementImage != null && (
         <Section heading="Image">
-          <Suspense fallback={<ImageInfoFallback />}>
+          <React.Suspense fallback={<ImageInfo fallback />}>
             <ImageInfo />
-          </Suspense>
+          </React.Suspense>
         </Section>
       )}
     </Card>
   );
 };
+
+export default EditProperties;

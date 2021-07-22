@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, VStack } from '@chakra-ui/react';
+import styled from 'styled-components';
 
 interface SectionProps {
   heading: string;
@@ -9,11 +9,21 @@ const Section: React.FC<SectionProps> = (props) => {
   const { heading, children } = props;
 
   return (
-    <VStack spacing={2} align="flex-start">
-      <Text fontWeight="500">{heading}</Text>
+    <Container>
+      <Label>{heading}</Label>
       {children}
-    </VStack>
+    </Container>
   );
 };
 
 export default Section;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Label = styled.div`
+  font-weight: 500;
+  margin-bottom: 10px;
+`;

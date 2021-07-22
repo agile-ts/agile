@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
 import { ResizeHandle } from 'react-resizable';
 import core from '../../../../core';
+import styled from 'styled-components';
 
 type Position = {
   top?: number | string;
@@ -36,10 +36,9 @@ const Handle: React.FC<HandlePropsInterface> = (props) => {
   if (handleAxis === 'n' || handleAxis === 's') cursor = 'ns-resize';
 
   return (
-    <Box
+    <Container
       className={`handle-${handleAxis}`}
       ref={innerRef}
-      position="absolute"
       style={{
         ...position,
         width: size - 2,
@@ -47,11 +46,15 @@ const Handle: React.FC<HandlePropsInterface> = (props) => {
         margin: -size / 2,
         cursor,
       }}
-      border={`1px solid ${core.ui.getBorderColor(visible)}`}
-      transition="0.1s border-color ease-in-out"
-      backgroundColor="white"
+      color={core.ui.getBorderColor(visible)}
     />
   );
 };
 
 export default Handle;
+
+const Container = styled.div<{ color: string }>`
+  position: absolute;
+  background-color: ${(props) => props.color};
+  transition: 0.1s background-color ease-in-out;
+`;

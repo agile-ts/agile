@@ -36,6 +36,7 @@ const Container = styled.div`
   padding: 5px;
   border-radius: 4px;
   box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
+  z-index: 1000;
 `;
 
 const ActionButton = styled.div`

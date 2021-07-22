@@ -12,9 +12,10 @@ const Container = styled.div`
   top: 20px;
   right: 20px;
   background: #ffffff;
-  padding: 10px;
+  padding: 5px 10px 0 10px;
   align-items: flex-start;
   justify-content: flex-start;
   box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
   border-radius: 4px;
+  z-index: 1000;
 `;

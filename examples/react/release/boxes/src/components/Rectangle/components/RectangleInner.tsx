@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import core from '../../../core';
 import { useAgile } from '@agile-ts/react';
-import { RectangleLoading } from './RectangleLoading';
-import { ElementImageInterface } from '../../../core/entities/ui/ui.interfaces';
+import RectangleLoading from './RectangleLoading';
 import styled from 'styled-components';
 import { useRandomBorderRadius } from '../../../hooks/useRandomBorderRadius';
 
@@ -11,44 +10,32 @@ export interface RectangleInnerProps {
   id: string | number;
 }
 
-export const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
+const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
   const { selected, id } = props;
 
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
   const element = useAgile(ELEMENT);
   const borderRadius = useRandomBorderRadius();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  useEffect(() => {
-    if (element?.image?.src != null) {
-      // Fetch Image size
-      const loadImage = async (image: ElementImageInterface) => {
-        setIsLoading(true);
-        const response = await core.ui.getImageDimensions(image.src);
-        setIsLoading(false);
-        if (ELEMENT != null) {
-          ELEMENT.nextStateValue.style.size = response;
-          ELEMENT?.ingest();
-        }
-      };
-      loadImage(element.image);
-    } else {
-      setIsLoading(false);
-    }
-  }, [element?.image?.src]);
-
-  if (isLoading || element == null)
-    return <RectangleLoading selected={selected} />;
+  React.useEffect(() => {
+    setIsLoading(true);
+    core.ui.applyImageDimensions(id).then(() => setIsLoading(false));
+  }, [id]);
 
   return (
     <Container borderColor={core.ui.getBorderColor(selected)}>
-      <Content imageUrl={element.image?.src} borderRadius={borderRadius}>
-        {element.id}
-      </Content>
+      {isLoading || element == null ? (
+        <RectangleLoading borderRadius={borderRadius} />
+      ) : (
+        <Content imageUrl={element.image?.src} borderRadius={borderRadius} />
+      )}
     </Container>
   );
 };
+
+export default RectangleInner;
 
 const Container = styled.div<{ borderColor: string }>`
   display: flex;
@@ -68,4 +55,5 @@ const Content = styled.div<{ imageUrl?: string; borderRadius?: string }>`
   border-radius: ${(props) => props.borderRadius};
   background-image: ${(props) => `url('${props.imageUrl}')`};
   background-size: cover;
+  background-color: #ffffff; ;
 `;

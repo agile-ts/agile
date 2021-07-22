@@ -1,8 +1,8 @@
 import React from 'react';
-import { Drag } from '../actionComponents/Drag';
-import { Resize } from '../actionComponents/Resize';
-import { RectangleContainer } from './components/RectangleContainer';
-import { RectangleInner } from './components/RectangleInner';
+import Drag from '../actionComponents/Drag';
+import Resize from '../actionComponents/Resize';
+import RectangleContainer from './components/RectangleContainer';
+import RectangleInner from './components/RectangleInner';
 import { useAgile } from '@agile-ts/react';
 import core from '../../core';
 import { ElementStyleInterface } from '../../core/entities/ui/ui.interfaces';
@@ -12,7 +12,7 @@ export interface RectangleProps {
   id: string | number;
 }
 
-export const Rectangle: React.FC<RectangleProps> = (props) => {
+const Rectangle: React.FC<RectangleProps> = (props) => {
   const { id } = props;
 
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
@@ -40,15 +40,14 @@ export const Rectangle: React.FC<RectangleProps> = (props) => {
         selected={selected}
         position={element.style.position}
         size={element.style.size}
-        onResize={(style: ElementStyleInterface) => {
-          ELEMENT?.patch({ style: style });
+        onResize={(updatedData: ElementStyleInterface) => {
+          core.ui.updateElementStyle(id, updatedData);
         }}
         lockAspectRatio={element.image !== undefined}>
         <Drag
           position={element.style.position}
           onDrag={(position) => {
-            ELEMENT.nextStateValue.style.position = position;
-            ELEMENT.ingest();
+            core.ui.updateElementPosition(id, position);
           }}>
           <RectangleInner id={id} selected={selected} />
         </Drag>
@@ -56,3 +55,5 @@ export const Rectangle: React.FC<RectangleProps> = (props) => {
     </RectangleContainer>
   );
 };
+
+export default Rectangle;
