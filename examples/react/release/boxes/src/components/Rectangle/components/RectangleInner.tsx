@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Box } from '@chakra-ui/react';
 import core from '../../../core';
 import { useAgile } from '@agile-ts/react';
 import { RectangleLoading } from './RectangleLoading';
-import {
-  ElementImageInterface,
-  ElementInterface,
-} from '../../../core/entities/ui/ui.interfaces';
+import { ElementImageInterface } from '../../../core/entities/ui/ui.interfaces';
+import styled from 'styled-components';
+import { useRandomBorderRadius } from '../../../hooks/useRandomBorderRadius';
 
 export interface RectangleInnerProps {
   selected: boolean;
@@ -18,6 +16,7 @@ export const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
 
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
   const element = useAgile(ELEMENT);
+  const borderRadius = useRandomBorderRadius();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -43,25 +42,30 @@ export const RectangleInner: React.FC<RectangleInnerProps> = (props) => {
     return <RectangleLoading selected={selected} />;
 
   return (
-    <Box
-      position="absolute"
-      border={`1px solid ${core.ui.getBorderColor(selected)}`}
-      transition="0.1s border-color ease-in-out"
-      width="100%"
-      height="100%"
-      display="flex"
-      padding="2px"
-      backgroundColor="red">
-      <Box
-        flex="1"
-        border="3px dashed #101010"
-        borderRadius="255px 15px 225px 15px/15px 225px 15px 255px"
-        backgroundColor="green"
-        backgroundImage={`url('${element.image?.src}')`}
-        backgroundSize="cover"
-        textAlign="center">
+    <Container borderColor={core.ui.getBorderColor(selected)}>
+      <Content imageUrl={element.image?.src} borderRadius={borderRadius}>
         {element.id}
-      </Box>
-    </Box>
+      </Content>
+    </Container>
   );
 };
+
+const Container = styled.div<{ borderColor: string }>`
+  display: flex;
+  position: absolute;
+  padding: 3px;
+  border: ${(props) => `1px solid ${props.borderColor}`};
+  width: 100%;
+  height: 100%;
+
+  transition: 0.1s border-bottom-color, border-left-color, border-top-color,
+    border-right-color ease-in-out;
+`;
+
+const Content = styled.div<{ imageUrl?: string; borderRadius?: string }>`
+  flex: 1;
+  border: 3px dashed #101010;
+  border-radius: ${(props) => props.borderRadius};
+  background-image: ${(props) => `url('${props.imageUrl}')`};
+  background-size: cover;
+`;

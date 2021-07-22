@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
 import { ElementStyleInterface } from '../../../core/entities/ui/ui.interfaces';
+import styled from 'styled-components';
 
 type RectangleContainerProps = {
   position: ElementStyleInterface['position'];
@@ -14,12 +14,15 @@ export const RectangleContainer: React.FC<RectangleContainerProps> = (
   const { children, size, position, onSelect } = props;
 
   return (
-    <Box
-      position="absolute"
+    <Container
       style={{ ...size, ...position }}
       onMouseDown={() => onSelect()}
       onClick={(e) => e.stopPropagation()}>
       {children}
-    </Box>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  position: absolute;
+`;

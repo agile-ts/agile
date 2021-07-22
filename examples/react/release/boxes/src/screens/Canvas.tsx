@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { EditProperties } from '../components/EditProperties';
-import { PageContainer } from '../components/PageContainer';
-import { Toolbar } from '../components/Toolbar';
+import PageContainer from '../components/PageContainer';
+import Toolbar from '../components/Toolbar';
 import { useValue } from '@agile-ts/react';
 import { Rectangle } from '../components/Rectangle';
 import core from '../core';
