@@ -4,6 +4,7 @@ import { useProxy } from '@agile-ts/react';
 import core from '../../../../../../core';
 import Info from './components/Info';
 import styled from 'styled-components';
+import Spacer from '../../../../../../components/Spacer';
 
 type ImageInfoProps = {
   fallback?: boolean;
@@ -29,8 +30,19 @@ const ImageInfo: React.FC<ImageInfoProps> = (props) => {
 
   return (
     <Container>
-      <Info label="Author" value={imageInfo?.author} />
-      <Info label="Image URL" value={imageInfo?.url} />
+      {!fallback ? (
+        <>
+          <Info label="Author" value={imageInfo?.author} />
+          <Spacer height={10} />
+          <Info label="Image URL" value={imageInfo?.url} />
+        </>
+      ) : (
+        <>
+          <Info label="Author" value={'Failed to load'} />
+          <Spacer height={10} />
+          <Info label="Image URL" value={'Failed to load'} />
+        </>
+      )}
     </Container>
   );
 };

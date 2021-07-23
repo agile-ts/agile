@@ -1,7 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Info = ({ label, value }: { label: string; value?: string }) => {
+type InfoProps = {
+  label: string;
+  value?: string;
+};
+
+const Info: React.FC<InfoProps> = (props) => {
+  const { label, value } = props;
+
   return (
     <Container>
       <Title>{label}</Title>
@@ -14,6 +21,7 @@ export default Info;
 
 const Container = styled.div`
   max-width: 175px;
+  overflow-wrap: break-word;
 `;
 
 const Title = styled.div`

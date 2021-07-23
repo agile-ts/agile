@@ -7,13 +7,14 @@ import {
   ELEMENTS,
 } from './ui.controller';
 import core from '../../index';
+import { copy } from '@agile-ts/utils';
 
 export const addDefaultElement = (image: boolean = false) => {
   if (image) addElement(defaultElementStyle, getRandomImage());
   else addElement(defaultElementStyle);
 };
 
-export const addElement = (
+export const addElement = async (
   style: ElementStyleInterface,
   image?: ElementImageInterface,
   select = true
@@ -24,7 +25,13 @@ export const addElement = (
     style,
     image,
   });
-  if (select) selectElement(id);
+
+  if (select) {
+    // TODO figure out why this timeout is needed
+    //  (otherwise it won't select the Element initially)
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    selectElement(id);
+  }
 };
 
 export const selectElement = (id: string | number) => {
@@ -133,9 +140,10 @@ export const updateElementY = (id: string | number, y: number) => {
 export const applyImageDimensions = async (id: string | number) => {
   const element = ELEMENTS.getItem(id);
   if (element && element.value.image?.src) {
-    element.nextStateValue.style.size = await core.ui.getImageDimensions(
+    const newDimensions = await core.ui.getImageDimensions(
       element.value.image.src
     );
+    element.nextStateValue.style.size = newDimensions;
     element.ingest();
   }
 };
