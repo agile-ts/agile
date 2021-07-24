@@ -13,3 +13,13 @@ export interface ElementInterface {
   style: ElementStyleInterface;
   image?: ElementImageInterface;
 }
+
+export interface CanvasInterface {
+  width: number;
+  height: number;
+}
+
+export interface ScreenInterface {
+  width: number;
+  height: number;
+}

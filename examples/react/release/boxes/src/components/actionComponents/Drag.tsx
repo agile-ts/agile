@@ -7,7 +7,7 @@ type DragProps = {
   onDrag: (position: ElementStyleInterface['position']) => void;
 };
 
-export const Drag: React.FC<DragProps> = (props) => {
+const Drag: React.FC<DragProps> = (props) => {
   const { position, onDrag, children } = props;
 
   return (
@@ -18,7 +18,9 @@ export const Drag: React.FC<DragProps> = (props) => {
           top: e.movementY + position.top,
         });
       }}>
-      {children}
+      <div>{children}</div>
     </DraggableCore>
   );
 };
+
+export default Drag;

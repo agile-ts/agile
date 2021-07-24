@@ -1,27 +1,29 @@
 import React from 'react';
-import { Box, Spinner } from '@chakra-ui/react';
-import core from '../../../core';
+import styled from 'styled-components';
+import BounceSpinner from '../../BounceSpinner';
 
-export const RectangleLoading = ({ selected }: { selected: boolean }) => {
+export interface RectangleLoadingProps {
+  borderRadius: string;
+}
+
+const RectangleLoading: React.FC<RectangleLoadingProps> = (props) => {
+  const { borderRadius } = props;
+
   return (
-    <Box
-      position="absolute"
-      border={`1px solid ${core.ui.getBorderColor(selected)}`}
-      transition="0.1s border-color ease-in-out"
-      width="100%"
-      height="100%"
-      display="flex"
-      padding="2px">
-      <Box
-        flex="1"
-        border="3px dashed #101010"
-        borderRadius="255px 15px 225px 15px/15px 225px 15px 255px"
-        backgroundColor="white"
-        display="flex"
-        alignItems="center"
-        justifyContent="center">
-        <Spinner size="lg" thickness="3px" />
-      </Box>
-    </Box>
+    <Container borderRadius={borderRadius}>
+      <BounceSpinner />
+    </Container>
   );
 };
+
+export default RectangleLoading;
+
+const Container = styled.div<{ borderRadius: string }>`
+  display: flex;
+  flex: 1;
+  border: 3px dashed #101010;
+  border-radius: ${(props) => props.borderRadius};
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+`;

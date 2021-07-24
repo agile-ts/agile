@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
 import { ResizeHandle } from 'react-resizable';
 import core from '../../../../core';
+import styled from 'styled-components';
 
 type Position = {
   top?: number | string;
@@ -11,32 +11,34 @@ type Position = {
 };
 
 export interface HandlePropsInterface {
-  placement: ResizeHandle;
+  handleAxis: ResizeHandle;
   visible: boolean;
   innerRef?: any;
 }
 
-export const Handle: React.FC<HandlePropsInterface> = (props) => {
-  const { placement, visible, innerRef } = props;
+const Handle: React.FC<HandlePropsInterface> = (props) => {
+  const { handleAxis, visible, innerRef } = props;
 
   const size = 10;
   const position: Position = {};
+  let cursor = 'default';
 
-  if (placement.startsWith('n')) position.top = 0;
-  if (placement.startsWith('s')) position.bottom = 0;
-  if (placement.includes('w')) position.left = 0;
-  if (placement.includes('e')) position.right = 0;
+  // Calculate handle position
+  if (handleAxis.startsWith('n')) position.top = 0;
+  if (handleAxis.startsWith('s')) position.bottom = 0;
+  if (handleAxis.includes('w')) position.left = 0;
+  if (handleAxis.includes('e')) position.right = 0;
 
-  if (placement === 'n' || placement === 's') position.left = '50%';
-  if (placement === 'e' || placement === 'w') position.top = '50%';
+  if (handleAxis === 'n' || handleAxis === 's') position.left = '50%';
+  if (handleAxis === 'e' || handleAxis === 'w') position.top = '50%';
 
-  let cursor = `${placement}-resize`;
-  if (placement === 'n' || placement === 's') cursor = 'ns-resize';
+  cursor = `${handleAxis}-resize`;
+  if (handleAxis === 'n' || handleAxis === 's') cursor = 'ns-resize';
 
   return (
-    <Box
+    <Container
+      className={`handle-${handleAxis}`}
       ref={innerRef}
-      position="absolute"
       style={{
         ...position,
         width: size - 2,
@@ -44,9 +46,15 @@ export const Handle: React.FC<HandlePropsInterface> = (props) => {
         margin: -size / 2,
         cursor,
       }}
-      border={`1px solid ${core.ui.getBorderColor(visible)}`}
-      transition="0.1s border-color ease-in-out"
-      backgroundColor="white"
+      color={core.ui.getBorderColor(visible)}
     />
   );
 };
+
+export default Handle;
+
+const Container = styled.div<{ color: string }>`
+  position: absolute;
+  background-color: ${(props) => props.color};
+  transition: 0.1s background-color ease-in-out;
+`;

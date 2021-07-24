@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.displayContainer {
+    padding: 1rem 0;
+}
+
+.displayContainer span{
+    background:#6C69A0;
+    color: #ffffff;
+    text-align: center;
+    font-size: 1rem;
+    padding: 1rem;
+    border-radius: 5px;
+}

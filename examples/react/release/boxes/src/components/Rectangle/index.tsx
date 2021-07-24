@@ -1,19 +1,18 @@
 import React from 'react';
-import { Drag } from '../actionComponents/Drag';
-import { Resize } from '../actionComponents/Resize';
-import { RectangleContainer } from './components/RectangleContainer';
-import { RectangleInner } from './components/RectangleInner';
+import Drag from '../actionComponents/Drag';
+import Resize from '../actionComponents/Resize';
+import RectangleContainer from './components/RectangleContainer';
+import RectangleInner from './components/RectangleInner';
 import { useAgile } from '@agile-ts/react';
 import core from '../../core';
-import { SELECTED_ELEMENT } from '../../core/entities/ui/ui.controller';
 import { ElementStyleInterface } from '../../core/entities/ui/ui.interfaces';
 import { useSelector } from '@agile-ts/react/dist/hooks/useSelector';
 
-export interface RectanglePropsInterface {
+export interface RectangleProps {
   id: string | number;
 }
 
-export const Rectangle: React.FC<RectanglePropsInterface> = (props) => {
+const Rectangle: React.FC<RectangleProps> = (props) => {
   const { id } = props;
 
   const ELEMENT = core.ui.ELEMENTS.getItem(id);
@@ -25,42 +24,36 @@ export const Rectangle: React.FC<RectanglePropsInterface> = (props) => {
       componentId: 'Rectangle',
     }
   ) as string | number;
+  const selected = selectedElementId === element?.id;
 
-  if (element == null) return null;
-
-  const selected = selectedElementId === element.id;
+  // Check if Element exists
+  if (element == null || ELEMENT == null) return null;
 
   return (
     <RectangleContainer
       position={element.style.position}
       size={element.style.size}
       onSelect={() => {
-        if (SELECTED_ELEMENT.itemKey !== id) SELECTED_ELEMENT.select(id);
+        core.ui.selectElement(id);
       }}>
       <Resize
         selected={selected}
         position={element.style.position}
         size={element.style.size}
-        onResize={(style: ElementStyleInterface) => {
-          console.log('onResize', style);
-          ELEMENT?.patch({ style: style });
+        onResize={(updatedData: ElementStyleInterface) => {
+          core.ui.updateElementStyle(id, updatedData);
         }}
         lockAspectRatio={element.image !== undefined}>
         <Drag
           position={element.style.position}
           onDrag={(position) => {
-            ELEMENT?.patch({
-              style: {
-                ...ELEMENT?.value.style,
-                position,
-              },
-            });
+            core.ui.updateElementPosition(id, position);
           }}>
-          <div>
-            <RectangleInner selected={selected} id={id} />
-          </div>
+          <RectangleInner id={id} selected={selected} />
         </Drag>
       </Resize>
     </RectangleContainer>
   );
 };
+
+export default Rectangle;

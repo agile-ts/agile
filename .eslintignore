@@ -5,3 +5,7 @@ jest.config.js
 jest.base.config.js
 scripts/
 examples/
+
+# Ignore the templates (because otherwise it will try to lint with the eslint config of these packages)
+cra-template-agile-typescript/
+cra-template-agile/

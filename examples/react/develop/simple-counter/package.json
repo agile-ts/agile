@@ -17,7 +17,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install"
   },
   "browserslist": {
     "production": [

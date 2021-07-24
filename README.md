@@ -1,6 +1,6 @@
  <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
 
-> Global State and Logic Framework
+> Global State and Logic Library
 
  <br />
 
@@ -29,7 +29,7 @@
 </p>
 
 <p align="left">
- <a href="https://twitter.com/intent/tweet?text=I%20just%20discovered%20AgileTs%3B%20a%20global%2C%20spacy%20and%20overall%20easy%20to%20use%20State%20Manager.%0A%60%60%60ts%0Aconst%20MY_STATE%20%3D%20App.createState(%22Hello%20stranger%22)%3B%0AMY_STATE.set(%22Hello%20friend%22)%3B%0A%60%60%60%0Ahttps%3A%2F%2Fgithub.com%2Fagile-ts%2Fagile%2F%20%0A%0A%40AgileFramework%20%0A%23agilets%20%23statemanagement%20%23webdev%20"><img src="http://randojs.com/images/tweetShield.svg" alt="Tweet" height="20"/>
+ <a href="https://twitter.com/intent/tweet?text=I%20just%20discovered%20AgileTs%3B%20a%20global%2C%20spacy%20and%20overall%20easy%20to%20use%20State%20Manager.%0A%60%60%60ts%0Aconst%20MY_STATE%20%3D%20App.createState(%22Hello%20stranger%22)%3B%0AMY_STATE.set(%22Hello%20friend%22)%3B%0A%60%60%60%0Ahttps%3A%2F%2Fgithub.com%2Fagile-ts%2Fagile%2F%20%0A%0A%40AgileTypescript%20%0A%23agilets%20%23statemanagement%20%23webdev%20"><img src="http://randojs.com/images/tweetShield.svg" alt="Tweet" height="20"/>
  </a>
  <a href="https://discord.gg/T9GzreAwPH">
    <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" alt="Join Discord"/>
@@ -64,7 +64,7 @@ It's only one click away. Just select your preferred Framework below.
 - [React](https://codesandbox.io/s/agilets-first-state-f12cz)
 - [React-Native](https://snack.expo.io/@bennodev/agilets-first-state)
 - [Vue](https://codesandbox.io/s/agilets-first-state-i5xxs)
-- Angular (coming soon)
+- Svelte (coming soon)
 
 More examples can be found in the [Example section](https://agile-ts.org/docs/examples).
 
@@ -75,7 +75,7 @@ More examples can be found in the [Example section](https://agile-ts.org/docs/ex
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
-AgileTs is a global State and Logic Framework implemented in Typescript.
+AgileTs is a global State and Logic Library implemented in Typescript.
 It offers a reimagined API that focuses on **developer experience**
 and allows you to **easily** and **flexible** manage your application States.
 Besides [States](https://agile-ts.org/docs/core/state),
@@ -175,7 +175,6 @@ We will be happy to help you.
 - Quick Start
   - [React](https://agile-ts.org/docs/quick-start/react)
   - [Vue](https://agile-ts.org/docs/quick-start/vue)
-  - [Angular](https://agile-ts.org/docs/quick-start/angular)
 - Packages
   - [core](https://agile-ts.org/docs/core)
     - [Agile Instance](https://agile-ts.org/docs/core/agile-instance)
@@ -232,5 +231,5 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/credits_header.png" alt="Credits"/>
 
-AgileTs is inspired by [MVVM Frameworks](https://de.wikipedia.org/wiki/Model_View_ViewModel) 
+AgileTs is inspired by [MVVM Libraries](https://de.wikipedia.org/wiki/Model_View_ViewModel) 
 like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).

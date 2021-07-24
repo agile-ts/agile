@@ -4,7 +4,7 @@
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
-  "description": "Spacy, Simple, Scalable State Management Framework",
+  "description": "Global State and Logic Library",
   "keywords": [
     "agile",
     "agile-ts",

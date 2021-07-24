@@ -1,0 +1,28 @@
+{
+  "name": "clock",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/logger @agile-ts/utils & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/logger @agile-ts/utils & yarn install"
+  },
+  "dependencies": {
+    "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@agile-ts/utils": "file:.yalc/@agile-ts/utils",
+    "next": "11.0.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "17.0.14",
+    "eslint": "7.31.0",
+    "eslint-config-next": "11.0.1",
+    "typescript": "4.3.5"
+  }
+}
