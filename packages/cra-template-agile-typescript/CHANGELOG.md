@@ -1,5 +1,19 @@
 # cra-template-agile-typescript
 
+## 0.0.8
+
+### Patch Changes
+
+- f0968b7: #### :nail_care: Polish
+
+  - `cra-template-agile`, `cra-template-agile-typescript`
+    - Optimized create-react-app templates ([@bennodev19](https://github.com/bennodev19))
+  - Optimized examples ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
 ## 0.0.7
 
 ### Patch Changes
