@@ -5,6 +5,7 @@ import {
   defaultElementStyle,
   SELECTED_ELEMENT,
   ELEMENTS,
+  SCREEN,
 } from './ui.controller';
 import core from '../../index';
 import { copy } from '@agile-ts/utils';
@@ -118,6 +119,32 @@ export const updateElementPosition = (
   if (element) {
     element.nextStateValue.style.position = position;
     element.ingest();
+
+    // TODO implement logic to follow the box with scrolling if it is out of the 'User View'
+    // // Coordinates of the User View
+    // const userViewX = element.value.style.position.left - window.scrollX;
+    // const userViewY = element.value.style.position.top - window.scrollY;
+    //
+    // const userViewOffsetX =
+    //   (userViewX -
+    //     SCREEN.value.width +
+    //     element.nextStateValue.style.size.width) *
+    //   -1;
+    //
+    // console.log(userViewOffsetX);
+    //
+    // if (userViewOffsetX <= 0) {
+    //   window.scrollTo({
+    //     left:
+    //       element.nextStateValue.style.position.left / 2 +
+    //       element.nextStateValue.style.size.width,
+    //     behavior: 'smooth',
+    //   });
+    // }
+    //
+    // if (userViewX <= 0) {
+    //   // Scroll left
+    // }
   }
 };
 
@@ -159,18 +186,26 @@ export const deleteSelectedElement = () => {
 };
 
 export const assignDefaultElementStyle = (
+  windowWidth: number,
+  windowHeight: number
+) => {
+  core.ui.defaultElementStyle.position = {
+    left: Math.floor(
+      windowWidth / 2 - core.ui.defaultElementStyle.size.width / 2
+    ),
+    top: Math.floor(
+      windowHeight / 2 - core.ui.defaultElementStyle.size.height / 2
+    ),
+  };
+};
+
+export const updateScreenDimensions = (
   windowWidth?: number,
   windowHeight?: number
 ) => {
   if (windowWidth != null && windowHeight != null) {
-    core.ui.defaultElementStyle.position = {
-      left: Math.floor(
-        windowWidth / 2 - core.ui.defaultElementStyle.size.width / 2
-      ),
-      top: Math.floor(
-        windowHeight / 2 - core.ui.defaultElementStyle.size.height / 2
-      ),
-    };
+    assignDefaultElementStyle(windowWidth, windowHeight);
+    SCREEN.set({ width: windowWidth, height: windowHeight });
   }
 };
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import useInterval from '../src/useInterval';
 import Nav from './Nav';
 import Clock from './Clock';

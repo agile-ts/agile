@@ -24,7 +24,7 @@ const DoubleBounce = styled.div`
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background-color: #000000;
+  background-color: #ccca;
   opacity: 0.6;
   position: absolute;
   top: 0;

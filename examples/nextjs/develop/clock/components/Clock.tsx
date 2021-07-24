@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAgile } from '@agile-ts/react';
 import { LAST_UPDATED_TIMESTAMP, LIGHT } from '../src/core';
 

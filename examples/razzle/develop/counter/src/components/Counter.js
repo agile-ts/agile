@@ -1,11 +1,6 @@
 import React from 'react';
 import { useAgile } from '@agile-ts/react';
-import {
-  COUNTER,
-  incrementCount,
-  decrementCount,
-  resetCount,
-} from '../src/core';
+import { COUNTER, incrementCount, decrementCount, resetCount } from '../core';
 
 const Counter = () => {
   const count = useAgile(COUNTER);

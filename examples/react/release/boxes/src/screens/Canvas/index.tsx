@@ -14,7 +14,7 @@ const Canvas = () => {
   const { windowHeight, windowWidth } = useWindowSize();
 
   useEffect(() => {
-    core.ui.assignDefaultElementStyle(windowWidth, windowHeight);
+    core.ui.updateScreenDimensions(windowWidth, windowHeight);
   }, [windowWidth, windowHeight]);
 
   useEffect(() => {

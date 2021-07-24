@@ -1,3 +1,4 @@
+import React from 'react';
 import Page from '../components/Page';
 import { COUNTER, LAST_UPDATED_TIMESTAMP, LIGHT } from '../src/core';
 

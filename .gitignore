@@ -5,6 +5,7 @@ package-lock.json
 coverage
 .tgz
 .changelog
+cache
 
 # Differs on each engine
 yalc.lock

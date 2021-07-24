@@ -18,3 +18,8 @@ export interface CanvasInterface {
   width: number;
   height: number;
 }
+
+export interface ScreenInterface {
+  width: number;
+  height: number;
+}
