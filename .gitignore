@@ -1,11 +1,4 @@
 node_modules/
-dist
-.yalc
-package-lock.json
-coverage
-.tgz
-.changelog
-cache
 
 # Differs on each engine
 yalc.lock
@@ -19,6 +12,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .eslintcache
+package-lock.json
+yarn.lock
 
 # Editor directories and files
 .idea
@@ -34,3 +29,9 @@ sync.js
 # Generated files from build
 src/*.js
 src/*.js.map
+*.tgz
+cache
+coverage
+.yalc
+dist
+.changelog
