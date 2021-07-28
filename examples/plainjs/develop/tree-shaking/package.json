@@ -1,0 +1,21 @@
+{
+  "name": "tree-shiking-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "install:dev:agile": "yalc add @agile-ts/core & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core & yarn install"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.47.0",
+    "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "@agile-ts/core": "file:.yalc/@agile-ts/core"
+  }
+}

@@ -14,7 +14,6 @@ import {
   CreateStorageConfigInterface,
   RegisterConfigInterface,
   StateConfigInterface,
-  flatMerge,
   LogCodeManager,
   DependableAgileInstancesType,
   CreateComputedConfigInterface,
