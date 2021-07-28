@@ -10,6 +10,7 @@ dotenv.config();
 // Extract entry (at third parameter) from the executed command
 // yarn run ./path/to/entry -> './path/to/entry' is extracted
 const entry = process.argv.slice(2)[0];
+const dev = process.argv.slice(2)[1] === '--dev' || process.env.DEV === 'true';
 if (entry == null) {
   throw new Error(
     "No valid entry was provided! Valid entry example: 'yarn run ./benchmarks/react/counter'"
@@ -34,7 +35,7 @@ const startBenchmark = async () => {
       target: 'es2015',
       format: 'cjs', // https://esbuild.github.io/api/#format-commonjs
       platform: 'browser',
-      minify: true, // https://esbuild.github.io/api/#minify
+      minify: !dev, // https://esbuild.github.io/api/#minify
       bundle: true, // https://esbuild.github.io/api/#bundle
       sourcemap: 'external', // https://esbuild.github.io/api/#sourcemap// https://github.com/evanw/esbuild/issues/69
     }
@@ -53,7 +54,12 @@ const startBenchmark = async () => {
   const page = await context.newPage();
 
   // Option to open and test the Benchmark Test Suite in the browser manually
-  if (process.env.MANUAL_BENCHMARK === 'true') {
+  if (dev) {
+    console.log(
+      `${chalk.blue('[i]')} ${chalk.gray(
+        `Development mode is ${chalk.green(`active`)}`
+      )}`
+    );
     console.log(
       `${chalk.blue('[i]')} ${chalk.gray(
         `Benchmark is running at ${chalk.blueBright.bold(serverUrl)}`

@@ -88,19 +88,19 @@ The philosophy behind AgileTs is simple:
 
 Write minimalistic, boilerplate-free code that captures your intent.
 ```ts
-// Create State with inital value 'frank'
+// Create State with the inital value 'frank'
 const MY_STATE = createState('frank');
 
-// Update State value from 'frank' to 'jeff'
+// Update the State value from 'frank' to 'jeff'
 MY_STATE.set('jeff');
 
-// Undo latest State value change
+// Undo the latest State value change
 MY_STATE.undo();
 
-// Reset State value to its initial value
+// Reset the State value to its initial value
 MY_STATE.reset();
 
-// Permanently store State value in an external Storage
+// Permanently store the State value in an external Storage
 MY_STATE.persist("storage-key"); 
 ```
 
