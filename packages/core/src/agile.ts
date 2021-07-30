@@ -1,30 +1,12 @@
-import {
-  Runtime,
-  Integration,
-  State,
-  Storage,
-  Collection,
-  CollectionConfig,
-  DefaultItem,
-  Computed,
-  Integrations,
-  SubController,
-  globalBind,
-  Storages,
-  CreateStorageConfigInterface,
-  RegisterConfigInterface,
-  StateConfigInterface,
-  LogCodeManager,
-  DependableAgileInstancesType,
-  CreateComputedConfigInterface,
-  ComputeFunctionType,
-  createStorage,
-  createState,
-  createCollection,
-  createComputed,
-  IntegrationsConfigInterface,
-  defineConfig,
-} from './internal';
+import { Runtime } from './runtime';
+import { SubController } from './runtime/subscription/sub.controller';
+import { RegisterConfigInterface, Storages } from './storages';
+import { Storage } from './storages/storage';
+import { Integrations, IntegrationsConfigInterface } from './integrations';
+import { defineConfig } from '@agile-ts/utils';
+import { LogCodeManager } from './logCodeManager';
+import { globalBind } from './utils';
+import { Integration } from './integrations/integration';
 
 export class Agile {
   public config: AgileConfigInterface;
@@ -102,143 +84,6 @@ export class Agile {
       if (!globalBind(Agile.globalKey, this)) {
         LogCodeManager.log('10:02:00');
       }
-  }
-
-  /**
-   * Returns a newly created Storage.
-   *
-   * A Storage Class serves as an interface to external storages,
-   * such as the [Async Storage](https://github.com/react-native-async-storage/async-storage) or
-   * [Local Storage](https://www.w3schools.com/html/html5_webstorage.asp).
-   *
-   * It creates the foundation to easily [`persist()`](https://agile-ts.org/docs/core/state/methods#persist) [Agile Sub Instances](https://agile-ts.org/docs/introduction/#agile-sub-instance)
-   * (like States or Collections) in nearly any external storage.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstorage)
-   *
-   * @public
-   * @param config - Configuration object
-   */
-  public createStorage(config: CreateStorageConfigInterface): Storage {
-    return createStorage(config);
-  }
-
-  /**
-   * Returns a newly created State.
-   *
-   * A State manages a piece of Information
-   * that we need to remember globally at a later point in time.
-   * While providing a toolkit to use and mutate this piece of Information.
-   *
-   * You can create as many global States as you need.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
-   *
-   * @public
-   * @param initialValue - Initial value of the State.
-   * @param config - Configuration object
-   */
-  public createState<ValueType = any>(
-    initialValue: ValueType,
-    config: StateConfigInterface = {}
-  ): State<ValueType> {
-    return createState<ValueType>(
-      initialValue,
-      defineConfig(config, {
-        agileInstance: this,
-      })
-    );
-  }
-
-  /**
-   * Returns a newly created Collection.
-   *
-   * A Collection manages a reactive set of Information
-   * that we need to remember globally at a later point in time.
-   * While providing a toolkit to use and mutate this set of Information.
-   *
-   * It is designed for arrays of data objects following the same pattern.
-   *
-   * Each of these data object must have a unique `primaryKey` to be correctly identified later.
-   *
-   * You can create as many global Collections as you need.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcollection)
-   *
-   * @public
-   * @param config - Configuration object
-   */
-  public createCollection<DataType extends Object = DefaultItem>(
-    config?: CollectionConfig<DataType>
-  ): Collection<DataType> {
-    return createCollection<DataType>(config, this);
-  }
-
-  /**
-   * Returns a newly created Computed.
-   *
-   * A Computed is an extension of the State Class
-   * that computes its value based on a specified compute function.
-   *
-   * The computed value will be cached to avoid unnecessary recomputes
-   * and is only recomputed when one of its direct dependencies changes.
-   *
-   * Direct dependencies can be States and Collections.
-   * So when, for example, a dependent State value changes, the computed value is recomputed.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
-   *
-   * @public
-   * @param computeFunction - Function to compute the computed value.
-   * @param config - Configuration object
-   */
-  public createComputed<ComputedValueType = any>(
-    computeFunction: ComputeFunctionType<ComputedValueType>,
-    config?: CreateComputedConfigInterface
-  ): Computed<ComputedValueType>;
-  /**
-   * Returns a newly created Computed.
-   *
-   * A Computed is an extension of the State Class
-   * that computes its value based on a specified compute function.
-   *
-   * The computed value will be cached to avoid unnecessary recomputes
-   * and is only recomputed when one of its direct dependencies changes.
-   *
-   * Direct dependencies can be States and Collections.
-   * So when, for example, a dependent State value changes, the computed value is recomputed.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcomputed)
-   *
-   * @public
-   * @param computeFunction - Function to compute the computed value.
-   * @param deps - Hard-coded dependencies on which the Computed Class should depend.
-   */
-  public createComputed<ComputedValueType = any>(
-    computeFunction: ComputeFunctionType<ComputedValueType>,
-    deps?: Array<DependableAgileInstancesType>
-  ): Computed<ComputedValueType>;
-  public createComputed<ComputedValueType = any>(
-    computeFunction: ComputeFunctionType<ComputedValueType>,
-    configOrDeps?:
-      | CreateComputedConfigInterface
-      | Array<DependableAgileInstancesType>
-  ): Computed<ComputedValueType> {
-    let _config: CreateComputedConfigInterface = {};
-
-    if (Array.isArray(configOrDeps)) {
-      _config = defineConfig(_config, {
-        computedDeps: configOrDeps,
-        agileInstance: this,
-      });
-    } else {
-      if (configOrDeps)
-        _config = defineConfig(configOrDeps, {
-          agileInstance: this,
-        });
-    }
-
-    return createComputed<ComputedValueType>(computeFunction, _config);
   }
 
   /**

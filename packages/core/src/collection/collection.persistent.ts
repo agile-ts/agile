@@ -1,17 +1,13 @@
+import { Collection, CollectionKey, DefaultItem, ItemKey } from './index';
 import {
-  Collection,
-  CollectionKey,
   CreatePersistentConfigInterface,
-  DefaultItem,
-  defineConfig,
-  Group,
-  GroupKey,
-  ItemKey,
-  LogCodeManager,
   Persistent,
   PersistentKey,
-  StorageKey,
-} from '../internal';
+} from '../storages/persistent';
+import { defineConfig } from '@agile-ts/utils';
+import { Group, GroupKey } from './group';
+import { LogCodeManager } from '../logCodeManager';
+import { StorageKey } from '../storages/storage';
 
 export class CollectionPersistent<
   DataType extends Object = DefaultItem

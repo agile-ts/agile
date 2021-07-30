@@ -1,27 +1,28 @@
+import { Agile } from '../agile';
+import { Item } from './item';
+import { CollectionPersistent } from './collection.persistent';
 import {
-  Agile,
-  Item,
-  Group,
-  GroupKey,
-  Selector,
-  SelectorKey,
-  StorageKey,
-  GroupConfigInterface,
+  copy,
+  defineConfig,
+  generateId,
+  isFunction,
   isValidObject,
   normalizeArray,
-  copy,
-  CollectionPersistent,
-  GroupAddConfigInterface,
-  ComputedTracker,
-  generateId,
-  SideEffectConfigInterface,
-  SelectorConfigInterface,
   removeProperties,
-  isFunction,
-  LogCodeManager,
-  PatchOptionConfigInterface,
-  defineConfig,
-} from '../internal';
+} from '@agile-ts/utils';
+import {
+  GroupAddConfigInterface,
+  GroupConfigInterface,
+  GroupKey,
+} from './group';
+import { LogCodeManager } from '../logCodeManager';
+import { Selector, SelectorConfigInterface, SelectorKey } from './selector';
+import { Group } from './group';
+import { ComputedTracker } from '../computed/computed.tracker';
+import { StorageKey } from '../storages/storage';
+import { SideEffectConfigInterface } from '../runtime/runtime.job';
+import { PatchOptionConfigInterface } from '../state';
+import { shared } from '../shared';
 
 export class Collection<
   DataType extends Object = DefaultItem,
@@ -1482,6 +1483,32 @@ export class Collection<
       }
     }
   }
+}
+
+/**
+ * Returns a newly created Collection.
+ *
+ * A Collection manages a reactive set of Information
+ * that we need to remember globally at a later point in time.
+ * While providing a toolkit to use and mutate this set of Information.
+ *
+ * It is designed for arrays of data objects following the same pattern.
+ *
+ * Each of these data object must have a unique `primaryKey` to be correctly identified later.
+ *
+ * You can create as many global Collections as you need.
+ *
+ * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcollection)
+ *
+ * @public
+ * @param config - Configuration object
+ * @param agileInstance - Instance of Agile the Collection belongs to.
+ */
+export function createCollection<DataType extends Object = DefaultItem>(
+  config?: CollectionConfig<DataType>,
+  agileInstance: Agile = shared
+): Collection<DataType> {
+  return new Collection<DataType>(agileInstance, config);
 }
 
 export type DefaultItem = Record<string, any>; // same as { [key: string]: any };

@@ -1,13 +1,10 @@
-import {
-  Agile,
-  SubscriptionContainer,
-  RuntimeJob,
-  CallbackSubscriptionContainer,
-  ComponentSubscriptionContainer,
-  notEqual,
-  LogCodeManager,
-  defineConfig,
-} from '../internal';
+import { Agile } from '../agile';
+import { RuntimeJob } from './runtime.job';
+import { LogCodeManager } from '../logCodeManager';
+import { defineConfig, notEqual } from '@agile-ts/utils';
+import { SubscriptionContainer } from './subscription/container/SubscriptionContainer';
+import { CallbackSubscriptionContainer } from './subscription/container/CallbackSubscriptionContainer';
+import { ComponentSubscriptionContainer } from './subscription/container/ComponentSubscriptionContainer';
 
 export class Runtime {
   // Agile Instance the Runtime belongs to

@@ -1,17 +1,17 @@
+import { State, StateConfigInterface } from '../state';
+import { Observer } from '../runtime/observer';
+import { Agile } from '../agile';
 import {
-  State,
-  Agile,
-  Observer,
-  StateConfigInterface,
-  ComputedTracker,
-  Collection,
-  StateIngestConfigInterface,
-  removeProperties,
-  LogCodeManager,
-  isAsyncFunction,
-  extractRelevantObservers,
   defineConfig,
-} from '../internal';
+  isAsyncFunction,
+  removeProperties,
+} from '@agile-ts/utils';
+import { extractRelevantObservers } from '../utils';
+import { ComputedTracker } from './computed.tracker';
+import { LogCodeManager } from '../logCodeManager';
+import { StateIngestConfigInterface } from '../state/state.observer';
+import { Collection } from '../collection';
+import { CreateAgileSubInstanceInterface, shared } from '../shared';
 
 export class Computed<ComputedValueType = any> extends State<
   ComputedValueType
@@ -203,6 +203,79 @@ export class Computed<ComputedValueType = any> extends State<
     return this;
   }
 }
+
+/**
+ * Returns a newly created Computed.
+ *
+ * A Computed is an extension of the State Class
+ * that computes its value based on a specified compute function.
+ *
+ * The computed value will be cached to avoid unnecessary recomputes
+ * and is only recomputed when one of its direct dependencies changes.
+ *
+ * Direct dependencies can be States and Collections.
+ * So when, for example, a dependent State value changes, the computed value is recomputed.
+ *
+ * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
+ *
+ * @public
+ * @param computeFunction - Function to compute the computed value.
+ * @param config - Configuration object
+ */
+export function createComputed<ComputedValueType = any>(
+  computeFunction: ComputeFunctionType<ComputedValueType>,
+  config?: CreateComputedConfigInterfaceWithAgile
+): Computed<ComputedValueType>;
+/**
+ * Returns a newly created Computed.
+ *
+ * A Computed is an extension of the State Class
+ * that computes its value based on a specified compute function.
+ *
+ * The computed value will be cached to avoid unnecessary recomputes
+ * and is only recomputed when one of its direct dependencies changes.
+ *
+ * Direct dependencies can be States and Collections.
+ * So when, for example, a dependent State value changes, the computed value is recomputed.
+ *
+ * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcomputed)
+ *
+ * @public
+ * @param computeFunction - Function to compute the computed value.
+ * @param deps - Hard-coded dependencies on which the Computed Class should depend.
+ */
+export function createComputed<ComputedValueType = any>(
+  computeFunction: ComputeFunctionType<ComputedValueType>,
+  deps?: Array<DependableAgileInstancesType>
+): Computed<ComputedValueType>;
+export function createComputed<ComputedValueType = any>(
+  computeFunction: ComputeFunctionType<ComputedValueType>,
+  configOrDeps?:
+    | CreateComputedConfigInterface
+    | Array<DependableAgileInstancesType>
+): Computed<ComputedValueType> {
+  let _config: CreateComputedConfigInterfaceWithAgile = {};
+
+  if (Array.isArray(configOrDeps)) {
+    _config = defineConfig(_config, {
+      computedDeps: configOrDeps,
+    });
+  } else {
+    if (configOrDeps) _config = configOrDeps;
+  }
+
+  _config = defineConfig(_config, { agileInstance: shared });
+
+  return new Computed<ComputedValueType>(
+    _config.agileInstance as any,
+    computeFunction,
+    removeProperties(_config, ['agileInstance'])
+  );
+}
+
+export interface CreateComputedConfigInterfaceWithAgile
+  extends CreateAgileSubInstanceInterface,
+    CreateComputedConfigInterface {}
 
 export type ComputeFunctionType<ComputedValueType = any> = () =>
   | ComputedValueType

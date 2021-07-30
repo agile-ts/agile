@@ -1,12 +1,8 @@
-import {
-  Agile,
-  Observer,
-  Collection,
-  normalizeArray,
-  isFunction,
-  LogCodeManager,
-  shared,
-} from './internal';
+import { isFunction, normalizeArray } from '@agile-ts/utils';
+import { Agile } from './agile';
+import { shared } from './shared';
+import { LogCodeManager } from './logCodeManager';
+import { Observer } from './runtime/observer';
 
 /**
  * Extracts an Instance of Agile from the specified Instance.
@@ -95,14 +91,15 @@ export function extractObservers(
       continue;
     }
 
+    // TODO this use of the Collection avoid tree shaking it
     // If the Instance equals to a Collection
-    if (instance instanceof Collection) {
-      observers.push(
-        instance.getGroupWithReference(instance.config.defaultGroupKey)
-          .observers as any
-      );
-      continue;
-    }
+    // if (instance instanceof Collection) {
+    //   observers.push(
+    //     instance.getGroupWithReference(instance.config.defaultGroupKey)
+    //       .observers as any
+    //   );
+    //   continue;
+    // }
 
     // If the Instance contains a property that is an Observer
     if (instance['observer'] && instance['observer'] instanceof Observer) {

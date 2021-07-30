@@ -1,4 +1,6 @@
-import { defineConfig, Observer, SubscriptionContainer } from '../internal';
+import { Observer } from './observer';
+import { SubscriptionContainer } from './subscription/container/SubscriptionContainer';
+import { defineConfig } from '@agile-ts/utils';
 
 export class RuntimeJob<ObserverType extends Observer = Observer> {
   public config: RuntimeJobConfigInterface;

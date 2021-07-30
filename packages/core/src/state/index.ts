@@ -1,23 +1,23 @@
+import { StatePersistent } from './state.persistent';
+import { Agile } from '../agile';
 import {
-  Agile,
-  StorageKey,
   copy,
-  flatMerge,
-  isValidObject,
-  StateObserver,
-  StatePersistent,
-  Observer,
-  equal,
-  isFunction,
-  notEqual,
-  generateId,
-  PersistentKey,
-  ComputedTracker,
-  StateIngestConfigInterface,
-  removeProperties,
-  LogCodeManager,
   defineConfig,
-} from '../internal';
+  equal,
+  flatMerge,
+  generateId,
+  isFunction,
+  isValidObject,
+  notEqual,
+  removeProperties,
+} from '@agile-ts/utils';
+import { ComputedTracker } from '../computed/computed.tracker';
+import { StateIngestConfigInterface, StateObserver } from './state.observer';
+import { LogCodeManager } from '../logCodeManager';
+import { PersistentKey } from '../storages/persistent';
+import { Observer } from '../runtime/observer';
+import { StorageKey } from '../storages/storage';
+import { CreateAgileSubInstanceInterface, shared } from '../shared';
 
 export class State<ValueType = any> {
   // Agile Instance the State belongs to
@@ -759,6 +759,39 @@ export class State<ValueType = any> {
     return this._value;
   }
 }
+
+/**
+ * Returns a newly created State.
+ *
+ * A State manages a piece of Information
+ * that we need to remember globally at a later point in time.
+ * While providing a toolkit to use and mutate this piece of Information.
+ *
+ * You can create as many global States as you need.
+ *
+ * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
+ *
+ * @public
+ * @param initialValue - Initial value of the State.
+ * @param config - Configuration object
+ */
+export function createState<ValueType = any>(
+  initialValue: ValueType,
+  config: CreateStateConfigInterfaceWithAgile = {}
+): State<ValueType> {
+  config = defineConfig(config, {
+    agileInstance: shared,
+  });
+  return new State<ValueType>(
+    config.agileInstance as any,
+    initialValue,
+    removeProperties(config, ['agileInstance'])
+  );
+}
+
+export interface CreateStateConfigInterfaceWithAgile
+  extends CreateAgileSubInstanceInterface,
+    StateConfigInterface {}
 
 export type StateKey = string | number;
 
