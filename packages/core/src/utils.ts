@@ -3,7 +3,6 @@ import { Agile } from './agile';
 import { shared } from './shared';
 import { LogCodeManager } from './logCodeManager';
 import { Observer } from './runtime/observer';
-import { Collection } from './collection';
 
 /**
  * Extracts an Instance of Agile from the specified Instance.
@@ -92,9 +91,8 @@ export function extractObservers(
       continue;
     }
 
-    // TODO this use of the Collection avoid tree shaking it
     // If the Instance equals to a Collection
-    if (instance instanceof Collection) {
+    if (instance.isCollection) {
       observers.push(
         instance.getGroupWithReference(instance.config.defaultGroupKey)
           .observers as any

@@ -1,15 +1,19 @@
 import { Agile } from './agile';
 
 // Required
+export * from './agile';
+export * from './integrations/integration';
 export * from './storages/storage';
 export * from './state';
-export * from './integrations/integration';
 export * from './computed';
 export * from './collection';
 export * from './collection/item';
 export * from './collection/group';
 export * from './collection/selector';
 export * from './shared';
+export * from './utils'; // Needed by external package
+export * from './logCodeManager'; // Needed by external package
+export * from '@agile-ts/utils';
 
 export default Agile;
 

@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "install:dev:agile": "yalc add @agile-ts/core & yarn install",
-    "install:prod:agile": "yarn add @agile-ts/core & yarn install"
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react & yarn install"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,8 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
-    "@agile-ts/core": "file:.yalc/@agile-ts/core"
+    "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "react": "^17.0.2"
   }
 }

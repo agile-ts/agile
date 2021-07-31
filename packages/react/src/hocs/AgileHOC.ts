@@ -1,17 +1,16 @@
 import React, { ComponentClass } from 'react';
-import {
+import Agile, {
   State,
-  Agile,
   ComponentSubscriptionContainer,
   getAgileInstance,
   Observer,
-  Collection,
   isValidObject,
   flatMerge,
   extractRelevantObservers,
   normalizeArray,
   LogCodeManager,
 } from '@agile-ts/core';
+import type { Collection } from '@agile-ts/core'; // Only import Collection and Group type for better Treeshaking
 
 /**
  * A Higher order Component for binding the most relevant value of multiple Agile Instances

@@ -53,6 +53,10 @@ export class Collection<
   // Whether the Collection was instantiated correctly
   public isInstantiated = false;
 
+  // Helper property to check whether an unknown instance is a Collection
+  // without importing the Collection for properly using 'instanceof' (Treeshaking support)
+  public isCollection = true;
+
   /**
    * A Collection manages a reactive set of Information
    * that we need to remember globally at a later point in time.
