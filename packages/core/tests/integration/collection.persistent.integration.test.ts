@@ -1,4 +1,4 @@
-import { Agile, Item } from '../../src';
+import { Agile, Item, createStorage, createCollection } from '../../src';
 import { LogMock } from '../helper/logMock';
 
 describe('Collection Persist Function Tests', () => {
@@ -30,7 +30,7 @@ describe('Collection Persist Function Tests', () => {
 
     App = new Agile({ localStorage: false });
     App.registerStorage(
-      App.createStorage({
+      createStorage({
         key: 'testStorage',
         prefix: 'test',
         methods: storageMethods,
@@ -41,7 +41,7 @@ describe('Collection Persist Function Tests', () => {
   describe('Collection', () => {
     it('Can persist Collection', async () => {
       // Create Collection
-      const MY_COLLECTION = App.createCollection<User>();
+      const MY_COLLECTION = createCollection<User>({}, App);
 
       // Test Collecting Item before Persisting
       MY_COLLECTION.collect({ id: 2, name: 'hans' });
@@ -147,7 +147,7 @@ describe('Collection Persist Function Tests', () => {
 
     it('Can load persisted Collection', async () => {
       // Create Collection
-      const MY_COLLECTION = App.createCollection<User>();
+      const MY_COLLECTION = createCollection<User>({}, App);
 
       // Load persisted Value
       MY_COLLECTION.persist('myCollection');
@@ -201,7 +201,7 @@ describe('Collection Persist Function Tests', () => {
 
     it('Can remove persisted Collection', async () => {
       // Create Collection
-      const MY_COLLECTION = App.createCollection<User>();
+      const MY_COLLECTION = createCollection<User>({}, App);
 
       // Load persisted Value
       MY_COLLECTION.persist('myCollection');
