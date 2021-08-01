@@ -183,11 +183,6 @@ export class StateObserver<ValueType = any> extends Observer {
   public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
 
-    // Call watcher functions
-    for (const watcherKey in state.watchers)
-      if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state._value, watcherKey);
-
     // Call side effect functions
     if (job.config?.sideEffects?.enabled) {
       const sideEffectArray = createArrayFromObject<

@@ -75,8 +75,6 @@ const logCodeMessages = {
   '13:03:00': "Invalid Storage '${0}()' method provided!",
 
   // State
-  '14:02:00': "Incorrect type '${0}' was provided! Requires type of ${1}.",
-  '14:03:00': "Incorrect type '${0}' was provided! Requires type of ${1}.",
   '14:03:01':
     "'${1}' is a not supported type! Supported types are: String, Boolean, Array, Object, Number.",
   '14:03:02': "The 'patch()' method works only in object based States!",

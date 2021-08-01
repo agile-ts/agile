@@ -422,7 +422,6 @@ describe('StateObserver Tests', () => {
           key: 'dummyJob',
         });
 
-        dummyState.watchers['dummyWatcher'] = jest.fn();
         dummyState.sideEffects['dummySideEffect3'] = {
           weight: 100,
           callback: jest.fn(() => {
@@ -448,10 +447,6 @@ describe('StateObserver Tests', () => {
 
         stateObserver.sideEffects(dummyJob);
 
-        expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-          'dummyValue',
-          'dummyWatcher'
-        );
         expect(
           dummyState.sideEffects['dummySideEffect'].callback
         ).toHaveBeenCalledWith(dummyState, dummyJob.config);
@@ -479,10 +474,6 @@ describe('StateObserver Tests', () => {
 
           stateObserver.sideEffects(dummyJob);
 
-          expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-            'dummyValue',
-            'dummyWatcher'
-          );
           expect(
             dummyState.sideEffects['dummySideEffect'].callback
           ).not.toHaveBeenCalled();
@@ -507,10 +498,6 @@ describe('StateObserver Tests', () => {
 
           stateObserver.sideEffects(dummyJob);
 
-          expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-            'dummyValue',
-            'dummyWatcher'
-          );
           expect(
             dummyState.sideEffects['dummySideEffect'].callback
           ).toHaveBeenCalledWith(dummyState, dummyJob.config);

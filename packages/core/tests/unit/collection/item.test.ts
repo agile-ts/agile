@@ -43,7 +43,6 @@ describe('Item Tests', () => {
     ).toHaveBeenCalledWith('dummyId');
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
-    expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeFalsy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
@@ -60,7 +59,6 @@ describe('Item Tests', () => {
     expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
-    expect(item.watchers).toStrictEqual({});
     expect(item.selectedBy.size).toBe(0);
   });
 
@@ -82,7 +80,6 @@ describe('Item Tests', () => {
 
     // Check if State was called with correct parameters
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
-    expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeTruthy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
@@ -99,7 +96,6 @@ describe('Item Tests', () => {
     expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
-    expect(item.watchers).toStrictEqual({});
     expect(item.selectedBy.size).toBe(0);
   });
 
@@ -119,7 +115,6 @@ describe('Item Tests', () => {
 
     // Check if State was called with correct parameters
     expect(item._key).toBeUndefined();
-    expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeFalsy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
@@ -136,7 +131,6 @@ describe('Item Tests', () => {
     expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
-    expect(item.watchers).toStrictEqual({});
     expect(item.selectedBy.size).toBe(0);
   });
 

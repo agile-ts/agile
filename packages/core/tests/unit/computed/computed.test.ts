@@ -42,7 +42,6 @@ describe('Computed Tests', () => {
 
     // Check if State was called with correct parameters
     expect(computed._key).toBeUndefined();
-    expect(computed.valueType).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
     expect(computed.initialStateValue).toBe(null);
@@ -59,7 +58,6 @@ describe('Computed Tests', () => {
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
-    expect(computed.watchers).toStrictEqual({});
   });
 
   it('should create Computed with a not async compute method (specific config)', () => {
@@ -111,7 +109,6 @@ describe('Computed Tests', () => {
 
     // Check if State was called with correct parameters
     expect(computed._key).toBe('coolComputed');
-    expect(computed.valueType).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
     expect(computed.initialStateValue).toBe(null);
@@ -128,7 +125,6 @@ describe('Computed Tests', () => {
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
-    expect(computed.watchers).toStrictEqual({});
   });
 
   it('should create Computed with an async compute method (default config)', () => {
@@ -149,7 +145,6 @@ describe('Computed Tests', () => {
 
     // Check if State was called with correct parameters
     expect(computed._key).toBeUndefined();
-    expect(computed.valueType).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
     expect(computed.initialStateValue).toBe(null);
@@ -166,7 +161,6 @@ describe('Computed Tests', () => {
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
-    expect(computed.watchers).toStrictEqual({});
   });
 
   describe('Computed Function Tests', () => {

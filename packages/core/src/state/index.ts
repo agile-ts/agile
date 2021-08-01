@@ -25,8 +25,6 @@ export class State<ValueType = any> {
 
   // Key/Name identifier of the State
   public _key?: StateKey;
-  // Primitive type which constrains the State value (for basic typesafety in Javascript)
-  public valueType?: string;
   // Whether the current value differs from the initial value
   public isSet = false;
   // Whether the State is a placeholder and only exist in the background
@@ -58,9 +56,6 @@ export class State<ValueType = any> {
   public isPersisted = false;
   // Manages the permanent persistent in external Storages
   public persistent: StatePersistent | undefined;
-
-  // Registered callbacks that are fired on each State value change
-  public watchers: { [key: string]: StateWatcherCallback<ValueType> } = {};
 
   // When an interval is active, the 'intervalId' to clear the interval is temporary stored here
   public currentInterval?: NodeJS.Timer | number;
@@ -203,15 +198,6 @@ export class State<ValueType = any> {
       ? (value as any)(copy(this._value))
       : value;
 
-    // Check if value has correct type (Javascript)
-    if (!this.hasCorrectType(_value)) {
-      LogCodeManager.log(config.force ? '14:02:00' : '14:03:00', [
-        typeof _value,
-        this.valueType,
-      ]);
-      if (!config.force) return this;
-    }
-
     // Ingest the State with the new value into the runtime
     this.observers['value'].ingestValue(_value, config);
 
@@ -232,26 +218,6 @@ export class State<ValueType = any> {
    */
   public ingest(config: StateIngestConfigInterface = {}): this {
     this.observers['value'].ingest(config);
-    return this;
-  }
-
-  /**
-   * Assigns a primitive type to the State
-   * which constrains the State value on the specified type
-   * to ensure basic typesafety in Javascript.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#type)
-   *
-   * @public
-   * @param type - Primitive type the State value must follow (`String`, `Boolean`, `Array`, `Object`, `Number`).
-   */
-  public type(type: any): this {
-    const supportedTypes = ['String', 'Boolean', 'Array', 'Object', 'Number'];
-    if (!supportedTypes.includes(type.name)) {
-      LogCodeManager.log('14:03:01', [type]);
-      return this;
-    }
-    this.valueType = type.name.toLowerCase();
     return this;
   }
 
@@ -377,7 +343,14 @@ export class State<ValueType = any> {
       LogCodeManager.log('00:03:01', ['Watcher Callback', 'function']);
       return this;
     }
-    this.watchers[key] = _callback;
+
+    this.addSideEffect(
+      key,
+      (instance) => {
+        _callback(instance.value, key);
+      },
+      { weight: 0 }
+    );
     return generateKey ? key : this;
   }
 
@@ -390,21 +363,8 @@ export class State<ValueType = any> {
    * @param key - Key/Name identifier of the watcher callback to be removed.
    */
   public removeWatcher(key: string): this {
-    delete this.watchers[key];
+    this.removeSideEffect(key);
     return this;
-  }
-
-  /**
-   * Returns a boolean indicating whether a watcher callback with the specified `key`
-   * exists in the State or not.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#haswatcher)
-   *
-   * @public
-   * @param key - Key/Name identifier of the watcher callback to be checked for existence.
-   */
-  public hasWatcher(key: string): boolean {
-    return !!this.watchers[key];
   }
 
   /**
@@ -419,7 +379,7 @@ export class State<ValueType = any> {
     const watcherKey = 'InauguratedWatcherKey';
     this.watch(watcherKey, (value, key) => {
       callback(value, key);
-      this.removeWatcher(watcherKey);
+      this.removeSideEffect(watcherKey);
     });
     return this;
   }
@@ -735,19 +695,6 @@ export class State<ValueType = any> {
    */
   public hasSideEffect(key: string): boolean {
     return !!this.sideEffects[key];
-  }
-
-  /**
-   * Returns a boolean indicating whether the passed value
-   * is of the before defined State `valueType` or not.
-   *
-   * @internal
-   * @param value - Value to be checked for the correct type.
-   */
-  public hasCorrectType(value: any): boolean {
-    if (!this.valueType) return true;
-    const type = typeof value;
-    return type === this.valueType;
   }
 
   /**
