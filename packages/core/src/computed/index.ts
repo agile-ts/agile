@@ -11,8 +11,6 @@ import {
   isAsyncFunction,
   extractRelevantObservers,
   defineConfig,
-  CreateAgileSubInstanceInterface,
-  shared,
 } from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
@@ -26,6 +24,10 @@ export class Computed<ComputedValueType = any> extends State<
   public deps: Set<Observer> = new Set();
   // Only hardCoded dependencies the Computed Class depends on
   public hardCodedDeps: Array<Observer> = [];
+
+  // Helper property to check whether an unknown instance is a Computed,
+  // without importing the Computed itself for using 'instanceof' (Treeshaking support)
+  public isComputed = true;
 
   /**
    * A Computed is an extension of the State Class

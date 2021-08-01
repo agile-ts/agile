@@ -21,7 +21,6 @@ import {
   LogCodeManager,
   PatchOptionConfigInterface,
   defineConfig,
-  shared,
 } from '../internal';
 
 export class Collection<
@@ -53,8 +52,8 @@ export class Collection<
   // Whether the Collection was instantiated correctly
   public isInstantiated = false;
 
-  // Helper property to check whether an unknown instance is a Collection
-  // without importing the Collection for properly using 'instanceof' (Treeshaking support)
+  // Helper property to check whether an unknown instance is a Collection,
+  // without importing the Collection itself for using 'instanceof' (Treeshaking support)
   public isCollection = true;
 
   /**
