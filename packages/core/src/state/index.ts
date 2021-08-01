@@ -1,23 +1,25 @@
-import { StatePersistent } from './state.persistent';
-import { Agile } from '../agile';
 import {
+  Agile,
+  StorageKey,
   copy,
-  defineConfig,
-  equal,
   flatMerge,
-  generateId,
-  isFunction,
   isValidObject,
+  StateObserver,
+  StatePersistent,
+  Observer,
+  equal,
+  isFunction,
   notEqual,
+  generateId,
+  PersistentKey,
+  ComputedTracker,
+  StateIngestConfigInterface,
   removeProperties,
-} from '@agile-ts/utils';
-import { ComputedTracker } from '../computed/computed.tracker';
-import { StateIngestConfigInterface, StateObserver } from './state.observer';
-import { LogCodeManager } from '../logCodeManager';
-import { PersistentKey } from '../storages/persistent';
-import { Observer } from '../runtime/observer';
-import { StorageKey } from '../storages/storage';
-import { CreateAgileSubInstanceInterface, shared } from '../shared';
+  LogCodeManager,
+  defineConfig,
+  shared,
+  CreateAgileSubInstanceInterface,
+} from '../internal';
 
 export class State<ValueType = any> {
   // Agile Instance the State belongs to

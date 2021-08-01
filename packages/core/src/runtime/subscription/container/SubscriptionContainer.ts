@@ -1,5 +1,9 @@
-import { Observer } from '../../observer';
-import { defineConfig, generateId, isValidObject } from '@agile-ts/utils';
+import {
+  defineConfig,
+  generateId,
+  isValidObject,
+  Observer,
+} from '../../../internal';
 
 export class SubscriptionContainer {
   /**

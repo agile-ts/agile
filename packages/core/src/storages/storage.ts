@@ -2,9 +2,9 @@ import {
   isJsonString,
   isAsyncFunction,
   isFunction,
+  LogCodeManager,
   defineConfig,
-} from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+} from '../internal';
 
 export class Storage {
   public config: StorageConfigInterface;

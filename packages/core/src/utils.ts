@@ -1,8 +1,11 @@
-import { isFunction, normalizeArray } from '@agile-ts/utils';
-import { Agile } from './agile';
-import { shared } from './shared';
-import { LogCodeManager } from './logCodeManager';
-import { Observer } from './runtime/observer';
+import {
+  Agile,
+  Observer,
+  normalizeArray,
+  isFunction,
+  LogCodeManager,
+  shared,
+} from './internal';
 
 /**
  * Extracts an Instance of Agile from the specified Instance.

@@ -1,28 +1,28 @@
-import { Agile } from '../agile';
-import { Item } from './item';
-import { CollectionPersistent } from './collection.persistent';
 import {
-  copy,
-  defineConfig,
-  generateId,
-  isFunction,
+  Agile,
+  Item,
+  Group,
+  GroupKey,
+  Selector,
+  SelectorKey,
+  StorageKey,
+  GroupConfigInterface,
   isValidObject,
   normalizeArray,
-  removeProperties,
-} from '@agile-ts/utils';
-import {
+  copy,
+  CollectionPersistent,
   GroupAddConfigInterface,
-  GroupConfigInterface,
-  GroupKey,
-} from './group';
-import { LogCodeManager } from '../logCodeManager';
-import { Selector, SelectorConfigInterface, SelectorKey } from './selector';
-import { Group } from './group';
-import { ComputedTracker } from '../computed/computed.tracker';
-import { StorageKey } from '../storages/storage';
-import { SideEffectConfigInterface } from '../runtime/runtime.job';
-import { PatchOptionConfigInterface } from '../state';
-import { shared } from '../shared';
+  ComputedTracker,
+  generateId,
+  SideEffectConfigInterface,
+  SelectorConfigInterface,
+  removeProperties,
+  isFunction,
+  LogCodeManager,
+  PatchOptionConfigInterface,
+  defineConfig,
+  shared,
+} from '../internal';
 
 export class Collection<
   DataType extends Object = DefaultItem,

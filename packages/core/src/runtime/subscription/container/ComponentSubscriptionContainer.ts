@@ -1,8 +1,8 @@
 import {
+  Observer,
   SubscriptionContainer,
   SubscriptionContainerConfigInterface,
-} from './SubscriptionContainer';
-import { Observer } from '../../observer';
+} from '../../../internal';
 
 export class ComponentSubscriptionContainer<
   C = any

@@ -1,17 +1,19 @@
-import { State, StateConfigInterface } from '../state';
-import { Observer } from '../runtime/observer';
-import { Agile } from '../agile';
 import {
-  defineConfig,
-  isAsyncFunction,
+  State,
+  Agile,
+  Observer,
+  StateConfigInterface,
+  ComputedTracker,
+  Collection,
+  StateIngestConfigInterface,
   removeProperties,
-} from '@agile-ts/utils';
-import { extractRelevantObservers } from '../utils';
-import { ComputedTracker } from './computed.tracker';
-import { LogCodeManager } from '../logCodeManager';
-import { StateIngestConfigInterface } from '../state/state.observer';
-import { Collection } from '../collection';
-import { CreateAgileSubInstanceInterface, shared } from '../shared';
+  LogCodeManager,
+  isAsyncFunction,
+  extractRelevantObservers,
+  defineConfig,
+  CreateAgileSubInstanceInterface,
+  shared,
+} from '../internal';
 
 export class Computed<ComputedValueType = any> extends State<
   ComputedValueType

@@ -1,13 +1,15 @@
-import { Agile } from '../../agile';
-import { ComponentSubscriptionContainer } from './container/ComponentSubscriptionContainer';
-import { CallbackSubscriptionContainer } from './container/CallbackSubscriptionContainer';
-import { Observer } from '../observer';
 import {
+  Agile,
+  Observer,
   SubscriptionContainer,
+  ComponentSubscriptionContainer,
+  CallbackSubscriptionContainer,
+  isFunction,
   SubscriptionContainerConfigInterface,
-} from './container/SubscriptionContainer';
-import { defineConfig, isFunction, removeProperties } from '@agile-ts/utils';
-import { LogCodeManager } from '../../logCodeManager';
+  removeProperties,
+  LogCodeManager,
+  defineConfig,
+} from '../../internal';
 
 export class SubController {
   // Agile Instance the SubController belongs to
