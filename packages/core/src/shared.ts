@@ -130,7 +130,7 @@ export function createComputed<ComputedValueType = any>(
 export function createComputed<ComputedValueType = any>(
   computeFunction: ComputeFunctionType<ComputedValueType>,
   configOrDeps?:
-    | CreateComputedConfigInterface
+    | CreateComputedConfigInterfaceWithAgile
     | Array<DependableAgileInstancesType>
 ): Computed<ComputedValueType> {
   let _config: CreateComputedConfigInterfaceWithAgile = {};
