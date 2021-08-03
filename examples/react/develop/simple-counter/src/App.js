@@ -1,11 +1,9 @@
-import { Agile } from '@agile-ts/core';
-import { useAgile } from '@agile-ts/react';
+import { createState } from '@agile-ts/core';
+import { useAgile, useValue } from '@agile-ts/react';
 
-const AgileApp = new Agile();
-
-const COUNTER_A = AgileApp.createState(1);
-const COUNTER_B = AgileApp.createState(2);
-const COUNTER_C = AgileApp.createState(3);
+const COUNTER_A = createState(1);
+const COUNTER_B = createState(2);
+const COUNTER_C = createState(3);
 
 const CounterA = () => {
   const count = useAgile(COUNTER_A);
@@ -17,7 +15,7 @@ const CounterA = () => {
 };
 
 const CounterB = () => {
-  const count = useAgile(COUNTER_B);
+  const count = useValue(COUNTER_B);
   return (
     <div>
       B: {count} <button onClick={() => COUNTER_B.set((c) => c + 1)}>+1</button>

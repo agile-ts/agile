@@ -1,17 +1,13 @@
 import {
   Agile,
-  State,
   Runtime,
   SubController,
   Integrations,
   Storage,
-  Computed,
-  Collection,
   Storages,
 } from '../../src';
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
-import * as Shared from '../../src/shared';
 
 // https://github.com/facebook/jest/issues/5023
 jest.mock('../../src/runtime', () => {

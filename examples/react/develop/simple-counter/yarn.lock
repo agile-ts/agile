@@ -2,37 +2,18 @@
 # yarn lockfile v1
 
 
-"@agile-ts/core@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@agile-ts/core/-/core-0.0.17.tgz#410ab31ff6279567ff0266a5a55818744598f2c2"
-  integrity sha512-EVWqf6PkBwDS/gdTTVwo9juyGPrnnKlq8dna3diXGZdDpwEzMc09nGCmLThYM5sEkDQGzir6enn3Oo2l+7Zp2Q==
+"@agile-ts/core@file:.yalc/@agile-ts/core":
+  version "0.2.0-alpha.3"
   dependencies:
-    "@agile-ts/logger" "^0.0.4"
-    "@agile-ts/utils" "^0.0.4"
+    "@agile-ts/utils" "^0.0.7"
 
-"@agile-ts/logger@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@agile-ts/logger/-/logger-0.0.4.tgz#7f4d82ef8f03b13089af0878c360575c43f0962d"
-  integrity sha512-qm0obAKqJMaPKM+c76gktRXyw3OL1v39AnhMZ0FBGwJqHWU+fLRkCzlQwjaROCr3F1XP01Lc/Ls3efF0WzyEPw==
-  dependencies:
-    "@agile-ts/utils" "^0.0.4"
+"@agile-ts/react@file:.yalc/@agile-ts/react":
+  version "0.1.2"
 
-"@agile-ts/proxytree@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@agile-ts/proxytree/-/proxytree-0.0.3.tgz#e3dacab123a311f2f0d4a0369793fe90fdab7569"
-  integrity sha512-auO6trCo7ivLJYuLjxrnK4xuUTangVPTq8UuOMTlGbJFjmb8PLEkaXuRoVGSzv9jsT2FeS7KsP7Fs+yvv0WPdg==
-
-"@agile-ts/react@^0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@agile-ts/react/-/react-0.0.18.tgz#db1a617ad535f7a70254d62980d97350d4a85718"
-  integrity sha512-K2FO3Odqaw/XkU3DO/mWSLkxLn45W7pXk/UlZl5E/CQPFFWlWsjuxtH/C/kfK+E6rnaNoToTjGscmcoeN/bLjQ==
-  dependencies:
-    "@agile-ts/proxytree" "^0.0.3"
-
-"@agile-ts/utils@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.4.tgz#66e9536e561796489a37155da6b74ce2dc482697"
-  integrity sha512-GiZyTYmCm4j2N57oDjeMuPpfQdgn9clb0Cxpfuwi2Bq5T/KPXlaROLsVGwHLjwwT+NX7xxr5qNJH8pZTnHnYRQ==
+"@agile-ts/utils@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.7.tgz#3dd1add6b9f63d0a5bf35e71f54ac46448ae047f"
+  integrity sha512-OviTDC+ZbfyiUx8Gy8veS6YymC/tT6UeP23nT8V0EQV4F2MmuWqZ2yiKk+AYxZx8h74Ey8BVEUX6/ntpxhSNPw==
 
 "@babel/code-frame@7.10.4":
   version "7.10.4"
