@@ -23,6 +23,7 @@
     "agile-ts"
   ],
   "main": "dist/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn run build:esm && yarn run build:cjs",
