@@ -14,7 +14,7 @@
     "agile"
   ],
   "scripts": {
-    "preview": "npm pack"
+    "pack": "npm pack"
   },
   "devDependencies": {
     "@agile-ts/core": "^0.1.2",

@@ -35,12 +35,12 @@
     "release": "lerna run release && changeset publish",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,ts}\"",
     "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\"",
-    "pack": "lerna run prepare && lerna run preview",
-    "pack:core": "cd packages/core && yarn run prepare && yarn run preview",
-    "pack:react": "cd packages/react && yarn run prepare && yarn run preview",
-    "pack:multieditor": "cd packages/multieditor && yarn run prepare && yarn run preview",
-    "pack:api": "cd packages/api && yarn run prepare && yarn run preview",
-    "pack:event": "cd packages/event && yarn run prepare && yarn run preview"
+    "pack": "lerna run prepare && lerna run pack",
+    "pack:core": "cd packages/core && yarn run prepare && yarn run pack",
+    "pack:react": "cd packages/react && yarn run prepare && yarn run pack",
+    "pack:multieditor": "cd packages/multieditor && yarn run prepare && yarn run pack",
+    "pack:api": "cd packages/api && yarn run prepare && yarn run pack",
+    "pack:event": "cd packages/event && yarn run prepare && yarn run pack"
   },
   "repository": {
     "type": "git",

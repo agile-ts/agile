@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/core",
-  "version": "0.2.0-alpha.2",
+  "version": "0.2.0-alpha.3",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -36,12 +36,12 @@
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "tsc -w",
     "release": "node ./scripts/prepublish.js && yarn run prepare",
+    "release:manual": "yarn run prepare && yarn run release && npm publish && git checkout README.md",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*",
-    "size": "yarn run build && size-limit",
-    "release:manual": "yarn run prepare && yarn run release && npm publish && git checkout README.md"
+    "size": "yarn run build && size-limit"
   },
   "devDependencies": {
     "@agile-ts/logger": "file:../logger",
@@ -73,5 +73,6 @@
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
-  ]
+  ],
+  "sideEffects": false
 }
