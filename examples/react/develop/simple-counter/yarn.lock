@@ -7,6 +7,11 @@
   dependencies:
     "@agile-ts/utils" "^0.0.7"
 
+"@agile-ts/logger@file:.yalc/@agile-ts/logger":
+  version "0.0.7"
+  dependencies:
+    "@agile-ts/utils" "^0.0.7"
+
 "@agile-ts/react@file:.yalc/@agile-ts/react":
   version "0.1.2"
 
