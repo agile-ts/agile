@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createState, LogCodeManager } from '@agile-ts/core';
+import { createState } from '@agile-ts/core';
 import { useAgile } from '@agile-ts/react';
 
-LogCodeManager.getLogger().isActive = false;
 const COUNT = createState(0);
 
 const App = () => {

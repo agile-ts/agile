@@ -1,3 +1,4 @@
+import React from 'react';
 import { createState } from '@agile-ts/core';
 import { useAgile, useValue } from '@agile-ts/react';
 
@@ -32,8 +33,9 @@ const CounterC = () => {
   );
 };
 
-const App = () => (
+export const App = () => (
   <div>
+    <p>Agile</p>
     <CounterA />
     <CounterA />
     <CounterB />
@@ -42,5 +44,3 @@ const App = () => (
     <CounterC />
   </div>
 );
-
-export default App;

@@ -1,9 +1,7 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createCollection, LogCodeManager } from '@agile-ts/core';
+import { createCollection } from '@agile-ts/core';
 import { useAgile, useValue } from '@agile-ts/react';
-
-LogCodeManager.getLogger().isActive = false;
 
 export default function (target: HTMLElement, fieldsCount: number) {
   const FIELDS = createCollection({

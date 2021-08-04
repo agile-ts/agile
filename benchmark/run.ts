@@ -2,23 +2,27 @@ import dotenv from 'dotenv';
 import esbuild from 'esbuild';
 import playwright from 'playwright';
 import chalk from 'chalk';
+import fs from 'fs';
 
 // Loads environment variables from the '.env' file
 dotenv.config();
+
+// TODO implement yargs https://yargs.js.org/
 
 // https://nodejs.org/docs/latest/api/process.html#process_process_argv
 // Extract entry (at third parameter) from the executed command
 // yarn run ./path/to/entry -> './path/to/entry' is extracted
 const entry = process.argv.slice(2)[0];
-const dev = process.argv.slice(2)[1] === '--dev' || process.env.DEV === 'true';
+const isDev =
+  process.argv.slice(2)[1] === '--dev' || process.env.DEV === 'true';
 if (entry == null) {
   throw new Error(
     "No valid entry was provided! Valid entry example: 'yarn run ./benchmarks/react/counter'"
   );
 }
 
-const startBenchmark = async () => {
-  console.log(chalk.blue('Starting the benchmark server..\n'));
+const startSpeedBench = async () => {
+  console.log(chalk.blue('Starting the speed benchmark server..\n'));
 
   // Bundle Benchmark Test Suite
   // and launch the server on which the Test Suite is executed
@@ -35,7 +39,7 @@ const startBenchmark = async () => {
       target: 'es2015',
       format: 'cjs', // https://esbuild.github.io/api/#format-commonjs
       platform: 'browser',
-      minify: !dev, // https://esbuild.github.io/api/#minify
+      minify: !isDev, // https://esbuild.github.io/api/#minify
       bundle: true, // https://esbuild.github.io/api/#bundle
       sourcemap: 'external', // https://esbuild.github.io/api/#sourcemap// https://github.com/evanw/esbuild/issues/69
     }
@@ -54,7 +58,7 @@ const startBenchmark = async () => {
   const page = await context.newPage();
 
   // Option to open and test the Benchmark Test Suite in the browser manually
-  if (dev) {
+  if (isDev) {
     console.log(
       `${chalk.blue('[i]')} ${chalk.gray(
         `Development mode is ${chalk.green(`active`)}`
@@ -113,5 +117,22 @@ const startBenchmark = async () => {
   server.stop();
 };
 
+const startBundleBench = async () => {
+  const bundle = await esbuild.build({
+    inject: ['./lodash.ts'], // https://esbuild.github.io/api/#inject
+    entryPoints: [entry], // https://esbuild.github.io/api/#entry-points
+    outfile: './public/bundle.js',
+    target: 'es2015',
+    format: 'cjs', // https://esbuild.github.io/api/#format-commonjs
+    platform: 'browser',
+    minify: !isDev, // https://esbuild.github.io/api/#minify
+    bundle: true, // https://esbuild.github.io/api/#bundle
+    sourcemap: 'external', // https://esbuild.github.io/api/#sourcemap// https://github.com/evanw/esbuild/issues/69
+    metafile: true, // https://esbuild.github.io/api/#metafile
+  });
+
+  fs;
+};
+
 // Execute the Benchmark
-startBenchmark();
+startSpeedBench();
