@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import esbuild from 'esbuild';
 import playwright from 'playwright';
 import chalk from 'chalk';
-import fs from 'fs';
 
 // Loads environment variables from the '.env' file
 dotenv.config();
@@ -131,7 +130,11 @@ const startBundleBench = async () => {
     metafile: true, // https://esbuild.github.io/api/#metafile
   });
 
-  fs;
+  // Extract metafile from bundle (https://esbuild.github.io/api/#metafile)
+  const metafile = bundle.metafile;
+
+  console.log(metafile);
+  // TODO analyze metafile
 };
 
 // Execute the Benchmark
