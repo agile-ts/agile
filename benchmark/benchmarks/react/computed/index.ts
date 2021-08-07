@@ -6,7 +6,7 @@ import {
   endBenchmarkLog,
   getCycleResult,
   startBenchmarkLog,
-} from '../../../benchmarkManager';
+} from '../../benchmarkManager';
 
 // Files to run the Benchmark on
 import agileAutoTracking from './bench/agilets/autoTracking';

@@ -1,26 +1,9 @@
-import dotenv from 'dotenv';
+import chalk from 'chalk';
 import esbuild from 'esbuild';
 import playwright from 'playwright';
-import chalk from 'chalk';
+import fs from 'fs';
 
-// Loads environment variables from the '.env' file
-dotenv.config();
-
-// TODO implement yargs https://yargs.js.org/
-
-// https://nodejs.org/docs/latest/api/process.html#process_process_argv
-// Extract entry (at third parameter) from the executed command
-// yarn run ./path/to/entry -> './path/to/entry' is extracted
-const entry = process.argv.slice(2)[0];
-const isDev =
-  process.argv.slice(2)[1] === '--dev' || process.env.DEV === 'true';
-if (entry == null) {
-  throw new Error(
-    "No valid entry was provided! Valid entry example: 'yarn run ./benchmarks/react/counter'"
-  );
-}
-
-const startSpeedBench = async () => {
+export const startSpeedBench = async (entry: string, isDev: boolean) => {
   console.log(chalk.blue('Starting the speed benchmark server..\n'));
 
   // Bundle Benchmark Test Suite
@@ -116,7 +99,7 @@ const startSpeedBench = async () => {
   server.stop();
 };
 
-const startBundleBench = async () => {
+export const startBundleBench = async (entry: string, isDev: boolean) => {
   const bundle = await esbuild.build({
     inject: ['./lodash.ts'], // https://esbuild.github.io/api/#inject
     entryPoints: [entry], // https://esbuild.github.io/api/#entry-points
@@ -130,12 +113,38 @@ const startBundleBench = async () => {
     metafile: true, // https://esbuild.github.io/api/#metafile
   });
 
+  console.log(
+    `${chalk.blue('[i]')} ${chalk.gray(
+      `Entry was ${chalk.green(`successfully`)} bundled`
+    )}`
+  );
+
+  if (isDev) {
+    console.log(
+      `${chalk.blue('[i]')} ${chalk.gray(
+        `Development mode is ${chalk.green(`active`)}`
+      )}`
+    );
+  }
+
   // Extract metafile from bundle (https://esbuild.github.io/api/#metafile)
   const metafile = bundle.metafile;
+
+  // Calculate bundle file size
+  let bundleSize = 0;
+  bundle.outputFiles?.map((file) => {
+    const stats = fs.statSync(file.path);
+    const fileSizeInBytes = stats.size;
+    const fileSizeInKilobytes = fileSizeInBytes / 1024;
+    bundleSize += fileSizeInKilobytes;
+  });
+
+  console.log(
+    `${chalk.blue('[i]')} ${chalk.gray(
+      `Total bundle size of the bundle is ${chalk.blueBright.bold(bundleSize)}`
+    )}`
+  );
 
   console.log(metafile);
   // TODO analyze metafile
 };
-
-// Execute the Benchmark
-startSpeedBench();

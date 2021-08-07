@@ -109,7 +109,7 @@ export function useAgile<
       // If specified selector function and the value is of type object.
       // Return the selected value.
       // (Destroys the type of the useAgile hook,
-      // however the type is adjusted in the useSelector hook)
+      // however the type can be adjusted in the useSelector hook)
       if (config.selector && isValidObject(value, true)) {
         return config.selector(value);
       }

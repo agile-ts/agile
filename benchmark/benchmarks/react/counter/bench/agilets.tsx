@@ -6,7 +6,7 @@ import { useAgile } from '@agile-ts/react';
 const COUNT = createState(0);
 
 const App = () => {
-  const count = useAgile(COUNT, undefined);
+  const count = useAgile(COUNT);
   return <h1 onClick={() => COUNT.set((state) => state + 1)}>{count}</h1>;
 };
 
