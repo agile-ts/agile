@@ -258,7 +258,7 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
  * @internal
  */
 let tempLogCodeManager;
-if (process.env.NODE_ENV === 'dev') {
+if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
   tempLogCodeManager = {
     getLog,
     log,

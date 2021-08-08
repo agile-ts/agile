@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createComputed, createState } from '@agile-ts/core';
-import { useAgile } from '@agile-ts/react';
+import { createComputed, createState, shared } from '@agile-ts/core';
+import reactIntegration, { useAgile } from '@agile-ts/react';
+import { assignSharedAgileLoggerConfig } from '@agile-ts/logger';
+
+assignSharedAgileLoggerConfig({ active: false });
+shared.integrate(reactIntegration);
 
 const COUNT = createState(0);
 const COMPUTED_COUNT = createComputed(
