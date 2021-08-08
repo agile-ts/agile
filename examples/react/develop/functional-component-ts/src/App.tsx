@@ -14,6 +14,7 @@ import {
   STATE_OBJECT,
 } from './core';
 import { generateId } from '@agile-ts/utils';
+import { globalBind } from '@agile-ts/core';
 
 let rerenderCount = 0;
 let rerenderCountInCountupView = 0;
@@ -69,7 +70,7 @@ const App = (props: any) => {
 
   // Create global Instance of Core (for better debugging)
   useEffect(() => {
-    // globalBind('__core__', { ...require('./core') });
+    globalBind('__core__', { ...require('./core') });
   }, []);
 
   const CountupView = () => {

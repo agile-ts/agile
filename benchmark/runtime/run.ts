@@ -6,13 +6,11 @@ import { hideBin } from 'yargs/helpers';
 // Loads environment variables from the '.env' file
 dotenv.config();
 
-// TODO implement yargs https://yargs.js.org/
-
 // hideBind handles the 'process.argv.slice' logic
 const argv = yargs(hideBin(process.argv))
   .option('_', {
     type: 'string',
-    default: ['./benchmarks/react/counter'],
+    // default: ['./benchmarks/react/counter'],
     description: 'What benchmark to execute',
   })
   .option('dev', {
@@ -25,12 +23,10 @@ const argv = yargs(hideBin(process.argv))
     type: 'string',
     default: 'speed',
     description: 'What type of benchmark to be executed',
-  }).argv;
-
-console.log(argv);
+  }).argv as any;
 
 const entry = argv._[0];
-const isDev = argv.dev;
+const isDev = argv.dev || process.env.DEV === 'true';
 const benchmarkType = argv.type;
 
 if (entry == null) {
