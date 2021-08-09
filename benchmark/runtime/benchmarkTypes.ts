@@ -19,7 +19,7 @@ export const startSpeedBench = async (entry: string, isDev: boolean) => {
       entryPoints: [entry], // https://esbuild.github.io/api/#entry-points
       outfile: './public/bundle.js',
       target: 'es2015',
-      format: 'cjs', // https://esbuild.github.io/api/#format-commonjs
+      format: 'esm', // https://esbuild.github.io/api/#format-commonjs
       platform: 'browser',
       minify: !isDev, // https://esbuild.github.io/api/#minify
       bundle: true, // https://esbuild.github.io/api/#bundle
@@ -105,7 +105,7 @@ export const startBundleBench = async (entry: string, isDev: boolean) => {
     entryPoints: [entry], // https://esbuild.github.io/api/#entry-points
     outfile: './public/bundle.js',
     target: 'es2015',
-    format: 'cjs', // https://esbuild.github.io/api/#format-commonjs
+    format: 'esm', // https://esbuild.github.io/api/#format-commonjs
     platform: 'browser',
     minify: !isDev, // https://esbuild.github.io/api/#minify
     bundle: true, // https://esbuild.github.io/api/#bundle
