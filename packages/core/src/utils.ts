@@ -272,3 +272,6 @@ export const runsOnServer = (): boolean => {
     typeof window.document.createElement !== 'undefined'
   );
 };
+
+export const isDev =
+  typeof process === 'object' && process.env.NODE_ENV !== 'production';

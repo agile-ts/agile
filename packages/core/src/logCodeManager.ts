@@ -1,3 +1,5 @@
+import { isDev } from './utils';
+
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
 //
@@ -163,8 +165,9 @@ const niceLogCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-const logCodeMessages: typeof niceLogCodeMessages =
-  process.env.NODE_ENV === 'dev' ? niceLogCodeMessages : ({} as any);
+const logCodeMessages: typeof niceLogCodeMessages = isDev
+  ? niceLogCodeMessages
+  : ({} as any);
 
 /**
  * Returns the log message according to the specified log code.
@@ -258,7 +261,7 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
  * @internal
  */
 let tempLogCodeManager;
-if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+if (isDev) {
   tempLogCodeManager = {
     getLog,
     log,
