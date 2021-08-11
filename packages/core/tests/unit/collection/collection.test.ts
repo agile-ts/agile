@@ -55,6 +55,7 @@ describe('Collection Tests', () => {
     expect(collection.persistent).toBeUndefined();
     expect(collection.groups).toStrictEqual({});
     expect(collection.selectors).toStrictEqual({});
+    expect(collection.isCollection).toBeTruthy();
 
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith({});
     expect(Collection.prototype.initSelectors).toHaveBeenCalledWith({});
@@ -93,6 +94,7 @@ describe('Collection Tests', () => {
     expect(collection.persistent).toBeUndefined();
     expect(collection.groups).toStrictEqual({});
     expect(collection.selectors).toStrictEqual({});
+    expect(collection.isCollection).toBeTruthy();
 
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith([
       'group1',
@@ -146,6 +148,7 @@ describe('Collection Tests', () => {
     expect(collection.persistent).toBeUndefined();
     expect(collection.groups).toStrictEqual({});
     expect(collection.selectors).toStrictEqual({});
+    expect(collection.isCollection).toBeTruthy();
 
     expect(Collection.prototype.initGroups).toHaveBeenCalledWith({
       group1: expect.any(Group),

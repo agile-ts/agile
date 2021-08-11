@@ -31,6 +31,7 @@ describe('Computed Tests', () => {
 
     expect(computed.computeFunction).toBe(computedFunction);
     expect(computed.config).toStrictEqual({ autodetect: true });
+    expect(computed.isComputed).toBeTruthy();
     expect(Array.from(computed.deps)).toStrictEqual([]);
     expect(computed.hardCodedDeps).toStrictEqual([]);
     expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([]);
@@ -80,6 +81,7 @@ describe('Computed Tests', () => {
 
     expect(computed.computeFunction).toBe(computedFunction);
     expect(computed.config).toStrictEqual({ autodetect: false });
+    expect(computed.isComputed).toBeTruthy();
     expect(Array.from(computed.deps)).toStrictEqual([
       dummyObserver2,
       dummyStateObserver,
@@ -134,6 +136,7 @@ describe('Computed Tests', () => {
 
     expect(computed.computeFunction).toBe(computedFunction);
     expect(computed.config).toStrictEqual({ autodetect: false });
+    expect(computed.isComputed).toBeTruthy();
     expect(Array.from(computed.deps)).toStrictEqual([]);
     expect(computed.hardCodedDeps).toStrictEqual([]);
     expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([]);

@@ -261,7 +261,14 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
  *
  * @internal
  */
-let tempLogCodeManager;
+let tempLogCodeManager: {
+  getLog: typeof getLog;
+  log: typeof log;
+  logCodeLogTypes: typeof logCodeTypes;
+  logCodeMessages: typeof logCodeMessages;
+  getLogger: () => any;
+  logIfTags: typeof logIfTags;
+};
 if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
   tempLogCodeManager = {
     getLog,
@@ -277,13 +284,13 @@ if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
       } catch (e) {
         // empty catch block
       }
-
       return loggerPackage?.sharedAgileLogger ?? null;
     },
     logIfTags,
   };
 } else {
   tempLogCodeManager = {
+    // Log only logCode
     getLog: (logCode, replacers) => logCode,
     log,
     logCodeLogTypes: logCodeTypes,
