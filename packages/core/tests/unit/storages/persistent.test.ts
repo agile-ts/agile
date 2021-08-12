@@ -1,4 +1,4 @@
-import { Agile, Persistent, Storage } from '../../../src';
+import { Agile, Persistent, Storage, createStorage } from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
 describe('Persistent Tests', () => {
@@ -263,7 +263,7 @@ describe('Persistent Tests', () => {
 
       it('should return true if set key and set StorageKeys', () => {
         dummyAgile.storages.register(
-          dummyAgile.createStorage({
+          createStorage({
             key: 'test',
             methods: {
               get: () => {

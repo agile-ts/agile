@@ -51,7 +51,6 @@ describe('Group Tests', () => {
 
     // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
-    expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
     expect(group.isPlaceholder).toBeFalsy();
     expect(group.initialStateValue).toStrictEqual([]);
@@ -69,7 +68,6 @@ describe('Group Tests', () => {
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
-    expect(group.watchers).toStrictEqual({});
   });
 
   it('should create Group with no initialItems (specific config)', () => {
@@ -92,7 +90,6 @@ describe('Group Tests', () => {
 
     // Check if State was called with correct parameters
     expect(group._key).toBe('dummyKey');
-    expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
     expect(group.isPlaceholder).toBeTruthy();
     expect(group.initialStateValue).toStrictEqual([]);
@@ -110,7 +107,6 @@ describe('Group Tests', () => {
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
-    expect(group.watchers).toStrictEqual({});
   });
 
   it('should create Group with initialItems (default config)', () => {
@@ -130,7 +126,6 @@ describe('Group Tests', () => {
 
     // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
-    expect(group.valueType).toBeUndefined();
     expect(group.isSet).toBeFalsy();
     expect(group.isPlaceholder).toBeFalsy();
     expect(group.initialStateValue).toStrictEqual(['test1', 'test2', 'test3']);
@@ -146,7 +141,6 @@ describe('Group Tests', () => {
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
     expect(group.isPersisted).toBeFalsy();
     expect(group.persistent).toBeUndefined();
-    expect(group.watchers).toStrictEqual({});
   });
 
   describe('Group Function Tests', () => {

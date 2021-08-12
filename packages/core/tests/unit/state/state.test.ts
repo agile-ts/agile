@@ -32,7 +32,6 @@ describe('State Tests', () => {
 
     expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
     expect(state._key).toBeUndefined();
-    expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
     expect(state.isPlaceholder).toBeTruthy();
     expect(state.initialStateValue).toBe('coolValue');
@@ -47,7 +46,6 @@ describe('State Tests', () => {
     expect(state.computeExistsMethod).toBeInstanceOf(Function);
     expect(state.isPersisted).toBeFalsy();
     expect(state.persistent).toBeUndefined();
-    expect(state.watchers).toStrictEqual({});
   });
 
   it('should create State and should call initial set (specific config)', () => {
@@ -63,7 +61,6 @@ describe('State Tests', () => {
 
     expect(state.set).toHaveBeenCalledWith('coolValue', { overwrite: true });
     expect(state._key).toBe('coolState');
-    expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
     expect(state.isPlaceholder).toBeTruthy();
     expect(state.initialStateValue).toBe('coolValue');
@@ -80,7 +77,6 @@ describe('State Tests', () => {
     expect(state.computeExistsMethod).toBeInstanceOf(Function);
     expect(state.isPersisted).toBeFalsy();
     expect(state.persistent).toBeUndefined();
-    expect(state.watchers).toStrictEqual({});
   });
 
   it("should create State and shouldn't call initial set (config.isPlaceholder = true)", () => {
@@ -91,7 +87,6 @@ describe('State Tests', () => {
 
     expect(state.set).not.toHaveBeenCalled();
     expect(state._key).toBeUndefined();
-    expect(state.valueType).toBeUndefined();
     expect(state.isSet).toBeFalsy();
     expect(state.isPlaceholder).toBeTruthy();
     expect(state.initialStateValue).toBe('coolValue');
@@ -106,7 +101,6 @@ describe('State Tests', () => {
     expect(state.computeExistsMethod).toBeInstanceOf(Function);
     expect(state.isPersisted).toBeFalsy();
     expect(state.persistent).toBeUndefined();
-    expect(state.watchers).toStrictEqual({});
   });
 
   describe('State Function Tests', () => {
@@ -278,30 +272,6 @@ describe('State Tests', () => {
         );
       });
 
-      it("shouldn't ingestValue if value hasn't correct type (default config)", () => {
-        numberState.type(Number);
-
-        numberState.set('coolValue' as any);
-
-        LogMock.hasNotLogged('warn');
-        LogMock.hasLoggedCode('14:03:00', ['string', 'number']);
-        expect(
-          numberState.observers['value'].ingestValue
-        ).not.toHaveBeenCalled();
-      });
-
-      it("should ingestValue if value hasn't correct type (config.force = true)", () => {
-        numberState.type(Number);
-
-        numberState.set('coolValue' as any, { force: true });
-
-        LogMock.hasNotLogged('error');
-        LogMock.hasLoggedCode('14:02:00', ['string', 'number']);
-        expect(
-          numberState.observers['value'].ingestValue
-        ).toHaveBeenCalledWith('coolValue', { force: true });
-      });
-
       it("should ingestValue if value hasn't correct type but the type isn't explicit defined (default config)", () => {
         numberState.set('coolValue' as any);
 
@@ -334,21 +304,6 @@ describe('State Tests', () => {
           background: true,
           force: true,
         });
-      });
-    });
-
-    describe('type function tests', () => {
-      it('should assign valid Type to State', () => {
-        numberState.type(Number);
-
-        expect(numberState.valueType).toBe('number');
-      });
-
-      it("shouldn't assign invalid Type to State", () => {
-        numberState.type('fuckingType');
-
-        expect(numberState.valueType).toBeUndefined();
-        LogMock.hasLoggedCode('14:03:01', ['fuckingType']);
       });
     });
 
@@ -516,30 +471,50 @@ describe('State Tests', () => {
     });
 
     describe('watch function tests', () => {
-      const dummyCallbackFunction1 = () => {
-        /* empty function */
-      };
-      const dummyCallbackFunction2 = () => {
-        /* empty function */
-      };
+      let dummyCallbackFunction;
+
+      beforeEach(() => {
+        jest.spyOn(numberState, 'addSideEffect');
+        dummyCallbackFunction = jest.fn();
+      });
 
       it('should add passed watcherFunction to watchers at passed key', () => {
-        const response = numberState.watch('dummyKey', dummyCallbackFunction1);
+        const response = numberState.watch('dummyKey', dummyCallbackFunction);
 
         expect(response).toBe(numberState);
-        expect(numberState.watchers).toHaveProperty('dummyKey');
-        expect(numberState.watchers['dummyKey']).toBe(dummyCallbackFunction1);
+        expect(numberState.addSideEffect).toHaveBeenCalledWith(
+          'dummyKey',
+          expect.any(Function),
+          { weight: 0 }
+        );
+
+        // Test whether registered callback function is called
+        numberState.sideEffects['dummyKey'].callback(numberState);
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(
+          numberState._value,
+          'dummyKey'
+        );
       });
 
       it('should add passed watcherFunction to watchers at random key if no key passed and return that generated key', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
 
-        const response = numberState.watch(dummyCallbackFunction1);
+        const response = numberState.watch(dummyCallbackFunction);
 
         expect(response).toBe('randomKey');
-        expect(numberState.watchers).toHaveProperty('randomKey');
-        expect(numberState.watchers['randomKey']).toBe(dummyCallbackFunction1);
+        expect(numberState.addSideEffect).toHaveBeenCalledWith(
+          'randomKey',
+          expect.any(Function),
+          { weight: 0 }
+        );
         expect(Utils.generateId).toHaveBeenCalled();
+
+        // Test whether registered callback function is called
+        numberState.sideEffects['randomKey'].callback(numberState);
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(
+          numberState._value,
+          'randomKey'
+        );
       });
 
       it("shouldn't add passed invalid watcherFunction to watchers at passed key", () => {
@@ -549,22 +524,20 @@ describe('State Tests', () => {
         );
 
         expect(response).toBe(numberState);
-        expect(numberState.watchers).not.toHaveProperty('dummyKey');
+        expect(numberState.addSideEffect).not.toHaveBeenCalled();
         LogMock.hasLoggedCode('00:03:01', ['Watcher Callback', 'function']);
       });
     });
 
     describe('removeWatcher function tests', () => {
       beforeEach(() => {
-        numberState.watchers['dummyKey'] = () => {
-          /* empty function */
-        };
+        jest.spyOn(numberState, 'removeSideEffect');
       });
 
       it('should remove watcher at key from State', () => {
         numberState.removeWatcher('dummyKey');
 
-        expect(numberState.watchers).not.toHaveProperty('dummyKey');
+        expect(numberState.removeSideEffect).toHaveBeenCalledWith('dummyKey');
       });
     });
 
@@ -573,6 +546,7 @@ describe('State Tests', () => {
 
       beforeEach(() => {
         jest.spyOn(numberState, 'watch');
+        jest.spyOn(numberState, 'removeSideEffect');
         dummyCallbackFunction = jest.fn();
       });
 
@@ -583,35 +557,21 @@ describe('State Tests', () => {
           'InauguratedWatcherKey',
           expect.any(Function)
         );
-        expect(numberState.watchers).toHaveProperty('InauguratedWatcherKey');
       });
 
-      it('should remove itself after getting called', () => {
+      it('should remove itself after invoking', () => {
         numberState.onInaugurated(dummyCallbackFunction);
 
         // Call Inaugurated Watcher
-        numberState.watchers['InauguratedWatcherKey'](10, 'testKey');
+        numberState.sideEffects['InauguratedWatcherKey'].callback(numberState);
 
-        expect(dummyCallbackFunction).toHaveBeenCalledWith(10, 'testKey');
-        expect(numberState.watchers).not.toHaveProperty(
+        expect(dummyCallbackFunction).toHaveBeenCalledWith(
+          numberState.value,
           'InauguratedWatcherKey'
         );
-      });
-    });
-
-    describe('hasWatcher function tests', () => {
-      beforeEach(() => {
-        numberState.watchers['dummyKey'] = () => {
-          /* empty function */
-        };
-      });
-
-      it('should return true if Watcher at given Key exists', () => {
-        expect(numberState.hasWatcher('dummyKey')).toBeTruthy();
-      });
-
-      it("should return false if Watcher at given Key doesn't exists", () => {
-        expect(numberState.hasWatcher('notExistingDummyKey')).toBeFalsy();
+        expect(numberState.removeSideEffect).toHaveBeenCalledWith(
+          'InauguratedWatcherKey'
+        );
       });
     });
 
@@ -1075,24 +1035,6 @@ describe('State Tests', () => {
 
       it("should return false if SideEffect at given Key doesn't exists", () => {
         expect(numberState.hasSideEffect('notExistingDummyKey')).toBeFalsy();
-      });
-    });
-
-    describe('hasCorrectType function tests', () => {
-      it('should return true if State Type matches passed type', () => {
-        numberState.type(Number);
-
-        expect(numberState.hasCorrectType(10)).toBeTruthy();
-      });
-
-      it("should return false if State Type doesn't matches passed type", () => {
-        numberState.type(Number);
-
-        expect(numberState.hasCorrectType('stringValue')).toBeFalsy();
-      });
-
-      it('should return true if State has no defined Type', () => {
-        expect(numberState.hasCorrectType('stringValue')).toBeTruthy();
       });
     });
   });

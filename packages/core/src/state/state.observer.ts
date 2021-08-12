@@ -1,7 +1,6 @@
 import {
   Observer,
   State,
-  Computed,
   copy,
   equal,
   notEqual,
@@ -59,9 +58,9 @@ export class StateObserver<ValueType = any> extends Observer {
    * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): void {
-    const state = this.state();
+    const state = this.state() as any;
 
-    if (state instanceof Computed) {
+    if (state.isComputed) {
       state.compute().then((result) => {
         this.ingestValue(result, config);
       });
@@ -183,11 +182,6 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
-
-    // Call watcher functions
-    for (const watcherKey in state.watchers)
-      if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state._value, watcherKey);
 
     // Call side effect functions
     if (job.config?.sideEffects?.enabled) {

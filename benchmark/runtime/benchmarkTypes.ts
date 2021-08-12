@@ -1,24 +1,10 @@
-import dotenv from 'dotenv';
+import chalk from 'chalk';
 import esbuild from 'esbuild';
 import playwright from 'playwright';
-import chalk from 'chalk';
+import fs from 'fs';
 
-// Loads environment variables from the '.env' file
-dotenv.config();
-
-// https://nodejs.org/docs/latest/api/process.html#process_process_argv
-// Extract entry (at third parameter) from the executed command
-// yarn run ./path/to/entry -> './path/to/entry' is extracted
-const entry = process.argv.slice(2)[0];
-const dev = process.argv.slice(2)[1] === '--dev' || process.env.DEV === 'true';
-if (entry == null) {
-  throw new Error(
-    "No valid entry was provided! Valid entry example: 'yarn run ./benchmarks/react/counter'"
-  );
-}
-
-const startBenchmark = async () => {
-  console.log(chalk.blue('Starting the benchmark server..\n'));
+export const startSpeedBench = async (entry: string, isDev: boolean) => {
+  console.log(chalk.blue('Starting the speed benchmark server..\n'));
 
   // Bundle Benchmark Test Suite
   // and launch the server on which the Test Suite is executed
@@ -33,9 +19,9 @@ const startBenchmark = async () => {
       entryPoints: [entry], // https://esbuild.github.io/api/#entry-points
       outfile: './public/bundle.js',
       target: 'es2015',
-      format: 'cjs', // https://esbuild.github.io/api/#format-commonjs
+      format: 'esm', // https://esbuild.github.io/api/#format-commonjs
       platform: 'browser',
-      minify: !dev, // https://esbuild.github.io/api/#minify
+      minify: !isDev, // https://esbuild.github.io/api/#minify
       bundle: true, // https://esbuild.github.io/api/#bundle
       sourcemap: 'external', // https://esbuild.github.io/api/#sourcemap// https://github.com/evanw/esbuild/issues/69
     }
@@ -54,7 +40,7 @@ const startBenchmark = async () => {
   const page = await context.newPage();
 
   // Option to open and test the Benchmark Test Suite in the browser manually
-  if (dev) {
+  if (isDev) {
     console.log(
       `${chalk.blue('[i]')} ${chalk.gray(
         `Development mode is ${chalk.green(`active`)}`
@@ -113,5 +99,52 @@ const startBenchmark = async () => {
   server.stop();
 };
 
-// Execute the Benchmark
-startBenchmark();
+export const startBundleBench = async (entry: string, isDev: boolean) => {
+  const bundle = await esbuild.build({
+    inject: ['./lodash.ts'], // https://esbuild.github.io/api/#inject
+    entryPoints: [entry], // https://esbuild.github.io/api/#entry-points
+    outfile: './public/bundle.js',
+    target: 'es2015',
+    format: 'esm', // https://esbuild.github.io/api/#format-commonjs
+    platform: 'browser',
+    minify: !isDev, // https://esbuild.github.io/api/#minify
+    bundle: true, // https://esbuild.github.io/api/#bundle
+    sourcemap: 'external', // https://esbuild.github.io/api/#sourcemap// https://github.com/evanw/esbuild/issues/69
+    metafile: true, // https://esbuild.github.io/api/#metafile
+  });
+
+  console.log(
+    `${chalk.blue('[i]')} ${chalk.gray(
+      `Entry was ${chalk.green(`successfully`)} bundled`
+    )}`
+  );
+
+  if (isDev) {
+    console.log(
+      `${chalk.blue('[i]')} ${chalk.gray(
+        `Development mode is ${chalk.green(`active`)}`
+      )}`
+    );
+  }
+
+  // Extract metafile from bundle (https://esbuild.github.io/api/#metafile)
+  const metafile = bundle.metafile;
+
+  // Calculate bundle file size
+  let bundleSize = 0;
+  bundle.outputFiles?.map((file) => {
+    const stats = fs.statSync(file.path);
+    const fileSizeInBytes = stats.size;
+    const fileSizeInKilobytes = fileSizeInBytes / 1024;
+    bundleSize += fileSizeInKilobytes;
+  });
+
+  console.log(
+    `${chalk.blue('[i]')} ${chalk.gray(
+      `Total bundle size of the bundle is ${chalk.blueBright.bold(bundleSize)}`
+    )}`
+  );
+
+  console.log(metafile);
+  // TODO analyze metafile
+};

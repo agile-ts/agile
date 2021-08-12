@@ -31,6 +31,7 @@ describe('Computed Tests', () => {
 
     expect(computed.computeFunction).toBe(computedFunction);
     expect(computed.config).toStrictEqual({ autodetect: true });
+    expect(computed.isComputed).toBeTruthy();
     expect(Array.from(computed.deps)).toStrictEqual([]);
     expect(computed.hardCodedDeps).toStrictEqual([]);
     expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([]);
@@ -42,7 +43,6 @@ describe('Computed Tests', () => {
 
     // Check if State was called with correct parameters
     expect(computed._key).toBeUndefined();
-    expect(computed.valueType).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
     expect(computed.initialStateValue).toBe(null);
@@ -59,7 +59,6 @@ describe('Computed Tests', () => {
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
-    expect(computed.watchers).toStrictEqual({});
   });
 
   it('should create Computed with a not async compute method (specific config)', () => {
@@ -82,6 +81,7 @@ describe('Computed Tests', () => {
 
     expect(computed.computeFunction).toBe(computedFunction);
     expect(computed.config).toStrictEqual({ autodetect: false });
+    expect(computed.isComputed).toBeTruthy();
     expect(Array.from(computed.deps)).toStrictEqual([
       dummyObserver2,
       dummyStateObserver,
@@ -111,7 +111,6 @@ describe('Computed Tests', () => {
 
     // Check if State was called with correct parameters
     expect(computed._key).toBe('coolComputed');
-    expect(computed.valueType).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
     expect(computed.initialStateValue).toBe(null);
@@ -128,7 +127,6 @@ describe('Computed Tests', () => {
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
-    expect(computed.watchers).toStrictEqual({});
   });
 
   it('should create Computed with an async compute method (default config)', () => {
@@ -138,6 +136,7 @@ describe('Computed Tests', () => {
 
     expect(computed.computeFunction).toBe(computedFunction);
     expect(computed.config).toStrictEqual({ autodetect: false });
+    expect(computed.isComputed).toBeTruthy();
     expect(Array.from(computed.deps)).toStrictEqual([]);
     expect(computed.hardCodedDeps).toStrictEqual([]);
     expect(Utils.extractRelevantObservers).toHaveBeenCalledWith([]);
@@ -149,7 +148,6 @@ describe('Computed Tests', () => {
 
     // Check if State was called with correct parameters
     expect(computed._key).toBeUndefined();
-    expect(computed.valueType).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
     expect(computed.initialStateValue).toBe(null);
@@ -166,7 +164,6 @@ describe('Computed Tests', () => {
     expect(computed.computeExistsMethod).toBeInstanceOf(Function);
     expect(computed.isPersisted).toBeFalsy();
     expect(computed.persistent).toBeUndefined();
-    expect(computed.watchers).toStrictEqual({});
   });
 
   describe('Computed Function Tests', () => {

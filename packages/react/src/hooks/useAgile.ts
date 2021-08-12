@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Agile,
-  Collection,
+import Agile, {
   getAgileInstance,
   Observer,
   State,
@@ -16,8 +14,8 @@ import {
   LogCodeManager,
   normalizeArray,
   defineConfig,
-  Group,
 } from '@agile-ts/core';
+import type { Collection, Group } from '@agile-ts/core'; // Only import Collection and Group type for better Treeshaking
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 // TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
@@ -111,7 +109,7 @@ export function useAgile<
       // If specified selector function and the value is of type object.
       // Return the selected value.
       // (Destroys the type of the useAgile hook,
-      // however the type is adjusted in the useSelector hook)
+      // however the type can be adjusted in the useSelector hook)
       if (config.selector && isValidObject(value, true)) {
         return config.selector(value);
       }
@@ -210,7 +208,7 @@ export function useAgile<
 
 export type SubscribableAgileInstancesType =
   | State
-  | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
+  | Collection<any, any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
 

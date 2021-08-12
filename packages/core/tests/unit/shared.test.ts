@@ -14,11 +14,11 @@ import {
 import { LogMock } from '../helper/logMock';
 
 jest.mock('../../src/storages/storage');
-jest.mock('../../src/collection');
-jest.mock('../../src/computed');
+jest.mock('../../src/collection/collection');
+jest.mock('../../src/computed/computed');
 
 // https://github.com/facebook/jest/issues/5023
-jest.mock('../../src/state', () => {
+jest.mock('../../src/state/state', () => {
   return {
     State: jest.fn(),
   };

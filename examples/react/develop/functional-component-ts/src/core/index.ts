@@ -1,6 +1,14 @@
-import { Agile, clone, Item } from '@agile-ts/core';
+import Agile, {
+  assignSharedAgileInstance,
+  createCollection,
+  createComputed,
+  createState,
+  createStorage,
+  Item,
+} from '@agile-ts/core';
 import Event from '@agile-ts/event';
 import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
+import { clone } from '@agile-ts/utils';
 
 export const myStorage: any = {};
 
@@ -8,10 +16,11 @@ assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 export const App = new Agile({
   localStorage: true,
 });
+assignSharedAgileInstance(App);
 
 // Register custom second Storage
 App.registerStorage(
-  App.createStorage({
+  createStorage({
     key: 'myStorage',
     methods: {
       get: (key: string) => {
@@ -30,7 +39,7 @@ App.registerStorage(
   })
 );
 
-export const STATE_OBJECT = App.createState(
+export const STATE_OBJECT = createState(
   {
     name: 'frank',
     age: 10,
@@ -43,9 +52,9 @@ export const STATE_OBJECT = App.createState(
   },
   { key: 'state-object' }
 );
-export const COUNTUP = App.createState(1); // .interval((value) => value + 1, 1000);
-export const MY_STATE = App.createState<string>('MyState', { key: 'my-state' }); //.persist();
-export const MY_STATE_2 = App.createState<string>('MyState2', {
+export const COUNTUP = createState(1); // .interval((value) => value + 1, 1000);
+export const MY_STATE = createState<string>('MyState', { key: 'my-state' }); //.persist();
+export const MY_STATE_2 = createState<string>('MyState2', {
   key: 'my-state2',
 }).persist({
   storageKeys: ['myStorage', 'localStorage'],
@@ -54,13 +63,13 @@ export const MY_STATE_2 = App.createState<string>('MyState2', {
 MY_STATE_2.onLoad(() => {
   console.log('On Load MY_STATE_2');
 });
-export const MY_STATE_3 = App.createState<number>(1); //.persist("my-state2");
+export const MY_STATE_3 = createState<number>(1); //.persist("my-state2");
 
 MY_STATE.watch('test', (value: any) => {
   console.log('Watch ' + value);
 });
 
-export const MY_COMPUTED = App.createComputed<string>(() => {
+export const MY_COMPUTED = createComputed<string>(() => {
   return 'test' + MY_STATE.value + '_computed_' + MY_STATE_2.value;
 }, []).setKey('myComputed');
 
@@ -69,7 +78,7 @@ interface collectionValueInterface {
   name: string;
 }
 
-export const MY_COLLECTION = App.createCollection<collectionValueInterface>(
+export const MY_COLLECTION = createCollection<collectionValueInterface>(
   (collection) => ({
     key: 'my-collection',
     primaryKey: 'key',

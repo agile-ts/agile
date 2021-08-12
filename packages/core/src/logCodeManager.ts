@@ -1,11 +1,3 @@
-// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
-export let loggerPackage: any = null;
-try {
-  loggerPackage = require('@agile-ts/logger');
-} catch (e) {
-  // empty catch block
-}
-
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
 //
@@ -31,7 +23,7 @@ const logCodeTypes = {
 // ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
-const logCodeMessages = {
+const niceLogCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
@@ -75,8 +67,6 @@ const logCodeMessages = {
   '13:03:00': "Invalid Storage '${0}()' method provided!",
 
   // State
-  '14:02:00': "Incorrect type '${0}' was provided! Requires type of ${1}.",
-  '14:03:00': "Incorrect type '${0}' was provided! Requires type of ${1}.",
   '14:03:01':
     "'${1}' is a not supported type! Supported types are: String, Boolean, Array, Object, Number.",
   '14:03:02': "The 'patch()' method works only in object based States!",
@@ -173,6 +163,13 @@ const logCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
+// Note: Not outsource the 'production' env check,
+// because then webpack can't treeshake based on the current env
+const logCodeMessages: typeof niceLogCodeMessages =
+  typeof process === 'object' && process.env.NODE_ENV !== 'production'
+    ? niceLogCodeMessages
+    : ({} as any);
+
 /**
  * Returns the log message according to the specified log code.
  *
@@ -185,7 +182,8 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
   replacers: any[] = []
 ): string {
-  let result = logCodeMessages[logCode] ?? `'${logCode}' is a unknown logCode!`;
+  let result = logCodeMessages[logCode];
+  if (result == null) return logCode;
 
   // Replace '${x}' with the specified replacer instances
   for (let i = 0; i < replacers.length; i++) {
@@ -257,25 +255,57 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   // Handle logging with Logger
   logger.if.tag(tags)[logType](getLog(logCode, replacers), ...data);
 }
-
 /**
  * The Log Code Manager keeps track
  * and manages all important Logs of AgileTs.
  *
  * @internal
  */
-export const LogCodeManager = {
-  getLog,
-  log,
-  logCodeLogTypes: logCodeTypes,
-  logCodeMessages: logCodeMessages,
-  // Not doing 'logger: loggerPackage?.sharedAgileLogger'
-  // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
-  getLogger: () => {
-    return loggerPackage?.sharedAgileLogger ?? null;
-  },
-  logIfTags,
+let tempLogCodeManager: {
+  getLog: typeof getLog;
+  log: typeof log;
+  logCodeLogTypes: typeof logCodeTypes;
+  logCodeMessages: typeof logCodeMessages;
+  getLogger: () => any;
+  logIfTags: typeof logIfTags;
 };
+if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+  tempLogCodeManager = {
+    getLog,
+    log,
+    logCodeLogTypes: logCodeTypes,
+    logCodeMessages: logCodeMessages,
+    // Not doing 'logger: loggerPackage?.sharedAgileLogger'
+    // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
+    getLogger: () => {
+      let loggerPackage: any = null;
+      try {
+        loggerPackage = require('@agile-ts/logger');
+      } catch (e) {
+        // empty catch block
+      }
+      return loggerPackage?.sharedAgileLogger ?? null;
+    },
+    logIfTags,
+  };
+} else {
+  tempLogCodeManager = {
+    // Log only logCode
+    getLog: (logCode, replacers) => logCode,
+    log,
+    logCodeLogTypes: logCodeTypes,
+    logCodeMessages: logCodeMessages,
+    // Not doing 'logger: loggerPackage?.sharedAgileLogger'
+    // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
+    getLogger: () => {
+      return null;
+    },
+    logIfTags: (tags, logCode, replacers) => {
+      /* empty */
+    },
+  };
+}
+export const LogCodeManager = tempLogCodeManager;
 
 export type LogCodesArrayType<T> = {
   [K in keyof T]: T[K] extends string ? K : never;

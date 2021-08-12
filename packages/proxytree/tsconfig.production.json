@@ -1,7 +1,9 @@
+// Use File: Overwrites already generated js files with new js files that have no comments
+// Not doing in main 'tsconfig.json' because then the typescript declarations would have no comments too
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "declaration": false,
+    "declaration": false, // '.d.ts' files should have been generated before
     "removeComments": true
   }
 }

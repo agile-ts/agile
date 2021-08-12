@@ -206,6 +206,14 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
 </a>
 
+### ♥️ Contributors 
+
+<a href="https://github.com/agile-ts/agile/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agile-ts/agile" />
+</a>
+
+[Become a contributor](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md)
+
 
 <br />
 

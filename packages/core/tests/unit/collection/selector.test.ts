@@ -38,7 +38,6 @@ describe('Selector Tests', () => {
 
     // Check if State was called with correct parameters
     expect(selector._key).toBeUndefined();
-    expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
     expect(selector.isPlaceholder).toBeTruthy();
     expect(selector.initialStateValue).toBeNull();
@@ -55,7 +54,6 @@ describe('Selector Tests', () => {
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
-    expect(selector.watchers).toStrictEqual({});
   });
 
   it('should create Selector and call initial select (specific config)', () => {
@@ -77,7 +75,6 @@ describe('Selector Tests', () => {
 
     // Check if State was called with correct parameters
     expect(selector._key).toBe('dummyKey');
-    expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
     expect(selector.isPlaceholder).toBeTruthy();
     expect(selector.initialStateValue).toBeNull();
@@ -94,7 +91,6 @@ describe('Selector Tests', () => {
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
-    expect(selector.watchers).toStrictEqual({});
   });
 
   it("should create Selector and shouldn't call initial select (config.isPlaceholder = true)", () => {
@@ -114,7 +110,6 @@ describe('Selector Tests', () => {
 
     // Check if State was called with correct parameters
     expect(selector._key).toBeUndefined();
-    expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
     expect(selector.isPlaceholder).toBeTruthy();
     expect(selector.initialStateValue).toBeNull();
@@ -131,7 +126,6 @@ describe('Selector Tests', () => {
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
-    expect(selector.watchers).toStrictEqual({});
   });
 
   it("should create Selector and shouldn't call initial select if specified selector key is null (default config)", () => {
@@ -149,7 +143,6 @@ describe('Selector Tests', () => {
 
     // Check if State was called with correct parameters
     expect(selector._key).toBeUndefined();
-    expect(selector.valueType).toBeUndefined();
     expect(selector.isSet).toBeFalsy();
     expect(selector.isPlaceholder).toBeTruthy();
     expect(selector.initialStateValue).toBeNull();
@@ -166,7 +159,6 @@ describe('Selector Tests', () => {
     expect(selector.computeExistsMethod).toBeInstanceOf(Function);
     expect(selector.isPersisted).toBeFalsy();
     expect(selector.persistent).toBeUndefined();
-    expect(selector.watchers).toStrictEqual({});
   });
 
   describe('Selector Function Tests', () => {
