@@ -166,7 +166,7 @@ const niceLogCodeMessages = {
 // Note: Not outsource the 'production' env check,
 // because then webpack can't treeshake based on the current env
 const logCodeMessages: typeof niceLogCodeMessages =
-  typeof process === 'object' && process.env.NODE_ENV === 'development'
+  typeof process === 'object' && process.env.NODE_ENV !== 'production'
     ? niceLogCodeMessages
     : ({} as any);
 
@@ -269,7 +269,7 @@ let tempLogCodeManager: {
   getLogger: () => any;
   logIfTags: typeof logIfTags;
 };
-if (typeof process === 'object' && process.env.NODE_ENV === 'development') {
+if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
   tempLogCodeManager = {
     getLog,
     log,
