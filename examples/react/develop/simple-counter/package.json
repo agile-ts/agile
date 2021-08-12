@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
-    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@reduxjs/toolkit": "^1.6.1",
     "jotai": "^1.2.2",
     "nanostores": "^0.4.1",
