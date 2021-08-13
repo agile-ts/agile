@@ -1,4 +1,5 @@
-import { CreateStorageConfigInterface, Storage } from '../internal';
+import { CreateStorageConfigInterface, generateId, Storage } from '../internal';
+import type { Storages, Persistent } from '../internal';
 
 export * from './storages';
 // export * from './storage';
@@ -22,3 +23,23 @@ export * from './storages';
 export function createStorage(config: CreateStorageConfigInterface): Storage {
   return new Storage(config);
 }
+
+// Handles the permanent persistence of Agile Classes
+export const storageManagers: {
+  [key: string]: Storages;
+} = {};
+export let defaultStorageManagerKey: string | null = null;
+
+export const registerStorageManager = (
+  instance: Storages,
+  key: string = generateId()
+) => {
+  if (Object.prototype.hasOwnProperty.call(storageManagers, key)) {
+    // TODO
+    return;
+  }
+
+  storageManagers[key] = instance;
+
+  if (defaultStorageManagerKey == null) defaultStorageManagerKey = key;
+};

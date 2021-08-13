@@ -54,8 +54,6 @@ export class State<ValueType = any> {
 
   // Whether the State is persisted in an external Storage
   public isPersisted = false;
-  // Manages the permanent persistent in external Storages
-  public persistent: StatePersistent | undefined;
 
   // When an interval is active, the 'intervalId' to clear the interval is temporary stored here
   public currentInterval?: NodeJS.Timer | number;

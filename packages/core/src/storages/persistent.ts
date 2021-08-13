@@ -1,9 +1,11 @@
 import {
   Agile,
   copy,
+  defaultStorageManagerKey,
   defineConfig,
   LogCodeManager,
   StorageKey,
+  storageManagers,
 } from '../internal';
 
 export class Persistent {
@@ -27,6 +29,8 @@ export class Persistent {
   // Key/Name identifier of the Storages the Persistent value is stored in
   public storageKeys: StorageKey[] = [];
 
+  public storageManagerKey: string;
+
   /**
    * A Persistent manages the permanent persistence
    * of an Agile Class such as the `State Class` in external Storages.
@@ -48,8 +52,9 @@ export class Persistent {
       instantiate: true,
       storageKeys: [],
       defaultStorageKey: null as any,
+      storageManagerKey: defaultStorageManagerKey,
     });
-    this.agileInstance().storages.persistentInstances.add(this);
+    this.storageManagerKey = config.storageManagerKey as any;
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
 
     // Instantiate Persistent
@@ -127,6 +132,9 @@ export class Persistent {
     this._key = this.formatKey(config.key) ?? Persistent.placeHolderKey;
     this.assignStorageKeys(config.storageKeys, config.defaultStorageKey);
     this.validatePersistent();
+    storageManagers[this.storageManagerKey].persistentInstances[
+      this._key
+    ] = this;
   }
 
   /**
@@ -140,6 +148,7 @@ export class Persistent {
    */
   public validatePersistent(): boolean {
     let isValid = true;
+    const storages = storageManagers[this.storageManagerKey];
 
     // Validate Persistent key/name identifier
     if (this._key === Persistent.placeHolderKey) {
@@ -155,7 +164,7 @@ export class Persistent {
 
     // Check if the Storages exist at the specified Storage keys
     this.storageKeys.map((key) => {
-      if (!this.agileInstance().storages.storages[key]) {
+      if (!storages.storages[key]) {
         LogCodeManager.log('12:03:02', [this._key, key]);
         isValid = false;
       }
@@ -180,7 +189,7 @@ export class Persistent {
     storageKeys: StorageKey[] = [],
     defaultStorageKey?: StorageKey
   ): void {
-    const storages = this.agileInstance().storages;
+    const storages = storageManagers[this.storageManagerKey];
     const _storageKeys = copy(storageKeys);
 
     // Assign specified default Storage key to the 'storageKeys' array
@@ -318,6 +327,10 @@ export interface CreatePersistentConfigInterface {
    * @default true
    */
   instantiate?: boolean;
+  /**
+   * TODO
+   */
+  storageManagerKey?: string;
 }
 
 export interface PersistentConfigInterface {

@@ -1,12 +1,9 @@
 import {
   Runtime,
   Integration,
-  Storage,
   Integrations,
   SubController,
   globalBind,
-  Storages,
-  RegisterConfigInterface,
   LogCodeManager,
   IntegrationsConfigInterface,
   defineConfig,
@@ -22,8 +19,6 @@ export class Agile {
   public runtime: Runtime;
   // Manages and simplifies the subscription to UI-Components
   public subController: SubController;
-  // Handles the permanent persistence of Agile Classes
-  public storages: Storages;
 
   // Integrations (UI-Frameworks) that are integrated into the Agile Instance
   public integrations: Integrations;
@@ -75,9 +70,6 @@ export class Agile {
     });
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
-    this.storages = new Storages(this, {
-      localStorage: config.localStorage,
-    });
 
     LogCodeManager.log('10:00:00', [], this);
 
@@ -108,27 +100,6 @@ export class Agile {
   }
 
   /**
-   * Registers the specified Storage with AgileTs.
-   *
-   * After a successful registration,
-   * [Agile Sub Instances](https://agile-ts.org/docs/introduction/#agile-sub-instance) such as States
-   * can be persisted in the external Storage.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#registerstorage)
-   *
-   * @public
-   * @param storage - Storage to be registered.
-   * @param config - Configuration object
-   */
-  public registerStorage(
-    storage: Storage,
-    config: RegisterConfigInterface = {}
-  ): this {
-    this.storages.register(storage, config);
-    return this;
-  }
-
-  /**
    * Returns a boolean indicating whether any Integration
    * has been registered with AgileTs or not.
    *
@@ -138,18 +109,6 @@ export class Agile {
    */
   public hasIntegration(): boolean {
     return this.integrations.hasIntegration();
-  }
-
-  /**
-   * Returns a boolean indicating whether any Storage
-   * has been registered with AgileTs or not.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#hasstorage)
-   *
-   * @public
-   */
-  public hasStorage(): boolean {
-    return this.storages.hasStorage();
   }
 }
 
@@ -163,11 +122,6 @@ export interface CreateAgileConfigInterface
    * @default true
    */
   waitForMount?: boolean;
-  /**
-   * Whether the Local Storage should be registered as a Agile Storage by default.
-   * @default false
-   */
-  localStorage?: boolean;
   /**
    * Whether the Agile Instance should be globally bound (globalThis)
    * and thus be globally available.
