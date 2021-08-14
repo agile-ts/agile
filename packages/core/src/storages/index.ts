@@ -1,5 +1,5 @@
 import { CreateStorageConfigInterface, generateId, Storage } from '../internal';
-import type { Storages, Persistent } from '../internal';
+import type { Storages } from '../internal';
 
 export * from './storages';
 // export * from './storage';

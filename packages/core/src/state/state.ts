@@ -17,6 +17,8 @@ import {
   removeProperties,
   LogCodeManager,
   defineConfig,
+  storageManagers,
+  defaultStorageManagerKey,
 } from '../internal';
 
 export class State<ValueType = any> {
@@ -432,15 +434,25 @@ export class State<ValueType = any> {
     });
 
     // Check if State is already persisted
-    if (this.persistent != null && this.isPersisted) return this;
+    if (this.isPersisted) return this;
 
-    // Create Persistent (-> persist value)
-    this.persistent = new StatePersistent<ValueType>(this, {
-      instantiate: _config.loadValue,
-      storageKeys: _config.storageKeys,
-      key: key,
-      defaultStorageKey: _config.defaultStorageKey,
-    });
+    const storageManager = storageManagers[defaultStorageManagerKey || ''];
+
+    // Check if a Storage Manager exists
+    if (storageManager != null && key != null) {
+      // TODO tree shake persistent when Storage not registered
+      storageManager.persistentInstances[key] = new StatePersistent<ValueType>(
+        this,
+        {
+          instantiate: _config.loadValue,
+          storageKeys: _config.storageKeys,
+          key: key,
+          defaultStorageKey: _config.defaultStorageKey,
+        }
+      );
+    } else {
+      // TODO add error
+    }
 
     return this;
   }
