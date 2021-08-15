@@ -120,4 +120,13 @@ export class PersistableState<ValueType = any> extends State<ValueType> {
 
     return this;
   }
+
+  /**
+   * Returns the persistable value of the State.
+   *
+   * @internal
+   */
+  public getPersistableValue(): any {
+    return this._value;
+  }
 }

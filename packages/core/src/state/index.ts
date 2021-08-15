@@ -5,6 +5,7 @@ import {
   removeProperties,
   CreateAgileSubInstanceInterface,
   shared,
+  PersistableState,
 } from '../internal';
 
 export * from './state';
@@ -39,6 +40,20 @@ export function createState<ValueType = any>(
     agileInstance: shared,
   });
   return new State<ValueType>(
+    config.agileInstance as any,
+    initialValue,
+    removeProperties(config, ['agileInstance'])
+  );
+}
+
+export function createPersistableState<ValueType = any>(
+  initialValue: ValueType,
+  config: CreateStateConfigInterfaceWithAgile = {}
+): PersistableState<ValueType> {
+  config = defineConfig(config, {
+    agileInstance: shared,
+  });
+  return new PersistableState<ValueType>(
     config.agileInstance as any,
     initialValue,
     removeProperties(config, ['agileInstance'])

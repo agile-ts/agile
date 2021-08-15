@@ -590,15 +590,6 @@ export class State<ValueType = any> {
   public hasSideEffect(key: string): boolean {
     return !!this.sideEffects[key];
   }
-
-  /**
-   * Returns the persistable value of the State.
-   *
-   * @internal
-   */
-  public getPersistableValue(): any {
-    return this._value;
-  }
 }
 
 export type StateKey = string | number;

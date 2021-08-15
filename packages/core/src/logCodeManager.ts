@@ -270,6 +270,13 @@ let tempLogCodeManager: {
   logIfTags: typeof logIfTags;
 };
 if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+  let loggerPackage: any = null;
+  try {
+    loggerPackage = require('@agile-ts/logger');
+  } catch (e) {
+    // empty catch block
+  }
+
   tempLogCodeManager = {
     getLog,
     log,
@@ -278,12 +285,6 @@ if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
     // Not doing 'logger: loggerPackage?.sharedAgileLogger'
     // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
     getLogger: () => {
-      let loggerPackage: any = null;
-      try {
-        loggerPackage = require('@agile-ts/logger');
-      } catch (e) {
-        // empty catch block
-      }
       return loggerPackage?.sharedAgileLogger ?? null;
     },
     logIfTags,
