@@ -11,6 +11,7 @@ import {
   Persistent,
   PersistentKey,
   StorageKey,
+  storageManager,
 } from '../internal';
 
 export class CollectionPersistent<
@@ -84,7 +85,7 @@ export class CollectionPersistent<
 
     // Check if Collection is already persisted
     // (indicated by the persistence of 'true' at '_storageItemKey')
-    const isPersisted = await this.agileInstance().storages.get<DataType>(
+    const isPersisted = await storageManager?.get<DataType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -207,7 +208,7 @@ export class CollectionPersistent<
     );
 
     // Set flag in Storage to indicate that the Collection is persisted
-    this.agileInstance().storages.set(_storageItemKey, true, this.storageKeys);
+    storageManager?.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
     defaultGroup.persist(defaultGroupStorageKey, {
@@ -282,7 +283,7 @@ export class CollectionPersistent<
     );
 
     // Remove Collection is persisted indicator flag from Storage
-    this.agileInstance().storages.remove(_storageItemKey, this.storageKeys);
+    storageManager?.remove(_storageItemKey, this.storageKeys);
 
     // Remove default Group from the Storage
     defaultGroup.persistent?.removePersistedValue(defaultGroupStorageKey);

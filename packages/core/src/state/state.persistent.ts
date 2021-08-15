@@ -1,14 +1,15 @@
 import {
   CreatePersistentConfigInterface,
   defineConfig,
+  PersistableState,
   Persistent,
   PersistentKey,
-  State,
+  storageManager,
 } from '../internal';
 
 export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to
-  public state: () => State;
+  public state: () => PersistableState;
 
   static storeValueSideEffectKey = 'rebuildStateStorageValue';
 
@@ -20,7 +21,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param config - Configuration object
    */
   constructor(
-    state: State<ValueType>,
+    state: PersistableState<ValueType>,
     config: CreatePersistentConfigInterface = {}
   ) {
     super(state.agileInstance(), {
@@ -72,7 +73,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const _storageItemKey = storageItemKey ?? this._key;
 
     // Load State value from the default Storage
-    const loadedValue = await this.agileInstance().storages.get<ValueType>(
+    const loadedValue = await storageManager?.get<ValueType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -150,7 +151,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey || this._key;
     this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
-    this.agileInstance().storages.remove(_storageItemKey, this.storageKeys);
+    storageManager?.remove(_storageItemKey, this.storageKeys);
     this.isPersisted = false;
     return true;
   }
@@ -184,12 +185,12 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param config - Configuration object
    */
   public rebuildStorageSideEffect(
-    state: State<ValueType>,
+    state: PersistableState<ValueType>,
     storageItemKey: PersistentKey,
     config: { [key: string]: any } = {}
   ) {
     if (config['storage'] == null || config.storage) {
-      this.agileInstance().storages.set(
+      storageManager?.set(
         storageItemKey,
         this.state().getPersistableValue(),
         this.storageKeys

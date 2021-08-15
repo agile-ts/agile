@@ -25,21 +25,11 @@ export function createStorage(config: CreateStorageConfigInterface): Storage {
 }
 
 // Handles the permanent persistence of Agile Classes
-export const storageManagers: {
-  [key: string]: Storages;
-} = {};
-export let defaultStorageManagerKey: string | null = null;
+export let storageManager: Storages | null = null;
 
-export const registerStorageManager = (
-  instance: Storages,
-  key: string = generateId()
-) => {
-  if (Object.prototype.hasOwnProperty.call(storageManagers, key)) {
-    // TODO
-    return;
+export const registerStorageManager = (instance: Storages) => {
+  if (storageManager != null) {
+    // TODO print warning
   }
-
-  storageManagers[key] = instance;
-
-  if (defaultStorageManagerKey == null) defaultStorageManagerKey = key;
+  storageManager = instance;
 };

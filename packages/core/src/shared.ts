@@ -1,11 +1,10 @@
-import { Agile, runsOnServer } from './internal';
+import { Agile } from './internal';
 
 /**
  * Shared Agile Instance that is used when no Agile Instance was specified.
  */
 let sharedAgileInstance = new Agile({
   key: 'shared',
-  localStorage: !runsOnServer(),
 });
 export { sharedAgileInstance as shared };
 
