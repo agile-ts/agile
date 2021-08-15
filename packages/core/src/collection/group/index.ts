@@ -1,5 +1,5 @@
 import {
-  State,
+  PersistableState,
   Collection,
   DefaultItem,
   ItemKey,
@@ -23,7 +23,7 @@ import {
 export class Group<
   DataType extends Object = DefaultItem,
   ValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
-> extends State<Array<ItemKey>> {
+> extends PersistableState<Array<ItemKey>> {
   // Collection the Group belongs to
   collection: () => Collection<DataType>;
 
