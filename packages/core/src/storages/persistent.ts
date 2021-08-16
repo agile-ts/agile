@@ -2,9 +2,9 @@ import {
   Agile,
   copy,
   defineConfig,
+  getStorageManager,
   LogCodeManager,
   StorageKey,
-  storageManager,
 } from '../internal';
 
 export class Persistent {
@@ -155,7 +155,7 @@ export class Persistent {
 
     // Check if the Storages exist at the specified Storage keys
     this.storageKeys.map((key) => {
-      if (!storageManager?.storages[key]) {
+      if (!getStorageManager()?.storages[key]) {
         LogCodeManager.log('12:03:02', [this._key, key]);
         isValid = false;
       }
@@ -190,10 +190,10 @@ export class Persistent {
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      const defaultStorageKey = storageManager?.config.defaultStorageKey;
+      const defaultStorageKey = getStorageManager()?.config.defaultStorageKey;
       if (defaultStorageKey != null) {
         this.config.defaultStorageKey = defaultStorageKey;
-        _storageKeys.push(storageManager?.config.defaultStorageKey as any);
+        _storageKeys.push(getStorageManager()?.config.defaultStorageKey as any);
       }
     } else {
       this.config.defaultStorageKey = defaultStorageKey ?? _storageKeys[0];

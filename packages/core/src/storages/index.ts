@@ -1,9 +1,20 @@
-import { CreateStorageConfigInterface, Storage } from '../internal';
-import type { Storages } from '../internal';
+import {
+  CreateStorageConfigInterface,
+  Storage,
+  Storages,
+  shared,
+  CreateStoragesConfigInterface,
+  CreateAgileSubInstanceInterface,
+  defineConfig,
+  removeProperties,
+} from '../internal';
 
 export * from './storages';
 // export * from './storage';
 // export * from './persistent';
+
+// Handles the permanent persistence of Agile Classes
+let storageManager: Storages | null = null;
 
 /**
  * Returns a newly created Storage.
@@ -24,8 +35,21 @@ export function createStorage(config: CreateStorageConfigInterface): Storage {
   return new Storage(config);
 }
 
-// Handles the permanent persistence of Agile Classes
-export let storageManager: Storages | null = null;
+export function createStorageManager(
+  config: CreateStorageManagerConfigInterfaceWithAgile = {}
+): Storages {
+  config = defineConfig(config, {
+    agileInstance: shared,
+  });
+  return new Storages(
+    config.agileInstance as any,
+    removeProperties(config, ['agileInstance'])
+  );
+}
+
+export function getStorageManager(): Storages | null {
+  return storageManager;
+}
 
 export const registerStorageManager = (instance: Storages) => {
   if (storageManager != null) {
@@ -33,3 +57,7 @@ export const registerStorageManager = (instance: Storages) => {
   }
   storageManager = instance;
 };
+
+export interface CreateStorageManagerConfigInterfaceWithAgile
+  extends CreateAgileSubInstanceInterface,
+    CreateStoragesConfigInterface {}

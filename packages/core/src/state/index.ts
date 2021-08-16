@@ -13,10 +13,6 @@ export * from './state';
 // export * from './state.persistent';
 // export * from './state.runtime.job';
 
-export interface CreateStateConfigInterfaceWithAgile
-  extends CreateAgileSubInstanceInterface,
-    StateConfigInterface {}
-
 /**
  * Returns a newly created State.
  *
@@ -74,3 +70,7 @@ export function createState<ValueType = any>(
     removeProperties(config, ['agileInstance'])
   );
 }
+
+export interface CreateStateConfigInterfaceWithAgile
+  extends CreateAgileSubInstanceInterface,
+    StateConfigInterface {}

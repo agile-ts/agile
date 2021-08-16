@@ -2,9 +2,9 @@ import {
   CreatePersistentConfigInterface,
   defineConfig,
   EnhancedState,
+  getStorageManager,
   Persistent,
   PersistentKey,
-  storageManager,
 } from '../internal';
 
 export class StatePersistent<ValueType = any> extends Persistent {
@@ -73,7 +73,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const _storageItemKey = storageItemKey ?? this._key;
 
     // Load State value from the default Storage
-    const loadedValue = await storageManager?.get<ValueType>(
+    const loadedValue = await getStorageManager()?.get<ValueType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -151,7 +151,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey || this._key;
     this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
-    storageManager?.remove(_storageItemKey, this.storageKeys);
+    getStorageManager()?.remove(_storageItemKey, this.storageKeys);
     this.isPersisted = false;
     return true;
   }
@@ -190,7 +190,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     config: { [key: string]: any } = {}
   ) {
     if (config['storage'] == null || config.storage) {
-      storageManager?.set(
+      getStorageManager()?.set(
         storageItemKey,
         this.state().getPersistableValue(),
         this.storageKeys

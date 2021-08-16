@@ -12,10 +12,6 @@ import {
 export * from './computed';
 // export * from './computed.tracker';
 
-export interface CreateComputedConfigInterfaceWithAgile
-  extends CreateAgileSubInstanceInterface,
-    CreateComputedConfigInterface {}
-
 /**
  * Returns a newly created Computed.
  *
@@ -84,3 +80,7 @@ export function createComputed<ComputedValueType = any>(
     removeProperties(_config, ['agileInstance'])
   );
 }
+
+export interface CreateComputedConfigInterfaceWithAgile
+  extends CreateAgileSubInstanceInterface,
+    CreateComputedConfigInterface {}

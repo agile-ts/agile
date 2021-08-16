@@ -11,7 +11,7 @@ import {
   Persistent,
   PersistentKey,
   StorageKey,
-  storageManager,
+  getStorageManager,
 } from '../internal';
 
 export class CollectionPersistent<
@@ -85,7 +85,7 @@ export class CollectionPersistent<
 
     // Check if Collection is already persisted
     // (indicated by the persistence of 'true' at '_storageItemKey')
-    const isPersisted = await storageManager?.get<DataType>(
+    const isPersisted = await getStorageManager()?.get<DataType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -208,7 +208,7 @@ export class CollectionPersistent<
     );
 
     // Set flag in Storage to indicate that the Collection is persisted
-    storageManager?.set(_storageItemKey, true, this.storageKeys);
+    getStorageManager()?.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
     defaultGroup.persist(defaultGroupStorageKey, {
@@ -283,7 +283,7 @@ export class CollectionPersistent<
     );
 
     // Remove Collection is persisted indicator flag from Storage
-    storageManager?.remove(_storageItemKey, this.storageKeys);
+    getStorageManager()?.remove(_storageItemKey, this.storageKeys);
 
     // Remove default Group from the Storage
     defaultGroup.persistent?.removePersistedValue(defaultGroupStorageKey);
