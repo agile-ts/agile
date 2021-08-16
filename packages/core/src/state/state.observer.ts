@@ -15,6 +15,7 @@ import {
   ObserverKey,
   defineConfig,
 } from '../internal';
+import type { EnhancedState } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
   // State the Observer belongs to
@@ -105,9 +106,9 @@ export class StateObserver<ValueType = any> extends Observer {
       config.overwrite = true;
     }
 
-    // Assign next State value to Observer and compute it if necessary
-    this.nextStateValue = state.computeValueMethod
-      ? copy(state.computeValueMethod(newStateValue))
+    // Assign next State value to Observer and compute it if necessary (enhanced State)
+    this.nextStateValue = (state as EnhancedState).computeValueMethod
+      ? copy((state as any).computeValueMethod(newStateValue))
       : copy(newStateValue);
 
     // Check if current State value and to assign State value are equal

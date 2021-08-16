@@ -1,10 +1,10 @@
 import React from 'react';
-import { createState } from '@agile-ts/core';
+import { createLightState } from '@agile-ts/core';
 import { useAgile, useValue } from '@agile-ts/react';
 
-const COUNTER_A = createState(1);
-const COUNTER_B = createState(2);
-const COUNTER_C = createState(3);
+const COUNTER_A = createLightState(1);
+const COUNTER_B = createLightState(2);
+const COUNTER_C = createLightState(3);
 
 const CounterA = () => {
   const count = useAgile(COUNTER_A);
