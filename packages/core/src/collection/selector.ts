@@ -4,13 +4,13 @@ import {
   defineConfig,
   Item,
   ItemKey,
-  PersistableState,
+  EnhancedState,
   StateRuntimeJobConfigInterface,
 } from '../internal';
 
 export class Selector<
   DataType extends Object = DefaultItem
-> extends PersistableState<DataType | null> {
+> extends EnhancedState<DataType | null> {
   // Collection the Selector belongs to
   public collection: () => Collection<DataType>;
 

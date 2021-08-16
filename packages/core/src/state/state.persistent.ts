@@ -1,7 +1,7 @@
 import {
   CreatePersistentConfigInterface,
   defineConfig,
-  PersistableState,
+  EnhancedState,
   Persistent,
   PersistentKey,
   storageManager,
@@ -9,7 +9,7 @@ import {
 
 export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to
-  public state: () => PersistableState;
+  public state: () => EnhancedState;
 
   static storeValueSideEffectKey = 'rebuildStateStorageValue';
 
@@ -21,7 +21,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param config - Configuration object
    */
   constructor(
-    state: PersistableState<ValueType>,
+    state: EnhancedState<ValueType>,
     config: CreatePersistentConfigInterface = {}
   ) {
     super(state.agileInstance(), {
@@ -185,7 +185,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param config - Configuration object
    */
   public rebuildStorageSideEffect(
-    state: PersistableState<ValueType>,
+    state: EnhancedState<ValueType>,
     storageItemKey: PersistentKey,
     config: { [key: string]: any } = {}
   ) {

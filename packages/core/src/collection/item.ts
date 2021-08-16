@@ -1,5 +1,5 @@
 import {
-  PersistableState,
+  EnhancedState,
   Collection,
   StateKey,
   StateRuntimeJobConfigInterface,
@@ -12,9 +12,9 @@ import {
   defineConfig,
 } from '../internal';
 
-export class Item<
-  DataType extends Object = DefaultItem
-> extends PersistableState<DataType> {
+export class Item<DataType extends Object = DefaultItem> extends EnhancedState<
+  DataType
+> {
   // Collection the Group belongs to
   public collection: () => Collection<DataType>;
 
