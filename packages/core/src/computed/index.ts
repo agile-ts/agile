@@ -24,7 +24,7 @@ export * from './computed';
  * Direct dependencies can be States and Collections.
  * So when, for example, a dependent State value changes, the computed value is recomputed.
  *
- * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
+ * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcomputed)
  *
  * @public
  * @param computeFunction - Function to compute the computed value.

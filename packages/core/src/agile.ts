@@ -42,7 +42,6 @@ export class Agile {
    *   changes in the Runtime to prevent race conditions
    * - update/rerender subscribed UI-Components through the provided Integrations
    *   such as the [React Integration](https://agile-ts.org/docs/react)
-   * - integrate with the persistent [Storage](https://agile-ts.org/docs/core/storage)
    * - provide configuration object
    *
    * Each Agile Sub Instance requires an Agile Instance to be instantiated and function properly.
