@@ -36,9 +36,9 @@ export * from './storages/persistent';
 // State
 export * from './state';
 export * from './state/state.observer';
+export * from './state/state.enhanced';
 export * from './state/state.persistent';
 export * from './state/state.runtime.job';
-export * from './state/state.enhanced';
 
 // Computed
 export * from './computed';
