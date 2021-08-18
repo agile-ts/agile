@@ -2,8 +2,13 @@
 // Note: Webpack Bundle Analyzer doesn't show accurately which bundles were tree shaken
 //       (See: https://github.com/webpack-contrib/webpack-bundle-analyzer/issues/161)
 
+import dotenv from 'dotenv';
+
+// Loads environment variables from the '.env' file
+dotenv.config();
+
 // https://nodejs.org/docs/latest/api/process.html#process_process_argv
-const isDev = process.argv.includes('--dev');
+const isDev = process.argv.includes('--dev') || process.env.DEV === 'true';
 
 console.log(
   `Start bundling a '${isDev ? 'development' : 'production'}' build!`
