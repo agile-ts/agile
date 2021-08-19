@@ -7,6 +7,7 @@ import {
   CreateAgileSubInstanceInterface,
   defineConfig,
   removeProperties,
+  LogCodeManager,
 } from '../internal';
 
 export * from './storages';
@@ -53,7 +54,7 @@ export function getStorageManager(): Storages | null {
 
 export const registerStorageManager = (instance: Storages) => {
   if (storageManager != null) {
-    // TODO print warning
+    LogCodeManager.log('11:02:06', [], storageManager);
   }
   storageManager = instance;
 };

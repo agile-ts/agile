@@ -40,6 +40,8 @@ const niceLogCodeMessages = {
     "Couldn't find Storage '${0}'. " +
     "The Storage with the key/name '${0}' doesn't exists!",
   '11:03:02': "Storage with the key/name '${0}' isn't ready yet!",
+  '11:02:06':
+    'By registering a new Storage Manager the old one will be overwritten!',
   '11:03:03':
     'No Storage found to get a value from! Please specify at least one Storage.',
   '11:03:04':
