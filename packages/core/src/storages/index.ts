@@ -36,6 +36,13 @@ export function createStorage(config: CreateStorageConfigInterface): Storage {
   return new Storage(config);
 }
 
+/**
+ * Returns a newly created Storage Manager.
+ *
+ * A Storage Manager manages the Storages.
+ *
+ * @param config - Configuration object
+ */
 export function createStorageManager(
   config: CreateStorageManagerConfigInterfaceWithAgile = {}
 ): Storages {
@@ -48,10 +55,18 @@ export function createStorageManager(
   );
 }
 
+/**
+ * Returns the current Storage Manager.
+ */
 export function getStorageManager(): Storages | null {
   return storageManager;
 }
 
+/**
+ * Registers a Storage Manager.
+ *
+ *  @param instance - Storage Manager to be registered as the default Storage Manager.
+ */
 export const registerStorageManager = (instance: Storages) => {
   if (storageManager != null) {
     LogCodeManager.log('11:02:06', [], storageManager);
