@@ -4,7 +4,9 @@ import Agile, {
   createComputed,
   createState,
   createStorage,
+  createStorageManager,
   Item,
+  registerSharedStorageManager,
 } from '@agile-ts/core';
 import Event from '@agile-ts/event';
 import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
@@ -13,13 +15,14 @@ import { clone } from '@agile-ts/utils';
 export const myStorage: any = {};
 
 assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
-export const App = new Agile({
-  localStorage: true,
-});
+export const App = new Agile();
 assignSharedAgileInstance(App);
 
+const storageManager = createStorageManager({ localStorage: true });
+registerSharedStorageManager(storageManager);
+
 // Register custom second Storage
-App.registerStorage(
+storageManager.register(
   createStorage({
     key: 'myStorage',
     methods: {

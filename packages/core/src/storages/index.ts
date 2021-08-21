@@ -67,7 +67,7 @@ export function getStorageManager(): Storages | null {
  *
  *  @param instance - Storage Manager to be registered as the default Storage Manager.
  */
-export const registerStorageManager = (instance: Storages) => {
+export const registerSharedStorageManager = (instance: Storages) => {
   if (storageManager != null) {
     LogCodeManager.log('11:02:06', [], storageManager);
   }
