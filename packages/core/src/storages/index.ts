@@ -39,7 +39,9 @@ export function createStorage(config: CreateStorageConfigInterface): Storage {
 /**
  * Returns a newly created Storage Manager.
  *
- * A Storage Manager manages the Storages.
+ * A Storage Manager manages all external Storages for an AgileTs
+ * and provides an interface to easily store,
+ * load and remove values from multiple Storages at once.
  *
  * @param config - Configuration object
  */
@@ -56,14 +58,15 @@ export function createStorageManager(
 }
 
 /**
- * Returns the current Storage Manager.
+ * Returns the current registered Storage Manager.
  */
 export function getStorageManager(): Storages | null {
   return storageManager;
 }
 
 /**
- * Registers a Storage Manager.
+ * Registers the specified Storage Manager
+ * as default Storage Manager for all Agile Instances.
  *
  *  @param instance - Storage Manager to be registered as the default Storage Manager.
  */
