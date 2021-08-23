@@ -7,7 +7,7 @@ describe('Persistent Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
 

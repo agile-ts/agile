@@ -19,7 +19,7 @@ describe('StateObserver Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });
 
     jest.clearAllMocks();

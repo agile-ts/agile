@@ -14,7 +14,7 @@ describe('SubController Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.clearAllMocks();
   });
@@ -215,10 +215,11 @@ describe('SubController Tests', () => {
         const dummyIntegration = () => {
           /* empty function */
         };
-        const callbackSubscriptionContainer = subController.createCallbackSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2]
-        );
+        const callbackSubscriptionContainer =
+          subController.createCallbackSubscriptionContainer(dummyIntegration, [
+            dummyObserver1,
+            dummyObserver2,
+          ]);
         callbackSubscriptionContainer.removeSubscription = jest.fn();
 
         subController.unsubscribe(callbackSubscriptionContainer);
@@ -240,10 +241,11 @@ describe('SubController Tests', () => {
         const dummyIntegration: any = {
           dummy: 'integration',
         };
-        const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2]
-        );
+        const componentSubscriptionContainer =
+          subController.createComponentSubscriptionContainer(dummyIntegration, [
+            dummyObserver1,
+            dummyObserver2,
+          ]);
         componentSubscriptionContainer.removeSubscription = jest.fn();
 
         subController.unsubscribe(componentSubscriptionContainer);
@@ -269,15 +271,17 @@ describe('SubController Tests', () => {
             dummy: 'integration',
             componentSubscriptionContainers: [],
           };
-          const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-            dummyIntegration,
-            [dummyObserver1, dummyObserver2]
-          );
+          const componentSubscriptionContainer =
+            subController.createComponentSubscriptionContainer(
+              dummyIntegration,
+              [dummyObserver1, dummyObserver2]
+            );
           componentSubscriptionContainer.removeSubscription = jest.fn();
-          const componentSubscriptionContainer2 = subController.createComponentSubscriptionContainer(
-            dummyIntegration,
-            [dummyObserver1, dummyObserver2]
-          );
+          const componentSubscriptionContainer2 =
+            subController.createComponentSubscriptionContainer(
+              dummyIntegration,
+              [dummyObserver1, dummyObserver2]
+            );
           componentSubscriptionContainer2.removeSubscription = jest.fn();
 
           subController.unsubscribe(dummyIntegration);
@@ -320,11 +324,12 @@ describe('SubController Tests', () => {
             dummy: 'integration',
           };
 
-          const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-            dummyIntegration,
-            [dummyObserver1, dummyObserver2],
-            { waitForMount: false }
-          );
+          const componentSubscriptionContainer =
+            subController.createComponentSubscriptionContainer(
+              dummyIntegration,
+              [dummyObserver1, dummyObserver2],
+              { waitForMount: false }
+            );
 
           expect(componentSubscriptionContainer).toBeInstanceOf(
             ComponentSubscriptionContainer
@@ -362,11 +367,12 @@ describe('SubController Tests', () => {
             componentSubscriptionContainers: [],
           };
 
-          const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-            dummyIntegration,
-            [dummyObserver1, dummyObserver2],
-            { waitForMount: false }
-          );
+          const componentSubscriptionContainer =
+            subController.createComponentSubscriptionContainer(
+              dummyIntegration,
+              [dummyObserver1, dummyObserver2],
+              { waitForMount: false }
+            );
 
           expect(
             dummyIntegration.componentSubscriptionContainers
@@ -383,11 +389,12 @@ describe('SubController Tests', () => {
             dummy: 'integration',
           };
 
-          const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-            dummyIntegration,
-            [dummyObserver1, dummyObserver2],
-            { waitForMount: false, componentId: 'testID', key: 'dummyKey' }
-          );
+          const componentSubscriptionContainer =
+            subController.createComponentSubscriptionContainer(
+              dummyIntegration,
+              [dummyObserver1, dummyObserver2],
+              { waitForMount: false, componentId: 'testID', key: 'dummyKey' }
+            );
 
           expect(componentSubscriptionContainer).toBeInstanceOf(
             ComponentSubscriptionContainer
@@ -420,11 +427,12 @@ describe('SubController Tests', () => {
           dummy: 'integration',
         };
 
-        const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          { waitForMount: true }
-        );
+        const componentSubscriptionContainer =
+          subController.createComponentSubscriptionContainer(
+            dummyIntegration,
+            [dummyObserver1, dummyObserver2],
+            { waitForMount: true }
+          );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
           ComponentSubscriptionContainer
@@ -453,11 +461,12 @@ describe('SubController Tests', () => {
         };
         subController.mount(dummyIntegration);
 
-        const componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          { waitForMount: true }
-        );
+        const componentSubscriptionContainer =
+          subController.createComponentSubscriptionContainer(
+            dummyIntegration,
+            [dummyObserver1, dummyObserver2],
+            { waitForMount: true }
+          );
 
         expect(componentSubscriptionContainer).toBeInstanceOf(
           ComponentSubscriptionContainer
@@ -487,10 +496,11 @@ describe('SubController Tests', () => {
           /* empty function */
         };
 
-        const callbackSubscriptionContainer = subController.createCallbackSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2]
-        );
+        const callbackSubscriptionContainer =
+          subController.createCallbackSubscriptionContainer(dummyIntegration, [
+            dummyObserver1,
+            dummyObserver2,
+          ]);
 
         expect(callbackSubscriptionContainer).toBeInstanceOf(
           CallbackSubscriptionContainer
@@ -520,15 +530,16 @@ describe('SubController Tests', () => {
           /* empty function */
         };
 
-        const callbackSubscriptionContainer = subController.createCallbackSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2],
-          {
-            waitForMount: false,
-            componentId: 'testID',
-            key: 'dummyKey',
-          }
-        );
+        const callbackSubscriptionContainer =
+          subController.createCallbackSubscriptionContainer(
+            dummyIntegration,
+            [dummyObserver1, dummyObserver2],
+            {
+              waitForMount: false,
+              componentId: 'testID',
+              key: 'dummyKey',
+            }
+          );
 
         expect(callbackSubscriptionContainer).toBeInstanceOf(
           CallbackSubscriptionContainer
@@ -557,10 +568,11 @@ describe('SubController Tests', () => {
 
       beforeEach(() => {
         dummyAgile.config.waitForMount = true;
-        componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2]
-        );
+        componentSubscriptionContainer =
+          subController.createComponentSubscriptionContainer(dummyIntegration, [
+            dummyObserver1,
+            dummyObserver2,
+          ]);
       });
 
       it(
@@ -585,10 +597,11 @@ describe('SubController Tests', () => {
 
       beforeEach(() => {
         dummyAgile.config.waitForMount = true;
-        componentSubscriptionContainer = subController.createComponentSubscriptionContainer(
-          dummyIntegration,
-          [dummyObserver1, dummyObserver2]
-        );
+        componentSubscriptionContainer =
+          subController.createComponentSubscriptionContainer(dummyIntegration, [
+            dummyObserver1,
+            dummyObserver2,
+          ]);
         subController.mount(dummyIntegration);
       });
 

@@ -22,7 +22,7 @@ describe('CollectionPersistent Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
       key: 'dummyCollectionKey',
     });
@@ -417,9 +417,10 @@ describe('CollectionPersistent Tests', () => {
           expect(
             placeholderItem1?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
-          expect(
-            dummyCollection.assignItem
-          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
+            placeholderItem1,
+            { overwrite: true }
+          );
           expect(placeholderItem1.isPersisted).toBeTruthy();
 
           // Placeholder Item 2
@@ -568,9 +569,10 @@ describe('CollectionPersistent Tests', () => {
           expect(
             placeholderItem1?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
-          expect(
-            dummyCollection.assignItem
-          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
+            placeholderItem1,
+            { overwrite: true }
+          );
           expect(placeholderItem1.isPersisted).toBeTruthy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
@@ -840,9 +842,7 @@ describe('CollectionPersistent Tests', () => {
       it("shouldn't add rebuild Storage side effect to the default Group", () => {
         collectionPersistent.setupSideEffects();
 
-        expect(
-          dummyDefaultGroup.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
           expect.any(Function),
           { weight: 0 }

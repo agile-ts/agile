@@ -7,7 +7,7 @@ describe('Storages Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.spyOn(Storages.prototype, 'instantiateLocalStorage');
 

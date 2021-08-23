@@ -16,7 +16,7 @@ describe('Computed Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.spyOn(Computed.prototype, 'recompute');
     jest.spyOn(Utils, 'extractRelevantObservers');

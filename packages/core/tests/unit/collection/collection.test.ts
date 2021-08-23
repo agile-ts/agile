@@ -24,7 +24,7 @@ describe('Collection Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.spyOn(Collection.prototype, 'initSelectors');
     jest.spyOn(Collection.prototype, 'initGroups');
@@ -264,10 +264,10 @@ describe('Collection Tests', () => {
           key: 'group1Key',
         });
 
-        expect(collection.createGroup).toHaveBeenCalledWith('group1Key', [
-          1,
-          2,
-        ]);
+        expect(collection.createGroup).toHaveBeenCalledWith(
+          'group1Key',
+          [1, 2]
+        );
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);

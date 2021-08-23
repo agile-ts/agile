@@ -20,7 +20,7 @@ describe('Item Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
@@ -315,9 +315,7 @@ describe('Item Tests', () => {
       it('should add rebuildGroupThatIncludeItemKey sideEffect to Item', () => {
         item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
-        expect(
-          item.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(item.addSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
           expect.any(Function),
           { weight: 100 }
