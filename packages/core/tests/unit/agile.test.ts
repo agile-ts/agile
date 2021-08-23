@@ -93,10 +93,6 @@ describe('Agile Tests', () => {
     // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock (mockImplementation)
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
-    expect(StoragesMock).toHaveBeenCalledWith(agile, {
-      localStorage: false,
-    });
-    expect(agile.storages).toBeInstanceOf(Storages);
 
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBeUndefined();
@@ -106,7 +102,6 @@ describe('Agile Tests', () => {
     const agile = new Agile({
       waitForMount: false,
       bucket: false,
-      localStorage: true,
       bindGlobal: true,
       key: 'jeff',
       autoIntegrate: false,
@@ -125,10 +120,6 @@ describe('Agile Tests', () => {
     // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock (mockImplementation)
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
-    expect(StoragesMock).toHaveBeenCalledWith(agile, {
-      localStorage: true,
-    });
-    expect(agile.storages).toBeInstanceOf(Storages);
 
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBe(agile);
@@ -174,56 +165,11 @@ describe('Agile Tests', () => {
       });
     });
 
-    describe('registerStorage function tests', () => {
-      beforeEach(() => {
-        agile.storages.register = jest.fn();
-      });
-
-      it('should register provided Storage', () => {
-        const dummyStorage = new Storage({
-          prefix: 'test',
-          methods: {
-            get: () => {
-              /* empty function */
-            },
-            set: () => {
-              /* empty function */
-            },
-            remove: () => {
-              /* empty function */
-            },
-          },
-          key: 'myTestStorage',
-        });
-
-        const returnedAgile = agile.registerStorage(dummyStorage, {
-          default: false,
-        });
-
-        expect(returnedAgile).toBe(agile);
-        expect(agile.storages.register).toHaveBeenCalledWith(dummyStorage, {
-          default: false,
-        });
-      });
-    });
-
     describe('hasIntegration function tests', () => {
       it('should check if Agile has any registered Integration', () => {
         agile.hasIntegration();
 
         expect(agile.integrations.hasIntegration).toHaveBeenCalled();
-      });
-    });
-
-    describe('hasStorage function tests', () => {
-      beforeEach(() => {
-        agile.storages.hasStorage = jest.fn();
-      });
-
-      it('should check if Agile has any registered Storage', () => {
-        agile.hasStorage();
-
-        expect(agile.storages.hasStorage).toHaveBeenCalled();
       });
     });
   });

@@ -44,13 +44,17 @@ export function createLightState<ValueType = any>(
 }
 
 /**
- * Returns a newly created State.
+ * Returns a newly created enhanced State.
  *
- * A State manages a piece of Information
+ * A enhanced State manages, like a normal State, a piece of Information
  * that we need to remember globally at a later point in time.
  * While providing a toolkit to use and mutate this piece of Information.
  *
- * You can create as many global States as you need.
+ * The main difference to a normal State is however
+ * that an enhanced State provides a wider variety of inbuilt utilities (like a persist, undo, watch functionality)
+ * but requires a larger bundle size in return.
+ *
+ * You can create as many global enhanced States as you need.
  *
  * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
  *
