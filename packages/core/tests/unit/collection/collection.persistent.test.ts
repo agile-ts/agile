@@ -7,8 +7,13 @@ import {
   StatePersistent,
   Group,
   Item,
+  registerSharedStorageManager,
+  createStorageManager,
+  getStorageManager,
+  Storages,
 } from '../../../src';
 import { LogMock } from '../../helper/logMock';
+import waitForExpect from 'wait-for-expect';
 
 describe('CollectionPersistent Tests', () => {
   interface ItemInterface {
@@ -18,6 +23,7 @@ describe('CollectionPersistent Tests', () => {
 
   let dummyAgile: Agile;
   let dummyCollection: Collection<ItemInterface>;
+  let storageManager: Storages;
 
   beforeEach(() => {
     LogMock.mockLogs();
@@ -26,6 +32,10 @@ describe('CollectionPersistent Tests', () => {
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
       key: 'dummyCollectionKey',
     });
+
+    // Register Storage Manager
+    registerSharedStorageManager(createStorageManager());
+    storageManager = getStorageManager() as any;
 
     jest.spyOn(CollectionPersistent.prototype, 'instantiatePersistent');
     jest.spyOn(CollectionPersistent.prototype, 'initialLoading');
@@ -169,7 +179,7 @@ describe('CollectionPersistent Tests', () => {
         key: 'collectionPersistentKey',
         storageKeys: ['dummyStorage'],
       });
-      dummyAgile.registerStorage(
+      storageManager.register(
         new Storage({
           key: 'dummyStorage',
           methods: {
@@ -226,8 +236,10 @@ describe('CollectionPersistent Tests', () => {
       it('should call initialLoad in parent and set Collection.isPersisted to true', async () => {
         await collectionPersistent.initialLoading();
 
-        expect(Persistent.prototype.initialLoading).toHaveBeenCalled();
-        expect(dummyCollection.isPersisted).toBeTruthy();
+        await waitForExpect(() => {
+          expect(Persistent.prototype.initialLoading).toHaveBeenCalled();
+          expect(dummyCollection.isPersisted).toBeTruthy();
+        });
       });
     });
 
@@ -266,7 +278,7 @@ describe('CollectionPersistent Tests', () => {
         );
         dummyCollection.assignItem = jest.fn();
 
-        dummyAgile.storages.get = jest.fn();
+        storageManager.get = jest.fn();
       });
 
       it(
@@ -277,7 +289,7 @@ describe('CollectionPersistent Tests', () => {
           dummyCollection.data = {
             ['3']: dummyItem3,
           };
-          dummyAgile.storages.get = jest
+          storageManager.get = jest
             .fn()
             .mockReturnValueOnce(Promise.resolve(true));
           dummyDefaultGroup._value = ['3'];
@@ -285,7 +297,7 @@ describe('CollectionPersistent Tests', () => {
           const response = await collectionPersistent.loadPersistedValue();
 
           expect(response).toBeTruthy();
-          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          expect(storageManager.get).toHaveBeenCalledWith(
             collectionPersistent._key,
             collectionPersistent.config.defaultStorageKey
           );
@@ -338,7 +350,7 @@ describe('CollectionPersistent Tests', () => {
           collectionPersistent.ready = true;
           dummyCollection.data = {};
           dummyCollection.size = 0;
-          dummyAgile.storages.get = jest
+          storageManager.get = jest
             .fn()
             .mockReturnValueOnce(Promise.resolve(true));
           placeholderItem1.persist = jest.fn(function () {
@@ -373,7 +385,7 @@ describe('CollectionPersistent Tests', () => {
           const response = await collectionPersistent.loadPersistedValue();
 
           expect(response).toBeTruthy();
-          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          expect(storageManager.get).toHaveBeenCalledWith(
             collectionPersistent._key,
             collectionPersistent.config.defaultStorageKey
           );
@@ -487,7 +499,7 @@ describe('CollectionPersistent Tests', () => {
             ['3']: dummyItem3,
           };
           dummyCollection.size = 1;
-          dummyAgile.storages.get = jest
+          storageManager.get = jest
             .fn()
             .mockReturnValueOnce(Promise.resolve(true));
           placeholderItem1.persist = jest.fn(function () {
@@ -508,7 +520,7 @@ describe('CollectionPersistent Tests', () => {
           );
 
           expect(response).toBeTruthy();
-          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          expect(storageManager.get).toHaveBeenCalledWith(
             'dummyKey',
             collectionPersistent.config.defaultStorageKey
           );
@@ -583,14 +595,14 @@ describe('CollectionPersistent Tests', () => {
 
       it("shouldn't load default Group and its Items if Collection flag isn't persisted", async () => {
         collectionPersistent.ready = true;
-        dummyAgile.storages.get = jest
+        storageManager.get = jest
           .fn()
           .mockReturnValueOnce(Promise.resolve(undefined));
 
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+        expect(storageManager.get).toHaveBeenCalledWith(
           collectionPersistent._key,
           collectionPersistent.config.defaultStorageKey
         );
@@ -614,7 +626,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.get).not.toHaveBeenCalled();
+        expect(storageManager.get).not.toHaveBeenCalled();
 
         expect(dummyCollection.getDefaultGroup).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
@@ -631,7 +643,7 @@ describe('CollectionPersistent Tests', () => {
 
       it("shouldn't load default Group and its Items if Collection has no defaultGroup", async () => {
         collectionPersistent.ready = true;
-        dummyAgile.storages.get = jest
+        storageManager.get = jest
           .fn()
           .mockReturnValueOnce(Promise.resolve(true));
         dummyCollection.getDefaultGroup = jest.fn(() => undefined);
@@ -639,7 +651,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.loadPersistedValue();
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+        expect(storageManager.get).toHaveBeenCalledWith(
           collectionPersistent._key,
           collectionPersistent.config.defaultStorageKey
         );
@@ -684,7 +696,7 @@ describe('CollectionPersistent Tests', () => {
           () => dummyDefaultGroup as any
         );
 
-        dummyAgile.storages.set = jest.fn();
+        storageManager.set = jest.fn();
       });
 
       it('should persist default Group and its Items (persistentKey)', async () => {
@@ -693,7 +705,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.persistValue();
 
         expect(response).toBeTruthy();
-        expect(dummyAgile.storages.set).toHaveBeenCalledWith(
+        expect(storageManager.set).toHaveBeenCalledWith(
           collectionPersistent._key,
           true,
           collectionPersistent.storageKeys
@@ -745,7 +757,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.persistValue('dummyKey');
 
         expect(response).toBeTruthy();
-        expect(dummyAgile.storages.set).toHaveBeenCalledWith(
+        expect(storageManager.set).toHaveBeenCalledWith(
           'dummyKey',
           true,
           collectionPersistent.storageKeys
@@ -791,7 +803,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.persistValue('dummyKey');
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.set).not.toHaveBeenCalled();
+        expect(storageManager.set).not.toHaveBeenCalled();
 
         expect(dummyCollection.getDefaultGroup).not.toHaveBeenCalled();
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
@@ -810,7 +822,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.persistValue();
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.set).not.toHaveBeenCalled();
+        expect(storageManager.set).not.toHaveBeenCalled();
 
         expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
         expect(dummyDefaultGroup.persist).not.toHaveBeenCalled();
@@ -919,7 +931,7 @@ describe('CollectionPersistent Tests', () => {
         if (dummyItem3.persistent)
           dummyItem3.persistent.removePersistedValue = jest.fn();
 
-        dummyAgile.storages.remove = jest.fn();
+        storageManager.remove = jest.fn();
       });
 
       it('should remove persisted default Group and its Items from Storage (persistentKey)', async () => {
@@ -928,7 +940,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.removePersistedValue();
 
         expect(response).toBeTruthy();
-        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+        expect(storageManager.remove).toHaveBeenCalledWith(
           collectionPersistent._key,
           collectionPersistent.storageKeys
         );
@@ -974,7 +986,7 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(response).toBeTruthy();
-        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+        expect(storageManager.remove).toHaveBeenCalledWith(
           'dummyKey',
           collectionPersistent.storageKeys
         );
@@ -1012,7 +1024,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.removePersistedValue();
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+        expect(storageManager.remove).not.toHaveBeenCalled();
 
         expect(dummyCollection.getDefaultGroup).not.toHaveBeenCalled();
         expect(
@@ -1037,7 +1049,7 @@ describe('CollectionPersistent Tests', () => {
         const response = await collectionPersistent.removePersistedValue();
 
         expect(response).toBeFalsy();
-        expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+        expect(storageManager.remove).not.toHaveBeenCalled();
 
         expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
         expect(

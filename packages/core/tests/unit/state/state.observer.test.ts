@@ -3,10 +3,10 @@ import {
   Computed,
   StateRuntimeJob,
   Observer,
-  State,
   StateObserver,
   StatePersistent,
   SubscriptionContainer,
+  EnhancedState,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
@@ -14,13 +14,15 @@ import waitForExpect from 'wait-for-expect';
 
 describe('StateObserver Tests', () => {
   let dummyAgile: Agile;
-  let dummyState: State;
+  let dummyState: EnhancedState;
 
   beforeEach(() => {
     LogMock.mockLogs();
 
     dummyAgile = new Agile();
-    dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });
+    dummyState = new EnhancedState(dummyAgile, 'dummyValue', {
+      key: 'dummyState',
+    });
 
     jest.clearAllMocks();
   });
