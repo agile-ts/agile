@@ -42,7 +42,6 @@ describe('Persistent Tests', () => {
       key: undefined,
       defaultStorageKey: null,
     });
-    expect(storageManager.persistentInstances.has(persistent)).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
@@ -70,7 +69,6 @@ describe('Persistent Tests', () => {
       key: 'persistentKey',
       defaultStorageKey: 'test1',
     });
-    expect(storageManager.persistentInstances.has(persistent)).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
@@ -90,7 +88,6 @@ describe('Persistent Tests', () => {
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
-    expect(storageManager.persistentInstances.has(persistent)).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
@@ -196,25 +193,67 @@ describe('Persistent Tests', () => {
     });
 
     describe('instantiatePersistent function tests', () => {
-      it('should call assign key to formatKey and call assignStorageKeys, validatePersistent', () => {
+      beforeEach(() => {
         jest.spyOn(persistent, 'formatKey');
         jest.spyOn(persistent, 'assignStorageKeys');
-        jest.spyOn(persistent, 'validatePersistent');
-
-        persistent.instantiatePersistent({
-          key: 'persistentKey',
-          storageKeys: ['myName', 'is', 'jeff'],
-          defaultStorageKey: 'jeff',
-        });
-
-        expect(persistent._key).toBe('persistentKey');
-        expect(persistent.formatKey).toHaveBeenCalledWith('persistentKey');
-        expect(persistent.assignStorageKeys).toHaveBeenCalledWith(
-          ['myName', 'is', 'jeff'],
-          'jeff'
-        );
-        expect(persistent.validatePersistent).toHaveBeenCalled();
       });
+
+      it(
+        'should call formatKey, assignStorageKeys, validatePersistent ' +
+          'and add Persistent to the Storage Manager when Persistent is valid',
+        () => {
+          jest
+            .spyOn(persistent, 'validatePersistent')
+            .mockReturnValueOnce(true);
+
+          persistent.instantiatePersistent({
+            key: 'persistentKey',
+            storageKeys: ['myName', 'is', 'jeff'],
+            defaultStorageKey: 'jeff',
+          });
+
+          expect(persistent._key).toBe('persistentKey');
+          expect(persistent.formatKey).toHaveBeenCalledWith('persistentKey');
+          expect(persistent.assignStorageKeys).toHaveBeenCalledWith(
+            ['myName', 'is', 'jeff'],
+            'jeff'
+          );
+          expect(persistent.validatePersistent).toHaveBeenCalled();
+          expect(storageManager.persistentInstances).toHaveProperty(
+            'persistentKey'
+          );
+          expect(storageManager.persistentInstances['persistentKey']).toBe(
+            persistent
+          );
+        }
+      );
+
+      it(
+        'should call formatKey, assignStorageKeys, validatePersistent ' +
+          "and shouldn't add Persistent to the Storage Manager when Persistent isn't valid",
+        () => {
+          jest
+            .spyOn(persistent, 'validatePersistent')
+            .mockReturnValueOnce(false);
+
+          persistent.instantiatePersistent({
+            key: 'persistentKey',
+            storageKeys: ['myName', 'is', 'jeff'],
+            defaultStorageKey: 'jeff',
+          });
+
+          expect(persistent._key).toBe('persistentKey');
+          expect(persistent.formatKey).toHaveBeenCalledWith('persistentKey');
+          expect(persistent.assignStorageKeys).toHaveBeenCalledWith(
+            ['myName', 'is', 'jeff'],
+            'jeff'
+          );
+          expect(persistent.validatePersistent).toHaveBeenCalled();
+          expect(storageManager.persistentInstances).not.toHaveProperty(
+            'persistentKey'
+          );
+        }
+      );
     });
 
     describe('validatePersistent function tests', () => {
