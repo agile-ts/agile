@@ -42,7 +42,7 @@ export function createStorage(config: CreateStorageConfigInterface): Storage {
  *
  * A Storage Manager manages all external Storages for AgileTs
  * and provides an interface to easily store,
- * load and remove values from multiple Storages at once.
+ * load and remove values from multiple external Storages at once.
  *
  * @param config - Configuration object
  */

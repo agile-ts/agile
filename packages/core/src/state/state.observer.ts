@@ -107,7 +107,7 @@ export class StateObserver<ValueType = any> extends Observer {
     }
 
     // Assign next State value to Observer and compute it if necessary (enhanced State)
-    this.nextStateValue = (state as EnhancedState).computeValueMethod
+    this.nextStateValue = (state as any).computeValueMethod
       ? copy((state as any).computeValueMethod(newStateValue))
       : copy(newStateValue);
 

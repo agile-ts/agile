@@ -43,6 +43,7 @@ export function createLightState<ValueType = any>(
   );
 }
 
+// TODO 'createState' doesn't get entirely treeshaken away
 /**
  * Returns a newly created enhanced State.
  *

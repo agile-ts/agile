@@ -97,7 +97,7 @@ export class Storages {
     this.storages[storage.key] = storage;
     if (config.default) this.config.defaultStorageKey = storage.key;
 
-    for (const persistentKey in this.persistentInstances) {
+    for (const persistentKey in Object.keys(this.persistentInstances)) {
       const persistent = this.persistentInstances[persistentKey];
 
       // Revalidate Persistent, which contains key/name identifier of the newly registered Storage

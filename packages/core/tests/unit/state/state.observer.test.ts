@@ -4,9 +4,9 @@ import {
   StateRuntimeJob,
   Observer,
   StateObserver,
-  StatePersistent,
-  SubscriptionContainer,
   EnhancedState,
+  SubscriptionContainer,
+  State,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
@@ -14,13 +14,13 @@ import waitForExpect from 'wait-for-expect';
 
 describe('StateObserver Tests', () => {
   let dummyAgile: Agile;
-  let dummyState: EnhancedState;
+  let dummyState: State;
 
   beforeEach(() => {
     LogMock.mockLogs();
 
     dummyAgile = new Agile();
-    dummyState = new EnhancedState(dummyAgile, 'dummyValue', {
+    dummyState = new State(dummyAgile, 'dummyValue', {
       key: 'dummyState',
     });
 
@@ -319,7 +319,8 @@ describe('StateObserver Tests', () => {
         'should ingest the State into the Runtime and compute its new value ' +
           'if the State has a set compute function (default config)',
         () => {
-          dummyState.computeValueMethod = (value) => `cool value '${value}'`;
+          (dummyState as EnhancedState).computeValueMethod = (value) =>
+            `cool value '${value}'`;
 
           stateObserver.ingestValue('updatedDummyValue');
 
@@ -343,8 +344,6 @@ describe('StateObserver Tests', () => {
         dummyJob = new StateRuntimeJob(stateObserver, {
           key: 'dummyJob',
         });
-        dummyState.persistent = new StatePersistent(dummyState);
-        dummyState.isPersisted = true;
 
         stateObserver.sideEffects = jest.fn();
       });
