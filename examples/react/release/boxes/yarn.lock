@@ -2,10 +2,8 @@
 # yarn lockfile v1
 
 
-"@agile-ts/core@^0.1.2":
+"@agile-ts/core@file:.yalc/@agile-ts/core":
   version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@agile-ts/core/-/core-0.1.2.tgz#5a3974ba0c57a51a19bcdf81b2055e091c884f5e"
-  integrity sha512-9031MGUrPpg/ZL1ErpwUlHX751HKEtOfbc5Ae7W7x/POGH89Gka09hMAhqQlDrKF2+olVs3sf6PAsAHRv6paGw==
   dependencies:
     "@agile-ts/utils" "^0.0.7"
 

@@ -1,13 +1,27 @@
-import { Agile, Persistent, Storage, createStorage } from '../../../src';
+import {
+  Agile,
+  Persistent,
+  Storage,
+  createStorage,
+  Storages,
+  registerSharedStorageManager,
+  createStorageManager,
+  getStorageManager,
+} from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
 describe('Persistent Tests', () => {
   let dummyAgile: Agile;
+  let storageManager: Storages;
 
   beforeEach(() => {
     LogMock.mockLogs();
 
     dummyAgile = new Agile();
+
+    // Register Storage Manager
+    registerSharedStorageManager(createStorageManager());
+    storageManager = getStorageManager() as any;
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
 
@@ -28,9 +42,7 @@ describe('Persistent Tests', () => {
       key: undefined,
       defaultStorageKey: null,
     });
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
+    expect(storageManager.persistentInstances.has(persistent)).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
@@ -58,9 +70,7 @@ describe('Persistent Tests', () => {
       key: 'persistentKey',
       defaultStorageKey: 'test1',
     });
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
+    expect(storageManager.persistentInstances.has(persistent)).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
@@ -80,9 +90,7 @@ describe('Persistent Tests', () => {
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.instantiatePersistent).not.toHaveBeenCalled();
-    expect(
-      dummyAgile.storages.persistentInstances.has(persistent)
-    ).toBeTruthy();
+    expect(storageManager.persistentInstances.has(persistent)).toBeTruthy();
 
     expect(persistent._key).toBe(Persistent.placeHolderKey);
     expect(persistent.ready).toBeFalsy();
@@ -262,7 +270,7 @@ describe('Persistent Tests', () => {
       });
 
       it('should return true if set key and set StorageKeys', () => {
-        dummyAgile.storages.register(
+        storageManager.register(
           createStorage({
             key: 'test',
             methods: {
@@ -337,7 +345,7 @@ describe('Persistent Tests', () => {
         'should try to get default StorageKey from Agile if no StorageKey was specified ' +
           'and assign it as StorageKey, if it is a valid StorageKey',
         () => {
-          dummyAgile.storages.register(
+          storageManager.register(
             new Storage({
               key: 'storage1',
               methods: {

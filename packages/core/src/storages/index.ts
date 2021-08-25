@@ -8,6 +8,7 @@ import {
   defineConfig,
   removeProperties,
   LogCodeManager,
+  runsOnServer,
 } from '../internal';
 
 export * from './storages';
@@ -61,6 +62,14 @@ export function createStorageManager(
  * Returns the current registered Storage Manager.
  */
 export function getStorageManager(): Storages | null {
+  if (storageManager == null) {
+    const newStorageManager = createStorageManager({
+      localStorage: !runsOnServer(),
+    });
+    registerSharedStorageManager(newStorageManager);
+    return newStorageManager;
+  }
+
   return storageManager;
 }
 

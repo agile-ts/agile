@@ -18,7 +18,7 @@ assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 export const App = new Agile();
 assignSharedAgileInstance(App);
 
-const storageManager = createStorageManager({ localStorage: true });
+export const storageManager = createStorageManager({ localStorage: true });
 registerSharedStorageManager(storageManager);
 
 // Register custom second Storage
