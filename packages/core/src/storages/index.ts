@@ -40,7 +40,7 @@ export function createStorage(config: CreateStorageConfigInterface): Storage {
 /**
  * Returns a newly created Storage Manager.
  *
- * A Storage Manager manages all external Storages for an AgileTs
+ * A Storage Manager manages all external Storages for AgileTs
  * and provides an interface to easily store,
  * load and remove values from multiple Storages at once.
  *
@@ -59,9 +59,10 @@ export function createStorageManager(
 }
 
 /**
- * Returns the current registered Storage Manager.
+ * Returns the shared Storage Manager
+ * or creates a new one when no shared Storage Manager exists.
  */
-export function getStorageManager(): Storages | null {
+export function getStorageManager(): Storages {
   if (storageManager == null) {
     const newStorageManager = createStorageManager({
       localStorage: !runsOnServer(),
@@ -69,7 +70,6 @@ export function getStorageManager(): Storages | null {
     registerSharedStorageManager(newStorageManager);
     return newStorageManager;
   }
-
   return storageManager;
 }
 

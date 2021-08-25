@@ -46,7 +46,7 @@ export function createLightState<ValueType = any>(
 /**
  * Returns a newly created enhanced State.
  *
- * A enhanced State manages, like a normal State, a piece of Information
+ * An enhanced State manages, like a normal State, a piece of Information
  * that we need to remember globally at a later point in time.
  * While providing a toolkit to use and mutate this piece of Information.
  *
