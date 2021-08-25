@@ -1,4 +1,10 @@
-import { Storages, Agile, Storage, Persistent } from '../../../src';
+import {
+  Storages,
+  Agile,
+  Storage,
+  Persistent,
+  registerSharedStorageManager,
+} from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
 describe('Storages Tests', () => {
@@ -19,7 +25,7 @@ describe('Storages Tests', () => {
 
     expect(storages.config).toStrictEqual({ defaultStorageKey: null });
     expect(storages.storages).toStrictEqual({});
-    expect(storages.persistentInstances.size).toBe(0);
+    expect(storages.persistentInstances).toStrictEqual({});
     expect(storages.instantiateLocalStorage).not.toHaveBeenCalled();
   });
 
@@ -31,7 +37,7 @@ describe('Storages Tests', () => {
 
     expect(storages.config).toStrictEqual({ defaultStorageKey: 'jeff' });
     expect(storages.storages).toStrictEqual({});
-    expect(storages.persistentInstances.size).toBe(0);
+    expect(storages.persistentInstances).toStrictEqual({});
     expect(storages.instantiateLocalStorage).toHaveBeenCalled();
   });
 
@@ -44,7 +50,8 @@ describe('Storages Tests', () => {
 
     beforeEach(() => {
       storages = new Storages(dummyAgile);
-      dummyAgile.storages = storages;
+      registerSharedStorageManager(storages);
+
       dummyStorageMethods = {
         get: jest.fn(),
         set: jest.fn(),

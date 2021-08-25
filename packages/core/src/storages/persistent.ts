@@ -126,11 +126,11 @@ export class Persistent {
   ) {
     this._key = this.formatKey(config.key) ?? Persistent.placeHolderKey;
     this.assignStorageKeys(config.storageKeys, config.defaultStorageKey);
-    const isValid = this.validatePersistent();
+    this.validatePersistent();
 
     // Register Persistent to Storage Manager
     const storageManager = getStorageManager();
-    if (isValid && storageManager != null) {
+    if (this._key !== Persistent.placeHolderKey && storageManager != null) {
       storageManager.persistentInstances[this._key] = this;
     }
   }

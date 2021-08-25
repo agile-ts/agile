@@ -196,16 +196,13 @@ describe('Persistent Tests', () => {
       beforeEach(() => {
         jest.spyOn(persistent, 'formatKey');
         jest.spyOn(persistent, 'assignStorageKeys');
+        jest.spyOn(persistent, 'validatePersistent');
       });
 
       it(
         'should call formatKey, assignStorageKeys, validatePersistent ' +
-          'and add Persistent to the Storage Manager when Persistent is valid',
+          'and add Persistent to the Storage Manager when Persistent has a valid key',
         () => {
-          jest
-            .spyOn(persistent, 'validatePersistent')
-            .mockReturnValueOnce(true);
-
           persistent.instantiatePersistent({
             key: 'persistentKey',
             storageKeys: ['myName', 'is', 'jeff'],
@@ -230,20 +227,15 @@ describe('Persistent Tests', () => {
 
       it(
         'should call formatKey, assignStorageKeys, validatePersistent ' +
-          "and shouldn't add Persistent to the Storage Manager when Persistent isn't valid",
+          "and shouldn't add Persistent to the Storage Manager when Persistent has no valid key",
         () => {
-          jest
-            .spyOn(persistent, 'validatePersistent')
-            .mockReturnValueOnce(false);
-
           persistent.instantiatePersistent({
-            key: 'persistentKey',
             storageKeys: ['myName', 'is', 'jeff'],
             defaultStorageKey: 'jeff',
           });
 
-          expect(persistent._key).toBe('persistentKey');
-          expect(persistent.formatKey).toHaveBeenCalledWith('persistentKey');
+          expect(persistent._key).toBe(Persistent.placeHolderKey);
+          expect(persistent.formatKey).toHaveBeenCalledWith(undefined);
           expect(persistent.assignStorageKeys).toHaveBeenCalledWith(
             ['myName', 'is', 'jeff'],
             'jeff'
