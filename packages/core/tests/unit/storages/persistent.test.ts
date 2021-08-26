@@ -4,7 +4,7 @@ import {
   Storage,
   createStorage,
   Storages,
-  registerSharedStorageManager,
+  assignSharedAgileStorageManager,
   createStorageManager,
   getStorageManager,
 } from '../../../src';
@@ -20,7 +20,7 @@ describe('Persistent Tests', () => {
     dummyAgile = new Agile();
 
     // Register Storage Manager
-    registerSharedStorageManager(createStorageManager());
+    assignSharedAgileStorageManager(createStorageManager());
     storageManager = getStorageManager() as any;
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
@@ -201,7 +201,7 @@ describe('Persistent Tests', () => {
 
       it(
         'should call formatKey, assignStorageKeys, validatePersistent ' +
-          'and add Persistent to the Storage Manager when Persistent has a valid key',
+          'and add Persistent to the shared Storage Manager if Persistent has a valid key',
         () => {
           persistent.instantiatePersistent({
             key: 'persistentKey',
@@ -227,7 +227,7 @@ describe('Persistent Tests', () => {
 
       it(
         'should call formatKey, assignStorageKeys, validatePersistent ' +
-          "and shouldn't add Persistent to the Storage Manager when Persistent has no valid key",
+          "and shouldn't add Persistent to the shared Storage Manager if Persistent has no valid key",
         () => {
           persistent.instantiatePersistent({
             storageKeys: ['myName', 'is', 'jeff'],

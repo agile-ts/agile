@@ -7,7 +7,7 @@ import {
   StatePersistent,
   Group,
   Item,
-  registerSharedStorageManager,
+  assignSharedAgileStorageManager,
   createStorageManager,
   getStorageManager,
   Storages,
@@ -34,7 +34,7 @@ describe('CollectionPersistent Tests', () => {
     });
 
     // Register Storage Manager
-    registerSharedStorageManager(createStorageManager());
+    assignSharedAgileStorageManager(createStorageManager());
     storageManager = getStorageManager() as any;
 
     jest.spyOn(CollectionPersistent.prototype, 'instantiatePersistent');

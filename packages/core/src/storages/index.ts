@@ -67,19 +67,19 @@ export function getStorageManager(): Storages {
     const newStorageManager = createStorageManager({
       localStorage: !runsOnServer(),
     });
-    registerSharedStorageManager(newStorageManager);
+    assignSharedAgileStorageManager(newStorageManager);
     return newStorageManager;
   }
   return storageManager;
 }
 
 /**
- * Registers the specified Storage Manager
- * as default Storage Manager for all Agile Instances.
+ * Assigns the specified Storage Manager
+ * as default (shared) Storage Manager for all Agile Instances.
  *
  *  @param instance - Storage Manager to be registered as the default Storage Manager.
  */
-export const registerSharedStorageManager = (instance: Storages) => {
+export const assignSharedAgileStorageManager = (instance: Storages) => {
   if (storageManager != null) {
     LogCodeManager.log('11:02:06', [], storageManager);
   }

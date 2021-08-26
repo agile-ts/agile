@@ -3,7 +3,7 @@ import {
   Agile,
   Storage,
   Persistent,
-  registerSharedStorageManager,
+  assignSharedAgileStorageManager,
 } from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
@@ -50,7 +50,7 @@ describe('Storages Tests', () => {
 
     beforeEach(() => {
       storages = new Storages(dummyAgile);
-      registerSharedStorageManager(storages);
+      assignSharedAgileStorageManager(storages);
 
       dummyStorageMethods = {
         get: jest.fn(),
