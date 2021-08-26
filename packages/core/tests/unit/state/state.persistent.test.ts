@@ -4,7 +4,6 @@ import {
   Storage,
   Persistent,
   EnhancedState,
-  getStorageManager,
   Storages,
   assignSharedAgileStorageManager,
   createStorageManager,
@@ -24,8 +23,8 @@ describe('StatePersistent Tests', () => {
     dummyState = new EnhancedState(dummyAgile, 'dummyValue');
 
     // Register Storage Manager
-    assignSharedAgileStorageManager(createStorageManager());
-    storageManager = getStorageManager() as any;
+    storageManager = createStorageManager();
+    assignSharedAgileStorageManager(storageManager);
 
     jest.spyOn(StatePersistent.prototype, 'instantiatePersistent');
     jest.spyOn(StatePersistent.prototype, 'initialLoading');

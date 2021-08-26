@@ -6,7 +6,6 @@ import {
   Storages,
   assignSharedAgileStorageManager,
   createStorageManager,
-  getStorageManager,
 } from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
@@ -20,8 +19,8 @@ describe('Persistent Tests', () => {
     dummyAgile = new Agile();
 
     // Register Storage Manager
-    assignSharedAgileStorageManager(createStorageManager());
-    storageManager = getStorageManager() as any;
+    storageManager = createStorageManager();
+    assignSharedAgileStorageManager(storageManager);
 
     jest.spyOn(Persistent.prototype, 'instantiatePersistent');
 

@@ -3,7 +3,6 @@ import {
   Runtime,
   SubController,
   Integrations,
-  Storage,
   Storages,
 } from '../../src';
 import testIntegration from '../helper/test.integration';

@@ -190,7 +190,7 @@ describe('Storages Tests', () => {
         expect(response).toBeTruthy();
       });
 
-      it('should revalidate and initial load Persistents that have no defined defaultStorage', () => {
+      it('should revalidate and initial load persistent Instances that have no defined defaultStorage', () => {
         const dummyPersistent1 = new Persistent(dummyAgile, {
           key: 'dummyPersistent1',
         });
