@@ -1,11 +1,8 @@
 const path = require('path');
-const packageJson = require('./package.json');
-const dependencies = packageJson.dependencies || {};
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: './src/index.js',
-  externals: Object.keys(dependencies),
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'app.js',
@@ -26,7 +23,9 @@ module.exports = {
     ],
   },
   optimization: {
-    providedExports: true,
     usedExports: true,
+    innerGraph: true,
+    sideEffects: true,
   },
+  devtool: false,
 };
