@@ -3,26 +3,14 @@ import {
   Collection,
   Computed,
   shared,
-  State,
-  Storage,
-  createStorage,
-  createState,
   createCollection,
   createComputed,
   assignSharedAgileInstance,
 } from '../../src';
 import { LogMock } from '../helper/logMock';
 
-jest.mock('../../src/storages/storage');
 jest.mock('../../src/collection/collection');
 jest.mock('../../src/computed/computed');
-
-// https://github.com/facebook/jest/issues/5023
-jest.mock('../../src/state/state', () => {
-  return {
-    State: jest.fn(),
-  };
-});
 
 describe('Shared Tests', () => {
   let sharedAgileInstance: Agile;
@@ -43,66 +31,6 @@ describe('Shared Tests', () => {
       assignSharedAgileInstance(newAgileInstance);
 
       expect(shared).toBe(newAgileInstance);
-    });
-  });
-
-  describe('createStorage function tests', () => {
-    const StorageMock = Storage as jest.MockedClass<typeof Storage>;
-
-    beforeEach(() => {
-      StorageMock.mockClear();
-    });
-
-    it('should create Storage', () => {
-      const storageConfig = {
-        prefix: 'test',
-        methods: {
-          get: () => {
-            /* empty function */
-          },
-          set: () => {
-            /* empty function */
-          },
-          remove: () => {
-            /* empty function */
-          },
-        },
-        key: 'myTestStorage',
-      };
-
-      const storage = createStorage(storageConfig);
-
-      expect(storage).toBeInstanceOf(Storage);
-      expect(StorageMock).toHaveBeenCalledWith(storageConfig);
-    });
-  });
-
-  describe('createState function tests', () => {
-    const StateMock = State as jest.MockedClass<typeof State>;
-
-    it('should create State with the shared Agile Instance', () => {
-      const state = createState('testValue', {
-        key: 'myCoolState',
-      });
-
-      expect(state).toBeInstanceOf(State);
-      expect(StateMock).toHaveBeenCalledWith(sharedAgileInstance, 'testValue', {
-        key: 'myCoolState',
-      });
-    });
-
-    it('should create State with a specified Agile Instance', () => {
-      const agile = new Agile();
-
-      const state = createState('testValue', {
-        key: 'myCoolState',
-        agileInstance: agile,
-      });
-
-      expect(state).toBeInstanceOf(State);
-      expect(StateMock).toHaveBeenCalledWith(agile, 'testValue', {
-        key: 'myCoolState',
-      });
     });
   });
 

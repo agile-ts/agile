@@ -79,7 +79,7 @@ export function getStorageManager(): Storages {
  *
  *  @param instance - Storage Manager to be registered as the default Storage Manager.
  */
-export const assignSharedAgileStorageManager = (instance: Storages) => {
+export const assignSharedAgileStorageManager = (instance: Storages | null) => {
   if (storageManager != null) {
     LogCodeManager.log('11:02:06', [], storageManager);
   }

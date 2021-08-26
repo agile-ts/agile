@@ -24,11 +24,6 @@ jest.mock('../../src/runtime/subscription/sub.controller', () => {
     SubController: jest.fn(),
   };
 });
-jest.mock('../../src/storages', () => {
-  return {
-    Storages: jest.fn(),
-  };
-});
 
 // https://gist.github.com/virgs/d9c50e878fc69832c01f8085f2953f12
 // https://medium.com/@masonlgoetz/mock-static-class-methods-in-jest-1ceda967b47f
