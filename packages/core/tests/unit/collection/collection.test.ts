@@ -1286,6 +1286,24 @@ describe('Collection Tests', () => {
       });
     });
 
+    describe('select function tests', () => {
+      beforeEach(() => {
+        collection.createSelector = jest.fn();
+      });
+      it(
+        'should call createSelector with the specified itemKey ' +
+          'as key of the Selector and as selected item key',
+        () => {
+          collection.select('test');
+
+          expect(collection.createSelector).toHaveBeenCalledWith(
+            'test',
+            'test'
+          );
+        }
+      );
+    });
+
     describe('hasSelector function tests', () => {
       let dummySelector: Selector<ItemInterface>;
 
