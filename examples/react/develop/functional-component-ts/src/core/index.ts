@@ -6,7 +6,7 @@ import Agile, {
   createStorage,
   createStorageManager,
   Item,
-  registerSharedStorageManager,
+  assignSharedAgileStorageManager,
 } from '@agile-ts/core';
 import Event from '@agile-ts/event';
 import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
@@ -19,7 +19,7 @@ export const App = new Agile();
 assignSharedAgileInstance(App);
 
 export const storageManager = createStorageManager({ localStorage: true });
-registerSharedStorageManager(storageManager);
+assignSharedAgileStorageManager(storageManager);
 
 // Register custom second Storage
 storageManager.register(
