@@ -5,11 +5,8 @@ import {
   State,
   defineConfig,
 } from '@agile-ts/core';
-import {
-  AgileHookConfigInterface,
-  SubscribableAgileInstancesType,
-  useAgile,
-} from './useAgile';
+import { AgileHookConfigInterface, useAgile } from './useAgile';
+import { SubscribableAgileInstancesType } from './useBaseAgile';
 
 export function useValue<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],

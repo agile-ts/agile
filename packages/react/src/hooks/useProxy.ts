@@ -1,11 +1,28 @@
 import {
-  AgileHookConfigInterface,
+  defineConfig,
+  extractRelevantObservers,
+  Observer,
+  ProxyWeakMapType,
+} from '@agile-ts/core';
+import { generateId, isValidObject, normalizeArray } from '@agile-ts/utils';
+import {
+  getReturnValue,
   SubscribableAgileInstancesType,
-  useAgile,
+  useBaseAgile,
+} from './useBaseAgile';
+import {
+  AgileHookConfigInterface,
   AgileOutputHookArrayType,
   AgileOutputHookType,
 } from './useAgile';
-import { defineConfig } from '@agile-ts/core';
+
+// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
+let proxyPackage: any = null;
+try {
+  proxyPackage = require('@agile-ts/proxytree');
+} catch (e) {
+  // empty catch block
+}
 
 export function useProxy<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
@@ -24,10 +41,75 @@ export function useProxy<
   deps: X | Y,
   config: AgileHookConfigInterface = {}
 ): AgileOutputHookArrayType<X> | AgileOutputHookType<Y> {
-  return useAgile(
-    deps as any,
-    defineConfig(config, {
-      proxyBased: true,
-    })
+  config = defineConfig(config, {
+    key: generateId(),
+    agileInstance: null as any,
+    componentId: undefined,
+    deps: [],
+  });
+  const depsArray = extractRelevantObservers(normalizeArray(deps));
+  const proxyTreeWeakMap = new WeakMap();
+
+  const handleReturn = (dep: Observer | undefined) => {
+    if (dep == null) return undefined as any;
+    const value = dep.value;
+
+    // If proxyBased and the value is of the type object.
+    // Wrap a Proxy around the object to track the accessed properties.
+    if (isValidObject(value, true)) {
+      if (proxyPackage != null) {
+        const { ProxyTree } = proxyPackage;
+        const proxyTree = new ProxyTree(value);
+        proxyTreeWeakMap.set(dep, proxyTree);
+        return proxyTree.proxy;
+      } else {
+        console.error(
+          'In order to use the Agile proxy functionality, ' +
+            `the installation of an additional package called '@agile-ts/proxytree' is required!`
+        );
+      }
+    }
+
+    return value;
+  };
+
+  useBaseAgile(
+    depsArray,
+    (observers) => {
+      // TODO Proxy doesn't work as expected when 'selecting' a not yet existing property.
+      //  For example you select the 'user.data.name' property, but the 'user' object is undefined.
+      //  -> No correct Proxy Path could be created on the Component mount, since the to select property doesn't exist
+      //  -> Selector was created based on the not complete Proxy Path
+      //  -> Component re-renders to often
+      //
+      // Build Proxy Path WeakMap based on the Proxy Tree WeakMap
+      // by extracting the routes from the Proxy Tree.
+      // Building the Path WeakMap in the 'useIsomorphicLayoutEffect'
+      // because the 'useIsomorphicLayoutEffect' is called after the rerender.
+      // -> All used paths in the UI-Component were successfully tracked.
+      let proxyWeakMap: ProxyWeakMapType | undefined = undefined;
+      if (proxyPackage != null) {
+        proxyWeakMap = new WeakMap();
+        for (const observer of observers) {
+          const proxyTree = proxyTreeWeakMap.get(observer);
+          if (proxyTree != null) {
+            proxyWeakMap.set(observer, {
+              paths: proxyTree.getUsedRoutes() as any,
+            });
+          }
+        }
+      }
+
+      return {
+        key: config.key,
+        waitForMount: false,
+        componentId: config.componentId,
+        proxyWeakMap,
+      };
+    },
+    config.deps || [],
+    config.agileInstance
   );
+
+  return getReturnValue(depsArray, handleReturn, Array.isArray(deps));
 }
