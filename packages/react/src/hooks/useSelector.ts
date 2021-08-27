@@ -24,6 +24,21 @@ export function useSelector<
   config?: BaseAgileHookConfigInterface
 ): ReturnType;
 
+/**
+ * A React Hook for binding a selected value of an Agile Instance
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the selected value of an Agile Instance mutates.
+ *
+ * @public
+ * @param dep - Agile Sub Instance to be bound to the Functional Component.
+ * @param selector - Equality comparison function
+ * that allows you to customize the way the selected Agile Instance
+ * is compared to determine whether the Component needs to be re-rendered.
+ * @param config - Configuration object
+ */
 export function useSelector<ValueType = any, ReturnType = any>(
   dep: SubscribableAgileInstancesType,
   selector: SelectorMethodType<ValueType>,

@@ -9,7 +9,7 @@ describe('EventObserver Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyEvent = new Event(dummyAgile);
 
     jest.clearAllMocks();

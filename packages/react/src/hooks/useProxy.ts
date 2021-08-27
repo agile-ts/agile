@@ -24,11 +24,48 @@ try {
   // empty catch block
 }
 
+/**
+ * A React Hook for binding the most relevant value of multiple Agile Instances
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant Observer of an Agile Instance mutates.
+ *
+ * In addition the the default 'useAgile' Hook,
+ * the useProxy Hooks wraps a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+ * around the to bind Agile Instance value objects,
+ * to automatically constraint the way the selected Agile Instances
+ * are compared to determine whether the React Component needs to be re-rendered
+ * based on the object's used properties.
+ *
+ * @public
+ * @param deps - Agile Sub Instances to be bound to the Functional Component.
+ * @param config - Configuration object
+ */
 export function useProxy<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
   config?: AgileHookConfigInterface
 ): AgileOutputHookArrayType<X>;
-
+/**
+ * A React Hook for binding the most relevant Agile Instance value
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the most relevant Observer of the Agile Instance mutates.
+ *
+ * In addition the the default 'useAgile' Hook,
+ * the useProxy Hooks wraps a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+ * around the to bind Agile Instance value objects,
+ * to automatically constraint the way the selected Agile Instances
+ * are compared to determine whether the React Component needs to be re-rendered
+ * based on the object's used properties.
+ *
+ * @public
+ * @param dep - Agile Sub Instance to be bound to the Functional Component.
+ * @param config - Configuration object
+ */
 export function useProxy<X extends SubscribableAgileInstancesType>(
   dep: X,
   config?: AgileHookConfigInterface
@@ -63,6 +100,7 @@ export function useProxy<
         proxyTreeWeakMap.set(dep, proxyTree);
         return proxyTree.proxy;
       } else {
+        // TODO add LogCode Manager logcode
         console.error(
           'In order to use the Agile proxy functionality, ' +
             `the installation of an additional package called '@agile-ts/proxytree' is required!`

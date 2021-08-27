@@ -11,6 +11,19 @@ import Agile, {
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
+/**
+ * An internal used React Hook
+ * to create a Callback based Subscription Container
+ * based on the specified depsArray
+ * and thus bind these dependencies to a Functional React Component.
+ *
+ * @internal
+ * @param depsArray - Observers to be bound to the Functional Component.
+ * @param getSubContainerConfig - Method to get the Subscription Container configuration object.
+ * @param deps - Dependencies that determine, in addition to unmounting and remounting the React-Component,
+ * when the specified Agile Sub Instances should be re-subscribed to the React-Component.
+ * @param agileInstance - Agile Instance the to create Subscription Container belongs to.
+ */
 export const useBaseAgile = (
   depsArray: (Observer | undefined)[],
   getSubContainerConfig: (
@@ -30,11 +43,18 @@ export const useBaseAgile = (
 
     const subContainerConfig = getSubContainerConfig(observers);
 
-    const _agileInstance = extractAgileInstance(observers, agileInstance);
-    if (_agileInstance == null) return;
+    // Try to extract Agile Instance from the specified Instance/s
+    if (agileInstance == null) agileInstance = getAgileInstance(observers[0]);
+    if (agileInstance == null || agileInstance.subController == null) {
+      LogCodeManager.getLogger()?.error(
+        'Failed to subscribe Component with deps because of missing valid Agile Instance.',
+        deps
+      );
+      return;
+    }
 
     // Create Callback based Subscription
-    const subscriptionContainer = _agileInstance.subController.subscribe(
+    const subscriptionContainer = agileInstance.subController.subscribe(
       () => {
         forceRender();
       },
@@ -44,31 +64,20 @@ export const useBaseAgile = (
 
     // Unsubscribe Callback based Subscription on unmount
     return () => {
-      _agileInstance.subController.unsubscribe(subscriptionContainer);
+      agileInstance?.subController.unsubscribe(subscriptionContainer);
     };
   }, deps);
 };
 
-export const extractAgileInstance = (
-  observers: Observer[],
-  agileInstance?: Agile
-): Agile | undefined => {
-  if (agileInstance != null) return agileInstance;
-
-  // Try to extract Agile Instance from the specified Observers
-  agileInstance = getAgileInstance(observers[0]);
-  if (!agileInstance || !agileInstance.subController) {
-    LogCodeManager.getLogger()?.error(
-      'Failed to subscribe to React Component because of missing valid Agile Instance.',
-      observers
-    );
-    return undefined;
-  }
-  return agileInstance;
-};
-
-// Builds return value,
-// depending on whether the deps were provided in array shape or not
+/**
+ * Builds return value for Agile Instance 'binding' Hooks,
+ * depending on whether the dependencies were provided in array shape or not.
+ *
+ * @internal
+ * @param depsArray - Dependencies to extract the return value from.
+ * @param handleReturn - Method to handle the return value.
+ * @param wasProvidedAsArray - Whether the specified depsArray was provided as array in the Hook.
+ */
 export const getReturnValue = (
   depsArray: (Observer | undefined)[],
   handleReturn: (dep: Observer | undefined) => any,

@@ -59,14 +59,15 @@ export function useAgile<
     componentId: undefined,
     observerType: undefined,
     deps: [],
-    handleReturn: (dep: Observer | undefined) => {
-      return dep != null ? dep.value : undefined;
-    },
   });
   const depsArray = extractRelevantObservers(
     normalizeArray(deps),
     config.observerType
   );
+
+  const handleReturn = (dep: Observer | undefined) => {
+    return dep != null ? dep.value : undefined;
+  };
 
   useBaseAgile(
     depsArray,
@@ -79,38 +80,10 @@ export function useAgile<
     config.agileInstance
   );
 
-  return getReturnValue(
-    depsArray,
-    config.handleReturn as any,
-    Array.isArray(deps)
-  );
+  return getReturnValue(depsArray, handleReturn, Array.isArray(deps));
 }
 
 export interface AgileHookConfigInterface extends BaseAgileHookConfigInterface {
-  /**
-   * Whether to wrap a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
-   * around the bound Agile Instance value object,
-   * to automatically constrain the way the selected Agile Instance
-   * is compared to determine whether the Component needs to be re-rendered
-   * based on the object's used properties.
-   *
-   * Requires an additional package called `@agile-ts/proxytree`!
-   *
-   * @default false
-   */
-  // proxyBased?: boolean;
-  /**
-   * Equality comparison function
-   * that allows you to customize the way the selected Agile Instance
-   * is compared to determine whether the Component needs to be re-rendered.
-   *
-   *  * Note that setting this property can destroy the useAgile type.
-   * -> should only be used internal!
-   *
-   * @default undefined
-   */
-  // selector?: SelectorMethodType;
-
   /**
    * What type of Observer to be bound to the UI-Component.
    *
@@ -120,10 +93,6 @@ export interface AgileHookConfigInterface extends BaseAgileHookConfigInterface {
    * @default undefined
    */
   observerType?: string;
-  /**
-   * TODO
-   */
-  handleReturn?: (dep: Observer | undefined) => any;
 }
 
 // Array Type
