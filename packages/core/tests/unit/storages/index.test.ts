@@ -18,6 +18,7 @@ describe('Storages Index', () => {
     sharedAgileInstance = new Agile();
     assignSharedAgileInstance(sharedAgileInstance);
 
+    // Reset Storage Manager
     StorageIndex.assignSharedAgileStorageManager(null);
 
     jest.clearAllMocks();

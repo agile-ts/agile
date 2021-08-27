@@ -39,6 +39,10 @@ describe('State Index', () => {
       typeof EnhancedState
     >;
 
+    beforeEach(() => {
+      EnhancedStateMock.mockClear();
+    });
+
     it('should create enhanced State with the shared Agile Instance', () => {
       const state = createState('testValue', {
         key: 'myCoolState',
@@ -71,6 +75,10 @@ describe('State Index', () => {
 
   describe('createLightState function tests', () => {
     const StateMock = State as jest.MockedClass<typeof State>;
+
+    beforeEach(() => {
+      StateMock.mockClear();
+    });
 
     it('should create State with the shared Agile Instance', () => {
       const state = createLightState('testValue', {

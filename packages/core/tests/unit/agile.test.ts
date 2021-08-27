@@ -1,10 +1,4 @@
-import {
-  Agile,
-  Runtime,
-  SubController,
-  Integrations,
-  Storages,
-} from '../../src';
+import { Agile, Runtime, SubController, Integrations } from '../../src';
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
 
@@ -49,7 +43,6 @@ describe('Agile Tests', () => {
   const SubControllerMock = SubController as jest.MockedClass<
     typeof SubController
   >;
-  const StoragesMock = Storages as jest.MockedClass<typeof Storages>;
   const IntegrationsMock = Integrations as jest.MockedClass<
     typeof Integrations
   >;
@@ -60,7 +53,6 @@ describe('Agile Tests', () => {
     // Clear specified mocks
     RuntimeMock.mockClear();
     SubControllerMock.mockClear();
-    StoragesMock.mockClear();
     IntegrationsMock.mockClear();
 
     // Reset globalThis
