@@ -5,7 +5,7 @@ import {
   LogCodeManager,
   Observer,
 } from '@agile-ts/core';
-import { EventObserver, EventJob } from './internal';
+import { EventObserver, EventRuntimeJob } from '../internal';
 import { defineConfig } from '@agile-ts/utils';
 
 export class Event<PayloadType = DefaultEventPayload> {
@@ -21,7 +21,7 @@ export class Event<PayloadType = DefaultEventPayload> {
   public observer: EventObserver;
 
   public currentTimeout: any; // Timeout that is active right now (delayed Event)
-  public queue: Array<EventJob> = []; // Queue of delayed Events
+  public queue: Array<EventRuntimeJob> = []; // Queue of delayed Events
 
   // @ts-ignore
   public payload: PayloadType; // Holds type of Payload so that it can be read external (never defined)
@@ -251,7 +251,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    * @param keys - Keys of Callback Functions that get triggered (Note: if not passed all registered Events will be triggered)
    */
   public delayedTrigger(payload: PayloadType, delay: number, keys?: string[]) {
-    const eventJob = new EventJob<PayloadType>(payload, keys);
+    const eventJob = new EventRuntimeJob<PayloadType>(payload, keys);
 
     // Execute Event no matter if another event is currently active
     if (this.config.overlap) {
@@ -268,7 +268,7 @@ export class Event<PayloadType = DefaultEventPayload> {
     }
 
     // Executes EventJob and calls itself again if queue isn't empty to execute the next EventJob
-    const looper = (eventJob: EventJob<PayloadType>) => {
+    const looper = (eventJob: EventRuntimeJob<PayloadType>) => {
       this.currentTimeout = setTimeout(() => {
         this.currentTimeout = undefined;
         this.normalTrigger(eventJob.payload, eventJob.keys);

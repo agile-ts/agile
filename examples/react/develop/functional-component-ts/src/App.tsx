@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import { useAgile, useWatcher, useProxy, useSelector } from '@agile-ts/react';
-import { useEvent } from '@agile-ts/event';
+import { useEvent } from '@agile-ts/event/dist/react';
 import {
   COUNTUP,
   externalCreatedItem,

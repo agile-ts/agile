@@ -1,14 +1,14 @@
 import {
-  CreateAgileSubInstanceInterface,
-  removeProperties,
-  shared,
-  defineConfig,
-} from '@agile-ts/core';
-import {
-  Event,
   CreateEventConfigInterface,
   DefaultEventPayload,
-} from './internal';
+  Event,
+} from './event';
+import { defineConfig, removeProperties } from '@agile-ts/utils';
+import { CreateAgileSubInstanceInterface, shared } from '@agile-ts/core';
+
+export * from './event';
+// export * from './event.observer';
+// export * from './event.job';
 
 export function createEvent<PayloadType = DefaultEventPayload>(
   config: CreateEventConfigInterfaceWithAgile = {}

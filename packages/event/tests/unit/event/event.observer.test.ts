@@ -1,6 +1,6 @@
-import { EventObserver, Event } from '../../src';
+import { EventObserver, Event } from '../../../src';
 import { Agile, Observer, SubscriptionContainer } from '@agile-ts/core';
-import { LogMock } from '../../../core/tests/helper/logMock';
+import { LogMock } from '../../../../core/tests/helper/logMock';
 
 describe('EventObserver Tests', () => {
   let dummyAgile: Agile;
