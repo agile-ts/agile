@@ -8,7 +8,7 @@ import Agile, {
   Item,
   assignSharedAgileStorageManager,
 } from '@agile-ts/core';
-import Event from '@agile-ts/event';
+import { createEvent } from '@agile-ts/event';
 import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
 import { clone } from '@agile-ts/utils';
 
@@ -114,7 +114,7 @@ export const externalCreatedItem = new Item(MY_COLLECTION, {
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));
 
-export const MY_EVENT = new Event<{ name: string }>(App, {
+export const MY_EVENT = createEvent<{ name: string }>({
   delay: 3000,
   key: 'myEvent',
 });
