@@ -1,3 +1,5 @@
+import { copy } from '@agile-ts/utils';
+
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
 //
@@ -9,7 +11,7 @@
 // 00 = General
 // 10 = Agile
 // 11 = Storage
-// ..
+// ...
 //
 // ---
 // 00:|00|:00 second digits are based on the Log Type
@@ -251,6 +253,13 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logger.if.tag(tags)[logType](getLog(logCode, replacers), ...data);
 }
 
+/**
+ * Creates an extension of the specified LogCodeManager
+ * and assigns the provided additional log messages to it.
+ *
+ * @param additionalLogs - Log messages to be added to the LogCodeManager.
+ * @param logCodeManager - LogCodeManager to create an extension from.
+ */
 export function assignAdditionalLogs<
   NewLogCodeMessages,
   OldLogCodeMessages = typeof logCodeMessages
@@ -258,11 +267,12 @@ export function assignAdditionalLogs<
   additionalLogs: { [key: string]: string },
   logCodeManager: LogCodeManagerInterface<OldLogCodeMessages>
 ): LogCodeManagerInterface<NewLogCodeMessages> {
-  logCodeManager.logCodeMessages = {
-    ...LogCodeManager.logCodeMessages,
+  const copiedLogCodeManager = copy(logCodeManager);
+  copiedLogCodeManager.logCodeMessages = {
+    ...copiedLogCodeManager.logCodeMessages,
     ...additionalLogs,
   } as any;
-  return logCodeManager as any;
+  return copiedLogCodeManager as any;
 }
 
 let tempLogCodeManager: LogCodeManagerInterface<typeof logCodeMessages>;
