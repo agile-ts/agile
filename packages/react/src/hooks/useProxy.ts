@@ -15,6 +15,7 @@ import {
   AgileOutputHookArrayType,
   AgileOutputHookType,
 } from './useAgile';
+import { LogCodeManager } from '../logCodeManager';
 
 // TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
 let proxyPackage: any = null;
@@ -100,11 +101,7 @@ export function useProxy<
         proxyTreeWeakMap.set(dep, proxyTree);
         return proxyTree.proxy;
       } else {
-        // TODO add LogCode Manager logcode
-        console.error(
-          'In order to use the Agile proxy functionality, ' +
-            `the installation of an additional package called '@agile-ts/proxytree' is required!`
-        );
+        LogCodeManager.log('31:03:00');
       }
     }
 

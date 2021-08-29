@@ -3,13 +3,13 @@ import Agile, {
   Collection,
   ComponentIdType,
   getAgileInstance,
-  LogCodeManager,
   Observer,
   State,
   SubscriptionContainerKeyType,
   RegisterSubscriptionConfigInterface,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { LogCodeManager } from '../logCodeManager';
 
 /**
  * An internal used React Hook
@@ -46,10 +46,7 @@ export const useBaseAgile = (
     // Try to extract Agile Instance from the specified Instance/s
     if (agileInstance == null) agileInstance = getAgileInstance(observers[0]);
     if (agileInstance == null || agileInstance.subController == null) {
-      LogCodeManager.getLogger()?.error(
-        'Failed to subscribe Component with deps because of missing valid Agile Instance.',
-        deps
-      );
+      LogCodeManager.log('30:03:00', deps);
       return;
     }
 

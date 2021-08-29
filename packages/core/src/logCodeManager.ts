@@ -23,7 +23,7 @@ const logCodeTypes = {
 // ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
-const niceLogCodeMessages = {
+const logCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
@@ -165,13 +165,6 @@ const niceLogCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-// Note: Not outsource the 'production' env check,
-// because then webpack can't treeshake based on the current env
-const logCodeMessages: typeof niceLogCodeMessages =
-  typeof process === 'object' && process.env.NODE_ENV !== 'production'
-    ? niceLogCodeMessages
-    : ({} as any);
-
 /**
  * Returns the log message according to the specified log code.
  *
@@ -257,20 +250,22 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   // Handle logging with Logger
   logger.if.tag(tags)[logType](getLog(logCode, replacers), ...data);
 }
-/**
- * The Log Code Manager keeps track
- * and manages all important Logs of AgileTs.
- *
- * @internal
- */
-let tempLogCodeManager: {
-  getLog: typeof getLog;
-  log: typeof log;
-  logCodeLogTypes: typeof logCodeTypes;
-  logCodeMessages: typeof logCodeMessages;
-  getLogger: () => any;
-  logIfTags: typeof logIfTags;
-};
+
+export function assignAdditionalLogs<
+  NewLogCodeMessages,
+  OldLogCodeMessages = typeof logCodeMessages
+>(
+  additionalLogs: { [key: string]: string },
+  logCodeManager: LogCodeManagerInterface<OldLogCodeMessages>
+): LogCodeManagerInterface<NewLogCodeMessages> {
+  logCodeManager.logCodeMessages = {
+    ...LogCodeManager.logCodeMessages,
+    ...additionalLogs,
+  } as any;
+  return logCodeManager as any;
+}
+
+let tempLogCodeManager: LogCodeManagerInterface<typeof logCodeMessages>;
 if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {
@@ -284,11 +279,7 @@ if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
     log,
     logCodeLogTypes: logCodeTypes,
     logCodeMessages: logCodeMessages,
-    // Not doing 'logger: loggerPackage?.sharedAgileLogger'
-    // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
-    getLogger: () => {
-      return loggerPackage?.sharedAgileLogger ?? null;
-    },
+    getLogger: loggerPackage.getLogger,
     logIfTags,
   };
 } else {
@@ -297,20 +288,43 @@ if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
     getLog: (logCode, replacers) => logCode,
     log,
     logCodeLogTypes: logCodeTypes,
-    logCodeMessages: logCodeMessages,
-    // Not doing 'logger: loggerPackage?.sharedAgileLogger'
-    // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
+    logCodeMessages: {} as any,
     getLogger: () => {
       return null;
     },
     logIfTags: (tags, logCode, replacers) => {
-      /* empty */
+      /* empty because logs with tags can't be that important */
     },
   };
 }
+
+/**
+ * The Log Code Manager keeps track
+ * and manages all important Logs for the '@agile-ts/core' package.
+ *
+ * @internal
+ */
 export const LogCodeManager = tempLogCodeManager;
 
 export type LogCodesArrayType<T> = {
   [K in keyof T]: T[K] extends string ? K : never;
 }[keyof T] &
   string;
+
+export interface LogCodeManagerInterface<T = typeof logCodeMessages> {
+  getLog: (logCode: LogCodesArrayType<T>, replacers?: any[]) => string;
+  log: (
+    logCode: LogCodesArrayType<T>,
+    replacers?: any[],
+    ...data: any[]
+  ) => void;
+  logCodeLogTypes: typeof logCodeTypes;
+  logCodeMessages: T;
+  getLogger: () => any;
+  logIfTags: (
+    tags: string[],
+    logCode: LogCodesArrayType<T>,
+    replacers?: any[],
+    ...data: any[]
+  ) => void;
+}
