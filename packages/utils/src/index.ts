@@ -237,8 +237,8 @@ export function notEqual(value1: any, value2: any): boolean {
  * @param characters - Characters to generate the id from (default = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789').
  */
 export function generateId(
-  length: number = 5,
-  characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  length = 5,
+  characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 ): string {
   const charactersLength = characters.length;
   let result = '';
