@@ -9,8 +9,8 @@ import Agile, {
   extractRelevantObservers,
   normalizeArray,
 } from '@agile-ts/core';
-import type { Collection } from '@agile-ts/core';
-import { LogCodeManager } from '../logCodeManager'; // Only import Collection and Group type for better Treeshaking
+import type { Collection } from '@agile-ts/core'; // Only import Collection and Group type for better Treeshaking
+import { LogCodeManager } from '../logCodeManager';
 
 /**
  * A Higher order Component for binding the most relevant value of multiple Agile Instances

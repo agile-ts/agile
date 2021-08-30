@@ -14,16 +14,6 @@ import {
 } from './useBaseAgile';
 import { AgileValueHookType } from './useValue';
 
-export function useSelector<
-  ReturnType,
-  X extends SubscribableAgileInstancesType,
-  ValueType extends AgileValueHookType<X>
->(
-  dep: X,
-  selector: SelectorMethodType<ValueType>,
-  config?: BaseAgileHookConfigInterface
-): ReturnType;
-
 /**
  * A React Hook for binding a selected value of an Agile Instance
  * (like the Collection's output or the State's value)
@@ -34,14 +24,38 @@ export function useSelector<
  *
  * @public
  * @param dep - Agile Sub Instance to be bound to the Functional Component.
- * @param selector - Equality comparison function
+ * @param selectorMethod - Equality comparison function.
+ * that allows you to customize the way the selected Agile Instance
+ * is compared to determine whether the Component needs to be re-rendered.
+ * @param config - Configuration object
+ */
+export function useSelector<
+  ReturnType,
+  X extends SubscribableAgileInstancesType,
+  ValueType extends AgileValueHookType<X>
+>(
+  dep: X,
+  selectorMethod: SelectorMethodType<ValueType>,
+  config?: BaseAgileHookConfigInterface
+): ReturnType;
+/**
+ * A React Hook for binding a selected value of an Agile Instance
+ * (like the Collection's output or the State's value)
+ * to a React Functional Component.
+ *
+ * This binding ensures that the Component re-renders
+ * whenever the selected value of an Agile Instance mutates.
+ *
+ * @public
+ * @param dep - Agile Sub Instance to be bound to the Functional Component.
+ * @param selectorMethod - Equality comparison function.
  * that allows you to customize the way the selected Agile Instance
  * is compared to determine whether the Component needs to be re-rendered.
  * @param config - Configuration object
  */
 export function useSelector<ValueType = any, ReturnType = any>(
   dep: SubscribableAgileInstancesType,
-  selector: SelectorMethodType<ValueType>,
+  selectorMethod: SelectorMethodType<ValueType>,
   config?: BaseAgileHookConfigInterface
 ): ReturnType;
 
@@ -51,13 +65,14 @@ export function useSelector<
   ReturnType = any
 >(
   dep: X,
-  selector: SelectorMethodType<ValueType>,
+  selectorMethod: SelectorMethodType<ValueType>,
   config: BaseAgileHookConfigInterface = {}
 ): ReturnType {
   config = defineConfig(config, {
     key: generateId(),
     agileInstance: null as any,
     componentId: undefined,
+    deps: [],
   });
   const depsArray = extractRelevantObservers([dep]);
 
@@ -70,7 +85,7 @@ export function useSelector<
     // (Destroys the type of the useAgile hook,
     // however the type can be adjusted in the useSelector hook)
     if (isValidObject(value, true)) {
-      return selector(value);
+      return selectorMethod(value);
     }
 
     return value;
@@ -83,7 +98,7 @@ export function useSelector<
       let selectorWeakMap: SelectorWeakMapType | undefined = undefined;
       selectorWeakMap = new WeakMap();
       for (const observer of observers) {
-        selectorWeakMap.set(observer, { methods: [selector] });
+        selectorWeakMap.set(observer, { methods: [selectorMethod] });
       }
 
       return {

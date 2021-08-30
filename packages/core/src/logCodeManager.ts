@@ -25,7 +25,7 @@ const logCodeTypes = {
 // ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
-const logCodeMessages = {
+const niceLogCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
@@ -166,6 +166,13 @@ const logCodeMessages = {
     ' ${1} is no stand alone class.',
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
+
+// Note: Not outsource the 'production' env check,
+// because then webpack can't treeshake based on the current env
+const logCodeMessages: typeof niceLogCodeMessages =
+  typeof process === 'object' && process.env.NODE_ENV !== 'production'
+    ? niceLogCodeMessages
+    : ({} as any);
 
 /**
  * Returns the log message according to the specified log code.
