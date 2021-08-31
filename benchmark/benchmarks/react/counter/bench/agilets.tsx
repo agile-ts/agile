@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createState, shared } from '@agile-ts/core';
+import { createState, LogCodeManager, shared } from '@agile-ts/core';
 import reactIntegration, { useAgile } from '@agile-ts/react';
-import { assignSharedAgileLoggerConfig } from '@agile-ts/logger';
 
-assignSharedAgileLoggerConfig({ active: false });
+LogCodeManager.setAllowLogging(false);
 shared.integrate(reactIntegration);
 
 const COUNT = createState(0);

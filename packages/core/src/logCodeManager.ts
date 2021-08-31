@@ -25,6 +25,7 @@ const logCodeTypes = {
 // ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
+let allowLogging = true;
 const niceLogCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
@@ -175,6 +176,16 @@ const logCodeMessages: typeof niceLogCodeMessages =
     : ({} as any);
 
 /**
+ * Specifies whether the LogCodeManager is allowed to print any logs.
+ *
+ * @internal
+ * @param logging - Whether the LogCodeManager is allowed to print any logs.
+ */
+function setAllowLogging(logging: boolean) {
+  allowLogging = logging;
+}
+
+/**
  * Returns the log message according to the specified log code.
  *
  * @internal
@@ -213,7 +224,7 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   ...data: any[]
 ): void {
   const logger = LogCodeManager.getLogger();
-  if (logger != null && !logger.isActive) return;
+  if ((logger != null && !logger.isActive) || !allowLogging) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
@@ -246,7 +257,7 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   ...data: any[]
 ): void {
   const logger = LogCodeManager.getLogger();
-  if (logger != null && !logger.isActive) return;
+  if ((logger != null && !logger.isActive) || !allowLogging) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
@@ -298,6 +309,7 @@ if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
     logCodeMessages: logCodeMessages,
     getLogger: loggerPackage.getLogger,
     logIfTags,
+    setAllowLogging,
   };
 } else {
   tempLogCodeManager = {
@@ -312,6 +324,7 @@ if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
     logIfTags: (tags, logCode, replacers) => {
       /* empty because logs with tags can't be that important */
     },
+    setAllowLogging,
   };
 }
 
@@ -344,4 +357,5 @@ export interface LogCodeManagerInterface<T = typeof logCodeMessages> {
     replacers?: any[],
     ...data: any[]
   ) => void;
+  setAllowLogging: (logging: boolean) => void;
 }
