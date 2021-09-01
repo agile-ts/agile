@@ -2,11 +2,23 @@
   "name": "counter",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "analyze": "yarn run build && source-map-explorer 'build/static/js/*.js'",
+    "analyze:webpack": "node scripts/analyze.js",
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install"
+  },
   "dependencies": {
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
     "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@hookstate/core": "^3.0.8",
     "@reduxjs/toolkit": "^1.6.1",
+    "dotenv": "^10.0.0",
     "jotai": "^1.2.2",
     "nanostores": "^0.4.1",
     "react": "17.0.2",
@@ -18,16 +30,6 @@
   "devDependencies": {
     "source-map-explorer": "^2.5.2",
     "webpack-bundle-analyzer": "^4.4.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "analyze": "yarn run build && source-map-explorer 'build/static/js/*.js'",
-    "analyze:webpack": "node scripts/analyze.js",
-    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install",
-    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install"
   },
   "browserslist": {
     "production": [
