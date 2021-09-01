@@ -1,11 +1,4 @@
-import {
-  Agile,
-  Runtime,
-  SubController,
-  Integrations,
-  Storage,
-  Storages,
-} from '../../src';
+import { Agile, Runtime, SubController, Integrations } from '../../src';
 import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
 
@@ -23,11 +16,6 @@ jest.mock('../../src/runtime', () => {
 jest.mock('../../src/runtime/subscription/sub.controller', () => {
   return {
     SubController: jest.fn(),
-  };
-});
-jest.mock('../../src/storages', () => {
-  return {
-    Storages: jest.fn(),
   };
 });
 
@@ -55,7 +43,6 @@ describe('Agile Tests', () => {
   const SubControllerMock = SubController as jest.MockedClass<
     typeof SubController
   >;
-  const StoragesMock = Storages as jest.MockedClass<typeof Storages>;
   const IntegrationsMock = Integrations as jest.MockedClass<
     typeof Integrations
   >;
@@ -66,7 +53,6 @@ describe('Agile Tests', () => {
     // Clear specified mocks
     RuntimeMock.mockClear();
     SubControllerMock.mockClear();
-    StoragesMock.mockClear();
     IntegrationsMock.mockClear();
 
     // Reset globalThis
@@ -93,10 +79,6 @@ describe('Agile Tests', () => {
     // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock (mockImplementation)
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
-    expect(StoragesMock).toHaveBeenCalledWith(agile, {
-      localStorage: false,
-    });
-    expect(agile.storages).toBeInstanceOf(Storages);
 
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBeUndefined();
@@ -106,7 +88,6 @@ describe('Agile Tests', () => {
     const agile = new Agile({
       waitForMount: false,
       bucket: false,
-      localStorage: true,
       bindGlobal: true,
       key: 'jeff',
       autoIntegrate: false,
@@ -125,10 +106,6 @@ describe('Agile Tests', () => {
     // expect(agile.runtime).toBeInstanceOf(Runtime); // Because 'Runtime' is completely overwritten with a mock (mockImplementation)
     expect(SubControllerMock).toHaveBeenCalledWith(agile);
     expect(agile.subController).toBeInstanceOf(SubController);
-    expect(StoragesMock).toHaveBeenCalledWith(agile, {
-      localStorage: true,
-    });
-    expect(agile.storages).toBeInstanceOf(Storages);
 
     // Check if Agile Instance got bound globally
     expect(globalThis[Agile.globalKey]).toBe(agile);
@@ -174,56 +151,11 @@ describe('Agile Tests', () => {
       });
     });
 
-    describe('registerStorage function tests', () => {
-      beforeEach(() => {
-        agile.storages.register = jest.fn();
-      });
-
-      it('should register provided Storage', () => {
-        const dummyStorage = new Storage({
-          prefix: 'test',
-          methods: {
-            get: () => {
-              /* empty function */
-            },
-            set: () => {
-              /* empty function */
-            },
-            remove: () => {
-              /* empty function */
-            },
-          },
-          key: 'myTestStorage',
-        });
-
-        const returnedAgile = agile.registerStorage(dummyStorage, {
-          default: false,
-        });
-
-        expect(returnedAgile).toBe(agile);
-        expect(agile.storages.register).toHaveBeenCalledWith(dummyStorage, {
-          default: false,
-        });
-      });
-    });
-
     describe('hasIntegration function tests', () => {
       it('should check if Agile has any registered Integration', () => {
         agile.hasIntegration();
 
         expect(agile.integrations.hasIntegration).toHaveBeenCalled();
-      });
-    });
-
-    describe('hasStorage function tests', () => {
-      beforeEach(() => {
-        agile.storages.hasStorage = jest.fn();
-      });
-
-      it('should check if Agile has any registered Storage', () => {
-        agile.hasStorage();
-
-        expect(agile.storages.hasStorage).toHaveBeenCalled();
       });
     });
   });

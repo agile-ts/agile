@@ -13,7 +13,7 @@ describe('Selector Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Selector.prototype, 'select');
@@ -258,17 +258,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
-        expect(
-          selector.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(selector.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildItemSideEffectKey,
           expect.any(Function),
           { weight: 90 }
         );
 
-        expect(
-          dummyItem2.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function),
           { weight: 100 }
@@ -306,17 +302,13 @@ describe('Selector Tests', () => {
           overwrite: true,
           storage: true,
         });
-        expect(
-          selector.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(selector.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildItemSideEffectKey,
           expect.any(Function),
           { weight: 90 }
         );
 
-        expect(
-          dummyItem2.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function),
           { weight: 100 }
@@ -367,17 +359,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
-        expect(
-          selector.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(selector.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildItemSideEffectKey,
           expect.any(Function),
           { weight: 90 }
         );
 
-        expect(
-          dummyItem1.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyItem1.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function),
           { weight: 100 }
@@ -428,17 +416,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
-        expect(
-          selector.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(selector.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildItemSideEffectKey,
           expect.any(Function),
           { weight: 90 }
         );
 
-        expect(
-          dummyItem2.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function),
           { weight: 100 }
@@ -470,17 +454,13 @@ describe('Selector Tests', () => {
           overwrite: true,
           storage: true,
         });
-        expect(
-          selector.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(selector.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildItemSideEffectKey,
           expect.any(Function),
           { weight: 90 }
         );
 
-        expect(
-          dummyItem2.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function),
           { weight: 100 }
@@ -512,17 +492,13 @@ describe('Selector Tests', () => {
           overwrite: false,
           storage: true,
         });
-        expect(
-          selector.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(selector.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildItemSideEffectKey,
           expect.any(Function),
           { weight: 90 }
         );
 
-        expect(
-          dummyItem2.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyItem2.addSideEffect).toHaveBeenCalledWith(
           Selector.rebuildSelectorSideEffectKey,
           expect.any(Function),
           { weight: 100 }

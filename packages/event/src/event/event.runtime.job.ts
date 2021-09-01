@@ -1,4 +1,4 @@
-export class EventJob<PayloadType = any> {
+export class EventRuntimeJob<PayloadType = any> {
   public payload: PayloadType;
   public creationTimestamp: number;
   public keys?: string[];

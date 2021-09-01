@@ -4,22 +4,25 @@ import Agile, {
   createComputed,
   createState,
   createStorage,
+  createStorageManager,
   Item,
+  assignSharedAgileStorageManager,
 } from '@agile-ts/core';
-import Event from '@agile-ts/event';
+import { createEvent } from '@agile-ts/event';
 import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
 import { clone } from '@agile-ts/utils';
 
 export const myStorage: any = {};
 
 assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
-export const App = new Agile({
-  localStorage: true,
-});
+export const App = new Agile();
 assignSharedAgileInstance(App);
 
+export const storageManager = createStorageManager({ localStorage: true });
+assignSharedAgileStorageManager(storageManager);
+
 // Register custom second Storage
-App.registerStorage(
+storageManager.register(
   createStorage({
     key: 'myStorage',
     methods: {
@@ -111,7 +114,7 @@ export const externalCreatedItem = new Item(MY_COLLECTION, {
 
 console.log('Initial: myCollection ', clone(MY_COLLECTION));
 
-export const MY_EVENT = new Event<{ name: string }>(App, {
+export const MY_EVENT = createEvent<{ name: string }>({
   delay: 3000,
   key: 'myEvent',
 });

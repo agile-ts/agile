@@ -26,7 +26,7 @@ describe('GroupObserver Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
     dummyGroup = new Group<ItemInterface>(dummyCollection, [], {
       key: 'dummyGroup',

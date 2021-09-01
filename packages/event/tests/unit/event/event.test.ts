@@ -1,7 +1,7 @@
-import { Event, EventObserver } from '../../src';
+import { Event, EventObserver } from '../../../src';
 import { Agile, Observer } from '@agile-ts/core';
 import * as Utils from '@agile-ts/utils';
-import { LogMock } from '../../../core/tests/helper/logMock';
+import { LogMock } from '../../../../core/tests/helper/logMock';
 
 describe('Event Tests', () => {
   let dummyAgile: Agile;
@@ -9,7 +9,7 @@ describe('Event Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.clearAllMocks();
   });

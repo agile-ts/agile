@@ -18,7 +18,7 @@ describe('RuntimeJob Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyIntegration = new Integration({
       key: 'myIntegration',
     });

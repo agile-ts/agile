@@ -1,8 +1,5 @@
-import { createState } from '@agile-ts/core';
-import { useAgile } from '@agile-ts/react';
+import { createLightState } from '@agile-ts/core';
 
-const MY_STATE = createState('hi');
+const MY_STATE = createLightState('hi');
 
 console.log(MY_STATE.value);
-
-useAgile(MY_STATE);

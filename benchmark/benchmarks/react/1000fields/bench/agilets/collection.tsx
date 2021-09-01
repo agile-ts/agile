@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createCollection, shared } from '@agile-ts/core';
+import { createCollection, LogCodeManager, shared } from '@agile-ts/core';
 import reactIntegration, { useAgile, useValue } from '@agile-ts/react';
-import { assignSharedAgileLoggerConfig } from '@agile-ts/logger';
 
-assignSharedAgileLoggerConfig({ active: false });
+LogCodeManager.setAllowLogging(false);
 shared.integrate(reactIntegration);
 
 export default function (target: HTMLElement, fieldsCount: number) {

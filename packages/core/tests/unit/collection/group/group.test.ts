@@ -5,9 +5,9 @@ import {
   StateObserver,
   ComputedTracker,
   Item,
-  State,
   CollectionPersistent,
   GroupObserver,
+  EnhancedState,
 } from '../../../../src';
 import { LogMock } from '../../../helper/logMock';
 
@@ -23,7 +23,7 @@ describe('Group Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyCollection = new Collection<ItemInterface>(dummyAgile, {
       key: 'dummyCollection',
     });
@@ -407,13 +407,13 @@ describe('Group Tests', () => {
 
     describe('persist function tests', () => {
       beforeEach(() => {
-        jest.spyOn(State.prototype, 'persist');
+        jest.spyOn(EnhancedState.prototype, 'persist');
       });
 
       it('should persist Group with formatted groupKey (default config)', () => {
         group.persist();
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
             group._key,
             dummyCollection._key
@@ -433,7 +433,7 @@ describe('Group Tests', () => {
           defaultStorageKey: 'test1',
         });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
             group._key,
             dummyCollection._key
@@ -449,7 +449,7 @@ describe('Group Tests', () => {
       it('should persist Group with formatted specified key (default config)', () => {
         group.persist('dummyKey');
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
             'dummyKey',
             dummyCollection._key
@@ -469,7 +469,7 @@ describe('Group Tests', () => {
           defaultStorageKey: 'test1',
         });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getGroupStorageKey(
             'dummyKey',
             dummyCollection._key
@@ -485,21 +485,27 @@ describe('Group Tests', () => {
       it('should persist Group with groupKey (config.followCollectionPersistKeyPattern = false)', () => {
         group.persist({ followCollectionPersistKeyPattern: false });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(group._key, {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
+          group._key,
+          {
+            loadValue: true,
+            storageKeys: [],
+            defaultStorageKey: null,
+          }
+        );
       });
 
       it('should persist Group with specified key (config.followCollectionPersistKeyPattern = false)', () => {
         group.persist('dummyKey', { followCollectionPersistKeyPattern: false });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
+          'dummyKey',
+          {
+            loadValue: true,
+            storageKeys: [],
+            defaultStorageKey: null,
+          }
+        );
       });
     });
 

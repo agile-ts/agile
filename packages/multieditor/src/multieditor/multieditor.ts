@@ -13,7 +13,7 @@ import {
   StatusType,
   StatusInterface,
   ValidationMethodInterface,
-} from './internal';
+} from '../internal';
 
 export class MultiEditor<
   DataType = any,

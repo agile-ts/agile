@@ -18,7 +18,7 @@ export class Storages {
   // Registered Storages
   public storages: { [key: string]: Storage } = {};
   // Persistent from Instances (for example States) that were persisted
-  public persistentInstances: Set<Persistent> = new Set();
+  public persistentInstances: { [key: string]: Persistent } = {};
 
   /**
    * The Storages Class manages all external Storages for an Agile Instance
@@ -97,12 +97,15 @@ export class Storages {
     this.storages[storage.key] = storage;
     if (config.default) this.config.defaultStorageKey = storage.key;
 
-    this.persistentInstances.forEach((persistent) => {
+    for (const persistentKey of Object.keys(this.persistentInstances)) {
+      const persistent = this.persistentInstances[persistentKey];
+      if (persistent == null) continue;
+
       // Revalidate Persistent, which contains key/name identifier of the newly registered Storage
       if (persistent.storageKeys.includes(storage.key)) {
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
-        return;
+        continue;
       }
 
       // If Persistent has no default Storage key,
@@ -113,7 +116,7 @@ export class Storages {
         const isValid = persistent.validatePersistent();
         if (isValid) persistent.initialLoading();
       }
-    });
+    }
 
     LogCodeManager.log('13:00:00', [storage.key], storage);
 

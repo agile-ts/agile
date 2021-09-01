@@ -331,7 +331,7 @@ export class SubController {
   }
 }
 
-interface RegisterSubscriptionConfigInterface
+export interface RegisterSubscriptionConfigInterface
   extends SubscriptionContainerConfigInterface {
   /**
    * Whether the Subscription Container shouldn't be ready

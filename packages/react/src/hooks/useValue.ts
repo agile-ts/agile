@@ -5,20 +5,20 @@ import {
   State,
   defineConfig,
 } from '@agile-ts/core';
+import { useAgile } from './useAgile';
 import {
-  AgileHookConfigInterface,
+  BaseAgileHookConfigInterface,
   SubscribableAgileInstancesType,
-  useAgile,
-} from './useAgile';
+} from './useBaseAgile';
 
 export function useValue<X extends Array<SubscribableAgileInstancesType>>(
   deps: X | [],
-  config?: AgileHookConfigInterface
+  config?: BaseAgileHookConfigInterface
 ): AgileValueHookArrayType<X>;
 
 export function useValue<X extends SubscribableAgileInstancesType>(
   dep: X,
-  config?: AgileHookConfigInterface
+  config?: BaseAgileHookConfigInterface
 ): AgileValueHookType<X>;
 
 export function useValue<
@@ -26,7 +26,7 @@ export function useValue<
   Y extends SubscribableAgileInstancesType
 >(
   deps: X | Y,
-  config: AgileHookConfigInterface = {}
+  config: BaseAgileHookConfigInterface = {}
 ): AgileValueHookArrayType<X> | AgileValueHookType<Y> {
   return useAgile(
     deps as any,

@@ -16,7 +16,7 @@ describe('Computed Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.spyOn(Computed.prototype, 'recompute');
     jest.spyOn(Utils, 'extractRelevantObservers');
@@ -55,10 +55,6 @@ describe('Computed Tests', () => {
     );
     expect(computed.observers['value']._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeValueMethod).toBeUndefined();
-    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
-    expect(computed.isPersisted).toBeFalsy();
-    expect(computed.persistent).toBeUndefined();
   });
 
   it('should create Computed with a not async compute method (specific config)', () => {
@@ -123,10 +119,6 @@ describe('Computed Tests', () => {
     ]);
     expect(computed.observers['value']._key).toBe('coolComputed');
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeValueMethod).toBeUndefined();
-    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
-    expect(computed.isPersisted).toBeFalsy();
-    expect(computed.persistent).toBeUndefined();
   });
 
   it('should create Computed with an async compute method (default config)', () => {
@@ -160,10 +152,6 @@ describe('Computed Tests', () => {
     );
     expect(computed.observers['value']._key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
-    expect(computed.computeValueMethod).toBeUndefined();
-    expect(computed.computeExistsMethod).toBeInstanceOf(Function);
-    expect(computed.isPersisted).toBeFalsy();
-    expect(computed.persistent).toBeUndefined();
   });
 
   describe('Computed Function Tests', () => {

@@ -1,21 +1,30 @@
 import {
   Agile,
-  State,
   StatePersistent,
   Storage,
   Persistent,
+  EnhancedState,
+  Storages,
+  assignSharedAgileStorageManager,
+  createStorageManager,
 } from '../../../src';
 import { LogMock } from '../../helper/logMock';
+import waitForExpect from 'wait-for-expect';
 
 describe('StatePersistent Tests', () => {
   let dummyAgile: Agile;
-  let dummyState: State;
+  let dummyState: EnhancedState;
+  let storageManager: Storages;
 
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
-    dummyState = new State(dummyAgile, 'dummyValue');
+    dummyAgile = new Agile();
+    dummyState = new EnhancedState(dummyAgile, 'dummyValue');
+
+    // Register Storage Manager
+    storageManager = createStorageManager();
+    assignSharedAgileStorageManager(storageManager);
 
     jest.spyOn(StatePersistent.prototype, 'instantiatePersistent');
     jest.spyOn(StatePersistent.prototype, 'initialLoading');
@@ -122,7 +131,7 @@ describe('StatePersistent Tests', () => {
         key: 'statePersistentKey',
         storageKeys: ['dummyStorage'],
       });
-      dummyAgile.registerStorage(
+      storageManager.register(
         new Storage({
           key: 'dummyStorage',
           methods: {
@@ -142,8 +151,10 @@ describe('StatePersistent Tests', () => {
       it('should initialLoad and set isPersisted in State to true', async () => {
         await statePersistent.initialLoading();
 
-        expect(Persistent.prototype.initialLoading).toHaveBeenCalled();
-        expect(dummyState.isPersisted).toBeTruthy();
+        await waitForExpect(() => {
+          expect(Persistent.prototype.initialLoading).toHaveBeenCalled();
+          expect(dummyState.isPersisted).toBeTruthy();
+        });
       });
     });
 
@@ -158,14 +169,14 @@ describe('StatePersistent Tests', () => {
           'and apply it to the State if the loading was successful',
         async () => {
           statePersistent.ready = true;
-          dummyAgile.storages.get = jest.fn(() =>
+          storageManager.get = jest.fn(() =>
             Promise.resolve('dummyValue' as any)
           );
 
           const response = await statePersistent.loadPersistedValue();
 
           expect(response).toBeTruthy();
-          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          expect(storageManager.get).toHaveBeenCalledWith(
             statePersistent._key,
             statePersistent.config.defaultStorageKey
           );
@@ -184,14 +195,12 @@ describe('StatePersistent Tests', () => {
           "and apply it to the State if the loading wasn't successful",
         async () => {
           statePersistent.ready = true;
-          dummyAgile.storages.get = jest.fn(() =>
-            Promise.resolve(undefined as any)
-          );
+          storageManager.get = jest.fn(() => Promise.resolve(undefined as any));
 
           const response = await statePersistent.loadPersistedValue();
 
           expect(response).toBeFalsy();
-          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          expect(storageManager.get).toHaveBeenCalledWith(
             statePersistent._key,
             statePersistent.config.defaultStorageKey
           );
@@ -205,14 +214,14 @@ describe('StatePersistent Tests', () => {
           'and apply it to the State if the loading was successful',
         async () => {
           statePersistent.ready = true;
-          dummyAgile.storages.get = jest.fn(() =>
+          storageManager.get = jest.fn(() =>
             Promise.resolve('dummyValue' as any)
           );
 
           const response = await statePersistent.loadPersistedValue('coolKey');
 
           expect(response).toBeTruthy();
-          expect(dummyAgile.storages.get).toHaveBeenCalledWith(
+          expect(storageManager.get).toHaveBeenCalledWith(
             'coolKey',
             statePersistent.config.defaultStorageKey
           );
@@ -231,14 +240,12 @@ describe('StatePersistent Tests', () => {
           "if Persistent isn't ready yet",
         async () => {
           statePersistent.ready = false;
-          dummyAgile.storages.get = jest.fn(() =>
-            Promise.resolve(undefined as any)
-          );
+          storageManager.get = jest.fn(() => Promise.resolve(undefined as any));
 
           const response = await statePersistent.loadPersistedValue();
 
           expect(response).toBeFalsy();
-          expect(dummyAgile.storages.get).not.toHaveBeenCalled();
+          expect(storageManager.get).not.toHaveBeenCalled();
           expect(dummyState.set).not.toHaveBeenCalled();
           expect(statePersistent.setupSideEffects).not.toHaveBeenCalled();
         }
@@ -308,9 +315,7 @@ describe('StatePersistent Tests', () => {
         () => {
           statePersistent.setupSideEffects();
 
-          expect(
-            dummyState.addSideEffect
-          ).toHaveBeenCalledWith(
+          expect(dummyState.addSideEffect).toHaveBeenCalledWith(
             StatePersistent.storeValueSideEffectKey,
             expect.any(Function),
             { weight: 0 }
@@ -364,7 +369,7 @@ describe('StatePersistent Tests', () => {
     describe('removePersistedValue function tests', () => {
       beforeEach(() => {
         dummyState.removeSideEffect = jest.fn();
-        dummyAgile.storages.remove = jest.fn();
+        storageManager.remove = jest.fn();
 
         statePersistent.isPersisted = true;
       });
@@ -378,7 +383,7 @@ describe('StatePersistent Tests', () => {
         expect(dummyState.removeSideEffect).toHaveBeenCalledWith(
           StatePersistent.storeValueSideEffectKey
         );
-        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+        expect(storageManager.remove).toHaveBeenCalledWith(
           statePersistent._key,
           statePersistent.storageKeys
         );
@@ -394,7 +399,7 @@ describe('StatePersistent Tests', () => {
         expect(dummyState.removeSideEffect).toHaveBeenCalledWith(
           StatePersistent.storeValueSideEffectKey
         );
-        expect(dummyAgile.storages.remove).toHaveBeenCalledWith(
+        expect(storageManager.remove).toHaveBeenCalledWith(
           'coolKey',
           statePersistent.storageKeys
         );
@@ -408,7 +413,7 @@ describe('StatePersistent Tests', () => {
 
         expect(response).toBeFalsy();
         expect(dummyState.removeSideEffect).not.toHaveBeenCalled();
-        expect(dummyAgile.storages.remove).not.toHaveBeenCalled();
+        expect(storageManager.remove).not.toHaveBeenCalled();
         expect(statePersistent.isPersisted).toBeTruthy();
       });
     });
@@ -450,13 +455,13 @@ describe('StatePersistent Tests', () => {
 
     describe('rebuildStorageSideEffect function tests', () => {
       beforeEach(() => {
-        dummyAgile.storages.set = jest.fn();
+        storageManager.set = jest.fn();
       });
 
       it('should store current State value in the corresponding Storage (default config)', () => {
         statePersistent.rebuildStorageSideEffect(dummyState, 'coolKey');
 
-        expect(dummyAgile.storages.set).toHaveBeenCalledWith(
+        expect(storageManager.set).toHaveBeenCalledWith(
           'coolKey',
           dummyState.getPersistableValue(),
           statePersistent.storageKeys
@@ -468,7 +473,7 @@ describe('StatePersistent Tests', () => {
           storage: false,
         });
 
-        expect(dummyAgile.storages.set).not.toHaveBeenCalled();
+        expect(storageManager.set).not.toHaveBeenCalled();
       });
     });
   });

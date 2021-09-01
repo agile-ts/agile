@@ -1,10 +1,12 @@
 import React from 'react';
-import { createState } from '@agile-ts/core';
-import { useAgile, useValue } from '@agile-ts/react';
+import { createLightState } from '@agile-ts/core';
+import { useAgile } from '@agile-ts/react';
 
-const COUNTER_A = createState(1);
-const COUNTER_B = createState(2);
-const COUNTER_C = createState(3);
+// registerStorageManager(createStorageManager({ localStorage: true }));
+// const COUNTER_A = createState(1).persist('persistKey');
+const COUNTER_A = createLightState(1);
+const COUNTER_B = createLightState(2);
+const COUNTER_C = createLightState(3);
 
 const CounterA = () => {
   const count = useAgile(COUNTER_A);
@@ -16,7 +18,7 @@ const CounterA = () => {
 };
 
 const CounterB = () => {
-  const count = useValue(COUNTER_B);
+  const count = useAgile(COUNTER_B);
   return (
     <div>
       B: {count} <button onClick={() => COUNTER_B.set((c) => c + 1)}>+1</button>

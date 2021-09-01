@@ -12,10 +12,6 @@ import {
 export * from './computed';
 // export * from './computed.tracker';
 
-export interface CreateComputedConfigInterfaceWithAgile
-  extends CreateAgileSubInstanceInterface,
-    CreateComputedConfigInterface {}
-
 /**
  * Returns a newly created Computed.
  *
@@ -28,7 +24,7 @@ export interface CreateComputedConfigInterfaceWithAgile
  * Direct dependencies can be States and Collections.
  * So when, for example, a dependent State value changes, the computed value is recomputed.
  *
- * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createstate)
+ * [Learn more..](https://agile-ts.org/docs/core/agile-instance/methods#createcomputed)
  *
  * @public
  * @param computeFunction - Function to compute the computed value.
@@ -84,3 +80,7 @@ export function createComputed<ComputedValueType = any>(
     removeProperties(_config, ['agileInstance'])
   );
 }
+
+export interface CreateComputedConfigInterfaceWithAgile
+  extends CreateAgileSubInstanceInterface,
+    CreateComputedConfigInterface {}

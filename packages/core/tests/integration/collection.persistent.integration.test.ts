@@ -1,4 +1,11 @@
-import { Agile, Item, createStorage, createCollection } from '../../src';
+import {
+  Agile,
+  Item,
+  createStorage,
+  createCollection,
+  createStorageManager,
+  assignSharedAgileStorageManager,
+} from '../../src';
 import { LogMock } from '../helper/logMock';
 
 describe('Collection Persist Function Tests', () => {
@@ -28,8 +35,11 @@ describe('Collection Persist Function Tests', () => {
     LogMock.mockLogs();
     jest.clearAllMocks();
 
-    App = new Agile({ localStorage: false });
-    App.registerStorage(
+    App = new Agile();
+
+    const storageManager = createStorageManager({ localStorage: false });
+    assignSharedAgileStorageManager(storageManager);
+    storageManager.register(
       createStorage({
         key: 'testStorage',
         prefix: 'test',

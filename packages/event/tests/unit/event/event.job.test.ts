@@ -1,5 +1,5 @@
-import { EventJob } from '../../src';
-import { LogMock } from '../../../core/tests/helper/logMock';
+import { EventRuntimeJob } from '../../../src';
+import { LogMock } from '../../../../core/tests/helper/logMock';
 
 describe('EventJob Tests', () => {
   beforeEach(() => {
@@ -8,7 +8,7 @@ describe('EventJob Tests', () => {
   });
 
   it('should create EventJob (without keys)', () => {
-    const eventJob = new EventJob('myPayload');
+    const eventJob = new EventRuntimeJob('myPayload');
 
     expect(eventJob.payload).toBe('myPayload');
     expect(eventJob.creationTimestamp).toBeCloseTo(
@@ -19,7 +19,10 @@ describe('EventJob Tests', () => {
   });
 
   it('should create EventJob (with keys)', () => {
-    const eventJob = new EventJob('myPayload', ['dummyKey1', 'dummyKey2']);
+    const eventJob = new EventRuntimeJob('myPayload', [
+      'dummyKey1',
+      'dummyKey2',
+    ]);
 
     expect(eventJob.payload).toBe('myPayload');
     expect(eventJob.creationTimestamp).toBeCloseTo(

@@ -7,7 +7,7 @@ describe('ComputedTracker Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     // Reset ComputedTracker (because it works static)
     ComputedTracker.isTracking = false;

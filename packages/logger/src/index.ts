@@ -1,6 +1,9 @@
 import { CreateLoggerConfigInterface, Logger } from './logger';
 import { defineConfig } from '@agile-ts/utils';
 
+export * from './logger';
+export default Logger;
+
 const defaultLogConfig = {
   prefix: 'Agile',
   active: true,
@@ -9,9 +12,6 @@ const defaultLogConfig = {
   allowedTags: ['runtime', 'storage', 'subscription', 'multieditor'],
 };
 
-/**
- * Shared Agile Logger.
- */
 let sharedAgileLogger = new Logger(defaultLogConfig);
 
 /**
@@ -19,8 +19,7 @@ let sharedAgileLogger = new Logger(defaultLogConfig);
  *
  * @param config - Configuration object
  */
-// https://stackoverflow.com/questions/32558514/javascript-es6-export-const-vs-export-let
-function assignSharedAgileLoggerConfig(
+export function assignSharedAgileLoggerConfig(
   config: CreateLoggerConfigInterface = {}
 ): Logger {
   config = defineConfig(config, defaultLogConfig);
@@ -28,6 +27,9 @@ function assignSharedAgileLoggerConfig(
   return sharedAgileLogger;
 }
 
-export { sharedAgileLogger, assignSharedAgileLoggerConfig };
-export * from './logger';
-export default Logger;
+/**
+ * Returns the shared Agile Logger.
+ */
+export function getLogger(): Logger {
+  return sharedAgileLogger;
+}

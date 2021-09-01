@@ -1,4 +1,9 @@
-import { createState, globalBind, shared } from '@agile-ts/core';
+import {
+  createState,
+  globalBind,
+  createStorage,
+  getStorageManager,
+} from '@agile-ts/core';
 import queryString from 'query-string';
 
 export type StopwatchStateType =
@@ -7,7 +12,7 @@ export type StopwatchStateType =
   | 'initial'; // Stopwatch is reset
 
 // Create Query Storage to store the State in the query (url)
-const queryUrlStorage = shared.createStorage({
+const queryUrlStorage = createStorage({
   key: 'query-url',
   methods: {
     set: (key, value) => {
@@ -30,7 +35,7 @@ const queryUrlStorage = shared.createStorage({
 });
 
 // Register Query Storage to the shared Agile Instance and set it as default
-shared.registerStorage(queryUrlStorage, { default: true });
+getStorageManager().register(queryUrlStorage, { default: true });
 
 // State to keep track of the current time of the Stopwatch
 const TIME = createState(
