@@ -2,7 +2,7 @@
 // Note: Webpack Bundle Analyzer doesn't show accurately which bundles were tree shaken
 //       (See: https://github.com/webpack-contrib/webpack-bundle-analyzer/issues/161)
 
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 // Loads environment variables from the '.env' file
 dotenv.config();
