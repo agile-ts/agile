@@ -171,9 +171,7 @@ const niceLogCodeMessages = {
 // Note: Not outsource the 'production' env check,
 // because then webpack can't treeshake based on the current env
 const logCodeMessages: typeof niceLogCodeMessages =
-  typeof process === 'object' && process.env.NODE_ENV !== 'production'
-    ? niceLogCodeMessages
-    : ({} as any);
+  process.env.NODE_ENV !== 'production' ? niceLogCodeMessages : ({} as any);
 
 /**
  * Specifies whether the LogCodeManager is allowed to print any logs.
@@ -294,7 +292,7 @@ export function assignAdditionalLogs<
 }
 
 let tempLogCodeManager: LogCodeManagerInterface<typeof logCodeMessages>;
-if (typeof process === 'object' && process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {
     loggerPackage = require('@agile-ts/logger');
