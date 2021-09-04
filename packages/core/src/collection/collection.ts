@@ -1,26 +1,27 @@
 import {
   Agile,
-  Item,
-  Group,
-  GroupKey,
-  Selector,
-  SelectorKey,
-  StorageKey,
-  GroupConfigInterface,
-  isValidObject,
-  normalizeArray,
-  copy,
   CollectionPersistent,
-  GroupAddConfigInterface,
   ComputedTracker,
-  generateId,
-  SideEffectConfigInterface,
-  SelectorConfigInterface,
-  removeProperties,
-  isFunction,
-  LogCodeManager,
-  PatchOptionConfigInterface,
+  copy,
   defineConfig,
+  generateId,
+  Group,
+  GroupAddConfigInterface,
+  GroupConfigInterface,
+  GroupKey,
+  isFunction,
+  isValidObject,
+  Item,
+  LogCodeManager,
+  normalizeArray,
+  PatchOptionConfigInterface,
+  removeProperties,
+  Selector,
+  SelectorConfigInterface,
+  SelectorKey,
+  SideEffectConfigInterface,
+  StorageKey,
+  TrackedChangeMethod,
 } from '../internal';
 
 export class Collection<
@@ -1473,12 +1474,19 @@ export class Collection<
     // Rebuild Groups that include itemKey
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey);
-      if (group?.has(itemKey)) {
+      if (group != null && group.has(itemKey)) {
         // Not necessary because a sideEffect of ingesting the Group
         // into the runtime is to rebuilt itself
         // group.rebuild();
 
-        group?.rebuild({
+        // TODO
+        group.trackChange({
+          key: itemKey,
+          index: group.nextStateValue.findIndex((ik) => itemKey === ik),
+          method: TrackedChangeMethod.UPDATE,
+        });
+
+        group.rebuild({
           background: config?.background,
           sideEffects: config?.sideEffects,
           storage: false,

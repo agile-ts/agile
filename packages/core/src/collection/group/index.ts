@@ -39,6 +39,13 @@ export class Group<
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
   notFoundItemKeys: Array<ItemKey> = [];
 
+  // Keeps track of all changes made between rebuilds (add, remove, update)
+  // Why not rebuilding the Group directly in the add(), remove() method?
+  // Because rebuilding the Group is a side effect of the Group.
+  // A rebuild should always happen whenever the Group mutates.
+  // (-> Simplicity and keeping the current structure to not rewrite all tests)
+  trackedChanges: TrackedChangeInterface[] = [];
+
   /**
    * An extension of the State Class that categorizes and preserves the ordering of structured data.
    * It allows us to cluster together data from a Collection as an array of Item keys.
@@ -130,12 +137,15 @@ export class Group<
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    config: StateIngestConfigInterface = {}
+    config: GroupRemoveConfigInterface = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const notExistingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
+    defineConfig(config, {
+      softRebuild: true,
+    });
 
     // Remove itemKeys from Group
     _itemKeys.forEach((itemKey) => {
@@ -144,6 +154,14 @@ export class Group<
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
         return;
+      }
+
+      if (config.softRebuild) {
+        this.trackChange({
+          index: newGroupValue.findIndex((ik) => ik === itemKey),
+          method: TrackedChangeMethod.REMOVE,
+          key: itemKey,
+        });
       }
 
       // Check if itemKey exists in Collection
@@ -187,17 +205,33 @@ export class Group<
     defineConfig(config, {
       method: 'push',
       overwrite: false,
+      softRebuild: true,
     });
 
     // Add itemKeys to Group
     _itemKeys.forEach((itemKey) => {
+      const exists = newGroupValue.includes(itemKey);
+
       // Check if itemKey exists in Collection
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
+      // Track changes to soft rebuild the Group when rebuilding the Group
+      if (config.softRebuild) {
+        this.trackChange({
+          method: exists ? TrackedChangeMethod.UPDATE : TrackedChangeMethod.ADD,
+          key: itemKey,
+          index: exists
+            ? newGroupValue.findIndex((ik) => ik === itemKey)
+            : config.method === 'push'
+            ? newGroupValue.length - 1
+            : 0,
+        });
+      }
+
       // Remove itemKey temporary from newGroupValue
       // if it should be overwritten and already exists in the newGroupValue
-      if (newGroupValue.includes(itemKey)) {
+      if (exists) {
         if (config.overwrite) {
           newGroupValue = newGroupValue.filter((key) => key !== itemKey);
         } else {
@@ -373,6 +407,14 @@ export class Group<
 
     return this;
   }
+
+  /**
+   * TODO
+   * @param change
+   */
+  public trackChange(change: TrackedChangeInterface) {
+    this.trackedChanges.push(change);
+  }
 }
 
 export type GroupKey = string | number;
@@ -400,6 +442,19 @@ export interface GroupAddConfigInterface extends StateIngestConfigInterface {
    * @default false
    */
   overwrite?: boolean;
+  /**
+   * TODO
+   * @default true
+   */
+  softRebuild?: boolean;
+}
+
+export interface GroupRemoveConfigInterface extends StateIngestConfigInterface {
+  /**
+   * TODO
+   * @default true
+   */
+  softRebuild?: boolean;
 }
 
 export interface GroupConfigInterface {
@@ -424,4 +479,25 @@ export interface GroupPersistConfigInterface
    * @default true
    */
   followCollectionPersistKeyPattern?: boolean;
+}
+
+export enum TrackedChangeMethod {
+  ADD,
+  REMOVE,
+  UPDATE,
+}
+
+export interface TrackedChangeInterface {
+  /**
+   * TODO
+   */
+  method: TrackedChangeMethod;
+  /**
+   * TODO
+   */
+  key: ItemKey;
+  /**
+   * TODO
+   */
+  index: number;
 }
