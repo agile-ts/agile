@@ -384,6 +384,35 @@ export class Group<
     // contains the Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
 
+    // Soft rebuild the Collection (-> rebuild only parts of the Collection)
+    if (this.trackedChanges.length > 0) {
+      this.trackedChanges.forEach((change) => {
+        const item = this.collection().getItem(change.key);
+        switch (change.method) {
+          case TrackedChangeMethod.ADD:
+            if (item != null) {
+              this._value.splice(change.index, 0, change.key);
+              this._output.splice(change.index, 0, copy(item._value));
+            }
+            break;
+          case TrackedChangeMethod.UPDATE:
+            if (item != null) {
+              this._output.splice(change.index, 0, copy(item._value));
+            }
+            break;
+          case TrackedChangeMethod.REMOVE:
+            this._value.splice(change.index, 1);
+            this._output.splice(change.index, 1);
+            break;
+          default:
+        }
+      });
+      this.trackedChanges = [];
+      return this;
+    }
+
+    // Rebuild the whole Collection
+
     // Fetch Items from Collection
     this._value.forEach((itemKey) => {
       const item = this.collection().getItem(itemKey);
