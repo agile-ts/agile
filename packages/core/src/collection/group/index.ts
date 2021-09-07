@@ -376,9 +376,6 @@ export class Group<
    * @param config - Configuration object
    */
   public rebuild(config: StateIngestConfigInterface = {}): this {
-    const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
-    const groupItems: Array<Item<DataType>> = [];
-
     // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
     // contains the Items which are essential for a proper rebuild)
@@ -386,13 +383,16 @@ export class Group<
 
     // Soft rebuild the Collection (-> rebuild only parts of the Collection)
     if (this.trackedChanges.length > 0) {
+      let ingestGroupValue = false;
       this.trackedChanges.forEach((change) => {
         const item = this.collection().getItem(change.key);
+
         switch (change.method) {
           case TrackedChangeMethod.ADD:
             if (item != null) {
               this._value.splice(change.index, 0, change.key);
               this._output.splice(change.index, 0, copy(item._value));
+              ingestGroupValue = true;
             }
             break;
           case TrackedChangeMethod.UPDATE:
@@ -403,15 +403,21 @@ export class Group<
           case TrackedChangeMethod.REMOVE:
             this._value.splice(change.index, 1);
             this._output.splice(change.index, 1);
+            ingestGroupValue = true;
             break;
           default:
         }
       });
       this.trackedChanges = [];
+      this.observers['output'].ingest(config);
+      if (ingestGroupValue) this.observers['value'].ingest(config);
       return this;
     }
 
-    // Rebuild the whole Collection
+    // Hard rebuild the whole Collection
+
+    const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
+    const groupItems: Array<Item<DataType>> = [];
 
     // Fetch Items from Collection
     this._value.forEach((itemKey) => {
@@ -432,7 +438,12 @@ export class Group<
     this.notFoundItemKeys = notFoundItemKeys;
 
     // Ingest rebuilt Group output into the Runtime
-    this.observers['output'].ingestItems(groupItems, config);
+    this.observers['output'].ingestOutput(
+      groupItems.map((item) => {
+        return item._value;
+      }),
+      config
+    );
 
     return this;
   }

@@ -1475,11 +1475,6 @@ export class Collection<
     for (const groupKey in this.groups) {
       const group = this.getGroup(groupKey);
       if (group != null && group.has(itemKey)) {
-        // Not necessary because a sideEffect of ingesting the Group
-        // into the runtime is to rebuilt itself
-        // group.rebuild();
-
-        // TODO
         group.trackChange({
           key: itemKey,
           index: group.nextStateValue.findIndex((ik) => itemKey === ik),

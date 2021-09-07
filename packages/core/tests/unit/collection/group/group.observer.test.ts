@@ -158,7 +158,7 @@ describe('GroupObserver Tests', () => {
             });
           });
 
-          groupObserver.ingestItems([dummyItem1, dummyItem2]);
+          groupObserver.ingestOutput([dummyItem1, dummyItem2]);
 
           expect(groupObserver.nextGroupOutput).toStrictEqual([
             dummyItem1._value,
@@ -190,7 +190,7 @@ describe('GroupObserver Tests', () => {
             });
           });
 
-          groupObserver.ingestItems([dummyItem1, dummyItem2], {
+          groupObserver.ingestOutput([dummyItem1, dummyItem2], {
             perform: false,
             force: true,
             sideEffects: {
@@ -219,7 +219,7 @@ describe('GroupObserver Tests', () => {
         () => {
           dummyGroup._output = [dummyItem1._value, dummyItem2._value];
 
-          groupObserver.ingestItems([dummyItem1, dummyItem2]);
+          groupObserver.ingestOutput([dummyItem1, dummyItem2]);
 
           expect(groupObserver.nextGroupOutput).toStrictEqual([
             dummyItem1._value,
@@ -249,7 +249,7 @@ describe('GroupObserver Tests', () => {
             });
           });
 
-          groupObserver.ingestItems([dummyItem1, dummyItem2], { force: true });
+          groupObserver.ingestOutput([dummyItem1, dummyItem2], { force: true });
 
           expect(groupObserver.nextGroupOutput).toStrictEqual([
             dummyItem1._value,
@@ -281,7 +281,7 @@ describe('GroupObserver Tests', () => {
         });
         dummyGroup.isPlaceholder = true;
 
-        groupObserver.ingestItems([dummyItem1, dummyItem2]);
+        groupObserver.ingestOutput([dummyItem1, dummyItem2]);
 
         expect(groupObserver.nextGroupOutput).toStrictEqual([
           dummyItem1._value,

@@ -512,7 +512,7 @@ describe('Group Tests', () => {
     describe('rebuild function tests', () => {
       beforeEach(() => {
         group._value = ['dummyItem1Key', 'dummyItem3Key', 'dummyItem2Key'];
-        group.observers['output'].ingestItems = jest.fn();
+        group.observers['output'].ingestOutput = jest.fn();
       });
 
       it('should ingest the built Group output and set notFoundItemKeys to the not found Item Keys (default config)', () => {
@@ -520,7 +520,7 @@ describe('Group Tests', () => {
 
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
         expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
-        expect(group.observers['output'].ingestItems).toHaveBeenCalledWith(
+        expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
           [dummyItem1, dummyItem2],
           {}
         );
@@ -537,7 +537,7 @@ describe('Group Tests', () => {
 
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
         expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
-        expect(group.observers['output'].ingestItems).toHaveBeenCalledWith(
+        expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
           [dummyItem1, dummyItem2],
           { storage: true, overwrite: true, background: false }
         );
@@ -556,7 +556,7 @@ describe('Group Tests', () => {
 
         expect(group.notFoundItemKeys).toStrictEqual([]);
         expect(group._output).toStrictEqual([]);
-        expect(group.observers['output'].ingestItems).not.toHaveBeenCalled();
+        expect(group.observers['output'].ingestOutput).not.toHaveBeenCalled();
         LogMock.hasNotLogged('warn');
       });
     });
