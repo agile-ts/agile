@@ -397,7 +397,7 @@ export class Group<
             break;
           case TrackedChangeMethod.UPDATE:
             if (item != null) {
-              this.nextGroupOutput.splice(change.index, 0, copy(item._value));
+              this.nextGroupOutput[change.index] = copy(item._value);
             }
             break;
           case TrackedChangeMethod.REMOVE:

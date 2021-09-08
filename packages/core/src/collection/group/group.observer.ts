@@ -6,7 +6,6 @@ import {
   equal,
   generateId,
   RuntimeJob,
-  Item,
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
   defineConfig,
