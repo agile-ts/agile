@@ -45,14 +45,14 @@ export class GroupObserver<DataType = any> extends Observer {
    * into the runtime wrapped into a Runtime-Job
    * where it is executed accordingly.
    *
-   * During the execution the runtime applies the current Group `output` to the Group,
+   * During the execution the runtime applies the `nextGroupOutput` to the Group,
    * updates its dependents and re-renders the UI-Components it is subscribed to.
    *
    * @internal
    * @param config - Configuration object
    */
   public ingest(config: GroupIngestConfigInterface = {}): void {
-    this.ingestOutput(this.group()._output, config);
+    this.ingestOutput(this.group().nextGroupOutput, config);
   }
 
   /**
@@ -126,6 +126,7 @@ export class GroupObserver<DataType = any> extends Observer {
 
     // Assign new Group output
     group._output = copy(observer.nextGroupOutput);
+    group.nextGroupOutput = copy(observer.nextGroupOutput);
 
     // Assign new public output to the Observer (output used by the Integrations)
     job.observer.previousValue = copy(job.observer.value);

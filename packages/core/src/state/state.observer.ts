@@ -15,7 +15,6 @@ import {
   ObserverKey,
   defineConfig,
 } from '../internal';
-import type { EnhancedState } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
   // State the Observer belongs to

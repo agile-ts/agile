@@ -30,21 +30,23 @@ export class Group<
   static rebuildGroupSideEffectKey = 'rebuildGroup';
 
   // Item values represented by the Group
-  _output: Array<DataType> = [];
+  public _output: Array<DataType> = [];
+  // Next output of the Group (which can be used for dynamic Group updates)
+  public nextGroupOutput: Array<DataType> = [];
 
   // Manages dependencies to other States and subscriptions of UI-Components.
   // It also serves as an interface to the runtime.
   public observers: GroupObservers<ItemKey[], DataType> = {} as any;
 
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
-  notFoundItemKeys: Array<ItemKey> = [];
+  public notFoundItemKeys: Array<ItemKey> = [];
 
   // Keeps track of all changes made between rebuilds (add, remove, update)
   // Why not rebuilding the Group directly in the add(), remove() method?
   // Because rebuilding the Group is a side effect of the Group.
   // A rebuild should always happen whenever the Group mutates.
   // (-> Simplicity and keeping the current structure to not rewrite all tests)
-  trackedChanges: TrackedChangeInterface[] = [];
+  public trackedChanges: TrackedChangeInterface[] = [];
 
   /**
    * An extension of the State Class that categorizes and preserves the ordering of structured data.
@@ -143,7 +145,7 @@ export class Group<
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const notExistingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
-    defineConfig(config, {
+    config = defineConfig(config, {
       softRebuild: true,
     });
 
@@ -202,7 +204,7 @@ export class Group<
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
-    defineConfig(config, {
+    config = defineConfig(config, {
       method: 'push',
       overwrite: false,
       softRebuild: true,
@@ -217,7 +219,7 @@ export class Group<
         notExistingItemKeysInCollection.push(itemKey);
 
       // Track changes to soft rebuild the Group when rebuilding the Group
-      if (config.softRebuild) {
+      if (config.softRebuild && (!exists || (exists && config.overwrite))) {
         this.trackChange({
           method: exists ? TrackedChangeMethod.UPDATE : TrackedChangeMethod.ADD,
           key: itemKey,
@@ -383,34 +385,30 @@ export class Group<
 
     // Soft rebuild the Collection (-> rebuild only parts of the Collection)
     if (this.trackedChanges.length > 0) {
-      let ingestGroupValue = false;
       this.trackedChanges.forEach((change) => {
         const item = this.collection().getItem(change.key);
 
         switch (change.method) {
           case TrackedChangeMethod.ADD:
             if (item != null) {
-              this._value.splice(change.index, 0, change.key);
-              this._output.splice(change.index, 0, copy(item._value));
-              ingestGroupValue = true;
+              // this._value.splice(change.index, 0, change.key); // Already updated in 'add' method
+              this.nextGroupOutput.splice(change.index, 0, copy(item._value));
             }
             break;
           case TrackedChangeMethod.UPDATE:
             if (item != null) {
-              this._output.splice(change.index, 0, copy(item._value));
+              this.nextGroupOutput.splice(change.index, 0, copy(item._value));
             }
             break;
           case TrackedChangeMethod.REMOVE:
-            this._value.splice(change.index, 1);
-            this._output.splice(change.index, 1);
-            ingestGroupValue = true;
+            // this._value.splice(change.index, 1); // Already updated in 'remove' method
+            this.nextGroupOutput.splice(change.index, 1);
             break;
           default:
         }
       });
       this.trackedChanges = [];
       this.observers['output'].ingest(config);
-      if (ingestGroupValue) this.observers['value'].ingest(config);
       return this;
     }
 

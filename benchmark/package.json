@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
+    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
     "@hookstate/core": "^3.0.8",
     "@pulsejs/core": "^4.0.0-beta.3",
