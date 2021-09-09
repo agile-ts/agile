@@ -36,7 +36,7 @@ export class CollectionPersistent<
     config: CreatePersistentConfigInterface = {}
   ) {
     super(collection.agileInstance(), {
-      instantiate: false,
+      loadValue: false,
     });
     config = defineConfig(config, {
       instantiate: true,
@@ -51,7 +51,7 @@ export class CollectionPersistent<
     });
 
     // Load/Store persisted value/s for the first time
-    if (this.ready && config.instantiate) this.initialLoading();
+    if (this.ready && config.loadValue) this.initialLoading();
   }
 
   /**
@@ -104,6 +104,7 @@ export class CollectionPersistent<
 
       // Persist default Group and load its value manually to be 100% sure
       // that it was loaded completely
+      defaultGroup.loadedInitialValue = false;
       defaultGroup.persist(defaultGroupStorageKey, {
         loadValue: false,
         defaultStorageKey: this.config.defaultStorageKey || undefined,
@@ -112,14 +113,6 @@ export class CollectionPersistent<
       });
       if (defaultGroup.persistent?.ready)
         await defaultGroup.persistent.initialLoading();
-
-      // TODO rebuild the default Group once at the end when all Items were loaded into the Collection
-      //  because otherwise it rebuilds the Group for each loaded Item
-      //  (-> warnings are printed for all not yet loaded Items when rebuilding the Group)
-      //  or rethink the whole Group rebuild process by adding a 'addItem()', 'removeItem()' and 'updateItem()' function
-      //  so that there is no need for rebuilding the whole Group when for example only Item B changed or Item C was added
-      //
-      //  See Issue by starting the vue develop example app and adding some todos to the _todo_ list
 
       // Persist Items found in the default Group's value
       for (const itemKey of defaultGroup._value) {
@@ -156,13 +149,14 @@ export class CollectionPersistent<
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
           if (placeholderItem?.persistent?.ready) {
-            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue(); // TODO FIRST GROUP REBUILD (by assigning loaded value to Item)
+            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue();
 
             // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem) {
               this.collection().assignItem(placeholderItem, {
                 overwrite: true, // Overwrite to overwrite the existing placeholder Item, if one exists
-              }); // TODO SECOND GROUP REBUILD (by calling rebuildGroupThatInclude() in the assignItem() method)
+                rebuildGroups: false, // Not necessary since the Groups that include the to assign Item were already rebuild while assigning the loaded value to the Item via 'loadPersistedValue()'
+              });
 
               placeholderItem.isPersisted = true;
 
@@ -176,6 +170,7 @@ export class CollectionPersistent<
         }
       }
 
+      defaultGroup.loadedInitialValue = true;
       return true;
     };
     const success = await loadValuesIntoCollection();

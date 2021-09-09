@@ -83,7 +83,7 @@ describe('Persistent Tests', () => {
       .spyOn(Persistent.prototype, 'instantiatePersistent')
       .mockReturnValueOnce(undefined);
 
-    const persistent = new Persistent(dummyAgile, { instantiate: false });
+    const persistent = new Persistent(dummyAgile, { loadValue: false });
 
     expect(persistent).toBeInstanceOf(Persistent);
     expect(persistent.instantiatePersistent).not.toHaveBeenCalled();

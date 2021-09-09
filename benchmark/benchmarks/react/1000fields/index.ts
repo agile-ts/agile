@@ -78,9 +78,9 @@ const results: CycleResultInterface[] = [];
 // Add Tests to the Benchmark Test Suite
 suite
   .add('Agile Collection', configTest(agileCollection))
-  .add('Agile State', configTest(agileState))
-  .add('Agile nested State', configTest(agileNestedState))
-  // .add('Pulse Collection', configTest(pulseCollection))
+  // .add('Agile State', configTest(agileState))
+  // .add('Agile nested State', configTest(agileNestedState))
+  .add('Pulse Collection', configTest(pulseCollection))
   // .add('Pulse State', configTest(pulseState))
   // .add('Pulse nested State', configTest(pulseNestedState))
   // .add('Hookstate', configTest(hookstate))

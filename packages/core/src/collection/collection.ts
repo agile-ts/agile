@@ -8,6 +8,7 @@ import {
   Group,
   GroupAddConfigInterface,
   GroupConfigInterface,
+  GroupIngestConfigInterface,
   GroupKey,
   isFunction,
   isValidObject,
@@ -19,7 +20,6 @@ import {
   Selector,
   SelectorConfigInterface,
   SelectorKey,
-  SideEffectConfigInterface,
   StorageKey,
   TrackedChangeMethod,
 } from '../internal';
@@ -979,7 +979,7 @@ export class Collection<
 
     // Create Persistent (-> persist value)
     this.persistent = new CollectionPersistent<DataType>(this, {
-      instantiate: _config.loadValue,
+      loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
       key: key,
       defaultStorageKey: _config.defaultStorageKey,
@@ -1406,6 +1406,7 @@ export class Collection<
     config = defineConfig(config, {
       overwrite: false,
       background: false,
+      rebuildGroups: true,
     });
     const primaryKey = this.config.primaryKey;
     let itemKey = item._value[primaryKey];
@@ -1443,9 +1444,10 @@ export class Collection<
     // Rebuild Groups that include itemKey
     // after adding Item with itemKey to the Collection
     // (because otherwise it can't find the Item as it isn't added yet)
-    this.rebuildGroupsThatIncludeItemKey(itemKey, {
-      background: config.background,
-    });
+    if (config.rebuildGroups)
+      this.rebuildGroupsThatIncludeItemKey(itemKey, {
+        background: config.background,
+      });
 
     if (increaseCollectionSize) this.size++;
 
@@ -1461,18 +1463,10 @@ export class Collection<
    */
   public rebuildGroupsThatIncludeItemKey(
     itemKey: ItemKey,
-    config: RebuildGroupsThatIncludeItemKeyConfigInterface = {}
+    config: GroupIngestConfigInterface = {}
   ): void {
-    config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-    });
-
     // Rebuild Groups that include itemKey
-    for (const groupKey in this.groups) {
+    for (const groupKey of Object.keys(this.groups)) {
       const group = this.getGroup(groupKey);
       if (group != null && group.has(itemKey)) {
         group.trackChange({
@@ -1481,11 +1475,7 @@ export class Collection<
           method: TrackedChangeMethod.UPDATE,
         });
 
-        group.rebuild({
-          background: config?.background,
-          sideEffects: config?.sideEffects,
-          storage: false,
-        });
+        group.rebuild(config);
       }
     }
   }
@@ -1604,20 +1594,6 @@ export interface UpdateItemKeyConfigInterface {
   background?: boolean;
 }
 
-export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
-  /**
-   * Whether to rebuilt the Group in background.
-   * So that the UI isn't notified of these changes and thus doesn't rerender.
-   * @default false
-   */
-  background?: boolean;
-  /**
-   * Whether to execute the defined side effects.
-   * @default true
-   */
-  sideEffects?: SideEffectConfigInterface;
-}
-
 export interface HasConfigInterface {
   /**
    * Whether Items that do not officially exist,
@@ -1697,4 +1673,9 @@ export interface AssignItemConfigInterface {
    * @default false
    */
   background?: boolean;
+  /**
+   * Whether to rebuild all Groups that include the itemKey of the to assign Item.
+   * @default true
+   */
+  rebuildGroups?: boolean;
 }

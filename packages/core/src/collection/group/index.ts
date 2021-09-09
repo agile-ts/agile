@@ -18,6 +18,7 @@ import {
   GroupObserver,
   StateObserver,
   defineConfig,
+  GroupIngestConfigInterface,
 } from '../../internal';
 
 export class Group<
@@ -47,6 +48,10 @@ export class Group<
   // A rebuild should always happen whenever the Group mutates.
   // (-> Simplicity and keeping the current structure to not rewrite all tests)
   public trackedChanges: TrackedChangeInterface[] = [];
+
+  // Whether the initial value was loaded from the corresponding Persistent
+  // https://github.com/agile-ts/agile/issues/155
+  public loadedInitialValue = true;
 
   /**
    * An extension of the State Class that categorizes and preserves the ordering of structured data.
@@ -113,7 +118,7 @@ export class Group<
    * @param itemKey - Key/Name identifier of the Item.
    */
   public has(itemKey: ItemKey) {
-    return this.value.findIndex((key) => key === itemKey) !== -1;
+    return this.value.indexOf(itemKey) !== -1;
   }
 
   /**
@@ -377,7 +382,7 @@ export class Group<
    * @internal
    * @param config - Configuration object
    */
-  public rebuild(config: StateIngestConfigInterface = {}): this {
+  public rebuild(config: GroupIngestConfigInterface = {}): this {
     // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
     // contains the Items which are essential for a proper rebuild)
@@ -425,7 +430,7 @@ export class Group<
     });
 
     // Logging
-    if (notFoundItemKeys.length > 0) {
+    if (notFoundItemKeys.length > 0 && this.loadedInitialValue) {
       LogCodeManager.log(
         '1C:02:00',
         [this.collection()._key, this._key],

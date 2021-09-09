@@ -117,7 +117,7 @@ describe('StatePersistent Tests', () => {
       });
 
     const statePersistent = new StatePersistent(dummyState, {
-      instantiate: false,
+      loadValue: false,
     });
 
     expect(statePersistent.initialLoading).not.toHaveBeenCalled();
@@ -315,7 +315,9 @@ describe('StatePersistent Tests', () => {
         () => {
           statePersistent.setupSideEffects();
 
-          expect(dummyState.addSideEffect).toHaveBeenCalledWith(
+          expect(
+            dummyState.addSideEffect
+          ).toHaveBeenCalledWith(
             StatePersistent.storeValueSideEffectKey,
             expect.any(Function),
             { weight: 0 }

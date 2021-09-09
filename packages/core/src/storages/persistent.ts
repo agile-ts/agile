@@ -53,7 +53,7 @@ export class Persistent {
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
 
     // Instantiate Persistent
-    if (config.instantiate) {
+    if (config.loadValue) {
       this.instantiatePersistent({
         storageKeys: config.storageKeys,
         key: config.key,
@@ -318,11 +318,11 @@ export interface CreatePersistentConfigInterface {
    */
   defaultStorageKey?: StorageKey;
   /**
-   * Whether the Persistent should be instantiated immediately
+   * Whether the Persistent should load/persist the value immediately
    * or whether this should be done manually.
    * @default true
    */
-  instantiate?: boolean;
+  loadValue?: boolean;
 }
 
 export interface PersistentConfigInterface {
