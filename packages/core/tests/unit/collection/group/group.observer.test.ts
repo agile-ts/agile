@@ -165,6 +165,7 @@ describe('GroupObserver Tests', () => {
               },
               force: false,
               maxTriesToUpdate: 3,
+              any: {},
             });
           });
 
@@ -197,6 +198,7 @@ describe('GroupObserver Tests', () => {
               },
               force: true,
               maxTriesToUpdate: 5,
+              any: {},
             });
           });
 
@@ -256,6 +258,7 @@ describe('GroupObserver Tests', () => {
               },
               force: true,
               maxTriesToUpdate: 3,
+              any: {},
             });
           });
 
@@ -289,6 +292,7 @@ describe('GroupObserver Tests', () => {
             },
             force: true,
             maxTriesToUpdate: 3,
+            any: {},
           });
         });
         dummyGroup.isPlaceholder = true;

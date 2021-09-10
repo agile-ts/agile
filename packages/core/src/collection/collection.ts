@@ -1469,13 +1469,13 @@ export class Collection<
     for (const groupKey of Object.keys(this.groups)) {
       const group = this.getGroup(groupKey);
       if (group != null && group.has(itemKey)) {
-        group.trackChange({
-          key: itemKey,
-          index: group.nextStateValue.findIndex((ik) => itemKey === ik),
-          method: TrackedChangeMethod.UPDATE,
-        });
-
-        group.rebuild(config);
+        group.rebuild(config, [
+          {
+            key: itemKey,
+            index: group.nextStateValue.findIndex((ik) => itemKey === ik),
+            method: TrackedChangeMethod.UPDATE,
+          },
+        ]);
       }
     }
   }

@@ -9,6 +9,7 @@ import {
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
   defineConfig,
+  removeProperties,
 } from '../../internal';
 
 export class GroupObserver<DataType = any> extends Observer {
@@ -72,13 +73,7 @@ export class GroupObserver<DataType = any> extends Observer {
     const group = this.group();
     config = defineConfig(config, {
       perform: true,
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
       force: false,
-      maxTriesToUpdate: 3,
     });
 
     // Force overwriting the Group value if it is a placeholder.
@@ -95,13 +90,12 @@ export class GroupObserver<DataType = any> extends Observer {
 
     // Create Runtime-Job
     const job = new RuntimeJob(this, {
-      sideEffects: config.sideEffects,
-      force: config.force,
-      background: config.background,
-      key:
-        config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
-      maxTriesToUpdate: config.maxTriesToUpdate,
+      ...removeProperties(config, ['perform']),
+      ...{
+        key:
+          config.key ??
+          `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
+      },
     });
 
     // Pass created Job into the Runtime

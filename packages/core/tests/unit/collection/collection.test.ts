@@ -3033,25 +3033,23 @@ describe('Collection Tests', () => {
         };
 
         dummyGroup1.rebuild = jest.fn();
-        dummyGroup1.trackChange = jest.fn();
         dummyGroup2.rebuild = jest.fn();
-        dummyGroup2.trackChange = jest.fn();
       });
 
       it('should rebuild each Group that includes the specified itemKey (default config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem1');
 
         // Group 1
-        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({});
-        expect(dummyGroup1.trackChange).toHaveBeenCalledWith({
-          key: 'dummyItem1',
-          index: 0,
-          method: TrackedChangeMethod.UPDATE,
-        });
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({}, [
+          {
+            key: 'dummyItem1',
+            index: 0,
+            method: TrackedChangeMethod.UPDATE,
+          },
+        ]);
 
         // Group 2
         expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
-        expect(dummyGroup2.trackChange).not.toHaveBeenCalled();
       });
 
       it('should rebuild each Group that includes the specified itemKey (specific config)', () => {
@@ -3062,28 +3060,36 @@ describe('Collection Tests', () => {
         });
 
         // Group 1
-        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({
-          key: 'frank',
-          background: true,
-          force: true,
-        });
-        expect(dummyGroup1.trackChange).toHaveBeenCalledWith({
-          key: 'dummyItem2',
-          index: 1,
-          method: TrackedChangeMethod.UPDATE,
-        });
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
+          {
+            key: 'frank',
+            background: true,
+            force: true,
+          },
+          [
+            {
+              key: 'dummyItem2',
+              index: 1,
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ]
+        );
 
         // Group 2
-        expect(dummyGroup2.rebuild).toHaveBeenCalledWith({
-          key: 'frank',
-          background: true,
-          force: true,
-        });
-        expect(dummyGroup2.trackChange).toHaveBeenCalledWith({
-          key: 'dummyItem2',
-          index: 0,
-          method: TrackedChangeMethod.UPDATE,
-        });
+        expect(dummyGroup2.rebuild).toHaveBeenCalledWith(
+          {
+            key: 'frank',
+            background: true,
+            force: true,
+          },
+          [
+            {
+              key: 'dummyItem2',
+              index: 0,
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ]
+        );
       });
     });
   });

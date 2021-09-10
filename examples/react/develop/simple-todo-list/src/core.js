@@ -6,4 +6,4 @@ assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 // Create Collection
 export const TODOS = createCollection({
   initialData: [{ id: 1, name: 'Clean Bathroom' }],
-}).persist('todos'); // perist does store the Collection in the Local Storage
+}).persist('todos'); // persist does store the Collection in the Local Storage

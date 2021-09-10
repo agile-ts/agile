@@ -42,14 +42,6 @@ export class Group<
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
   public notFoundItemKeys: Array<ItemKey> = [];
 
-  // Keeps track of all changes made between rebuilds (add, remove, update).
-  // Why not rebuilding the Group directly in the add(), remove() methods?
-  // Because rebuilding the Group is also a side effect of the Group.
-  // Thus a rebuild should always happen whenever the Group mutates.
-  // (-> Simplicity and keeping the current structure to not rewrite all tests)
-  // Note: Changes array must be processed from front to back otherwise issues might arise!!
-  public trackedChanges: TrackedChangeInterface[] = [];
-
   // Whether the initial value was loaded from the corresponding Persistent
   // https://github.com/agile-ts/agile/issues/155
   public loadedInitialValue = true;
@@ -87,7 +79,9 @@ export class Group<
 
     // Add side effect to Group
     // that rebuilds the Group whenever the Group value changes
-    this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
+    this.addSideEffect(Group.rebuildGroupSideEffectKey, (state, config) => {
+      this.rebuild(config, config?.any?.trackedChanges || []);
+    });
 
     // Initial rebuild
     this.rebuild();
@@ -153,7 +147,9 @@ export class Group<
     let newGroupValue = copy(this.nextStateValue);
     config = defineConfig(config, {
       softRebuild: true,
+      any: {},
     });
+    config.any['trackedChanges'] = []; // TODO might be improved since the 'any' property is very vague
 
     // Remove itemKeys from Group
     _itemKeys.forEach((itemKey) => {
@@ -166,8 +162,9 @@ export class Group<
         return;
       }
 
+      // Track changes to soft rebuild the Group when rebuilding the Group in a side effect
       if (config.softRebuild) {
-        this.trackChange({
+        config.any['trackedChanges'].push({
           index: newGroupValue.findIndex((ik) => ik === itemKey),
           method: TrackedChangeMethod.REMOVE,
           key: itemKey,
@@ -215,7 +212,9 @@ export class Group<
     config = defineConfig(config, {
       method: 'push',
       softRebuild: true,
+      any: {},
     });
+    config.any['trackedChanges'] = []; // TODO might be improved since the 'any' property is very vague
 
     // Add itemKeys to Group
     _itemKeys.forEach((itemKey) => {
@@ -231,12 +230,12 @@ export class Group<
         return;
       }
 
-      // Track changes to soft rebuild the Group when rebuilding the Group
+      // Track changes to soft rebuild the Group when rebuilding the Group in a side effect
       if (config.softRebuild) {
-        this.trackChange({
+        config.any['trackedChanges'].push({
+          index: config.method === 'push' ? newGroupValue.length - 1 : 0,
           method: TrackedChangeMethod.ADD,
           key: itemKey,
-          index: config.method === 'push' ? newGroupValue.length - 1 : 0,
         });
       }
 
@@ -377,16 +376,20 @@ export class Group<
    *
    * @internal
    * @param config - Configuration object
+   * @param trackedChanges - Changes that were made between two rebuilds.
    */
-  public rebuild(config: GroupIngestConfigInterface = {}): this {
+  public rebuild(
+    config: GroupIngestConfigInterface = {},
+    trackedChanges: TrackedChangeInterface[] = []
+  ): this {
     // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
     // contains the Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
 
     // Soft rebuild the Collection (-> rebuild only parts of the Collection)
-    if (this.trackedChanges.length > 0) {
-      this.trackedChanges.forEach((change) => {
+    if (trackedChanges.length > 0) {
+      trackedChanges.forEach((change) => {
         const item = this.collection().getItem(change.key);
 
         switch (change.method) {
@@ -409,7 +412,6 @@ export class Group<
             break;
         }
       });
-      this.trackedChanges = [];
       this.observers['output'].ingest(config);
       return this;
     }
@@ -446,14 +448,6 @@ export class Group<
     );
 
     return this;
-  }
-
-  /**
-   * TODO
-   * @param change
-   */
-  public trackChange(change: TrackedChangeInterface) {
-    this.trackedChanges.push(change);
   }
 }
 

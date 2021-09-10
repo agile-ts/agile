@@ -50,7 +50,6 @@ describe('Group Tests', () => {
     expect(group._output).toStrictEqual([]);
     expect(group.nextGroupOutput).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
-    expect(group.trackedChanges).toStrictEqual([]);
     expect(group.loadedInitialValue).toBeTruthy();
 
     // Check if State was called with correct parameters
@@ -92,7 +91,6 @@ describe('Group Tests', () => {
     expect(group._output).toStrictEqual([]);
     expect(group.nextGroupOutput).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
-    expect(group.trackedChanges).toStrictEqual([]);
     expect(group.loadedInitialValue).toBeTruthy();
 
     // Check if State was called with correct parameters
@@ -131,7 +129,6 @@ describe('Group Tests', () => {
     expect(group._output).toStrictEqual([]);
     expect(group.nextGroupOutput).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
-    expect(group.trackedChanges).toStrictEqual([]);
     expect(group.loadedInitialValue).toBeTruthy();
 
     // Check if State was called with correct parameters
@@ -240,22 +237,24 @@ describe('Group Tests', () => {
           'dummyItem3Key',
         ];
         group.set = jest.fn();
-        group.trackChange = jest.fn();
       });
 
       it('should remove Item from Group (default config)', () => {
         group.remove('dummyItem1Key');
 
-        expect(group.trackChange).toHaveBeenCalledTimes(1);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 0,
-          method: TrackedChangeMethod.REMOVE,
-          key: 'dummyItem1Key',
-        });
-
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          {}
+          {
+            any: {
+              trackedChanges: [
+                {
+                  index: 0,
+                  method: TrackedChangeMethod.REMOVE,
+                  key: 'dummyItem1Key',
+                },
+              ],
+            },
+          }
         );
       });
 
@@ -267,18 +266,19 @@ describe('Group Tests', () => {
           softRebuild: false,
         });
 
-        expect(group.trackChange).not.toHaveBeenCalled();
-
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          { background: true, force: true, storage: false }
+          {
+            background: true,
+            force: true,
+            storage: false,
+            any: { trackedChanges: [] },
+          }
         );
       });
 
       it("shouldn't remove not existing Item from Group", () => {
         group.remove('notExistingKey');
-
-        expect(group.trackChange).not.toHaveBeenCalled();
 
         expect(group.set).not.toHaveBeenCalled();
       });
@@ -286,34 +286,41 @@ describe('Group Tests', () => {
       it('should remove Items from Group', () => {
         group.remove(['dummyItem1Key', 'notExistingItemKey', 'dummyItem3Key']);
 
-        expect(group.trackChange).toHaveBeenCalledTimes(2);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 0,
-          method: TrackedChangeMethod.REMOVE,
-          key: 'dummyItem1Key',
+        expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {
+          any: {
+            trackedChanges: [
+              {
+                index: 0,
+                method: TrackedChangeMethod.REMOVE,
+                key: 'dummyItem1Key',
+              },
+              {
+                index: 1,
+                method: TrackedChangeMethod.REMOVE,
+                key: 'dummyItem3Key',
+              },
+            ],
+          },
         });
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 1,
-          method: TrackedChangeMethod.REMOVE,
-          key: 'dummyItem3Key',
-        });
-
-        expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {});
       });
 
       it("should remove Item/s from Group that doesn't exist in the Collection in background", () => {
         group.remove('dummyItem3Key');
 
-        expect(group.trackChange).toHaveBeenCalledTimes(1);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 2,
-          method: TrackedChangeMethod.REMOVE,
-          key: 'dummyItem3Key',
-        });
-
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
-          { background: true }
+          {
+            background: true,
+            any: {
+              trackedChanges: [
+                {
+                  index: 2,
+                  method: TrackedChangeMethod.REMOVE,
+                  key: 'dummyItem3Key',
+                },
+              ],
+            },
+          }
         );
       });
 
@@ -324,16 +331,20 @@ describe('Group Tests', () => {
         () => {
           group.remove(['notExistingItemKey', 'dummyItem3Key']);
 
-          expect(group.trackChange).toHaveBeenCalledTimes(1);
-          expect(group.trackChange).toHaveBeenCalledWith({
-            index: 2,
-            method: TrackedChangeMethod.REMOVE,
-            key: 'dummyItem3Key',
-          });
-
           expect(group.set).toHaveBeenCalledWith(
             ['dummyItem1Key', 'dummyItem2Key'],
-            { background: true }
+            {
+              background: true,
+              any: {
+                trackedChanges: [
+                  {
+                    index: 2,
+                    method: TrackedChangeMethod.REMOVE,
+                    key: 'dummyItem3Key',
+                  },
+                ],
+              },
+            }
           );
         }
       );
@@ -343,22 +354,24 @@ describe('Group Tests', () => {
       beforeEach(() => {
         group.nextStateValue = ['placeholder', 'dummyItem1Key', 'placeholder'];
         group.set = jest.fn();
-        group.trackChange = jest.fn();
       });
 
       it('should add Item at the end of the Group (default config)', () => {
         group.add('dummyItem2Key');
 
-        expect(group.trackChange).toHaveBeenCalledTimes(1);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 2,
-          method: TrackedChangeMethod.ADD,
-          key: 'dummyItem2Key',
-        });
-
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          {}
+          {
+            any: {
+              trackedChanges: [
+                {
+                  index: 2,
+                  method: TrackedChangeMethod.ADD,
+                  key: 'dummyItem2Key',
+                },
+              ],
+            },
+          }
         );
       });
 
@@ -370,52 +383,44 @@ describe('Group Tests', () => {
           softRebuild: false,
         });
 
-        expect(group.trackChange).not.toHaveBeenCalled();
-
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          { background: true, force: true, storage: false }
+          {
+            background: true,
+            force: true,
+            storage: false,
+            any: { trackedChanges: [] },
+          }
         );
       });
 
       it("should add Item at the beginning of the Group (config.method = 'unshift')", () => {
         group.add('dummyItem2Key', { method: 'unshift' });
 
-        expect(group.trackChange).toHaveBeenCalledTimes(1);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 0,
-          method: TrackedChangeMethod.ADD,
-          key: 'dummyItem2Key',
-        });
-
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'placeholder', 'dummyItem1Key', 'placeholder'],
-          {}
+          {
+            any: {
+              trackedChanges: [
+                {
+                  index: 0,
+                  method: TrackedChangeMethod.ADD,
+                  key: 'dummyItem2Key',
+                },
+              ],
+            },
+          }
         );
       });
 
       it("shouldn't add already existing Item to the Group (default config)", () => {
         group.add('dummyItem1Key');
 
-        expect(group.trackChange).not.toHaveBeenCalled();
-
         expect(group.set).not.toHaveBeenCalled();
       });
 
       it('should add Items at the end of the Group', () => {
         group.add(['dummyItem1Key', 'dummyItem2Key', 'dummyItem3Key']);
-
-        expect(group.trackChange).toHaveBeenCalledTimes(2);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 2,
-          method: TrackedChangeMethod.ADD,
-          key: 'dummyItem2Key',
-        });
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 3,
-          method: TrackedChangeMethod.ADD,
-          key: 'dummyItem3Key',
-        });
 
         expect(group.set).toHaveBeenCalledWith(
           [
@@ -425,23 +430,42 @@ describe('Group Tests', () => {
             'dummyItem2Key',
             'dummyItem3Key',
           ],
-          {}
+          {
+            any: {
+              trackedChanges: [
+                {
+                  index: 2,
+                  method: TrackedChangeMethod.ADD,
+                  key: 'dummyItem2Key',
+                },
+                {
+                  index: 3,
+                  method: TrackedChangeMethod.ADD,
+                  key: 'dummyItem3Key',
+                },
+              ],
+            },
+          }
         );
       });
 
       it("should add Item that doesn't exist in Collection at the end of the Group in background", () => {
         group.add('dummyItem3Key');
 
-        expect(group.trackChange).toHaveBeenCalledTimes(1);
-        expect(group.trackChange).toHaveBeenCalledWith({
-          index: 2,
-          method: TrackedChangeMethod.ADD,
-          key: 'dummyItem3Key',
-        });
-
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-          { background: true }
+          {
+            background: true,
+            any: {
+              trackedChanges: [
+                {
+                  index: 2,
+                  method: TrackedChangeMethod.ADD,
+                  key: 'dummyItem3Key',
+                },
+              ],
+            },
+          }
         );
       });
 
@@ -452,16 +476,20 @@ describe('Group Tests', () => {
         () => {
           group.add(['dummyItem1Key', 'dummyItem3Key']);
 
-          expect(group.trackChange).toHaveBeenCalledTimes(1);
-          expect(group.trackChange).toHaveBeenCalledWith({
-            index: 2,
-            method: TrackedChangeMethod.ADD,
-            key: 'dummyItem3Key',
-          });
-
           expect(group.set).toHaveBeenCalledWith(
             ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-            { background: true }
+            {
+              background: true,
+              any: {
+                trackedChanges: [
+                  {
+                    index: 2,
+                    method: TrackedChangeMethod.ADD,
+                    key: 'dummyItem3Key',
+                  },
+                ],
+              },
+            }
           );
         }
       );
