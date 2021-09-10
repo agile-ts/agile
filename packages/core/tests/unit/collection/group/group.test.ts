@@ -8,6 +8,7 @@ import {
   CollectionPersistent,
   GroupObserver,
   EnhancedState,
+  TrackedChangeMethod,
 } from '../../../../src';
 import { LogMock } from '../../../helper/logMock';
 
@@ -47,7 +48,10 @@ describe('Group Tests', () => {
 
     expect(group.collection()).toBe(dummyCollection);
     expect(group._output).toStrictEqual([]);
+    expect(group.nextGroupOutput).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
+    expect(group.trackedChanges).toStrictEqual([]);
+    expect(group.loadedInitialValue).toBeTruthy();
 
     // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
@@ -86,7 +90,10 @@ describe('Group Tests', () => {
 
     expect(group.collection()).toBe(dummyCollection);
     expect(group._output).toStrictEqual([]);
+    expect(group.nextGroupOutput).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
+    expect(group.trackedChanges).toStrictEqual([]);
+    expect(group.loadedInitialValue).toBeTruthy();
 
     // Check if State was called with correct parameters
     expect(group._key).toBe('dummyKey');
@@ -122,7 +129,10 @@ describe('Group Tests', () => {
 
     expect(group.collection()).toBe(dummyCollection);
     expect(group._output).toStrictEqual([]);
+    expect(group.nextGroupOutput).toStrictEqual([]);
     expect(group.notFoundItemKeys).toStrictEqual([]);
+    expect(group.trackedChanges).toStrictEqual([]);
+    expect(group.loadedInitialValue).toBeTruthy();
 
     // Check if State was called with correct parameters
     expect(group._key).toBeUndefined();
@@ -230,10 +240,18 @@ describe('Group Tests', () => {
           'dummyItem3Key',
         ];
         group.set = jest.fn();
+        group.trackChange = jest.fn();
       });
 
-      it('should remove Item from Group not in background (default config)', () => {
+      it('should remove Item from Group (default config)', () => {
         group.remove('dummyItem1Key');
+
+        expect(group.trackChange).toHaveBeenCalledTimes(1);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 0,
+          method: TrackedChangeMethod.REMOVE,
+          key: 'dummyItem1Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
@@ -241,54 +259,102 @@ describe('Group Tests', () => {
         );
       });
 
-      it('should remove Item from Group in background (config.background = true)', () => {
-        group.remove('dummyItem1Key', { background: true });
+      it('should remove Item from Group (specific config)', () => {
+        group.remove('dummyItem1Key', {
+          background: true,
+          force: true,
+          storage: false,
+          softRebuild: false,
+        });
+
+        expect(group.trackChange).not.toHaveBeenCalled();
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'dummyItem3Key'],
-          { background: true }
+          { background: true, force: true, storage: false }
         );
       });
 
-      it("shouldn't remove not existing Item from Group (default config)", () => {
+      it("shouldn't remove not existing Item from Group", () => {
         group.remove('notExistingKey');
+
+        expect(group.trackChange).not.toHaveBeenCalled();
 
         expect(group.set).not.toHaveBeenCalled();
       });
 
-      it("should remove Item from Group that doesn't exist in Collection in background (default config)", () => {
-        group.remove('dummyItem3Key');
-
-        expect(group.set).toHaveBeenCalledWith(
-          ['dummyItem1Key', 'dummyItem2Key'],
-          { background: true }
-        );
-      });
-
-      it('should remove Items from Group not in background (default config)', () => {
+      it('should remove Items from Group', () => {
         group.remove(['dummyItem1Key', 'notExistingItemKey', 'dummyItem3Key']);
+
+        expect(group.trackChange).toHaveBeenCalledTimes(2);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 0,
+          method: TrackedChangeMethod.REMOVE,
+          key: 'dummyItem1Key',
+        });
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 1,
+          method: TrackedChangeMethod.REMOVE,
+          key: 'dummyItem3Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {});
       });
 
-      it("should remove Items from Group in background if passing not existing Item and Item that doesn't exist in Collection (default config)", () => {
-        group.remove(['notExistingItemKey', 'dummyItem3Key']);
+      it("should remove Item/s from Group that doesn't exist in the Collection in background", () => {
+        group.remove('dummyItem3Key');
+
+        expect(group.trackChange).toHaveBeenCalledTimes(1);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 2,
+          method: TrackedChangeMethod.REMOVE,
+          key: 'dummyItem3Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem1Key', 'dummyItem2Key'],
           { background: true }
         );
       });
+
+      it(
+        'should remove Items from Group in background ' +
+          'if passing not existing Items to remove ' +
+          "and Items that doesn't exist in the Collection",
+        () => {
+          group.remove(['notExistingItemKey', 'dummyItem3Key']);
+
+          expect(group.trackChange).toHaveBeenCalledTimes(1);
+          expect(group.trackChange).toHaveBeenCalledWith({
+            index: 2,
+            method: TrackedChangeMethod.REMOVE,
+            key: 'dummyItem3Key',
+          });
+
+          expect(group.set).toHaveBeenCalledWith(
+            ['dummyItem1Key', 'dummyItem2Key'],
+            { background: true }
+          );
+        }
+      );
     });
 
     describe('add function tests', () => {
       beforeEach(() => {
         group.nextStateValue = ['placeholder', 'dummyItem1Key', 'placeholder'];
         group.set = jest.fn();
+        group.trackChange = jest.fn();
       });
 
-      it('should add Item to Group at the end not in background (default config)', () => {
+      it('should add Item at the end of the Group (default config)', () => {
         group.add('dummyItem2Key');
+
+        expect(group.trackChange).toHaveBeenCalledTimes(1);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 2,
+          method: TrackedChangeMethod.ADD,
+          key: 'dummyItem2Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
@@ -296,8 +362,31 @@ describe('Group Tests', () => {
         );
       });
 
-      it("should add Item to Group at the beginning not in background (config.method = 'unshift')", () => {
+      it('should add Item at the end of the Group (specific config)', () => {
+        group.add('dummyItem2Key', {
+          background: true,
+          force: true,
+          storage: false,
+          softRebuild: false,
+        });
+
+        expect(group.trackChange).not.toHaveBeenCalled();
+
+        expect(group.set).toHaveBeenCalledWith(
+          ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
+          { background: true, force: true, storage: false }
+        );
+      });
+
+      it("should add Item at the beginning of the Group (config.method = 'unshift')", () => {
         group.add('dummyItem2Key', { method: 'unshift' });
+
+        expect(group.trackChange).toHaveBeenCalledTimes(1);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 0,
+          method: TrackedChangeMethod.ADD,
+          key: 'dummyItem2Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(
           ['dummyItem2Key', 'placeholder', 'dummyItem1Key', 'placeholder'],
@@ -305,41 +394,28 @@ describe('Group Tests', () => {
         );
       });
 
-      it('should add Item to Group at the end in background (config.background = true)', () => {
-        group.add('dummyItem2Key', { background: true });
-
-        expect(group.set).toHaveBeenCalledWith(
-          ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem2Key'],
-          { background: true }
-        );
-      });
-
-      it("should add Item to Group at the end that doesn't exist in Collection in background (default config)", () => {
-        group.add('dummyItem3Key');
-
-        expect(group.set).toHaveBeenCalledWith(
-          ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
-          { background: true }
-        );
-      });
-
-      it("shouldn't add existing Item to Group again (default config)", () => {
+      it("shouldn't add already existing Item to the Group (default config)", () => {
         group.add('dummyItem1Key');
+
+        expect(group.trackChange).not.toHaveBeenCalled();
 
         expect(group.set).not.toHaveBeenCalled();
       });
 
-      it('should remove existingItem and add it again at the end to the Group not in background (config.overwrite = true)', () => {
-        group.add('dummyItem1Key', { overwrite: true });
-
-        expect(group.set).toHaveBeenCalledWith(
-          ['placeholder', 'placeholder', 'dummyItem1Key'],
-          {}
-        );
-      });
-
-      it('should add Items to Group at the end not in background (default config)', () => {
+      it('should add Items at the end of the Group', () => {
         group.add(['dummyItem1Key', 'dummyItem2Key', 'dummyItem3Key']);
+
+        expect(group.trackChange).toHaveBeenCalledTimes(2);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 2,
+          method: TrackedChangeMethod.ADD,
+          key: 'dummyItem2Key',
+        });
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 3,
+          method: TrackedChangeMethod.ADD,
+          key: 'dummyItem3Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(
           [
@@ -353,14 +429,42 @@ describe('Group Tests', () => {
         );
       });
 
-      it('should add Items toGroup at the end in background if passing existing Item and in Collection not existing Item (default config)', () => {
-        group.add(['dummyItem1Key', 'dummyItem3Key']);
+      it("should add Item that doesn't exist in Collection at the end of the Group in background", () => {
+        group.add('dummyItem3Key');
+
+        expect(group.trackChange).toHaveBeenCalledTimes(1);
+        expect(group.trackChange).toHaveBeenCalledWith({
+          index: 2,
+          method: TrackedChangeMethod.ADD,
+          key: 'dummyItem3Key',
+        });
 
         expect(group.set).toHaveBeenCalledWith(
           ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
           { background: true }
         );
       });
+
+      it(
+        'should add Items at the end of the Group in background ' +
+          'if passing already added Items ' +
+          "and Items that doesn't exist in the Collection",
+        () => {
+          group.add(['dummyItem1Key', 'dummyItem3Key']);
+
+          expect(group.trackChange).toHaveBeenCalledTimes(1);
+          expect(group.trackChange).toHaveBeenCalledWith({
+            index: 2,
+            method: TrackedChangeMethod.ADD,
+            key: 'dummyItem3Key',
+          });
+
+          expect(group.set).toHaveBeenCalledWith(
+            ['placeholder', 'dummyItem1Key', 'placeholder', 'dummyItem3Key'],
+            { background: true }
+          );
+        }
+      );
     });
 
     describe('replace function tests', () => {
@@ -533,13 +637,13 @@ describe('Group Tests', () => {
       });
 
       it('should ingest the built Group output and set notFoundItemKeys to the not found Item Keys (specific config)', () => {
-        group.rebuild({ storage: true, overwrite: true, background: false });
+        group.rebuild({ background: true, force: false });
 
         expect(group.notFoundItemKeys).toStrictEqual(['dummyItem3Key']);
         expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
         expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
           [dummyItem1, dummyItem2],
-          { storage: true, overwrite: true, background: false }
+          { background: true, force: false }
         );
 
         LogMock.hasLoggedCode(

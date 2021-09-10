@@ -61,6 +61,7 @@ describe('CollectionPersistent Tests', () => {
     });
     expect(collectionPersistent.initialLoading).toHaveBeenCalled();
 
+    // Check if Persistent was called with correct parameters
     expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
     expect(collectionPersistent.ready).toBeTruthy();
     expect(collectionPersistent.isPersisted).toBeFalsy();
@@ -94,6 +95,7 @@ describe('CollectionPersistent Tests', () => {
     });
     expect(collectionPersistent.initialLoading).toHaveBeenCalled();
 
+    // Check if Persistent was called with correct parameters
     expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
     expect(collectionPersistent.ready).toBeTruthy();
     expect(collectionPersistent.isPersisted).toBeFalsy();
@@ -124,6 +126,7 @@ describe('CollectionPersistent Tests', () => {
     });
     expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
 
+    // Check if Persistent was called with correct parameters
     expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
     expect(collectionPersistent.ready).toBeFalsy();
     expect(collectionPersistent.isPersisted).toBeFalsy();
@@ -134,7 +137,7 @@ describe('CollectionPersistent Tests', () => {
     });
   });
 
-  it("should create CollectionPersistent and shouldn't call initialLoading if Persistent is ready (config.instantiate = false)", () => {
+  it("should create CollectionPersistent and shouldn't call initialLoading if Persistent is ready (config.loadValue = false)", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
       .spyOn(CollectionPersistent.prototype, 'instantiatePersistent')
@@ -156,6 +159,7 @@ describe('CollectionPersistent Tests', () => {
     });
     expect(collectionPersistent.initialLoading).not.toHaveBeenCalled();
 
+    // Check if Persistent was called with correct parameters
     expect(collectionPersistent._key).toBe(CollectionPersistent.placeHolderKey);
     expect(collectionPersistent.ready).toBeTruthy();
     expect(collectionPersistent.isPersisted).toBeFalsy();
@@ -428,9 +432,13 @@ describe('CollectionPersistent Tests', () => {
           expect(
             placeholderItem1?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
-          expect(
-            dummyCollection.assignItem
-          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
+            placeholderItem1,
+            {
+              overwrite: true,
+              rebuildGroups: false,
+            }
+          );
           expect(placeholderItem1.isPersisted).toBeTruthy();
 
           // Placeholder Item 2
@@ -453,7 +461,11 @@ describe('CollectionPersistent Tests', () => {
             placeholderItem2?.persistent?.loadPersistedValue
           ).not.toHaveBeenCalled();
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
-            placeholderItem2
+            placeholderItem2,
+            {
+              overwrite: true,
+              rebuildGroups: false,
+            }
           ); // Because Item persistent isn't ready
           expect(placeholderItem2.isPersisted).toBeFalsy();
 
@@ -476,9 +488,12 @@ describe('CollectionPersistent Tests', () => {
           expect(
             placeholderItem3?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
-          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
-            placeholderItem3
-          ); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
+          expect(
+            dummyCollection.assignItem
+          ).not.toHaveBeenCalledWith(placeholderItem3, {
+            overwrite: true,
+            rebuildGroups: false,
+          }); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
           expect(placeholderItem3.isPersisted).toBeFalsy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(
@@ -560,7 +575,11 @@ describe('CollectionPersistent Tests', () => {
             '3'
           ); // Because Item 3 is already present in the Collection
           expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
-            placeholderItem3
+            placeholderItem3,
+            {
+              overwrite: true,
+              rebuildGroups: false,
+            }
           ); // Because Item 3 is already present in the Collection
 
           // Placeholder Item 1
@@ -579,9 +598,13 @@ describe('CollectionPersistent Tests', () => {
           expect(
             placeholderItem1?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
-          expect(
-            dummyCollection.assignItem
-          ).toHaveBeenCalledWith(placeholderItem1, { overwrite: true });
+          expect(dummyCollection.assignItem).toHaveBeenCalledWith(
+            placeholderItem1,
+            {
+              overwrite: true,
+              rebuildGroups: false,
+            }
+          );
           expect(placeholderItem1.isPersisted).toBeTruthy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(

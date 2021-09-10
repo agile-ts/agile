@@ -28,7 +28,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
       loadValue: false,
     });
     config = defineConfig(config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
     });

@@ -110,31 +110,41 @@ describe('GroupObserver Tests', () => {
 
     describe('ingest function tests', () => {
       beforeEach(() => {
-        dummyGroup.rebuild = jest.fn();
+        groupObserver.ingestOutput = jest.fn();
       });
 
-      it('should rebuild the Group and ingests it into the runtime (default config)', () => {
+      it('should call ingestOutput with nextGroupOutput (default config)', () => {
+        groupObserver.group().nextGroupOutput = 'jeff' as any;
+
         groupObserver.ingest();
 
-        expect(dummyGroup.rebuild).toHaveBeenCalledWith({});
+        expect(groupObserver.ingestOutput).toHaveBeenCalledWith(
+          groupObserver.group().nextGroupOutput,
+          {}
+        );
       });
 
-      it('should rebuild the Group and ingests it into the runtime (specific config)', () => {
+      it('should call ingestOutput with nextGroupOutput (specific config)', () => {
+        groupObserver.group().nextGroupOutput = 'jeff' as any;
+
         groupObserver.ingest({
           background: true,
           force: true,
           maxTriesToUpdate: 5,
         });
 
-        expect(dummyGroup.rebuild).toHaveBeenCalledWith({
-          background: true,
-          force: true,
-          maxTriesToUpdate: 5,
-        });
+        expect(groupObserver.ingestOutput).toHaveBeenCalledWith(
+          groupObserver.group().nextGroupOutput,
+          {
+            background: true,
+            force: true,
+            maxTriesToUpdate: 5,
+          }
+        );
       });
     });
 
-    describe('ingestItems function tests', () => {
+    describe('ingestOutput function tests', () => {
       beforeEach(() => {
         dummyAgile.runtime.ingest = jest.fn();
       });
@@ -158,7 +168,7 @@ describe('GroupObserver Tests', () => {
             });
           });
 
-          groupObserver.ingestOutput([dummyItem1, dummyItem2]);
+          groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value]);
 
           expect(groupObserver.nextGroupOutput).toStrictEqual([
             dummyItem1._value,
@@ -190,7 +200,7 @@ describe('GroupObserver Tests', () => {
             });
           });
 
-          groupObserver.ingestOutput([dummyItem1, dummyItem2], {
+          groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value], {
             perform: false,
             force: true,
             sideEffects: {
@@ -219,7 +229,7 @@ describe('GroupObserver Tests', () => {
         () => {
           dummyGroup._output = [dummyItem1._value, dummyItem2._value];
 
-          groupObserver.ingestOutput([dummyItem1, dummyItem2]);
+          groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value]);
 
           expect(groupObserver.nextGroupOutput).toStrictEqual([
             dummyItem1._value,
@@ -249,7 +259,9 @@ describe('GroupObserver Tests', () => {
             });
           });
 
-          groupObserver.ingestOutput([dummyItem1, dummyItem2], { force: true });
+          groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value], {
+            force: true,
+          });
 
           expect(groupObserver.nextGroupOutput).toStrictEqual([
             dummyItem1._value,
@@ -281,7 +293,7 @@ describe('GroupObserver Tests', () => {
         });
         dummyGroup.isPlaceholder = true;
 
-        groupObserver.ingestOutput([dummyItem1, dummyItem2]);
+        groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value]);
 
         expect(groupObserver.nextGroupOutput).toStrictEqual([
           dummyItem1._value,
@@ -312,10 +324,15 @@ describe('GroupObserver Tests', () => {
         ];
         dummyJob.observer.value = [dummyItem1._value];
         dummyGroup._output = [dummyItem1._value];
+        dummyGroup.nextGroupOutput = [dummyItem1._value];
 
         groupObserver.perform(dummyJob);
 
         expect(dummyGroup._output).toStrictEqual([
+          dummyItem1._value,
+          dummyItem2._value,
+        ]);
+        expect(dummyGroup.nextGroupOutput).toStrictEqual([
           dummyItem1._value,
           dummyItem2._value,
         ]);

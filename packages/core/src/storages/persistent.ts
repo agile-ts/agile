@@ -46,7 +46,7 @@ export class Persistent {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
     config = defineConfig(config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
     });

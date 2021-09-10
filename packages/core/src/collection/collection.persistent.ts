@@ -39,7 +39,7 @@ export class CollectionPersistent<
       loadValue: false,
     });
     config = defineConfig(config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
     });

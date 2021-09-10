@@ -42,11 +42,12 @@ export class Group<
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
   public notFoundItemKeys: Array<ItemKey> = [];
 
-  // Keeps track of all changes made between rebuilds (add, remove, update)
-  // Why not rebuilding the Group directly in the add(), remove() method?
-  // Because rebuilding the Group is a side effect of the Group.
-  // A rebuild should always happen whenever the Group mutates.
+  // Keeps track of all changes made between rebuilds (add, remove, update).
+  // Why not rebuilding the Group directly in the add(), remove() methods?
+  // Because rebuilding the Group is also a side effect of the Group.
+  // Thus a rebuild should always happen whenever the Group mutates.
   // (-> Simplicity and keeping the current structure to not rewrite all tests)
+  // Note: Changes array must be processed from front to back otherwise issues might arise!!
   public trackedChanges: TrackedChangeInterface[] = [];
 
   // Whether the initial value was loaded from the corresponding Persistent
@@ -156,8 +157,10 @@ export class Group<
 
     // Remove itemKeys from Group
     _itemKeys.forEach((itemKey) => {
+      const exists = newGroupValue.includes(itemKey);
+
       // Check if itemKey exists in Group
-      if (!newGroupValue.includes(itemKey)) {
+      if (!exists) {
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
         return;
@@ -187,7 +190,7 @@ export class Group<
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    this.set(newGroupValue, config);
+    this.set(newGroupValue, removeProperties(config, ['softRebuild']));
 
     return this;
   }
@@ -208,10 +211,9 @@ export class Group<
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
-    let newGroupValue = copy(this.nextStateValue);
+    const newGroupValue = copy(this.nextStateValue);
     config = defineConfig(config, {
       method: 'push',
-      overwrite: false,
       softRebuild: true,
     });
 
@@ -223,28 +225,19 @@ export class Group<
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
-      // Track changes to soft rebuild the Group when rebuilding the Group
-      if (config.softRebuild && (!exists || (exists && config.overwrite))) {
-        this.trackChange({
-          method: exists ? TrackedChangeMethod.UPDATE : TrackedChangeMethod.ADD,
-          key: itemKey,
-          index: exists
-            ? newGroupValue.findIndex((ik) => ik === itemKey)
-            : config.method === 'push'
-            ? newGroupValue.length - 1
-            : 0,
-        });
+      // Handle existing Item
+      if (exists) {
+        existingItemKeys.push(itemKey);
+        return;
       }
 
-      // Remove itemKey temporary from newGroupValue
-      // if it should be overwritten and already exists in the newGroupValue
-      if (exists) {
-        if (config.overwrite) {
-          newGroupValue = newGroupValue.filter((key) => key !== itemKey);
-        } else {
-          existingItemKeys.push(itemKey);
-          return;
-        }
+      // Track changes to soft rebuild the Group when rebuilding the Group
+      if (config.softRebuild) {
+        this.trackChange({
+          method: TrackedChangeMethod.ADD,
+          key: itemKey,
+          index: config.method === 'push' ? newGroupValue.length - 1 : 0,
+        });
       }
 
       // Add new itemKey to Group
@@ -262,7 +255,10 @@ export class Group<
     )
       config.background = true;
 
-    this.set(newGroupValue, removeProperties(config, ['method', 'overwrite']));
+    this.set(
+      newGroupValue,
+      removeProperties(config, ['method', 'softRebuild'])
+    );
 
     return this;
   }
@@ -481,13 +477,9 @@ export interface GroupAddConfigInterface extends StateIngestConfigInterface {
    */
   method?: 'unshift' | 'push';
   /**
-   * If the to add `itemKey` already exists,
-   * whether its position should be overwritten with the position of the new `itemKey`.
-   * @default false
-   */
-  overwrite?: boolean;
-  /**
-   * TODO
+   * Whether to soft rebuild the Group.
+   * -> only rebuild the parts of the Group that have actually changed
+   * instead of rebuilding the whole Group.
    * @default true
    */
   softRebuild?: boolean;
@@ -495,7 +487,9 @@ export interface GroupAddConfigInterface extends StateIngestConfigInterface {
 
 export interface GroupRemoveConfigInterface extends StateIngestConfigInterface {
   /**
-   * TODO
+   * Whether to soft rebuild the Group.
+   * -> only rebuild the parts of the Group that have actually changed
+   * instead of rebuilding the whole Group.
    * @default true
    */
   softRebuild?: boolean;
