@@ -410,6 +410,7 @@ export class Group<
             this.nextGroupOutput.splice(change.index, 1);
             break;
           default:
+            break;
         }
       });
       this.trackedChanges = [];

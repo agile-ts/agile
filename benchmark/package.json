@@ -12,6 +12,7 @@
     "test:1000fields": "yarn test ./benchmarks/react/1000fields",
     "test:computed": "yarn test ./benchmarks/react/computed",
     "test:defineConfig": "yarn test ./benchmarks/typescript/defineConfig",
+    "test:cloneDeep": "yarn test ./benchmarks/typescript/cloneDeep",
     "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react & yarn install",
     "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react & yarn install"
   },
