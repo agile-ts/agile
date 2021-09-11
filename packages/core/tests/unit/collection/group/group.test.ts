@@ -1,13 +1,13 @@
 import {
-  Group,
   Agile,
   Collection,
-  StateObserver,
-  ComputedTracker,
-  Item,
   CollectionPersistent,
-  GroupObserver,
+  ComputedTracker,
   EnhancedState,
+  Group,
+  GroupObserver,
+  Item,
+  StateObserver,
   TrackedChangeMethod,
 } from '../../../../src';
 import { LogMock } from '../../../helper/logMock';
@@ -229,11 +229,14 @@ describe('Group Tests', () => {
 
     describe('remove function tests', () => {
       beforeEach(() => {
-        group.nextStateValue = [
+        group._value = [
           'dummyItem1Key',
           'dummyItem2Key',
           'missingInCollectionItemKey',
         ];
+        group.nextStateValue = group._value;
+        group._preciseItemKeys = ['dummyItem1Key', 'dummyItem2Key'];
+
         group.set = jest.fn();
       });
 
@@ -286,9 +289,10 @@ describe('Group Tests', () => {
           'dummyItem1Key',
           'notExistingItemKey',
           'missingInCollectionItemKey',
+          'dummyItem2Key',
         ]);
 
-        expect(group.set).toHaveBeenCalledWith(['dummyItem2Key'], {
+        expect(group.set).toHaveBeenCalledWith([], {
           any: {
             trackedChanges: [
               {
@@ -297,9 +301,9 @@ describe('Group Tests', () => {
                 key: 'dummyItem1Key',
               },
               {
-                index: 1,
+                index: 0,
                 method: TrackedChangeMethod.REMOVE,
-                key: 'missingInCollectionItemKey',
+                key: 'dummyItem2Key',
               },
             ],
           },
@@ -313,15 +317,7 @@ describe('Group Tests', () => {
           ['dummyItem1Key', 'dummyItem2Key'],
           {
             background: true,
-            any: {
-              trackedChanges: [
-                {
-                  index: 2,
-                  method: TrackedChangeMethod.REMOVE,
-                  key: 'missingInCollectionItemKey',
-                },
-              ],
-            },
+            any: { trackedChanges: [] },
           }
         );
       });
@@ -337,15 +333,7 @@ describe('Group Tests', () => {
             ['dummyItem1Key', 'dummyItem2Key'],
             {
               background: true,
-              any: {
-                trackedChanges: [
-                  {
-                    index: 2,
-                    method: TrackedChangeMethod.REMOVE,
-                    key: 'missingInCollectionItemKey',
-                  },
-                ],
-              },
+              any: { trackedChanges: [] },
             }
           );
         }
@@ -354,7 +342,10 @@ describe('Group Tests', () => {
 
     describe('add function tests', () => {
       beforeEach(() => {
-        group.nextStateValue = ['placeholder', 'dummyItem1Key', 'placeholder'];
+        group._value = ['placeholder', 'dummyItem1Key', 'placeholder'];
+        group.nextStateValue = group._value;
+        group._preciseItemKeys = ['dummyItem1Key'];
+
         group.set = jest.fn();
       });
 
@@ -367,7 +358,7 @@ describe('Group Tests', () => {
             any: {
               trackedChanges: [
                 {
-                  index: 2,
+                  index: 1,
                   method: TrackedChangeMethod.ADD,
                   key: 'dummyItem2Key',
                 },
@@ -436,12 +427,12 @@ describe('Group Tests', () => {
             any: {
               trackedChanges: [
                 {
-                  index: 2,
+                  index: 1,
                   method: TrackedChangeMethod.ADD,
                   key: 'dummyItem2Key',
                 },
                 {
-                  index: 3,
+                  index: 2,
                   method: TrackedChangeMethod.ADD,
                   key: 'notExistingItemKey',
                 },
@@ -461,7 +452,7 @@ describe('Group Tests', () => {
             any: {
               trackedChanges: [
                 {
-                  index: 2,
+                  index: 1,
                   method: TrackedChangeMethod.ADD,
                   key: 'notExistingItemKey',
                 },
@@ -490,7 +481,7 @@ describe('Group Tests', () => {
               any: {
                 trackedChanges: [
                   {
-                    index: 2,
+                    index: 1,
                     method: TrackedChangeMethod.ADD,
                     key: 'notExistingItemKey',
                   },
@@ -652,7 +643,7 @@ describe('Group Tests', () => {
       beforeEach(() => {
         group._value = [
           'dummyItem1Key',
-          'notExistingItemKey',
+          'missingInCollectionItemKey',
           'dummyItem2Key',
           'dummyItem3Key',
         ];
@@ -668,14 +659,14 @@ describe('Group Tests', () => {
           expect(group.notFoundItemKeys).toStrictEqual(['notExistingItemKey']);
           expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
           expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
-            [dummyItem1._value, dummyItem2._value],
+            [dummyItem1._value, dummyItem2._value, dummyItem3._value],
             {}
           );
 
           LogMock.hasLoggedCode(
             '1C:02:00',
             [dummyCollection._key, group._key],
-            ['notExistingItemKey']
+            ['missingInCollectionItemKey']
           );
         }
       );
@@ -684,25 +675,57 @@ describe('Group Tests', () => {
         'should hard rebuild the Group if no trackedChanges were specified ' +
           'and set notExistingItemKeys to the not found Item Keys (specific config)',
         () => {
-          group.rebuild([], { background: true, force: false });
+          group.rebuild([], { background: true, force: false, key: 'frank' });
 
           expect(group.notFoundItemKeys).toStrictEqual(['notExistingItemKey']);
           expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
           expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
-            [dummyItem1._value, dummyItem2._value],
-            { background: true, force: false }
+            [dummyItem1._value, dummyItem2._value, dummyItem3._value],
+            { background: true, force: false, key: 'frank' }
           );
 
           LogMock.hasLoggedCode(
             '1C:02:00',
             [dummyCollection._key, group._key],
-            ['notExistingItemKey']
+            ['missingInCollectionItemKey']
           );
         }
       );
 
       it('should soft rebuild the Group if trackedChanges were specified (default config)', () => {
-        // TODO
+        // 'dummyItem1Key',
+        // 'missingInCollectionItemKey',
+        // 'dummyItem2Key',
+        // 'dummyItem3Key'
+        // TODO the index of a TrackedChange is based on the Group value
+        //  which also contains not existing Items
+        //   -> the index might differ since in the Group output
+        //      not existing Items were skipped
+
+        group.nextGroupOutput = [
+          { id: 'dummyItem1Key', name: 'jeff' },
+          { id: 'dummyItem2Key', name: 'frank' },
+          { id: 'dummyItem3Key', name: 'hans' },
+        ];
+
+        group.rebuild([
+          { index: 3, method: TrackedChangeMethod.ADD, key: 'dummyItem3Key' },
+          {
+            index: 1,
+            method: TrackedChangeMethod.REMOVE,
+            key: 'dummyItem2Key',
+          },
+          {
+            index: 10,
+            method: TrackedChangeMethod.UPDATE,
+            key: 'missingInCollectionItemKey',
+          },
+          {
+            index: 0,
+            method: TrackedChangeMethod.UPDATE,
+            key: 'dummyItem1Key',
+          },
+        ]);
       });
 
       it('should soft rebuild the Group if trackedChanges were specified (specific config)', () => {

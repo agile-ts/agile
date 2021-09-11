@@ -34,6 +34,9 @@ export class Group<
   public _output: Array<DataType> = [];
   // Next output of the Group (which can be used for dynamic Group updates)
   public nextGroupOutput: Array<DataType> = [];
+  // Precise itemKeys of the Group only include itemKeys
+  // that actually exist in the corresponding Collection
+  public _preciseItemKeys: Array<ItemKey> = [];
 
   // Manages dependencies to other States and subscriptions of UI-Components.
   // It also serves as an interface to the runtime.
@@ -145,6 +148,10 @@ export class Group<
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const notExistingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
+    // Need to temporary update the preciseItemKeys
+    // since in the rebuild one action (trackedChanges) is performed after the other
+    // which requires a dynamic updated index
+    let updatedPreciseItemKeys = copy(this._preciseItemKeys);
     config = defineConfig(config, {
       softRebuild: true,
       any: {},
@@ -164,11 +171,15 @@ export class Group<
 
       // Track changes to soft rebuild the Group when rebuilding the Group in a side effect
       if (config.softRebuild) {
-        config.any['trackedChanges'].push({
-          index: newGroupValue.findIndex((ik) => ik === itemKey),
-          method: TrackedChangeMethod.REMOVE,
-          key: itemKey,
-        });
+        const index = updatedPreciseItemKeys.findIndex((ik) => ik === itemKey);
+        if (index !== -1) {
+          updatedPreciseItemKeys.splice(index, 1);
+          config.any['trackedChanges'].push({
+            index,
+            method: TrackedChangeMethod.REMOVE,
+            key: itemKey,
+          });
+        }
       }
 
       // Check if itemKey exists in Collection
@@ -209,6 +220,10 @@ export class Group<
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
     const newGroupValue = copy(this.nextStateValue);
+    // Need to temporary update the preciseItemKeys
+    // since in the rebuild one action (trackedChanges) is performed after the other
+    // which requires a dynamic updated index
+    const updatedPreciseItemKeys = copy(this._preciseItemKeys);
     config = defineConfig(config, {
       method: 'push',
       softRebuild: true,
@@ -232,8 +247,11 @@ export class Group<
 
       // Track changes to soft rebuild the Group when rebuilding the Group in a side effect
       if (config.softRebuild) {
+        const index =
+          config.method === 'push' ? updatedPreciseItemKeys.length : 0;
+        updatedPreciseItemKeys.push(itemKey);
         config.any['trackedChanges'].push({
-          index: config.method === 'push' ? newGroupValue.length - 1 : 0,
+          index,
           method: TrackedChangeMethod.ADD,
           key: itemKey,
         });
@@ -397,17 +415,23 @@ export class Group<
 
         switch (change.method) {
           case TrackedChangeMethod.ADD:
+            this._preciseItemKeys.splice(change.index, 0, change.key);
+            // this._value.splice(change.index, 0, change.key); // Already updated in 'add' method
             if (item != null) {
-              // this._value.splice(change.index, 0, change.key); // Already updated in 'add' method
               this.nextGroupOutput.splice(change.index, 0, copy(item._value));
+            } else {
+              notFoundItemKeys.push(change.key);
             }
             break;
           case TrackedChangeMethod.UPDATE:
             if (item != null) {
               this.nextGroupOutput[change.index] = copy(item._value);
+            } else {
+              notFoundItemKeys.push(change.key);
             }
             break;
           case TrackedChangeMethod.REMOVE:
+            this._preciseItemKeys.splice(change.index, 1);
             // this._value.splice(change.index, 1); // Already updated in 'remove' method
             this.nextGroupOutput.splice(change.index, 1);
             break;
@@ -421,11 +445,16 @@ export class Group<
     else {
       const groupItemValues: Array<DataType> = [];
 
+      // Reset precise itemKeys array to rebuild it from scratch
+      this._preciseItemKeys = [];
+
       // Fetch Items from Collection
       this._value.forEach((itemKey) => {
         const item = this.collection().getItem(itemKey);
-        if (item != null) groupItemValues.push(item._value);
-        else notFoundItemKeys.push(itemKey);
+        if (item != null) {
+          groupItemValues.push(item._value);
+          this._preciseItemKeys.push(itemKey);
+        } else notFoundItemKeys.push(itemKey);
       });
 
       // Ingest rebuilt Group output into the Runtime
