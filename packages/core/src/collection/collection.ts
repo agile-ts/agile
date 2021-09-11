@@ -107,7 +107,7 @@ export class Collection<
     // Rebuild of Groups
     // Not necessary because if Items are added to the Collection,
     // (after 'isInstantiated = true')
-    // the Groups which contain these added Items are rebuilt.
+    // the Groups which contain these added Items get rebuilt.
     // for (const key in this.groups) this.groups[key].rebuild();
   }
 
@@ -1218,9 +1218,7 @@ export class Collection<
    * @public
    * @param itemKeys - Item/s with identifier/s to be removed.
    */
-  public remove(
-    itemKeys: ItemKey | Array<ItemKey>
-  ): {
+  public remove(itemKeys: ItemKey | Array<ItemKey>): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
     everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
@@ -1469,13 +1467,16 @@ export class Collection<
     for (const groupKey of Object.keys(this.groups)) {
       const group = this.getGroup(groupKey);
       if (group != null && group.has(itemKey)) {
-        group.rebuild(config, [
-          {
-            key: itemKey,
-            index: group.nextStateValue.findIndex((ik) => itemKey === ik),
-            method: TrackedChangeMethod.UPDATE,
-          },
-        ]);
+        group.rebuild(
+          [
+            {
+              key: itemKey,
+              index: group.nextStateValue.findIndex((ik) => itemKey === ik),
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ],
+          config
+        );
       }
     }
   }

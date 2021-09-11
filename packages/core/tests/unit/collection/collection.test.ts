@@ -265,10 +265,10 @@ describe('Collection Tests', () => {
           key: 'group1Key',
         });
 
-        expect(collection.createGroup).toHaveBeenCalledWith('group1Key', [
-          1,
-          2,
-        ]);
+        expect(collection.createGroup).toHaveBeenCalledWith(
+          'group1Key',
+          [1, 2]
+        );
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
@@ -3040,13 +3040,16 @@ describe('Collection Tests', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem1');
 
         // Group 1
-        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({}, [
-          {
-            key: 'dummyItem1',
-            index: 0,
-            method: TrackedChangeMethod.UPDATE,
-          },
-        ]);
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
+          [
+            {
+              key: 'dummyItem1',
+              index: 0,
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ],
+          {}
+        );
 
         // Group 2
         expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
@@ -3061,34 +3064,34 @@ describe('Collection Tests', () => {
 
         // Group 1
         expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
-          {
-            key: 'frank',
-            background: true,
-            force: true,
-          },
           [
             {
               key: 'dummyItem2',
               index: 1,
               method: TrackedChangeMethod.UPDATE,
             },
-          ]
-        );
-
-        // Group 2
-        expect(dummyGroup2.rebuild).toHaveBeenCalledWith(
+          ],
           {
             key: 'frank',
             background: true,
             force: true,
-          },
+          }
+        );
+
+        // Group 2
+        expect(dummyGroup2.rebuild).toHaveBeenCalledWith(
           [
             {
               key: 'dummyItem2',
               index: 0,
               method: TrackedChangeMethod.UPDATE,
             },
-          ]
+          ],
+          {
+            key: 'frank',
+            background: true,
+            force: true,
+          }
         );
       });
     });

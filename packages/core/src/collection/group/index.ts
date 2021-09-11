@@ -80,7 +80,7 @@ export class Group<
     // Add side effect to Group
     // that rebuilds the Group whenever the Group value changes
     this.addSideEffect(Group.rebuildGroupSideEffectKey, (state, config) => {
-      this.rebuild(config, config?.any?.trackedChanges || []);
+      this.rebuild(config?.any?.trackedChanges || [], config);
     });
 
     // Initial rebuild
@@ -375,17 +375,20 @@ export class Group<
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#rebuild)
    *
    * @internal
+   * @param trackedChanges - Changes that were tracked between two rebuilds.
    * @param config - Configuration object
-   * @param trackedChanges - Changes that were made between two rebuilds.
    */
   public rebuild(
-    config: GroupIngestConfigInterface = {},
-    trackedChanges: TrackedChangeInterface[] = []
+    trackedChanges: TrackedChangeInterface[] = [],
+    config: GroupIngestConfigInterface = {}
   ): this {
     // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
     // contains the Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
+
+    // Item keys that couldn't be found in the Collection
+    const notFoundItemKeys: Array<ItemKey> = [];
 
     // Soft rebuild the Collection (-> rebuild only parts of the Collection)
     if (trackedChanges.length > 0) {
@@ -413,20 +416,21 @@ export class Group<
         }
       });
       this.observers['output'].ingest(config);
-      return this;
     }
-
     // Hard rebuild the whole Collection
+    else {
+      const groupItemValues: Array<DataType> = [];
 
-    const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
-    const groupItems: Array<Item<DataType>> = [];
+      // Fetch Items from Collection
+      this._value.forEach((itemKey) => {
+        const item = this.collection().getItem(itemKey);
+        if (item != null) groupItemValues.push(item._value);
+        else notFoundItemKeys.push(itemKey);
+      });
 
-    // Fetch Items from Collection
-    this._value.forEach((itemKey) => {
-      const item = this.collection().getItem(itemKey);
-      if (item != null) groupItems.push(item);
-      else notFoundItemKeys.push(itemKey);
-    });
+      // Ingest rebuilt Group output into the Runtime
+      this.observers['output'].ingestOutput(groupItemValues, config);
+    }
 
     // Logging
     if (notFoundItemKeys.length > 0 && this.loadedInitialValue) {
@@ -438,14 +442,6 @@ export class Group<
     }
 
     this.notFoundItemKeys = notFoundItemKeys;
-
-    // Ingest rebuilt Group output into the Runtime
-    this.observers['output'].ingestOutput(
-      groupItems.map((item) => {
-        return item._value;
-      }),
-      config
-    );
 
     return this;
   }
