@@ -7,6 +7,7 @@ import {
   CollectionPersistent,
   ComputedTracker,
   StatePersistent,
+  TrackedChangeMethod,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
@@ -264,10 +265,10 @@ describe('Collection Tests', () => {
           key: 'group1Key',
         });
 
-        expect(collection.createGroup).toHaveBeenCalledWith(
-          'group1Key',
-          [1, 2]
-        );
+        expect(collection.createGroup).toHaveBeenCalledWith('group1Key', [
+          1,
+          2,
+        ]);
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
@@ -1820,19 +1821,19 @@ describe('Collection Tests', () => {
     });
 
     describe('persist function tests', () => {
-      it('should create persistent with CollectionKey (default config)', () => {
+      it('should create Persistent with CollectionKey (default config)', () => {
         collection.persist();
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          instantiate: true,
+          loadValue: true,
           storageKeys: [],
           key: collection._key,
           defaultStorageKey: null,
         });
       });
 
-      it('should create persistent with CollectionKey (specific config)', () => {
+      it('should create Persistent with CollectionKey (specific config)', () => {
         collection.persist({
           storageKeys: ['test1', 'test2'],
           loadValue: false,
@@ -1841,26 +1842,26 @@ describe('Collection Tests', () => {
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
           key: collection._key,
           defaultStorageKey: 'test1',
         });
       });
 
-      it('should create persistent with passed Key (default config)', () => {
+      it('should create Persistent with passed Key (default config)', () => {
         collection.persist('passedKey');
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          instantiate: true,
+          loadValue: true,
           storageKeys: [],
           key: 'passedKey',
           defaultStorageKey: null,
         });
       });
 
-      it('should create persistent with passed Key (specific config)', () => {
+      it('should create Persistent with passed Key (specific config)', () => {
         collection.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
           loadValue: false,
@@ -1869,14 +1870,14 @@ describe('Collection Tests', () => {
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
           key: 'passedKey',
           defaultStorageKey: 'test1',
         });
       });
 
-      it("shouldn't overwrite existing persistent", () => {
+      it("shouldn't overwrite existing Persistent", () => {
         const dummyPersistent = new CollectionPersistent(collection);
         collection.persistent = dummyPersistent;
         collection.isPersisted = true;
@@ -2871,7 +2872,7 @@ describe('Collection Tests', () => {
         collection.assignData = jest.fn();
       });
 
-      it('should assign valid Item to Collection (default config)', () => {
+      it('should assign valid Item to the Collection (default config)', () => {
         const response = collection.assignItem(toAddDummyItem2);
 
         expect(response).toBeTruthy();
@@ -2893,21 +2894,19 @@ describe('Collection Tests', () => {
         LogMock.hasNotLogged('warn');
       });
 
-      it('should assign valid Item to Collection (config.background = true)', () => {
+      it('should assign valid Item to the Collection (specific config)', () => {
         const response = collection.assignItem(toAddDummyItem2, {
           background: true,
+          rebuildGroups: false,
         });
 
         expect(response).toBeTruthy();
         expect(collection.size).toBe(2);
         expect(collection.data).toHaveProperty('dummyItem2');
         expect(collection.data['dummyItem2']).toBe(toAddDummyItem2);
-        expect(collection.rebuildGroupsThatIncludeItemKey).toHaveBeenCalledWith(
-          'dummyItem2',
-          {
-            background: true,
-          }
-        );
+        expect(
+          collection.rebuildGroupsThatIncludeItemKey
+        ).not.toHaveBeenCalled();
         expect(collection.assignData).not.toHaveBeenCalled();
 
         expect(toAddDummyItem2.patch).not.toHaveBeenCalled();
@@ -3021,10 +3020,24 @@ describe('Collection Tests', () => {
       let dummyGroup1: Group<ItemInterface>;
       let dummyGroup2: Group<ItemInterface>;
 
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+
       beforeEach(() => {
-        dummyGroup1 = new Group(collection, ['dummyItem1', 'dummyItem2'], {
-          key: 'dummyGroup1',
-        });
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
+        dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Jeff' });
+        collection.data = {
+          dummyItem1: dummyItem1,
+          dummyItem2: dummyItem2,
+        };
+
+        dummyGroup1 = new Group(
+          collection,
+          ['dummyItem1', 'missingInCollectionItemKey', 'dummyItem2'],
+          {
+            key: 'dummyGroup1',
+          }
+        );
         dummyGroup2 = new Group(collection, ['dummyItem2'], {
           key: 'dummyGroup2',
         });
@@ -3037,43 +3050,89 @@ describe('Collection Tests', () => {
         dummyGroup2.rebuild = jest.fn();
       });
 
-      it('should call ingest on each Group that includes the passed ItemKey (default config)', () => {
+      it('should update the Item in each Group (output) that includes the specified itemKey (default config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem1');
 
-        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({
-          background: false,
-          sideEffects: {
-            enabled: true,
-            exclude: [],
-          },
-          storage: false,
-        });
+        // Group 1
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
+          [
+            {
+              key: 'dummyItem1',
+              index: 0,
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ],
+          {}
+        );
+
+        // Group 2
         expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
       });
 
-      it('should call ingest on each Group that includes the passed ItemKey (specific config)', () => {
+      it('should update the Item in each Group (output) that includes the specified itemKey (specific config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem2', {
+          key: 'frank',
           background: true,
-          sideEffects: {
-            enabled: false,
-          },
+          force: true,
         });
 
-        expect(dummyGroup1.rebuild).toHaveBeenCalledWith({
-          background: true,
-          sideEffects: {
-            enabled: false,
-          },
-          storage: false,
-        });
-        expect(dummyGroup2.rebuild).toHaveBeenCalledWith({
-          background: true,
-          sideEffects: {
-            enabled: false,
-          },
-          storage: false,
-        });
+        // Group 1
+        expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
+          [
+            {
+              key: 'dummyItem2',
+              index: 1,
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ],
+          {
+            key: 'frank',
+            background: true,
+            force: true,
+          }
+        );
+
+        // Group 2
+        expect(dummyGroup2.rebuild).toHaveBeenCalledWith(
+          [
+            {
+              key: 'dummyItem2',
+              index: 0,
+              method: TrackedChangeMethod.UPDATE,
+            },
+          ],
+          {
+            key: 'frank',
+            background: true,
+            force: true,
+          }
+        );
       });
+
+      it(
+        'should update the Item in each Group (output) that includes the specified itemKey ' +
+          "although the Item doesn't exist in the Group output yet",
+        () => {
+          collection.rebuildGroupsThatIncludeItemKey(
+            'missingInCollectionItemKey'
+          );
+
+          // Group 1
+          expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
+            [
+              {
+                key: 'missingInCollectionItemKey',
+                index: 1,
+                method: TrackedChangeMethod.ADD,
+              },
+            ],
+            {}
+          );
+
+          // Group 2
+          expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
+        }
+      );
     });
   });
 });

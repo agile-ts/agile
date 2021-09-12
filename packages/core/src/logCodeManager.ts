@@ -305,7 +305,9 @@ if (process.env.NODE_ENV !== 'production') {
     log,
     logCodeLogTypes: logCodeTypes,
     logCodeMessages: logCodeMessages,
-    getLogger: loggerPackage.getLogger,
+    getLogger: () => {
+      return loggerPackage?.getLogger() ?? null;
+    },
     logIfTags,
     setAllowLogging,
   };

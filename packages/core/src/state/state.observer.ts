@@ -14,8 +14,8 @@ import {
   SubscriptionContainer,
   ObserverKey,
   defineConfig,
+  removeProperties,
 } from '../internal';
-import type { EnhancedState } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
   // State the Observer belongs to
@@ -88,15 +88,7 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = this.state();
     config = defineConfig(config, {
       perform: true,
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
       force: false,
-      storage: true,
-      overwrite: false,
-      maxTriesToUpdate: 3,
     });
 
     // Force overwriting the State value if it is a placeholder.
@@ -116,15 +108,12 @@ export class StateObserver<ValueType = any> extends Observer {
 
     // Create Runtime-Job
     const job = new StateRuntimeJob(this, {
-      storage: config.storage,
-      sideEffects: config.sideEffects,
-      force: config.force,
-      background: config.background,
-      overwrite: config.overwrite,
-      key:
-        config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
-      maxTriesToUpdate: config.maxTriesToUpdate,
+      ...removeProperties(config, ['perform']),
+      ...{
+        key:
+          config.key ??
+          `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
+      },
     });
 
     // Pass created Job into the Runtime

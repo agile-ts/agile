@@ -455,7 +455,7 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
 
     // Create Persistent (-> persist value)
     this.persistent = new StatePersistent<ValueType>(this, {
-      instantiate: _config.loadValue,
+      loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
       key: key,
       defaultStorageKey: _config.defaultStorageKey,

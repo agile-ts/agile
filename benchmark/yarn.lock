@@ -3,7 +3,12 @@
 
 
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.2.0-alpha.3"
+  version "0.2.0-alpha.5"
+  dependencies:
+    "@agile-ts/utils" "^0.0.7"
+
+"@agile-ts/logger@file:.yalc/@agile-ts/logger":
+  version "0.0.7"
   dependencies:
     "@agile-ts/utils" "^0.0.7"
 
@@ -22,10 +27,10 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@hookstate/core@^3.0.8":
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/@hookstate/core/-/core-3.0.8.tgz#d6838153d6d43c2f35cfca475c31248192564e62"
-  integrity sha512-blQagGIVIbNoUiNCRrvaXqFmUe7WGMY35ok/LENfl2pcIsLBjkreYIZiaSFi83tkycwq7ZOmcQz/R1nvLKhH8w==
+"@hookstate/core@^3.0.11":
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/@hookstate/core/-/core-3.0.11.tgz#515f2748b3741f3d7e90cbc1acff8d6ac84e5494"
+  integrity sha512-cbI711aFWX4d8+xkLxikmLnR+f55ePHrBMWFA4gTLEoCa1+Cg0pfNw7h7zSodYMeYt8Y5A5TVSh7a5p8lBC89A==
 
 "@pulsejs/core@^4.0.0-beta.3":
   version "4.0.0-beta.3"

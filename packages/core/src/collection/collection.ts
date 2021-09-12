@@ -1,26 +1,27 @@
 import {
   Agile,
-  Item,
+  CollectionPersistent,
+  ComputedTracker,
+  copy,
+  defineConfig,
+  generateId,
   Group,
+  GroupAddConfigInterface,
+  GroupConfigInterface,
+  GroupIngestConfigInterface,
   GroupKey,
+  isFunction,
+  isValidObject,
+  Item,
+  LogCodeManager,
+  normalizeArray,
+  PatchOptionConfigInterface,
+  removeProperties,
   Selector,
+  SelectorConfigInterface,
   SelectorKey,
   StorageKey,
-  GroupConfigInterface,
-  isValidObject,
-  normalizeArray,
-  copy,
-  CollectionPersistent,
-  GroupAddConfigInterface,
-  ComputedTracker,
-  generateId,
-  SideEffectConfigInterface,
-  SelectorConfigInterface,
-  removeProperties,
-  isFunction,
-  LogCodeManager,
-  PatchOptionConfigInterface,
-  defineConfig,
+  TrackedChangeMethod,
 } from '../internal';
 
 export class Collection<
@@ -106,7 +107,7 @@ export class Collection<
     // Rebuild of Groups
     // Not necessary because if Items are added to the Collection,
     // (after 'isInstantiated = true')
-    // the Groups which contain these added Items are rebuilt.
+    // the Groups which contain these added Items get rebuilt.
     // for (const key in this.groups) this.groups[key].rebuild();
   }
 
@@ -978,7 +979,7 @@ export class Collection<
 
     // Create Persistent (-> persist value)
     this.persistent = new CollectionPersistent<DataType>(this, {
-      instantiate: _config.loadValue,
+      loadValue: _config.loadValue,
       storageKeys: _config.storageKeys,
       key: key,
       defaultStorageKey: _config.defaultStorageKey,
@@ -1405,6 +1406,7 @@ export class Collection<
     config = defineConfig(config, {
       overwrite: false,
       background: false,
+      rebuildGroups: true,
     });
     const primaryKey = this.config.primaryKey;
     let itemKey = item._value[primaryKey];
@@ -1442,9 +1444,10 @@ export class Collection<
     // Rebuild Groups that include itemKey
     // after adding Item with itemKey to the Collection
     // (because otherwise it can't find the Item as it isn't added yet)
-    this.rebuildGroupsThatIncludeItemKey(itemKey, {
-      background: config.background,
-    });
+    if (config.rebuildGroups)
+      this.rebuildGroupsThatIncludeItemKey(itemKey, {
+        background: config.background,
+      });
 
     if (increaseCollectionSize) this.size++;
 
@@ -1460,29 +1463,49 @@ export class Collection<
    */
   public rebuildGroupsThatIncludeItemKey(
     itemKey: ItemKey,
-    config: RebuildGroupsThatIncludeItemKeyConfigInterface = {}
+    config: GroupIngestConfigInterface = {}
   ): void {
-    config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-    });
-
     // Rebuild Groups that include itemKey
-    for (const groupKey in this.groups) {
+    for (const groupKey of Object.keys(this.groups)) {
       const group = this.getGroup(groupKey);
-      if (group?.has(itemKey)) {
-        // Not necessary because a sideEffect of ingesting the Group
-        // into the runtime is to rebuilt itself
-        // group.rebuild();
+      if (group != null && group.has(itemKey)) {
+        const index = group._preciseItemKeys.findIndex((ik) => itemKey === ik);
 
-        group?.rebuild({
-          background: config?.background,
-          sideEffects: config?.sideEffects,
-          storage: false,
-        });
+        // Update Group output at index
+        if (index !== -1) {
+          group.rebuild(
+            [
+              {
+                key: itemKey,
+                index: index,
+                method: TrackedChangeMethod.UPDATE,
+              },
+            ],
+            config
+          );
+        }
+        // Add Item to the Group output if it isn't yet represented there to be updated
+        else {
+          const indexOfBeforeItemKey =
+            group.nextStateValue.findIndex((ik) => itemKey === ik) - 1;
+
+          group.rebuild(
+            [
+              {
+                key: itemKey,
+                index:
+                  indexOfBeforeItemKey >= 0
+                    ? group._preciseItemKeys.findIndex(
+                        (ik) =>
+                          group.nextStateValue[indexOfBeforeItemKey] === ik
+                      ) + 1
+                    : 0,
+                method: TrackedChangeMethod.ADD,
+              },
+            ],
+            config
+          );
+        }
       }
     }
   }
@@ -1601,20 +1624,6 @@ export interface UpdateItemKeyConfigInterface {
   background?: boolean;
 }
 
-export interface RebuildGroupsThatIncludeItemKeyConfigInterface {
-  /**
-   * Whether to rebuilt the Group in background.
-   * So that the UI isn't notified of these changes and thus doesn't rerender.
-   * @default false
-   */
-  background?: boolean;
-  /**
-   * Whether to execute the defined side effects.
-   * @default true
-   */
-  sideEffects?: SideEffectConfigInterface;
-}
-
 export interface HasConfigInterface {
   /**
    * Whether Items that do not officially exist,
@@ -1694,4 +1703,9 @@ export interface AssignItemConfigInterface {
    * @default false
    */
   background?: boolean;
+  /**
+   * Whether to rebuild all Groups that include the itemKey of the to assign Item.
+   * @default true
+   */
+  rebuildGroups?: boolean;
 }

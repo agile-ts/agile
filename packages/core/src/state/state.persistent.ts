@@ -25,10 +25,10 @@ export class StatePersistent<ValueType = any> extends Persistent {
     config: CreatePersistentConfigInterface = {}
   ) {
     super(state.agileInstance(), {
-      instantiate: false,
+      loadValue: false,
     });
     config = defineConfig(config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
     });
@@ -40,7 +40,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     });
 
     // Load/Store persisted value/s for the first time
-    if (this.ready && config.instantiate) this.initialLoading();
+    if (this.ready && config.loadValue) this.initialLoading();
   }
 
   /**
