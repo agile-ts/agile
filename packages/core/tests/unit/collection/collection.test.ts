@@ -265,10 +265,10 @@ describe('Collection Tests', () => {
           key: 'group1Key',
         });
 
-        expect(collection.createGroup).toHaveBeenCalledWith(
-          'group1Key',
-          [1, 2]
-        );
+        expect(collection.createGroup).toHaveBeenCalledWith('group1Key', [
+          1,
+          2,
+        ]);
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
@@ -3020,10 +3020,24 @@ describe('Collection Tests', () => {
       let dummyGroup1: Group<ItemInterface>;
       let dummyGroup2: Group<ItemInterface>;
 
+      let dummyItem1: Item<ItemInterface>;
+      let dummyItem2: Item<ItemInterface>;
+
       beforeEach(() => {
-        dummyGroup1 = new Group(collection, ['dummyItem1', 'dummyItem2'], {
-          key: 'dummyGroup1',
-        });
+        dummyItem1 = new Item(collection, { id: 'dummyItem1', name: 'Jeff' });
+        dummyItem2 = new Item(collection, { id: 'dummyItem2', name: 'Jeff' });
+        collection.data = {
+          dummyItem1: dummyItem1,
+          dummyItem2: dummyItem2,
+        };
+
+        dummyGroup1 = new Group(
+          collection,
+          ['dummyItem1', 'missingInCollectionItemKey', 'dummyItem2'],
+          {
+            key: 'dummyGroup1',
+          }
+        );
         dummyGroup2 = new Group(collection, ['dummyItem2'], {
           key: 'dummyGroup2',
         });
@@ -3036,7 +3050,7 @@ describe('Collection Tests', () => {
         dummyGroup2.rebuild = jest.fn();
       });
 
-      it('should rebuild each Group that includes the specified itemKey (default config)', () => {
+      it('should update the Item in each Group (output) that includes the specified itemKey (default config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem1');
 
         // Group 1
@@ -3055,7 +3069,7 @@ describe('Collection Tests', () => {
         expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
       });
 
-      it('should rebuild each Group that includes the specified itemKey (specific config)', () => {
+      it('should update the Item in each Group (output) that includes the specified itemKey (specific config)', () => {
         collection.rebuildGroupsThatIncludeItemKey('dummyItem2', {
           key: 'frank',
           background: true,
@@ -3094,6 +3108,31 @@ describe('Collection Tests', () => {
           }
         );
       });
+
+      it(
+        'should update the Item in each Group (output) that includes the specified itemKey ' +
+          "although the Item doesn't exist in the Group output yet",
+        () => {
+          collection.rebuildGroupsThatIncludeItemKey(
+            'missingInCollectionItemKey'
+          );
+
+          // Group 1
+          expect(dummyGroup1.rebuild).toHaveBeenCalledWith(
+            [
+              {
+                key: 'missingInCollectionItemKey',
+                index: 1,
+                method: TrackedChangeMethod.ADD,
+              },
+            ],
+            {}
+          );
+
+          // Group 2
+          expect(dummyGroup2.rebuild).not.toHaveBeenCalled();
+        }
+      );
     });
   });
 });

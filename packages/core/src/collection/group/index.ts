@@ -415,9 +415,9 @@ export class Group<
 
         switch (change.method) {
           case TrackedChangeMethod.ADD:
-            this._preciseItemKeys.splice(change.index, 0, change.key);
             // this._value.splice(change.index, 0, change.key); // Already updated in 'add' method
             if (item != null) {
+              this._preciseItemKeys.splice(change.index, 0, change.key);
               this.nextGroupOutput.splice(change.index, 0, copy(item._value));
             } else {
               notFoundItemKeys.push(change.key);
@@ -431,8 +431,8 @@ export class Group<
             }
             break;
           case TrackedChangeMethod.REMOVE:
-            this._preciseItemKeys.splice(change.index, 1);
             // this._value.splice(change.index, 1); // Already updated in 'remove' method
+            this._preciseItemKeys.splice(change.index, 1);
             this.nextGroupOutput.splice(change.index, 1);
             break;
           default:

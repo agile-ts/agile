@@ -1218,7 +1218,9 @@ export class Collection<
    * @public
    * @param itemKeys - Item/s with identifier/s to be removed.
    */
-  public remove(itemKeys: ItemKey | Array<ItemKey>): {
+  public remove(
+    itemKeys: ItemKey | Array<ItemKey>
+  ): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
     everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
@@ -1467,16 +1469,43 @@ export class Collection<
     for (const groupKey of Object.keys(this.groups)) {
       const group = this.getGroup(groupKey);
       if (group != null && group.has(itemKey)) {
-        group.rebuild(
-          [
-            {
-              key: itemKey,
-              index: group.nextStateValue.findIndex((ik) => itemKey === ik),
-              method: TrackedChangeMethod.UPDATE,
-            },
-          ],
-          config
-        );
+        const index = group._preciseItemKeys.findIndex((ik) => itemKey === ik);
+
+        // Update Group output at index
+        if (index !== -1) {
+          group.rebuild(
+            [
+              {
+                key: itemKey,
+                index: index,
+                method: TrackedChangeMethod.UPDATE,
+              },
+            ],
+            config
+          );
+        }
+        // Add Item to the Group output if it isn't yet represented there to be updated
+        else {
+          const indexOfBeforeItemKey =
+            group.nextStateValue.findIndex((ik) => itemKey === ik) - 1;
+
+          group.rebuild(
+            [
+              {
+                key: itemKey,
+                index:
+                  indexOfBeforeItemKey >= 0
+                    ? group._preciseItemKeys.findIndex(
+                        (ik) =>
+                          group.nextStateValue[indexOfBeforeItemKey] === ik
+                      ) + 1
+                    : 0,
+                method: TrackedChangeMethod.ADD,
+              },
+            ],
+            config
+          );
+        }
       }
     }
   }

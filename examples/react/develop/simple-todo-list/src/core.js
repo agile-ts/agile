@@ -1,4 +1,4 @@
-import { createCollection } from '@agile-ts/core';
+import { createCollection, globalBind } from '@agile-ts/core';
 import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
 
 assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
@@ -7,3 +7,5 @@ assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 export const TODOS = createCollection({
   initialData: [{ id: 1, name: 'Clean Bathroom' }],
 }).persist('todos'); // persist does store the Collection in the Local Storage
+
+globalBind('__core__', { TODOS });
