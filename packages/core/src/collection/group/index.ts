@@ -151,7 +151,7 @@ export class Group<
     // Need to temporary update the preciseItemKeys
     // since in the rebuild one action (trackedChanges) is performed after the other
     // which requires a dynamic updated index
-    let updatedPreciseItemKeys = copy(this._preciseItemKeys);
+    const updatedPreciseItemKeys = copy(this._preciseItemKeys);
     config = defineConfig(config, {
       softRebuild: true,
       any: {},
