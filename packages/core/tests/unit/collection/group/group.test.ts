@@ -648,6 +648,7 @@ describe('Group Tests', () => {
           'dummyItem3Key',
         ];
         group.observers['output'].ingestOutput = jest.fn();
+        group.observers['output'].ingest = jest.fn();
       });
 
       it(
@@ -656,12 +657,14 @@ describe('Group Tests', () => {
         () => {
           group.rebuild();
 
-          expect(group.notFoundItemKeys).toStrictEqual(['notExistingItemKey']);
-          expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
+          expect(group.notFoundItemKeys).toStrictEqual([
+            'missingInCollectionItemKey',
+          ]);
           expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
             [dummyItem1._value, dummyItem2._value, dummyItem3._value],
             {}
           );
+          expect(group.observers['output'].ingest).not.toHaveBeenCalled();
 
           LogMock.hasLoggedCode(
             '1C:02:00',
@@ -677,8 +680,9 @@ describe('Group Tests', () => {
         () => {
           group.rebuild([], { background: true, force: false, key: 'frank' });
 
-          expect(group.notFoundItemKeys).toStrictEqual(['notExistingItemKey']);
-          expect(group._output).toStrictEqual([]); // because of mocking 'ingestValue'
+          expect(group.notFoundItemKeys).toStrictEqual([
+            'missingInCollectionItemKey',
+          ]);
           expect(group.observers['output'].ingestOutput).toHaveBeenCalledWith(
             [dummyItem1._value, dummyItem2._value, dummyItem3._value],
             { background: true, force: false, key: 'frank' }
@@ -692,45 +696,118 @@ describe('Group Tests', () => {
         }
       );
 
-      it('should soft rebuild the Group if trackedChanges were specified (default config)', () => {
-        // 'dummyItem1Key',
-        // 'missingInCollectionItemKey',
-        // 'dummyItem2Key',
-        // 'dummyItem3Key'
-        // TODO the index of a TrackedChange is based on the Group value
-        //  which also contains not existing Items
-        //   -> the index might differ since in the Group output
-        //      not existing Items were skipped
+      it(
+        'should soft rebuild the Group if trackedChanges were specified ' +
+          'and set notExistingItemKeys to the not found Item Keys (default config)',
+        () => {
+          group.nextGroupOutput = [
+            { id: 'dummyItem1Key', name: 'jeff' },
+            { id: 'dummyItem2Key', name: 'frank' },
+          ];
+          group._preciseItemKeys = ['dummyItem1Key', 'dummyItem2Key'];
 
-        group.nextGroupOutput = [
-          { id: 'dummyItem1Key', name: 'jeff' },
-          { id: 'dummyItem2Key', name: 'frank' },
-          { id: 'dummyItem3Key', name: 'hans' },
-        ];
+          group.rebuild([
+            { index: 2, method: TrackedChangeMethod.ADD, key: 'dummyItem3Key' },
+            {
+              index: 1,
+              method: TrackedChangeMethod.REMOVE,
+              key: 'dummyItem2Key',
+            },
+            {
+              index: 4,
+              method: TrackedChangeMethod.UPDATE,
+              key: 'missingInCollectionItemKey',
+            },
+            {
+              index: 0,
+              method: TrackedChangeMethod.UPDATE,
+              key: 'dummyItem1Key',
+            },
+          ]);
 
-        group.rebuild([
-          { index: 3, method: TrackedChangeMethod.ADD, key: 'dummyItem3Key' },
-          {
-            index: 1,
-            method: TrackedChangeMethod.REMOVE,
-            key: 'dummyItem2Key',
-          },
-          {
-            index: 10,
-            method: TrackedChangeMethod.UPDATE,
-            key: 'missingInCollectionItemKey',
-          },
-          {
-            index: 0,
-            method: TrackedChangeMethod.UPDATE,
-            key: 'dummyItem1Key',
-          },
-        ]);
-      });
+          expect(group.notFoundItemKeys).toStrictEqual([
+            'missingInCollectionItemKey',
+          ]);
+          expect(group.observers['output'].ingestOutput).not.toHaveBeenCalled();
+          expect(group.observers['output'].ingest).toHaveBeenCalled();
+          expect(group.nextGroupOutput).toStrictEqual([
+            { id: 'dummyItem1Key', name: 'jeff' },
+            { id: 'dummyItem3Key', name: 'hans' },
+          ]);
+          expect(group._preciseItemKeys).toStrictEqual([
+            'dummyItem1Key',
+            'dummyItem3Key',
+          ]);
 
-      it('should soft rebuild the Group if trackedChanges were specified (specific config)', () => {
-        // TODO
-      });
+          LogMock.hasLoggedCode(
+            '1C:02:00',
+            [dummyCollection._key, group._key],
+            ['missingInCollectionItemKey']
+          );
+        }
+      );
+
+      it(
+        'should soft rebuild the Group if trackedChanges were specified ' +
+          'and set notExistingItemKeys to the not found Item Keys (specific config)',
+        () => {
+          group.nextGroupOutput = [
+            { id: 'dummyItem1Key', name: 'jeff' },
+            { id: 'dummyItem2Key', name: 'frank' },
+          ];
+          group._preciseItemKeys = ['dummyItem1Key', 'dummyItem2Key'];
+
+          group.rebuild(
+            [
+              {
+                index: 2,
+                method: TrackedChangeMethod.ADD,
+                key: 'dummyItem3Key',
+              },
+              {
+                index: 1,
+                method: TrackedChangeMethod.REMOVE,
+                key: 'dummyItem2Key',
+              },
+              {
+                index: 4,
+                method: TrackedChangeMethod.UPDATE,
+                key: 'missingInCollectionItemKey',
+              },
+              {
+                index: 0,
+                method: TrackedChangeMethod.UPDATE,
+                key: 'dummyItem1Key',
+              },
+            ],
+            { key: 'frank', force: true, background: true }
+          );
+
+          expect(group.notFoundItemKeys).toStrictEqual([
+            'missingInCollectionItemKey',
+          ]);
+          expect(group.observers['output'].ingestOutput).not.toHaveBeenCalled();
+          expect(group.observers['output'].ingest).toHaveBeenCalledWith({
+            key: 'frank',
+            force: true,
+            background: true,
+          });
+          expect(group.nextGroupOutput).toStrictEqual([
+            { id: 'dummyItem1Key', name: 'jeff' },
+            { id: 'dummyItem3Key', name: 'hans' },
+          ]);
+          expect(group._preciseItemKeys).toStrictEqual([
+            'dummyItem1Key',
+            'dummyItem3Key',
+          ]);
+
+          LogMock.hasLoggedCode(
+            '1C:02:00',
+            [dummyCollection._key, group._key],
+            ['missingInCollectionItemKey']
+          );
+        }
+      );
 
       it(
         "shouldn't ingest the build Group output " +
@@ -741,7 +818,6 @@ describe('Group Tests', () => {
           group.rebuild();
 
           expect(group.notFoundItemKeys).toStrictEqual([]);
-          expect(group._output).toStrictEqual([]);
           expect(group.observers['output'].ingestOutput).not.toHaveBeenCalled();
           LogMock.hasNotLogged('warn');
         }

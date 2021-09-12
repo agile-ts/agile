@@ -103,6 +103,7 @@ describe('Observer Tests', () => {
             },
             force: false,
             maxTriesToUpdate: 3,
+            any: {},
           });
         });
 
@@ -128,6 +129,7 @@ describe('Observer Tests', () => {
             },
             force: true,
             maxTriesToUpdate: 3,
+            any: {},
           });
         });
 
