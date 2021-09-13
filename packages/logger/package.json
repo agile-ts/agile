@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/logger",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -34,7 +34,7 @@
     "@agile-ts/utils": "file:../utils"
   },
   "dependencies": {
-    "@agile-ts/utils": "^0.0.7"
+    "@agile-ts/utils": "^0.0.8"
   },
   "publishConfig": {
     "access": "public"
