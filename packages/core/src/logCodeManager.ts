@@ -1,10 +1,4 @@
-// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
-export let loggerPackage: any = null;
-try {
-  loggerPackage = require('@agile-ts/logger');
-} catch (e) {
-  // empty catch block
-}
+import { copy } from '@agile-ts/utils';
 
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
@@ -17,7 +11,7 @@ try {
 // 00 = General
 // 10 = Agile
 // 11 = Storage
-// ..
+// ...
 //
 // ---
 // 00:|00|:00 second digits are based on the Log Type
@@ -31,7 +25,8 @@ const logCodeTypes = {
 // ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
-const logCodeMessages = {
+let allowLogging = true;
+const niceLogCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
@@ -48,6 +43,8 @@ const logCodeMessages = {
     "Couldn't find Storage '${0}'. " +
     "The Storage with the key/name '${0}' doesn't exists!",
   '11:03:02': "Storage with the key/name '${0}' isn't ready yet!",
+  '11:02:06':
+    'By registering a new Storage Manager the old one will be overwritten!',
   '11:03:03':
     'No Storage found to get a value from! Please specify at least one Storage.',
   '11:03:04':
@@ -75,8 +72,6 @@ const logCodeMessages = {
   '13:03:00': "Invalid Storage '${0}()' method provided!",
 
   // State
-  '14:02:00': "Incorrect type '${0}' was provided! Requires type of ${1}.",
-  '14:03:00': "Incorrect type '${0}' was provided! Requires type of ${1}.",
   '14:03:01':
     "'${1}' is a not supported type! Supported types are: String, Boolean, Array, Object, Number.",
   '14:03:02': "The 'patch()' method works only in object based States!",
@@ -173,6 +168,21 @@ const logCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
+// Note: Not outsource the 'production' env check,
+// because then webpack can't treeshake based on the current env
+const logCodeMessages: typeof niceLogCodeMessages =
+  process.env.NODE_ENV !== 'production' ? niceLogCodeMessages : ({} as any);
+
+/**
+ * Specifies whether the LogCodeManager is allowed to print any logs.
+ *
+ * @internal
+ * @param logging - Whether the LogCodeManager is allowed to print any logs.
+ */
+function setAllowLogging(logging: boolean) {
+  allowLogging = logging;
+}
+
 /**
  * Returns the log message according to the specified log code.
  *
@@ -185,7 +195,8 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
   logCode: T,
   replacers: any[] = []
 ): string {
-  let result = logCodeMessages[logCode] ?? `'${logCode}' is a unknown logCode!`;
+  let result = logCodeMessages[logCode];
+  if (result == null) return logCode;
 
   // Replace '${x}' with the specified replacer instances
   for (let i = 0; i < replacers.length; i++) {
@@ -211,7 +222,7 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
   ...data: any[]
 ): void {
   const logger = LogCodeManager.getLogger();
-  if (logger != null && !logger.isActive) return;
+  if ((logger != null && !logger.isActive) || !allowLogging) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
@@ -244,7 +255,7 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
   ...data: any[]
 ): void {
   const logger = LogCodeManager.getLogger();
-  if (logger != null && !logger.isActive) return;
+  if ((logger != null && !logger.isActive) || !allowLogging) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
@@ -259,25 +270,92 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
 }
 
 /**
+ * Creates an extension of the specified LogCodeManager
+ * and assigns the provided additional log messages to it.
+ *
+ * @param additionalLogs - Log messages to be added to the LogCodeManager.
+ * @param logCodeManager - LogCodeManager to create an extension from.
+ */
+export function assignAdditionalLogs<
+  NewLogCodeMessages,
+  OldLogCodeMessages = typeof logCodeMessages
+>(
+  additionalLogs: { [key: string]: string },
+  logCodeManager: LogCodeManagerInterface<OldLogCodeMessages>
+): LogCodeManagerInterface<NewLogCodeMessages> {
+  const copiedLogCodeManager = copy(logCodeManager);
+  copiedLogCodeManager.logCodeMessages = {
+    ...copiedLogCodeManager.logCodeMessages,
+    ...additionalLogs,
+  } as any;
+  return copiedLogCodeManager as any;
+}
+
+let tempLogCodeManager: LogCodeManagerInterface<typeof logCodeMessages>;
+if (process.env.NODE_ENV !== 'production') {
+  let loggerPackage: any = null;
+  try {
+    loggerPackage = require('@agile-ts/logger');
+  } catch (e) {
+    // empty catch block
+  }
+
+  tempLogCodeManager = {
+    getLog,
+    log,
+    logCodeLogTypes: logCodeTypes,
+    logCodeMessages: logCodeMessages,
+    getLogger: () => {
+      return loggerPackage?.getLogger() ?? null;
+    },
+    logIfTags,
+    setAllowLogging,
+  };
+} else {
+  tempLogCodeManager = {
+    // Log only logCode
+    getLog: (logCode, replacers) => logCode,
+    log,
+    logCodeLogTypes: logCodeTypes,
+    logCodeMessages: {} as any,
+    getLogger: () => {
+      return null;
+    },
+    logIfTags: (tags, logCode, replacers) => {
+      /* empty because logs with tags can't be that important */
+    },
+    setAllowLogging,
+  };
+}
+
+/**
  * The Log Code Manager keeps track
- * and manages all important Logs of AgileTs.
+ * and manages all important Logs for the '@agile-ts/core' package.
  *
  * @internal
  */
-export const LogCodeManager = {
-  getLog,
-  log,
-  logCodeLogTypes: logCodeTypes,
-  logCodeMessages: logCodeMessages,
-  // Not doing 'logger: loggerPackage?.sharedAgileLogger'
-  // because only by calling a function (now 'getLogger()') the 'sharedLogger' is refetched
-  getLogger: () => {
-    return loggerPackage?.sharedAgileLogger ?? null;
-  },
-  logIfTags,
-};
+export const LogCodeManager = tempLogCodeManager;
 
 export type LogCodesArrayType<T> = {
   [K in keyof T]: T[K] extends string ? K : never;
 }[keyof T] &
   string;
+
+export interface LogCodeManagerInterface<T = typeof logCodeMessages> {
+  getLog: (logCode: LogCodesArrayType<T>, replacers?: any[]) => string;
+  log: (
+    logCode: LogCodesArrayType<T>,
+    replacers?: any[],
+    ...data: any[]
+  ) => void;
+  logCodeLogTypes: typeof logCodeTypes;
+  logCodeMessages: T;
+  getLogger: () => any;
+  logIfTags: (
+    tags: string[],
+    logCode: LogCodesArrayType<T>,
+    replacers?: any[],
+    ...data: any[]
+  ) => void;
+  setAllowLogging: (logging: boolean) => void;
+}

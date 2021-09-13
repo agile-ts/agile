@@ -8,7 +8,6 @@ import {
   SCREEN,
 } from './ui.controller';
 import core from '../../index';
-import { copy } from '@agile-ts/utils';
 
 export const addDefaultElement = (image: boolean = false) => {
   if (image) addElement(defaultElementStyle, getRandomImage());

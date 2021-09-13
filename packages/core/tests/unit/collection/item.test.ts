@@ -3,7 +3,7 @@ import {
   Collection,
   Agile,
   StateObserver,
-  State,
+  EnhancedState,
   CollectionPersistent,
 } from '../../../src';
 import { LogMock } from '../../helper/logMock';
@@ -20,7 +20,7 @@ describe('Item Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyCollection = new Collection<ItemInterface>(dummyAgile);
 
     jest.spyOn(Item.prototype, 'addRebuildGroupThatIncludeItemKeySideEffect');
@@ -43,7 +43,6 @@ describe('Item Tests', () => {
     ).toHaveBeenCalledWith('dummyId');
 
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
-    expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeFalsy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
@@ -60,7 +59,6 @@ describe('Item Tests', () => {
     expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
-    expect(item.watchers).toStrictEqual({});
     expect(item.selectedBy.size).toBe(0);
   });
 
@@ -82,7 +80,6 @@ describe('Item Tests', () => {
 
     // Check if State was called with correct parameters
     expect(item._key).toBe(dummyData[dummyCollection.config.primaryKey]);
-    expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeTruthy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
@@ -99,7 +96,6 @@ describe('Item Tests', () => {
     expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
-    expect(item.watchers).toStrictEqual({});
     expect(item.selectedBy.size).toBe(0);
   });
 
@@ -119,7 +115,6 @@ describe('Item Tests', () => {
 
     // Check if State was called with correct parameters
     expect(item._key).toBeUndefined();
-    expect(item.valueType).toBeUndefined();
     expect(item.isSet).toBeFalsy();
     expect(item.isPlaceholder).toBeFalsy();
     expect(item.initialStateValue).toStrictEqual(dummyData);
@@ -136,7 +131,6 @@ describe('Item Tests', () => {
     expect(item.computeExistsMethod).toBeInstanceOf(Function);
     expect(item.isPersisted).toBeFalsy();
     expect(item.persistent).toBeUndefined();
-    expect(item.watchers).toStrictEqual({});
     expect(item.selectedBy.size).toBe(0);
   });
 
@@ -151,13 +145,13 @@ describe('Item Tests', () => {
       beforeEach(() => {
         item.removeSideEffect = jest.fn();
         item.patch = jest.fn();
-        jest.spyOn(State.prototype, 'setKey');
+        jest.spyOn(EnhancedState.prototype, 'setKey');
       });
 
       it('should call State setKey, add rebuildGroup sideEffect to Item and patch newItemKey into Item (default config)', () => {
         item.setKey('myNewKey');
 
-        expect(State.prototype.setKey).toHaveBeenCalledWith('myNewKey');
+        expect(EnhancedState.prototype.setKey).toHaveBeenCalledWith('myNewKey');
         expect(item.removeSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey
         );
@@ -190,7 +184,7 @@ describe('Item Tests', () => {
           force: true,
         });
 
-        expect(State.prototype.setKey).toHaveBeenCalledWith('myNewKey');
+        expect(EnhancedState.prototype.setKey).toHaveBeenCalledWith('myNewKey');
         expect(item.removeSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey
         );
@@ -216,13 +210,13 @@ describe('Item Tests', () => {
 
     describe('persist function tests', () => {
       beforeEach(() => {
-        jest.spyOn(State.prototype, 'persist');
+        jest.spyOn(EnhancedState.prototype, 'persist');
       });
 
       it('should persist Item with formatted itemKey (default config)', () => {
         item.persist();
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             item._key,
             dummyCollection._key
@@ -242,7 +236,7 @@ describe('Item Tests', () => {
           defaultStorageKey: 'test1',
         });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             item._key,
             dummyCollection._key
@@ -258,7 +252,7 @@ describe('Item Tests', () => {
       it('should persist Item with formatted specified key (default config)', () => {
         item.persist('dummyKey');
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             'dummyKey',
             dummyCollection._key
@@ -278,7 +272,7 @@ describe('Item Tests', () => {
           defaultStorageKey: 'test1',
         });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
           CollectionPersistent.getItemStorageKey(
             'dummyKey',
             dummyCollection._key
@@ -294,21 +288,27 @@ describe('Item Tests', () => {
       it('should persist Item with itemKey (config.followCollectionPersistKeyPattern = false)', () => {
         item.persist({ followCollectionPersistKeyPattern: false });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith(item._key, {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
+          item._key,
+          {
+            loadValue: true,
+            storageKeys: [],
+            defaultStorageKey: null,
+          }
+        );
       });
 
       it('should persist Item with specified key (config.followCollectionPersistKeyPattern = false)', () => {
         item.persist('dummyKey', { followCollectionPersistKeyPattern: false });
 
-        expect(State.prototype.persist).toHaveBeenCalledWith('dummyKey', {
-          loadValue: true,
-          storageKeys: [],
-          defaultStorageKey: null,
-        });
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
+          'dummyKey',
+          {
+            loadValue: true,
+            storageKeys: [],
+            defaultStorageKey: null,
+          }
+        );
       });
     });
 
@@ -321,9 +321,7 @@ describe('Item Tests', () => {
       it('should add rebuildGroupThatIncludeItemKey sideEffect to Item', () => {
         item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
-        expect(
-          item.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(item.addSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
           expect.any(Function),
           { weight: 100 }

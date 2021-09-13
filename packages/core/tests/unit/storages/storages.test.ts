@@ -1,4 +1,10 @@
-import { Storages, Agile, Storage, Persistent } from '../../../src';
+import {
+  Storages,
+  Agile,
+  Storage,
+  Persistent,
+  assignSharedAgileStorageManager,
+} from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
 describe('Storages Tests', () => {
@@ -7,7 +13,7 @@ describe('Storages Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
 
     jest.spyOn(Storages.prototype, 'instantiateLocalStorage');
 
@@ -19,7 +25,7 @@ describe('Storages Tests', () => {
 
     expect(storages.config).toStrictEqual({ defaultStorageKey: null });
     expect(storages.storages).toStrictEqual({});
-    expect(storages.persistentInstances.size).toBe(0);
+    expect(storages.persistentInstances).toStrictEqual({});
     expect(storages.instantiateLocalStorage).not.toHaveBeenCalled();
   });
 
@@ -31,7 +37,7 @@ describe('Storages Tests', () => {
 
     expect(storages.config).toStrictEqual({ defaultStorageKey: 'jeff' });
     expect(storages.storages).toStrictEqual({});
-    expect(storages.persistentInstances.size).toBe(0);
+    expect(storages.persistentInstances).toStrictEqual({});
     expect(storages.instantiateLocalStorage).toHaveBeenCalled();
   });
 
@@ -44,7 +50,8 @@ describe('Storages Tests', () => {
 
     beforeEach(() => {
       storages = new Storages(dummyAgile);
-      dummyAgile.storages = storages;
+      assignSharedAgileStorageManager(storages);
+
       dummyStorageMethods = {
         get: jest.fn(),
         set: jest.fn(),
@@ -183,7 +190,7 @@ describe('Storages Tests', () => {
         expect(response).toBeTruthy();
       });
 
-      it('should revalidate and initial load Persistents that have no defined defaultStorage', () => {
+      it('should revalidate and initial load persistent Instances that have no defined defaultStorage', () => {
         const dummyPersistent1 = new Persistent(dummyAgile, {
           key: 'dummyPersistent1',
         });

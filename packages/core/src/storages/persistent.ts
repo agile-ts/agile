@@ -2,6 +2,7 @@ import {
   Agile,
   copy,
   defineConfig,
+  getStorageManager,
   LogCodeManager,
   StorageKey,
 } from '../internal';
@@ -45,15 +46,14 @@ export class Persistent {
     this.agileInstance = () => agileInstance;
     this._key = Persistent.placeHolderKey;
     config = defineConfig(config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
     });
-    this.agileInstance().storages.persistentInstances.add(this);
     this.config = { defaultStorageKey: config.defaultStorageKey as any };
 
     // Instantiate Persistent
-    if (config.instantiate) {
+    if (config.loadValue) {
       this.instantiatePersistent({
         storageKeys: config.storageKeys,
         key: config.key,
@@ -127,6 +127,12 @@ export class Persistent {
     this._key = this.formatKey(config.key) ?? Persistent.placeHolderKey;
     this.assignStorageKeys(config.storageKeys, config.defaultStorageKey);
     this.validatePersistent();
+
+    // Register Persistent to Storage Manager
+    const storageManager = getStorageManager();
+    if (this._key !== Persistent.placeHolderKey && storageManager != null) {
+      storageManager.persistentInstances[this._key] = this;
+    }
   }
 
   /**
@@ -155,7 +161,7 @@ export class Persistent {
 
     // Check if the Storages exist at the specified Storage keys
     this.storageKeys.map((key) => {
-      if (!this.agileInstance().storages.storages[key]) {
+      if (!getStorageManager()?.storages[key]) {
         LogCodeManager.log('12:03:02', [this._key, key]);
         isValid = false;
       }
@@ -180,7 +186,6 @@ export class Persistent {
     storageKeys: StorageKey[] = [],
     defaultStorageKey?: StorageKey
   ): void {
-    const storages = this.agileInstance().storages;
     const _storageKeys = copy(storageKeys);
 
     // Assign specified default Storage key to the 'storageKeys' array
@@ -191,10 +196,10 @@ export class Persistent {
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      const defaultStorageKey = storages.config.defaultStorageKey;
+      const defaultStorageKey = getStorageManager()?.config.defaultStorageKey;
       if (defaultStorageKey != null) {
         this.config.defaultStorageKey = defaultStorageKey;
-        _storageKeys.push(storages.config.defaultStorageKey as any);
+        _storageKeys.push(getStorageManager()?.config.defaultStorageKey as any);
       }
     } else {
       this.config.defaultStorageKey = defaultStorageKey ?? _storageKeys[0];
@@ -313,11 +318,11 @@ export interface CreatePersistentConfigInterface {
    */
   defaultStorageKey?: StorageKey;
   /**
-   * Whether the Persistent should be instantiated immediately
+   * Whether the Persistent should load/persist the value immediately
    * or whether this should be done manually.
    * @default true
    */
-  instantiate?: boolean;
+  loadValue?: boolean;
 }
 
 export interface PersistentConfigInterface {

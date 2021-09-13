@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/core",
-  "version": "0.1.3",
+  "version": "0.2.0-alpha.5",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -24,16 +24,20 @@
     "agile-ts"
   ],
   "main": "dist/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "prepare": "tsc && tsc -p ./tsconfig.production.json",
+    "build": "yarn run build:esm && yarn run build:cjs",
+    "prepare": "yarn run build",
+    "build:esm": "tsc -p ./tsconfig.esm.json",
+    "build:cjs": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.production.json",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "tsc -w",
     "release": "node ./scripts/prepublish.js && yarn run prepare",
-    "preview": "npm pack",
+    "release:manual": "yarn run prepare && yarn run release && npm publish && git checkout README.md",
+    "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*",
@@ -69,5 +73,6 @@
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
-  ]
+  ],
+  "sideEffects": false
 }

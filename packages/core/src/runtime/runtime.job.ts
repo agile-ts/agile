@@ -40,6 +40,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       },
       force: false,
       maxTriesToUpdate: 3,
+      any: {},
     });
 
     this.config = {
@@ -47,6 +48,7 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       force: config.force,
       sideEffects: config.sideEffects,
       maxTriesToUpdate: config.maxTriesToUpdate,
+      any: config.any,
     };
     this.observer = observer;
     this.rerender =
@@ -115,6 +117,10 @@ export interface RuntimeJobConfigInterface {
    * @default 3
    */
   maxTriesToUpdate?: number | null;
+  /**
+   * Anything unrelated that might be required by a side effect.
+   */
+  any?: any;
 }
 
 export interface SideEffectConfigInterface {

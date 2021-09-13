@@ -121,10 +121,18 @@ Execute the benchmark located in `./benchmarks/react/counter`.
 ```ts
 yarn run test:counter
 ```
+If you want to test it manually, enable the `dev mode`.
+```ts
+yarn run test:counter --dev
+```
+The difference to the 'normal' mode is that:
+- the executed bundle isn't `minified`
+- the test has to be started manually by opening `localhost:3003`
+- the test results are printed in the `browser console`
 
 ## ⭐️ Contribute
 
-Get a part of AgileTs and start contributing. We welcome any meaningful contribution. 😀
+Feel free to add more tests and State Managers to be tested. We welcome any meaningful contribution. 😀
 To find out more about contributing, check out the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
 
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">

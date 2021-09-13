@@ -1,8 +1,8 @@
 import React from 'react';
-import { StateWatcherCallback, State } from '@agile-ts/core';
+import { StateWatcherCallback, EnhancedState } from '@agile-ts/core';
 
 export function useWatcher<T = any>(
-  state: State<T>,
+  state: EnhancedState<T>,
   callback: StateWatcherCallback<T>
 ): void {
   React.useEffect(() => {

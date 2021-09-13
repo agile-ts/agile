@@ -2,29 +2,21 @@
 # yarn lockfile v1
 
 
-"@agile-ts/core@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@agile-ts/core/-/core-0.1.2.tgz#5a3974ba0c57a51a19bcdf81b2055e091c884f5e"
-  integrity sha512-9031MGUrPpg/ZL1ErpwUlHX751HKEtOfbc5Ae7W7x/POGH89Gka09hMAhqQlDrKF2+olVs3sf6PAsAHRv6paGw==
+"@agile-ts/core@file:.yalc/@agile-ts/core":
+  version "0.2.0-alpha.4"
   dependencies:
     "@agile-ts/utils" "^0.0.7"
 
-"@agile-ts/logger@^0.0.7":
+"@agile-ts/logger@file:.yalc/@agile-ts/logger":
   version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@agile-ts/logger/-/logger-0.0.7.tgz#9e89e8d80f80a46901a508432696860f88d5e878"
-  integrity sha512-6N9qyooo/a7ibyl9L7HnBX0LyMlSwaEYgObYs58KzR19JGF00PX/sUFfQAVplXXsMfT/8HvLyI+4TssmyI6DdQ==
   dependencies:
     "@agile-ts/utils" "^0.0.7"
 
-"@agile-ts/proxytree@^0.0.5":
+"@agile-ts/proxytree@file:.yalc/@agile-ts/proxytree":
   version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@agile-ts/proxytree/-/proxytree-0.0.5.tgz#81c40970707271822a176ee59f93b9230df6311d"
-  integrity sha512-KODknVD30ld9xPCyt0UCf0yGcroy/0CHEncAdmTFwEvDSMipMaqFQRsAYZ0tgB4bMfFzab40aUmYTK8XDkwdHw==
 
-"@agile-ts/react@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@agile-ts/react/-/react-0.1.2.tgz#d07f6b935d9322cd60d2e9e3871da554b04460af"
-  integrity sha512-W4u2+X6KCeXPdkjit/NsMJG5nBsa7dNFaEzyfTsp5Cqbs99zLqY6dO8LUIYyhRt/+HBvEW9o64i/6Kqd59WM1Q==
+"@agile-ts/react@file:.yalc/@agile-ts/react":
+  version "0.2.0-alpha.1"
 
 "@agile-ts/utils@^0.0.7":
   version "0.0.7"

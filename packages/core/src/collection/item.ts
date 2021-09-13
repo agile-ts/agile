@@ -1,5 +1,5 @@
 import {
-  State,
+  EnhancedState,
   Collection,
   StateKey,
   StateRuntimeJobConfigInterface,
@@ -12,7 +12,7 @@ import {
   defineConfig,
 } from '../internal';
 
-export class Item<DataType extends Object = DefaultItem> extends State<
+export class Item<DataType extends Object = DefaultItem> extends EnhancedState<
   DataType
 > {
   // Collection the Group belongs to
@@ -166,9 +166,6 @@ export class Item<DataType extends Object = DefaultItem> extends State<
     this.addSideEffect<Item<DataType>>(
       Item.updateGroupSideEffectKey,
       (instance, config) => {
-        // TODO optimise this because currently the whole Group rebuilds
-        //  although only one Item value has changed which definitely needs no complete rebuild
-        //   https://github.com/agile-ts/agile/issues/113
         instance.collection().rebuildGroupsThatIncludeItemKey(itemKey, config);
       },
       { weight: 100 }

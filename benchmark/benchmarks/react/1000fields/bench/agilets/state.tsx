@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { createState, LogCodeManager } from '@agile-ts/core';
-import { useAgile } from '@agile-ts/react';
+import { createState, LogCodeManager, shared } from '@agile-ts/core';
+import reactIntegration, { useAgile } from '@agile-ts/react';
 
-LogCodeManager.getLogger().isActive = false;
+LogCodeManager.setAllowLogging(false);
+shared.integrate(reactIntegration);
 
 export default function (target: HTMLElement, fieldsCount: number) {
   const FIELDS = createState(

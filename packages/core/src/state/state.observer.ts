@@ -1,7 +1,6 @@
 import {
   Observer,
   State,
-  Computed,
   copy,
   equal,
   notEqual,
@@ -15,6 +14,7 @@ import {
   SubscriptionContainer,
   ObserverKey,
   defineConfig,
+  removeProperties,
 } from '../internal';
 
 export class StateObserver<ValueType = any> extends Observer {
@@ -59,9 +59,9 @@ export class StateObserver<ValueType = any> extends Observer {
    * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): void {
-    const state = this.state();
+    const state = this.state() as any;
 
-    if (state instanceof Computed) {
+    if (state.isComputed) {
       state.compute().then((result) => {
         this.ingestValue(result, config);
       });
@@ -88,15 +88,7 @@ export class StateObserver<ValueType = any> extends Observer {
     const state = this.state();
     config = defineConfig(config, {
       perform: true,
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
       force: false,
-      storage: true,
-      overwrite: false,
-      maxTriesToUpdate: 3,
     });
 
     // Force overwriting the State value if it is a placeholder.
@@ -106,9 +98,9 @@ export class StateObserver<ValueType = any> extends Observer {
       config.overwrite = true;
     }
 
-    // Assign next State value to Observer and compute it if necessary
-    this.nextStateValue = state.computeValueMethod
-      ? copy(state.computeValueMethod(newStateValue))
+    // Assign next State value to Observer and compute it if necessary (enhanced State)
+    this.nextStateValue = (state as any).computeValueMethod
+      ? copy((state as any).computeValueMethod(newStateValue))
       : copy(newStateValue);
 
     // Check if current State value and to assign State value are equal
@@ -116,15 +108,12 @@ export class StateObserver<ValueType = any> extends Observer {
 
     // Create Runtime-Job
     const job = new StateRuntimeJob(this, {
-      storage: config.storage,
-      sideEffects: config.sideEffects,
-      force: config.force,
-      background: config.background,
-      overwrite: config.overwrite,
-      key:
-        config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
-      maxTriesToUpdate: config.maxTriesToUpdate,
+      ...removeProperties(config, ['perform']),
+      ...{
+        key:
+          config.key ??
+          `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
+      },
     });
 
     // Pass created Job into the Runtime
@@ -183,11 +172,6 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
-
-    // Call watcher functions
-    for (const watcherKey in state.watchers)
-      if (isFunction(state.watchers[watcherKey]))
-        state.watchers[watcherKey](state._value, watcherKey);
 
     // Call side effect functions
     if (job.config?.sideEffects?.enabled) {

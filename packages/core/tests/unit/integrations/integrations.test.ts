@@ -9,7 +9,7 @@ describe('Integrations Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyIntegration1 = new Integration({
       key: 'dummyIntegration1',
     });

@@ -6,7 +6,7 @@ import {
   endBenchmarkLog,
   getCycleResult,
   startBenchmarkLog,
-} from '../../../benchmarkManager';
+} from '../../benchmarkManager';
 
 // Files to run the Benchmark on
 import agileCollection from './bench/agilets/collection';
@@ -81,8 +81,8 @@ suite
   .add('Agile State', configTest(agileState))
   .add('Agile nested State', configTest(agileNestedState))
   .add('Pulse Collection', configTest(pulseCollection))
-  // .add('Pulse State', configTest(pulseState))
-  // .add('Pulse nested State', configTest(pulseNestedState))
+  .add('Pulse State', configTest(pulseState))
+  .add('Pulse nested State', configTest(pulseNestedState))
   .add('Hookstate', configTest(hookstate))
   .add('Jotai', configTest(jotai))
   .add('Mobx', configTest(mobx))

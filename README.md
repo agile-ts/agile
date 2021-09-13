@@ -79,7 +79,7 @@ AgileTs is a global State and Logic Library implemented in Typescript.
 It offers a reimagined API that focuses on **developer experience**
 and allows you to **easily** and **flexible** manage your application States.
 Besides [States](https://agile-ts.org/docs/core/state),
-AgileTs offers some other powerful APIs that make your life easier,
+AgileTs offers some other powerful and tree shakable APIs that make your life easier,
 such as [Collections](https://agile-ts.org/docs/core/collection)
 and [Computed States](https://agile-ts.org/docs/core/computed).
 The philosophy behind AgileTs is simple:
@@ -88,19 +88,19 @@ The philosophy behind AgileTs is simple:
 
 Write minimalistic, boilerplate-free code that captures your intent.
 ```ts
-// Create State with inital value 'frank'
+// Create State with the inital value 'frank'
 const MY_STATE = createState('frank');
 
-// Update State value from 'frank' to 'jeff'
+// Update the State value from 'frank' to 'jeff'
 MY_STATE.set('jeff');
 
-// Undo latest State value change
+// Undo the latest State value change
 MY_STATE.undo();
 
-// Reset State value to its initial value
+// Reset the State value to its initial value
 MY_STATE.reset();
 
-// Permanently store State value in an external Storage
+// Permanently store the State value in an external Storage
 MY_STATE.persist("storage-key"); 
 ```
 
@@ -205,6 +205,14 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 <a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
    <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
 </a>
+
+### ♥️ Contributors 
+
+<a href="https://github.com/agile-ts/agile/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agile-ts/agile" />
+</a>
+
+[Become a contributor](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md)
 
 
 <br />

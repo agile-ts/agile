@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import {
   Agile,
-  Collection,
   extractRelevantObservers,
   Observer,
   State,
 } from '@agile-ts/core';
 import { isValidObject, normalizeArray } from '@agile-ts/utils';
+import type { Collection } from '@agile-ts/core'; // Only import Collection and Group type for better Treeshaking
 
 export function bindAgileInstances(
   deps: DepsType,

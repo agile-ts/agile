@@ -18,7 +18,7 @@ describe('RuntimeJob Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
+    dummyAgile = new Agile();
     dummyIntegration = new Integration({
       key: 'myIntegration',
     });
@@ -48,6 +48,7 @@ describe('RuntimeJob Tests', () => {
         storage: true,
         overwrite: false,
         maxTriesToUpdate: 3,
+        any: {},
       });
       expect(job.rerender).toBeTruthy();
       expect(job.performed).toBeFalsy();
@@ -70,6 +71,7 @@ describe('RuntimeJob Tests', () => {
         },
         force: true,
         maxTriesToUpdate: 5,
+        any: { jeff: 'frank' },
       });
 
       expect(job._key).toBe('dummyJob');
@@ -83,6 +85,7 @@ describe('RuntimeJob Tests', () => {
         storage: true,
         overwrite: false,
         maxTriesToUpdate: 5,
+        any: { jeff: 'frank' },
       });
       expect(job.rerender).toBeTruthy();
       expect(job.performed).toBeFalsy();
@@ -110,6 +113,7 @@ describe('RuntimeJob Tests', () => {
         storage: true,
         overwrite: false,
         maxTriesToUpdate: 3,
+        any: {},
       });
       expect(job.rerender).toBeFalsy();
       expect(job.performed).toBeFalsy();
@@ -139,6 +143,7 @@ describe('RuntimeJob Tests', () => {
         storage: true,
         overwrite: false,
         maxTriesToUpdate: 3,
+        any: {},
       });
       expect(job.rerender).toBeFalsy();
       expect(job.performed).toBeFalsy();

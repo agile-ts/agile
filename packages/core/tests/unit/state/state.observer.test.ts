@@ -3,10 +3,10 @@ import {
   Computed,
   StateRuntimeJob,
   Observer,
-  State,
   StateObserver,
-  StatePersistent,
+  EnhancedState,
   SubscriptionContainer,
+  State,
 } from '../../../src';
 import * as Utils from '@agile-ts/utils';
 import { LogMock } from '../../helper/logMock';
@@ -19,8 +19,10 @@ describe('StateObserver Tests', () => {
   beforeEach(() => {
     LogMock.mockLogs();
 
-    dummyAgile = new Agile({ localStorage: false });
-    dummyState = new State(dummyAgile, 'dummyValue', { key: 'dummyState' });
+    dummyAgile = new Agile();
+    dummyState = new State(dummyAgile, 'dummyValue', {
+      key: 'dummyState',
+    });
 
     jest.clearAllMocks();
   });
@@ -181,6 +183,7 @@ describe('StateObserver Tests', () => {
               storage: true,
               overwrite: false,
               maxTriesToUpdate: 3,
+              any: {},
             });
           });
 
@@ -212,6 +215,7 @@ describe('StateObserver Tests', () => {
               storage: true,
               overwrite: true,
               maxTriesToUpdate: 5,
+              any: {},
             });
           });
 
@@ -268,6 +272,7 @@ describe('StateObserver Tests', () => {
               storage: true,
               overwrite: false,
               maxTriesToUpdate: 3,
+              any: {},
             });
           });
 
@@ -298,6 +303,7 @@ describe('StateObserver Tests', () => {
             storage: true,
             overwrite: true,
             maxTriesToUpdate: 3,
+            any: {},
           });
         });
         dummyState.isPlaceholder = true;
@@ -317,7 +323,8 @@ describe('StateObserver Tests', () => {
         'should ingest the State into the Runtime and compute its new value ' +
           'if the State has a set compute function (default config)',
         () => {
-          dummyState.computeValueMethod = (value) => `cool value '${value}'`;
+          (dummyState as EnhancedState).computeValueMethod = (value) =>
+            `cool value '${value}'`;
 
           stateObserver.ingestValue('updatedDummyValue');
 
@@ -341,8 +348,6 @@ describe('StateObserver Tests', () => {
         dummyJob = new StateRuntimeJob(stateObserver, {
           key: 'dummyJob',
         });
-        dummyState.persistent = new StatePersistent(dummyState);
-        dummyState.isPersisted = true;
 
         stateObserver.sideEffects = jest.fn();
       });
@@ -422,7 +427,6 @@ describe('StateObserver Tests', () => {
           key: 'dummyJob',
         });
 
-        dummyState.watchers['dummyWatcher'] = jest.fn();
         dummyState.sideEffects['dummySideEffect3'] = {
           weight: 100,
           callback: jest.fn(() => {
@@ -448,10 +452,6 @@ describe('StateObserver Tests', () => {
 
         stateObserver.sideEffects(dummyJob);
 
-        expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-          'dummyValue',
-          'dummyWatcher'
-        );
         expect(
           dummyState.sideEffects['dummySideEffect'].callback
         ).toHaveBeenCalledWith(dummyState, dummyJob.config);
@@ -479,10 +479,6 @@ describe('StateObserver Tests', () => {
 
           stateObserver.sideEffects(dummyJob);
 
-          expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-            'dummyValue',
-            'dummyWatcher'
-          );
           expect(
             dummyState.sideEffects['dummySideEffect'].callback
           ).not.toHaveBeenCalled();
@@ -507,10 +503,6 @@ describe('StateObserver Tests', () => {
 
           stateObserver.sideEffects(dummyJob);
 
-          expect(dummyState.watchers['dummyWatcher']).toHaveBeenCalledWith(
-            'dummyValue',
-            'dummyWatcher'
-          );
           expect(
             dummyState.sideEffects['dummySideEffect'].callback
           ).toHaveBeenCalledWith(dummyState, dummyJob.config);

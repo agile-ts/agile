@@ -1,11 +1,11 @@
 import {
-  State,
   StateRuntimeJobConfigInterface,
   defineConfig,
+  EnhancedState,
 } from '@agile-ts/core';
 import { MultiEditor, Validator, Status, ItemKey } from './internal';
 
-export class Item<DataType = any> extends State<DataType> {
+export class Item<DataType = any> extends EnhancedState<DataType> {
   public editor: () => MultiEditor<DataType>;
 
   public isValid = false;

@@ -1,6 +1,7 @@
-// This file exposes Agile functions and types to the outside world
-// It also serves as a cyclic dependency workaround
-// https://medium.com/visual-development/how-to-fix-nasty-circular-dependency-issues-once-and-for-all-in-javascript-typescript-a04c987cf0de.
+// This file exposes Agile functions and types to the outside world.
+// It also serves as a cyclic dependency workaround,
+// and allows us to structure the loading order as needed (for example, './agile' need to be loaded before './state')
+// https://medium.com/visual-development/how-to-fix-nasty-circular-dependency-issues-once-and-for-all-in-javascript-typescript-a04c987cf0de
 
 // !! All internal Agile modules must be imported from here!!
 
@@ -35,6 +36,7 @@ export * from './storages/persistent';
 // State
 export * from './state';
 export * from './state/state.observer';
+export * from './state/state.enhanced';
 export * from './state/state.persistent';
 export * from './state/state.runtime.job';
 

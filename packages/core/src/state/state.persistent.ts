@@ -1,14 +1,15 @@
 import {
   CreatePersistentConfigInterface,
   defineConfig,
+  EnhancedState,
+  getStorageManager,
   Persistent,
   PersistentKey,
-  State,
 } from '../internal';
 
 export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to
-  public state: () => State;
+  public state: () => EnhancedState;
 
   static storeValueSideEffectKey = 'rebuildStateStorageValue';
 
@@ -20,14 +21,14 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param config - Configuration object
    */
   constructor(
-    state: State<ValueType>,
+    state: EnhancedState<ValueType>,
     config: CreatePersistentConfigInterface = {}
   ) {
     super(state.agileInstance(), {
-      instantiate: false,
+      loadValue: false,
     });
     config = defineConfig(config, {
-      instantiate: true,
+      loadValue: true,
       storageKeys: [],
       defaultStorageKey: null as any,
     });
@@ -39,7 +40,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     });
 
     // Load/Store persisted value/s for the first time
-    if (this.ready && config.instantiate) this.initialLoading();
+    if (this.ready && config.loadValue) this.initialLoading();
   }
 
   /**
@@ -72,7 +73,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const _storageItemKey = storageItemKey ?? this._key;
 
     // Load State value from the default Storage
-    const loadedValue = await this.agileInstance().storages.get<ValueType>(
+    const loadedValue = await getStorageManager()?.get<ValueType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -150,7 +151,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey || this._key;
     this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
-    this.agileInstance().storages.remove(_storageItemKey, this.storageKeys);
+    getStorageManager()?.remove(_storageItemKey, this.storageKeys);
     this.isPersisted = false;
     return true;
   }
@@ -184,12 +185,12 @@ export class StatePersistent<ValueType = any> extends Persistent {
    * @param config - Configuration object
    */
   public rebuildStorageSideEffect(
-    state: State<ValueType>,
+    state: EnhancedState<ValueType>,
     storageItemKey: PersistentKey,
     config: { [key: string]: any } = {}
   ) {
     if (config['storage'] == null || config.storage) {
-      this.agileInstance().storages.set(
+      getStorageManager()?.set(
         storageItemKey,
         this.state().getPersistableValue(),
         this.storageKeys

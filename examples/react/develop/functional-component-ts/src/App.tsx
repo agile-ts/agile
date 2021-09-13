@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import { useAgile, useWatcher, useProxy, useSelector } from '@agile-ts/react';
-import { useEvent } from '@agile-ts/event';
 import {
   COUNTUP,
   externalCreatedItem,
@@ -13,13 +12,15 @@ import {
   MY_STATE_3,
   STATE_OBJECT,
 } from './core';
-import { generateId, globalBind, Item } from '@agile-ts/core';
+import { generateId } from '@agile-ts/utils';
+import { globalBind } from '@agile-ts/core';
+import { useEvent } from '@agile-ts/event';
 
 let rerenderCount = 0;
 let rerenderCountInCountupView = 0;
 
 const App = (props: any) => {
-  // Note: Rerenders twice because of React Strickt Mode (also useState does trigger a rerender twice)
+  // Note: re-renders twice because of React strict Mode (also useState does trigger a rerender twice)
   // https://stackoverflow.com/questions/54927622/usestate-do-double-render
   rerenderCount++;
 
@@ -43,9 +44,12 @@ const App = (props: any) => {
   ]);
   const [myGroup] = useAgile([MY_COLLECTION.getGroupWithReference('myGroup')]);
 
-  const selectedObjectItem = useSelector(STATE_OBJECT, (value) => {
-    return value.age;
-  });
+  const stateObjectAge = useSelector<typeof STATE_OBJECT.value, number>(
+    STATE_OBJECT,
+    (value) => {
+      return value.age;
+    }
+  );
 
   const [stateObject, item2, collection2] = useProxy(
     [STATE_OBJECT, MY_COLLECTION.getItem('id2'), MY_COLLECTION],
@@ -54,8 +58,6 @@ const App = (props: any) => {
 
   console.log('Item1: ', item2?.name);
   console.log('Collection: ', collection2.slice(0, 2));
-
-  // const myCollection2 = useAgile(MY_COLLECTION);
 
   const mySelector = useAgile(MY_COLLECTION.getSelector('mySelector'));
 
@@ -124,6 +126,13 @@ const App = (props: any) => {
               STATE_OBJECT.patch({ name: generateId() });
             }}>
             Change shallow name
+          </button>
+          <p>Age: {stateObjectAge}</p>
+          <button
+            onClick={() => {
+              STATE_OBJECT.patch({ age: generateId(2) });
+            }}>
+            Change age
           </button>
         </div>
 

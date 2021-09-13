@@ -1,24 +1,24 @@
-import { Agile, assignSharedAgileInstance, globalBind } from '@agile-ts/core';
+import {
+  globalBind,
+  createState,
+  createComputed,
+  createCollection,
+} from '@agile-ts/core';
 import { Logger, assignSharedAgileLoggerConfig } from '@agile-ts/logger';
 import '@agile-ts/vue';
 
 assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
 
-// Create Agile Instance
-export const App = new Agile({ localStorage: true });
-assignSharedAgileInstance(App);
-
 // console.debug('hi'); // Doesn't work here idk why
 
 // Create State
-export const MY_STATE = App.createState('World', {
+export const MY_STATE = createState('World', {
   key: 'my-state',
-})
-  .computeValue((v) => {
-    return `Hello ${v}`;
-  });
+}).computeValue((v) => {
+  return `Hello ${v}`;
+});
 
-export const MY_COMPUTED = App.createComputed(
+export const MY_COMPUTED = createComputed(
   async () => {
     await new Promise((resolve) => setTimeout(resolve, 3000));
     return `${MY_STATE.value} Frank`;
@@ -27,7 +27,7 @@ export const MY_COMPUTED = App.createComputed(
 );
 
 // Create Collection
-export const TODOS = App.createCollection({
+export const TODOS = createCollection({
   initialData: [{ id: 1, name: 'Clean Bathroom' }],
   selectors: [1],
 }).persist('todos');

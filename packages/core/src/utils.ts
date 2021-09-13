@@ -1,7 +1,6 @@
 import {
   Agile,
   Observer,
-  Collection,
   normalizeArray,
   isFunction,
   LogCodeManager,
@@ -96,7 +95,7 @@ export function extractObservers(
     }
 
     // If the Instance equals to a Collection
-    if (instance instanceof Collection) {
+    if (instance.isCollection) {
       observers.push(
         instance.getGroupWithReference(instance.config.defaultGroupKey)
           .observers as any

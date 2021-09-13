@@ -2,8 +2,15 @@
 # yarn lockfile v1
 
 
+"@agile-ts/core@^0.1.2":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@agile-ts/core/-/core-0.1.3.tgz#d96dd4a20d65adce9aaba1c494b31e4e0dd1bb60"
+  integrity sha512-sHw9PMbqww0dwqLEZih9hIpZjMAmZB4yea7bkbqblNc1CRDKfCGeYGnNcg8GOqXfNfq5SywMGWo5KhhFFyx+ag==
+  dependencies:
+    "@agile-ts/utils" "^0.0.7"
+
 "@agile-ts/core@file:packages/core":
-  version "0.1.2"
+  version "0.2.0-alpha.4"
   dependencies:
     "@agile-ts/utils" "^0.0.7"
 
@@ -14,6 +21,11 @@
 
 "@agile-ts/proxytree@file:packages/proxytree":
   version "0.0.5"
+
+"@agile-ts/react@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@agile-ts/react/-/react-0.1.2.tgz#d07f6b935d9322cd60d2e9e3871da554b04460af"
+  integrity sha512-W4u2+X6KCeXPdkjit/NsMJG5nBsa7dNFaEzyfTsp5Cqbs99zLqY6dO8LUIYyhRt/+HBvEW9o64i/6Kqd59WM1Q==
 
 "@akryum/winattr@^3.0.0":
   version "3.0.0"
