@@ -79,7 +79,7 @@ AgileTs is a global State and Logic Library implemented in Typescript.
 It offers a reimagined API that focuses on **developer experience**
 and allows you to **easily** and **flexible** manage your application States.
 Besides [States](https://agile-ts.org/docs/core/state),
-AgileTs offers some other powerful APIs that make your life easier,
+AgileTs offers some other powerful and tree shakable APIs that make your life easier,
 such as [Collections](https://agile-ts.org/docs/core/collection)
 and [Computed States](https://agile-ts.org/docs/core/computed).
 The philosophy behind AgileTs is simple:

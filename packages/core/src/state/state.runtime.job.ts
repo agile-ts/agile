@@ -35,6 +35,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
       storage: true,
       overwrite: false,
       maxTriesToUpdate: 3,
+      any: {},
     });
 
     this.config = {
@@ -44,6 +45,7 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
       storage: config.storage,
       overwrite: config.overwrite,
       maxTriesToUpdate: config.maxTriesToUpdate,
+      any: config.any,
     };
   }
 }

@@ -1,5 +1,43 @@
 # Change Log
 
+## 0.2.0
+
+### Patch Changes
+
+- aae6455: #### :rocket: New Feature
+
+  - `core`, `event`, `logger`, `multieditor`, `react`, `utils`
+    - [#188](https://github.com/agile-ts/agile/pull/188) Tree shakeable support ([@bennodev19](https://github.com/bennodev19))
+
+  #### :nail_care: Polish
+
+  - `core`
+    - [#189](https://github.com/agile-ts/agile/pull/189) Optimize collection rebuilds ([@bennodev19](https://github.com/bennodev19))
+  - `api`, `core`, `cra-template-agile-typescript`, `cra-template-agile`, `event`, `logger`, `multieditor`, `proxytree`, `react`, `utils`, `vue`
+    - [#187](https://github.com/agile-ts/agile/pull/187) Tree shakeable support ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+- Updated dependencies [aae6455]
+  - @agile-ts/logger@0.0.8
+  - @agile-ts/utils@0.0.8
+
+## 0.1.3
+
+### Patch Changes
+
+- f0968b7: #### :nail_care: Polish
+
+  - `cra-template-agile`, `cra-template-agile-typescript`
+    - Optimized create-react-app templates ([@bennodev19](https://github.com/bennodev19))
+  - Optimized examples ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
 ## 0.1.2
 
 ### Patch Changes

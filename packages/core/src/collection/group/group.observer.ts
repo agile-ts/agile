@@ -6,10 +6,10 @@ import {
   equal,
   generateId,
   RuntimeJob,
-  Item,
   IngestConfigInterface,
   CreateRuntimeJobConfigInterface,
   defineConfig,
+  removeProperties,
 } from '../../internal';
 
 export class GroupObserver<DataType = any> extends Observer {
@@ -45,14 +45,14 @@ export class GroupObserver<DataType = any> extends Observer {
    * into the runtime wrapped into a Runtime-Job
    * where it is executed accordingly.
    *
-   * During the execution the runtime applies the rebuilt `nextGroupOutput` to the Group,
+   * During the execution the runtime applies the `nextGroupOutput` to the Group,
    * updates its dependents and re-renders the UI-Components it is subscribed to.
    *
    * @internal
    * @param config - Configuration object
    */
   public ingest(config: GroupIngestConfigInterface = {}): void {
-    this.group().rebuild(config);
+    this.ingestOutput(this.group().nextGroupOutput, config);
   }
 
   /**
@@ -63,23 +63,17 @@ export class GroupObserver<DataType = any> extends Observer {
    * updates its dependents and re-renders the UI-Components it is subscribed to.
    *
    * @internal
-   * @param newGroupItems - New Group Items to be applied to the Group.
+   * @param newGroupOutput - New Group Output to be applied to the Group.
    * @param config - Configuration object.
    */
-  public ingestItems(
-    newGroupItems: Item<DataType>[],
+  public ingestOutput(
+    newGroupOutput: DataType[],
     config: GroupIngestConfigInterface = {}
   ): void {
     const group = this.group();
     config = defineConfig(config, {
       perform: true,
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
       force: false,
-      maxTriesToUpdate: 3,
     });
 
     // Force overwriting the Group value if it is a placeholder.
@@ -89,24 +83,19 @@ export class GroupObserver<DataType = any> extends Observer {
     }
 
     // Assign next Group output to Observer
-    this.nextGroupOutput = copy(
-      newGroupItems.map((item) => {
-        return item._value;
-      })
-    );
+    this.nextGroupOutput = copy(newGroupOutput);
 
     // Check if current Group output and to assign Group output are equal
     if (equal(group._output, this.nextGroupOutput) && !config.force) return;
 
     // Create Runtime-Job
     const job = new RuntimeJob(this, {
-      sideEffects: config.sideEffects,
-      force: config.force,
-      background: config.background,
-      key:
-        config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
-      maxTriesToUpdate: config.maxTriesToUpdate,
+      ...removeProperties(config, ['perform']),
+      ...{
+        key:
+          config.key ??
+          `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
+      },
     });
 
     // Pass created Job into the Runtime
@@ -130,6 +119,7 @@ export class GroupObserver<DataType = any> extends Observer {
 
     // Assign new Group output
     group._output = copy(observer.nextGroupOutput);
+    group.nextGroupOutput = copy(observer.nextGroupOutput);
 
     // Assign new public output to the Observer (output used by the Integrations)
     job.observer.previousValue = copy(job.observer.value);

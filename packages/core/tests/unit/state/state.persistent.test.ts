@@ -32,7 +32,72 @@ describe('StatePersistent Tests', () => {
     jest.clearAllMocks();
   });
 
-  it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (default config)", () => {
+  it('should create StatePersistent and should call initialLoading if Persistent is ready (default config)', () => {
+    // Overwrite instantiatePersistent once to not call it
+    jest
+      .spyOn(StatePersistent.prototype, 'instantiatePersistent')
+      .mockImplementationOnce(function () {
+        // @ts-ignore
+        this.ready = true;
+      });
+
+    const statePersistent = new StatePersistent(dummyState);
+
+    expect(statePersistent).toBeInstanceOf(StatePersistent);
+
+    expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
+      key: undefined,
+      storageKeys: [],
+      defaultStorageKey: null,
+    });
+    expect(statePersistent.initialLoading).toHaveBeenCalled();
+
+    // Check if Persistent was called with correct parameters
+    expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
+    expect(statePersistent.ready).toBeTruthy();
+    expect(statePersistent.isPersisted).toBeFalsy();
+    expect(statePersistent.onLoad).toBeUndefined();
+    expect(statePersistent.storageKeys).toStrictEqual([]);
+    expect(statePersistent.config).toStrictEqual({
+      defaultStorageKey: null, // gets set in 'instantiatePersistent' which is mocked
+    });
+  });
+
+  it('should create StatePersistent and should call initialLoading if Persistent is ready (specific config)', () => {
+    // Overwrite instantiatePersistent once to not call it and set ready property
+    jest
+      .spyOn(StatePersistent.prototype, 'instantiatePersistent')
+      .mockImplementationOnce(function () {
+        // @ts-ignore
+        this.ready = true;
+      });
+
+    const statePersistent = new StatePersistent(dummyState, {
+      key: 'statePersistentKey',
+      storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
+    });
+
+    expect(statePersistent).toBeInstanceOf(StatePersistent);
+    expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
+      key: 'statePersistentKey',
+      storageKeys: ['test1', 'test2'],
+      defaultStorageKey: 'test2',
+    });
+    expect(statePersistent.initialLoading).toHaveBeenCalled();
+
+    // Check if Persistent was called with correct parameters
+    expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
+    expect(statePersistent.ready).toBeTruthy();
+    expect(statePersistent.isPersisted).toBeFalsy();
+    expect(statePersistent.onLoad).toBeUndefined();
+    expect(statePersistent.storageKeys).toStrictEqual([]);
+    expect(statePersistent.config).toStrictEqual({
+      defaultStorageKey: null, // gets set in 'instantiatePersistent' which is mocked
+    });
+  });
+
+  it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
@@ -52,6 +117,7 @@ describe('StatePersistent Tests', () => {
     });
     expect(statePersistent.initialLoading).not.toHaveBeenCalled();
 
+    // Check if Persistent was called with correct parameters
     expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
     expect(statePersistent.ready).toBeFalsy();
     expect(statePersistent.isPersisted).toBeFalsy();
@@ -60,67 +126,35 @@ describe('StatePersistent Tests', () => {
     expect(statePersistent.config).toStrictEqual({ defaultStorageKey: null });
   });
 
-  it("should create StatePersistent and shouldn't call initialLoading if Persistent isn't ready (specific config)", () => {
+  it("should create StatePersistent and shouldn't call initialLoading if Persistent is ready (config.loadValue = false)", () => {
     // Overwrite instantiatePersistent once to not call it and set ready property
     jest
       .spyOn(StatePersistent.prototype, 'instantiatePersistent')
       .mockImplementationOnce(function () {
         // @ts-ignore
-        this.ready = false;
+        this.ready = true;
       });
 
     const statePersistent = new StatePersistent(dummyState, {
-      key: 'statePersistentKey',
-      storageKeys: ['test1', 'test2'],
-      defaultStorageKey: 'test2',
+      loadValue: false,
     });
 
     expect(statePersistent).toBeInstanceOf(StatePersistent);
+    expect(statePersistent.state()).toBe(dummyState);
     expect(statePersistent.instantiatePersistent).toHaveBeenCalledWith({
-      key: 'statePersistentKey',
-      storageKeys: ['test1', 'test2'],
-      defaultStorageKey: 'test2',
+      key: undefined,
+      storageKeys: [],
+      defaultStorageKey: null,
     });
     expect(statePersistent.initialLoading).not.toHaveBeenCalled();
 
+    // Check if Persistent was called with correct parameters
     expect(statePersistent._key).toBe(StatePersistent.placeHolderKey);
-    expect(statePersistent.ready).toBeFalsy();
+    expect(statePersistent.ready).toBeTruthy();
     expect(statePersistent.isPersisted).toBeFalsy();
     expect(statePersistent.onLoad).toBeUndefined();
     expect(statePersistent.storageKeys).toStrictEqual([]);
-    expect(statePersistent.config).toStrictEqual({
-      defaultStorageKey: null, // gets set in 'instantiatePersistent' which is mocked
-    });
-  });
-
-  it('should create StatePersistent and should call initialLoading if Persistent is ready (default config)', () => {
-    // Overwrite instantiatePersistent once to not call it
-    jest
-      .spyOn(StatePersistent.prototype, 'instantiatePersistent')
-      .mockImplementationOnce(function () {
-        // @ts-ignore
-        this.ready = true;
-      });
-
-    const statePersistent = new StatePersistent(dummyState);
-
-    expect(statePersistent.initialLoading).toHaveBeenCalled();
-  });
-
-  it("should create StatePersistent and shouldn't call initialLoading if Persistent is ready (config.instantiate = false)", () => {
-    // Overwrite instantiatePersistent once to not call it and set ready property
-    jest
-      .spyOn(StatePersistent.prototype, 'instantiatePersistent')
-      .mockImplementationOnce(function () {
-        // @ts-ignore
-        this.ready = true;
-      });
-
-    const statePersistent = new StatePersistent(dummyState, {
-      instantiate: false,
-    });
-
-    expect(statePersistent.initialLoading).not.toHaveBeenCalled();
+    expect(statePersistent.config).toStrictEqual({ defaultStorageKey: null });
   });
 
   describe('StatePersistent Function Tests', () => {
@@ -315,7 +349,9 @@ describe('StatePersistent Tests', () => {
         () => {
           statePersistent.setupSideEffects();
 
-          expect(dummyState.addSideEffect).toHaveBeenCalledWith(
+          expect(
+            dummyState.addSideEffect
+          ).toHaveBeenCalledWith(
             StatePersistent.storeValueSideEffectKey,
             expect.any(Function),
             { weight: 0 }

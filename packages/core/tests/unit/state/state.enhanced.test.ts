@@ -415,19 +415,19 @@ describe('Enhanced State Tests', () => {
     });
 
     describe('persist function tests', () => {
-      it('should create persistent with StateKey (default config)', () => {
+      it('should create Persistent with StateKey (default config)', () => {
         numberState.persist();
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: true,
+          loadValue: true,
           storageKeys: [],
           key: numberState._key,
           defaultStorageKey: null,
         });
       });
 
-      it('should create persistent with StateKey (specific config)', () => {
+      it('should create Persistent with StateKey (specific config)', () => {
         numberState.persist({
           storageKeys: ['test1', 'test2'],
           loadValue: false,
@@ -436,26 +436,26 @@ describe('Enhanced State Tests', () => {
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
           key: numberState._key,
           defaultStorageKey: 'test1',
         });
       });
 
-      it('should create persistent with passed Key (default config)', () => {
+      it('should create Persistent with passed Key (default config)', () => {
         numberState.persist('passedKey');
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: true,
+          loadValue: true,
           storageKeys: [],
           key: 'passedKey',
           defaultStorageKey: null,
         });
       });
 
-      it('should create persistent with passed Key (specific config)', () => {
+      it('should create Persistent with passed Key (specific config)', () => {
         numberState.persist('passedKey', {
           storageKeys: ['test1', 'test2'],
           loadValue: false,
@@ -464,7 +464,7 @@ describe('Enhanced State Tests', () => {
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          instantiate: false,
+          loadValue: false,
           storageKeys: ['test1', 'test2'],
           key: 'passedKey',
           defaultStorageKey: 'test1',

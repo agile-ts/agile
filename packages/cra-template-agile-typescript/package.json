@@ -1,6 +1,6 @@
 {
   "name": "cra-template-agile-typescript",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -17,8 +17,8 @@
     "pack": "npm pack"
   },
   "devDependencies": {
-    "@agile-ts/core": "^0.1.2",
-    "@agile-ts/react": "^0.1.2",
+    "@agile-ts/core": "^0.2.0",
+    "@agile-ts/react": "^0.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",

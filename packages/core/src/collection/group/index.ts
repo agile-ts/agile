@@ -18,6 +18,7 @@ import {
   GroupObserver,
   StateObserver,
   defineConfig,
+  GroupIngestConfigInterface,
 } from '../../internal';
 
 export class Group<
@@ -30,14 +31,23 @@ export class Group<
   static rebuildGroupSideEffectKey = 'rebuildGroup';
 
   // Item values represented by the Group
-  _output: Array<DataType> = [];
+  public _output: Array<DataType> = [];
+  // Next output of the Group (which can be used for dynamic Group updates)
+  public nextGroupOutput: Array<DataType> = [];
+  // Precise itemKeys of the Group only include itemKeys
+  // that actually exist in the corresponding Collection
+  public _preciseItemKeys: Array<ItemKey> = [];
 
   // Manages dependencies to other States and subscriptions of UI-Components.
   // It also serves as an interface to the runtime.
   public observers: GroupObservers<ItemKey[], DataType> = {} as any;
 
   // Keeps track of all Item identifiers for Items that couldn't be found in the Collection
-  notFoundItemKeys: Array<ItemKey> = [];
+  public notFoundItemKeys: Array<ItemKey> = [];
+
+  // Whether the initial value was loaded from the corresponding Persistent
+  // https://github.com/agile-ts/agile/issues/155
+  public loadedInitialValue = true;
 
   /**
    * An extension of the State Class that categorizes and preserves the ordering of structured data.
@@ -72,7 +82,9 @@ export class Group<
 
     // Add side effect to Group
     // that rebuilds the Group whenever the Group value changes
-    this.addSideEffect(Group.rebuildGroupSideEffectKey, () => this.rebuild());
+    this.addSideEffect(Group.rebuildGroupSideEffectKey, (state, config) => {
+      this.rebuild(config?.any?.trackedChanges || [], config);
+    });
 
     // Initial rebuild
     this.rebuild();
@@ -104,7 +116,7 @@ export class Group<
    * @param itemKey - Key/Name identifier of the Item.
    */
   public has(itemKey: ItemKey) {
-    return this.value.findIndex((key) => key === itemKey) !== -1;
+    return this.value.indexOf(itemKey) !== -1;
   }
 
   /**
@@ -130,20 +142,44 @@ export class Group<
    */
   public remove(
     itemKeys: ItemKey | ItemKey[],
-    config: StateIngestConfigInterface = {}
+    config: GroupRemoveConfigInterface = {}
   ): this {
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const notExistingItemKeys: Array<ItemKey> = [];
     let newGroupValue = copy(this.nextStateValue);
+    // Need to temporary update the preciseItemKeys
+    // since in the rebuild one action (trackedChanges) is performed after the other
+    // which requires a dynamic updated index
+    const updatedPreciseItemKeys = copy(this._preciseItemKeys);
+    config = defineConfig(config, {
+      softRebuild: true,
+      any: {},
+    });
+    config.any['trackedChanges'] = []; // TODO might be improved since the 'any' property is very vague
 
     // Remove itemKeys from Group
     _itemKeys.forEach((itemKey) => {
+      const exists = newGroupValue.includes(itemKey);
+
       // Check if itemKey exists in Group
-      if (!newGroupValue.includes(itemKey)) {
+      if (!exists) {
         notExistingItemKeys.push(itemKey);
         notExistingItemKeysInCollection.push(itemKey);
         return;
+      }
+
+      // Track changes to soft rebuild the Group when rebuilding the Group in a side effect
+      if (config.softRebuild) {
+        const index = updatedPreciseItemKeys.findIndex((ik) => ik === itemKey);
+        if (index !== -1) {
+          updatedPreciseItemKeys.splice(index, 1);
+          config.any['trackedChanges'].push({
+            index,
+            method: TrackedChangeMethod.REMOVE,
+            key: itemKey,
+          });
+        }
       }
 
       // Check if itemKey exists in Collection
@@ -162,7 +198,7 @@ export class Group<
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    this.set(newGroupValue, config);
+    this.set(newGroupValue, removeProperties(config, ['softRebuild']));
 
     return this;
   }
@@ -183,27 +219,42 @@ export class Group<
     const _itemKeys = normalizeArray<ItemKey>(itemKeys);
     const notExistingItemKeysInCollection: Array<ItemKey> = [];
     const existingItemKeys: Array<ItemKey> = [];
-    let newGroupValue = copy(this.nextStateValue);
-    defineConfig(config, {
+    const newGroupValue = copy(this.nextStateValue);
+    // Need to temporary update the preciseItemKeys
+    // since in the rebuild one action (trackedChanges) is performed after the other
+    // which requires a dynamic updated index
+    const updatedPreciseItemKeys = copy(this._preciseItemKeys);
+    config = defineConfig(config, {
       method: 'push',
-      overwrite: false,
+      softRebuild: true,
+      any: {},
     });
+    config.any['trackedChanges'] = []; // TODO might be improved since the 'any' property is very vague
 
     // Add itemKeys to Group
     _itemKeys.forEach((itemKey) => {
+      const exists = newGroupValue.includes(itemKey);
+
       // Check if itemKey exists in Collection
       if (!this.collection().getItem(itemKey))
         notExistingItemKeysInCollection.push(itemKey);
 
-      // Remove itemKey temporary from newGroupValue
-      // if it should be overwritten and already exists in the newGroupValue
-      if (newGroupValue.includes(itemKey)) {
-        if (config.overwrite) {
-          newGroupValue = newGroupValue.filter((key) => key !== itemKey);
-        } else {
-          existingItemKeys.push(itemKey);
-          return;
-        }
+      // Handle existing Item
+      if (exists) {
+        existingItemKeys.push(itemKey);
+        return;
+      }
+
+      // Track changes to soft rebuild the Group when rebuilding the Group in a side effect
+      if (config.softRebuild) {
+        const index =
+          config.method === 'push' ? updatedPreciseItemKeys.length : 0;
+        updatedPreciseItemKeys.push(itemKey);
+        config.any['trackedChanges'].push({
+          index,
+          method: TrackedChangeMethod.ADD,
+          key: itemKey,
+        });
       }
 
       // Add new itemKey to Group
@@ -221,7 +272,10 @@ export class Group<
     )
       config.background = true;
 
-    this.set(newGroupValue, removeProperties(config, ['method', 'overwrite']));
+    this.set(
+      newGroupValue,
+      removeProperties(config, ['method', 'softRebuild'])
+    );
 
     return this;
   }
@@ -339,26 +393,76 @@ export class Group<
    * [Learn more..](https://agile-ts.org/docs/core/collection/group/methods#rebuild)
    *
    * @internal
+   * @param trackedChanges - Changes that were tracked between two rebuilds.
    * @param config - Configuration object
    */
-  public rebuild(config: StateIngestConfigInterface = {}): this {
-    const notFoundItemKeys: Array<ItemKey> = []; // Item keys that couldn't be found in the Collection
-    const groupItems: Array<Item<DataType>> = [];
-
+  public rebuild(
+    trackedChanges: TrackedChangeInterface[] = [],
+    config: GroupIngestConfigInterface = {}
+  ): this {
     // Don't rebuild Group if Collection isn't correctly instantiated yet
     // (because only after a successful instantiation the Collection
     // contains the Items which are essential for a proper rebuild)
     if (!this.collection().isInstantiated) return this;
 
-    // Fetch Items from Collection
-    this._value.forEach((itemKey) => {
-      const item = this.collection().getItem(itemKey);
-      if (item != null) groupItems.push(item);
-      else notFoundItemKeys.push(itemKey);
-    });
+    // Item keys that couldn't be found in the Collection
+    const notFoundItemKeys: Array<ItemKey> = [];
+
+    // Soft rebuild the Collection (-> rebuild only parts of the Collection)
+    if (trackedChanges.length > 0) {
+      trackedChanges.forEach((change) => {
+        const item = this.collection().getItem(change.key);
+
+        switch (change.method) {
+          case TrackedChangeMethod.ADD:
+            // this._value.splice(change.index, 0, change.key); // Already updated in 'add' method
+            if (item != null) {
+              this._preciseItemKeys.splice(change.index, 0, change.key);
+              this.nextGroupOutput.splice(change.index, 0, copy(item._value));
+            } else {
+              notFoundItemKeys.push(change.key);
+            }
+            break;
+          case TrackedChangeMethod.UPDATE:
+            if (item != null) {
+              this.nextGroupOutput[change.index] = copy(item._value);
+            } else {
+              notFoundItemKeys.push(change.key);
+            }
+            break;
+          case TrackedChangeMethod.REMOVE:
+            // this._value.splice(change.index, 1); // Already updated in 'remove' method
+            this._preciseItemKeys.splice(change.index, 1);
+            this.nextGroupOutput.splice(change.index, 1);
+            break;
+          default:
+            break;
+        }
+      });
+      this.observers['output'].ingest(config);
+    }
+    // Hard rebuild the whole Collection
+    else {
+      const groupItemValues: Array<DataType> = [];
+
+      // Reset precise itemKeys array to rebuild it from scratch
+      this._preciseItemKeys = [];
+
+      // Fetch Items from Collection
+      this._value.forEach((itemKey) => {
+        const item = this.collection().getItem(itemKey);
+        if (item != null) {
+          groupItemValues.push(item._value);
+          this._preciseItemKeys.push(itemKey);
+        } else notFoundItemKeys.push(itemKey);
+      });
+
+      // Ingest rebuilt Group output into the Runtime
+      this.observers['output'].ingestOutput(groupItemValues, config);
+    }
 
     // Logging
-    if (notFoundItemKeys.length > 0) {
+    if (notFoundItemKeys.length > 0 && this.loadedInitialValue) {
       LogCodeManager.log(
         '1C:02:00',
         [this.collection()._key, this._key],
@@ -367,9 +471,6 @@ export class Group<
     }
 
     this.notFoundItemKeys = notFoundItemKeys;
-
-    // Ingest rebuilt Group output into the Runtime
-    this.observers['output'].ingestItems(groupItems, config);
 
     return this;
   }
@@ -395,11 +496,22 @@ export interface GroupAddConfigInterface extends StateIngestConfigInterface {
    */
   method?: 'unshift' | 'push';
   /**
-   * If the to add `itemKey` already exists,
-   * whether its position should be overwritten with the position of the new `itemKey`.
-   * @default false
+   * Whether to soft rebuild the Group.
+   * -> only rebuild the parts of the Group that have actually changed
+   * instead of rebuilding the whole Group.
+   * @default true
    */
-  overwrite?: boolean;
+  softRebuild?: boolean;
+}
+
+export interface GroupRemoveConfigInterface extends StateIngestConfigInterface {
+  /**
+   * Whether to soft rebuild the Group.
+   * -> only rebuild the parts of the Group that have actually changed
+   * instead of rebuilding the whole Group.
+   * @default true
+   */
+  softRebuild?: boolean;
 }
 
 export interface GroupConfigInterface {
@@ -424,4 +536,25 @@ export interface GroupPersistConfigInterface
    * @default true
    */
   followCollectionPersistKeyPattern?: boolean;
+}
+
+export enum TrackedChangeMethod {
+  ADD,
+  REMOVE,
+  UPDATE,
+}
+
+export interface TrackedChangeInterface {
+  /**
+   * TODO
+   */
+  method: TrackedChangeMethod;
+  /**
+   * TODO
+   */
+  key: ItemKey;
+  /**
+   * TODO
+   */
+  index: number;
 }

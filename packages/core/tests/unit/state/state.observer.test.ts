@@ -183,6 +183,7 @@ describe('StateObserver Tests', () => {
               storage: true,
               overwrite: false,
               maxTriesToUpdate: 3,
+              any: {},
             });
           });
 
@@ -214,6 +215,7 @@ describe('StateObserver Tests', () => {
               storage: true,
               overwrite: true,
               maxTriesToUpdate: 5,
+              any: {},
             });
           });
 
@@ -270,6 +272,7 @@ describe('StateObserver Tests', () => {
               storage: true,
               overwrite: false,
               maxTriesToUpdate: 3,
+              any: {},
             });
           });
 
@@ -300,6 +303,7 @@ describe('StateObserver Tests', () => {
             storage: true,
             overwrite: true,
             maxTriesToUpdate: 3,
+            any: {},
           });
         });
         dummyState.isPlaceholder = true;
