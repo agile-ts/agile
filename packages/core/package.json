@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/core",
-  "version": "0.2.0-alpha.5",
+  "version": "0.2.0",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -48,10 +48,10 @@
     "@agile-ts/utils": "file:../utils"
   },
   "dependencies": {
-    "@agile-ts/utils": "^0.0.7"
+    "@agile-ts/utils": "^0.0.8"
   },
   "peerDependencies": {
-    "@agile-ts/logger": "^0.0.7"
+    "@agile-ts/logger": "^0.0.8"
   },
   "peerDependenciesMeta": {
     "@agile-ts/logger": {
