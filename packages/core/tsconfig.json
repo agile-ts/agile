@@ -1,9 +1,7 @@
 {
   "extends": "../tsconfig.default.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2015",
-    "outDir": "dist",
+    "target": "esnext",
     "rootDir": "src"
   },
   "include": [

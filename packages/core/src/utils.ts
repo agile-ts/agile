@@ -18,7 +18,7 @@ import {
 export function getAgileInstance(instance: any): Agile | undefined {
   try {
     // Try to get Agile Instance from specified Instance
-    if (instance) {
+    if (instance != null) {
       const _agileInstance = isFunction(instance['agileInstance'])
         ? instance['agileInstance']()
         : instance['agileInstance'];

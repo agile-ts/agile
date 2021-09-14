@@ -1,14 +1,15 @@
 import path from 'path';
-// import babel from '@rollup/plugin-babel';
+import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
 
 // TODO https://www.youtube.com/watch?v=v0ZLEy1SE-A
 
-const extensions = ['.js', '.ts', '.tsx'];
-const { root } = path.parse(process.cwd());
+const fileExtensions = ['.js', '.ts', '.tsx'];
+const { root } = path.parse(process.cwd()); // https://nodejs.org/api/process.html#process_process_cwd
 
+// https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
 function external(id) {
   return !id.startsWith('.') && !id.startsWith(root);
 }
@@ -43,7 +44,7 @@ function createESMConfig(input, output) {
     input,
     output: { file: output, format: 'esm' },
     external,
-    plugins: [resolve({ extensions }), getEsbuild('node12')],
+    plugins: [resolve({ extensions: fileExtensions }), getEsbuild('node12')],
   };
 }
 
@@ -52,7 +53,13 @@ function createCommonJSConfig(input, output) {
     input,
     output: { file: output, format: 'cjs', exports: 'named' },
     external,
-    plugins: [resolve({ extensions })],
+    plugins: [
+      resolve({ extensions: fileExtensions }),
+      babel({
+        babelHelpers: 'bundled',
+        comments: false,
+      }),
+    ],
   };
 }
 
