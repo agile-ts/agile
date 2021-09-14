@@ -48,6 +48,9 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.16.0",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^13.0.4",
+    "@rollup/plugin-typescript": "^8.2.5",
     "@size-limit/file": "^5.0.1",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.3.2",
@@ -65,6 +68,8 @@
     "lerna-changelog": "^1.0.1",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
+    "rollup": "^2.56.3",
+    "rollup-plugin-esbuild": "^4.5.0",
     "size-limit": "^5.0.1",
     "ts-jest": "^26.5.6",
     "ts-node": "^10.1.0",
