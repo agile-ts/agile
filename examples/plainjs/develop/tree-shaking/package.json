@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
-    "@agile-ts/logger": "file:.yalc/@agile-ts/logger"
+    "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
+    "@agile-ts/react": "file:.yalc/@agile-ts/react"
   }
 }

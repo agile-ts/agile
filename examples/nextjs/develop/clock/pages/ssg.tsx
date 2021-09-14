@@ -8,7 +8,7 @@ export default function SSG() {
 }
 
 // If you build and start the app, the date returned here will have the same
-// value for all requests, as this method gets executed at build time.
+// value for all requests, as this method gets executed at build time. (see browser network tab)
 export function getStaticProps() {
   const initialCore = {
     light: LIGHT.value,

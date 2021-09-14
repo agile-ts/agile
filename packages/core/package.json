@@ -27,10 +27,10 @@
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "yarn run build:esm && yarn run build:cjs",
+    "build": "yarn run build:cjs && yarn run build:esm",
     "prepare": "yarn run build",
     "build:esm": "tsc -p ./tsconfig.esm.json",
-    "build:cjs": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.production.json",
+    "build:cjs": "tsc -p ./tsconfig.cjs.json",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
