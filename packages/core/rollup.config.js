@@ -10,6 +10,7 @@ const fileExtensions = ['.js', '.ts', '.tsx'];
 const { root } = path.parse(process.cwd()); // https://nodejs.org/api/process.html#process_process_cwd
 
 // https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
+// Checks whether the specified id/path is outside the particular package (-> external)
 function external(id) {
   return !id.startsWith('.') && !id.startsWith(root);
 }
@@ -44,7 +45,11 @@ function createESMConfig(input, output) {
     input,
     output: { file: output, format: 'esm' },
     external,
-    plugins: [resolve({ extensions: fileExtensions }), getEsbuild('node12')],
+    plugins: [
+      resolve({ extensions: fileExtensions }),
+      getEsbuild('node12'),
+      typescript(),
+    ],
   };
 }
 
@@ -59,6 +64,7 @@ function createCommonJSConfig(input, output) {
         babelHelpers: 'bundled',
         comments: false,
       }),
+      typescript(),
     ],
   };
 }
