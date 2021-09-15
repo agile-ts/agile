@@ -1,4 +1,5 @@
 import path from 'path';
+import { defineConfig } from 'rollup'; // https://rollupjs.org/guide/en/#big-list-of-options
 import { babel } from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
@@ -22,7 +23,7 @@ function createEsbuildConfig(target) {
 }
 
 function createDeclarationConfig(input, output) {
-  return {
+  return defineConfig({
     input,
     output: {
       dir: output,
@@ -35,11 +36,11 @@ function createDeclarationConfig(input, output) {
         outDir: output,
       }),
     ],
-  };
+  });
 }
 
 function createESMConfig(input, output, multiFileOutput = false) {
-  return {
+  return defineConfig({
     input,
     output: {
       dir: multiFileOutput ? output : undefined,
@@ -49,15 +50,16 @@ function createESMConfig(input, output, multiFileOutput = false) {
     external,
     plugins: [
       nodeResolve({ extensions: fileExtensions }),
-      createEsbuildConfig('es6'),
+      createEsbuildConfig('es2015'),
       // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
     ],
     preserveModules: multiFileOutput, // https://stackoverflow.com/questions/55339256/tree-shaking-with-rollup
-  };
+    treeshake: false, // Otherwise the 'internal.js' file is treeshaken away, which messes up the holy import order
+  });
 }
 
 function createCommonJSConfig(input, output) {
-  return {
+  return defineConfig({
     input,
     output: { file: output, format: 'cjs' },
     external,
@@ -69,7 +71,7 @@ function createCommonJSConfig(input, output) {
       }),
       typescript(),
     ],
-  };
+  });
 }
 
 // https://rollupjs.org/guide/en/#configuration-files

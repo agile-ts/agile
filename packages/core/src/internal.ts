@@ -6,8 +6,8 @@
 // !! All internal Agile modules must be imported from here!!
 
 // Utils
-export * from './utils';
 export * from '@agile-ts/utils';
+export * from './utils';
 
 // Logger
 export * from './logCodeManager';
