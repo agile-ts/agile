@@ -1,10 +1,8 @@
 import path from 'path';
-import babel from '@rollup/plugin-babel';
-import resolve from '@rollup/plugin-node-resolve';
+import { babel } from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
-
-// TODO https://www.youtube.com/watch?v=v0ZLEy1SE-A
 
 const fileExtensions = ['.js', '.ts', '.tsx'];
 const { root } = path.parse(process.cwd()); // https://nodejs.org/api/process.html#process_process_cwd
@@ -15,7 +13,7 @@ function external(id) {
   return !id.startsWith('.') && !id.startsWith(root);
 }
 
-function getEsbuild(target) {
+function createEsbuildConfig(target) {
   return esbuild({
     minify: false,
     target,
@@ -40,26 +38,31 @@ function createDeclarationConfig(input, output) {
   };
 }
 
-function createESMConfig(input, output) {
+function createESMConfig(input, output, multiFileOutput = false) {
   return {
     input,
-    output: { file: output, format: 'esm' },
+    output: {
+      dir: multiFileOutput ? output : undefined,
+      file: !multiFileOutput ? output : undefined,
+      format: 'esm',
+    },
     external,
     plugins: [
-      resolve({ extensions: fileExtensions }),
-      getEsbuild('node12'),
-      typescript(),
+      nodeResolve({ extensions: fileExtensions }),
+      createEsbuildConfig('es6'),
+      // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
     ],
+    preserveModules: multiFileOutput, // https://stackoverflow.com/questions/55339256/tree-shaking-with-rollup
   };
 }
 
 function createCommonJSConfig(input, output) {
   return {
     input,
-    output: { file: output, format: 'cjs', exports: 'named' },
+    output: { file: output, format: 'cjs' },
     external,
     plugins: [
-      resolve({ extensions: fileExtensions }),
+      nodeResolve({ extensions: fileExtensions }),
       babel({
         babelHelpers: 'bundled',
         comments: false,
@@ -69,11 +72,12 @@ function createCommonJSConfig(input, output) {
   };
 }
 
+// https://rollupjs.org/guide/en/#configuration-files
 export default function () {
   return [
     createDeclarationConfig('src/index.ts', 'dist'),
     createCommonJSConfig('src/index.ts', 'dist/index.js'),
-    createESMConfig('src/index.ts', 'dist/esm/index.mjs'),
-    createESMConfig('src/index.ts', 'dist/esm/index.js'),
+    createESMConfig('src/index.ts', 'dist/esm', true),
+    // createESMConfig('src/index.ts', 'dist/mjs/index.js', false),
   ];
 }

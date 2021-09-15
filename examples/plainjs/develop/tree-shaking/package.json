@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
+    "build": "shx rm -rf dist && webpack",
     "install:dev:agile": "yalc add @agile-ts/core @agile-ts/logger & yarn install",
     "install:prod:agile": "yarn add @agile-ts/core @agile-ts/logger & yarn install"
   },
