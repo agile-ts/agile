@@ -1,5 +1,6 @@
 import { Agile } from './agile';
 
+export * from '@agile-ts/utils';
 export * from './agile';
 export * from './utils';
 export * from './logCodeManager';
