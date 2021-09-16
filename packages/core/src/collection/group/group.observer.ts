@@ -1,16 +1,18 @@
+import { Group } from './index';
 import {
-  Observer,
-  Group,
   CreateObserverConfigInterface,
+  CreateRuntimeJobConfigInterface,
+  IngestConfigInterface,
+  Observer,
+  RuntimeJob,
+} from '../../runtime';
+import {
   copy,
+  defineConfig,
   equal,
   generateId,
-  RuntimeJob,
-  IngestConfigInterface,
-  CreateRuntimeJobConfigInterface,
-  defineConfig,
   removeProperties,
-} from '../../internal';
+} from '@agile-ts/utils';
 
 export class GroupObserver<DataType = any> extends Observer {
   // Group the Observer belongs to

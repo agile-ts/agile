@@ -1,11 +1,8 @@
-import {
-  Agile,
-  copy,
-  defineConfig,
-  getStorageManager,
-  LogCodeManager,
-  StorageKey,
-} from '../internal';
+import { Agile } from '../agile';
+import { StorageKey } from './storage';
+import { copy, defineConfig } from '@agile-ts/utils';
+import { getStorageManager } from './index';
+import { LogCodeManager } from '../logCodeManager';
 
 export class Persistent {
   // Agile Instance the Persistent belongs to

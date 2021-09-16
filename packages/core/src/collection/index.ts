@@ -1,17 +1,13 @@
-import {
-  Collection,
-  CollectionConfig,
-  DefaultItem,
-  Agile,
-  shared,
-} from '../internal';
+import { Collection, CollectionConfig, DefaultItem } from './collection';
+import { Agile } from '../agile';
+import { shared } from '../shared';
 
 export * from './collection';
-// export * from './collection.persistent';
-// export * from './group';
-// export * from './group/group.observer';
-// export * from './item';
-// export * from './selector';
+export * from './collection.persistent';
+export * from './group';
+export * from './group/group.observer';
+export * from './item';
+export * from './selector';
 
 /**
  * Returns a newly created Collection.

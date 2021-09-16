@@ -1,5 +1,3 @@
-import { copy } from './internal';
-
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
 //
@@ -15,6 +13,8 @@ import { copy } from './internal';
 //
 // ---
 // 00:|00|:00 second digits are based on the Log Type
+import { copy } from '@agile-ts/utils';
+
 const logCodeTypes = {
   '00': 'success',
   '01': 'info',

@@ -1,8 +1,8 @@
-import { Agile } from './internal';
-
 /**
  * Shared Agile Instance that is used when no Agile Instance was specified.
  */
+import { Agile } from './agile';
+
 let sharedAgileInstance = new Agile({
   key: 'shared',
 });

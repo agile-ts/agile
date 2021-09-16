@@ -3,25 +3,25 @@
 
 
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.2.0-alpha.4"
+  version "0.2.1"
   dependencies:
-    "@agile-ts/utils" "^0.0.7"
+    "@agile-ts/utils" "^0.0.8"
 
 "@agile-ts/logger@file:.yalc/@agile-ts/logger":
-  version "0.0.7"
+  version "0.0.8"
   dependencies:
-    "@agile-ts/utils" "^0.0.7"
+    "@agile-ts/utils" "^0.0.8"
 
 "@agile-ts/proxytree@file:.yalc/@agile-ts/proxytree":
-  version "0.0.5"
+  version "0.0.6"
 
 "@agile-ts/react@file:.yalc/@agile-ts/react":
-  version "0.2.0-alpha.1"
+  version "0.2.0"
 
-"@agile-ts/utils@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.7.tgz#3dd1add6b9f63d0a5bf35e71f54ac46448ae047f"
-  integrity sha512-OviTDC+ZbfyiUx8Gy8veS6YymC/tT6UeP23nT8V0EQV4F2MmuWqZ2yiKk+AYxZx8h74Ey8BVEUX6/ntpxhSNPw==
+"@agile-ts/utils@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.8.tgz#ab9e1eeaddf282340936bddeb74421a2f77de804"
+  integrity sha512-ex19gPIS5imgV+rzs5HE2CNAIkQ162hPWH5u3HKNZnHiVU6FX62sikH5tG2oQocbDb7FkeB16D7v9ihQeuKYug==
 
 "@babel/code-frame@7.10.4":
   version "7.10.4"

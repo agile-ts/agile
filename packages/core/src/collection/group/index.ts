@@ -1,25 +1,24 @@
+import { Collection, DefaultItem, ItemKey } from '../collection';
 import {
   EnhancedState,
-  Collection,
-  DefaultItem,
-  ItemKey,
-  normalizeArray,
-  Item,
-  copy,
-  CollectionPersistent,
-  StatePersistentConfigInterface,
-  isValidObject,
-  PersistentKey,
-  ComputedTracker,
   StateIngestConfigInterface,
-  removeProperties,
-  LogCodeManager,
-  StateObserversInterface,
-  GroupObserver,
   StateObserver,
+  StateObserversInterface,
+  StatePersistentConfigInterface,
+} from '../../state';
+import { GroupIngestConfigInterface, GroupObserver } from './group.observer';
+import { ComputedTracker } from '../../computed';
+import {
+  copy,
   defineConfig,
-  GroupIngestConfigInterface,
-} from '../../internal';
+  isValidObject,
+  normalizeArray,
+  removeProperties,
+} from '@agile-ts/utils';
+import { LogCodeManager } from '../../logCodeManager';
+import { Item } from '../item';
+import { PersistentKey } from '../../storages';
+import { CollectionPersistent } from '../collection.persistent';
 
 export class Group<
   DataType extends Object = DefaultItem,

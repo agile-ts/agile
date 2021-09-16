@@ -1,12 +1,7 @@
-import {
-  Collection,
-  DefaultItem,
-  defineConfig,
-  Item,
-  ItemKey,
-  EnhancedState,
-  StateRuntimeJobConfigInterface,
-} from '../internal';
+import { Collection, DefaultItem, ItemKey } from './collection';
+import { EnhancedState, StateRuntimeJobConfigInterface } from '../state';
+import { Item } from './item';
+import { defineConfig } from '@agile-ts/utils';
 
 export class Selector<
   DataType extends Object = DefaultItem

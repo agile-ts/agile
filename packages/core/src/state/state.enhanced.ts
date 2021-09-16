@@ -1,22 +1,19 @@
+import { State, StateConfigInterface, StateKey } from './state';
+import { StatePersistent } from './state.persistent';
+import { Agile } from '../agile';
+import { StateIngestConfigInterface } from './state.observer';
 import {
-  Agile,
   defineConfig,
   equal,
   flatMerge,
   generateId,
   isFunction,
   isValidObject,
-  LogCodeManager,
   notEqual,
-  PersistentKey,
   removeProperties,
-  State,
-  StateConfigInterface,
-  StateIngestConfigInterface,
-  StateKey,
-  StatePersistent,
-  StorageKey,
-} from '../internal';
+} from '@agile-ts/utils';
+import { LogCodeManager } from '../logCodeManager';
+import { PersistentKey, StorageKey } from '../storages';
 
 export class EnhancedState<ValueType = any> extends State<ValueType> {
   // Whether the State is persisted in an external Storage
