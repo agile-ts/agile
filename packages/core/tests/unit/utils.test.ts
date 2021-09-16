@@ -5,7 +5,6 @@ import {
   Collection,
   StateObserver,
   GroupObserver,
-  assignSharedAgileInstance,
 } from '../../src';
 import * as Utils from '../../src/utils';
 import { LogMock } from '../helper/logMock';
@@ -22,64 +21,6 @@ describe('Utils Tests', () => {
     globalThis = {};
 
     jest.clearAllMocks();
-  });
-
-  describe('getAgileInstance function tests', () => {
-    beforeEach(() => {
-      assignSharedAgileInstance(dummyAgile);
-      globalThis[Agile.globalKey] = dummyAgile;
-    });
-
-    it('should return Agile Instance from State', () => {
-      const dummyState = new State(dummyAgile, 'dummyValue');
-
-      expect(Utils.getAgileInstance(dummyState)).toBe(dummyAgile);
-    });
-
-    it('should return Agile Instance from Collection', () => {
-      const dummyCollection = new Collection(dummyAgile);
-
-      expect(Utils.getAgileInstance(dummyCollection)).toBe(dummyAgile);
-    });
-
-    it('should return Agile Instance from Observer', () => {
-      const dummyObserver = new Observer(dummyAgile);
-
-      expect(Utils.getAgileInstance(dummyObserver)).toBe(dummyAgile);
-    });
-
-    it(
-      'should return shared Agile Instance ' +
-        'if specified Instance contains no valid Agile Instance',
-      () => {
-        expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
-      }
-    );
-
-    it(
-      'should return globally bound Agile Instance' +
-        'if specified Instance contains no valid Agile Instance' +
-        'and no shared Agile Instance is specified',
-      () => {
-        // Destroy shared Agile Instance
-        assignSharedAgileInstance(undefined as any);
-
-        expect(Utils.getAgileInstance('weiredInstance')).toBe(dummyAgile);
-      }
-    );
-
-    it('should print error if no Agile Instance could be retrieved', () => {
-      // @ts-ignore | Destroy globalThis
-      globalThis = undefined;
-
-      // Destroy shared Agile Instance
-      assignSharedAgileInstance(undefined as any);
-
-      const response = Utils.getAgileInstance('weiredInstance');
-
-      expect(response).toBeUndefined();
-      LogMock.hasLoggedCode('20:03:00', [], 'weiredInstance');
-    });
   });
 
   describe('extractObservers function tests', () => {
@@ -118,11 +59,13 @@ describe('Utils Tests', () => {
       // State with multiple Observer
       dummyStateWithMultipleObserver = new State(dummyAgile, null);
       dummyStateValueObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers['value'] =
-        dummyStateValueObserver;
+      dummyStateWithMultipleObserver.observers[
+        'value'
+      ] = dummyStateValueObserver;
       dummyStateRandomObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers['random'] =
-        dummyStateRandomObserver;
+      dummyStateWithMultipleObserver.observers[
+        'random'
+      ] = dummyStateRandomObserver;
 
       // Collection
       dummyCollection = new Collection(dummyAgile);
@@ -214,11 +157,13 @@ describe('Utils Tests', () => {
       // State with multiple Observer
       dummyStateWithMultipleObserver = new State(dummyAgile, null);
       dummyStateValueObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers['value'] =
-        dummyStateValueObserver;
+      dummyStateWithMultipleObserver.observers[
+        'value'
+      ] = dummyStateValueObserver;
       dummyStateRandomObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers['random'] =
-        dummyStateRandomObserver;
+      dummyStateWithMultipleObserver.observers[
+        'random'
+      ] = dummyStateRandomObserver;
 
       // Collection
       dummyCollection = new Collection(dummyAgile);

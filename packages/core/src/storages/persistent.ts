@@ -1,7 +1,7 @@
 import { Agile } from '../agile';
 import { StorageKey } from './storage';
 import { copy, defineConfig } from '@agile-ts/utils';
-import { getStorageManager } from './index';
+import { getStorageManager } from './shared';
 import { LogCodeManager } from '../logCodeManager';
 
 export class Persistent {

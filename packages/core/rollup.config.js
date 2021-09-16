@@ -54,7 +54,6 @@ function createESMConfig(input, output, multiFileOutput = false) {
       // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
     ],
     preserveModules: multiFileOutput, // https://stackoverflow.com/questions/55339256/tree-shaking-with-rollup
-    // treeshake: false,
   });
 }
 

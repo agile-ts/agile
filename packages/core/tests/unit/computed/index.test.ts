@@ -8,7 +8,7 @@ import { LogMock } from '../../helper/logMock';
 
 jest.mock('../../../src/computed/computed');
 
-describe('Computed Index', () => {
+describe('Computed Index Tests', () => {
   let sharedAgileInstance: Agile;
 
   beforeEach(() => {
