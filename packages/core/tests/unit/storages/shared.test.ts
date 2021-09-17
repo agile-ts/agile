@@ -4,7 +4,7 @@ import { LogMock } from '../../helper/logMock';
 
 jest.mock('../../../src/storages/storages');
 
-describe('Shared Tests', () => {
+describe('Shared (Storage) Tests', () => {
   let sharedAgileInstance: Agile;
 
   beforeEach(() => {
@@ -115,7 +115,7 @@ describe('Shared Tests', () => {
     });
 
     it(
-      'should assign the specified Storage Manager as shared Storage Manager' +
+      'should assign the specified Storage Manager as shared Storage Manager ' +
         'and print warning if a shared Storage Manager is already set',
       () => {
         const oldStorageManager = new Storages(sharedAgileInstance);

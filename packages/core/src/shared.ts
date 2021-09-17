@@ -20,7 +20,7 @@ export function assignSharedAgileInstance(agileInstance: Agile): void {
   sharedAgileInstance = agileInstance;
 }
 
-// Note: Not located in 'utils' due circular dependency issues
+// Note: Not located in 'utils.ts' due circular dependency issues
 /**
  * Extracts an Instance of Agile from the specified Instance.
  * When no valid Agile Instance was found,

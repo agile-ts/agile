@@ -9,7 +9,7 @@ import {
 } from '../../src';
 import { LogMock } from '../helper/logMock';
 
-describe('Shared Tests', () => {
+describe('Shared (Agile) Tests', () => {
   let dummyAgile: Agile;
 
   beforeEach(() => {
@@ -55,7 +55,7 @@ describe('Shared Tests', () => {
     it(
       'should return globally bound Agile Instance' +
         'if specified Instance contains no valid Agile Instance' +
-        'and no shared Agile Instance is specified',
+        'and no shared Agile Instance was specified',
       () => {
         // Destroy shared Agile Instance
         assignSharedAgileInstance(undefined as any);
@@ -82,6 +82,7 @@ describe('Shared Tests', () => {
     beforeEach(() => {
       assignSharedAgileInstance(dummyAgile);
     });
+
     it('should assign the specified Agile Instance as new shared Agile Instance', () => {
       const newAgileInstance = new Agile({ key: 'notShared' });
 
