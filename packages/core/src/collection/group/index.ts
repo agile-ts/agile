@@ -155,7 +155,7 @@ export class Group<
       softRebuild: true,
       any: {},
     });
-    config.any['trackedChanges'] = []; // TODO might be improved since the 'any' property is very vague
+    config.any['trackedChanges'] = []; // TODO should be improved since the 'any' property is very vague
 
     // Remove itemKeys from Group
     _itemKeys.forEach((itemKey) => {
@@ -228,7 +228,7 @@ export class Group<
       softRebuild: true,
       any: {},
     });
-    config.any['trackedChanges'] = []; // TODO might be improved since the 'any' property is very vague
+    config.any['trackedChanges'] = []; // TODO should be improved since the 'any' property is very vague
 
     // Add itemKeys to Group
     _itemKeys.forEach((itemKey) => {
@@ -545,15 +545,18 @@ export enum TrackedChangeMethod {
 
 export interface TrackedChangeInterface {
   /**
-   * TODO
+   * What type of change the tracked change is.
+   * @default undefined
    */
   method: TrackedChangeMethod;
   /**
-   * TODO
+   * Item key of the tracked change.
+   * @default undefined
    */
   key: ItemKey;
   /**
-   * TODO
+   * Current index in the Group value of the tracked change.
+   * @default undefined
    */
   index: number;
 }

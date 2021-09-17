@@ -143,7 +143,49 @@ describe('Enhanced State Tests', () => {
     });
 
     describe('setKey function tests', () => {
-      // TODO
+      beforeEach(() => {
+        numberState.persistent = new StatePersistent(numberState);
+
+        numberState.persistent.setKey = jest.fn();
+        jest.spyOn(State.prototype, 'setKey');
+      });
+
+      it("should call 'setKey()' in the State and update the Persistent key", () => {
+        if (numberState.persistent)
+          numberState.persistent._key = numberState._key as any;
+
+        numberState.setKey('newKey');
+
+        expect(State.prototype.setKey).toHaveBeenCalledWith('newKey');
+        expect(numberState.persistent?.setKey).toHaveBeenCalledWith('newKey');
+      });
+
+      it(
+        "should call 'setKey()' in the State " +
+          "and shouldn't update the Persistent key if the specified StateKey and PersistKey differentiate",
+        () => {
+          if (numberState.persistent) numberState.persistent._key = 'randomKey';
+
+          numberState.setKey('newKey');
+
+          expect(State.prototype.setKey).toHaveBeenCalledWith('newKey');
+          expect(numberState.persistent?.setKey).not.toHaveBeenCalled();
+        }
+      );
+
+      it(
+        "should call 'setKey()' in the State " +
+          "and shouldn't update the Persistent key if the specified StateKey is undefined",
+        () => {
+          if (numberState.persistent)
+            numberState.persistent._key = numberState._key as any;
+
+          numberState.setKey(undefined);
+
+          expect(State.prototype.setKey).toHaveBeenCalledWith(undefined);
+          expect(numberState.persistent?.setKey).not.toHaveBeenCalled();
+        }
+      );
     });
 
     describe('undo function tests', () => {

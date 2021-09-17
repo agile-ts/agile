@@ -4,7 +4,7 @@ import {
   ObserverKey,
   SubscriptionContainer,
 } from '@agile-ts/core';
-import { Event } from '../internal';
+import { Event } from './event';
 
 export class EventObserver<PayloadType = any> extends Observer {
   public event: () => Event<PayloadType>;

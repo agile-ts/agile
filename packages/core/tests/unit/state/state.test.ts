@@ -7,8 +7,6 @@ import {
 } from '../../../src';
 import { LogMock } from '../../helper/logMock';
 
-jest.mock('../../../src/state/state.persistent');
-
 describe('State Tests', () => {
   let dummyAgile: Agile;
 
@@ -164,28 +162,12 @@ describe('State Tests', () => {
         numberState.observers['output'] = dummyOutputObserver;
       });
 
-      it('should update existing Key in all instances', () => {
+      it('should update the key indicator of the State and all associated Observers', () => {
         numberState.setKey('newKey');
 
         expect(numberState._key).toBe('newKey');
         expect(numberState.observers['value']._key).toBe('newKey');
         expect(numberState.observers['output']._key).toBe('newKey');
-      });
-
-      it("should update existing Key in all instances except persistent if the StateKey and PersistKey aren't equal", () => {
-        numberState.setKey('newKey');
-
-        expect(numberState._key).toBe('newKey');
-        expect(numberState.observers['value']._key).toBe('newKey');
-        expect(numberState.observers['output']._key).toBe('newKey');
-      });
-
-      it('should update existing Key in all instances except persistent if new StateKey is undefined', () => {
-        numberState.setKey(undefined);
-
-        expect(numberState._key).toBeUndefined();
-        expect(numberState.observers['value']._key).toBeUndefined();
-        expect(numberState.observers['output']._key).toBeUndefined();
       });
     });
 
@@ -249,10 +231,9 @@ describe('State Tests', () => {
 
         LogMock.hasNotLogged('warn');
         LogMock.hasNotLogged('error');
-        expect(numberState.observers['value'].ingestValue).toHaveBeenCalledWith(
-          'coolValue',
-          { force: false }
-        );
+        expect(
+          numberState.observers['value'].ingestValue
+        ).toHaveBeenCalledWith('coolValue', { force: false });
       });
     });
 
