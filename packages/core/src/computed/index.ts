@@ -1,16 +1,14 @@
+import { removeProperties, defineConfig } from '@agile-ts/utils';
+import { CreateAgileSubInstanceInterface, shared } from '../shared';
 import {
   Computed,
   ComputeFunctionType,
   CreateComputedConfigInterface,
   DependableAgileInstancesType,
-  defineConfig,
-  removeProperties,
-  CreateAgileSubInstanceInterface,
-  shared,
-} from '../internal';
+} from './computed';
 
 export * from './computed';
-// export * from './computed.tracker';
+export * from './computed.tracker';
 
 /**
  * Returns a newly created Computed.

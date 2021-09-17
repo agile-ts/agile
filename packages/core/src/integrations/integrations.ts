@@ -1,4 +1,7 @@
-import { Agile, Integration, LogCodeManager, defineConfig } from '../internal';
+import { defineConfig } from '@agile-ts/utils';
+import { LogCodeManager } from '../logCodeManager';
+import { Agile } from '../agile';
+import { Integration } from './integration';
 
 const onRegisterInitialIntegrationCallbacks: ((
   integration: Integration

@@ -22,7 +22,7 @@ jest.mock('../../../src/state/state.enhanced', () => {
   };
 });
 
-describe('State Index', () => {
+describe('State Index Tests', () => {
   let sharedAgileInstance: Agile;
 
   beforeEach(() => {

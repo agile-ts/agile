@@ -1,14 +1,9 @@
-import {
-  Agile,
-  copy,
-  StateObserver,
-  Observer,
-  isFunction,
-  ComputedTracker,
-  StateIngestConfigInterface,
-  LogCodeManager,
-  defineConfig,
-} from '../internal';
+import { copy, defineConfig, isFunction } from '@agile-ts/utils';
+import { LogCodeManager } from '../logCodeManager';
+import { Agile } from '../agile';
+import { StateIngestConfigInterface, StateObserver } from './state.observer';
+import { Observer } from '../runtime';
+import { ComputedTracker } from '../computed/computed.tracker'; // Not imported directly from '../computed' due circular dependencies
 
 export class State<ValueType = any> {
   // Agile Instance the State belongs to

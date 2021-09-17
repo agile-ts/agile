@@ -1,11 +1,11 @@
+import { defineConfig } from '@agile-ts/utils';
 import {
   CreatePersistentConfigInterface,
-  defineConfig,
-  EnhancedState,
   getStorageManager,
   Persistent,
   PersistentKey,
-} from '../internal';
+} from '../storages';
+import { EnhancedState } from './state.enhanced';
 
 export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to

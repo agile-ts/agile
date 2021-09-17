@@ -1,16 +1,14 @@
+import { defineConfig, isValidObject } from '@agile-ts/utils';
 import {
   EnhancedState,
-  Collection,
   StateKey,
-  StateRuntimeJobConfigInterface,
-  SelectorKey,
-  PersistentKey,
-  isValidObject,
-  CollectionPersistent,
   StatePersistentConfigInterface,
-  DefaultItem,
-  defineConfig,
-} from '../internal';
+  StateRuntimeJobConfigInterface,
+} from '../state';
+import { Collection, DefaultItem } from './collection';
+import { SelectorKey } from './selector';
+import { PersistentKey } from '../storages';
+import { CollectionPersistent } from './collection.persistent';
 
 export class Item<DataType extends Object = DefaultItem> extends EnhancedState<
   DataType

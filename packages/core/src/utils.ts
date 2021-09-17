@@ -1,43 +1,6 @@
-import {
-  Agile,
-  Observer,
-  normalizeArray,
-  isFunction,
-  LogCodeManager,
-  shared,
-} from './internal';
-
-/**
- * Extracts an Instance of Agile from the specified Instance.
- * When no valid Agile Instance was found,
- * it returns the global bound Agile Instance or `undefined`.
- *
- * @internal
- * @param instance - Instance to extract the Agile Instance from.
- */
-export function getAgileInstance(instance: any): Agile | undefined {
-  try {
-    // Try to get Agile Instance from specified Instance
-    if (instance != null) {
-      const _agileInstance = isFunction(instance['agileInstance'])
-        ? instance['agileInstance']()
-        : instance['agileInstance'];
-      if (_agileInstance) return _agileInstance;
-    }
-
-    // Try to get shared Agile Instance
-    if (shared instanceof Agile) {
-      return shared;
-    }
-
-    // Return global bound Agile Instance
-    return globalThis[Agile.globalKey];
-  } catch (e) {
-    LogCodeManager.log('20:03:00', [], instance);
-  }
-
-  return undefined;
-}
+import { normalizeArray } from '@agile-ts/utils';
+import { LogCodeManager } from './logCodeManager';
+import { Observer } from './runtime';
 
 /**
  * Extracts all Observers from the specified Instances

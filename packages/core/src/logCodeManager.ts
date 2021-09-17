@@ -1,4 +1,4 @@
-import { copy } from './internal';
+import { copy } from '@agile-ts/utils';
 
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.

@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/core",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -26,8 +26,17 @@
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/esm/index.js",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "shx rm -rf dist && rollup -c",
+    "build": "shx rm -rf dist && rollup --c rollup.config.js",
     "prepare": "yarn run build",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",

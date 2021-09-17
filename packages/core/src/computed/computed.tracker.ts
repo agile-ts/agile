@@ -1,4 +1,4 @@
-import { Observer } from '../internal';
+import { Observer } from '../runtime';
 
 export class ComputedTracker {
   static isTracking = false;
