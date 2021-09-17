@@ -1,18 +1,18 @@
-import path from 'path';
 import {
   createCommonJSConfig,
   createDeclarationConfig,
   createESMConfig,
 } from '../rollup.config.default';
 
-const { root } = path.parse(process.cwd()); // https://nodejs.org/api/process.html#process_process_cwd
-
-console.log(root, process.cwd()); // TODO REMOVE
+const packageRoot = process.cwd();
 
 // https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
-// Checks whether the specified id/path is outside the particular package (-> external)
-function external(id) {
-  return !id.startsWith('.') && !id.startsWith(root);
+// Checks whether the specified path is outside this particular package
+function external(path) {
+  return (
+    !path.startsWith('.') && // Paths that doesn't start with a '.' (e.g. './agile.ts')
+    !path.startsWith(packageRoot) // Paths that doesn't start with the package root path (e.g. 'path/to/package/agile.ts')
+  );
 }
 
 // https://rollupjs.org/guide/en/#configuration-files

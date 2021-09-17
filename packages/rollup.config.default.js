@@ -1,18 +1,16 @@
-// @ts-ignore
+// No Typescript because https://stackoverflow.com/questions/69212224/modularize-rollup-config-error-could-not-resolve-path-to-module-from-rol
+
 import path from 'path';
-import { ExternalOption, RollupOptions } from 'rollup'; // https://rollupjs.org/guide/en/#big-list-of-options
-import { babel } from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { defineConfig as rollupDefineConfig } from 'rollup';
+import { babel } from '@rollup/plugin-babel'; // https://rollupjs.org/guide/en/#babel
+import { nodeResolve } from '@rollup/plugin-node-resolve'; // https://rollupjs.org/guide/en/#rollupplugin-node-resolve
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from '@agile-ts/utils';
 
-// TODO https://javascript.plainenglish.io/building-a-npm-library-with-web-components-using-lerna-rollup-and-jest-9f76f59348ba
-// TODO https://github.com/bjerkek/lerna-rollup-npm
-
 export const fileExtensions = ['.js', '.ts', '.tsx'];
 
-export function createEsbuildConfig(config: EsbuildConfigInterface) {
+export function createEsbuildConfig(config) {
   config = defineConfig(config, {
     target: 'es2015',
     tsconfig: path.resolve('./tsconfig.json'),
@@ -24,9 +22,7 @@ export function createEsbuildConfig(config: EsbuildConfigInterface) {
   });
 }
 
-export function createDeclarationConfig(
-  config: DefaultConfigInterface
-): RollupOptions {
+export function createDeclarationConfig(config) {
   config = defineConfig(config, {
     input: 'src/index.ts',
     output: 'dist',
@@ -34,7 +30,7 @@ export function createDeclarationConfig(
     external: [],
   });
 
-  return {
+  return rollupDefineConfig({
     input: config.input,
     output: {
       dir: config.output,
@@ -45,10 +41,10 @@ export function createDeclarationConfig(
         tsconfig: config.tsconfig,
       }),
     ],
-  };
+  });
 }
 
-export function createESMConfig(config: ESMConfigInterface): RollupOptions {
+export function createESMConfig(config) {
   config = defineConfig(config, {
     input: 'src/index.ts',
     output: 'dist/esm',
@@ -57,7 +53,7 @@ export function createESMConfig(config: ESMConfigInterface): RollupOptions {
     external: [],
   });
 
-  return {
+  return rollupDefineConfig({
     input: config.input,
     output: {
       [config.multiFileOutput ? 'dir' : 'file']: config.output,
@@ -70,12 +66,10 @@ export function createESMConfig(config: ESMConfigInterface): RollupOptions {
       // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
     ],
     preserveModules: config.multiFileOutput, // https://stackoverflow.com/questions/55339256/tree-shaking-with-rollup
-  };
+  });
 }
 
-export function createCommonJSConfig(
-  config: DefaultConfigInterface
-): RollupOptions {
+export function createCommonJSConfig(config) {
   config = defineConfig(config, {
     input: 'src/index.ts',
     output: 'dist/index.js',
@@ -83,7 +77,7 @@ export function createCommonJSConfig(
     external: [],
   });
 
-  return {
+  return rollupDefineConfig({
     input: config.input,
     output: { file: config.output, format: 'cjs' },
     external: config.external,
@@ -95,21 +89,5 @@ export function createCommonJSConfig(
       }),
       typescript({ tsconfig: config.tsconfig }),
     ],
-  };
-}
-
-interface ESMConfigInterface extends DefaultConfigInterface {
-  multiFileOutput?: boolean;
-}
-
-interface DefaultConfigInterface {
-  input?: string;
-  output?: string;
-  tsconfig?: string;
-  external?: ExternalOption;
-}
-
-interface EsbuildConfigInterface {
-  target?: string[] | string;
-  tsconfig?: string;
+  });
 }
