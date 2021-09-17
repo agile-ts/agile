@@ -1,7 +1,3 @@
-import { State, StateConfigInterface, StateKey } from './state';
-import { StatePersistent } from './state.persistent';
-import { Agile } from '../agile';
-import { StateIngestConfigInterface } from './state.observer';
 import {
   defineConfig,
   equal,
@@ -13,6 +9,10 @@ import {
   removeProperties,
 } from '@agile-ts/utils';
 import { LogCodeManager } from '../logCodeManager';
+import { State, StateConfigInterface, StateKey } from './state';
+import { Agile } from '../agile';
+import { StateIngestConfigInterface } from './state.observer';
+import { StatePersistent } from './state.persistent';
 import { PersistentKey, StorageKey } from '../storages';
 
 export class EnhancedState<ValueType = any> extends State<ValueType> {

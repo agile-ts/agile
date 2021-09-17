@@ -1,12 +1,12 @@
-import { Collection, DefaultItem } from './collection';
+import { defineConfig, isValidObject } from '@agile-ts/utils';
 import {
   EnhancedState,
   StateKey,
   StatePersistentConfigInterface,
   StateRuntimeJobConfigInterface,
 } from '../state';
+import { Collection, DefaultItem } from './collection';
 import { SelectorKey } from './selector';
-import { defineConfig, isValidObject } from '@agile-ts/utils';
 import { PersistentKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 

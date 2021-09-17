@@ -1,18 +1,18 @@
 import {
+  defineConfig,
+  isAsyncFunction,
+  removeProperties,
+} from '@agile-ts/utils';
+import { LogCodeManager } from '../logCodeManager';
+import { Agile } from '../agile';
+import { extractRelevantObservers } from '../utils';
+import {
   State,
   StateConfigInterface,
   StateIngestConfigInterface,
 } from '../state';
 import { Observer } from '../runtime';
-import { Agile } from '../agile';
-import {
-  defineConfig,
-  isAsyncFunction,
-  removeProperties,
-} from '@agile-ts/utils';
-import { extractRelevantObservers } from '../utils';
 import { ComputedTracker } from './computed.tracker';
-import { LogCodeManager } from '../logCodeManager';
 import { Collection } from '../collection';
 
 export class Computed<ComputedValueType = any> extends State<

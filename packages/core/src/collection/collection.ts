@@ -1,6 +1,3 @@
-import { Agile } from '../agile';
-import { Item } from './item';
-import { CollectionPersistent } from './collection.persistent';
 import {
   copy,
   defineConfig,
@@ -11,6 +8,10 @@ import {
   removeProperties,
 } from '@agile-ts/utils';
 import { LogCodeManager } from '../logCodeManager';
+import { Agile } from '../agile';
+import { PatchOptionConfigInterface } from '../state';
+import { ComputedTracker } from '../computed';
+import { Item } from './item';
 import { SelectorConfigInterface, Selector, SelectorKey } from './selector';
 import {
   Group,
@@ -19,10 +20,9 @@ import {
   GroupKey,
   TrackedChangeMethod,
 } from './group';
-import { ComputedTracker } from '../computed';
-import { StorageKey } from '../storages';
-import { PatchOptionConfigInterface } from '../state';
 import { GroupIngestConfigInterface } from './group/group.observer';
+import { StorageKey } from '../storages';
+import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<
   DataType extends Object = DefaultItem,

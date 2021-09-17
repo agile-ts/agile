@@ -1,6 +1,6 @@
-import { State, StateConfigInterface } from './state';
-import { removeProperties, defineConfig } from '@agile-ts/utils';
+import { defineConfig, removeProperties } from '@agile-ts/utils';
 import { CreateAgileSubInstanceInterface, shared } from '../shared';
+import { State, StateConfigInterface } from './state';
 import { EnhancedState } from './state.enhanced';
 
 export * from './state';

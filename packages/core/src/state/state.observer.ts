@@ -1,4 +1,3 @@
-import { SideEffectInterface, State } from './state';
 import {
   copy,
   createArrayFromObject,
@@ -10,15 +9,16 @@ import {
   removeProperties,
 } from '@agile-ts/utils';
 import {
-  CreateStateRuntimeJobConfigInterface,
-  StateRuntimeJob,
-} from './state.runtime.job';
-import {
   IngestConfigInterface,
   Observer,
   ObserverKey,
   SubscriptionContainer,
 } from '../runtime';
+import {
+  CreateStateRuntimeJobConfigInterface,
+  StateRuntimeJob,
+} from './state.runtime.job';
+import { SideEffectInterface, State } from './state';
 
 export class StateObserver<ValueType = any> extends Observer {
   // State the Observer belongs to

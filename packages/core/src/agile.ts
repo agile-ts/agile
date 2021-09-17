@@ -1,12 +1,12 @@
+import { defineConfig } from '@agile-ts/utils';
+import { LogCodeManager } from './logCodeManager';
+import { globalBind } from './utils';
 import { Runtime, SubController } from './runtime';
 import {
   Integration,
   Integrations,
   IntegrationsConfigInterface,
 } from './integrations';
-import { defineConfig } from '@agile-ts/utils';
-import { LogCodeManager } from './logCodeManager';
-import { globalBind } from './utils';
 
 export class Agile {
   public config: AgileConfigInterface;

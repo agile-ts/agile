@@ -1,6 +1,6 @@
-import { Collection, CollectionConfig, DefaultItem } from './collection';
 import { Agile } from '../agile';
 import { shared } from '../shared';
+import { Collection, CollectionConfig, DefaultItem } from './collection';
 
 export * from './collection';
 export * from './collection.persistent';

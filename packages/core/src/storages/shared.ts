@@ -1,8 +1,8 @@
-import { CreateStoragesConfigInterface, Storages } from './storages';
 import { defineConfig, removeProperties } from '@agile-ts/utils';
-import { CreateAgileSubInstanceInterface, shared } from '../shared';
-import { runsOnServer } from '../utils';
 import { LogCodeManager } from '../logCodeManager';
+import { runsOnServer } from '../utils';
+import { CreateAgileSubInstanceInterface, shared } from '../shared';
+import { CreateStoragesConfigInterface, Storages } from './storages';
 
 // Handles the permanent persistence of Agile Classes
 let storageManager: Storages | null = null;

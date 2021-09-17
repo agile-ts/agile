@@ -14,11 +14,13 @@ export function createEsbuildConfig(config) {
   config = defineConfig(config, {
     target: 'es2015',
     tsconfig: path.resolve('./tsconfig.json'),
+    additionalOptions: {},
   });
   return esbuild({
     minify: false,
     target: config.target,
     tsconfig: config.tsconfig,
+    ...config.additionalOptions,
   });
 }
 
@@ -28,6 +30,8 @@ export function createDeclarationConfig(config) {
     output: 'dist',
     tsconfig: path.resolve('./tsconfig.json'),
     external: [],
+    additionalOptions: {},
+    additionalPlugins: [],
   });
 
   return rollupDefineConfig({
@@ -40,7 +44,9 @@ export function createDeclarationConfig(config) {
       typescript({
         tsconfig: config.tsconfig,
       }),
+      ...config.additionalPlugins,
     ],
+    ...config.additionalOptions,
   });
 }
 
@@ -51,6 +57,8 @@ export function createESMConfig(config) {
     tsconfig: path.resolve('./tsconfig.json'),
     multiFileOutput: true,
     external: [],
+    additionalOptions: {},
+    additionalPlugins: [],
   });
 
   return rollupDefineConfig({
@@ -64,8 +72,10 @@ export function createESMConfig(config) {
       nodeResolve({ extensions: fileExtensions }),
       createEsbuildConfig({ target: 'es2015', tsconfig: config.tsconfig }),
       // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
+      ...config.additionalPlugins,
     ],
     preserveModules: config.multiFileOutput, // https://stackoverflow.com/questions/55339256/tree-shaking-with-rollup
+    ...config.additionalOptions,
   });
 }
 
@@ -75,6 +85,8 @@ export function createCommonJSConfig(config) {
     output: 'dist/index.js',
     tsconfig: path.resolve('./tsconfig.json'),
     external: [],
+    additionalOptions: {},
+    additionalPlugins: [],
   });
 
   return rollupDefineConfig({
@@ -88,6 +100,8 @@ export function createCommonJSConfig(config) {
         comments: false,
       }),
       typescript({ tsconfig: config.tsconfig }),
+      ...config.additionalPlugins,
     ],
+    ...config.additionalOptions,
   });
 }

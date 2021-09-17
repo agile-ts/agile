@@ -1,6 +1,6 @@
-import { Agile } from './agile';
 import { isFunction } from '@agile-ts/utils';
 import { LogCodeManager } from './logCodeManager';
+import { Agile } from './agile';
 
 /**
  * Shared Agile Instance that is used when no Agile Instance was specified.

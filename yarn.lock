@@ -3,7 +3,7 @@
 
 
 "@agile-ts/core@file:packages/core":
-  version "0.2.0"
+  version "0.2.3"
   dependencies:
     "@agile-ts/utils" "^0.0.8"
 
