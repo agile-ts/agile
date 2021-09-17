@@ -1,10 +1,12 @@
 import { defineConfig, notEqual } from '@agile-ts/utils';
 import { LogCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
+import {
+  SubscriptionContainer,
+  CallbackSubscriptionContainer,
+  ComponentSubscriptionContainer,
+} from './subscription';
 import { RuntimeJob } from './runtime.job';
-import { SubscriptionContainer } from './subscription/container/SubscriptionContainer';
-import { CallbackSubscriptionContainer } from './subscription/container/CallbackSubscriptionContainer';
-import { ComponentSubscriptionContainer } from './subscription/container/ComponentSubscriptionContainer';
 
 export class Runtime {
   // Agile Instance the Runtime belongs to
@@ -157,9 +159,8 @@ export class Runtime {
       return false;
 
     // Extract the Subscription Container to be re-rendered from the Jobs
-    const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
-      jobsToRerender
-    );
+    const subscriptionContainerToUpdate =
+      this.extractToUpdateSubscriptionContainer(jobsToRerender);
     if (subscriptionContainerToUpdate.length <= 0) return false;
 
     // Update Subscription Container (trigger re-render on the UI-Component they represent)

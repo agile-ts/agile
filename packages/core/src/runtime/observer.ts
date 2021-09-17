@@ -1,7 +1,7 @@
 import { defineConfig, generateId } from '@agile-ts/utils';
 import { LogCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
-import { SubscriptionContainer } from './subscription/container/SubscriptionContainer';
+import { SubscriptionContainer } from './subscription';
 import { CreateRuntimeJobConfigInterface, RuntimeJob } from './runtime.job';
 import { IngestConfigInterface } from './runtime';
 import { StateKey } from '../state';
