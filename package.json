@@ -70,6 +70,7 @@
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "rollup": "^2.56.3",
+    "rollup-plugin-bundle-size": "^1.0.3",
     "rollup-plugin-esbuild": "^4.5.0",
     "shx": "^0.3.3",
     "size-limit": "^5.0.1",

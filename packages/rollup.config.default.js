@@ -6,6 +6,7 @@ import { babel } from '@rollup/plugin-babel'; // https://rollupjs.org/guide/en/#
 import { nodeResolve } from '@rollup/plugin-node-resolve'; // https://rollupjs.org/guide/en/#rollupplugin-node-resolve
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
+import bundleSize from 'rollup-plugin-bundle-size';
 
 export const fileExtensions = ['.js', '.ts', '.tsx'];
 
@@ -74,6 +75,7 @@ export function createESMConfig(config) {
       nodeResolve({ extensions: fileExtensions }),
       createEsbuildConfig({ target: 'es2015', tsconfig: config.tsconfig }),
       // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
+      !config.multiFileOutput && bundleSize(),
       ...config.additionalPlugins,
     ],
     preserveModules: config.multiFileOutput, // https://stackoverflow.com/questions/55339256/tree-shaking-with-rollup
@@ -103,6 +105,7 @@ export function createCommonJSConfig(config) {
         comments: false,
       }),
       typescript({ tsconfig: config.tsconfig }),
+      bundleSize(),
       ...config.additionalPlugins,
     ],
     ...config.additionalOptions,
