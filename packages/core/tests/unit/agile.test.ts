@@ -3,14 +3,10 @@ import testIntegration from '../helper/test.integration';
 import { LogMock } from '../helper/logMock';
 
 // https://github.com/facebook/jest/issues/5023
-jest.mock('../../src/runtime', () => {
+jest.mock('../../src/runtime/runtime', () => {
   return {
     // https://jestjs.io/docs/mock-function-api#mockfnmockimplementationfn
-    Runtime: jest.fn().mockImplementation(() => {
-      return {
-        ingest: jest.fn(),
-      };
-    }),
+    Runtime: jest.fn(),
   };
 });
 jest.mock('../../src/runtime/subscription/sub.controller', () => {
@@ -21,7 +17,7 @@ jest.mock('../../src/runtime/subscription/sub.controller', () => {
 
 // https://gist.github.com/virgs/d9c50e878fc69832c01f8085f2953f12
 // https://medium.com/@masonlgoetz/mock-static-class-methods-in-jest-1ceda967b47f
-jest.mock('../../src/integrations', () => {
+jest.mock('../../src/integrations/integrations', () => {
   const mockedInstances = {
     // https://jestjs.io/docs/mock-function-api#mockfnmockimplementationfn
     Integrations: jest.fn().mockImplementation(() => {
@@ -32,9 +28,8 @@ jest.mock('../../src/integrations', () => {
     }),
   };
   // @ts-ignore
-  mockedInstances.Integrations.onRegisteredExternalIntegration = jest.fn();
-  // @ts-ignore
   mockedInstances.Integrations.initialIntegrations = [];
+
   return mockedInstances;
 });
 

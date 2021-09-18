@@ -1,28 +1,28 @@
 import {
-  Agile,
-  CollectionPersistent,
-  ComputedTracker,
   copy,
   defineConfig,
   generateId,
+  isFunction,
+  isValidObject,
+  normalizeArray,
+  removeProperties,
+} from '@agile-ts/utils';
+import { LogCodeManager } from '../logCodeManager';
+import { Agile } from '../agile';
+import { PatchOptionConfigInterface } from '../state';
+import { ComputedTracker } from '../computed';
+import { Item } from './item';
+import { SelectorConfigInterface, Selector, SelectorKey } from './selector';
+import {
   Group,
   GroupAddConfigInterface,
   GroupConfigInterface,
-  GroupIngestConfigInterface,
   GroupKey,
-  isFunction,
-  isValidObject,
-  Item,
-  LogCodeManager,
-  normalizeArray,
-  PatchOptionConfigInterface,
-  removeProperties,
-  Selector,
-  SelectorConfigInterface,
-  SelectorKey,
-  StorageKey,
   TrackedChangeMethod,
-} from '../internal';
+} from './group';
+import { GroupIngestConfigInterface } from './group/group.observer';
+import { StorageKey } from '../storages';
+import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<
   DataType extends Object = DefaultItem,

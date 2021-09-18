@@ -7,13 +7,9 @@ import {
   Observer,
   defineConfig,
 } from '@agile-ts/core';
-import {
-  Item,
-  Validator,
-  StatusType,
-  StatusInterface,
-  ValidationMethodInterface,
-} from '../internal';
+import { ValidationMethodInterface, Validator } from '../validator';
+import { Item } from '../item';
+import { StatusInterface, StatusType } from '../status';
 
 export class MultiEditor<
   DataType = any,

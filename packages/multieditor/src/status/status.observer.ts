@@ -1,4 +1,3 @@
-import { Status, StatusInterface } from '../internal';
 import {
   Agile,
   copy,
@@ -10,6 +9,7 @@ import {
   RuntimeJobConfigInterface,
   defineConfig,
 } from '@agile-ts/core';
+import { Status, StatusInterface } from './status';
 
 export class StatusObserver extends Observer {
   public status: () => Status;
