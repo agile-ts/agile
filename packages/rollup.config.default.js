@@ -1,21 +1,21 @@
 // No Typescript because https://stackoverflow.com/questions/69212224/modularize-rollup-config-error-could-not-resolve-path-to-module-from-rol
 
 import path from 'path';
-import { defineConfig as rollupDefineConfig } from 'rollup';
+import { defineConfig } from 'rollup';
 import { babel } from '@rollup/plugin-babel'; // https://rollupjs.org/guide/en/#babel
 import { nodeResolve } from '@rollup/plugin-node-resolve'; // https://rollupjs.org/guide/en/#rollupplugin-node-resolve
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
-import { defineConfig } from '@agile-ts/utils';
 
 export const fileExtensions = ['.js', '.ts', '.tsx'];
 
 export function createEsbuildConfig(config) {
-  config = defineConfig(config, {
+  config = {
     target: 'es2015',
     tsconfig: path.resolve('./tsconfig.json'),
     additionalOptions: {},
-  });
+    ...config,
+  };
   return esbuild({
     minify: false,
     target: config.target,
@@ -25,16 +25,17 @@ export function createEsbuildConfig(config) {
 }
 
 export function createDeclarationConfig(config) {
-  config = defineConfig(config, {
+  config = {
     input: 'src/index.ts',
     output: 'dist',
     tsconfig: path.resolve('./tsconfig.json'),
     external: [],
     additionalOptions: {},
     additionalPlugins: [],
-  });
+    ...config,
+  };
 
-  return rollupDefineConfig({
+  return defineConfig({
     input: config.input,
     output: {
       dir: config.output,
@@ -51,7 +52,7 @@ export function createDeclarationConfig(config) {
 }
 
 export function createESMConfig(config) {
-  config = defineConfig(config, {
+  config = {
     input: 'src/index.ts',
     output: 'dist/esm',
     tsconfig: path.resolve('./tsconfig.json'),
@@ -59,9 +60,10 @@ export function createESMConfig(config) {
     external: [],
     additionalOptions: {},
     additionalPlugins: [],
-  });
+    ...config,
+  };
 
-  return rollupDefineConfig({
+  return defineConfig({
     input: config.input,
     output: {
       [config.multiFileOutput ? 'dir' : 'file']: config.output,
@@ -80,16 +82,17 @@ export function createESMConfig(config) {
 }
 
 export function createCommonJSConfig(config) {
-  config = defineConfig(config, {
+  config = {
     input: 'src/index.ts',
     output: 'dist/index.js',
     tsconfig: path.resolve('./tsconfig.json'),
     external: [],
     additionalOptions: {},
     additionalPlugins: [],
-  });
+    ...config,
+  };
 
-  return rollupDefineConfig({
+  return defineConfig({
     input: config.input,
     output: { file: config.output, format: 'cjs' },
     external: config.external,
