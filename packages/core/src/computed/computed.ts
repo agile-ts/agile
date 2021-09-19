@@ -200,14 +200,6 @@ export class Computed<ComputedValueType = any> extends State<
 
     return computedValue;
   }
-
-  /**
-   * Not usable in Computed Class.
-   */
-  public persist(): this {
-    LogCodeManager.log('19:03:00');
-    return this;
-  }
 }
 
 export type ComputeFunctionType<ComputedValueType = any> = () =>

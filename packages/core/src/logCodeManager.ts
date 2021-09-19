@@ -102,10 +102,6 @@ const niceLogCodeMessages = {
   '18:03:00': "Failed to integrate Framework '${0}' into AgileTs '${1}'!",
 
   // Computed
-  '19:03:00':
-    "The 'persist()' method can't be used in the Computed Class! " +
-    "The Computed Class has a dynamic value which shouldn't be persisted. " +
-    'Consider persisting the values the Computed depends on.',
 
   // Collection Persistent
   '1A:02:00': 'Failed to build unique Item StorageKey!',

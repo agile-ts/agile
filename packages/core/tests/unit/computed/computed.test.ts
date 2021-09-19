@@ -447,13 +447,5 @@ describe('Computed Tests', () => {
         }
       );
     });
-
-    describe('persist function tests', () => {
-      it('should print error', () => {
-        computed.persist();
-
-        LogMock.hasLoggedCode('19:03:00');
-      });
-    });
   });
 });
