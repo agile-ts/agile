@@ -1,11 +1,24 @@
 import { defineConfig, removeProperties } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
 import { runsOnServer } from '../utils';
 import { CreateAgileSubInstanceInterface, shared } from '../shared';
 import { CreateStoragesConfigInterface, Storages } from './storages';
 
-// Handles the permanent persistence of Agile Classes
-let storageManager: Storages | null = null;
+/**
+ * Handles the permanent persistence of Agile Classes.
+ */
+let sharedStorageManager: Storages | null = null;
+export { sharedStorageManager };
+
+/**
+ * Assigns the specified Storage Manager
+ * as default (shared) Storage Manager for all Agile Instances.
+ *
+ *  @param instance - Storage Manager to be assigned as the shared Storage Manager.
+ */
+// https://stackoverflow.com/questions/32558514/javascript-es6-export-const-vs-export-let
+export const assignSharedStorageManager = (instance: Storages | null) => {
+  sharedStorageManager = instance;
+};
 
 /**
  * Returns a newly created Storage Manager.
@@ -33,28 +46,15 @@ export function createStorageManager(
  * or creates a new one when no shared Storage Manager exists.
  */
 export function getStorageManager(): Storages {
-  if (storageManager == null) {
+  if (sharedStorageManager == null) {
     const newStorageManager = createStorageManager({
       localStorage: !runsOnServer(),
     });
-    assignSharedAgileStorageManager(newStorageManager);
+    assignSharedStorageManager(newStorageManager);
     return newStorageManager;
   }
-  return storageManager;
+  return sharedStorageManager;
 }
-
-/**
- * Assigns the specified Storage Manager
- * as default (shared) Storage Manager for all Agile Instances.
- *
- *  @param instance - Storage Manager to be registered as the default Storage Manager.
- */
-export const assignSharedAgileStorageManager = (instance: Storages | null) => {
-  if (storageManager != null) {
-    LogCodeManager.log('11:02:06', [], storageManager);
-  }
-  storageManager = instance;
-};
 
 export interface CreateStorageManagerConfigInterfaceWithAgile
   extends CreateAgileSubInstanceInterface,

@@ -4,7 +4,7 @@ import {
   createStorage,
   createCollection,
   createStorageManager,
-  assignSharedAgileStorageManager,
+  assignSharedStorageManager,
 } from '../../src';
 import { LogMock } from '../helper/logMock';
 
@@ -38,7 +38,7 @@ describe('Collection Persist Function Tests', () => {
     App = new Agile();
 
     const storageManager = createStorageManager({ localStorage: false });
-    assignSharedAgileStorageManager(storageManager);
+    assignSharedStorageManager(storageManager);
     storageManager.register(
       createStorage({
         key: 'testStorage',

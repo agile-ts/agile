@@ -14,7 +14,7 @@ describe('Shared (Storage) Tests', () => {
     assignSharedAgileInstance(sharedAgileInstance);
 
     // Reset Storage Manager
-    SharedStorageManager.assignSharedAgileStorageManager(null);
+    SharedStorageManager.assignSharedStorageManager(null);
 
     jest.clearAllMocks();
   });
@@ -52,9 +52,9 @@ describe('Shared (Storage) Tests', () => {
 
   describe('getStorageManager function tests', () => {
     beforeEach(() => {
-      SharedStorageManager.assignSharedAgileStorageManager(null);
+      SharedStorageManager.assignSharedStorageManager(null);
 
-      jest.spyOn(SharedStorageManager, 'assignSharedAgileStorageManager');
+      jest.spyOn(SharedStorageManager, 'assignSharedStorageManager');
       jest.spyOn(SharedStorageManager, 'createStorageManager');
     });
 
@@ -62,9 +62,7 @@ describe('Shared (Storage) Tests', () => {
       const createdStorageManager = new Storages(sharedAgileInstance, {
         localStorage: false,
       });
-      SharedStorageManager.assignSharedAgileStorageManager(
-        createdStorageManager
-      );
+      SharedStorageManager.assignSharedStorageManager(createdStorageManager);
       jest.clearAllMocks();
 
       const returnedStorageManager = SharedStorageManager.getStorageManager();
@@ -73,7 +71,7 @@ describe('Shared (Storage) Tests', () => {
       expect(returnedStorageManager).toBe(createdStorageManager);
       expect(SharedStorageManager.createStorageManager).not.toHaveBeenCalled();
       expect(
-        SharedStorageManager.assignSharedAgileStorageManager
+        SharedStorageManager.assignSharedStorageManager
       ).not.toHaveBeenCalled();
     });
 
@@ -104,29 +102,13 @@ describe('Shared (Storage) Tests', () => {
     // );
   });
 
-  describe('assignSharedAgileStorageManager function tests', () => {
+  describe('assignSharedStorageManager function tests', () => {
     it('should assign the specified Storage Manager as shared Storage Manager', () => {
       const storageManager = new Storages(sharedAgileInstance);
 
-      SharedStorageManager.assignSharedAgileStorageManager(storageManager);
+      SharedStorageManager.assignSharedStorageManager(storageManager);
 
       expect(SharedStorageManager.getStorageManager()).toBe(storageManager);
-      LogMock.hasNotLoggedCode('11:02:06');
     });
-
-    it(
-      'should assign the specified Storage Manager as shared Storage Manager ' +
-        'and print warning if a shared Storage Manager is already set',
-      () => {
-        const oldStorageManager = new Storages(sharedAgileInstance);
-        SharedStorageManager.assignSharedAgileStorageManager(oldStorageManager);
-        const storageManager = new Storages(sharedAgileInstance);
-
-        SharedStorageManager.assignSharedAgileStorageManager(storageManager);
-
-        expect(SharedStorageManager.getStorageManager()).toBe(storageManager);
-        LogMock.hasLoggedCode('11:02:06', [], oldStorageManager);
-      }
-    );
   });
 });
