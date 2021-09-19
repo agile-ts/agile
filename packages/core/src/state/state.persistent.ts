@@ -1,7 +1,7 @@
 import { defineConfig } from '@agile-ts/utils';
 import {
   CreatePersistentConfigInterface,
-  getStorageManager,
+  getSharedStorageManager,
   Persistent,
   PersistentKey,
 } from '../storages';
@@ -73,7 +73,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     const _storageItemKey = storageItemKey ?? this._key;
 
     // Load State value from the default Storage
-    const loadedValue = await getStorageManager()?.get<ValueType>(
+    const loadedValue = await getSharedStorageManager()?.get<ValueType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -151,7 +151,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (!this.ready) return false;
     const _storageItemKey = storageItemKey || this._key;
     this.state().removeSideEffect(StatePersistent.storeValueSideEffectKey);
-    getStorageManager()?.remove(_storageItemKey, this.storageKeys);
+    getSharedStorageManager()?.remove(_storageItemKey, this.storageKeys);
     this.isPersisted = false;
     return true;
   }
@@ -190,7 +190,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
     config: { [key: string]: any } = {}
   ) {
     if (config['storage'] == null || config.storage) {
-      getStorageManager()?.set(
+      getSharedStorageManager()?.set(
         storageItemKey,
         this.state().getPersistableValue(),
         this.storageKeys

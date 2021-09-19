@@ -50,7 +50,7 @@ describe('Shared (Storage) Tests', () => {
     });
   });
 
-  describe('getStorageManager function tests', () => {
+  describe('getSharedStorageManager function tests', () => {
     beforeEach(() => {
       SharedStorageManager.assignSharedStorageManager(null);
 
@@ -58,14 +58,14 @@ describe('Shared (Storage) Tests', () => {
       jest.spyOn(SharedStorageManager, 'createStorageManager');
     });
 
-    it('should return shared Storage Manager', () => {
+    it('should return the shared Storage Manager', () => {
       const createdStorageManager = new Storages(sharedAgileInstance, {
         localStorage: false,
       });
       SharedStorageManager.assignSharedStorageManager(createdStorageManager);
       jest.clearAllMocks();
 
-      const returnedStorageManager = SharedStorageManager.getStorageManager();
+      const returnedStorageManager = SharedStorageManager.getSharedStorageManager();
 
       expect(returnedStorageManager).toBeInstanceOf(Storages);
       expect(returnedStorageManager).toBe(createdStorageManager);
@@ -108,7 +108,9 @@ describe('Shared (Storage) Tests', () => {
 
       SharedStorageManager.assignSharedStorageManager(storageManager);
 
-      expect(SharedStorageManager.getStorageManager()).toBe(storageManager);
+      expect(SharedStorageManager.getSharedStorageManager()).toBe(
+        storageManager
+      );
     });
   });
 });

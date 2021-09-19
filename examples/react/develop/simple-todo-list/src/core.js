@@ -1,7 +1,7 @@
 import { createCollection, globalBind } from '@agile-ts/core';
-import { assignSharedAgileLoggerConfig, Logger } from '@agile-ts/logger';
+import { assignSharedLogger, createLogger, Logger } from '@agile-ts/logger';
 
-assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
+assignSharedLogger(createLogger({ level: Logger.level.DEBUG }));
 
 // Create Collection
 export const TODOS = createCollection({

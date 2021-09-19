@@ -4,7 +4,7 @@ import {
   createComputed,
   createCollection,
 } from '@agile-ts/core';
-import { createEvent, Event } from '@agile-ts/event';
+import { createEvent } from '@agile-ts/event';
 
 export const MY_STATE = createState<string>('MyState'); //.persist();
 export const MY_STATE_2 = createState<string>('MyState2', {

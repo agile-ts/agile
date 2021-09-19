@@ -1,7 +1,7 @@
 import { copy, defineConfig } from '@agile-ts/utils';
 import { LogCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
-import { getStorageManager } from './shared';
+import { getSharedStorageManager } from './shared';
 import { StorageKey } from './storage';
 
 export class Persistent {
@@ -126,7 +126,7 @@ export class Persistent {
     this.validatePersistent();
 
     // Register Persistent to Storage Manager
-    const storageManager = getStorageManager();
+    const storageManager = getSharedStorageManager();
     if (this._key !== Persistent.placeHolderKey && storageManager != null) {
       storageManager.persistentInstances[this._key] = this;
     }
@@ -158,7 +158,7 @@ export class Persistent {
 
     // Check if the Storages exist at the specified Storage keys
     this.storageKeys.map((key) => {
-      if (!getStorageManager()?.storages[key]) {
+      if (!getSharedStorageManager()?.storages[key]) {
         LogCodeManager.log('12:03:02', [this._key, key]);
         isValid = false;
       }
@@ -193,10 +193,13 @@ export class Persistent {
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      const defaultStorageKey = getStorageManager()?.config.defaultStorageKey;
+      const defaultStorageKey = getSharedStorageManager()?.config
+        .defaultStorageKey;
       if (defaultStorageKey != null) {
         this.config.defaultStorageKey = defaultStorageKey;
-        _storageKeys.push(getStorageManager()?.config.defaultStorageKey as any);
+        _storageKeys.push(
+          getSharedStorageManager()?.config.defaultStorageKey as any
+        );
       }
     } else {
       this.config.defaultStorageKey = defaultStorageKey ?? _storageKeys[0];

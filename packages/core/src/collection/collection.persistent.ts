@@ -4,7 +4,7 @@ import { Collection, CollectionKey, DefaultItem, ItemKey } from './collection';
 import { Group, GroupKey } from './group';
 import {
   CreatePersistentConfigInterface,
-  getStorageManager,
+  getSharedStorageManager,
   Persistent,
   PersistentKey,
   StorageKey,
@@ -81,7 +81,7 @@ export class CollectionPersistent<
 
     // Check if Collection is already persisted
     // (indicated by the persistence of 'true' at '_storageItemKey')
-    const isPersisted = await getStorageManager()?.get<DataType>(
+    const isPersisted = await getSharedStorageManager()?.get<DataType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -199,7 +199,7 @@ export class CollectionPersistent<
     );
 
     // Set flag in Storage to indicate that the Collection is persisted
-    getStorageManager()?.set(_storageItemKey, true, this.storageKeys);
+    getSharedStorageManager()?.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
     defaultGroup.persist(defaultGroupStorageKey, {
@@ -274,7 +274,7 @@ export class CollectionPersistent<
     );
 
     // Remove Collection is persisted indicator flag from Storage
-    getStorageManager()?.remove(_storageItemKey, this.storageKeys);
+    getSharedStorageManager()?.remove(_storageItemKey, this.storageKeys);
 
     // Remove default Group from the Storage
     defaultGroup.persistent?.removePersistedValue(defaultGroupStorageKey);

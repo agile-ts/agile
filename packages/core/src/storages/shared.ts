@@ -45,7 +45,7 @@ export function createStorageManager(
  * Returns the shared Storage Manager
  * or creates a new one when no shared Storage Manager exists.
  */
-export function getStorageManager(): Storages {
+export function getSharedStorageManager(): Storages {
   if (sharedStorageManager == null) {
     const newStorageManager = createStorageManager({
       localStorage: !runsOnServer(),

@@ -3,11 +3,13 @@ import {
   createState,
   createComputed,
   createCollection,
+  shared,
 } from '@agile-ts/core';
-import { Logger, assignSharedAgileLoggerConfig } from '@agile-ts/logger';
-import '@agile-ts/vue';
+import { assignSharedLogger, createLogger, Logger } from '@agile-ts/logger';
+import vueIntegration from '@agile-ts/vue';
 
-assignSharedAgileLoggerConfig({ level: Logger.level.DEBUG });
+assignSharedLogger(createLogger({ level: Logger.level.DEBUG }));
+shared.integrate(vueIntegration);
 
 // console.debug('hi'); // Doesn't work here idk why
 
@@ -34,4 +36,4 @@ export const TODOS = createCollection({
 
 // TODOS.collect({ id: 2, name: 'jeff' });
 
-globalBind('__core__', { App, MY_STATE, TODOS, MY_COMPUTED });
+globalBind('__core__', { MY_STATE, TODOS, MY_COMPUTED, shared });
