@@ -7,7 +7,7 @@ import {
   StatePersistent,
   Group,
   Item,
-  assignSharedAgileStorageManager,
+  assignSharedStorageManager,
   createStorageManager,
   Storages,
 } from '../../../src';
@@ -34,7 +34,7 @@ describe('CollectionPersistent Tests', () => {
 
     // Register Storage Manager
     storageManager = createStorageManager();
-    assignSharedAgileStorageManager(storageManager);
+    assignSharedStorageManager(storageManager);
 
     jest.spyOn(CollectionPersistent.prototype, 'instantiatePersistent');
     jest.spyOn(CollectionPersistent.prototype, 'initialLoading');
@@ -488,12 +488,13 @@ describe('CollectionPersistent Tests', () => {
           expect(
             placeholderItem3?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
-          expect(
-            dummyCollection.assignItem
-          ).not.toHaveBeenCalledWith(placeholderItem3, {
-            overwrite: true,
-            rebuildGroups: false,
-          }); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
+          expect(dummyCollection.assignItem).not.toHaveBeenCalledWith(
+            placeholderItem3,
+            {
+              overwrite: true,
+              rebuildGroups: false,
+            }
+          ); // Because Item persistent 'leadPersistedValue()' returned false -> Item properly doesn't exist in Storage
           expect(placeholderItem3.isPersisted).toBeFalsy();
 
           expect(collectionPersistent.setupSideEffects).toHaveBeenCalledWith(

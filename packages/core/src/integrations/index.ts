@@ -1,2 +1,2 @@
 export * from './integrations';
-// export * from './integration';
+export * from './integration';

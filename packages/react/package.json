@@ -25,15 +25,22 @@
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/esm/index.js",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "yarn run build:esm && yarn run build:cjs",
+    "build": "shx rm -rf dist && rollup --c rollup.config.js",
     "prepare": "yarn run build",
-    "build:esm": "tsc -p ./tsconfig.esm.json",
-    "build:cjs": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.production.json",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
-    "watch": "tsc -w",
+    "watch": "shx rm -rf dist && tsc -w",
     "release": "yarn run prepare",
     "release:manual": "yarn run prepare && yarn run release && npm publish",
     "pack": "npm pack",
@@ -45,8 +52,8 @@
   "devDependencies": {
     "@agile-ts/core": "file:../core",
     "@agile-ts/proxytree": "file:../proxytree",
-    "@types/react": "^17.0.0",
-    "react": "^17.0.1"
+    "@types/react": "^17.0.21",
+    "react": "^17.0.2"
   },
   "peerDependencies": {
     "react": "^16.13.1",

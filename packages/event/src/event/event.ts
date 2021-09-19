@@ -5,8 +5,9 @@ import {
   LogCodeManager,
   Observer,
 } from '@agile-ts/core';
-import { EventObserver, EventRuntimeJob } from '../internal';
 import { defineConfig } from '@agile-ts/utils';
+import { EventObserver } from './event.observer';
+import { EventRuntimeJob } from './event.runtime.job';
 
 export class Event<PayloadType = DefaultEventPayload> {
   public agileInstance: () => Agile;

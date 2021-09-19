@@ -1,4 +1,6 @@
-import { Event } from './internal';
+import { Event } from './event';
 
-export * from './internal';
+export * from './event';
+export * from './react';
+
 export default Event;

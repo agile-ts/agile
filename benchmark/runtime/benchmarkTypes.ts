@@ -146,5 +146,4 @@ export const startBundleBench = async (entry: string, isDev: boolean) => {
   );
 
   console.log(metafile);
-  // TODO analyze metafile
 };

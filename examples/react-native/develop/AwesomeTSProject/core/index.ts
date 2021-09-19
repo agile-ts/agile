@@ -1,10 +1,9 @@
 import { createState, createComputed, createCollection } from '@agile-ts/core';
-import { createEvent, Event } from '@agile-ts/event';
+import { createEvent } from '@agile-ts/event';
 import { Alert } from 'react-native';
 
 export const MY_STATE = createState<string>('MyState', { key: 'my-state' }); //.persist();
 export const MY_STATE_2 = createState<string>('MyState2'); //.persist("my-state2");
-export const MY_STATE_3 = createState<number>(1); //.persist("my-state2");
 
 MY_STATE.watch('test', (value: any) => {
   console.log('Watch ' + value);
@@ -36,8 +35,6 @@ MY_COLLECTION.update('id1', { id: 'id1Updated', name: 'testUpdated' });
 MY_COLLECTION.getGroup('myGroup')?.persist({
   followCollectionPersistKeyPattern: true,
 });
-
-console.log('Initial: myCollection ', MY_COLLECTION);
 
 export const MY_EVENT = createEvent<{ name: string }>();
 

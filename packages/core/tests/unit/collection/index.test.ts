@@ -8,7 +8,7 @@ import { LogMock } from '../../helper/logMock';
 
 jest.mock('../../../src/collection/collection');
 
-describe('Collection Index', () => {
+describe('Collection Index Tests', () => {
   let sharedAgileInstance: Agile;
 
   beforeEach(() => {

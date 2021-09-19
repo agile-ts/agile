@@ -1,9 +1,9 @@
 {
   "extends": "../tsconfig.default.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "rootDir": "src",
-    "outDir": "dist"
+    "target": "esnext",
+    "outDir": "dist",
+    "rootDir": "src"
   },
   "include": [
     "./src/**/*" // Only include what is in src (-> dist, tests, .. will be excluded)

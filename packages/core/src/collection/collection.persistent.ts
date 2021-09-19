@@ -1,18 +1,14 @@
+import { defineConfig } from '@agile-ts/utils';
+import { LogCodeManager } from '../logCodeManager';
+import { Collection, CollectionKey, DefaultItem, ItemKey } from './collection';
+import { Group, GroupKey } from './group';
 import {
-  Collection,
-  CollectionKey,
   CreatePersistentConfigInterface,
-  DefaultItem,
-  defineConfig,
-  Group,
-  GroupKey,
-  ItemKey,
-  LogCodeManager,
+  getSharedStorageManager,
   Persistent,
   PersistentKey,
   StorageKey,
-  getStorageManager,
-} from '../internal';
+} from '../storages';
 
 export class CollectionPersistent<
   DataType extends Object = DefaultItem
@@ -85,7 +81,7 @@ export class CollectionPersistent<
 
     // Check if Collection is already persisted
     // (indicated by the persistence of 'true' at '_storageItemKey')
-    const isPersisted = await getStorageManager()?.get<DataType>(
+    const isPersisted = await getSharedStorageManager()?.get<DataType>(
       _storageItemKey,
       this.config.defaultStorageKey as any
     );
@@ -203,7 +199,7 @@ export class CollectionPersistent<
     );
 
     // Set flag in Storage to indicate that the Collection is persisted
-    getStorageManager()?.set(_storageItemKey, true, this.storageKeys);
+    getSharedStorageManager()?.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
     defaultGroup.persist(defaultGroupStorageKey, {
@@ -278,7 +274,7 @@ export class CollectionPersistent<
     );
 
     // Remove Collection is persisted indicator flag from Storage
-    getStorageManager()?.remove(_storageItemKey, this.storageKeys);
+    getSharedStorageManager()?.remove(_storageItemKey, this.storageKeys);
 
     // Remove default Group from the Storage
     defaultGroup.persistent?.removePersistedValue(defaultGroupStorageKey);

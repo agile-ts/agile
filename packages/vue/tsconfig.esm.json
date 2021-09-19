@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "module": "ES2015",
-    "outDir": "dist/esm",
-    "declaration": false, // already generated via 'tsconfig.json' in the root dist folder
-    "removeComments": true
-  }
-}

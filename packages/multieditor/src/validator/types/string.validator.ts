@@ -1,5 +1,5 @@
-import { Validator } from '../../internal';
-import { copy } from '@agile-ts/core';
+import { copy } from '@agile-ts/utils';
+import { Validator } from '../validator';
 
 export class StringValidator<DataType = any> extends Validator<DataType> {
   /**

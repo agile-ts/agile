@@ -1,21 +1,24 @@
 import {
-  Observer,
-  State,
   copy,
-  equal,
-  notEqual,
-  isFunction,
-  IngestConfigInterface,
-  StateRuntimeJob,
-  SideEffectInterface,
   createArrayFromObject,
-  CreateStateRuntimeJobConfigInterface,
-  generateId,
-  SubscriptionContainer,
-  ObserverKey,
   defineConfig,
+  equal,
+  generateId,
+  isFunction,
+  notEqual,
   removeProperties,
-} from '../internal';
+} from '@agile-ts/utils';
+import {
+  IngestConfigInterface,
+  Observer,
+  ObserverKey,
+  SubscriptionContainer,
+} from '../runtime';
+import {
+  CreateStateRuntimeJobConfigInterface,
+  StateRuntimeJob,
+} from './state.runtime.job';
+import { SideEffectInterface, State } from './state';
 
 export class StateObserver<ValueType = any> extends Observer {
   // State the Observer belongs to

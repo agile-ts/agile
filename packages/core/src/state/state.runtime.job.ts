@@ -1,10 +1,10 @@
+import { defineConfig } from '@agile-ts/utils';
 import {
-  defineConfig,
   RuntimeJob,
   RuntimeJobConfigInterface,
   RuntimeJobKey,
-  StateObserver,
-} from '../internal';
+} from '../runtime';
+import { StateObserver } from './state.observer';
 
 export class StateRuntimeJob extends RuntimeJob<StateObserver> {
   public config: StateRuntimeJobConfigInterface;
