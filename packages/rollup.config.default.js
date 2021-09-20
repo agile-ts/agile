@@ -7,8 +7,19 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'; // https://rollupjs.o
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
 import bundleSize from 'rollup-plugin-bundle-size';
+import getBabelConfig from './babel.config';
 
 export const fileExtensions = ['.ts'];
+
+function createBabelConfig() {
+  // https://github.com/rollup/plugins/tree/master/packages/babel#running-babel-on-the-generated-code
+  return babel({
+    babelHelpers: 'bundled',
+    comments: false,
+    extensions: fileExtensions, // https://github.com/rollup/rollup-plugin-babel/issues/255
+    ...getBabelConfig(),
+  });
+}
 
 export function createEsbuildConfig(config) {
   config = {
@@ -102,14 +113,7 @@ export function createCommonJSConfig(config) {
     external: config.external,
     plugins: [
       nodeResolve({ extensions: fileExtensions }),
-      // https://github.com/rollup/plugins/tree/master/packages/babel#running-babel-on-the-generated-code
-      babel({
-        babelHelpers: 'bundled',
-        comments: false,
-        exclude: ['node_modules/**'],
-        presets: ['@babel/preset-env'],
-        extensions: fileExtensions, // https://github.com/rollup/rollup-plugin-babel/issues/255
-      }),
+      createBabelConfig(),
       typescript(), // Only so that Rollup can work with typescript (Not for generating any 'declaration' files)
       bundleSize(),
       ...config.additionalPlugins,
