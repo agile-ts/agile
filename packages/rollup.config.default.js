@@ -14,7 +14,7 @@ export const fileExtensions = ['.ts'];
 function createBabelConfig() {
   // https://github.com/rollup/plugins/tree/master/packages/babel#running-babel-on-the-generated-code
   return babel({
-    babelHelpers: 'bundled',
+    babelHelpers: 'runtime',
     comments: false,
     extensions: fileExtensions, // https://github.com/rollup/rollup-plugin-babel/issues/255
     ...getBabelConfig(),
