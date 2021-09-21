@@ -1,18 +1,12 @@
-import {
-  copy,
-  generateId,
-  isFunction,
-  LogCodeManager,
-  defineConfig,
-} from '@agile-ts/core';
-import { DataObject, ItemKey, Multieditor } from '../multieditor';
-import { normalizeArray } from '@agile-ts/utils';
+import { generateId, isFunction, LogCodeManager } from '@agile-ts/core';
+import { ItemKey, Multieditor } from '../multieditor';
 
 export class Validator<DataType = any> {
   public _key?: ValidatorKey;
   public config: ValidatorConfigInterface = {};
-  public validationMethods: DataObject<ValidationMethodInterface<DataType>> =
-    {};
+  public validationMethods: {
+    [key: string]: ValidationMethodInterface<DataType>;
+  } = {};
 
   /**
    * @public
@@ -20,9 +14,6 @@ export class Validator<DataType = any> {
    * @param config - Config
    */
   constructor(config: ValidatorConfigInterface = {}) {
-    this.config = defineConfig(config, {
-      prefix: 'default',
-    });
     this._key = this.config.key;
   }
 
@@ -42,6 +33,16 @@ export class Validator<DataType = any> {
     return this._key;
   }
 
+  //=========================================================================================================
+  // Validate
+  //=========================================================================================================
+  /**
+   * @public
+   * Validates Item Value at Key and updates its Status
+   * @param key - Key/Name of Item
+   * @param value - Value that gets validated
+   * @param editor - MultiEditor that holds the Item which gets validated
+   */
   public async validate(
     key: ItemKey,
     value: DataType,
@@ -60,11 +61,11 @@ export class Validator<DataType = any> {
     // Call validation methods (-> validate Item at specified key)
     for (const validationMethodKey of validationMethodKeys)
       isValid =
-        (await this.validationMethods[validationMethodKey]({
+        (await this.validationMethods[validationMethodKey](
           key,
           value,
-          editor,
-        })) && isValid;
+          editor
+        )) && isValid;
 
     // Handle tracked Statuses
     const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
@@ -74,52 +75,64 @@ export class Validator<DataType = any> {
     return isValid;
   }
 
-  public addValidationMethod(method: ValidationMethodInterface<DataType>): this;
+  //=========================================================================================================
+  // Add Validation Method
+  //=========================================================================================================
+  /**
+   * @public
+   * Adds Validation Method to Validator
+   * @param method - Validation Method
+   */
   public addValidationMethod(
-    key: ItemKey,
-    method: ValidationMethodInterface<DataType>
+    method: AddValidationMethodMethodType<DataType>
   ): this;
   public addValidationMethod(
-    keyOrMethod: ItemKey | ValidationMethodInterface<DataType>,
-    method?: ValidationMethodInterface<DataType>
+    key: ValidationMethodKey,
+    method: AddValidationMethodMethodType<DataType>
+  ): this;
+  public addValidationMethod(
+    keyOrMethod: ValidationMethodKey | AddValidationMethodMethodType<DataType>,
+    method?: AddValidationMethodMethodType<DataType>
   ): this {
     const generateKey = isFunction(keyOrMethod);
-    let _method: ValidationMethodInterface<DataType>;
-    let key: ItemKey;
+    let validationMethodObject: AddValidationMethodMethodType<DataType>;
+    let key: ValidationMethodKey;
 
     if (generateKey) {
       key = generateId();
-      _method = keyOrMethod as ValidationMethodInterface<DataType>;
+      validationMethodObject = keyOrMethod as AddValidationMethodMethodType<
+        DataType
+      >;
     } else {
       key = keyOrMethod as string;
-      _method = method as ValidationMethodInterface<DataType>;
+      validationMethodObject = method as AddValidationMethodMethodType<
+        DataType
+      >;
     }
 
-    // Check if Validation Method is a Function
-    if (!isFunction(_method)) {
+    // Resolve validation method
+    if (typeof validationMethodObject !== 'object') {
+      validationMethodObject = validationMethodObject();
+    }
+
+    if (!isFunction(validationMethodObject.method)) {
       LogCodeManager.getLogger()?.error(
         'A Validation Method has to be a function!'
       );
       return this;
     }
 
-    this.validationMethods[key] = _method;
+    this.validationMethods[key] = validationMethodObject.method;
 
-    return this;
-  }
-
-  public registerValidationMethods(
-    validationMethods: ValidationMethodInterface[] | ValidationMethodInterface
-  ): this {
-    const _validationMethods = normalizeArray(validationMethods);
-    _validationMethods.forEach((validatorMethod) => {
-      this.addValidationMethod(generateId(), validatorMethod);
-    });
     return this;
   }
 }
 
 export type ValidatorKey = string | number;
+
+export type AddValidationMethodMethodType<DataType = any> =
+  | ValidationMethodObjectInterface<DataType>
+  | (() => ValidationMethodObjectInterface<DataType>);
 
 /**
  * @param key - Key/Name of Validator
@@ -127,16 +140,17 @@ export type ValidatorKey = string | number;
  */
 export interface ValidatorConfigInterface {
   key?: ValidatorKey;
-  prefix?: string;
 }
 
 export type ValidationMethodInterface<DataType = any> = (
-  config: ValidatorMethodConfigInterface<DataType>
+  toValidateItemKey: ItemKey,
+  value: DataType,
+  editor: Multieditor<DataType>
 ) => boolean;
 
-export interface ValidatorMethodConfigInterface<DataType = any> {
-  key?: ItemKey;
-  value: DataType;
-  editor: Multieditor<DataType>;
-  errorMessage?: string;
+export type ValidationMethodKey = string | number;
+
+export interface ValidationMethodObjectInterface<DataType = any> {
+  name?: string;
+  method: ValidationMethodInterface<DataType>;
 }

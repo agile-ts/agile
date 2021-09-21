@@ -5,8 +5,17 @@ import {
   LogCodeManager,
   Observer,
 } from '@agile-ts/core';
-import { defineConfig, copy } from '@agile-ts/utils';
-import { ValidationMethodInterface, Validator } from '../validator';
+import {
+  defineConfig,
+  copy,
+  normalizeArray,
+  generateId,
+} from '@agile-ts/utils';
+import {
+  ValidationMethodInterface,
+  ValidationMethodObjectInterface,
+  Validator,
+} from '../validator';
 import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';
 
@@ -141,8 +150,20 @@ export class Multieditor<
    * @public
    * Validator - Create validation Conditions for an Item
    */
-  public Validator(): Validator<DataType> {
-    return new Validator<DataType>(this as any);
+  public Validator(
+    ...validationMethods: (
+      | ValidationMethodObjectInterface<DataType>
+      | (() => ValidationMethodObjectInterface<DataType>)
+    )[]
+  ): Validator<DataType> {
+    const _validationMethods = normalizeArray(validationMethods);
+    const validator = new Validator();
+
+    _validationMethods.forEach((validatorMethod) => {
+      validator.addValidationMethod(generateId(), validatorMethod);
+    });
+
+    return validator;
   }
 
   //=========================================================================================================
@@ -405,7 +426,7 @@ export class Multieditor<
       } else {
         return new Validator<DataType>({
           key: key,
-        }).addValidationMethod(validation);
+        }).addValidationMethod({ method: validation });
       }
     }
     return new Validator<DataType>({ key: key });

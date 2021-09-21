@@ -1,23 +1,20 @@
-import { ValidatorMethodConfigInterface } from '../validator';
-import { defineConfig } from '@agile-ts/core';
+import { ValidationMethodObjectInterface } from '../validator';
 
-export async function isRequired<DataType = any>(
-  config: ValidatorMethodConfigInterface<DataType>
-) {
-  config = defineConfig(config, {
-    key: 'isRequired',
-    errorMessage: `${config.key} is a required field`,
-  });
-
-  const isValid = !!config.value;
-
-  if (!isValid) {
-    config.editor.setStatus(
-      config.key as any,
-      'error',
-      config.errorMessage as any
-    );
-  }
-
-  return isValid;
+export function isRequired(
+  errorMessage?: string
+): ValidationMethodObjectInterface {
+  return {
+    name: 'isRequired',
+    method: (toValidateItemKey, value, editor): boolean => {
+      const isValid = !!value;
+      if (!isValid) {
+        editor.setStatus(
+          toValidateItemKey as any,
+          'error',
+          errorMessage || `${toValidateItemKey} is a required field`
+        );
+      }
+      return isValid;
+    },
+  };
 }

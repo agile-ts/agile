@@ -1,5 +1,4 @@
 import { Agile, shared } from '@agile-ts/core';
-import { defineConfig } from '@agile-ts/utils';
 import { EditorConfig, Multieditor } from './multieditor';
 
 export * from './multieditor';
