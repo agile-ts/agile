@@ -3,20 +3,20 @@
 
 
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.2.3"
+  version "0.2.5"
   dependencies:
-    "@agile-ts/utils" "^0.0.8"
+    "@agile-ts/utils" "^0.0.9"
 
 "@agile-ts/multieditor@file:.yalc/@agile-ts/multieditor":
-  version "0.0.21"
+  version "0.0.22"
 
 "@agile-ts/react@file:.yalc/@agile-ts/react":
-  version "0.2.0"
+  version "0.2.1"
 
-"@agile-ts/utils@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.8.tgz#ab9e1eeaddf282340936bddeb74421a2f77de804"
-  integrity sha512-ex19gPIS5imgV+rzs5HE2CNAIkQ162hPWH5u3HKNZnHiVU6FX62sikH5tG2oQocbDb7FkeB16D7v9ihQeuKYug==
+"@agile-ts/utils@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.9.tgz#b20d03cc450d1a916bb7d8836c3451cb06cc882c"
+  integrity sha512-M9/QQjX+I5r11MwztfK371/kfInmJS7kLlAKmG8ZkgqG/x8LdCxD7tOTwqMa9Dc1p1ZJqSvNzL/Y8l7boi/3IQ==
 
 "@babel/code-frame@7.8.3":
   version "7.8.3"

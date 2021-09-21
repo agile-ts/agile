@@ -12,11 +12,8 @@ export function createMultieditor<
   config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
   agileInstance: Agile = shared
 ): Multieditor<DataType, SubmitReturnType, OnSubmitConfigType> {
-  config = defineConfig(config, {
-    agileInstance: shared,
-  });
   return new Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>(
     config,
-    agileInstance as any
+    agileInstance
   );
 }

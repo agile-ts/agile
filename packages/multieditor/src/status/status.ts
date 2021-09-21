@@ -1,6 +1,7 @@
 import { Agile, copy, RuntimeJobConfigInterface } from '@agile-ts/core';
 import { Item } from '../item';
 import { StatusObserver } from './status.observer';
+import { StatusTracker } from './status.tracker';
 
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
@@ -13,9 +14,7 @@ export class Status<DataType = any> {
   public nextValue: StatusInterface | null; // The last set Value
   public activeValues: Set<StatusInterface> = new Set(); // All Values that got set during the validation Time of the Validator
 
-  // Tracking
-  public track = false;
-  public foundValues: Set<StatusInterface> = new Set();
+  public statusTracker: StatusTracker;
 
   /**
    * @public
@@ -28,6 +27,7 @@ export class Status<DataType = any> {
     this._value = null;
     this.nextValue = null;
     this.observer = new StatusObserver(this.agileInstance(), this);
+    this.statusTracker = new StatusTracker();
   }
 
   /**
@@ -51,7 +51,7 @@ export class Status<DataType = any> {
     this.nextValue = copy(value);
 
     // Track Status
-    if (this.track && value) this.foundValues.add(value);
+    if (value != null) this.statusTracker.tracked(value);
 
     // Assign Status to Item
     if (this.item.editor().canAssignStatusToItemOnChange(this.item))
@@ -70,23 +70,6 @@ export class Status<DataType = any> {
    */
   public assign(config: RuntimeJobConfigInterface = {}) {
     this.observer.assign(config);
-  }
-
-  //=========================================================================================================
-  // Get Tracked Statuses
-  //=========================================================================================================
-  /**
-   * @internal
-   * Returns tracked Values and stops Status from tracking anymore Values
-   */
-  public getTrackedValues(): Set<StatusInterface> {
-    const finalFoundStatuses = this.foundValues;
-
-    // Reset tracking
-    this.track = false;
-    this.foundValues = new Set();
-
-    return finalFoundStatuses;
   }
 }
 

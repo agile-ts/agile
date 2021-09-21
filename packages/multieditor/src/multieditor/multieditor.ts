@@ -1,12 +1,11 @@
 import {
   Agile,
   ComputeValueMethod,
-  copy,
   getAgileInstance,
   LogCodeManager,
   Observer,
-  defineConfig,
 } from '@agile-ts/core';
+import { defineConfig, copy } from '@agile-ts/utils';
 import { ValidationMethodInterface, Validator } from '../validator';
 import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';

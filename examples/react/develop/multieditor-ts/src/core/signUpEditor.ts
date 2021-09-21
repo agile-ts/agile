@@ -7,7 +7,8 @@ export const isValidNameValidator = new Validator()
   .string()
   .min(2)
   .max(10)
-  .matches(/^([^0-9]*)$/, 'No Numbers allowed!');
+  .matches(/^([^0-9]*)$/, 'No Numbers allowed!')
+  .main();
 
 export const signUpEditor = createMultieditor((editor) => ({
   data: {
@@ -38,19 +39,20 @@ export const signUpEditor = createMultieditor((editor) => ({
           editor.setStatus(key, 'error', 'Sry only the name Jeff is allowed!');
         return isValid;
       }),
-    email: editor.Validator().required().string().email(),
+    email: editor.Validator().required().string().email().main(),
     aboutYou: editor
       .Validator()
       .required()
       .string()
       .min(10)
+      .main()
       .addValidationMethod(async (key, value, editor) => {
         const isValid = typeof value === 'string' && !value.includes('fuck');
         if (!isValid)
           editor.setStatus(key, 'error', 'The word fuck is not allowed!');
         return isValid;
       }),
-    age: editor.Validator().required().number().min(18).max(100),
+    age: editor.Validator().required().number().min(18).max(100).main(),
     gender: editor.Validator().required(),
     image: editor
       .Validator()

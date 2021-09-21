@@ -23,7 +23,7 @@ export class ComputedTracker {
   }
 
   /**
-   * Tracks the passed Observer and caches it
+   * Tracks the specified Observer and caches it
    * when the Computed Tracker is actively tracking.
    *
    * @internal
