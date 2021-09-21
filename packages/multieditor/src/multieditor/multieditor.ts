@@ -11,7 +11,7 @@ import { ValidationMethodInterface, Validator } from '../validator';
 import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';
 
-export class MultiEditor<
+export class Multieditor<
   DataType = any,
   SubmitReturnType = void,
   OnSubmitConfigType = any
@@ -538,7 +538,7 @@ export type EditorConfig<
 > =
   | CreateEditorConfigInterface<DataType, SubmitReturnType, OnSubmitConfigType>
   | ((
-      editor: MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>
+      editor: Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>
     ) => CreateEditorConfigInterface<
       DataType,
       SubmitReturnType,

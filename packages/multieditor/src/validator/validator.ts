@@ -5,7 +5,7 @@ import {
   LogCodeManager,
   defineConfig,
 } from '@agile-ts/core';
-import { DataObject, ItemKey, MultiEditor } from '../multieditor';
+import { DataObject, ItemKey, Multieditor } from '../multieditor';
 import { StringValidator } from './types/string.validator';
 import { NumberValidator } from './types/number.validator';
 
@@ -55,7 +55,7 @@ export class Validator<DataType = any> {
   public async validate(
     key: ItemKey,
     value: DataType,
-    editor: MultiEditor<DataType>
+    editor: Multieditor<DataType>
   ): Promise<boolean> {
     let isValid = true;
     const item = editor.getItemById(key);
@@ -219,7 +219,7 @@ export type ValidatorKey = string | number;
 export type ValidationMethodInterface<DataType = any> = (
   key: ItemKey,
   value: DataType,
-  editor: MultiEditor<DataType>
+  editor: Multieditor<DataType>
 ) => Promise<boolean>;
 
 /**

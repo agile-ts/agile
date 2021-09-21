@@ -141,31 +141,18 @@ export class Logger {
         table: (...data: any[]) => this.table(...data),
       };
     }
+    const doNothing = () => {
+      /* do nothing */
+    };
     return {
-      log: () => {
-        /* do nothing */
-      },
-      debug: () => {
-        /* do nothing */
-      },
-      info: () => {
-        /* do nothing */
-      },
-      success: () => {
-        /* do nothing */
-      },
-      warn: () => {
-        /* do nothing */
-      },
-      error: () => {
-        /* do nothing */
-      },
-      trace: () => {
-        /* do nothing */
-      },
-      table: () => {
-        /* do nothing */
-      },
+      log: doNothing,
+      debug: doNothing,
+      info: doNothing,
+      success: doNothing,
+      warn: doNothing,
+      error: doNothing,
+      trace: doNothing,
+      table: doNothing,
     };
   }
 

@@ -1,5 +1,6 @@
 import { createMultieditor, Validator } from '@agile-ts/multieditor';
 import { generateColor, generateId, isLight } from './utils';
+import { globalBind } from '@agile-ts/core';
 
 export const isValidNameValidator = new Validator()
   .required()
@@ -71,3 +72,6 @@ export const signUpEditor = createMultieditor((editor) => ({
   fixedProperties: ['id'],
   reValidateMode: 'afterFirstSubmit',
 }));
+
+// For better debugging
+globalBind('__core__', { isValidNameValidator, signUpEditor });

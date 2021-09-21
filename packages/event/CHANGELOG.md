@@ -1,5 +1,23 @@
 # Change Log
 
+## 0.0.12
+
+### Patch Changes
+
+- 488c87c: #### :nail_care: Polish
+
+  - `api`, `core`, `cra-template-agile-typescript`, `cra-template-agile`, `event`, `logger`, `multieditor`, `proxytree`, `react`, `utils`, `vue`
+    - [#194](https://github.com/agile-ts/agile/pull/194) Commonjs issue ([@bennodev19](https://github.com/bennodev19))
+  - `core`
+    - [#195](https://github.com/agile-ts/agile/pull/195) Removed `internal.ts` and resolved cycle dependencies ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+- Updated dependencies [488c87c]
+  - @agile-ts/core@0.2.4
+
 ## 0.0.11
 
 ### Patch Changes

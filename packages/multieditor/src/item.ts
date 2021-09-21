@@ -3,12 +3,12 @@ import {
   defineConfig,
   EnhancedState,
 } from '@agile-ts/core';
-import { ItemKey, MultiEditor } from './multieditor';
+import { ItemKey, Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
 
 export class Item<DataType = any> extends EnhancedState<DataType> {
-  public editor: () => MultiEditor<DataType>;
+  public editor: () => Multieditor<DataType>;
 
   public isValid = false;
   public config: ItemConfigInterface;
@@ -25,7 +25,7 @@ export class Item<DataType = any> extends EnhancedState<DataType> {
    * @param config - Config
    */
   constructor(
-    editor: MultiEditor<DataType>,
+    editor: Multieditor<DataType>,
     data: DataType,
     key: ItemKey,
     config: ItemConfigInterface = {}

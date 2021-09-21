@@ -1,6 +1,6 @@
 import { Agile, shared } from '@agile-ts/core';
 import { defineConfig } from '@agile-ts/utils';
-import { EditorConfig, MultiEditor } from './multieditor';
+import { EditorConfig, Multieditor } from './multieditor';
 
 export * from './multieditor';
 
@@ -11,11 +11,11 @@ export function createMultieditor<
 >(
   config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
   agileInstance: Agile = shared
-): MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType> {
+): Multieditor<DataType, SubmitReturnType, OnSubmitConfigType> {
   config = defineConfig(config, {
     agileInstance: shared,
   });
-  return new MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>(
+  return new Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>(
     config,
     agileInstance as any
   );
