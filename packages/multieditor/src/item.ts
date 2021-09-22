@@ -7,28 +7,33 @@ import { ItemKey, Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
 
-export class Item<DataType = any> extends State<DataType> {
-  public editor: () => Multieditor<DataType>;
+export class Item<ValueType = any> extends State<ValueType> {
+  // Multieditor the Item belongs to
+  public editor: () => Multieditor<ValueType>;
 
-  public isValid = false;
   public config: ItemConfigInterface;
 
+  // Whether the Item is valid.
+  public isValid = false;
+  // Handles the validation of the Item
+  public validator: Validator<ValueType>;
+  // Validation Status of the Item
   public status: Status;
-  public validator: Validator<DataType>;
 
   /**
+   * An Item represents a piece of information from the Multieditor.
+   *
    * @public
-   * Item - Item of an Editor
-   * @param editor - Editor to which the Item belongs
-   * @param data - Data that the Item holds
-   * @param config - Config
+   * @param editor - Multieditor to which the Item belongs.
+   * @param initialValue - Data that the Item holds
+   * @param config - Configuration object
    */
   constructor(
-    editor: Multieditor<DataType>,
-    data: DataType,
+    editor: Multieditor<ValueType>,
+    initialValue: ValueType,
     config: ItemConfigInterface
   ) {
-    super(editor.agileInstance(), data, {
+    super(editor.agileInstance(), initialValue, {
       key: config.key,
     });
     config = defineConfig(config, {
@@ -39,13 +44,10 @@ export class Item<DataType = any> extends State<DataType> {
     this.config = config;
     this.status = new Status(this);
 
-    // Add SideEffect that rebuilds the Status depending of the Item value
+    // Add side effect to revalidate the Item on every Item value change
     this.addSideEffect('validateItem', async () => {
-      this.isValid = await this.validator.validate(
-        config.key,
-        this.value,
-        this.editor()
-      );
+      await this.validate();
+
       if (this.editor().canAssignStatusToItemOnChange(this))
         this.status.display = true;
       this.editor().validate();
@@ -53,28 +55,23 @@ export class Item<DataType = any> extends State<DataType> {
     });
   }
 
-  //=========================================================================================================
-  // Validate
-  //=========================================================================================================
   /**
+   * Revalidates the Item.
+   *
    * @public
-   * Validates Item and updates its 'isValid' property
    */
   public async validate(): Promise<boolean> {
-    const isValid = this.key
-      ? await this.validator.validate(this.key, this.value, this.editor())
-      : false;
+    const isValid = await this.validator.validate(this, this.value);
     this.isValid = isValid;
     return isValid;
   }
 
-  //=========================================================================================================
-  // Reset
-  //=========================================================================================================
   /**
+   * Resets the Item value to its initial value.
+   *
+   *
    * @public
-   * Resets State to its initial Value
-   * @param config - Config
+   * @param config - Configuration object
    */
   public reset(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
@@ -83,11 +80,15 @@ export class Item<DataType = any> extends State<DataType> {
   }
 }
 
-/**
- * @param key - Key/Name of Item
- * @param canBeEdited - If Item Value gets passed into the preparedData on Submit (if it got edited)
- */
 export interface ItemConfigInterface {
+  /**
+   * Key/Name identifier of the State.
+   */
   key: ItemKey;
+  /**
+   * @param canBeEdited - Whether the Item value can be edited
+   * and thus is passes into the 'preparedData' object when submitting.
+   * @default true
+   */
   canBeEdited?: boolean;
 }

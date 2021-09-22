@@ -1,9 +1,11 @@
 import {
+  agileResolver,
   createMultieditor,
   isNumber,
   isRequired,
   isString,
   max,
+  yupResolver,
 } from '@agile-ts/multieditor';
 import { globalBind } from '@agile-ts/core';
 import * as Yup from 'yup';
@@ -82,7 +84,7 @@ import * as Yup from 'yup';
 // }));
 
 export const signUpEditor = createMultieditor((editor) => ({
-  data: {
+  initialData: {
     id: 'myCoolId',
     firstName: 'jeff',
     lastName: 'rose',
@@ -91,13 +93,15 @@ export const signUpEditor = createMultieditor((editor) => ({
   onSubmit: async (preparedData) => {
     alert(JSON.stringify(preparedData));
   },
-  validateMethods: {
-    firstName: editor.Validator(isRequired, isString),
-    lastName: Yup.string().max(15) as any, // TODO
-    age: editor.Validator(isRequired, isNumber, max(10)),
+  validationSchema: {
+    firstName: agileResolver(isRequired, isString).append(
+      yupResolver(Yup.string().min(10))
+    ),
+    lastName: yupResolver(Yup.string().max(15)),
+    age: agileResolver(isRequired, isNumber, max(10)),
   },
   fixedProperties: ['id'],
-  reValidateMode: 'afterFirstSubmit',
+  reValidateMode: 'onChange',
 }));
 
 // For better debugging

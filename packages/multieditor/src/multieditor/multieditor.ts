@@ -77,7 +77,7 @@ export class Multieditor<
       } else
         this.validators[key] = new Validator<DataType>({
           key,
-        }).addValidationSchema(validationMethod);
+        }).addValidationMethod(validationMethod);
     });
 
     // Instantiate data Items
@@ -137,29 +137,6 @@ export class Multieditor<
       deps.push(item.status.observer);
     }
     return deps;
-  }
-
-  //=========================================================================================================
-  // Validator
-  //=========================================================================================================
-  /**
-   * @public
-   * Validator - Create validation Conditions for an Item
-   */
-  public Validator(
-    ...validationMethods: (
-      | ValidationMethodObjectInterface<DataType>
-      | (() => ValidationMethodObjectInterface<DataType>)
-    )[]
-  ): Validator<DataType> {
-    const _validationMethods = normalizeArray(validationMethods);
-    const validator = new Validator();
-
-    _validationMethods.forEach((validatorMethod) => {
-      validator.addValidationSchema(generateId(), validatorMethod);
-    });
-
-    return validator;
   }
 
   //=========================================================================================================
