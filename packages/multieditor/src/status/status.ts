@@ -1,86 +1,84 @@
-import { Agile, copy, RuntimeJobConfigInterface } from '@agile-ts/core';
+import { State, StateIngestConfigInterface } from '@agile-ts/core';
 import { Item } from '../item';
-import { StatusObserver } from './status.observer';
 import { StatusTracker } from './status.tracker';
+import { copy, defineConfig, isFunction } from '@agile-ts/utils';
 
-// TODO why not extending State??
-export class Status<DataType = any> {
-  public agileInstance: () => Agile;
-
+export class Status<DataType = any> extends State<StatusValueType> {
+  // Item the Status belongs to
   public item: Item<DataType>;
-  public observer: StatusObserver; // Handles deps and subs of Status and is like an interface to the Runtime
 
+  // Whether the Status can be displayed or should stay hidden
   public display = false;
-  public _value: StatusInterface | null; // The last assigned Value
-  public nextValue: StatusInterface | null; // The last set Value
-  public activeValues: Set<StatusInterface> = new Set(); // All Values that got set during the validation Time of the Validator
 
+  // Helper Class for automatic tracking set Statuses in validation methods
   public statusTracker: StatusTracker;
 
   /**
+   * Represents the current status of the specified Item.
+   *
    * @public
-   * Status - Represents the Status of an Item
-   * @param item - Item to that the Status belongs
+   * @param item - Item the Status belongs to.
    */
   constructor(item: Item<DataType>) {
+    super(item.agileInstance(), null);
     this.item = item;
-    this.agileInstance = () => item.agileInstance();
-    this._value = null;
-    this.nextValue = null;
-    this.observer = new StatusObserver(this.agileInstance(), this);
     this.statusTracker = new StatusTracker();
   }
 
   /**
+   * Returns a reference-free version of the current Status value
+   * if the Status should be displayed.
+   *
    * @public
-   * Get current Value of Status
-   * Note: Returns null if Status shouldn't get displayed
    */
-  public get value(): StatusInterface | null {
-    return this.display ? this._value : null;
+  public get value(): StatusValueType {
+    return this.display ? copy(this._value) : null;
   }
 
-  //=========================================================================================================
-  // Set
-  //=========================================================================================================
   /**
+   * Assigns a new value to the Status
+   * and re-renders all subscribed UI-Components.
+   *
    * @public
-   * Set next Status Value that will be assigned to the Status
-   * @param value - next Status Value
+   * @param value - New Status value
+   * @param config - Configuration object
    */
-  public set(value: StatusInterface | null): this {
-    this.nextValue = copy(value);
+  public set(
+    value: StatusValueType | ((value: StatusValueType) => StatusValueType),
+    config: StateIngestConfigInterface = {}
+  ): this {
+    config = defineConfig(config, {
+      force: false,
+    });
+    const _value = isFunction(value)
+      ? (value as any)(copy(this._value))
+      : value;
 
-    // Track Status
-    if (value != null) this.statusTracker.tracked(value);
+    // Track updated Status
+    if (value != null) this.statusTracker.tracked(_value);
 
-    // Assign Status to Item
-    if (this.item.editor().canAssignStatusToItemOnChange(this.item))
-      this.assign();
+    // Ingest the Status with the new value into the runtime
+    if (
+      this.item == null || // Because on the initial set (when calling '.super') the item isn't set
+      this.item.editor().canAssignStatusToItemOnChange(this.item)
+    ) {
+      this.observers['value'].ingestValue(_value, config);
+    }
 
     return this;
-  }
-
-  //=========================================================================================================
-  // Assign
-  //=========================================================================================================
-  /**
-   * @public
-   * Assign last set Status Value to the current Status Value
-   * @param config - Config
-   */
-  public assign(config: RuntimeJobConfigInterface = {}) {
-    this.observer.assign(config);
   }
 }
 
 export type StatusType = 'error' | 'success';
+export type StatusValueType = StatusInterface | null;
 
-/**
- * @param type - Type of Status
- * @param message - Message of Status
- */
 export interface StatusInterface {
+  /**
+   * Type of Status ('error', 'success', ..)
+   */
   type: StatusType;
+  /**
+   * Message of Status
+   */
   message: string;
 }

@@ -5,18 +5,8 @@ import {
   StateIngestConfigInterface,
   StateRuntimeJobConfigInterface,
 } from '@agile-ts/core';
-import {
-  defineConfig,
-  copy,
-  normalizeArray,
-  generateId,
-  removeProperties,
-} from '@agile-ts/utils';
-import {
-  ValidationMethodInterface,
-  ValidationMethodObjectInterface,
-  Validator,
-} from '../validator';
+import { defineConfig, copy, removeProperties } from '@agile-ts/utils';
+import { ValidationMethodInterface, Validator } from '../validator';
 import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';
 
@@ -139,7 +129,7 @@ export class Multieditor<
     for (const key in this.data) {
       const item = this.data[key];
       deps.push(item.observers['value']);
-      deps.push(item.status.observer);
+      deps.push(item.status.observers['value']);
     }
     return deps;
   }
@@ -155,7 +145,7 @@ export class Multieditor<
     const item = this.getItem(key);
     if (item) {
       deps.push(item.observers['value']);
-      deps.push(item.status.observer);
+      deps.push(item.status.observers['value']);
     }
     return deps;
   }
@@ -236,7 +226,7 @@ export class Multieditor<
     for (const key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
-        item.status.assign({
+        item.status.ingest({
           force: true, // Force because the value hasn't changed
           background: false,
         });

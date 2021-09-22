@@ -1,5 +1,5 @@
-import { generateId, isFunction, LogCodeManager } from '@agile-ts/core';
-import { defineConfig, isValidObject } from '@agile-ts/utils';
+import { generateId, isFunction } from '@agile-ts/core';
+import { defineConfig } from '@agile-ts/utils';
 import { ItemKey, Multieditor } from '../multieditor';
 import { Item } from '../item';
 
@@ -77,7 +77,6 @@ export class Validator<DataType = any> {
 
     // Handle tracked Statuses
     const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
-    item.status.activeValues = new Set(trackedStatuses);
     if (trackedStatuses.length <= 0) editor.resetStatus(item._key);
 
     return isValid;
@@ -143,7 +142,7 @@ export class Validator<DataType = any> {
       validator.validationMethods
     );
     for (const key of toMergeValidationMethodKeys) {
-      if (!this.validationMethods.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(this.validationMethods, key)) {
         this.validationMethods[key] = validator.validationMethods[key];
       }
     }
