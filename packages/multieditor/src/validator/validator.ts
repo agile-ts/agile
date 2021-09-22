@@ -1,20 +1,27 @@
 import { generateId, isFunction, LogCodeManager } from '@agile-ts/core';
 import { ItemKey, Multieditor } from '../multieditor';
+import { defineConfig } from '@agile-ts/utils';
 
 export class Validator<DataType = any> {
   public _key?: ValidatorKey;
   public config: ValidatorConfigInterface = {};
-  public validationMethods: {
+
+  // Schemas to validate Items via this Validator
+  public validationSchemas: {
     [key: string]: ValidationMethodInterface<DataType>;
   } = {};
 
   /**
-   * @public
    * Validator - Easy way to validate Editor Values
+   *
+   * @public
    * @param config - Config
    */
   constructor(config: ValidatorConfigInterface = {}) {
-    this._key = this.config.key;
+    config = defineConfig(config, {
+      key: generateId(),
+    });
+    this._key = config.key;
   }
 
   /**
@@ -53,7 +60,7 @@ export class Validator<DataType = any> {
     if (item == null) return false;
 
     // Reverse validation methods because the first method should have the highest weight
-    const validationMethodKeys = Object.keys(this.validationMethods).reverse();
+    const validationMethodKeys = Object.keys(this.validationSchemas).reverse();
 
     // Track created Statuses during the Validation Time
     item.status.statusTracker.track();
@@ -61,7 +68,7 @@ export class Validator<DataType = any> {
     // Call validation methods (-> validate Item at specified key)
     for (const validationMethodKey of validationMethodKeys)
       isValid =
-        (await this.validationMethods[validationMethodKey](
+        (await this.validationSchemas[validationMethodKey](
           key,
           value,
           editor
@@ -83,14 +90,14 @@ export class Validator<DataType = any> {
    * Adds Validation Method to Validator
    * @param method - Validation Method
    */
-  public addValidationMethod(
+  public addValidationSchema(
     method: AddValidationMethodMethodType<DataType>
   ): this;
-  public addValidationMethod(
+  public addValidationSchema(
     key: ValidationMethodKey,
     method: AddValidationMethodMethodType<DataType>
   ): this;
-  public addValidationMethod(
+  public addValidationSchema(
     keyOrMethod: ValidationMethodKey | AddValidationMethodMethodType<DataType>,
     method?: AddValidationMethodMethodType<DataType>
   ): this {
@@ -110,7 +117,8 @@ export class Validator<DataType = any> {
       >;
     }
 
-    // Resolve validation method
+    // Resolve validation schema
+    // TODO add Yup support via resolvers (https://github.dev/formium/formik/tree/master/packages/formik/src, https://github.com/react-hook-form/resolvers)
     if (typeof validationMethodObject !== 'object') {
       validationMethodObject = validationMethodObject();
     }
@@ -122,7 +130,7 @@ export class Validator<DataType = any> {
       return this;
     }
 
-    this.validationMethods[key] = validationMethodObject.method;
+    this.validationSchemas[key] = validationMethodObject.method;
 
     return this;
   }

@@ -1,13 +1,13 @@
 import {
   StateRuntimeJobConfigInterface,
   defineConfig,
-  EnhancedState,
+  State,
 } from '@agile-ts/core';
 import { ItemKey, Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
 
-export class Item<DataType = any> extends EnhancedState<DataType> {
+export class Item<DataType = any> extends State<DataType> {
   public editor: () => Multieditor<DataType>;
 
   public isValid = false;
@@ -21,30 +21,28 @@ export class Item<DataType = any> extends EnhancedState<DataType> {
    * Item - Item of an Editor
    * @param editor - Editor to which the Item belongs
    * @param data - Data that the Item holds
-   * @param key - Key/Name of Item
    * @param config - Config
    */
   constructor(
     editor: Multieditor<DataType>,
     data: DataType,
-    key: ItemKey,
-    config: ItemConfigInterface = {}
+    config: ItemConfigInterface
   ) {
     super(editor.agileInstance(), data, {
-      key: key,
+      key: config.key,
     });
     config = defineConfig(config, {
       canBeEdited: true,
     });
     this.editor = () => editor;
-    this.validator = editor.getValidator(key);
+    this.validator = editor.getValidator(config.key);
     this.config = config;
     this.status = new Status(this);
 
     // Add SideEffect that rebuilds the Status depending of the Item value
     this.addSideEffect('validateItem', async () => {
       this.isValid = await this.validator.validate(
-        key,
+        config.key,
         this.value,
         this.editor()
       );
@@ -79,15 +77,17 @@ export class Item<DataType = any> extends EnhancedState<DataType> {
    * @param config - Config
    */
   public reset(config: StateRuntimeJobConfigInterface = {}): this {
-    super.reset(config);
+    this.set(this.initialStateValue, config);
     this.status.display = false;
     return this;
   }
 }
 
 /**
+ * @param key - Key/Name of Item
  * @param canBeEdited - If Item Value gets passed into the preparedData on Submit (if it got edited)
  */
 export interface ItemConfigInterface {
+  key: ItemKey;
   canBeEdited?: boolean;
 }

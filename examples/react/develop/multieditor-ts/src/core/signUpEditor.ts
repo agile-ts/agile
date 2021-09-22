@@ -4,10 +4,9 @@ import {
   isRequired,
   isString,
   max,
-  Validator,
 } from '@agile-ts/multieditor';
-import { generateColor, generateId, isLight } from './utils';
 import { globalBind } from '@agile-ts/core';
+import * as Yup from 'yup';
 //
 // export const isValidNameValidator = new Validator()
 //   .required()
@@ -81,23 +80,25 @@ import { globalBind } from '@agile-ts/core';
 //   fixedProperties: ['id'],
 //   reValidateMode: 'afterFirstSubmit',
 // }));
-//
-// // For better debugging
-// globalBind('__core__', { isValidNameValidator, signUpEditor });
 
 export const signUpEditor = createMultieditor((editor) => ({
   data: {
     id: 'myCoolId',
-    name: 'jeff',
+    firstName: 'jeff',
+    lastName: 'rose',
     age: 10,
   },
   onSubmit: async (preparedData) => {
     alert(JSON.stringify(preparedData));
   },
   validateMethods: {
-    name: editor.Validator(isRequired, isString),
+    firstName: editor.Validator(isRequired, isString),
+    lastName: Yup.string().max(15) as any, // TODO
     age: editor.Validator(isRequired, isNumber, max(10)),
   },
   fixedProperties: ['id'],
   reValidateMode: 'afterFirstSubmit',
 }));
+
+// For better debugging
+globalBind('__core__', { signUpEditor });

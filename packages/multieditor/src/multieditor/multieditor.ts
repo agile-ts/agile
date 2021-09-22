@@ -1,10 +1,4 @@
-import {
-  Agile,
-  ComputeValueMethod,
-  getAgileInstance,
-  LogCodeManager,
-  Observer,
-} from '@agile-ts/core';
+import { Agile, LogCodeManager, Observer } from '@agile-ts/core';
 import {
   defineConfig,
   copy,
@@ -27,15 +21,16 @@ export class Multieditor<
   public agileInstance: () => Agile;
 
   public config: EditorConfigInterface;
+
   public isModified = false;
   public isValid = false;
   public submitted = false;
+
   public fixedProperties: ItemKey[] = [];
   public editableProperties: ItemKey[] = [];
-  public validateMethods: DataObject<
-    ValidationMethodInterface<DataType> | Validator<DataType>
-  > = {};
-  public computeMethods: DataObject<ComputeValueMethod<DataType>> = {};
+
+  public validators: { [key: string]: Validator<DataType> } = {};
+
   public onSubmit: (
     preparedData: DataObject<DataType>,
     config?: OnSubmitConfigType
@@ -53,20 +48,14 @@ export class Multieditor<
    */
   constructor(
     config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
-    agileInstance?: Agile
+    agileInstance: Agile
   ) {
-    if (!agileInstance) agileInstance = getAgileInstance(null);
-    if (!agileInstance)
-      LogCodeManager.getLogger()?.error(
-        'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!'
-      );
-    this.agileInstance = () => agileInstance as any;
+    this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
       fixedProperties: [],
-      editableProperties: Object.keys(_config.data),
-      validateMethods: {},
-      computeMethods: {},
+      editableProperties: Object.keys(_config.initialData),
+      validationSchema: {},
       reValidateMode: 'onSubmit',
       validate: 'editable',
     });
@@ -74,24 +63,31 @@ export class Multieditor<
     this.onSubmit = _config.onSubmit as any;
     this.fixedProperties = _config.fixedProperties as any;
     this.editableProperties = _config.editableProperties as any;
-    this.validateMethods = _config.validateMethods as any;
-    this.computeMethods = _config.computeMethods as any;
     this.config = {
       reValidateMode: _config.reValidateMode as any,
       validate: _config.validate as any,
     };
 
-    // Add Items to Data Object and validate it for the first Time
-    for (const key in _config.data) {
-      const item = new Item<DataType>(this as any, _config.data[key], key, {
+    // Format validation methods to Validators
+    Object.keys(_config.validationSchema as any).map((key) => {
+      const validationMethod = (_config.validationSchema as any)[key];
+      if (validationMethod instanceof Validator) {
+        if (validationMethod.key == null) validationMethod.key = key;
+        this.validators[key] = validationMethod as Validator<DataType>;
+      } else
+        this.validators[key] = new Validator<DataType>({
+          key,
+        }).addValidationSchema(validationMethod);
+    });
+
+    // Instantiate data Items
+    for (const key in _config.initialData) {
+      const item = new Item<DataType>(this as any, _config.initialData[key], {
+        key,
         canBeEdited: this.editableProperties.includes(key),
       });
       this.data[key] = item;
-      item.validate();
-      if (Object.prototype.hasOwnProperty.call(this.computeMethods, key)) {
-        const computeMethod = this.computeMethods[key];
-        item.computeValue(computeMethod);
-      }
+      item.validate(); // Initial validate
     }
   }
 
@@ -160,7 +156,7 @@ export class Multieditor<
     const validator = new Validator();
 
     _validationMethods.forEach((validatorMethod) => {
-      validator.addValidationMethod(generateId(), validatorMethod);
+      validator.addValidationSchema(generateId(), validatorMethod);
     });
 
     return validator;
@@ -418,16 +414,8 @@ export class Multieditor<
    * @param key - Key/Name of Item
    */
   public getValidator(key: ItemKey): Validator<DataType> {
-    if (Object.prototype.hasOwnProperty.call(this.validateMethods, key)) {
-      const validation = this.validateMethods[key];
-      if (validation instanceof Validator) {
-        if (!validation.key) validation.key = key;
-        return validation;
-      } else {
-        return new Validator<DataType>({
-          key: key,
-        }).addValidationMethod({ method: validation });
-      }
+    if (Object.prototype.hasOwnProperty.call(this.validators, key)) {
+      return this.validators[key];
     }
     return new Validator<DataType>({ key: key });
   }
@@ -527,13 +515,12 @@ export interface CreateEditorConfigInterface<
   onSubmitConfig = any
 > {
   key?: string;
-  data: DataObject<DataType>;
+  initialData: DataObject<DataType>;
   fixedProperties?: string[];
   editableProperties?: string[];
-  validateMethods?: DataObject<
-    ValidationMethodInterface<DataType> | Validator<DataType>
-  >;
-  computeMethods?: DataObject<ComputeValueMethod<DataType>>;
+  validationSchema?: {
+    [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
+  };
   onSubmit: (
     preparedData: DataObject<DataType>,
     config?: onSubmitConfig
