@@ -1,10 +1,10 @@
-import { ValidationMethodObjectInterface } from '../validator';
+import { ValidationMethodObjectInterface } from '../resolvers/agile';
 
 export function isNumber(
   errorMessage?: string
 ): ValidationMethodObjectInterface {
   return {
-    name: 'isNumber',
+    key: 'isNumber',
     method: (toValidateItemKey, value, editor): boolean => {
       const isValid = typeof value === 'number';
       if (!isValid) {
@@ -24,7 +24,7 @@ export function max(
   errorMessage?: string
 ): ValidationMethodObjectInterface {
   return {
-    name: 'max',
+    key: 'max',
     method: (toValidateItemKey, value, editor): boolean => {
       if (!value || typeof value !== 'number') return false;
       const isValid = value <= maxNumber;

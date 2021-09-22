@@ -8,7 +8,7 @@ const multiEditor = new MultiEditor<string, boolean>((editor) => ({
   data: {
     id: "myId",
     email: undefined,
-    name: undefined,
+    key: undefined,
   },
   onSubmit: async (data) => {
     console.log("Submitted ", data);
@@ -17,8 +17,8 @@ const multiEditor = new MultiEditor<string, boolean>((editor) => ({
   fixedProperties: ["id"],
   validateMethods: {
     email: editor.Validator().string().email().required(),
-    name: editor.Validator().string().max(10).min(2).required(),
+    key: editor.Validator().string().max(10).min(2).required(),
   },
-  editableProperties: ["email", "name"],
+  editableProperties: ["email", "key"],
 }), App);
  */

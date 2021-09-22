@@ -21,7 +21,7 @@ const multiEditor = new MultiEditor(editor => ({
   data: {
     id: "myId", // Inital Id
     email: undefined, // Inital Email
-    name: undefined, // Inital Name
+    key: undefined, // Inital Name
   },
   onSubmit: async (data) => {
     console.log("Submitted ", data);  // <-------------------------------------------    
@@ -29,20 +29,20 @@ const multiEditor = new MultiEditor(editor => ({
   fixedProperties: ["id"], // Properties that always get passed as data into the onSubmit function
   validateMethods: {
     email: editor.Validator().string().email().required(), // Email is requiered, a string and follows the Email regex
-    name: editor.Validator().string().max(10).min(2).required(), // Name is required, a string, has to be shorter than 10 and longer than 2 chars
+    key: editor.Validator().string().max(10).min(2).required(), // Name is required, a string, has to be shorter than 10 and longer than 2 chars
   },
-  editableProperties: ["email", "name"], // Properties that can be edited
+  editableProperties: ["email", "key"], // Properties that can be edited
 }));
 
 // Lets update the requiered properties to validate the Editor
 multiEditor.setValue("email", "test@test.com");
-multiEditor.setValue("name", "Jeff");
+multiEditor.setValue("key", "Jeff");
 
 // Now we can submit the Editor and see what the onSubmit will log
 multiEditor.submit();
 // Submited {
 //   id: "myId",
-//   name: "Jeff",
+//   key: "Jeff",
 //   email: "test@test.com"
 // }
 ```
@@ -62,7 +62,7 @@ Write minimalistic, boilerplate free code that captures your intent. <br />
 - Compute Value
   ```ts
   // Force Name to be lowercase
-  name: (value) => {
+  key: (value) => {
         return value.toLowerCase();
       }
   ```

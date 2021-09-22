@@ -1,10 +1,10 @@
-import { ValidationMethodObjectInterface } from '../validator';
+import { ValidationMethodObjectInterface } from '../resolvers/agile';
 
 export function isRequired(
   errorMessage?: string
 ): ValidationMethodObjectInterface {
   return {
-    name: 'isRequired',
+    key: 'isRequired',
     method: (toValidateItemKey, value, editor): boolean => {
       const isValid = !!value;
       if (!isValid) {

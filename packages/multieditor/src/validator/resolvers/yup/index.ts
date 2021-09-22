@@ -2,13 +2,22 @@ import * as Yup from 'yup';
 import { Validator } from '../../validator';
 import { generateId } from '@agile-ts/core';
 
+/**
+ * Returns a Validator created based on the specified Yup schema.
+ *
+ * @param schema - Yup schema.
+ */
 export function yupResolver(schema: Yup.BaseSchema): Validator {
   const validator = new Validator();
+
+  // Add validation method to the created Validator
   validator.addValidationMethod(
     `yup_${generateId()}`,
     async (toValidateItemKey, value, editor) => {
       let isValid = true;
+
       try {
+        // Validate Yup schema
         await schema.validate(value);
       } catch (e: any) {
         isValid = false;

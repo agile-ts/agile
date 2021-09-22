@@ -38,9 +38,10 @@ export class Item<ValueType = any> extends State<ValueType> {
     });
     config = defineConfig(config, {
       canBeEdited: true,
+      validator: new Validator(),
     });
     this.editor = () => editor;
-    this.validator = editor.getValidator(config.key);
+    this.validator = config.validator as any;
     this.config = config;
     this.status = new Status(this);
 
@@ -51,7 +52,7 @@ export class Item<ValueType = any> extends State<ValueType> {
       if (this.editor().canAssignStatusToItemOnChange(this))
         this.status.display = true;
       this.editor().validate();
-      this.editor().updateIsModified();
+      this.editor().recomputeModifiedState();
     });
   }
 
@@ -86,9 +87,14 @@ export interface ItemConfigInterface {
    */
   key: ItemKey;
   /**
-   * @param canBeEdited - Whether the Item value can be edited
+   * Whether the Item value can be edited
    * and thus is passes into the 'preparedData' object when submitting.
    * @default true
    */
   canBeEdited?: boolean;
+  /**
+   * Validator to handle the validation of the Item.
+   * @default newly create Validator
+   */
+  validator?: Validator;
 }

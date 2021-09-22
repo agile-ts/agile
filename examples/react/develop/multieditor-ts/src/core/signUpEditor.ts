@@ -9,6 +9,7 @@ import {
 } from '@agile-ts/multieditor';
 import { globalBind } from '@agile-ts/core';
 import * as Yup from 'yup';
+import { generateColor, generateId } from './utils';
 //
 // export const isValidNameValidator = new Validator()
 //   .required()
@@ -44,7 +45,7 @@ import * as Yup from 'yup';
 //       .addValidationMethod(async (key, value, editor) => {
 //         const isValid = value === 'Jeff';
 //         if (!isValid)
-//           editor.setStatus(key, 'error', 'Sry only the name Jeff is allowed!');
+//           editor.setStatus(key, 'error', 'Sry only the key Jeff is allowed!');
 //         return isValid;
 //       }),
 //     email: editor.Validator().required().string().email().main(),
@@ -83,21 +84,37 @@ import * as Yup from 'yup';
 //   reValidateMode: 'afterFirstSubmit',
 // }));
 
+// export const isValidNameValidator = new Validator()
+//   .required()
+//   .string()
+//   .min(2)
+//   .max(10)
+//   .matches(/^([^0-9]*)$/, 'No Numbers allowed!')
+//   .main();
+
 export const signUpEditor = createMultieditor((editor) => ({
   initialData: {
     id: 'myCoolId',
-    firstName: 'jeff',
-    lastName: 'rose',
-    age: 10,
+    firstName: 'Jeff',
+    lastName: '',
+    gender: undefined,
+    userName: '',
+    email: '',
+    aboutYou: '',
+    age: undefined,
+    image: {
+      id: generateId(),
+      color: generateColor(),
+    },
   },
   onSubmit: async (preparedData) => {
     alert(JSON.stringify(preparedData));
   },
   validationSchema: {
     firstName: agileResolver(isRequired, isString).append(
-      yupResolver(Yup.string().min(10))
+      yupResolver(Yup.string().max(10))
     ),
-    lastName: yupResolver(Yup.string().max(15)),
+    lastName: yupResolver(Yup.string().max(10).required()),
     age: agileResolver(isRequired, isNumber, max(10)),
   },
   fixedProperties: ['id'],

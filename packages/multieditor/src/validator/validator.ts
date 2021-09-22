@@ -26,17 +26,17 @@ export class Validator<DataType = any> {
   }
 
   /**
-   * Updates the key/name identifier of the Validator.
+   * Updates the key/key identifier of the Validator.
    *
    * @public
-   * @param value - New key/name identifier.
+   * @param value - New key/key identifier.
    */
   public set key(value: ValidatorKey | undefined) {
     this._key = value;
   }
 
   /**
-   * Returns the key/name identifier of the Validator.
+   * Returns the key/key identifier of the Validator.
    *
    * @public
    */
@@ -154,23 +154,27 @@ export class Validator<DataType = any> {
 
 export type ValidatorKey = string | number;
 
-/**
- * @param key - Key/Name of Validator
- * @param prefix - Validation Method Prefix
- */
 export interface ValidatorConfigInterface {
+  /**
+   * Key/Name identifier of the Validator.
+   * @default undefined
+   */
   key?: ValidatorKey;
 }
 
 export type ValidationMethodInterface<DataType = any> = (
+  /**
+   * Key/Name identifier of Item whose value to be validated.
+   */
   toValidateItemKey: ItemKey,
+  /**
+   * Value to be validated.
+   */
   value: DataType,
+  /**
+   * Multieditor the to validate Item belongs to.
+   */
   editor: Multieditor<DataType>
 ) => Promise<boolean> | boolean;
 
 export type ValidationMethodKey = string | number;
-
-export interface ValidationMethodObjectInterface<DataType = any> {
-  name?: string;
-  method: ValidationMethodInterface<DataType>;
-}

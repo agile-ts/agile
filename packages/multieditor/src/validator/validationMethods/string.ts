@@ -1,10 +1,10 @@
-import { ValidationMethodObjectInterface } from '../validator';
+import { ValidationMethodObjectInterface } from '../resolvers/agile';
 
 export function isString(
   errorMessage?: string
 ): ValidationMethodObjectInterface {
   return {
-    name: 'isString',
+    key: 'isString',
     method: (toValidateItemKey, value, editor): boolean => {
       const isValid = typeof value === 'string';
       if (!isValid) {

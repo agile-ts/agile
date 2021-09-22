@@ -3,6 +3,7 @@ import { Item } from '../item';
 import { StatusObserver } from './status.observer';
 import { StatusTracker } from './status.tracker';
 
+// TODO why not extending State??
 export class Status<DataType = any> {
   public agileInstance: () => Agile;
 
