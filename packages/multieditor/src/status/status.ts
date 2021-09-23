@@ -1,5 +1,5 @@
 import { State, StateIngestConfigInterface } from '@agile-ts/core';
-import { copy, generateId } from '@agile-ts/utils';
+import { copy, defineConfig } from '@agile-ts/utils';
 import { Item } from '../item';
 import { StatusTracker } from './status.tracker';
 
@@ -43,11 +43,14 @@ export class Status<DataType = any> extends State<StatusValueType> {
    * @param value - New Status value
    * @param config - Configuration object
    */
-  public set(
-    value: StatusValueType,
-    config: StateIngestConfigInterface = {}
-  ): this {
+  public set(value: StatusValueType, config: StatusSetInterface = {}): this {
+    config = defineConfig(config, {
+      waitForTracking: false,
+    });
     if (value != null) this.statusTracker.tracked(value);
+
+    // Return when waiting for end of tracking to apply the last tracked change to the Status, if applicable
+    if (config.waitForTracking && this.statusTracker.isTracking) return this;
 
     // Ingest the Status with the new value into the runtime
     if (
@@ -72,4 +75,15 @@ export interface StatusInterface {
    * Message of Status
    */
   message: string;
+}
+
+export interface StatusSetInterface extends StateIngestConfigInterface {
+  /**
+   * If tracking of the particular Status is active,
+   * the value is only tracked (not applied).
+   * If the tracking has been finished the last tracked Status value should be applied to the Status.
+   * (See: https://github.com/agile-ts/agile/pull/204#issuecomment-925934647)
+   * @default false
+   */
+  waitForTracking?: boolean;
 }

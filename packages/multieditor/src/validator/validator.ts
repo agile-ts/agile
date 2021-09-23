@@ -70,7 +70,9 @@ export class Validator<DataType = any> {
 
     // Handle tracked Statuses
     const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
-    if (trackedStatuses.length <= 0) editor.resetStatus(item._key);
+    if (trackedStatuses.length > 0)
+      item.status.set(trackedStatuses[trackedStatuses.length - 1]);
+    else editor.resetStatus(item._key);
 
     return isValid;
   }

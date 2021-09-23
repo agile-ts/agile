@@ -76,9 +76,9 @@ export class Multieditor<
     Object.keys(
       _config.validationSchema as ValidationSchemaType<DataType>
     ).forEach((key) => {
-      const validationMethod = (
-        _config.validationSchema as ValidationSchemaType<DataType>
-      )[key];
+      const validationMethod = (_config.validationSchema as ValidationSchemaType<
+        DataType
+      >)[key];
 
       // If validation schema item is a Validator
       if (validationMethod instanceof Validator) {
@@ -294,6 +294,10 @@ export class Multieditor<
   /**
    * Assigns the specified new Status to the Item with the specified key/name identifier.
    *
+   * However, if tracking of the particular Status is active,
+   * the value is only tracked (not applied).
+   * If the tracking has been finished the last tracked Status value should be applied to the Status.
+   *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    * @param type - Status type
@@ -302,10 +306,13 @@ export class Multieditor<
   public setStatus(itemKey: ItemKey, type: StatusType, message: string): this {
     const item = this.getItem(itemKey);
     if (item == null) return this;
-    item.status.set({
-      type,
-      message,
-    });
+    item.status.set(
+      {
+        type,
+        message,
+      },
+      { waitForTracking: true }
+    );
     return this;
   }
 
