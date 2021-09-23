@@ -1,5 +1,23 @@
 # @agile-ts/logger
 
+## 0.0.10
+
+### Patch Changes
+
+- e6ef3a7: #### :bug: Bug Fix
+
+  - `core`, `multieditor`, `react`
+    - [#204](https://github.com/agile-ts/agile/pull/204) fix multieditor ([@bennodev19](https://github.com/bennodev19))
+  - `api`, `core`, `cra-template-agile-typescript`, `cra-template-agile`, `event`, `logger`, `multieditor`, `proxytree`, `react`, `utils`, `vue`
+    - [#201](https://github.com/agile-ts/agile/pull/201) fix commonjs bundle ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+- Updated dependencies [e6ef3a7]
+  - @agile-ts/utils@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes

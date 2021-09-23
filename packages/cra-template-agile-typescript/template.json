@@ -5,8 +5,8 @@
       "lint": "eslint --cache \"**/*.{js,jsx,ts,tsx}\""
     },
     "dependencies": {
-      "@agile-ts/core": "^0.2.3",
-      "@agile-ts/react": "^0.2.0",
+      "@agile-ts/core": "^0.2.6",
+      "@agile-ts/react": "^0.2.2",
       "react": "^17.0.2",
       "react-dom": "^17.0.2",
       "react-scripts": "^4.0.3"
