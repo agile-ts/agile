@@ -55,7 +55,7 @@ export function minLength(
           toValidateItemKey,
           'error',
           errorMessage ||
-            `${toValidateItemKey} must be at most ${minLength} characters`
+            `${toValidateItemKey} must be at least ${minLength} characters`
         );
       }
       return isValid;
@@ -70,7 +70,8 @@ export function isEmail(
     key: 'isEmail',
     method: (toValidateItemKey, value, editor): boolean => {
       if (value == null || typeof value !== 'string') return false;
-      const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      const emailRegex =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       const isValid = emailRegex.test(value.toLowerCase());
       if (!isValid) {
         editor.setStatus(
@@ -89,7 +90,8 @@ export function isUrl(errorMessage?: string): ValidationMethodObjectInterface {
     key: 'isUrl',
     method: (toValidateItemKey, value, editor): boolean => {
       if (value == null || typeof value !== 'string') return false;
-      const urlRegex = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+      const urlRegex =
+        /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
       const isValid = urlRegex.test(value.toLowerCase());
       if (!isValid) {
         editor.setStatus(

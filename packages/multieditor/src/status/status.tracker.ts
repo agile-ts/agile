@@ -14,7 +14,7 @@ export class StatusTracker {
   }
 
   /**
-   * Activates Computed Tracker to globally track used Statuses.
+   * Activates the Status Tracker to globally track used Statuses.
    *
    * @internal
    */
@@ -24,7 +24,7 @@ export class StatusTracker {
 
   /**
    * Tracks the specified Status and caches it
-   * when the Computed Tracker is actively tracking.
+   * if the Status Tracker is actively tracking.
    *
    * @internal
    * @param status - Status
@@ -42,7 +42,7 @@ export class StatusTracker {
   getTrackedStatuses(): Array<StatusInterface> {
     const trackedStatuses = Array.from(this.trackedStatuses);
 
-    // Reset Computed Tracker
+    // Reset Status Tracker
     this.isTracking = false;
     this.trackedStatuses = new Set();
 

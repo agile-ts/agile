@@ -1,13 +1,9 @@
-import {
-  StateRuntimeJobConfigInterface,
-  defineConfig,
-  State,
-  LogCodeManager,
-} from '@agile-ts/core';
+import { StateRuntimeJobConfigInterface, State } from '@agile-ts/core';
+import { isFunction, defineConfig } from '@agile-ts/utils';
 import { ItemKey, Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
-import { isFunction } from '@agile-ts/utils';
+import { LogCodeManager } from './logCodeManager';
 
 export class Item<ValueType = any> extends State<ValueType> {
   // Multieditor the Item belongs to
@@ -15,11 +11,11 @@ export class Item<ValueType = any> extends State<ValueType> {
 
   public config: ItemConfigInterface;
 
-  // Whether the Item is valid.
+  // Whether the Item value is valid
   public isValid = false;
   // Handles the validation of the Item
   public validator: Validator<ValueType>;
-  // Validation Status of the Item
+  // Handles and represents the validation Status of the Item
   public status: Status;
 
   // Method for dynamically computing the Item value
@@ -30,7 +26,7 @@ export class Item<ValueType = any> extends State<ValueType> {
    *
    * @public
    * @param editor - Multieditor to which the Item belongs.
-   * @param initialValue - Data that the Item holds
+   * @param initialValue - Initial value of the Item.
    * @param config - Configuration object
    */
   constructor(
@@ -56,13 +52,16 @@ export class Item<ValueType = any> extends State<ValueType> {
 
       if (this.editor().canAssignStatusToItemOnChange(this))
         this.status.display = true;
-      this.editor().validate();
+
+      // Recompute Multieditor states
+      this.editor().recomputeValidatedState({ validate: false });
       this.editor().recomputeModifiedState();
     });
   }
 
   /**
-   * Revalidates the Item.
+   * Revalidates the Item via the Validator
+   * and updates the 'isValid' state.
    *
    * @public
    */
@@ -74,7 +73,6 @@ export class Item<ValueType = any> extends State<ValueType> {
 
   /**
    * Resets the Item value to its initial value.
-   *
    *
    * @public
    * @param config - Configuration object
@@ -112,17 +110,17 @@ export class Item<ValueType = any> extends State<ValueType> {
 
 export interface ItemConfigInterface {
   /**
-   * Key/Name identifier of the State.
+   * Key/Name identifier of the Item.
    */
   key: ItemKey;
   /**
    * Whether the Item value can be edited
-   * and thus is passes into the 'preparedData' object when submitting.
+   * and thus should be represented in the 'preparedData' object when submitting.
    * @default true
    */
   canBeEdited?: boolean;
   /**
-   * Validator to handle the validation of the Item.
+   * Validator to handle validating the Item.
    * @default newly create Validator
    */
   validator?: Validator;

@@ -1,2 +1,2 @@
-export * from './yup';
 export * from './agile';
+export * from './yup';

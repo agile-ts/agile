@@ -1,13 +1,13 @@
 import { State, StateIngestConfigInterface } from '@agile-ts/core';
+import { copy, generateId } from '@agile-ts/utils';
 import { Item } from '../item';
 import { StatusTracker } from './status.tracker';
-import { copy, defineConfig, isFunction } from '@agile-ts/utils';
 
 export class Status<DataType = any> extends State<StatusValueType> {
   // Item the Status belongs to
   public item: Item<DataType>;
 
-  // Whether the Status can be displayed or should stay hidden
+  // Whether the Status should be displayed or stay hidden (in the UI)
   public display = false;
 
   // Helper Class for automatic tracking set Statuses in validation methods
@@ -20,7 +20,7 @@ export class Status<DataType = any> extends State<StatusValueType> {
    * @param item - Item the Status belongs to.
    */
   constructor(item: Item<DataType>) {
-    super(item.agileInstance(), null);
+    super(item.agileInstance(), null, { key: `status_${item._key}` });
     this.item = item;
     this.statusTracker = new StatusTracker();
   }
@@ -44,32 +44,23 @@ export class Status<DataType = any> extends State<StatusValueType> {
    * @param config - Configuration object
    */
   public set(
-    value: StatusValueType | ((value: StatusValueType) => StatusValueType),
+    value: StatusValueType,
     config: StateIngestConfigInterface = {}
   ): this {
-    config = defineConfig(config, {
-      force: false,
-    });
-    const _value = isFunction(value)
-      ? (value as any)(copy(this._value))
-      : value;
-
-    // Track updated Status
-    if (value != null) this.statusTracker.tracked(_value);
+    if (value != null) this.statusTracker.tracked(value);
 
     // Ingest the Status with the new value into the runtime
     if (
-      this.item == null || // Because on the initial set (when calling '.super') the item isn't set
+      this.item == null || // Because on the initial set (when calling '.super') the Item isn't set
       this.item.editor().canAssignStatusToItemOnChange(this.item)
-    ) {
-      this.observers['value'].ingestValue(_value, config);
-    }
+    )
+      this.observers['value'].ingestValue(value, config);
 
     return this;
   }
 }
 
-export type StatusType = 'error' | 'success';
+export type StatusType = 'error' | 'success' | 'warn' | string;
 export type StatusValueType = StatusInterface | null;
 
 export interface StatusInterface {

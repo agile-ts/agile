@@ -1,7 +1,6 @@
 import {
   Agile,
   ComputeValueMethod,
-  LogCodeManager,
   Observer,
   StateIngestConfigInterface,
   StateRuntimeJobConfigInterface,
@@ -28,9 +27,9 @@ export class Multieditor<
   public isValid = false;
   public submitted = false;
 
-  // Properties to be added to the submit data all the time
+  // Item keys of Items to be added to the submit data all the time
   public fixedProperties: ItemKey[] = [];
-  // Properties that can be edited
+  // Item keys of Items that can be edited
   public editableProperties: ItemKey[] = [];
 
   public onSubmit: (
@@ -55,38 +54,47 @@ export class Multieditor<
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
+      key: undefined,
       fixedProperties: [],
       editableProperties: Object.keys(_config.initialData),
       validationSchema: {},
       computeMethods: {},
       reValidateMode: 'onSubmit',
-      validate: 'editable',
+      toValidate: 'editable',
     });
-    this._key = _config?.key;
+    this._key = _config.key;
     this.onSubmit = _config.onSubmit as any;
     this.fixedProperties = _config.fixedProperties as any;
     this.editableProperties = _config.editableProperties as any;
     this.config = {
       reValidateMode: _config.reValidateMode as any,
-      validate: _config.validate as any,
+      toValidate: _config.toValidate as any,
     };
 
     // Format specified validation instances to valid Validators
     const formattedValidators: { [key: string]: Validator<DataType> } = {};
-    Object.keys(_config.validationSchema as any).map((key) => {
-      const validationMethod = (_config.validationSchema as any)[key];
+    Object.keys(
+      _config.validationSchema as ValidationSchemaType<DataType>
+    ).forEach((key) => {
+      const validationMethod = (
+        _config.validationSchema as ValidationSchemaType<DataType>
+      )[key];
 
+      // If validation schema item is a Validator
       if (validationMethod instanceof Validator) {
         if (validationMethod.key == null) validationMethod.key = key;
-        formattedValidators[key] = validationMethod as Validator<DataType>;
-      } else {
+        formattedValidators[key] = validationMethod;
+      }
+
+      // If validation schema item is a method
+      else {
         formattedValidators[key] = new Validator<DataType>({
           key,
         }).addValidationMethod(validationMethod);
       }
     });
 
-    // Instantiate data Items
+    // Instantiate Multieditor Items based on the 'initialData'
     for (const key in _config.initialData) {
       const item = new Item<DataType>(this as any, _config.initialData[key], {
         key,
@@ -122,9 +130,8 @@ export class Multieditor<
   /**
    * Returns an array of dependencies the Multieditor depends on.
    *
-   * These returned dependencies need to be bound to the UI-Component,
-   * the Mutlieditor is used in,
-   * in order to make the Form reactive.
+   * These returned dependencies can be bound to a UI-Component
+   * the Mutlieditor is used in, to make the Form reactive.
    *
    * @public
    */
@@ -139,7 +146,8 @@ export class Multieditor<
   }
 
   /**
-   * Returns an array of dependencies the Item with the specified key/name identifier depends on.
+   * Returns an array of dependencies the Item
+   * with the specified key/name identifier depends on.
    *
    * @public
    * @param key - Key/Name identifier of the Item.
@@ -174,7 +182,7 @@ export class Multieditor<
     const item = this.getItem(itemKey);
     if (item == null) return this;
 
-    // Apply changes to Item
+    // Update current value
     item.set(value, config);
 
     return this;
@@ -201,7 +209,7 @@ export class Multieditor<
     const item = this.getItem(itemKey);
     if (item == null) return this;
 
-    // Update initial Value
+    // Update initial value
     item.initialStateValue = copy(value);
 
     // Reset Item (-> assign initial value to the current value)
@@ -230,23 +238,22 @@ export class Multieditor<
     for (const key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
+        item.status.display = true;
         item.status.ingest({
           force: true, // Force because the value hasn't changed
-          background: false,
         });
-        item.status.display = true;
       }
     }
 
     this.submitted = true;
 
-    // Check whether the Validator is valid and thus can be submitted
+    // Check whether the Multieditor is valid and thus can be submitted
     if (!this.isValid) return false;
 
     // Data to be passed to the 'onSubmit()' method
     const preparedData: DataObject<DataType> = {};
 
-    // Add Item which have changed and could be edited to the prepared data
+    // Add Items whose value has been updated to the prepared data
     for (const key in this.data) {
       const item = this.data[key];
       if (item.isSet && item.config.canBeEdited) {
@@ -274,15 +281,12 @@ export class Multieditor<
    */
   public reset(): this {
     // Reset Items
-    for (const key in this.data) {
-      const item = this.data[key];
-      item.reset();
-    }
+    for (const key in this.data) this.data[key].reset();
 
     // Reset Editor
     this.isModified = false;
     this.submitted = false;
-    this.validate();
+    // this.recomputeValidatedState(); // already recomputed during the reset of the Items
 
     return this;
   }
@@ -292,21 +296,21 @@ export class Multieditor<
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
-   * @param type - Status Type
-   * @param message - Status Message
+   * @param type - Status type
+   * @param message - Status message
    */
   public setStatus(itemKey: ItemKey, type: StatusType, message: string): this {
     const item = this.getItem(itemKey);
     if (item == null) return this;
     item.status.set({
-      type: type,
-      message: message,
+      type,
+      message,
     });
     return this;
   }
 
   /**
-   * Resets the Status of the Item with the specified itemKey.
+   * Resets the Status of the Item with the specified key/name identifier.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
@@ -327,9 +331,7 @@ export class Multieditor<
    * @param itemKey - Key/Name identifier of the Item.
    */
   public getStatus(itemKey: ItemKey): StatusInterface | null {
-    const item = this.getItem(itemKey);
-    if (item == null) return null;
-    return item.status.value;
+    return this.getItem(itemKey)?.status.value || null;
   }
 
   /**
@@ -341,28 +343,20 @@ export class Multieditor<
    * @param itemKey - Key/Name identifier of the Item.
    */
   public getItem(itemKey: ItemKey): Item<DataType> | undefined {
-    if (!Object.prototype.hasOwnProperty.call(this.data, itemKey)) {
-      LogCodeManager.getLogger()?.error(
-        `Editor Item '${itemKey}' does not exists!`
-      );
-      return undefined;
-    }
     return this.data[itemKey];
   }
 
   /**
    * Retrieves the initial value of a single Item
-   * with the specified key/nname identifier from the Multieditor.
+   * with the specified key/name identifier from the Multieditor.
    *
-   * If the to retrieve Item containing the value doesn't exist, `undefined` is returned.
+   * If the to retrieve Item containing the initial value doesn't exist, `undefined` is returned.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
   public getItemValue(itemKey: string): DataType | undefined {
-    const item = this.getItem(itemKey);
-    if (item == null) return undefined;
-    return item.value;
+    return this.getItem(itemKey)?.value;
   }
 
   /**
@@ -375,9 +369,7 @@ export class Multieditor<
    * @param itemKey - Key/Name identifier of the Item.
    */
   public getItemInitialValue(itemKey: string): DataType | undefined {
-    const item = this.getItem(itemKey);
-    if (item == null) return undefined;
-    return item.initialStateValue;
+    return this.getItem(itemKey)?.initialStateValue;
   }
 
   /**
@@ -399,7 +391,7 @@ export class Multieditor<
 
   /**
    * Recomputes the modified state of the Multieditor
-   * based on the Items modified status.
+   * based on its Items modified status.
    *
    * @public
    */
@@ -409,17 +401,24 @@ export class Multieditor<
   }
 
   /**
-   * Revalidates the Multieditor.
+   * Recomputes the validated state of the Multieditor
+   * based on its Items validation status.
    *
    * @public
    */
-  public validate(): boolean {
+  public recomputeValidatedState(
+    config: RecomputeValidatedStateMethodConfigInterface = {}
+  ): boolean {
+    config = defineConfig(config, {
+      validate: true,
+    });
     let isValid = true;
 
     // Check whether all Items are valid
     for (const key in this.data) {
       const item = this.data[key];
-      if (!item.config.canBeEdited && this.config.validate === 'editable')
+      if (config.validate) item.validate();
+      if (!item.config.canBeEdited && this.config.toValidate === 'editable')
         continue;
       isValid = item.isValid && isValid;
     }
@@ -429,8 +428,17 @@ export class Multieditor<
   }
 
   /**
+   * evalidates the Multieditor.
+   *
+   * @public
+   */
+  public validate(): boolean {
+    return this.recomputeValidatedState({ validate: true });
+  }
+
+  /**
    * Returns a boolean indication whether the Status of the specified Item
-   * can be updated during a 'onChange()' action.
+   * can be updated during a value change of the Item.
    *
    * @internal
    * @param item - Item
@@ -440,15 +448,15 @@ export class Multieditor<
       (this.config.reValidateMode === 'onChange' ||
         (this.config.reValidateMode === 'afterFirstSubmit' &&
           this.submitted)) &&
-      (this.config.validate === 'all' ||
-        (this.config.validate === 'editable' && item.config.canBeEdited) ||
+      (this.config.toValidate === 'all' ||
+        (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
 
   /**
    * Returns a boolean indication whether the Status of the specified Item
-   * can be updated during a 'onSubmit()' action.
+   * can be updated during the submission of the Multieditor.
    *
    * @internal
    * @param item - Item
@@ -459,8 +467,8 @@ export class Multieditor<
         (this.config.reValidateMode === 'afterFirstSubmit' &&
           !this.submitted) ||
         (this.config.reValidateMode === 'onChange' && !item.status.display)) &&
-      (this.config.validate === 'all' ||
-        (this.config.validate === 'editable' && item.config.canBeEdited) ||
+      (this.config.toValidate === 'all' ||
+        (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
@@ -482,7 +490,7 @@ export interface CreateEditorConfigInterface<
   key?: string;
   /**
    * Initial data of the Multieditor.
-   * @default []
+   * @default {}
    */
   initialData: DataObject<DataType>;
   /**
@@ -493,18 +501,16 @@ export interface CreateEditorConfigInterface<
   fixedProperties?: string[];
   /**
    * Key/Name identifiers of Items that can be edited.
-   * @default []
+   * @default Object.keys(config.initialData)
    */
   editableProperties?: string[];
   /**
-   * Keymap to add validation schemas to the individual Items of the Multieditor.
+   * Keymap to assign validation schemas to the individual Items of the Multieditor.
    * @default {}
    */
-  validationSchema?: {
-    [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
-  };
+  validationSchema?: ValidationSchemaType<DataType>;
   /**
-   * Keymap to add compute methods to the individual Items of the Multieditor.
+   * Keymap to assign compute methods to the individual Items of the Multieditor.
    * @default {}
    */
   computeMethods?: { [key: string]: ComputeValueMethod<DataType> };
@@ -525,8 +531,12 @@ export interface CreateEditorConfigInterface<
    * What type of data should be revalidated.
    * @default 'editable'
    */
-  validate?: ValidateType;
+  toValidate?: ValidateType;
 }
+
+export type ValidationSchemaType<DataType = any> = {
+  [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
+};
 
 export interface EditorConfigInterface {
   /**
@@ -538,7 +548,7 @@ export interface EditorConfigInterface {
    * What type of data should be revalidated.
    * @default 'editable'
    */
-  validate: ValidateType;
+  toValidate: ValidateType;
 }
 
 export type EditorConfig<
@@ -557,7 +567,8 @@ export type EditorConfig<
 
 export interface SubmitConfigInterface<OnSubmitConfigType = any> {
   /**
-   * Whether the submitted values should be assigned as the initial values ot the Items.
+   * Whether the submitted values should be assigned
+   * as the initial values of the corresponding Items.
    * @default true
    */
   assignToInitial?: boolean;
@@ -575,6 +586,15 @@ export interface UpdateInitialValueConfigInterface
    * @default true
    */
   reset?: boolean;
+}
+
+export interface RecomputeValidatedStateMethodConfigInterface {
+  /**
+   * Whether all Items should be revalidated
+   * before the validation state of the Multieditor is computed.
+   * @default true
+   */
+  validate?: boolean;
 }
 
 export type RevalidationModeType = 'onChange' | 'onSubmit' | 'afterFirstSubmit';

@@ -18,8 +18,3 @@ export function isRequired(
     },
   };
 }
-
-// TODO add some kind of combined Validator besides the tree shakable validation syntax
-// resolveAgile(Validator().required().string().max(10).email());
-// ===
-// resolveAgile(isRequired, isString, maxLength(10), isEmail)

@@ -63,7 +63,7 @@ export function minNumber(
   };
 }
 
-export function positiveNumber(
+export function isPositiveNumber(
   errorMessage?: string
 ): ValidationMethodObjectInterface {
   return {
@@ -83,7 +83,7 @@ export function positiveNumber(
   };
 }
 
-export function negativeNumber(
+export function isNegativeNumber(
   errorMessage?: string
 ): ValidationMethodObjectInterface {
   return {

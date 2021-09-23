@@ -15,6 +15,9 @@ import {
 import { globalBind } from '@agile-ts/core';
 import * as Yup from 'yup';
 import { generateColor, generateId, isLight } from './utils';
+import { assignSharedLogger, createLogger, Logger } from '@agile-ts/logger';
+
+assignSharedLogger(createLogger({ level: Logger.level.DEBUG }));
 
 export const isValidNameValidator = agileResolver(
   isRequired,
@@ -32,8 +35,8 @@ export const signUpEditor = createMultieditor((editor) => ({
     gender: undefined,
     userName: '',
     email: '',
-    aboutYou: '',
     age: undefined,
+    aboutYou: '',
     image: {
       id: generateId(),
       color: generateColor(),
@@ -49,23 +52,26 @@ export const signUpEditor = createMultieditor((editor) => ({
     // Validation with Yup
     lastName: yupResolver(
       Yup.string()
+        .required()
         .min(2)
         .max(10)
         .matches(/^([^0-9]*)$/, 'No Numbers allowed!')
     ),
 
     // Outsourced Validator with additional validation method
-    userName: isValidNameValidator.addValidationMethod(
-      async (key, value, editor) => {
+    userName: isValidNameValidator
+      .copy()
+      .addValidationMethod(async (key, value, editor) => {
         const isValid = value === 'Jeff';
         if (!isValid)
           editor.setStatus(key, 'error', 'Sry only the name Jeff is allowed!');
         return isValid;
-      }
-    ),
+      }),
 
     // Validation with Agile
     email: agileResolver(isRequired, isString, isEmail),
+
+    age: agileResolver(isRequired, isNumber, minNumber(18), maxNumber(100)),
 
     // Validation with Yup and Agile
     aboutYou: agileResolver(isRequired)
@@ -76,7 +82,6 @@ export const signUpEditor = createMultieditor((editor) => ({
           editor.setStatus(key, 'error', 'The word fuck is not allowed!');
         return isValid;
       }),
-    age: agileResolver(isRequired, isNumber, minNumber(18), maxNumber(100)),
 
     gender: agileResolver(isRequired),
 
