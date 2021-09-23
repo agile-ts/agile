@@ -42,7 +42,8 @@
     "lint": "eslint src/**/*"
   },
   "devDependencies": {
-    "@agile-ts/core": "file:../core"
+    "@agile-ts/core": "file:../core",
+    "yup": "^0.32.9"
   },
   "peerDependencies": {
     "@agile-ts/core": "^0.2.4"

@@ -14,7 +14,7 @@ export class ComputedTracker {
   }
 
   /**
-   * Activates Computed Tracker to globally track used Observers.
+   * Activates the Computed Tracker to globally track used Observers.
    *
    * @internal
    */
@@ -23,8 +23,8 @@ export class ComputedTracker {
   }
 
   /**
-   * Tracks the passed Observer and caches it
-   * when the Computed Tracker is actively tracking.
+   * Tracks the specified Observer and caches it
+   * if the Computed Tracker is actively tracking.
    *
    * @internal
    * @param observer - Observer

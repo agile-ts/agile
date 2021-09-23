@@ -14,31 +14,31 @@
   <img src="https://img.shields.io/bundlephobia/min/@agile-ts/multieditor.svg" alt="npm minified size"/></a>
   
 
-## ⏰ Short Example
+## 👀 Example
 ```ts
-// Let's create our MultiEditor
-const multiEditor = new MultiEditor(editor => ({
+// Create Multieditior 
+const multiEditor = createMultieditor(editor => ({
   data: {
-    id: "myId", // Inital Id
+    id: "myId", // Initial Id
     email: undefined, // Inital Email
     name: undefined, // Inital Name
   },
   onSubmit: async (data) => {
-    console.log("Submitted ", data);  // <-------------------------------------------    
-  },                                                                  //            |
-  fixedProperties: ["id"], // Properties that always get passed as data into the onSubmit function
+    console.log("Submitted ", data);  // <---------------------------------------------    
+  }, //                                                                               |
+  fixedProperties: ["id"], // Properties that are always passed to the 'onSubmit()' method
   validateMethods: {
-    email: editor.Validator().string().email().required(), // Email is requiered, a string and follows the Email regex
-    name: editor.Validator().string().max(10).min(2).required(), // Name is required, a string, has to be shorter than 10 and longer than 2 chars
+    email: agileResolver(isString, isEmail, isRequired), // Validation with tree shakable validation methods
+    name: yupResolver(Yup.string().max(10).min(2).required()), // Validation with external validatiors like Yup
   },
   editableProperties: ["email", "name"], // Properties that can be edited
 }));
 
-// Lets update the requiered properties to validate the Editor
+// Update Multieditor values in the UI-Form
 multiEditor.setValue("email", "test@test.com");
 multiEditor.setValue("name", "Jeff");
 
-// Now we can submit the Editor and see what the onSubmit will log
+// Submit Multieditor and see what the 'onSubmit()' method will log
 multiEditor.submit();
 // Submited {
 //   id: "myId",
@@ -46,35 +46,43 @@ multiEditor.submit();
 //   email: "test@test.com"
 // }
 ```
-_Do you want to see it in action? Click [here](https://codesandbox.io/s/multieditor-yxt4x)._
+
+### ⛳️ Sandbox
+Test the Multieditor yourself in a [codesandbox](https://codesandbox.io/s/multieditor-yxt4x).
+It's only one click away. Just select your preferred Framework below.
+
+- [React](https://codesandbox.io/s/multieditor-yxt4x)
+
+More examples can be found in the [Example section](https://agile-ts.org/docs/examples).
 
 
-## ❓ Why Agile MultiEditor
+## ❓ Why Multieditor
 
 #### 🚅 Straightforward
-Write minimalistic, boilerplate free code that captures your intent. <br />
-**For instance**
-- Simple Validation
-  ```ts
-  // Email is requiered, a string and follows the Email regex
-  EDITOR.Validator().string().email().required()
-  ```
-- Compute Value
-  ```ts
-  // Force Name to be lowercase
+Write minimalistic, boilerplate-free code that captures your intent.
+```ts
+// Simple and tree shakable inbuilt validation
+agileResolver(isRequired, isString('custom error message'), isEmail);
+
+// Easy integration with external validation libraries like Yup
+yupResolver(Yup.string().email());
+
+// Easy value compution
+computeMethods: {
   name: (value) => {
-        return value.toLowerCase();
-      }
-  ```
+    return value.toLowerCase();
+  }
+}
+```
 
+### 🤸‍ Flexible
+- Works in nearly any UI-Framework (currently supported are [React](https://reactjs.org/), [React-Native](https://reactnative.dev/) and [Vue](https://vuejs.org/)).
+- Surly behaves with the workflow that suits you best.
+- Has **0** external dependencies.
 
-#### 🎯 Easy to Use
-Learn the powerful and simple tools of Agile MultiEditor in a short amount of time.
-
-
-#### 🍃 Lightweight
-Agile Api has an unpacked size of [14.1kB](https://bundlephobia.com/result?p=@agile-ts/multieditor@0.0.6)
-and [0 external dependencies](https://www.npmjs.com/package/@agile-ts/multieditor).
+### ⚡️ Fast
+Minimizes the number of re-renders
+and validate computation.
 
 
 ## ⬇️ Installation
@@ -88,10 +96,33 @@ Therefore, we have created a table which shows which versions fit together witho
 
 | @agile-ts/multieditor | @agile-ts/core          | NPM Version              |
 | ----------------------| ----------------------- | ------------------------ |
-| v0.0.7+               | v0.0.7+                 | v6+                      |
-| v0.0.6                | v0.0.3 - v0.0.6         | v6+                      |
+| v0.0.22+              | v0.2.5+                 | v6+                      |
+
 _Other Versions aren't supported anymore_
 
 
 ## 📄 Documentation
-The Agile MultiEditor Docs are located [here](https://agile-ts.org/docs/)
+Does the Multieditor sound interesting to you?
+Take a look at our **[documentation](https://agile-ts.org/docs/introduction)**,
+to learn more about its functionalities and capabilities.
+If you have any further questions,
+feel free to join our [Community Discord](https://discord.gg/T9GzreAwPH).
+We will be happy to help you.
+
+
+## 👨‍💻 Contribute
+Get a part of AgileTs and start contributing. We welcome any meaningful contribution. 😀
+To find out more about contributing, check out the [CONTRIBUTING.md](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md).
+
+<a href="https://codeclimate.com/github/agile-ts/agile/coverage.svg">
+   <img src="https://codeclimate.com/github/agile-ts/agile/badges/gpa.svg" alt="Maintainability"/>
+</a>
+
+### ♥️ Contributors
+
+<a href="https://github.com/agile-ts/agile/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agile-ts/agile" />
+</a>
+
+[Become a contributor](https://github.com/agile-ts/agile/blob/master/CONTRIBUTING.md)
+

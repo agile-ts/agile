@@ -7,20 +7,33 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'; // https://rollupjs.o
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
 import bundleSize from 'rollup-plugin-bundle-size';
+import getBabelConfig from './babel.config';
 
-export const fileExtensions = ['.js', '.ts', '.tsx'];
+export const fileExtensions = ['.ts'];
+
+function createBabelConfig() {
+  // https://github.com/rollup/plugins/tree/master/packages/babel#running-babel-on-the-generated-code
+  return babel({
+    // 'babelHelpers' option 'runtime' is recommended for libraries.
+    // However using the 'runtime' options requires an external (prod) dependency ('@babel/runtime') which we want to avoid at this point in time.
+    // (See: https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers)
+    // Therefore we decided against it and only support browsers that support ES modules.
+    babelHelpers: 'bundled',
+    comments: false,
+    extensions: fileExtensions, // https://github.com/rollup/rollup-plugin-babel/issues/255
+    ...getBabelConfig(),
+  });
+}
 
 export function createEsbuildConfig(config) {
   config = {
     target: 'es2015',
-    tsconfig: path.resolve('./tsconfig.json'),
     additionalOptions: {},
     ...config,
   };
   return esbuild({
     minify: false,
     target: config.target,
-    tsconfig: config.tsconfig,
     ...config.additionalOptions,
   });
 }
@@ -73,8 +86,9 @@ export function createESMConfig(config) {
     external: config.external,
     plugins: [
       nodeResolve({ extensions: fileExtensions }),
-      createEsbuildConfig({ target: 'es2015', tsconfig: config.tsconfig }),
-      // typescript(), // Not required because the 'esbuild-config' does configure typescript for us
+      createEsbuildConfig({ target: 'es2015' }),
+      // typescript(), // Not required because esbuild takes care of configuring typescript
+      // babel(/* */), // Not required because esbuild takes care of converting ES2015+ modules into compatible JavaScript files
       !config.multiFileOutput && bundleSize(),
       ...config.additionalPlugins,
     ],
@@ -96,15 +110,16 @@ export function createCommonJSConfig(config) {
 
   return defineConfig({
     input: config.input,
-    output: { file: config.output, format: 'cjs' },
+    output: {
+      file: config.output,
+      format: 'cjs',
+      sourcemap: true,
+    },
     external: config.external,
     plugins: [
       nodeResolve({ extensions: fileExtensions }),
-      babel({
-        babelHelpers: 'bundled',
-        comments: false,
-      }),
-      typescript({ tsconfig: config.tsconfig }),
+      createBabelConfig(),
+      typescript(), // Only so that Rollup can work with typescript (Not for generating any 'declaration' files)
       bundleSize(),
       ...config.additionalPlugins,
     ],

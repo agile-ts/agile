@@ -1,102 +1,89 @@
-import { Agile, copy, RuntimeJobConfigInterface } from '@agile-ts/core';
+import { State, StateIngestConfigInterface } from '@agile-ts/core';
+import { copy, defineConfig } from '@agile-ts/utils';
 import { Item } from '../item';
-import { StatusObserver } from './status.observer';
+import { StatusTracker } from './status.tracker';
 
-export class Status<DataType = any> {
-  public agileInstance: () => Agile;
-
+export class Status<DataType = any> extends State<StatusValueType> {
+  // Item the Status belongs to
   public item: Item<DataType>;
-  public observer: StatusObserver; // Handles deps and subs of Status and is like an interface to the Runtime
 
+  // Whether the Status should be displayed or stay hidden (in the UI)
   public display = false;
-  public _value: StatusInterface | null; // The last assigned Value
-  public nextValue: StatusInterface | null; // The last set Value
-  public activeValues: Set<StatusInterface> = new Set(); // All Values that got set during the validation Time of the Validator
 
-  // Tracking
-  public track = false;
-  public foundValues: Set<StatusInterface> = new Set();
+  // Helper Class for automatic tracking set Statuses in validation methods
+  public statusTracker: StatusTracker;
 
   /**
+   * Represents the current status of the specified Item.
+   *
    * @public
-   * Status - Represents the Status of an Item
-   * @param item - Item to that the Status belongs
+   * @param item - Item the Status belongs to.
    */
   constructor(item: Item<DataType>) {
+    super(item.agileInstance(), null, { key: `status_${item._key}` });
     this.item = item;
-    this.agileInstance = () => item.agileInstance();
-    this._value = null;
-    this.nextValue = null;
-    this.observer = new StatusObserver(this.agileInstance(), this);
+    this.statusTracker = new StatusTracker();
   }
 
   /**
+   * Returns a reference-free version of the current Status value
+   * if the Status should be displayed.
+   *
    * @public
-   * Get current Value of Status
-   * Note: Returns null if Status shouldn't get displayed
    */
-  public get value(): StatusInterface | null {
-    return this.display ? this._value : null;
+  public get value(): StatusValueType {
+    return this.display ? copy(this._value) : null;
   }
 
-  //=========================================================================================================
-  // Set
-  //=========================================================================================================
   /**
+   * Assigns a new value to the Status
+   * and re-renders all subscribed UI-Components.
+   *
    * @public
-   * Set next Status Value that will be assigned to the Status
-   * @param value - next Status Value
+   * @param value - New Status value
+   * @param config - Configuration object
    */
-  public set(value: StatusInterface | null): this {
-    this.nextValue = copy(value);
+  public set(value: StatusValueType, config: StatusSetInterface = {}): this {
+    config = defineConfig(config, {
+      waitForTracking: false,
+    });
+    if (value != null) this.statusTracker.tracked(value);
 
-    // Track Status
-    if (this.track && value) this.foundValues.add(value);
+    // Return when waiting for end of tracking to apply the last tracked change to the Status, if applicable
+    if (config.waitForTracking && this.statusTracker.isTracking) return this;
 
-    // Assign Status to Item
-    if (this.item.editor().canAssignStatusToItemOnChange(this.item))
-      this.assign();
+    // Ingest the Status with the new value into the runtime
+    if (
+      this.item == null || // Because on the initial set (when calling '.super') the Item isn't set
+      this.item.editor().canAssignStatusToItemOnChange(this.item)
+    )
+      this.observers['value'].ingestValue(value, config);
 
     return this;
   }
-
-  //=========================================================================================================
-  // Assign
-  //=========================================================================================================
-  /**
-   * @public
-   * Assign last set Status Value to the current Status Value
-   * @param config - Config
-   */
-  public assign(config: RuntimeJobConfigInterface = {}) {
-    this.observer.assign(config);
-  }
-
-  //=========================================================================================================
-  // Get Tracked Statuses
-  //=========================================================================================================
-  /**
-   * @internal
-   * Returns tracked Values and stops Status from tracking anymore Values
-   */
-  public getTrackedValues(): Set<StatusInterface> {
-    const finalFoundStatuses = this.foundValues;
-
-    // Reset tracking
-    this.track = false;
-    this.foundValues = new Set();
-
-    return finalFoundStatuses;
-  }
 }
 
-export type StatusType = 'error' | 'success';
+export type StatusType = 'error' | 'success' | 'warn' | string;
+export type StatusValueType = StatusInterface | null;
 
-/**
- * @param type - Type of Status
- * @param message - Message of Status
- */
 export interface StatusInterface {
+  /**
+   * Type of Status ('error', 'success', ..)
+   */
   type: StatusType;
+  /**
+   * Message of Status
+   */
   message: string;
+}
+
+export interface StatusSetInterface extends StateIngestConfigInterface {
+  /**
+   * If tracking of the particular Status is active,
+   * the value is only tracked (not applied).
+   * If the tracking has been finished the last tracked Status value should be applied to the Status.
+   * (See: https://github.com/agile-ts/agile/pull/204#issuecomment-925934647)
+   * @default false
+   */
+  waitForTracking?: boolean;
 }

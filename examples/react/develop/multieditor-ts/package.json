@@ -11,7 +11,8 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "yup": "^0.32.9"
   },
   "devDependencies": {
     "@testing-library/react": "^9.3.2",
@@ -19,13 +20,15 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
-    "@types/react-router-dom": "^5.1.5"
+    "@types/react-router-dom": "^5.1.5",
+    "source-map-explorer": "^2.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "analyze": "yarn run build && source-map-explorer 'build/static/js/*.js'",
     "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/multieditor & yarn install",
     "install:prod:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/multieditor & yarn install"
   },

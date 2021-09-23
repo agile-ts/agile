@@ -1,9 +1,17 @@
 import { Agile, shared } from '@agile-ts/core';
-import { defineConfig } from '@agile-ts/utils';
-import { EditorConfig, MultiEditor } from './multieditor';
+import { EditorConfig, Multieditor } from './multieditor';
 
 export * from './multieditor';
 
+/**
+ * Returns a newly created Multieditor.
+ *
+ * A Multieditor is a simple Form Handler.
+ *
+ * @public
+ * @param config - Configuration object
+ * @param agileInstance - Instance of Agile the Multieditor belongs to.
+ */
 export function createMultieditor<
   DataType = any,
   SubmitReturnType = void,
@@ -11,12 +19,9 @@ export function createMultieditor<
 >(
   config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
   agileInstance: Agile = shared
-): MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType> {
-  config = defineConfig(config, {
-    agileInstance: shared,
-  });
-  return new MultiEditor<DataType, SubmitReturnType, OnSubmitConfigType>(
+): Multieditor<DataType, SubmitReturnType, OnSubmitConfigType> {
+  return new Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>(
     config,
-    agileInstance as any
+    agileInstance
   );
 }
