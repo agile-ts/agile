@@ -24,8 +24,13 @@ const App = () => {
 
       <label>Last Name:</label>
       <input
-        onChange={(e) => signUpEditor.setValue('lastName', e.target.value)}
+        onChange={(e) =>
+          signUpEditor.setValue('lastName', e.target.value, {
+            background: false,
+          })
+        }
         defaultValue={signUpEditor.getItemInitialValue('lastName')}
+        value={signUpEditor.getItemValue('lastName')}
       />
       <ErrorMessage error={signUpEditor.getStatus('lastName')?.message} />
 
@@ -84,8 +89,11 @@ const App = () => {
 
       <label>Age</label>
       <input
-        onChange={(e) => signUpEditor.setValue('age', e.target.value)}
+        onChange={(e) =>
+          signUpEditor.setValue('age', e.target.value, { background: false })
+        }
         defaultValue={signUpEditor.getItemInitialValue('age')}
+        value={signUpEditor.getItemValue('age')}
       />
       <ErrorMessage error={signUpEditor.getStatus('age')?.message} />
 

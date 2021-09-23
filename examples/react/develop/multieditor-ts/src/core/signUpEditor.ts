@@ -88,6 +88,14 @@ export const signUpEditor = createMultieditor((editor) => ({
       }
     ),
   },
+  computeMethods: {
+    lastName: (value) => {
+      return value && typeof value === 'string' ? value.toUpperCase() : value;
+    },
+    age: (value) => {
+      return Number(value) || value;
+    },
+  },
   fixedProperties: ['id'],
   reValidateMode: 'onChange',
 }));

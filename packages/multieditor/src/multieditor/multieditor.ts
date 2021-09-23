@@ -93,6 +93,8 @@ export class Multieditor<
         canBeEdited: this.editableProperties.includes(key),
         validator: formattedValidators[key],
       });
+      if (Object.prototype.hasOwnProperty.call(_config.computeMethods, key))
+        item.computeValue((_config.computeMethods as any)[key]);
       this.data[key] = item;
       item.validate(); // Initial validate
     }
@@ -468,15 +470,6 @@ export type DataObject<T = any> = { [key: string]: T };
 export type EditorKey = string | number;
 export type ItemKey = string | number;
 
-/**
- * @param data - Data that gets registered
- * @param fixedProperties - Data that will always be passed into the 'onSubmit' Function
- * @param editableProperties - Properties that can be edited
- * @param validateMethods - Methods to validate the Data
- * @param onSubmit - Function that gets called if the Editor gets submitted
- * @param reValidateMode - When the Editor and its Data gets revalidated
- * @param validate - Which Data gets validated
- */
 export interface CreateEditorConfigInterface<
   DataType = any,
   SubmitReturnType = void,
@@ -504,14 +497,15 @@ export interface CreateEditorConfigInterface<
    */
   editableProperties?: string[];
   /**
-   * Schema to validate the individual Items of the Multieditor.
+   * Keymap to add validation schemas to the individual Items of the Multieditor.
    * @default {}
    */
   validationSchema?: {
     [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
   };
   /**
-   * TODO
+   * Keymap to add compute methods to the individual Items of the Multieditor.
+   * @default {}
    */
   computeMethods?: { [key: string]: ComputeValueMethod<DataType> };
   /**

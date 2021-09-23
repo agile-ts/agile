@@ -2,10 +2,12 @@ import {
   StateRuntimeJobConfigInterface,
   defineConfig,
   State,
+  LogCodeManager,
 } from '@agile-ts/core';
 import { ItemKey, Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
+import { isFunction } from '@agile-ts/utils';
 
 export class Item<ValueType = any> extends State<ValueType> {
   // Multieditor the Item belongs to
@@ -19,6 +21,9 @@ export class Item<ValueType = any> extends State<ValueType> {
   public validator: Validator<ValueType>;
   // Validation Status of the Item
   public status: Status;
+
+  // Method for dynamically computing the Item value
+  public computeValueMethod?: ComputeValueMethod<ValueType>;
 
   /**
    * An Item represents a piece of information from the Multieditor.
@@ -79,6 +84,30 @@ export class Item<ValueType = any> extends State<ValueType> {
     this.status.display = false;
     return this;
   }
+
+  /**
+   * Defines the method used to compute the value of the Item.
+   *
+   * It is retrieved on each Item value change,
+   * in order to compute the new Item value
+   * based on the specified compute method.
+   *
+   * @public
+   * @param method - Method to compute the value of the Item.
+   */
+  public computeValue(method: ComputeValueMethod<ValueType>): this {
+    if (!isFunction(method)) {
+      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
+      return this;
+    }
+    this.computeValueMethod = method;
+
+    // Initial compute
+    // (not directly computing it here since it is computed once in the runtime!)
+    this.set(this.nextStateValue);
+
+    return this;
+  }
 }
 
 export interface ItemConfigInterface {
@@ -98,3 +127,5 @@ export interface ItemConfigInterface {
    */
   validator?: Validator;
 }
+
+export type ComputeValueMethod<T = any> = (value: T) => T;
