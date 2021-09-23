@@ -32,7 +32,7 @@ export function yupResolver(schema: Yup.BaseSchema): Validator {
                 e.message.replace('this', toValidateItemKey)
               );
             }
-            for (let err of e.inner) {
+            for (const err of e.inner) {
               editor.setStatus(
                 toValidateItemKey,
                 'error',
