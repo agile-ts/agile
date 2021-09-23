@@ -1,24 +1,42 @@
-import { createMultieditor, Validator } from '@agile-ts/multieditor';
-import { generateColor, generateId, isLight } from './utils';
+import {
+  agileResolver,
+  createMultieditor,
+  isEmail,
+  isNumber,
+  isRequired,
+  isString,
+  matchesRegex,
+  maxLength,
+  maxNumber,
+  minLength,
+  minNumber,
+  yupResolver,
+} from '@agile-ts/multieditor';
 import { globalBind } from '@agile-ts/core';
+import * as Yup from 'yup';
+import { generateColor, generateId, isLight } from './utils';
+import { assignSharedLogger, createLogger, Logger } from '@agile-ts/logger';
 
-export const isValidNameValidator = new Validator()
-  .required()
-  .string()
-  .min(2)
-  .max(10)
-  .matches(/^([^0-9]*)$/, 'No Numbers allowed!');
+assignSharedLogger(createLogger({ level: Logger.level.DEBUG }));
+
+export const isValidNameValidator = agileResolver(
+  isRequired,
+  isString,
+  minLength(2),
+  maxLength(10),
+  matchesRegex(/^([^0-9]*)$/, 'No Numbers allowed!')
+);
 
 export const signUpEditor = createMultieditor((editor) => ({
-  data: {
+  initialData: {
     id: 'myCoolId',
     firstName: 'Jeff',
     lastName: '',
     gender: undefined,
     userName: '',
     email: '',
-    aboutYou: '',
     age: undefined,
+    aboutYou: '',
     image: {
       id: generateId(),
       color: generateColor(),
@@ -27,39 +45,53 @@ export const signUpEditor = createMultieditor((editor) => ({
   onSubmit: async (preparedData) => {
     alert(JSON.stringify(preparedData));
   },
-  validateMethods: {
+  validationSchema: {
+    // Outsourced Validator
     firstName: isValidNameValidator,
-    lastName: isValidNameValidator,
+
+    // Validation with Yup
+    lastName: yupResolver(
+      Yup.string()
+        .required()
+        .min(2)
+        .max(10)
+        .matches(/^([^0-9]*)$/, 'No Numbers allowed!')
+    ),
+
+    // Outsourced Validator with additional validation method
     userName: isValidNameValidator
-      .clone()
+      .copy()
       .addValidationMethod(async (key, value, editor) => {
         const isValid = value === 'Jeff';
         if (!isValid)
           editor.setStatus(key, 'error', 'Sry only the name Jeff is allowed!');
         return isValid;
       }),
-    email: editor.Validator().required().string().email(),
-    aboutYou: editor
-      .Validator()
-      .required()
-      .string()
-      .min(10)
+
+    // Validation with Agile
+    email: agileResolver(isRequired, isString, isEmail),
+
+    age: agileResolver(isRequired, isNumber, minNumber(18), maxNumber(100)),
+
+    // Validation with Yup and Agile
+    aboutYou: agileResolver(isRequired)
+      .append(yupResolver(Yup.string().min(10)))
       .addValidationMethod(async (key, value, editor) => {
         const isValid = typeof value === 'string' && !value.includes('fuck');
         if (!isValid)
           editor.setStatus(key, 'error', 'The word fuck is not allowed!');
         return isValid;
       }),
-    age: editor.Validator().required().number().min(18).max(100),
-    gender: editor.Validator().required(),
-    image: editor
-      .Validator()
-      .required()
-      .addValidationMethod(async (key, value, editor) => {
+
+    gender: agileResolver(isRequired),
+
+    image: agileResolver(isRequired).addValidationMethod(
+      async (key, value, editor) => {
         const isValid = isLight(value.color);
         if (!isValid) editor.setStatus(key, 'error', 'The Image is to dark!');
         return isValid;
-      }),
+      }
+    ),
   },
   computeMethods: {
     lastName: (value) => {
@@ -70,8 +102,8 @@ export const signUpEditor = createMultieditor((editor) => ({
     },
   },
   fixedProperties: ['id'],
-  reValidateMode: 'afterFirstSubmit',
+  reValidateMode: 'onChange',
 }));
 
 // For better debugging
-globalBind('__core__', { isValidNameValidator, signUpEditor });
+globalBind('__core__', { signUpEditor });

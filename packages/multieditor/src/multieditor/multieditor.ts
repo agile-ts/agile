@@ -1,12 +1,11 @@
 import {
   Agile,
   ComputeValueMethod,
-  copy,
-  getAgileInstance,
-  LogCodeManager,
   Observer,
-  defineConfig,
+  StateIngestConfigInterface,
+  StateRuntimeJobConfigInterface,
 } from '@agile-ts/core';
+import { defineConfig, copy, removeProperties } from '@agile-ts/utils';
 import { ValidationMethodInterface, Validator } from '../validator';
 import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';
@@ -14,216 +13,222 @@ import { StatusInterface, StatusType } from '../status';
 export class Multieditor<
   DataType = any,
   SubmitReturnType = void,
-  OnSubmitConfigType = any
+  OnSubmitConfigType = Object
 > {
+  // Agile Instance the Multieditor belongs to
   public agileInstance: () => Agile;
 
   public config: EditorConfigInterface;
+
+  // Key/Name identifier of the Multieditor
+  public _key?: EditorKey;
+
   public isModified = false;
   public isValid = false;
   public submitted = false;
+
+  // Item keys of Items to be added to the submit data all the time
   public fixedProperties: ItemKey[] = [];
+  // Item keys of Items that can be edited
   public editableProperties: ItemKey[] = [];
-  public validateMethods: DataObject<
-    ValidationMethodInterface<DataType> | Validator<DataType>
-  > = {};
-  public computeMethods: DataObject<ComputeValueMethod<DataType>> = {};
+
   public onSubmit: (
     preparedData: DataObject<DataType>,
     config?: OnSubmitConfigType
   ) => Promise<SubmitReturnType>;
 
-  public _key?: EditorKey;
-
+  // Items the Multieditor works with
   public data: DataObject<Item<DataType>> = {};
 
   /**
+   * Simple Form Handler.
+   *
    * @public
-   * Editor - A simple From Handler
-   * @param agileInstance - An instance of Agile
-   * @param config - Config
+   * @param agileInstance - Instance of Agile the Multieditor belongs to.
+   * @param config - Configuration object
    */
   constructor(
     config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
-    agileInstance?: Agile
+    agileInstance: Agile
   ) {
-    if (!agileInstance) agileInstance = getAgileInstance(null);
-    if (!agileInstance)
-      LogCodeManager.getLogger()?.error(
-        'No Global agileInstance found! Please pass an agileInstance into the MultiEditor!'
-      );
-    this.agileInstance = () => agileInstance as any;
+    this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
+      key: undefined,
       fixedProperties: [],
-      editableProperties: Object.keys(_config.data),
-      validateMethods: {},
+      editableProperties: Object.keys(_config.initialData),
+      validationSchema: {},
       computeMethods: {},
       reValidateMode: 'onSubmit',
-      validate: 'editable',
+      toValidate: 'editable',
     });
-    this._key = _config?.key;
+    this._key = _config.key;
     this.onSubmit = _config.onSubmit as any;
     this.fixedProperties = _config.fixedProperties as any;
     this.editableProperties = _config.editableProperties as any;
-    this.validateMethods = _config.validateMethods as any;
-    this.computeMethods = _config.computeMethods as any;
     this.config = {
       reValidateMode: _config.reValidateMode as any,
-      validate: _config.validate as any,
+      toValidate: _config.toValidate as any,
     };
 
-    // Add Items to Data Object and validate it for the first Time
-    for (const key in _config.data) {
-      const item = new Item<DataType>(this as any, _config.data[key], key, {
-        canBeEdited: this.editableProperties.includes(key),
-      });
-      this.data[key] = item;
-      item.validate();
-      if (Object.prototype.hasOwnProperty.call(this.computeMethods, key)) {
-        const computeMethod = this.computeMethods[key];
-        item.computeValue(computeMethod);
+    // Format specified validation instances to valid Validators
+    const formattedValidators: { [key: string]: Validator<DataType> } = {};
+    Object.keys(
+      _config.validationSchema as ValidationSchemaType<DataType>
+    ).forEach((key) => {
+      const validationMethod = (_config.validationSchema as ValidationSchemaType<
+        DataType
+      >)[key];
+
+      // If validation schema item is a Validator
+      if (validationMethod instanceof Validator) {
+        if (validationMethod.key == null) validationMethod.key = key;
+        formattedValidators[key] = validationMethod;
       }
+
+      // If validation schema item is a method
+      else {
+        formattedValidators[key] = new Validator<DataType>({
+          key,
+        }).addValidationMethod(validationMethod);
+      }
+    });
+
+    // Instantiate Multieditor Items based on the 'initialData'
+    for (const key in _config.initialData) {
+      const item = new Item<DataType>(this as any, _config.initialData[key], {
+        key,
+        canBeEdited: this.editableProperties.includes(key),
+        validator: formattedValidators[key],
+      });
+      if (Object.prototype.hasOwnProperty.call(_config.computeMethods, key))
+        item.computeValue((_config.computeMethods as any)[key]);
+      this.data[key] = item;
+      item.validate(); // Initial validate
     }
   }
 
   /**
+   * Updates the key/name identifier of the Multieditor.
+   *
    * @public
-   * Set Key/Name of MultiEditor
+   * @param value - New key/name identifier.
    */
   public set key(value: EditorKey | undefined) {
     this._key = value;
   }
 
   /**
+   * Returns the key/name identifier of the Multieditor.
+   *
    * @public
-   * Get Key/Name of MultiEditor
    */
   public get key(): EditorKey | undefined {
     return this._key;
   }
 
   /**
+   * Returns an array of dependencies the Multieditor depends on.
+   *
+   * These returned dependencies can be bound to a UI-Component
+   * the Mutlieditor is used in, to make the Form reactive.
+   *
    * @public
-   * Dependencies of the MultiEditor
    */
   public get deps(): Array<Observer> {
     const deps: Array<Observer> = [];
     for (const key in this.data) {
       const item = this.data[key];
       deps.push(item.observers['value']);
-      deps.push(item.status.observer);
+      deps.push(item.status.observers['value']);
     }
     return deps;
   }
 
-  //=========================================================================================================
-  // Item Dependencies
-  //=========================================================================================================
   /**
+   * Returns an array of dependencies the Item
+   * with the specified key/name identifier depends on.
+   *
    * @public
-   * Dependencies of specific Item
-   * @param key - Key/Name of Item
+   * @param key - Key/Name identifier of the Item.
    */
   public itemDeps(key: ItemKey): Array<Observer> {
     const deps: Array<Observer> = [];
-    const item = this.getItemById(key);
+    const item = this.getItem(key);
     if (item) {
       deps.push(item.observers['value']);
-      deps.push(item.status.observer);
+      deps.push(item.status.observers['value']);
     }
     return deps;
   }
 
-  //=========================================================================================================
-  // Validator
-  //=========================================================================================================
   /**
+   * Assigns a new value to the Item with the specified key/name identifier.
+   *
    * @public
-   * Validator - Create validation Conditions for an Item
-   */
-  public Validator(): Validator<DataType> {
-    return new Validator<DataType>(this as any);
-  }
-
-  //=========================================================================================================
-  // Set Value
-  //=========================================================================================================
-  /**
-   * @public
-   * Assigns new Value to Item at key
-   * @param key - Key/Name of Item
-   * @param value - New Item Value
-   * @param config - Config
+   * @param itemKey - Key/Name identifier of the Item.
+   * @param value - New Item value
+   * @param config - Configuration object
    */
   public setValue(
-    key: ItemKey,
+    itemKey: ItemKey,
     value: DataType,
-    config: SetValueConfigInterface = {}
+    config: StateIngestConfigInterface = {}
   ): this {
-    const item = this.getItemById(key);
-    if (!item) return this;
     config = defineConfig(config, {
-      background: true,
+      background: true, // Because by default the Form should only be re-rendered when the Status updates
     });
 
-    // Apply changes to Item
+    const item = this.getItem(itemKey);
+    if (item == null) return this;
+
+    // Update current value
     item.set(value, config);
 
     return this;
   }
 
-  //=========================================================================================================
-  // Update Initial Value
-  //=========================================================================================================
   /**
+   * Assigns a new initial value to the Item with the specified key/name identifier.
+   *
    * @public
-   * Assigns new initial Value to Item at key
-   * @param key - Key/Name of Item
-   * @param value - New Item initial Value
-   * @param config - Config
+   * @param itemKey - Key/Name identifier of the Item.
+   * @param value - New Item initial value
+   * @param config - Configuration object
    */
-  public updateInitialValue(
-    key: ItemKey,
+  public setInitialValue(
+    itemKey: ItemKey,
     value: DataType,
     config: UpdateInitialValueConfigInterface = {}
   ): this {
-    const item = this.getItemById(key);
-    if (!item) return this;
     config = defineConfig(config, {
-      background: false,
+      background: true, // Because by default the Form should only be re-rendered when the Status updates
       reset: true,
     });
 
-    // Update initial Value
+    const item = this.getItem(itemKey);
+    if (item == null) return this;
+
+    // Update initial value
     item.initialStateValue = copy(value);
 
-    // Reset Item (-> Assign current Value to the new Initial Value)
+    // Reset Item (-> assign initial value to the current value)
     if (config.reset) {
-      item.reset({
-        force: true,
-        background: config.background,
-      });
-    } else {
-      item.ingest({ force: true, background: config.background });
+      item.reset(removeProperties(config, ['reset']));
     }
 
     return this;
   }
 
-  //=========================================================================================================
-  // Submit
-  //=========================================================================================================
   /**
+   * Submits the Multieditor.
+   *
    * @public
-   * Submits Editor
-   * @param config - Config
-   * @return false if MultiEditor is not valid
+   * @param config - Configuration object
    */
   public async submit(
     config: SubmitConfigInterface<OnSubmitConfigType> = {}
   ): Promise<SubmitReturnType | false> {
-    const preparedData: DataObject<DataType> = {};
     config = defineConfig(config, {
       assignToInitial: true,
       onSubmitConfig: undefined,
@@ -233,36 +238,35 @@ export class Multieditor<
     for (const key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
-        item.status.assign({
-          force: true, // Force because value hasn't changed..
-          background: false,
-        });
         item.status.display = true;
+        item.status.ingest({
+          force: true, // Force because the value hasn't changed
+        });
       }
     }
 
     this.submitted = true;
 
-    // Logging
-    // Agile.logger.if
-    //   .tag(['multieditor'])
-    //   .info(`Submit MultiEditor '${this.key}'`, this.isValid);
-
-    // Check if Editor is Valid
+    // Check whether the Multieditor is valid and thus can be submitted
     if (!this.isValid) return false;
 
-    // Add prepared Items to prepared Data
+    // Data to be passed to the 'onSubmit()' method
+    const preparedData: DataObject<DataType> = {};
+
+    // Add Items whose value has been updated to the prepared data
     for (const key in this.data) {
       const item = this.data[key];
       if (item.isSet && item.config.canBeEdited) {
         preparedData[key] = item.value;
-        if (config.assignToInitial) this.updateInitialValue(key, item.value);
+
+        // Assign 'submitted' Item value as initial Item value
+        if (config.assignToInitial) this.setInitialValue(key, item.value);
       }
     }
 
-    // Add fixed Properties(Items) to Prepared Data
+    // Add fixed properties (Items) to the prepared data
     for (const key of this.fixedProperties) {
-      const item = this.getItemById(key);
+      const item = this.getItem(key);
       if (!item) continue;
       preparedData[key] = item.value;
     }
@@ -270,174 +274,158 @@ export class Multieditor<
     return await this.onSubmit(preparedData, config.onSubmitConfig);
   }
 
-  //=========================================================================================================
-  // Reset
-  //=========================================================================================================
   /**
+   * Resets the Multieditor and all its Items.
+   *
    * @public
-   * Resets Editor
    */
   public reset(): this {
     // Reset Items
-    for (const key in this.data) {
-      const item = this.data[key];
-      item.reset();
-    }
+    for (const key in this.data) this.data[key].reset();
 
     // Reset Editor
     this.isModified = false;
     this.submitted = false;
-    this.validate();
+    // this.recomputeValidatedState(); // already recomputed during the reset of the Items
 
     return this;
   }
 
-  //=========================================================================================================
-  // Set Status
-  //=========================================================================================================
   /**
+   * Assigns the specified new Status to the Item with the specified key/name identifier.
+   *
+   * However, if tracking of the particular Status is active,
+   * the value is only tracked (not applied).
+   * If the tracking has been finished the last tracked Status value should be applied to the Status.
+   *
    * @public
-   * Assigns new Status to Item at key
-   * @param key - Key/Name of Item
-   * @param type - Status Type
-   * @param message - Status Message
+   * @param itemKey - Key/Name identifier of the Item.
+   * @param type - Status type
+   * @param message - Status message
    */
-  public setStatus(key: ItemKey, type: StatusType, message: string): this {
-    const item = this.getItemById(key);
-    if (!item) return this;
-    item.status.set({
-      type: type,
-      message: message,
-    });
+  public setStatus(itemKey: ItemKey, type: StatusType, message: string): this {
+    const item = this.getItem(itemKey);
+    if (item == null) return this;
+    item.status.set(
+      {
+        type,
+        message,
+      },
+      { waitForTracking: true }
+    );
     return this;
   }
 
-  //=========================================================================================================
-  // Reset Status
-  //=========================================================================================================
   /**
+   * Resets the Status of the Item with the specified key/name identifier.
+   *
    * @public
-   * Resets Status of Item at key
-   * @param key - Key/Name of Item
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public resetStatus(key: ItemKey): this {
-    const item = this.getItemById(key);
-    if (!item || !item.status) return this;
+  public resetStatus(itemKey: ItemKey): this {
+    const item = this.getItem(itemKey);
+    if (item == null || item.status == null) return this;
     item.status.set(null);
     return this;
   }
 
-  //=========================================================================================================
-  // Get Status
-  //=========================================================================================================
   /**
+   * Retrieves the Status of the Item with the specified key/name identifier.
+   *
+   * If the to retrieve Item doesn't exist, `null` is returned.
+   *
    * @public
-   * Get Status of Item
-   * @param key - Key/Name of Item
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public getStatus(key: ItemKey): StatusInterface | null {
-    const item = this.getItemById(key);
-    if (!item) return null;
-    return item.status.value;
+  public getStatus(itemKey: ItemKey): StatusInterface | null {
+    return this.getItem(itemKey)?.status.value || null;
   }
 
-  //=========================================================================================================
-  // Get Item By Id
-  //=========================================================================================================
   /**
+   * Retrieves a single Item with the specified key/name identifier from the Multieditor.
+   *
+   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   *
    * @public
-   * Get Item by Id
-   * @param key - Key/Name of Item
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemById(key: ItemKey): Item<DataType> | undefined {
-    if (!Object.prototype.hasOwnProperty.call(this.data, key)) {
-      LogCodeManager.getLogger()?.error(
-        `Editor Item '${key}' does not exists!`
-      );
-      return undefined;
-    }
-    return this.data[key];
+  public getItem(itemKey: ItemKey): Item<DataType> | undefined {
+    return this.data[itemKey];
   }
 
-  //=========================================================================================================
-  // Get Value By Id
-  //=========================================================================================================
   /**
+   * Retrieves the initial value of a single Item
+   * with the specified key/name identifier from the Multieditor.
+   *
+   * If the to retrieve Item containing the initial value doesn't exist, `undefined` is returned.
+   *
    * @public
-   * Get Value of Item by Id
-   * @param key - Key/Name of Item that holds the Value
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public getValueById(key: string): DataType | undefined {
-    return this.getItemById(key)?.value;
+  public getItemValue(itemKey: string): DataType | undefined {
+    return this.getItem(itemKey)?.value;
   }
 
-  //=========================================================================================================
-  // Are Modified
-  //=========================================================================================================
   /**
+   * Retrieves the value of a single Item
+   * with the specified key/name identifier from the Multieditor.
+   *
+   * If the to retrieve Item containing the initial value doesn't exist, `undefined` is returned.
+   *
    * @public
-   * Check if Items at Keys are modified
-   * @param keys - Keys/Names of Items
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public areModified(keys: ItemKey[]): boolean {
+  public getItemInitialValue(itemKey: string): DataType | undefined {
+    return this.getItem(itemKey)?.initialStateValue;
+  }
+
+  /**
+   * Returns a boolean indicating whether at least one Item
+   * of the Items with the specified key/name identifiers is modified.
+   *
+   * @public
+   * @param itemKeys - Key/Name identifiers of the Items.
+   */
+  public areModified(itemKeys: ItemKey[]): boolean {
     let _isModified = false;
-    for (const key of keys) {
-      const item = this.getItemById(key);
-      if (!item) continue;
-      _isModified = _isModified || item?.isSet;
+    for (const key of itemKeys) {
+      const item = this.getItem(key);
+      if (item == null) continue;
+      _isModified = _isModified || item.isSet;
     }
     return _isModified;
   }
 
-  //=========================================================================================================
-  // Get Validator
-  //=========================================================================================================
   /**
-   * @internal
-   * Get Validator of Item based on validateMethods
-   * @param key - Key/Name of Item
+   * Recomputes the modified state of the Multieditor
+   * based on its Items modified status.
+   *
+   * @public
    */
-  public getValidator(key: ItemKey): Validator<DataType> {
-    if (Object.prototype.hasOwnProperty.call(this.validateMethods, key)) {
-      const validation = this.validateMethods[key];
-      if (validation instanceof Validator) {
-        if (!validation.key) validation.key = key;
-        return validation;
-      } else {
-        return new Validator<DataType>({
-          key: key,
-        }).addValidationMethod(validation);
-      }
-    }
-    return new Validator<DataType>({ key: key });
-  }
-
-  //=========================================================================================================
-  // Update Is Modified
-  //=========================================================================================================
-  /**
-   * @internal
-   * Updates the isModified property
-   */
-  public updateIsModified(): this {
+  public recomputeModifiedState(): this {
     this.isModified = this.areModified(this.editableProperties);
     return this;
   }
 
-  //=========================================================================================================
-  // Validate
-  //=========================================================================================================
   /**
-   * @internal
-   * Validates Editor and updates its 'isValid' property
+   * Recomputes the validated state of the Multieditor
+   * based on its Items validation status.
+   *
+   * @public
    */
-  public validate(): boolean {
+  public recomputeValidatedState(
+    config: RecomputeValidatedStateMethodConfigInterface = {}
+  ): boolean {
+    config = defineConfig(config, {
+      validate: true,
+    });
     let isValid = true;
 
-    // Check if Items are Valid
+    // Check whether all Items are valid
     for (const key in this.data) {
       const item = this.data[key];
-      if (!item.config.canBeEdited && this.config.validate === 'editable')
+      if (config.validate) item.validate();
+      if (!item.config.canBeEdited && this.config.toValidate === 'editable')
         continue;
       isValid = item.isValid && isValid;
     }
@@ -446,32 +434,39 @@ export class Multieditor<
     return isValid;
   }
 
-  //=========================================================================================================
-  // Can Assign Status To Item On Change
-  //=========================================================================================================
   /**
+   * evalidates the Multieditor.
+   *
+   * @public
+   */
+  public validate(): boolean {
+    return this.recomputeValidatedState({ validate: true });
+  }
+
+  /**
+   * Returns a boolean indication whether the Status of the specified Item
+   * can be updated during a value change of the Item.
+   *
    * @internal
-   * If Status can be assigned on Change
-   * @param item - Item to which the Status should get applied
+   * @param item - Item
    */
   public canAssignStatusToItemOnChange(item: Item): boolean {
     return (
       (this.config.reValidateMode === 'onChange' ||
         (this.config.reValidateMode === 'afterFirstSubmit' &&
           this.submitted)) &&
-      (this.config.validate === 'all' ||
-        (this.config.validate === 'editable' && item.config.canBeEdited) ||
+      (this.config.toValidate === 'all' ||
+        (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
 
-  //=========================================================================================================
-  // Can Assign Status To Item On Submit
-  //=========================================================================================================
   /**
+   * Returns a boolean indication whether the Status of the specified Item
+   * can be updated during the submission of the Multieditor.
+   *
    * @internal
-   * If Status can be assigned on Submit
-   * @param item - Item to which the Status should get applied
+   * @param item - Item
    */
   public canAssignStatusToItemOnSubmit(item: Item): boolean {
     return (
@@ -479,8 +474,8 @@ export class Multieditor<
         (this.config.reValidateMode === 'afterFirstSubmit' &&
           !this.submitted) ||
         (this.config.reValidateMode === 'onChange' && !item.status.display)) &&
-      (this.config.validate === 'all' ||
-        (this.config.validate === 'editable' && item.config.canBeEdited) ||
+      (this.config.toValidate === 'all' ||
+        (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
@@ -490,45 +485,77 @@ export type DataObject<T = any> = { [key: string]: T };
 export type EditorKey = string | number;
 export type ItemKey = string | number;
 
-/**
- * @param data - Data that gets registered
- * @param fixedProperties - Data that will always be passed into the 'onSubmit' Function
- * @param editableProperties - Properties that can be edited
- * @param validateMethods - Methods to validate the Data
- * @param onSubmit - Function that gets called if the Editor gets submitted
- * @param reValidateMode - When the Editor and its Data gets revalidated
- * @param validate - Which Data gets validated
- * @param reValidateMode - When the Editor and its Data gets revalidated
- * @param validate - Which Data gets validated
- */
 export interface CreateEditorConfigInterface<
   DataType = any,
   SubmitReturnType = void,
   onSubmitConfig = any
 > {
+  /**
+   * Key/Name identifier of the Multieditor.
+   * @default undefined
+   */
   key?: string;
-  data: DataObject<DataType>;
+  /**
+   * Initial data of the Multieditor.
+   * @default {}
+   */
+  initialData: DataObject<DataType>;
+  /**
+   * Key/name identifiers of Items whose values
+   * to be always passed to the specified 'onSubmit()' method.
+   * @default []
+   */
   fixedProperties?: string[];
+  /**
+   * Key/Name identifiers of Items that can be edited.
+   * @default Object.keys(config.initialData)
+   */
   editableProperties?: string[];
-  validateMethods?: DataObject<
-    ValidationMethodInterface<DataType> | Validator<DataType>
-  >;
-  computeMethods?: DataObject<ComputeValueMethod<DataType>>;
+  /**
+   * Keymap to assign validation schemas to the individual Items of the Multieditor.
+   * @default {}
+   */
+  validationSchema?: ValidationSchemaType<DataType>;
+  /**
+   * Keymap to assign compute methods to the individual Items of the Multieditor.
+   * @default {}
+   */
+  computeMethods?: { [key: string]: ComputeValueMethod<DataType> };
+  /**
+   * Callback to be called when the Multieditor is submitted.
+   * @default () => {}
+   */
   onSubmit: (
     preparedData: DataObject<DataType>,
     config?: onSubmitConfig
   ) => Promise<SubmitReturnType>;
+  /**
+   * In which circumstances the Multieditor is revalidated.
+   * @default 'onSubmit'
+   */
   reValidateMode?: RevalidationModeType;
-  validate?: ValidateType;
+  /**
+   * What type of data should be revalidated.
+   * @default 'editable'
+   */
+  toValidate?: ValidateType;
 }
 
-/**
- * @param reValidateMode - When the Editor and its Data gets revalidated
- * @param validate - Which Data gets validated
- */
+export type ValidationSchemaType<DataType = any> = {
+  [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
+};
+
 export interface EditorConfigInterface {
+  /**
+   * In which circumstances the Multieditor is revalidated.
+   * @default 'onSubmit'
+   */
   reValidateMode: RevalidationModeType;
-  validate: ValidateType;
+  /**
+   * What type of data should be revalidated.
+   * @default 'editable'
+   */
+  toValidate: ValidateType;
 }
 
 export type EditorConfig<
@@ -545,29 +572,36 @@ export type EditorConfig<
       OnSubmitConfigType
     >);
 
-/**
- * @param background - If assigning a new Item happens in the background (-> not causing any rerender)
- */
-export interface SetValueConfigInterface {
-  background?: boolean;
-}
-
-/**
- * @param assignToInitial - If modified Value gets set to the initial Value of the Item
- * @param onSubmitConfig - Config that gets passed into the onSubmit Function
- */
 export interface SubmitConfigInterface<OnSubmitConfigType = any> {
+  /**
+   * Whether the submitted values should be assigned
+   * as the initial values of the corresponding Items.
+   * @default true
+   */
   assignToInitial?: boolean;
+  /**
+   * Configuration object that is passed into the 'onSubmit()' method.
+   * @default {}
+   */
   onSubmitConfig?: OnSubmitConfigType;
 }
 
-/**
- * @param reset - If Item gets reset -> new Initial Value gets assigned to the Item Value
- * @param background - If setting the new Item initial Value happens in the background (-> not causing any rerender)
- */
-export interface UpdateInitialValueConfigInterface {
+export interface UpdateInitialValueConfigInterface
+  extends StateRuntimeJobConfigInterface {
+  /**
+   * Whether the new initial Item value should be applied to the current Item value.
+   * @default true
+   */
   reset?: boolean;
-  background?: boolean;
+}
+
+export interface RecomputeValidatedStateMethodConfigInterface {
+  /**
+   * Whether all Items should be revalidated
+   * before the validation state of the Multieditor is computed.
+   * @default true
+   */
+  validate?: boolean;
 }
 
 export type RevalidationModeType = 'onChange' | 'onSubmit' | 'afterFirstSubmit';

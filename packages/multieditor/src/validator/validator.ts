@@ -1,232 +1,175 @@
-import {
-  copy,
-  generateId,
-  isFunction,
-  LogCodeManager,
-  defineConfig,
-} from '@agile-ts/core';
-import { DataObject, ItemKey, Multieditor } from '../multieditor';
-import { StringValidator } from './types/string.validator';
-import { NumberValidator } from './types/number.validator';
+import { generateId, isFunction, defineConfig, copy } from '@agile-ts/utils';
+import { ItemKey, Multieditor } from '../multieditor';
+import { Item } from '../item';
+import { LogCodeManager } from '../logCodeManager';
 
 export class Validator<DataType = any> {
-  public _key?: ValidatorKey;
   public config: ValidatorConfigInterface = {};
-  public validationMethods: DataObject<ValidationMethodInterface> = {};
+
+  // Key/Name identifier of the Validator
+  public _key?: ValidatorKey;
+
+  // Methods that a value must pass in order to be 'valid'
+  public validationMethods: ValidationMethodContainerInterface<DataType>[] = [];
 
   /**
+   * Handles the validation of Items.
+   *
    * @public
-   * Validator - Easy way to validate Editor Values
-   * @param config - Config
+   * @param config - Configuration object
    */
   constructor(config: ValidatorConfigInterface = {}) {
-    this.config = defineConfig(config, {
-      prefix: 'default',
+    config = defineConfig(config, {
+      key: generateId(),
     });
-    this._key = this.config.key;
+    this._key = config.key;
   }
 
   /**
+   * Updates the key/name identifier of the Validator.
+   *
    * @public
-   * Set Key/Name of Validator
+   * @param value - New key/name identifier.
    */
   public set key(value: ValidatorKey | undefined) {
     this._key = value;
   }
 
   /**
+   * Returns the key/name identifier of the Validator.
+   *
    * @public
-   * Get Key/Name of Validator
    */
   public get key(): ValidatorKey | undefined {
     return this._key;
   }
 
-  //=========================================================================================================
-  // Validate
-  //=========================================================================================================
   /**
+   * Validates the specified value
+   * and updates the Status of the provided Item.
+   *
    * @public
-   * Validates Item Value at Key and updates its Status
-   * @param key - Key/Name of Item
-   * @param value - Value that gets validated
-   * @param editor - MultiEditor that holds the Item which gets validated
+   * @param item - Item to apply the computed status to.
+   * @param value - Value to be validated.
    */
   public async validate(
-    key: ItemKey,
-    value: DataType,
-    editor: Multieditor<DataType>
+    item: Item<DataType>,
+    value: DataType
   ): Promise<boolean> {
     let isValid = true;
-    const item = editor.getItemById(key);
-    if (!item) return false;
+    if (item == null || item._key == null) return false;
+    const editor = item.editor();
 
-    // Reverse because the first validation Method should have the highest weight (needs to be called as last to overwrite the Status)
-    const validationMethodKeys = Object.keys(this.validationMethods).reverse();
+    // Track updated Statuses during the validation time
+    item.status.statusTracker.track();
 
-    // Track created Statuses during the Validation Time
-    item.status.track = true;
-
-    // Call validationMethods (Validation Time)
-    for (const validationMethodKey of validationMethodKeys)
+    // Call validation methods with the specified value
+    for (const validationMethod of this.validationMethods)
       isValid =
-        (await this.validationMethods[validationMethodKey](
-          key,
-          value,
-          editor
-        )) && isValid;
+        (await validationMethod.method(item._key, value, editor)) && isValid;
 
     // Handle tracked Statuses
-    const foundStatuses = item.status.getTrackedValues();
-    item.status.activeValues = new Set(foundStatuses);
-    if (foundStatuses.size <= 0) editor.resetStatus(key);
+    const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
+    if (trackedStatuses.length > 0)
+      item.status.set(trackedStatuses[trackedStatuses.length - 1]);
+    else editor.resetStatus(item._key);
 
     return isValid;
   }
 
-  //=========================================================================================================
-  // Add Validation Method
-  //=========================================================================================================
   /**
+   * Assigns a new validation method to the Validator.
+   *
    * @public
-   * Adds Validation Method to Validator
-   * @param method - Validation Method
-   */
-  public addValidationMethod(method: ValidationMethodInterface<DataType>): this;
-  /**
-   * @public
-   * Adds Validation Method to Validator
-   * @param key - Key of Validation Method
-   * @param method - Validation Method
+   * @param method - Validation method to be added.
+   * @param config = Configuration object
    */
   public addValidationMethod(
-    key: ItemKey,
-    method: ValidationMethodInterface<DataType>
-  ): this;
-  public addValidationMethod(
-    keyOrMethod: ItemKey | ValidationMethodInterface<DataType>,
-    method?: ValidationMethodInterface<DataType>
+    method: ValidationMethodInterface<DataType>,
+    config: AddValidationMethodConfigInterface = {}
   ): this {
-    const generateKey = isFunction(keyOrMethod);
-    let _method: ValidationMethodInterface<DataType>;
-    let key: ItemKey;
-
-    if (generateKey) {
-      key = generateId();
-      _method = keyOrMethod as ValidationMethodInterface<DataType>;
-    } else {
-      key = keyOrMethod as string;
-      _method = method as ValidationMethodInterface<DataType>;
-    }
-
-    // Check if Validation Method is a Function
-    if (!isFunction(_method)) {
-      LogCodeManager.getLogger()?.error(
-        'A Validation Method has to be a function!'
-      );
+    if (!isFunction(method)) {
+      LogCodeManager.log('41:03:00');
       return this;
     }
-
-    // Check if Validation Method already exists
-    if (this.validationMethods[key]) {
-      LogCodeManager.getLogger()?.error(
-        `Validation Method with the key/name '${key}' already exists!`
-      );
-      return this;
-    }
-
-    this.validationMethods[key] = _method;
+    this.validationMethods.unshift({ key: config.key, method });
     return this;
   }
 
-  //=========================================================================================================
-  // String
-  //=========================================================================================================
   /**
+   * Appends the specified Validator to this Validator.
+   *
    * @public
-   * Get String Validator
+   * @param validator - Validator to be appended to this Validator.
    */
-  public string(): StringValidator<DataType> {
-    return new StringValidator<DataType>(this);
-  }
+  public append(validator: Validator) {
+    if (validator === this) {
+      LogCodeManager.log('41:03:01');
+      return this;
+    }
 
-  //=========================================================================================================
-  // Number
-  //=========================================================================================================
-  /**
-   * @public
-   * Get Number Validator
-   */
-  public number(): NumberValidator<DataType> {
-    return new NumberValidator<DataType>(this);
-  }
+    // Append validation methods to this Validator
+    this.validationMethods.concat(validator.validationMethods);
 
-  //=========================================================================================================
-  // Clone
-  //=========================================================================================================
-  /**
-   * @public
-   * Get a fresh clone of this Validator
-   */
-  public clone(): Validator<DataType> {
-    const clone = new Validator<DataType>();
-    clone.validationMethods = copy(this.validationMethods);
-    clone._key = this._key;
-    clone.config = copy(this.config);
-    return clone;
-  }
-
-  //=========================================================================================================
-  // Required
-  //=========================================================================================================
-  /**
-   * @public
-   * Checks if the Editor Value exists
-   * @param errorMessage - Error Message
-   */
-  public required(errorMessage?: string): this {
-    this.addValidationMethod(
-      this.getValidationMethodKey('required'),
-      async (key: ItemKey, value: DataType, editor) => {
-        const isValid = !!value;
-        if (!isValid) {
-          editor.setStatus(
-            key,
-            'error',
-            errorMessage || `${key} is a required field`
-          );
-        }
-        return isValid;
-      }
-    );
     return this;
   }
 
-  //=========================================================================================================
-  // Get Validation Method Key
-  //=========================================================================================================
   /**
-   * @internal
-   * Creates Validation Method Key from provided key
-   * @param key - Key that gets converted into a Validation Method Key
+   * Returns a fresh reference free copy of this Validator.
+   *
+   * @public
    */
-  public getValidationMethodKey(key: string): string {
-    return `_${this.config.prefix}_${key}`;
+  public copy(): Validator<DataType> {
+    const newValidator = new Validator<DataType>({ key: this._key });
+    newValidator.validationMethods = copy(this.validationMethods);
+    newValidator.config = copy(this.config);
+    return newValidator;
   }
 }
 
 export type ValidatorKey = string | number;
-export type ValidationMethodInterface<DataType = any> = (
-  key: ItemKey,
-  value: DataType,
-  editor: Multieditor<DataType>
-) => Promise<boolean>;
 
-/**
- * @param key - Key/Name of Validator
- * @param prefix - Validation Method Prefix
- */
 export interface ValidatorConfigInterface {
+  /**
+   * Key/Name identifier of the Validator.
+   * @default undefined
+   */
   key?: ValidatorKey;
-  prefix?: string;
 }
+
+export type ValidationMethodInterface<DataType = any> = (
+  /**
+   * Key/Name identifier of the Item whose value to be validated.
+   */
+  toValidateItemKey: ItemKey,
+  /**
+   * Value to be validated.
+   */
+  value: DataType,
+  /**
+   * Multieditor the to validate Item belongs to.
+   */
+  editor: Multieditor<DataType>
+) => Promise<boolean> | boolean;
+
+export interface ValidationMethodContainerInterface<DataType = any> {
+  /**
+   * Key/Name identifier of the validation method.
+   * @default undefined
+   */
+  key?: string;
+  /**
+   * Validation method
+   */
+  method: ValidationMethodInterface<DataType>;
+}
+
+export interface AddValidationMethodConfigInterface {
+  /**
+   * Key/Name identifier of the validation method.
+   * @default undefined
+   */
+  key?: string;
+}
+
+export type ValidationMethodKey = string | number;

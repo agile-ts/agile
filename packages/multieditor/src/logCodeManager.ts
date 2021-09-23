@@ -4,16 +4,14 @@ import {
 } from '@agile-ts/core';
 
 const additionalLogs = {
-  '30:03:00':
-    'Failed to subscribe Component with deps because of missing valid Agile Instance.',
-  '31:03:00':
-    "In order to use the Agile proxy functionality, the installation of an additional package called '@agile-ts/proxytree' is required!",
-  '32:03:00': 'Failed to subscribe Component with deps',
+  // Validator
+  '41:03:00': "A validation method needs to be of the type 'function'!",
+  '41:03:01': "Appending a Validator to itself isn't allowed!",
 };
 
 /**
  * The Log Code Manager keeps track
- * and manages all important Logs for the '@agile-ts/react' package.
+ * and manages all important Logs for the '@agile-ts/multieditor' package.
  *
  * @internal
  */
