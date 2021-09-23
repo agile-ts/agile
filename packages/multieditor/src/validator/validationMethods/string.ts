@@ -11,7 +11,7 @@ export function isString(
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} is no valid String!`
+          errorMessage || `${toValidateItemKey} must be a valid string`
         );
       }
       return isValid;
@@ -33,7 +33,7 @@ export function maxLength(
           toValidateItemKey,
           'error',
           errorMessage ||
-            `${toValidateItemKey} needs at least ${maxLength} characters`
+            `${toValidateItemKey} must be at most ${maxLength} characters`
         );
       }
       return isValid;
@@ -55,7 +55,7 @@ export function minLength(
           toValidateItemKey,
           'error',
           errorMessage ||
-            `${toValidateItemKey} needs at least ${minLength} characters`
+            `${toValidateItemKey} must be at most ${minLength} characters`
         );
       }
       return isValid;
@@ -76,7 +76,7 @@ export function isEmail(
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} is no valid email`
+          errorMessage || `${toValidateItemKey} must be a valid email`
         );
       }
       return isValid;
@@ -95,7 +95,7 @@ export function isUrl(errorMessage?: string): ValidationMethodObjectInterface {
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} is no valid url`
+          errorMessage || `${toValidateItemKey} must be a valid url`
         );
       }
       return isValid;
@@ -116,7 +116,7 @@ export function matchesRegex(
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} doesn't follow defined regex`
+          errorMessage || `${toValidateItemKey} must follow the defined regex`
         );
       }
       return isValid;

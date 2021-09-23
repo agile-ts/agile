@@ -1,5 +1,6 @@
 import {
   Agile,
+  ComputeValueMethod,
   LogCodeManager,
   Observer,
   StateIngestConfigInterface,
@@ -57,6 +58,7 @@ export class Multieditor<
       fixedProperties: [],
       editableProperties: Object.keys(_config.initialData),
       validationSchema: {},
+      computeMethods: {},
       reValidateMode: 'onSubmit',
       validate: 'editable',
     });
@@ -97,17 +99,17 @@ export class Multieditor<
   }
 
   /**
-   * Updates the key/key identifier of the Multieditor.
+   * Updates the key/name identifier of the Multieditor.
    *
    * @public
-   * @param value - New key/key identifier.
+   * @param value - New key/name identifier.
    */
   public set key(value: EditorKey | undefined) {
     this._key = value;
   }
 
   /**
-   * Returns the key/key identifier of the Multieditor.
+   * Returns the key/name identifier of the Multieditor.
    *
    * @public
    */
@@ -135,7 +137,7 @@ export class Multieditor<
   }
 
   /**
-   * Returns an array of dependencies the Item with the specified key/key identifier depends on.
+   * Returns an array of dependencies the Item with the specified key/name identifier depends on.
    *
    * @public
    * @param key - Key/Name identifier of the Item.
@@ -151,7 +153,7 @@ export class Multieditor<
   }
 
   /**
-   * Assigns a new value to the Item with the specified key/key identifier.
+   * Assigns a new value to the Item with the specified key/name identifier.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
@@ -177,7 +179,7 @@ export class Multieditor<
   }
 
   /**
-   * Assigns a new initial value to the Item with the specified key/key identifier.
+   * Assigns a new initial value to the Item with the specified key/name identifier.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
@@ -284,7 +286,7 @@ export class Multieditor<
   }
 
   /**
-   * Assigns the specified new Status to the Item with the specified key/key identifier.
+   * Assigns the specified new Status to the Item with the specified key/name identifier.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
@@ -315,7 +317,7 @@ export class Multieditor<
   }
 
   /**
-   * Retrieves the Status of the Item with the specified key/key identifier.
+   * Retrieves the Status of the Item with the specified key/name identifier.
    *
    * If the to retrieve Item doesn't exist, `null` is returned.
    *
@@ -329,7 +331,7 @@ export class Multieditor<
   }
 
   /**
-   * Retrieves a single Item with the specified key/key identifier from the Multieditor.
+   * Retrieves a single Item with the specified key/name identifier from the Multieditor.
    *
    * If the to retrieve Item doesn't exist, `undefined` is returned.
    *
@@ -347,8 +349,8 @@ export class Multieditor<
   }
 
   /**
-   * Retrieves the value of a single Item
-   * with the specified key/key identifier from the Multieditor.
+   * Retrieves the initial value of a single Item
+   * with the specified key/nname identifier from the Multieditor.
    *
    * If the to retrieve Item containing the value doesn't exist, `undefined` is returned.
    *
@@ -362,8 +364,23 @@ export class Multieditor<
   }
 
   /**
+   * Retrieves the value of a single Item
+   * with the specified key/name identifier from the Multieditor.
+   *
+   * If the to retrieve Item containing the initial value doesn't exist, `undefined` is returned.
+   *
+   * @public
+   * @param itemKey - Key/Name identifier of the Item.
+   */
+  public getItemInitialValue(itemKey: string): DataType | undefined {
+    const item = this.getItem(itemKey);
+    if (item == null) return undefined;
+    return item.initialStateValue;
+  }
+
+  /**
    * Returns a boolean indicating whether at least one Item
-   * of the Items with the specified key/key identifiers is modified.
+   * of the Items with the specified key/name identifiers is modified.
    *
    * @public
    * @param itemKeys - Key/Name identifiers of the Items.
@@ -476,7 +493,7 @@ export interface CreateEditorConfigInterface<
    */
   initialData: DataObject<DataType>;
   /**
-   * Key/key identifiers of Items whose values
+   * Key/name identifiers of Items whose values
    * to be always passed to the specified 'onSubmit()' method.
    * @default []
    */
@@ -493,6 +510,10 @@ export interface CreateEditorConfigInterface<
   validationSchema?: {
     [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
   };
+  /**
+   * TODO
+   */
+  computeMethods?: { [key: string]: ComputeValueMethod<DataType> };
   /**
    * Callback to be called when the Multieditor is submitted.
    * @default () => {}

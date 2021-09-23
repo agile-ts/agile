@@ -11,7 +11,7 @@ export function isNumber(
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} is no valid Number!`
+          errorMessage || `${toValidateItemKey} must be a valid number`
         );
       }
       return isValid;
@@ -33,7 +33,7 @@ export function maxNumber(
           toValidateItemKey,
           'error',
           errorMessage ||
-            `${toValidateItemKey} has to be smaller than ${maxNumber}`
+            `${toValidateItemKey} must be smaller than ${maxNumber}`
         );
       }
       return isValid;
@@ -55,7 +55,7 @@ export function minNumber(
           toValidateItemKey,
           'error',
           errorMessage ||
-            `${toValidateItemKey} has to be smaller than ${minNumber}`
+            `${toValidateItemKey} must be larger than ${minNumber}`
         );
       }
       return isValid;
@@ -75,7 +75,7 @@ export function positiveNumber(
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} has to be positive`
+          errorMessage || `${toValidateItemKey} must be a positive number`
         );
       }
       return isValid;
@@ -95,7 +95,7 @@ export function negativeNumber(
         editor.setStatus(
           toValidateItemKey,
           'error',
-          errorMessage || `${toValidateItemKey} has to be negative`
+          errorMessage || `${toValidateItemKey} must be a negative number`
         );
       }
       return isValid;

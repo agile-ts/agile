@@ -5,31 +5,27 @@ import { useAgile } from '@agile-ts/react';
 import { signUpEditor } from './core/signUpEditor';
 import { generateColor, generateId } from './core/utils';
 
+let renderCount = 0;
+
 const App = () => {
   useAgile(signUpEditor.deps);
+
+  renderCount++;
 
   return (
     <form>
       <h1>Sign Up</h1>
       <label>First Name:</label>
       <input
-        onChange={(e) =>
-          signUpEditor.setValue('firstName', e.target.value, {
-            background: false,
-          })
-        }
-        value={signUpEditor.getItemValue('firstName')}
+        onChange={(e) => signUpEditor.setValue('firstName', e.target.value)}
+        defaultValue={signUpEditor.getItemInitialValue('firstName')}
       />
       <ErrorMessage error={signUpEditor.getStatus('firstName')?.message} />
 
       <label>Last Name:</label>
       <input
-        onChange={(e) =>
-          signUpEditor.setValue('lastName', e.target.value, {
-            background: false,
-          })
-        }
-        value={signUpEditor.getItemValue('lastName')}
+        onChange={(e) => signUpEditor.setValue('lastName', e.target.value)}
+        defaultValue={signUpEditor.getItemInitialValue('lastName')}
       />
       <ErrorMessage error={signUpEditor.getStatus('lastName')?.message} />
 
@@ -75,20 +71,28 @@ const App = () => {
       <label>Username</label>
       <input
         onChange={(e) => signUpEditor.setValue('userName', e.target.value)}
+        defaultValue={signUpEditor.getItemInitialValue('userName')}
       />
       <ErrorMessage error={signUpEditor.getStatus('userName')?.message} />
 
       <label>Email</label>
-      <input onChange={(e) => signUpEditor.setValue('email', e.target.value)} />
+      <input
+        onChange={(e) => signUpEditor.setValue('email', e.target.value)}
+        defaultValue={signUpEditor.getItemInitialValue('email')}
+      />
       <ErrorMessage error={signUpEditor.getStatus('email')?.message} />
 
       <label>Age</label>
-      <input onChange={(e) => signUpEditor.setValue('age', e.target.value)} />
+      <input
+        onChange={(e) => signUpEditor.setValue('age', e.target.value)}
+        defaultValue={signUpEditor.getItemInitialValue('age')}
+      />
       <ErrorMessage error={signUpEditor.getStatus('age')?.message} />
 
       <label>About you</label>
       <textarea
         onChange={(e) => signUpEditor.setValue('aboutYou', e.target.value)}
+        defaultValue={signUpEditor.getItemInitialValue('aboutYou')}
       />
       <ErrorMessage error={signUpEditor.getStatus('aboutYou')?.message} />
 
@@ -103,6 +107,7 @@ const App = () => {
       </button>
       <p>Is Modified: {signUpEditor.isModified.toString()}</p>
       <p>Is Valid: {signUpEditor.isValid.toString()}</p>
+      <p>Render Count: {renderCount}</p>
     </form>
   );
 };
