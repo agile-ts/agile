@@ -3,41 +3,36 @@
 
 
 "@agile-ts/api@file:.yalc/@agile-ts/api":
-  version "0.0.21"
+  version "0.0.23"
   dependencies:
-    "@agile-ts/utils" "^0.0.7"
+    "@agile-ts/utils" "^0.0.9"
 
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.2.0"
+  version "0.2.5"
   dependencies:
-    "@agile-ts/utils" "^0.0.8"
+    "@agile-ts/utils" "^0.0.9"
 
 "@agile-ts/event@file:.yalc/@agile-ts/event":
-  version "0.0.10"
+  version "0.0.12"
 
 "@agile-ts/logger@file:.yalc/@agile-ts/logger":
-  version "0.0.7"
+  version "0.0.9"
   dependencies:
-    "@agile-ts/utils" "^0.0.7"
+    "@agile-ts/utils" "^0.0.9"
 
 "@agile-ts/multieditor@file:.yalc/@agile-ts/multieditor":
-  version "0.0.20"
+  version "0.0.22"
 
 "@agile-ts/proxytree@file:.yalc/@agile-ts/proxytree":
-  version "0.0.5"
+  version "0.0.7"
 
 "@agile-ts/react@file:.yalc/@agile-ts/react":
-  version "0.2.0"
+  version "0.2.1"
 
-"@agile-ts/utils@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.7.tgz#3dd1add6b9f63d0a5bf35e71f54ac46448ae047f"
-  integrity sha512-OviTDC+ZbfyiUx8Gy8veS6YymC/tT6UeP23nT8V0EQV4F2MmuWqZ2yiKk+AYxZx8h74Ey8BVEUX6/ntpxhSNPw==
-
-"@agile-ts/utils@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.8.tgz#ab9e1eeaddf282340936bddeb74421a2f77de804"
-  integrity sha512-ex19gPIS5imgV+rzs5HE2CNAIkQ162hPWH5u3HKNZnHiVU6FX62sikH5tG2oQocbDb7FkeB16D7v9ihQeuKYug==
+"@agile-ts/utils@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.9.tgz#b20d03cc450d1a916bb7d8836c3451cb06cc882c"
+  integrity sha512-M9/QQjX+I5r11MwztfK371/kfInmJS7kLlAKmG8ZkgqG/x8LdCxD7tOTwqMa9Dc1p1ZJqSvNzL/Y8l7boi/3IQ==
 
 "@babel/code-frame@7.8.3":
   version "7.8.3"
@@ -1220,6 +1215,11 @@
   integrity sha512-tAag0jEcjwH+P2quUfipd7liWCNX2F8NvYjQp2wtInsZxnMlypdw0FtAOLxtvvkO+GSRRbmNi8m/5y42PQJYCQ==
   dependencies:
     "@hapi/hoek" "^8.3.0"
+
+"@hookform/resolvers@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-2.8.1.tgz#0d4fdd25bdeb4b98bf4e177c63fc4efa173454dd"
+  integrity sha512-U5lgaCkvD+0e5X8iQmCHiF+jOqjTX6OHUA7zPdeIHI6xdAOoi3rH9MKNuwMwv5Hly2LL6XtDgDkS/k+YG9hOew==
 
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"

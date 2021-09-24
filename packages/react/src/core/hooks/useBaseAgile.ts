@@ -8,8 +8,8 @@ import Agile, {
   SubscriptionContainerKeyType,
   RegisterSubscriptionConfigInterface,
 } from '@agile-ts/core';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { LogCodeManager } from '../logCodeManager';
+import { useIsomorphicLayoutEffect } from '../../general/hooks/useIsomorphicLayoutEffect';
+import { LogCodeManager } from '../../logCodeManager';
 
 /**
  * An internal used React Hook

@@ -5,8 +5,8 @@ import {
   LogCodeManager,
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
-import { Event, EventCallbackFunction } from '../../index';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
+import { Event, EventCallbackFunction } from '@agile-ts/event';
+import { useIsomorphicLayoutEffect } from '../../general';
 
 export function useEvent<E extends Event<any>>(
   event: E,

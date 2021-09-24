@@ -5,25 +5,15 @@ import {
   ProxyWeakMapType,
 } from '@agile-ts/core';
 import { generateId, isValidObject, normalizeArray } from '@agile-ts/utils';
-import {
-  getReturnValue,
-  SubscribableAgileInstancesType,
-  useBaseAgile,
-} from './useBaseAgile';
+import { ProxyTree } from '@agile-ts/proxytree';
 import {
   AgileHookConfigInterface,
   AgileOutputHookArrayType,
   AgileOutputHookType,
-} from './useAgile';
-import { LogCodeManager } from '../logCodeManager';
-
-// TODO https://stackoverflow.com/questions/68148235/require-module-inside-a-function-doesnt-work
-let proxyPackage: any = null;
-try {
-  proxyPackage = require('@agile-ts/proxytree');
-} catch (e) {
-  // empty catch block
-}
+  getReturnValue,
+  SubscribableAgileInstancesType,
+  useBaseAgile,
+} from '../../core';
 
 /**
  * A React Hook for binding the most relevant value of multiple Agile Instances
@@ -95,14 +85,9 @@ export function useProxy<
     // If proxyBased and the value is of the type object.
     // Wrap a Proxy around the object to track the accessed properties.
     if (isValidObject(value, true)) {
-      if (proxyPackage != null) {
-        const { ProxyTree } = proxyPackage;
-        const proxyTree = new ProxyTree(value);
-        proxyTreeWeakMap.set(dep, proxyTree);
-        return proxyTree.proxy;
-      } else {
-        LogCodeManager.log('31:03:00');
-      }
+      const proxyTree = new ProxyTree(value);
+      proxyTreeWeakMap.set(dep, proxyTree);
+      return proxyTree.proxy;
     }
 
     return value;
@@ -123,15 +108,13 @@ export function useProxy<
       // because the 'useIsomorphicLayoutEffect' is called after the rerender.
       // -> All used paths in the UI-Component were successfully tracked.
       let proxyWeakMap: ProxyWeakMapType | undefined = undefined;
-      if (proxyPackage != null) {
-        proxyWeakMap = new WeakMap();
-        for (const observer of observers) {
-          const proxyTree = proxyTreeWeakMap.get(observer);
-          if (proxyTree != null) {
-            proxyWeakMap.set(observer, {
-              paths: proxyTree.getUsedRoutes() as any,
-            });
-          }
+      proxyWeakMap = new WeakMap();
+      for (const observer of observers) {
+        const proxyTree = proxyTreeWeakMap.get(observer);
+        if (proxyTree != null) {
+          proxyWeakMap.set(observer, {
+            paths: proxyTree.getUsedRoutes() as any,
+          });
         }
       }
 
