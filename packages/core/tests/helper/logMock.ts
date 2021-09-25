@@ -1,5 +1,5 @@
 import mockConsole from 'jest-mock-console';
-import { LogCodesArrayType, logCodeManager } from '../../src';
+import { LogCodesArrayType, logCodeManager, logCodeTypes } from '../../src';
 
 type LogTypes = 'log' | 'warn' | 'error';
 
@@ -55,7 +55,7 @@ function hasLoggedCode<
   const codes = logCode.split(':');
   if (codes.length === 3)
     hasLogged(
-      logCodeManager.logCodeLogTypes[codes[1]] as any,
+      logCodeTypes[codes[1]] as any,
       ...[logCodeManager.getLog(logCode, replacers)],
       ...data
     );
@@ -67,7 +67,7 @@ function hasNotLoggedCode<
   const codes = logCode.split(':');
   if (codes.length === 3)
     hasNotLogged(
-      logCodeManager.logCodeLogTypes[codes[1]] as any,
+      logCodeTypes[codes[1]] as any,
       ...[logCodeManager.getLog(logCode, replacers)],
       ...data
     );

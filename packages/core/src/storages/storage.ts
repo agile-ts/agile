@@ -57,15 +57,15 @@ export class Storage {
    */
   public validate(): boolean {
     if (!isFunction(this.methods?.get)) {
-      logCodeManager.log('13:03:00', { tags: ['get'] });
+      logCodeManager.log('13:03:00', { replacers: ['get'] });
       return false;
     }
     if (!isFunction(this.methods?.set)) {
-      logCodeManager.log('13:03:00', { tags: ['set'] });
+      logCodeManager.log('13:03:00', { replacers: ['set'] });
       return false;
     }
     if (!isFunction(this.methods?.remove)) {
-      logCodeManager.log('13:03:00', { tags: ['remove'] });
+      logCodeManager.log('13:03:00', { replacers: ['remove'] });
       return false;
     }
     return true;

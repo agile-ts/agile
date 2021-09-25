@@ -95,7 +95,9 @@ export class Item<ValueType = any> extends State<ValueType> {
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      logCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Compute Value Method', 'function'],
+      });
       return this;
     }
     this.computeValueMethod = method;

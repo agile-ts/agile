@@ -16,7 +16,7 @@ import type { Logger } from '@agile-ts/logger';
 //
 // ---
 // 00:|00|:00 second digits are based on the Log Type
-const logCodeTypes = {
+export const logCodeTypes = {
   '00': 'success',
   '01': 'info',
   '02': 'warn',
@@ -198,7 +198,7 @@ export class LogCodeManager<LogCodeMessagesType = {}> {
    * @param replacers - Instances that replace these '${x}' placeholders based on the index
    * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
    */
-  private getLog<T extends LogCodesArrayType<LogCodeMessagesType>>(
+  public getLog<T extends LogCodesArrayType<LogCodeMessagesType>>(
     logCode: T,
     replacers: any[] = []
   ): string {
