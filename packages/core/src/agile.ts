@@ -1,5 +1,5 @@
 import { defineConfig } from '@agile-ts/utils';
-import { LogCodeManager } from './logCodeManager';
+import { logCodeManager } from './logCodeManager';
 import { globalBind } from './utils';
 import { Runtime, SubController } from './runtime';
 import {
@@ -69,14 +69,14 @@ export class Agile {
     this.runtime = new Runtime(this);
     this.subController = new SubController(this);
 
-    LogCodeManager.log('10:00:00', [], this);
+    logCodeManager.log('10:00:00', {}, this);
 
     // Create a global instance of the Agile Instance.
     // Why? 'getAgileInstance()' returns the global Agile Instance
     // if it couldn't find any Agile Instance in the specified Instance.
     if (config.bindGlobal)
       if (!globalBind(Agile.globalKey, this)) {
-        LogCodeManager.log('10:02:00');
+        logCodeManager.log('10:02:00');
       }
   }
 

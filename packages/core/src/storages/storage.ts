@@ -4,7 +4,7 @@ import {
   isFunction,
   isJsonString,
 } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 
 export class Storage {
   public config: StorageConfigInterface;
@@ -57,15 +57,15 @@ export class Storage {
    */
   public validate(): boolean {
     if (!isFunction(this.methods?.get)) {
-      LogCodeManager.log('13:03:00', ['get']);
+      logCodeManager.log('13:03:00', { tags: ['get'] });
       return false;
     }
     if (!isFunction(this.methods?.set)) {
-      LogCodeManager.log('13:03:00', ['set']);
+      logCodeManager.log('13:03:00', { tags: ['set'] });
       return false;
     }
     if (!isFunction(this.methods?.remove)) {
-      LogCodeManager.log('13:03:00', ['remove']);
+      logCodeManager.log('13:03:00', { tags: ['remove'] });
       return false;
     }
     return true;
@@ -82,16 +82,15 @@ export class Storage {
    */
   public normalGet<GetTpe = any>(key: StorageItemKey): GetTpe | undefined {
     if (!this.ready || !this.methods.get) return undefined;
-    if (isAsyncFunction(this.methods.get)) LogCodeManager.log('13:02:00');
+    if (isAsyncFunction(this.methods.get)) logCodeManager.log('13:02:00');
 
     // Retrieve value
     const res = this.methods.get(this.getStorageKey(key));
     const _res = isJsonString(res) ? JSON.parse(res) : res;
 
-    LogCodeManager.logIfTags(
-      ['storage'],
+    logCodeManager.log(
       '13:01:00',
-      [this.key, this.getStorageKey(key)],
+      { tags: ['storage'], replacers: [this.key, this.getStorageKey(key)] },
       _res
     );
 
@@ -121,10 +120,12 @@ export class Storage {
         .then((res: any) => {
           const _res = isJsonString(res) ? JSON.parse(res) : res;
 
-          LogCodeManager.logIfTags(
-            ['storage'],
+          logCodeManager.log(
             '13:01:00',
-            [this.key, this.getStorageKey(key)],
+            {
+              tags: ['storage'],
+              replacers: [this.key, this.getStorageKey(key)],
+            },
             _res
           );
 
@@ -145,10 +146,10 @@ export class Storage {
   public set(key: StorageItemKey, value: any): void {
     if (!this.ready || !this.methods.set) return;
 
-    LogCodeManager.logIfTags(['storage'], '13:01:01', [
-      this.key,
-      this.getStorageKey(key),
-    ]);
+    logCodeManager.log('13:01:01', {
+      tags: ['storage'],
+      replacers: [this.key, this.getStorageKey(key)],
+    });
 
     this.methods.set(this.getStorageKey(key), JSON.stringify(value));
   }
@@ -163,10 +164,10 @@ export class Storage {
   public remove(key: StorageItemKey): void {
     if (!this.ready || !this.methods.remove) return;
 
-    LogCodeManager.logIfTags(['storage'], '13:01:02', [
-      this.key,
-      this.getStorageKey(key),
-    ]);
+    logCodeManager.log('13:01:02', {
+      tags: ['storage'],
+      replacers: [this.key, this.getStorageKey(key)],
+    });
 
     this.methods.remove(this.getStorageKey(key));
   }

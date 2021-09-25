@@ -3,7 +3,7 @@ import { isFunction, defineConfig } from '@agile-ts/utils';
 import { ItemKey, Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
-import { LogCodeManager } from './logCodeManager';
+import { logCodeManager } from './logCodeManager';
 
 export class Item<ValueType = any> extends State<ValueType> {
   // Multieditor the Item belongs to
@@ -95,7 +95,7 @@ export class Item<ValueType = any> extends State<ValueType> {
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
+      logCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
       return this;
     }
     this.computeValueMethod = method;

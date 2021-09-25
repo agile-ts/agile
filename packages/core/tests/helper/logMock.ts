@@ -1,5 +1,5 @@
 import mockConsole from 'jest-mock-console';
-import { LogCodesArrayType, LogCodeManager } from '../../src';
+import { LogCodesArrayType, logCodeManager } from '../../src';
 
 type LogTypes = 'log' | 'warn' | 'error';
 
@@ -50,25 +50,25 @@ function getLogArguments(type: LoggerTypes, ...data: any[]): any[] {
 }
 
 function hasLoggedCode<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
+  T extends LogCodesArrayType<typeof logCodeManager.logCodeMessages>
 >(logCode: T, replacers: any[] = [], ...data: any[]): void {
   const codes = logCode.split(':');
   if (codes.length === 3)
     hasLogged(
-      LogCodeManager.logCodeLogTypes[codes[1]] as any,
-      ...[LogCodeManager.getLog(logCode, replacers)],
+      logCodeManager.logCodeLogTypes[codes[1]] as any,
+      ...[logCodeManager.getLog(logCode, replacers)],
       ...data
     );
 }
 
 function hasNotLoggedCode<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
+  T extends LogCodesArrayType<typeof logCodeManager.logCodeMessages>
 >(logCode: T, replacers: any[] = [], ...data: any[]) {
   const codes = logCode.split(':');
   if (codes.length === 3)
     hasNotLogged(
-      LogCodeManager.logCodeLogTypes[codes[1]] as any,
-      ...[LogCodeManager.getLog(logCode, replacers)],
+      logCodeManager.logCodeLogTypes[codes[1]] as any,
+      ...[logCodeManager.getLog(logCode, replacers)],
       ...data
     );
 }

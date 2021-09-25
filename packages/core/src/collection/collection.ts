@@ -7,7 +7,7 @@ import {
   normalizeArray,
   removeProperties,
 } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { PatchOptionConfigInterface } from '../state';
 import { ComputedTracker } from '../computed';
@@ -178,7 +178,7 @@ export class Collection<
   ): Group<DataType> {
     if (this.isInstantiated) {
       const key = config.key ?? generateId();
-      LogCodeManager.log('1B:02:00');
+      logCodeManager.log('1B:02:00');
       return this.createGroup(key, initialItems);
     }
 
@@ -206,7 +206,7 @@ export class Collection<
   ): Selector<DataType> {
     if (this.isInstantiated) {
       const key = config.key ?? generateId();
-      LogCodeManager.log('1B:02:01');
+      logCodeManager.log('1B:02:01');
       return this.createSelector(key, initialKey);
     }
 
@@ -385,11 +385,11 @@ export class Collection<
 
     // Check if the given conditions are suitable for a update action
     if (item == null) {
-      LogCodeManager.log('1B:03:00', [itemKey, this._key]);
+      logCodeManager.log('1B:03:00', { replacers: [itemKey, this._key] });
       return undefined;
     }
     if (!isValidObject(changes)) {
-      LogCodeManager.log('1B:03:01', [itemKey, this._key]);
+      logCodeManager.log('1B:03:01', { replacers: [itemKey, this._key] });
       return undefined;
     }
 
@@ -425,7 +425,7 @@ export class Collection<
       // Ensure that the current Item identifier isn't different from the 'changes object' itemKey
       if (changes[this.config.primaryKey] !== itemKey) {
         changes[this.config.primaryKey] = itemKey;
-        LogCodeManager.log('1B:02:02', [], changes);
+        logCodeManager.log('1B:02:02', {}, changes);
       }
 
       item.set(changes as any, {
@@ -450,12 +450,12 @@ export class Collection<
     initialItems: Array<ItemKey> = []
   ): Group<DataType> {
     let group = this.getGroup(groupKey, { notExisting: true });
-    if (!this.isInstantiated) LogCodeManager.log('1B:02:03');
+    if (!this.isInstantiated) logCodeManager.log('1B:02:03');
 
     // Check if Group already exists
     if (group != null) {
       if (!group.isPlaceholder) {
-        LogCodeManager.log('1B:03:02', [groupKey]);
+        logCodeManager.log('1B:03:02', { replacers: [groupKey] });
         return group;
       }
       group.set(initialItems, { overwrite: true });
@@ -601,12 +601,12 @@ export class Collection<
     itemKey: ItemKey | null
   ): Selector<DataType> {
     let selector = this.getSelector(selectorKey, { notExisting: true });
-    if (!this.isInstantiated) LogCodeManager.log('1B:02:04');
+    if (!this.isInstantiated) logCodeManager.log('1B:02:04');
 
     // Check if Selector already exists
     if (selector != null) {
       if (!selector.isPlaceholder) {
-        LogCodeManager.log('1B:03:03', [selectorKey]);
+        logCodeManager.log('1B:03:03', { replacers: [selectorKey] });
         return selector;
       }
       selector.select(itemKey, { overwrite: true });
@@ -1003,7 +1003,9 @@ export class Collection<
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
     if (!isFunction(callback)) {
-      LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['OnLoad Callback', 'function'],
+      });
       return this;
     }
 
@@ -1119,7 +1121,9 @@ export class Collection<
 
     // Check if Item with newItemKey already exists
     if (this.hasItem(newItemKey)) {
-      LogCodeManager.log('1B:03:04', [oldItemKey, newItemKey, this._key]);
+      logCodeManager.log('1B:03:04', {
+        replacers: [oldItemKey, newItemKey, this._key],
+      });
       return false;
     }
 
@@ -1353,14 +1357,14 @@ export class Collection<
     const primaryKey = this.config.primaryKey;
 
     if (!isValidObject(_data)) {
-      LogCodeManager.log('1B:03:05', [this._key]);
+      logCodeManager.log('1B:03:05', { replacers: [this._key] });
       return false;
     }
 
     // Check if data object contains valid itemKey,
     // otherwise add random itemKey to Item
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
-      LogCodeManager.log('1B:02:05', [this._key, primaryKey]);
+      logCodeManager.log('1B:02:05', { replacers: [this._key, primaryKey] });
       _data[primaryKey] = generateId();
     }
 
@@ -1415,7 +1419,7 @@ export class Collection<
     // Check if Item has valid itemKey,
     // otherwise add random itemKey to Item
     if (!Object.prototype.hasOwnProperty.call(item._value, primaryKey)) {
-      LogCodeManager.log('1B:02:05', [this._key, primaryKey]);
+      logCodeManager.log('1B:02:05', { replacers: [this._key, primaryKey] });
       itemKey = generateId();
       item.patch(
         { [this.config.primaryKey]: itemKey },
@@ -1426,7 +1430,9 @@ export class Collection<
 
     // Check if Item belongs to this Collection
     if (item.collection() !== this) {
-      LogCodeManager.log('1B:03:06', [this._key, item.collection()._key]);
+      logCodeManager.log('1B:03:06', {
+        replacers: [this._key, item.collection()._key],
+      });
       return false;
     }
 

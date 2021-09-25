@@ -14,7 +14,7 @@ import {
   useBaseAgile,
 } from '../../core';
 import { proxyPackage } from '../proxyPackage';
-import { LogCodeManager } from '../../logCodeManager';
+import { logCodeManager } from '../../logCodeManager';
 
 /**
  * A React Hook for binding the most relevant value of multiple Agile Instances
@@ -81,7 +81,7 @@ export function useProxy<
 
   // Return if '@agile-ts/proxytree' isn't installed
   if (proxyPackage == null) {
-    LogCodeManager.log('31:03:00');
+    logCodeManager.log('31:03:00');
     return null as any;
   }
 

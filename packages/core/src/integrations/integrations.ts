@@ -1,5 +1,5 @@
 import { defineConfig } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { Integration } from './integration';
 
@@ -83,9 +83,9 @@ export class Integrations {
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
     if (integration._key == null) {
-      LogCodeManager.log(
+      logCodeManager.log(
         '18:03:00',
-        [integration._key, this.agileInstance().key],
+        { replacers: [integration._key, this.agileInstance().key] },
         integration
       );
       return false;
@@ -100,9 +100,9 @@ export class Integrations {
     this.integrations.add(integration);
     integration.integrated = true;
 
-    LogCodeManager.log(
+    logCodeManager.log(
       '18:00:00',
-      [integration._key, this.agileInstance().key],
+      { replacers: [integration._key, this.agileInstance().key] },
       integration
     );
 
@@ -123,7 +123,7 @@ export class Integrations {
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
       if (!integration.ready) {
-        LogCodeManager.log('18:02:00', [integration._key]);
+        logCodeManager.log('18:02:00', { replacers: [integration._key] });
         return;
       }
       if (integration.methods.updateMethod)

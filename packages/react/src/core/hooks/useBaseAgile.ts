@@ -9,7 +9,7 @@ import Agile, {
   RegisterSubscriptionConfigInterface,
 } from '@agile-ts/core';
 import { useIsomorphicLayoutEffect } from '../../general';
-import { LogCodeManager } from '../../logCodeManager';
+import { logCodeManager } from '../../logCodeManager';
 
 /**
  * An internal used React Hook
@@ -46,7 +46,7 @@ export const useBaseAgile = (
     // Try to extract Agile Instance from the specified Instance/s
     if (agileInstance == null) agileInstance = getAgileInstance(observers[0]);
     if (agileInstance == null || agileInstance.subController == null) {
-      LogCodeManager.log('30:03:00', deps);
+      logCodeManager.log('30:03:00', { replacers: deps });
       return;
     }
 

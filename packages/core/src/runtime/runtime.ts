@@ -1,5 +1,5 @@
 import { defineConfig, notEqual } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import {
   SubscriptionContainer,
@@ -73,7 +73,11 @@ export class Runtime {
     // Add specified Job to the queue
     this.jobQueue.push(job);
 
-    LogCodeManager.logIfTags(['runtime'], '16:01:00', [job._key], job);
+    logCodeManager.log(
+      '16:01:00',
+      { tags: ['runtime'], replacers: [job._key] },
+      job
+    );
 
     // Run first Job from the queue
     if (config.perform) {
@@ -110,7 +114,11 @@ export class Runtime {
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 
-    LogCodeManager.logIfTags(['runtime'], '16:01:01', [job._key], job);
+    logCodeManager.log(
+      '16:01:01',
+      { tags: ['runtime'], replacers: [job._key] },
+      job
+    );
 
     // Perform Jobs as long as Jobs are left in the queue.
     // If no Job is left start updating (re-rendering) Subscription Container (UI-Components)
@@ -159,8 +167,9 @@ export class Runtime {
       return false;
 
     // Extract the Subscription Container to be re-rendered from the Jobs
-    const subscriptionContainerToUpdate =
-      this.extractToUpdateSubscriptionContainer(jobsToRerender);
+    const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
+      jobsToRerender
+    );
     if (subscriptionContainerToUpdate.length <= 0) return false;
 
     // Update Subscription Container (trigger re-render on the UI-Component they represent)
@@ -197,15 +206,15 @@ export class Runtime {
           ) {
             job.timesTriedToUpdateCount++;
             this.notReadyJobsToRerender.add(job);
-            LogCodeManager.log(
+            logCodeManager.log(
               '16:02:00',
-              [subscriptionContainer.key],
+              { replacers: [subscriptionContainer.key] },
               subscriptionContainer
             );
           } else {
-            LogCodeManager.log(
+            logCodeManager.log(
               '16:02:01',
-              [job.config.maxTriesToUpdate],
+              { replacers: [job.config.maxTriesToUpdate] },
               subscriptionContainer
             );
           }
@@ -273,10 +282,9 @@ export class Runtime {
       subscriptionContainer.updatedSubscribers.clear();
     }
 
-    LogCodeManager.logIfTags(
-      ['runtime'],
+    logCodeManager.log(
       '16:01:02',
-      [],
+      { tags: ['runtime'] },
       subscriptionsToUpdate
     );
   }

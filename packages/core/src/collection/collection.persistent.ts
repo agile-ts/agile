@@ -1,5 +1,5 @@
 import { defineConfig } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Collection, CollectionKey, DefaultItem, ItemKey } from './collection';
 import { Group, GroupKey } from './group';
 import {
@@ -379,7 +379,7 @@ export class CollectionPersistent<
     collectionKey: CollectionKey | undefined | null
   ): string {
     if (itemKey == null || collectionKey == null)
-      LogCodeManager.log('1A:02:00');
+      logCodeManager.log('1A:02:00');
     if (itemKey == null) itemKey = 'unknown';
     if (collectionKey == null) collectionKey = 'unknown';
     return this.storageItemKeyPattern
@@ -399,7 +399,7 @@ export class CollectionPersistent<
     collectionKey: CollectionKey | undefined | null
   ): string {
     if (groupKey == null || collectionKey == null)
-      LogCodeManager.log('1A:02:01');
+      logCodeManager.log('1A:02:01');
     if (groupKey == null) groupKey = 'unknown';
     if (collectionKey == null) collectionKey = 'unknown';
     return this.storageGroupKeyPattern

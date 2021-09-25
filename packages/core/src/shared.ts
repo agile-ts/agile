@@ -1,5 +1,5 @@
 import { isFunction } from '@agile-ts/utils';
-import { LogCodeManager } from './logCodeManager';
+import { logCodeManager } from './logCodeManager';
 import { Agile } from './agile';
 
 /**
@@ -47,7 +47,7 @@ export function getAgileInstance(instance: any): Agile | undefined {
     // Return global bound Agile Instance
     return globalThis[Agile.globalKey];
   } catch (e) {
-    LogCodeManager.log('20:03:00', [], instance);
+    logCodeManager.log('20:03:00', {}, instance);
   }
 
   return undefined;

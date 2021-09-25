@@ -1,5 +1,5 @@
 import { normalizeArray } from '@agile-ts/utils';
-import { LogCodeManager } from './logCodeManager';
+import { logCodeManager } from './logCodeManager';
 import { Observer } from './runtime';
 
 /**
@@ -184,7 +184,7 @@ export function optionalRequire<PackageType = any>(
     requiredPackage = require(moduleName);
   } catch (e) {
     if (error) {
-      LogCodeManager.log('20:03:02', [moduleName]);
+      logCodeManager.log('20:03:02', { replacers: [moduleName] });
       console.log(e);
     }
   }
@@ -218,7 +218,7 @@ export function globalBind(
       return true;
     }
   } catch (e) {
-    LogCodeManager.log('20:03:01', [key]);
+    logCodeManager.log('20:03:01', { replacers: [key] });
   }
   return false;
 }

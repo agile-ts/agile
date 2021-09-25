@@ -1,5 +1,5 @@
 import { defineConfig, isFunction, removeProperties } from '@agile-ts/utils';
-import { LogCodeManager } from '../../logCodeManager';
+import { logCodeManager } from '../../logCodeManager';
 import { Agile } from '../../agile';
 import {
   SubscriptionContainer,
@@ -163,10 +163,9 @@ export class SubController {
     if (subscriptionInstance instanceof CallbackSubscriptionContainer) {
       unsub(subscriptionInstance);
       this.callbackSubs.delete(subscriptionInstance);
-      LogCodeManager.logIfTags(
-        ['subscription'],
+      logCodeManager.log(
         '15:01:00',
-        [],
+        { tags: ['subscription'] },
         subscriptionInstance
       );
       return;
@@ -176,10 +175,9 @@ export class SubController {
     if (subscriptionInstance instanceof ComponentSubscriptionContainer) {
       unsub(subscriptionInstance);
       this.componentSubs.delete(subscriptionInstance);
-      LogCodeManager.logIfTags(
-        ['subscription'],
+      logCodeManager.log(
         '15:01:01',
-        [],
+        { tags: ['subscription'] },
         subscriptionInstance
       );
       return;
@@ -195,10 +193,9 @@ export class SubController {
         (subContainer) => {
           unsub(subContainer as ComponentSubscriptionContainer);
           this.componentSubs.delete(subContainer);
-          LogCodeManager.logIfTags(
-            ['subscription'],
+          logCodeManager.log(
             '15:01:01',
-            [],
+            { tags: ['subscription'] },
             subscriptionInstance
           );
         }
@@ -248,10 +245,9 @@ export class SubController {
         componentSubscriptionContainer,
       ];
 
-    LogCodeManager.logIfTags(
-      ['subscription'],
+    logCodeManager.log(
       '15:01:02',
-      [],
+      { tags: ['subscription'] },
       componentSubscriptionContainer
     );
 
@@ -280,10 +276,9 @@ export class SubController {
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;
 
-    LogCodeManager.logIfTags(
-      ['subscription'],
+    logCodeManager.log(
       '15:01:03',
-      [],
+      { tags: ['subscription'] },
       callbackSubscriptionContainer
     );
 

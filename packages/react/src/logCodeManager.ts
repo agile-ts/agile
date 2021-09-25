@@ -1,5 +1,5 @@
 import {
-  LogCodeManager as CoreLogCodeManager,
+  logCodeManager as coreLogCodeManager,
   assignAdditionalLogs,
 } from '@agile-ts/core';
 
@@ -19,13 +19,10 @@ const additionalLogs = {
  *
  * @internal
  */
-export const LogCodeManager =
-  process.env.NODE_ENV !== 'production'
-    ? assignAdditionalLogs<
-        typeof CoreLogCodeManager.logCodeMessages & typeof additionalLogs
-      >(CoreLogCodeManager, additionalLogs)
-    : assignAdditionalLogs<
-        typeof CoreLogCodeManager.logCodeMessages & typeof additionalLogs
-      >(CoreLogCodeManager, {});
-
-console.log(LogCodeManager);
+export const logCodeManager = assignAdditionalLogs<
+  typeof coreLogCodeManager.logCodeMessages & typeof additionalLogs,
+  typeof coreLogCodeManager.logCodeMessages
+>(
+  coreLogCodeManager,
+  process.env.NODE_ENV !== 'production' ? additionalLogs : {}
+);

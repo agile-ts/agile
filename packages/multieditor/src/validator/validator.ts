@@ -1,7 +1,7 @@
 import { generateId, isFunction, defineConfig, copy } from '@agile-ts/utils';
 import { ItemKey, Multieditor } from '../multieditor';
 import { Item } from '../item';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 
 export class Validator<DataType = any> {
   public config: ValidatorConfigInterface = {};
@@ -89,7 +89,7 @@ export class Validator<DataType = any> {
     config: AddValidationMethodConfigInterface = {}
   ): this {
     if (!isFunction(method)) {
-      LogCodeManager.log('41:03:00');
+      logCodeManager.log('41:03:00');
       return this;
     }
     this.validationMethods.unshift({ key: config.key, method });
@@ -104,7 +104,7 @@ export class Validator<DataType = any> {
    */
   public append(validator: Validator) {
     if (validator === this) {
-      LogCodeManager.log('41:03:01');
+      logCodeManager.log('41:03:01');
       return this;
     }
 
@@ -171,5 +171,3 @@ export interface AddValidationMethodConfigInterface {
    */
   key?: string;
 }
-
-export type ValidationMethodKey = string | number;

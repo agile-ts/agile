@@ -1,4 +1,5 @@
-import { copy } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
+import type { Logger } from '@agile-ts/logger';
 
 // The Log Code Manager keeps track
 // and manages all important Logs of AgileTs.
@@ -25,8 +26,7 @@ const logCodeTypes = {
 // ---
 // 00:00:|00| third digits are based on the Log Message (ascending counted)
 
-let allowLogging = true;
-const niceLogCodeMessages = {
+const logCodeMessages = {
   // Agile
   '10:00:00': 'Created new AgileInstance.',
   '10:02:00':
@@ -162,99 +162,92 @@ const niceLogCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-// Note: Not outsource the 'production' env check,
-// because then webpack can't treeshake based on the current env
-const logCodeMessages: typeof niceLogCodeMessages =
-  process.env.NODE_ENV !== 'production' ? niceLogCodeMessages : ({} as any);
+export class LogCodeManager<LogCodeMessagesType = {}> {
+  // Keymap of messages tat the LogCodeManager can log
+  public logCodeMessages: LogCodeMessagesType;
+  // Optional '@agile-ts/logger' package
+  public _loggerPackage: any;
+  // Whether the LogCodeManager is allowed to log
+  public allowLogging = true;
 
-/**
- * Specifies whether the LogCodeManager is allowed to print any logs.
- *
- * @internal
- * @param logging - Whether the LogCodeManager is allowed to print any logs.
- */
-function setAllowLogging(logging: boolean) {
-  allowLogging = logging;
-}
-
-/**
- * Returns the log message according to the specified log code.
- *
- * @internal
- * @param logCode - Log code of the message to be returned.
- * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
- */
-function getLog<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
->(logCode: T, replacers: any[] = []): string {
-  let result = LogCodeManager.logCodeMessages[logCode];
-  if (result == null) return logCode;
-
-  // Replace '${x}' with the specified replacer instances
-  for (let i = 0; i < replacers.length; i++) {
-    result = result.replace('${' + i + '}', replacers[i]);
+  /**
+   * Manages logging based on a specified 'logCodeMessages' keymap.
+   *
+   * @param logCodeMessages - Keymap of messages tat the LogCodeManager can log.
+   * @param loggerPackage - Optional '@agile-ts/logger' package to log more advanced logs.
+   */
+  constructor(logCodeMessages: LogCodeMessagesType, loggerPackage?: any) {
+    this.logCodeMessages = logCodeMessages;
+    this._loggerPackage = loggerPackage;
   }
 
-  return result;
-}
-
-/**
- * Logs the log message according to the specified log code
- * with the Agile Logger if installed or the normal console.
- *
- * @internal
- * @param logCode - Log code of the message to be returned.
- * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
- * @param data - Data to be attached to the end of the log message.
- */
-function log<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
->(logCode: T, replacers: any[] = [], ...data: any[]): void {
-  const logger = LogCodeManager.getLogger();
-  if ((logger != null && !logger.isActive) || !allowLogging) return;
-  const logType = logCodeTypes[logCode.substr(3, 2)];
-  if (typeof logType !== 'string') return;
-
-  // Handle logging without Logger
-  if (logger == null) {
-    if (logType === 'error' || logType === 'warn')
-      console[logType](`Agile: ${getLog(logCode, replacers)}`);
-    return;
+  /**
+   * Retrieves the shared Logger from the specified 'loggerPackage'.
+   *
+   * @public
+   */
+  public get logger(): Logger | null {
+    return this._loggerPackage?.sharedLogger || null;
   }
 
-  // Handle logging with Logger
-  logger[logType](getLog(logCode, replacers), ...data);
-}
+  /**
+   * Returns the log message according to the specified log code.
+   *
+   * @internal
+   * @param logCode - Log code of the message to be returned.
+   * @param replacers - Instances that replace these '${x}' placeholders based on the index
+   * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
+   */
+  private getLog<T extends LogCodesArrayType<LogCodeMessagesType>>(
+    logCode: T,
+    replacers: any[] = []
+  ): string {
+    let result = this.logCodeMessages[logCode] as any;
+    if (result == null) return logCode;
 
-/**
- * Logs the log message according to the specified log code
- * with the Agile Logger if installed and the provided tags are active.
- *
- * @internal
- * @param tags - Tags to be active to log the logCode.
- * @param logCode - Log code of the message to be returned.
- * @param replacers - Instances that replace these '${x}' placeholders based on the index
- * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
- * @param data - Data to be attached to the end of the log message.
- */
-function logIfTags<
-  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
->(tags: string[], logCode: T, replacers: any[] = [], ...data: any[]): void {
-  const logger = LogCodeManager.getLogger();
-  if ((logger != null && !logger.isActive) || !allowLogging) return;
-  const logType = LogCodeManager.logCodeLogTypes[logCode.substr(3, 2)];
-  if (typeof logType !== 'string') return;
+    // Replace '${x}' with the specified replacer instances
+    for (let i = 0; i < replacers.length; i++) {
+      result = result.replace('${' + i + '}', replacers[i]);
+    }
 
-  // Handle logging without Logger
-  if (logger == null) {
-    // Log nothing since if a log has a tag it is probably not so important
-    return;
+    return result;
   }
 
-  // Handle logging with Logger
-  logger.if.tag(tags)[logType](getLog(logCode, replacers), ...data);
+  /**
+   * Logs the log message according to the specified log code
+   * with the Agile Logger if installed or the normal console.
+   *
+   * @internal
+   * @param logCode - Log code of the message to be returned.
+   * @param config - Configuration object
+   * @param data - Data to be attached to the end of the log message.
+   */
+  public log<T extends LogCodesArrayType<LogCodeMessagesType>>(
+    logCode: T,
+    config: LogConfigInterface = {},
+    ...data: any[]
+  ): void {
+    if ((this.logger != null && !this.logger.isActive) || !this.allowLogging)
+      return;
+    config = defineConfig(config, {
+      replacers: [],
+      tags: [],
+    });
+    const logType = logCodeTypes[logCode.substr(3, 2)];
+    if (typeof logType !== 'string') return;
+
+    // Handle logging without Logger
+    if (this.logger == null) {
+      if (logType === 'error' || logType === 'warn')
+        console[logType](`Agile: ${this.getLog(logCode, config.replacers)}`);
+      return;
+    }
+
+    // Handle logging with Logger
+    const log = this.getLog(logCode, config.replacers);
+    if (config.tags?.length === 0) this.logger[logType](log, ...data);
+    else this.logger.if.tag(config.tags as any)[logType](log, ...data);
+  }
 }
 
 /**
@@ -264,22 +257,22 @@ function logIfTags<
  * @param logCodeManager - LogCodeManager to create an extension from.
  * @param additionalLogs - Log messages to be added to the LogCodeManager.
  */
-export function assignAdditionalLogs<
-  NewLogCodeMessages,
-  OldLogCodeMessages = typeof LogCodeManager.logCodeMessages
->(
-  logCodeManager: LogCodeManagerInterface<OldLogCodeMessages>,
+export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
+  logCodeManager: LogCodeManager<OldLogCodeMessages>,
   additionalLogs: { [key: string]: string }
-): LogCodeManagerInterface<NewLogCodeMessages> {
-  const copiedLogCodeManager = copy(logCodeManager);
-  copiedLogCodeManager.logCodeMessages = {
-    ...copiedLogCodeManager.logCodeMessages,
-    ...additionalLogs,
-  } as any;
+): LogCodeManager<NewLogCodeMessages> {
+  const copiedLogCodeManager = new LogCodeManager(
+    {
+      ...logCodeManager.logCodeMessages,
+      ...additionalLogs,
+    },
+    logCodeManager._loggerPackage
+  );
   return copiedLogCodeManager as any;
 }
 
-let tempLogCodeManager: LogCodeManagerInterface<typeof logCodeMessages>;
+// Instantiate LogCodeManager based on the current environment
+let tempLogCodeManager: LogCodeManager<typeof logCodeMessages>;
 if (process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {
@@ -287,33 +280,9 @@ if (process.env.NODE_ENV !== 'production') {
   } catch (e) {
     // empty catch block
   }
-
-  tempLogCodeManager = {
-    getLog,
-    log,
-    logCodeLogTypes: logCodeTypes,
-    logCodeMessages: logCodeMessages,
-    getLogger: () => {
-      return loggerPackage?.sharedLogger || null;
-    },
-    logIfTags,
-    setAllowLogging,
-  };
+  tempLogCodeManager = new LogCodeManager(logCodeMessages, loggerPackage);
 } else {
-  tempLogCodeManager = {
-    // Log only logCode
-    getLog: (logCode, replacers) => logCode,
-    log,
-    logCodeLogTypes: logCodeTypes,
-    logCodeMessages: {} as any,
-    getLogger: () => {
-      return null;
-    },
-    logIfTags: (tags, logCode, replacers) => {
-      /* empty because logs with tags can't be that important */
-    },
-    setAllowLogging,
-  };
+  tempLogCodeManager = new LogCodeManager({} as any, null);
 }
 
 /**
@@ -322,28 +291,23 @@ if (process.env.NODE_ENV !== 'production') {
  *
  * @internal
  */
-export const LogCodeManager = tempLogCodeManager;
+export { tempLogCodeManager as logCodeManager };
 
 export type LogCodesArrayType<T> = {
   [K in keyof T]: T[K] extends string ? K : never;
 }[keyof T] &
   string;
 
-export interface LogCodeManagerInterface<T = typeof logCodeMessages> {
-  getLog: (logCode: LogCodesArrayType<T>, replacers?: any[]) => string;
-  log: (
-    logCode: LogCodesArrayType<T>,
-    replacers?: any[],
-    ...data: any[]
-  ) => void;
-  logCodeLogTypes: typeof logCodeTypes;
-  logCodeMessages: T;
-  getLogger: () => any;
-  logIfTags: (
-    tags: string[],
-    logCode: LogCodesArrayType<T>,
-    replacers?: any[],
-    ...data: any[]
-  ) => void;
-  setAllowLogging: (logging: boolean) => void;
+interface LogConfigInterface {
+  /**
+   * Instances that replace these '${x}' placeholders based on the index
+   * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
+   * @default []
+   */
+  replacers?: any[];
+  /**
+   * Tags that need to be active in order to log the specified logCode.
+   * @default []
+   */
+  tags?: string[];
 }
