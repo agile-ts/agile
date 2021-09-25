@@ -7,10 +7,12 @@ const additionalLogs = {
   '30:03:00':
     'Failed to subscribe Component with deps because of missing valid Agile Instance.',
   '31:03:00':
-    "In order to use the Agile proxy functionality, the installation of an additional package called '@agile-ts/proxytree' is required!",
+    "In order to use the Agile Proxy functionality, the installation of an additional package called '@agile-ts/proxytree' is required!",
   '32:03:00': 'Failed to subscribe Component with deps',
   '33:03:00':
-    "In order to use the Agile event functionality, the installation of an additional package called '@agile-ts/event' is required!",
+    "In order to use the Agile Event functionality, the installation of an additional package called '@agile-ts/event' is required!",
+  '34:03:00':
+    "In order to use the Agile Multieditor functionality, the installation of an additional package called '@agile-ts/multieditor' is required!",
 };
 
 /**

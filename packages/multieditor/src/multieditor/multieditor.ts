@@ -332,7 +332,7 @@ export class Multieditor<
   /**
    * Retrieves the Status of the Item with the specified key/name identifier.
    *
-   * If the to retrieve Item doesn't exist, `null` is returned.
+   * If the to retrieve Status doesn't exist, `null` is returned.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
