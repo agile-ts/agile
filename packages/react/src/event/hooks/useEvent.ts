@@ -2,11 +2,12 @@ import React from 'react';
 import {
   Agile,
   getAgileInstance,
-  LogCodeManager,
   SubscriptionContainerKeyType,
 } from '@agile-ts/core';
-import { Event, EventCallbackFunction } from '@agile-ts/event';
+import type { Event, EventCallbackFunction } from '@agile-ts/event'; // When only importing the types the "Can't resolve '@agile-ts/event'" error doesn't occur
 import { useIsomorphicLayoutEffect } from '../../general';
+import { eventPackage } from '../eventPackage';
+import { LogCodeManager } from '../../logCodeManager';
 
 export function useEvent<E extends Event<any>>(
   event: E,
@@ -14,6 +15,12 @@ export function useEvent<E extends Event<any>>(
   key?: SubscriptionContainerKeyType,
   agileInstance?: Agile
 ): void {
+  // Return if '@agile-ts/event' isn't installed
+  if (eventPackage == null) {
+    LogCodeManager.log('33:03:00');
+    return;
+  }
+
   // Trigger State used to force Component to rerender
   const [, forceRender] = React.useReducer((s) => s + 1, 0);
 

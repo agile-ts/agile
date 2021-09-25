@@ -5,7 +5,6 @@ import {
   ProxyWeakMapType,
 } from '@agile-ts/core';
 import { generateId, isValidObject, normalizeArray } from '@agile-ts/utils';
-import { ProxyTree } from '@agile-ts/proxytree';
 import {
   AgileHookConfigInterface,
   AgileOutputHookArrayType,
@@ -14,6 +13,8 @@ import {
   SubscribableAgileInstancesType,
   useBaseAgile,
 } from '../../core';
+import { proxyPackage } from '../proxyPackage';
+import { LogCodeManager } from '../../logCodeManager';
 
 /**
  * A React Hook for binding the most relevant value of multiple Agile Instances
@@ -78,6 +79,12 @@ export function useProxy<
   const depsArray = extractRelevantObservers(normalizeArray(deps));
   const proxyTreeWeakMap = new WeakMap();
 
+  // Return if '@agile-ts/proxytree' isn't installed
+  if (proxyPackage == null) {
+    LogCodeManager.log('31:03:00');
+    return null as any;
+  }
+
   const handleReturn = (dep: Observer | undefined) => {
     if (dep == null) return undefined as any;
     const value = dep.value;
@@ -85,7 +92,7 @@ export function useProxy<
     // If proxyBased and the value is of the type object.
     // Wrap a Proxy around the object to track the accessed properties.
     if (isValidObject(value, true)) {
-      const proxyTree = new ProxyTree(value);
+      const proxyTree = new proxyPackage.ProxyTree(value);
       proxyTreeWeakMap.set(dep, proxyTree);
       return proxyTree.proxy;
     }

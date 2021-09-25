@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import { useAgile, useWatcher, useSelector } from '@agile-ts/react';
-import { useProxy } from '@agile-ts/react/proxy';
+import { useProxy } from '@agile-ts/react';
 import {
   COUNTUP,
   externalCreatedItem,

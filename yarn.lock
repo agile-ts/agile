@@ -3,23 +3,17 @@
 
 
 "@agile-ts/core@file:packages/core":
-  version "0.2.5"
+  version "0.2.6"
   dependencies:
-    "@agile-ts/utils" "^0.0.9"
-
-"@agile-ts/event@file:packages/event":
-  version "0.0.12"
+    "@agile-ts/utils" "^0.0.10"
 
 "@agile-ts/logger@file:packages/logger":
-  version "0.0.9"
+  version "0.0.10"
   dependencies:
-    "@agile-ts/utils" "^0.0.9"
-
-"@agile-ts/multieditor@file:packages/multieditor":
-  version "0.0.22"
+    "@agile-ts/utils" "^0.0.10"
 
 "@agile-ts/proxytree@file:packages/proxytree":
-  version "0.0.7"
+  version "0.0.8"
 
 "@akryum/winattr@^3.0.0":
   version "3.0.0"
@@ -4598,7 +4592,7 @@
     "@types/scheduler" "*"
     csstype "^3.0.2"
 
-"@types/react@^17.0.24":
+"@types/react@^17.0.21":
   version "17.0.24"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.24.tgz#7e1b3f78d0fc53782543f9bce6d949959a5880bd"
   integrity sha512-eIpyco99gTH+FTI3J7Oi/OH8MZoFMJuztNRimDOJwH4iGIsKV2qkGnk4M9VzlaVWeEEWLWSQRy0FEA0Kz218cg==

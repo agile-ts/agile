@@ -19,7 +19,7 @@ export const LogCodeManager =
   process.env.NODE_ENV !== 'production'
     ? assignAdditionalLogs<
         typeof CoreLogCodeManager.logCodeMessages & typeof additionalLogs
-      >(additionalLogs, CoreLogCodeManager)
+      >(CoreLogCodeManager, additionalLogs)
     : assignAdditionalLogs<
         typeof CoreLogCodeManager.logCodeMessages & typeof additionalLogs
-      >({}, CoreLogCodeManager);
+      >(CoreLogCodeManager, {});

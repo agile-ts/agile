@@ -185,11 +185,10 @@ function setAllowLogging(logging: boolean) {
  * @param replacers - Instances that replace these '${x}' placeholders based on the index
  * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
  */
-function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
-  logCode: T,
-  replacers: any[] = []
-): string {
-  let result = logCodeMessages[logCode];
+function getLog<
+  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
+>(logCode: T, replacers: any[] = []): string {
+  let result = LogCodeManager.logCodeMessages[logCode];
   if (result == null) return logCode;
 
   // Replace '${x}' with the specified replacer instances
@@ -210,11 +209,9 @@ function getLog<T extends LogCodesArrayType<typeof logCodeMessages>>(
  * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
  * @param data - Data to be attached to the end of the log message.
  */
-function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
-  logCode: T,
-  replacers: any[] = [],
-  ...data: any[]
-): void {
+function log<
+  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
+>(logCode: T, replacers: any[] = [], ...data: any[]): void {
   const logger = LogCodeManager.getLogger();
   if ((logger != null && !logger.isActive) || !allowLogging) return;
   const logType = logCodeTypes[logCode.substr(3, 2)];
@@ -242,15 +239,12 @@ function log<T extends LogCodesArrayType<typeof logCodeMessages>>(
  * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
  * @param data - Data to be attached to the end of the log message.
  */
-function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
-  tags: string[],
-  logCode: T,
-  replacers: any[] = [],
-  ...data: any[]
-): void {
+function logIfTags<
+  T extends LogCodesArrayType<typeof LogCodeManager.logCodeMessages>
+>(tags: string[], logCode: T, replacers: any[] = [], ...data: any[]): void {
   const logger = LogCodeManager.getLogger();
   if ((logger != null && !logger.isActive) || !allowLogging) return;
-  const logType = logCodeTypes[logCode.substr(3, 2)];
+  const logType = LogCodeManager.logCodeLogTypes[logCode.substr(3, 2)];
   if (typeof logType !== 'string') return;
 
   // Handle logging without Logger
@@ -267,15 +261,15 @@ function logIfTags<T extends LogCodesArrayType<typeof logCodeMessages>>(
  * Creates an extension of the specified LogCodeManager
  * and assigns the provided additional log messages to it.
  *
- * @param additionalLogs - Log messages to be added to the LogCodeManager.
  * @param logCodeManager - LogCodeManager to create an extension from.
+ * @param additionalLogs - Log messages to be added to the LogCodeManager.
  */
 export function assignAdditionalLogs<
   NewLogCodeMessages,
-  OldLogCodeMessages = typeof logCodeMessages
+  OldLogCodeMessages = typeof LogCodeManager.logCodeMessages
 >(
-  additionalLogs: { [key: string]: string },
-  logCodeManager: LogCodeManagerInterface<OldLogCodeMessages>
+  logCodeManager: LogCodeManagerInterface<OldLogCodeMessages>,
+  additionalLogs: { [key: string]: string }
 ): LogCodeManagerInterface<NewLogCodeMessages> {
   const copiedLogCodeManager = copy(logCodeManager);
   copiedLogCodeManager.logCodeMessages = {

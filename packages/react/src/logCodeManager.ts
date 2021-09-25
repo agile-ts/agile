@@ -9,6 +9,8 @@ const additionalLogs = {
   '31:03:00':
     "In order to use the Agile proxy functionality, the installation of an additional package called '@agile-ts/proxytree' is required!",
   '32:03:00': 'Failed to subscribe Component with deps',
+  '33:03:00':
+    "In order to use the Agile event functionality, the installation of an additional package called '@agile-ts/event' is required!",
 };
 
 /**
@@ -21,7 +23,9 @@ export const LogCodeManager =
   process.env.NODE_ENV !== 'production'
     ? assignAdditionalLogs<
         typeof CoreLogCodeManager.logCodeMessages & typeof additionalLogs
-      >(additionalLogs, CoreLogCodeManager)
+      >(CoreLogCodeManager, additionalLogs)
     : assignAdditionalLogs<
         typeof CoreLogCodeManager.logCodeMessages & typeof additionalLogs
-      >({}, CoreLogCodeManager);
+      >(CoreLogCodeManager, {});
+
+console.log(LogCodeManager);
