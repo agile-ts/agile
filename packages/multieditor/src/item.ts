@@ -32,7 +32,7 @@ export class Item<ValueType = any> extends State<ValueType> {
   constructor(
     editor: Multieditor,
     initialValue: ValueType,
-    config: ItemConfigInterface
+    config: ItemConfigInterface<ValueType>
   ) {
     super(editor.agileInstance(), initialValue, {
       key: config.key,
@@ -110,7 +110,7 @@ export class Item<ValueType = any> extends State<ValueType> {
   }
 }
 
-export interface ItemConfigInterface {
+export interface ItemConfigInterface<ValueType = any> {
   /**
    * Key/Name identifier of the Item.
    */
@@ -125,7 +125,7 @@ export interface ItemConfigInterface {
    * Validator to handle validating the Item.
    * @default newly create Validator
    */
-  validator?: Validator;
+  validator?: Validator<ValueType>;
 }
 
 export type ComputeValueMethod<T = any> = (value: T) => T;

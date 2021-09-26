@@ -38,7 +38,7 @@ export class Multieditor<
   ) => Promise<SubmitReturnType>;
 
   // Items the Multieditor works with
-  public data: { [key: string]: any } = {};
+  public data: { [key: string]: Item } = {};
 
   /**
    * Simple Form Handler.
@@ -363,7 +363,7 @@ export class Multieditor<
   public getItem(
     itemKey: DataObjectKeysArrayType<DataObjectType>
   ): Item | undefined {
-    return this.data[itemKey as any];
+    return this.data[itemKey];
   }
 
   /**
