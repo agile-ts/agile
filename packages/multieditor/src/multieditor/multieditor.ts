@@ -238,7 +238,7 @@ export class Multieditor<
     for (const key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
-        item.status.display = true;
+        item.status.config.display = true;
         item.status.ingest({
           force: true, // Force because the value hasn't changed
         });
@@ -473,7 +473,8 @@ export class Multieditor<
       (this.config.reValidateMode === 'onSubmit' ||
         (this.config.reValidateMode === 'afterFirstSubmit' &&
           !this.submitted) ||
-        (this.config.reValidateMode === 'onChange' && !item.status.display)) &&
+        (this.config.reValidateMode === 'onChange' &&
+          !item.status.config.display)) &&
       (this.config.toValidate === 'all' ||
         (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)

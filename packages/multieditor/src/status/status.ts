@@ -4,25 +4,34 @@ import { Item } from '../item';
 import { StatusTracker } from './status.tracker';
 
 export class Status<DataType = any> extends State<StatusValueType> {
+  config: StatusConfigInterface;
+
   // Item the Status belongs to
   public item: Item<DataType>;
 
-  // Whether the Status should be displayed or stay hidden (in the UI)
-  public display = false;
-
   // Helper Class for automatic tracking set Statuses in validation methods
   public statusTracker: StatusTracker;
+
+  // Represents all tracked Status values of the last validation
+  public lastTrackedValues: StatusValueType[] = [];
 
   /**
    * Represents the current status of the specified Item.
    *
    * @public
    * @param item - Item the Status belongs to.
+   * @param config - Configuration object
    */
-  constructor(item: Item<DataType>) {
+  constructor(item: Item<DataType>, config: CreateStatusConfigInterface = {}) {
+    config = defineConfig(config, {
+      display: false,
+    });
     super(item.agileInstance(), null, { key: `status_${item._key}` });
     this.item = item;
     this.statusTracker = new StatusTracker();
+    this.config = {
+      display: config.display as any,
+    };
   }
 
   /**
@@ -32,7 +41,7 @@ export class Status<DataType = any> extends State<StatusValueType> {
    * @public
    */
   public get value(): StatusValueType {
-    return this.display ? copy(this._value) : null;
+    return this.config.display ? copy(this._value) : null;
   }
 
   /**
@@ -46,6 +55,10 @@ export class Status<DataType = any> extends State<StatusValueType> {
   public set(value: StatusValueType, config: StatusSetInterface = {}): this {
     config = defineConfig(config, {
       waitForTracking: false,
+      background:
+        this.config != null // Because on the initial set (when calling '.super') the Config isn't set
+          ? !this.config.display
+          : undefined,
     });
     if (value != null) this.statusTracker.tracked(value);
 
@@ -53,11 +66,7 @@ export class Status<DataType = any> extends State<StatusValueType> {
     if (config.waitForTracking && this.statusTracker.isTracking) return this;
 
     // Ingest the Status with the new value into the runtime
-    if (
-      this.item == null || // Because on the initial set (when calling '.super') the Item isn't set
-      this.item.editor().canAssignStatusToItemOnChange(this.item)
-    )
-      this.observers['value'].ingestValue(value, config);
+    this.observers['value'].ingestValue(value, config);
 
     return this;
   }
@@ -86,4 +95,20 @@ export interface StatusSetInterface extends StateIngestConfigInterface {
    * @default false
    */
   waitForTracking?: boolean;
+}
+
+export interface StatusConfigInterface {
+  /**
+   * Whether the Status should be displayed or stay hidden (in the UI).
+   * @default false
+   */
+  display: boolean;
+}
+
+export interface CreateStatusConfigInterface {
+  /**
+   * Whether the Status should be displayed or stay hidden (in the UI).
+   * @default false
+   */
+  display?: boolean;
 }

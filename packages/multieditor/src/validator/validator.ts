@@ -70,9 +70,10 @@ export class Validator<DataType = any> {
 
     // Handle tracked Statuses
     const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
-    if (trackedStatuses.length > 0)
-      item.status.set(trackedStatuses[trackedStatuses.length - 1]);
-    else editor.resetStatus(item._key);
+    if (trackedStatuses.length > 0) {
+      item.status.set(trackedStatuses[0]);
+      item.status.lastTrackedValues = copy(trackedStatuses);
+    } else editor.resetStatus(item._key);
 
     return isValid;
   }
@@ -92,7 +93,7 @@ export class Validator<DataType = any> {
       logCodeManager.log('41:03:00');
       return this;
     }
-    this.validationMethods.unshift({ key: config.key, method });
+    this.validationMethods.push({ key: config.key, method });
     return this;
   }
 
@@ -109,7 +110,9 @@ export class Validator<DataType = any> {
     }
 
     // Append validation methods to this Validator
-    this.validationMethods.concat(validator.validationMethods);
+    this.validationMethods = this.validationMethods.concat(
+      validator.validationMethods
+    );
 
     return this;
   }

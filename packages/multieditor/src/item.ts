@@ -48,10 +48,10 @@ export class Item<ValueType = any> extends State<ValueType> {
 
     // Add side effect to revalidate the Item on every Item value change
     this.addSideEffect('validateItem', async () => {
-      await this.validate();
-
       if (this.editor().canAssignStatusToItemOnChange(this))
-        this.status.display = true;
+        this.status.config.display = true;
+
+      await this.validate();
 
       // Recompute Multieditor states
       this.editor().recomputeValidatedState({ validate: false });
@@ -79,7 +79,7 @@ export class Item<ValueType = any> extends State<ValueType> {
    */
   public reset(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
-    this.status.display = false;
+    this.status.config.display = false;
     return this;
   }
 
