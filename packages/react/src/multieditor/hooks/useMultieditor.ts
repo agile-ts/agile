@@ -11,20 +11,12 @@ import { logCodeManager } from '../../logCodeManager';
 import { multieditorPackage } from '../multieditorPackage';
 import { DataObjectKeysArrayType, Item } from '@agile-ts/multieditor';
 
-export function useMultieditor<
-  DataObjectType extends Object = { [key: string]: any },
-  SubmitReturnType = void,
-  OnSubmitConfigType = Object
->(
+export function useMultieditor<DataObjectType extends Object>(
   configOrMultieditor:
-    | EditorConfig<DataObjectType, SubmitReturnType, OnSubmitConfigType>
-    | Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>,
+    | EditorConfig<DataObjectType>
+    | Multieditor<DataObjectType>,
   agileInstance: Agile = shared
-): UseMultieditorResponseInterface<
-  DataObjectType,
-  SubmitReturnType,
-  OnSubmitConfigType
-> {
+): MultieditorHookResponseInterface<DataObjectType> {
   // Return if '@agile-ts/multieditor' isn't installed
   if (multieditorPackage == null) {
     logCodeManager.log('34:03:00');
@@ -41,7 +33,7 @@ export function useMultieditor<
   // Subscribe Multieditor dependencies to the React Component
   useAgile(multieditor.deps);
 
-  // Inserts the most important 'props' into the React Component.
+  // Inserts the most important 'props' into the React Component
   const insertItem = (
     itemKey: DataObjectKeysArrayType<DataObjectType>
   ): InsertMethodConfigInterface => {
@@ -75,21 +67,21 @@ export function useMultieditor<
     };
   };
 
-  // Submits the Multieditor.
+  // Submits the Multieditor
   const submit = async (
-    config: SubmitConfigInterface<OnSubmitConfigType> = {}
-  ): Promise<SubmitReturnType | false> => {
+    config: SubmitConfigInterface = {}
+  ): Promise<any | false> => {
     return await multieditor.submit(config);
   };
 
-  // Retrieves the Status of the Item with the specified key/name identifier.
+  // Retrieves the Status of the Item with the specified key/name identifier
   const status = (
     itemKey: DataObjectKeysArrayType<DataObjectType>
   ): StatusInterface | null => {
     return multieditor.getStatus(itemKey);
   };
 
-  // Retrieves a single Item with the specified key/name identifier from the Multieditor.
+  // Retrieves a single Item with the specified key/name identifier from the Multieditor
   const item = (
     itemKey: DataObjectKeysArrayType<DataObjectType>
   ): Item | null => {
@@ -115,23 +107,19 @@ export interface InsertMethodConfigInterface {
   onChange?: (event: ChangeEvent) => void;
 }
 
-export interface UseMultieditorResponseInterface<
-  DataObjectType extends Object = { [key: string]: any },
-  SubmitReturnType = void,
-  OnSubmitConfigType = Object
+export interface MultieditorHookResponseInterface<
+  DataObjectType extends Object
 > {
   /**
    * Multieditor that manages all the Form tasks.
    */
-  editor: Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>;
+  editor: Multieditor<DataObjectType>;
   /**
    * Submits the Multieditor.
    *
    * @param config - Configuration object
    */
-  submit: (
-    config?: SubmitConfigInterface<OnSubmitConfigType>
-  ) => Promise<SubmitReturnType | false>;
+  submit: (config?: SubmitConfigInterface) => Promise<any | false>;
   /**
    * Inserts the most important 'props' into the React Component.
    *

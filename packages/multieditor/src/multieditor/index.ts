@@ -12,16 +12,9 @@ export * from './multieditor';
  * @param config - Configuration object
  * @param agileInstance - Instance of Agile the Multieditor belongs to.
  */
-export function createMultieditor<
-  DataObjectType extends Object = { [key: string]: any },
-  SubmitReturnType = void,
-  OnSubmitConfigType = any
->(
-  config: EditorConfig<DataObjectType, SubmitReturnType, OnSubmitConfigType>,
+export function createMultieditor<DataObjectType extends Object>(
+  config: EditorConfig<DataObjectType>,
   agileInstance: Agile = shared
-): Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType> {
-  return new Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>(
-    config,
-    agileInstance
-  );
+): Multieditor<DataObjectType> {
+  return new Multieditor<DataObjectType>(config, agileInstance);
 }

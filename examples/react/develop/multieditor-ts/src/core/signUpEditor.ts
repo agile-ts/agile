@@ -27,7 +27,7 @@ export const isValidNameValidator = agileResolver(
   matchesRegex(/^([^0-9]*)$/, 'No Numbers allowed!')
 );
 
-interface InitialDataInterface {
+export interface InitialDataInterface {
   id: string;
   firstName: string;
   lastName: string;

@@ -10,11 +10,7 @@ import { ValidationMethodInterface, Validator } from '../validator';
 import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';
 
-export class Multieditor<
-  DataObjectType extends Object = { [key: string]: any },
-  SubmitReturnType = void,
-  OnSubmitConfigType = Object
-> {
+export class Multieditor<DataObjectType extends Object> {
   // Agile Instance the Multieditor belongs to
   public agileInstance: () => Agile;
 
@@ -34,8 +30,8 @@ export class Multieditor<
 
   public onSubmit: (
     preparedData: { [key: string]: any },
-    config?: OnSubmitConfigType
-  ) => Promise<SubmitReturnType>;
+    config?: Object
+  ) => Promise<any>;
 
   // Items the Multieditor works with
   public data: { [key: string]: Item } = {};
@@ -47,10 +43,7 @@ export class Multieditor<
    * @param agileInstance - Instance of Agile the Multieditor belongs to.
    * @param config - Configuration object
    */
-  constructor(
-    config: EditorConfig<DataObjectType, SubmitReturnType, OnSubmitConfigType>,
-    agileInstance: Agile
-  ) {
+  constructor(config: EditorConfig<DataObjectType>, agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
@@ -232,8 +225,8 @@ export class Multieditor<
    * @param config - Configuration object
    */
   public async submit(
-    config: SubmitConfigInterface<OnSubmitConfigType> = {}
-  ): Promise<SubmitReturnType | false> {
+    config: SubmitConfigInterface = {}
+  ): Promise<any | false> {
     config = defineConfig(config, {
       assignToInitial: true,
       onSubmitConfig: undefined,
@@ -510,11 +503,7 @@ export type DataObjectKeysArrayType<T> =
       string)
   | ItemKey;
 
-export interface CreateEditorConfigInterface<
-  DataObjectType extends Object = { [key: string]: any },
-  SubmitReturnType = void,
-  onSubmitConfig = any
-> {
+export interface CreateEditorConfigInterface<DataObjectType extends Object> {
   /**
    * Key/Name identifier of the Multieditor.
    * @default undefined
@@ -552,8 +541,8 @@ export interface CreateEditorConfigInterface<
    */
   onSubmit: (
     preparedData: { [key: string]: any },
-    config?: onSubmitConfig
-  ) => Promise<SubmitReturnType>;
+    config?: any
+  ) => Promise<any>;
   /**
    * In which circumstances the Multieditor is revalidated.
    * @default 'onSubmit'
@@ -583,23 +572,11 @@ export interface EditorConfigInterface {
   toValidate: ValidateType;
 }
 
-export type EditorConfig<
-  DataObjectType extends Object = { [key: string]: any },
-  SubmitReturnType = void,
-  OnSubmitConfigType = any
-> =
-  | CreateEditorConfigInterface<
-      DataObjectType,
-      SubmitReturnType,
-      OnSubmitConfigType
-    >
+export type EditorConfig<DataObjectType extends Object> =
+  | CreateEditorConfigInterface<DataObjectType>
   | ((
-      editor: Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>
-    ) => CreateEditorConfigInterface<
-      DataObjectType,
-      SubmitReturnType,
-      OnSubmitConfigType
-    >);
+      editor: Multieditor<DataObjectType>
+    ) => CreateEditorConfigInterface<DataObjectType>);
 
 export interface SubmitConfigInterface<OnSubmitConfigType = any> {
   /**
