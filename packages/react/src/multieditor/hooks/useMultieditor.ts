@@ -2,7 +2,6 @@ import { ChangeEvent, useState } from 'react';
 import { Agile, shared } from '@agile-ts/core';
 import type {
   EditorConfig,
-  ItemKey,
   Multieditor,
   StatusInterface,
   SubmitConfigInterface,
@@ -10,19 +9,19 @@ import type {
 import { useAgile } from '../../core';
 import { logCodeManager } from '../../logCodeManager';
 import { multieditorPackage } from '../multieditorPackage';
-import { Item } from '@agile-ts/multieditor';
+import { DataObjectKeysArrayType, Item } from '@agile-ts/multieditor';
 
 export function useMultieditor<
-  DataType = any,
+  DataObjectType extends Object = { [key: string]: any },
   SubmitReturnType = void,
   OnSubmitConfigType = Object
 >(
   configOrMultieditor:
-    | EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>
-    | Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>,
+    | EditorConfig<DataObjectType, SubmitReturnType, OnSubmitConfigType>
+    | Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>,
   agileInstance: Agile = shared
 ): UseMultieditorResponseInterface<
-  DataType,
+  DataObjectType,
   SubmitReturnType,
   OnSubmitConfigType
 > {
@@ -43,7 +42,9 @@ export function useMultieditor<
   useAgile(multieditor.deps);
 
   // Inserts the most important 'props' into the React Component.
-  const insertItem = (itemKey: ItemKey): InsertMethodConfigInterface => {
+  const insertItem = (
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): InsertMethodConfigInterface => {
     const item = multieditor.getItem(itemKey);
     if (item == null) return {};
 
@@ -82,12 +83,16 @@ export function useMultieditor<
   };
 
   // Retrieves the Status of the Item with the specified key/name identifier.
-  const status = (itemKey: ItemKey): StatusInterface | null => {
+  const status = (
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): StatusInterface | null => {
     return multieditor.getStatus(itemKey);
   };
 
   // Retrieves a single Item with the specified key/name identifier from the Multieditor.
-  const item = (itemKey: ItemKey): Item | null => {
+  const item = (
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): Item | null => {
     return multieditor.getItem(itemKey);
   };
 
@@ -111,14 +116,14 @@ export interface InsertMethodConfigInterface {
 }
 
 export interface UseMultieditorResponseInterface<
-  DataType = any,
+  DataObjectType extends Object = { [key: string]: any },
   SubmitReturnType = void,
   OnSubmitConfigType = Object
 > {
   /**
    * Multieditor that manages all the Form tasks.
    */
-  editor: Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>;
+  editor: Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>;
   /**
    * Submits the Multieditor.
    *
@@ -132,7 +137,9 @@ export interface UseMultieditorResponseInterface<
    *
    * @param itemKey - Key/Name identifier of the Item.
    */
-  insertItem: (itemKey: ItemKey) => InsertMethodConfigInterface;
+  insertItem: (
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ) => InsertMethodConfigInterface;
   /**
    * Retrieves the Status of the Item with the specified key/name identifier.
    *
@@ -140,7 +147,9 @@ export interface UseMultieditorResponseInterface<
    *
    * @param itemKey - Key/Name identifier of the Item.
    */
-  status: (itemKey: ItemKey) => StatusInterface | null;
+  status: (
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ) => StatusInterface | null;
   /**
    * Retrieves a single Item with the specified key/name identifier from the Multieditor.
    *
@@ -149,5 +158,5 @@ export interface UseMultieditorResponseInterface<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  item: (itemKey: ItemKey) => Item | null;
+  item: (itemKey: DataObjectKeysArrayType<DataObjectType>) => Item | null;
 }

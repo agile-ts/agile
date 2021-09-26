@@ -3,14 +3,16 @@ import { ItemKey, Multieditor } from '../multieditor';
 import { Item } from '../item';
 import { logCodeManager } from '../logCodeManager';
 
-export class Validator<DataType = any> {
+export class Validator<ValueType = any> {
   public config: ValidatorConfigInterface = {};
 
   // Key/Name identifier of the Validator
   public _key?: ValidatorKey;
 
   // Methods that a value must pass in order to be 'valid'
-  public validationMethods: ValidationMethodContainerInterface<DataType>[] = [];
+  public validationMethods: ValidationMethodContainerInterface<
+    ValueType
+  >[] = [];
 
   /**
    * Handles the validation of Items.
@@ -53,8 +55,8 @@ export class Validator<DataType = any> {
    * @param value - Value to be validated.
    */
   public async validate(
-    item: Item<DataType>,
-    value: DataType
+    item: Item<ValueType>,
+    value: ValueType
   ): Promise<boolean> {
     let isValid = true;
     if (item == null || item._key == null) return false;
@@ -64,14 +66,15 @@ export class Validator<DataType = any> {
     item.status.statusTracker.track();
 
     // Call validation methods with the specified value
-    for (const validationMethod of this.validationMethods)
+    for (let i = 0; i < this.validationMethods.length; i++)
       isValid =
-        (await validationMethod.method(item._key, value, editor)) && isValid;
+        (await this.validationMethods[i].method(item._key, value, editor)) &&
+        isValid;
 
     // Handle tracked Statuses
     const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
     if (trackedStatuses.length > 0) {
-      item.status.set(trackedStatuses[0]);
+      item.status.set(trackedStatuses[0]); // First tracked Status is the most recent validation Status and thus should be displayed
       item.status.lastTrackedValues = copy(trackedStatuses);
     } else editor.resetStatus(item._key);
 
@@ -86,7 +89,7 @@ export class Validator<DataType = any> {
    * @param config = Configuration object
    */
   public addValidationMethod(
-    method: ValidationMethodInterface<DataType>,
+    method: ValidationMethodInterface<ValueType>,
     config: AddValidationMethodConfigInterface = {}
   ): this {
     if (!isFunction(method)) {
@@ -122,8 +125,8 @@ export class Validator<DataType = any> {
    *
    * @public
    */
-  public copy(): Validator<DataType> {
-    const newValidator = new Validator<DataType>({ key: this._key });
+  public copy(): Validator<ValueType> {
+    const newValidator = new Validator<ValueType>({ key: this._key });
     newValidator.validationMethods = copy(this.validationMethods);
     newValidator.config = copy(this.config);
     return newValidator;
@@ -140,7 +143,7 @@ export interface ValidatorConfigInterface {
   key?: ValidatorKey;
 }
 
-export type ValidationMethodInterface<DataType = any> = (
+export type ValidationMethodInterface<ValueType = any> = (
   /**
    * Key/Name identifier of the Item whose value to be validated.
    */
@@ -148,11 +151,11 @@ export type ValidationMethodInterface<DataType = any> = (
   /**
    * Value to be validated.
    */
-  value: DataType,
+  value: ValueType,
   /**
    * Multieditor the to validate Item belongs to.
    */
-  editor: Multieditor<DataType>
+  editor: Multieditor
 ) => Promise<boolean> | boolean;
 
 export interface ValidationMethodContainerInterface<DataType = any> {

@@ -11,7 +11,7 @@ import { Item } from '../item';
 import { StatusInterface, StatusType } from '../status';
 
 export class Multieditor<
-  DataType = any,
+  DataObjectType extends Object = { [key: string]: any },
   SubmitReturnType = void,
   OnSubmitConfigType = Object
 > {
@@ -33,12 +33,12 @@ export class Multieditor<
   public editableProperties: ItemKey[] = [];
 
   public onSubmit: (
-    preparedData: DataObject<DataType>,
+    preparedData: { [key: string]: any },
     config?: OnSubmitConfigType
   ) => Promise<SubmitReturnType>;
 
   // Items the Multieditor works with
-  public data: DataObject<Item<DataType>> = {};
+  public data: { [key: string]: any } = {};
 
   /**
    * Simple Form Handler.
@@ -48,7 +48,7 @@ export class Multieditor<
    * @param config - Configuration object
    */
   constructor(
-    config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
+    config: EditorConfig<DataObjectType, SubmitReturnType, OnSubmitConfigType>,
     agileInstance: Agile
   ) {
     this.agileInstance = () => agileInstance;
@@ -72,31 +72,34 @@ export class Multieditor<
     };
 
     // Format specified validation instances to valid Validators
-    const formattedValidators: { [key: string]: Validator<DataType> } = {};
-    Object.keys(
-      _config.validationSchema as ValidationSchemaType<DataType>
-    ).forEach((key) => {
-      const validationMethod = (_config.validationSchema as ValidationSchemaType<
-        DataType
-      >)[key];
+    const formattedValidators: {
+      [key: string]: Validator;
+    } = {};
+    Object.keys(_config.validationSchema as ValidationSchemaType).forEach(
+      (key) => {
+        const validationMethod = (_config.validationSchema as ValidationSchemaType)[
+          key
+        ];
 
-      // If validation schema item is a Validator
-      if (validationMethod instanceof Validator) {
-        if (validationMethod.key == null) validationMethod.key = key;
-        formattedValidators[key] = validationMethod;
-      }
+        // If validation schema item is a Validator
+        if (validationMethod instanceof Validator) {
+          if (validationMethod.key == null) validationMethod.key = key;
+          formattedValidators[key] = validationMethod;
+        }
 
-      // If validation schema item is a method
-      else {
-        formattedValidators[key] = new Validator<DataType>({
-          key,
-        }).addValidationMethod(validationMethod);
+        // If validation schema item is a method
+        else {
+          formattedValidators[key] = new Validator({
+            key,
+          }).addValidationMethod(validationMethod);
+        }
       }
-    });
+    );
 
     // Instantiate Multieditor Items based on the 'initialData'
     for (const key in _config.initialData) {
-      const item = new Item<DataType>(this as any, _config.initialData[key], {
+      const data = _config.initialData[key];
+      const item = new Item<typeof data>(this as any, data, {
         key,
         canBeEdited: this.editableProperties.includes(key),
         validator: formattedValidators[key],
@@ -150,11 +153,13 @@ export class Multieditor<
    * with the specified key/name identifier depends on.
    *
    * @public
-   * @param key - Key/Name identifier of the Item.
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public itemDeps(key: ItemKey): Array<Observer> {
+  public itemDeps(
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): Array<Observer> {
     const deps: Array<Observer> = [];
-    const item = this.getItem(key);
+    const item = this.getItem(itemKey);
     if (item) {
       deps.push(item.observers['value']);
       deps.push(item.status.observers['value']);
@@ -171,8 +176,8 @@ export class Multieditor<
    * @param config - Configuration object
    */
   public setValue(
-    itemKey: ItemKey,
-    value: DataType,
+    itemKey: DataObjectKeysArrayType<DataObjectType>,
+    value: any,
     config: StateIngestConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -197,8 +202,8 @@ export class Multieditor<
    * @param config - Configuration object
    */
   public setInitialValue(
-    itemKey: ItemKey,
-    value: DataType,
+    itemKey: DataObjectKeysArrayType<DataObjectType>,
+    value: any,
     config: UpdateInitialValueConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -251,7 +256,7 @@ export class Multieditor<
     if (!this.isValid) return false;
 
     // Data to be passed to the 'onSubmit()' method
-    const preparedData: DataObject<DataType> = {};
+    const preparedData = {};
 
     // Add Items whose value has been updated to the prepared data
     for (const key in this.data) {
@@ -303,7 +308,11 @@ export class Multieditor<
    * @param type - Status type
    * @param message - Status message
    */
-  public setStatus(itemKey: ItemKey, type: StatusType, message: string): this {
+  public setStatus(
+    itemKey: DataObjectKeysArrayType<DataObjectType>,
+    type: StatusType,
+    message: string
+  ): this {
     const item = this.getItem(itemKey);
     if (item == null) return this;
     item.status.set(
@@ -322,7 +331,7 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public resetStatus(itemKey: ItemKey): this {
+  public resetStatus(itemKey: DataObjectKeysArrayType<DataObjectType>): this {
     const item = this.getItem(itemKey);
     if (item == null || item.status == null) return this;
     item.status.set(null);
@@ -337,7 +346,9 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getStatus(itemKey: ItemKey): StatusInterface | null {
+  public getStatus(
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): StatusInterface | null {
     return this.getItem(itemKey)?.status.value || null;
   }
 
@@ -349,8 +360,10 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItem(itemKey: ItemKey): Item<DataType> | undefined {
-    return this.data[itemKey];
+  public getItem(
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): Item | undefined {
+    return this.data[itemKey as any];
   }
 
   /**
@@ -362,7 +375,9 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemValue(itemKey: string): DataType | undefined {
+  public getItemValue(
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): any | undefined {
     return this.getItem(itemKey)?.value;
   }
 
@@ -375,10 +390,13 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemInitialValue(itemKey: string): DataType | undefined {
+  public getItemInitialValue(
+    itemKey: DataObjectKeysArrayType<DataObjectType>
+  ): any | undefined {
     return this.getItem(itemKey)?.initialStateValue;
   }
 
+  /**
   /**
    * Returns a boolean indicating whether at least one Item
    * of the Items with the specified key/name identifiers is modified.
@@ -435,7 +453,7 @@ export class Multieditor<
   }
 
   /**
-   * evalidates the Multieditor.
+   * Revalidates the Multieditor.
    *
    * @public
    */
@@ -482,12 +500,18 @@ export class Multieditor<
   }
 }
 
-export type DataObject<T = any> = { [key: string]: T };
 export type EditorKey = string | number;
 export type ItemKey = string | number;
 
+export type DataObjectKeysArrayType<T> =
+  | ({
+      [K in keyof T]: T[K] extends any ? K : never;
+    }[keyof T] &
+      string)
+  | ItemKey;
+
 export interface CreateEditorConfigInterface<
-  DataType = any,
+  DataObjectType extends Object = { [key: string]: any },
   SubmitReturnType = void,
   onSubmitConfig = any
 > {
@@ -500,7 +524,7 @@ export interface CreateEditorConfigInterface<
    * Initial data of the Multieditor.
    * @default {}
    */
-  initialData: DataObject<DataType>;
+  initialData: DataObjectType;
   /**
    * Key/name identifiers of Items whose values
    * to be always passed to the specified 'onSubmit()' method.
@@ -516,18 +540,18 @@ export interface CreateEditorConfigInterface<
    * Keymap to assign validation schemas to the individual Items of the Multieditor.
    * @default {}
    */
-  validationSchema?: ValidationSchemaType<DataType>;
+  validationSchema?: ValidationSchemaType;
   /**
    * Keymap to assign compute methods to the individual Items of the Multieditor.
    * @default {}
    */
-  computeMethods?: { [key: string]: ComputeValueMethod<DataType> };
+  computeMethods?: { [key: string]: ComputeValueMethod };
   /**
    * Callback to be called when the Multieditor is submitted.
    * @default () => {}
    */
   onSubmit: (
-    preparedData: DataObject<DataType>,
+    preparedData: { [key: string]: any },
     config?: onSubmitConfig
   ) => Promise<SubmitReturnType>;
   /**
@@ -542,8 +566,8 @@ export interface CreateEditorConfigInterface<
   toValidate?: ValidateType;
 }
 
-export type ValidationSchemaType<DataType = any> = {
-  [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
+export type ValidationSchemaType = {
+  [key: string]: ValidationMethodInterface | Validator;
 };
 
 export interface EditorConfigInterface {
@@ -560,15 +584,19 @@ export interface EditorConfigInterface {
 }
 
 export type EditorConfig<
-  DataType = any,
+  DataObjectType extends Object = { [key: string]: any },
   SubmitReturnType = void,
   OnSubmitConfigType = any
 > =
-  | CreateEditorConfigInterface<DataType, SubmitReturnType, OnSubmitConfigType>
+  | CreateEditorConfigInterface<
+      DataObjectType,
+      SubmitReturnType,
+      OnSubmitConfigType
+    >
   | ((
-      editor: Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>
+      editor: Multieditor<DataObjectType, SubmitReturnType, OnSubmitConfigType>
     ) => CreateEditorConfigInterface<
-      DataType,
+      DataObjectType,
       SubmitReturnType,
       OnSubmitConfigType
     >);

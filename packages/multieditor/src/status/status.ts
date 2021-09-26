@@ -3,11 +3,11 @@ import { copy, defineConfig } from '@agile-ts/utils';
 import { Item } from '../item';
 import { StatusTracker } from './status.tracker';
 
-export class Status<DataType = any> extends State<StatusValueType> {
+export class Status<ValueType = any> extends State<StatusValueType> {
   config: StatusConfigInterface;
 
   // Item the Status belongs to
-  public item: Item<DataType>;
+  public item: Item<ValueType>;
 
   // Helper Class for automatic tracking set Statuses in validation methods
   public statusTracker: StatusTracker;
@@ -22,7 +22,7 @@ export class Status<DataType = any> extends State<StatusValueType> {
    * @param item - Item the Status belongs to.
    * @param config - Configuration object
    */
-  constructor(item: Item<DataType>, config: CreateStatusConfigInterface = {}) {
+  constructor(item: Item<ValueType>, config: CreateStatusConfigInterface = {}) {
     config = defineConfig(config, {
       display: false,
     });

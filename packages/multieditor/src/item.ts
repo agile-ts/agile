@@ -7,7 +7,7 @@ import { logCodeManager } from './logCodeManager';
 
 export class Item<ValueType = any> extends State<ValueType> {
   // Multieditor the Item belongs to
-  public editor: () => Multieditor<ValueType>;
+  public editor: () => Multieditor;
 
   public config: ItemConfigInterface;
 
@@ -16,7 +16,7 @@ export class Item<ValueType = any> extends State<ValueType> {
   // Handles the validation of the Item
   public validator: Validator<ValueType>;
   // Handles and represents the validation Status of the Item
-  public status: Status;
+  public status: Status<ValueType>;
 
   // Method for dynamically computing the Item value
   public computeValueMethod?: ComputeValueMethod<ValueType>;
@@ -30,7 +30,7 @@ export class Item<ValueType = any> extends State<ValueType> {
    * @param config - Configuration object
    */
   constructor(
-    editor: Multieditor<ValueType>,
+    editor: Multieditor,
     initialValue: ValueType,
     config: ItemConfigInterface
   ) {

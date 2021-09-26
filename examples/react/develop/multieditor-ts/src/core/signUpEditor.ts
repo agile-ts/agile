@@ -27,7 +27,22 @@ export const isValidNameValidator = agileResolver(
   matchesRegex(/^([^0-9]*)$/, 'No Numbers allowed!')
 );
 
-export const signUpEditor = createMultieditor((editor) => ({
+interface InitialDataInterface {
+  id: string;
+  firstName: string;
+  lastName: string;
+  gender: string | undefined;
+  userName: string;
+  email: string;
+  age: number | undefined;
+  aboutYou: string;
+  image: {
+    id: string;
+    color: string;
+  };
+}
+
+export const signUpEditor = createMultieditor<InitialDataInterface>({
   initialData: {
     id: 'myCoolId',
     firstName: 'Jeff',
@@ -103,7 +118,7 @@ export const signUpEditor = createMultieditor((editor) => ({
   },
   fixedProperties: ['id'],
   reValidateMode: 'onChange',
-}));
+});
 
 // For better debugging
 globalBind('__core__', { signUpEditor });
