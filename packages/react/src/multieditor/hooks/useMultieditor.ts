@@ -5,18 +5,18 @@ import type {
   Multieditor,
   StatusInterface,
   SubmitConfigInterface,
+  FieldPaths,
+  Item,
 } from '@agile-ts/multieditor';
 import { useAgile } from '../../core';
 import { logCodeManager } from '../../logCodeManager';
 import { multieditorPackage } from '../multieditorPackage';
-import { DataObjectKeysArrayType, Item } from '@agile-ts/multieditor';
+import { FieldData } from '@agile-ts/multieditor';
 
-export function useMultieditor<DataObjectType extends Object>(
-  configOrMultieditor:
-    | EditorConfig<DataObjectType>
-    | Multieditor<DataObjectType>,
+export function useMultieditor<TFieldData extends FieldData = FieldData>(
+  configOrMultieditor: EditorConfig<TFieldData> | Multieditor<TFieldData>,
   agileInstance: Agile = shared
-): MultieditorHookResponseInterface<DataObjectType> {
+): MultieditorHookResponseInterface<TFieldData> {
   // Return if '@agile-ts/multieditor' isn't installed
   if (multieditorPackage == null) {
     logCodeManager.log('34:03:00');
@@ -35,7 +35,7 @@ export function useMultieditor<DataObjectType extends Object>(
 
   // Inserts the most important 'props' into the React Component
   const insertItem = (
-    itemKey: DataObjectKeysArrayType<DataObjectType>
+    itemKey: FieldPaths<TFieldData>
   ): InsertMethodConfigInterface => {
     const item = multieditor.getItem(itemKey);
     if (item == null) return {};
@@ -75,16 +75,12 @@ export function useMultieditor<DataObjectType extends Object>(
   };
 
   // Retrieves the Status of the Item with the specified key/name identifier
-  const status = (
-    itemKey: DataObjectKeysArrayType<DataObjectType>
-  ): StatusInterface | null => {
+  const status = (itemKey: FieldPaths<TFieldData>): StatusInterface | null => {
     return multieditor.getStatus(itemKey);
   };
 
   // Retrieves a single Item with the specified key/name identifier from the Multieditor
-  const item = (
-    itemKey: DataObjectKeysArrayType<DataObjectType>
-  ): Item | null => {
+  const item = (itemKey: FieldPaths<TFieldData>): Item | null => {
     return multieditor.getItem(itemKey);
   };
 
@@ -108,12 +104,12 @@ export interface InsertMethodConfigInterface {
 }
 
 export interface MultieditorHookResponseInterface<
-  DataObjectType extends Object
+  TFieldData extends FieldData = FieldData
 > {
   /**
    * Multieditor that manages all the Form tasks.
    */
-  editor: Multieditor<DataObjectType>;
+  editor: Multieditor<TFieldData>;
   /**
    * Submits the Multieditor.
    *
@@ -125,9 +121,7 @@ export interface MultieditorHookResponseInterface<
    *
    * @param itemKey - Key/Name identifier of the Item.
    */
-  insertItem: (
-    itemKey: DataObjectKeysArrayType<DataObjectType>
-  ) => InsertMethodConfigInterface;
+  insertItem: (itemKey: FieldPaths<TFieldData>) => InsertMethodConfigInterface;
   /**
    * Retrieves the Status of the Item with the specified key/name identifier.
    *
@@ -135,9 +129,7 @@ export interface MultieditorHookResponseInterface<
    *
    * @param itemKey - Key/Name identifier of the Item.
    */
-  status: (
-    itemKey: DataObjectKeysArrayType<DataObjectType>
-  ) => StatusInterface | null;
+  status: (itemKey: FieldPaths<TFieldData>) => StatusInterface | null;
   /**
    * Retrieves a single Item with the specified key/name identifier from the Multieditor.
    *
@@ -146,5 +138,5 @@ export interface MultieditorHookResponseInterface<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  item: (itemKey: DataObjectKeysArrayType<DataObjectType>) => Item | null;
+  item: (itemKey: FieldPaths<TFieldData>) => Item | null;
 }

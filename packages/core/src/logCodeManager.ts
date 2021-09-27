@@ -163,18 +163,18 @@ const logCodeMessages = {
 };
 
 export class LogCodeManager<LogCodeMessagesType = {}> {
-  // Keymap of messages tat the LogCodeManager can log
+  // Keymap of messages that the LogCodeManager can log
   public logCodeMessages: LogCodeMessagesType;
-  // Optional '@agile-ts/logger' package
+  // Optional '@agile-ts/logger' package for more advanced logging
   public _loggerPackage: any;
   // Whether the LogCodeManager is allowed to log
   public allowLogging = true;
 
   /**
-   * Manages logging based on a specified 'logCodeMessages' keymap.
+   * Manages logging for AgileTs based on log codes.
    *
-   * @param logCodeMessages - Keymap of messages tat the LogCodeManager can log.
-   * @param loggerPackage - Optional '@agile-ts/logger' package to log more advanced logs.
+   * @param logCodeMessages - Keymap of messages that the LogCodeManager can log.
+   * @param loggerPackage - Optional '@agile-ts/logger' package for more advanced logging.
    */
   constructor(logCodeMessages: LogCodeMessagesType, loggerPackage?: any) {
     this.logCodeMessages = logCodeMessages;
@@ -198,7 +198,7 @@ export class LogCodeManager<LogCodeMessagesType = {}> {
    * @param replacers - Instances that replace these '${x}' placeholders based on the index
    * For example: 'replacers[0]' replaces '${0}', 'replacers[1]' replaces '${1}', ..
    */
-  public getLog<T extends LogCodesArrayType<LogCodeMessagesType>>(
+  public getLog<T extends LogCodePaths<LogCodeMessagesType>>(
     logCode: T,
     replacers: any[] = []
   ): string {
@@ -218,11 +218,11 @@ export class LogCodeManager<LogCodeMessagesType = {}> {
    * with the Agile Logger if installed or the normal console.
    *
    * @internal
-   * @param logCode - Log code of the message to be returned.
+   * @param logCode - Log code of the message to be logged.
    * @param config - Configuration object
    * @param data - Data to be attached to the end of the log message.
    */
-  public log<T extends LogCodesArrayType<LogCodeMessagesType>>(
+  public log<T extends LogCodePaths<LogCodeMessagesType>>(
     logCode: T,
     config: LogConfigInterface = {},
     ...data: any[]
@@ -236,14 +236,14 @@ export class LogCodeManager<LogCodeMessagesType = {}> {
     const logType = logCodeTypes[logCode.substr(3, 2)];
     if (typeof logType !== 'string') return;
 
-    // Handle logging without Logger
+    // Handle logging without Logger package
     if (this.logger == null) {
       if (logType === 'error' || logType === 'warn')
         console[logType](`Agile: ${this.getLog(logCode, config.replacers)}`);
       return;
     }
 
-    // Handle logging with Logger
+    // Handle logging with Logger package
     const log = this.getLog(logCode, config.replacers);
     if (config.tags?.length === 0) this.logger[logType](log, ...data);
     else this.logger.if.tag(config.tags as any)[logType](log, ...data);
@@ -255,7 +255,7 @@ export class LogCodeManager<LogCodeMessagesType = {}> {
  * and assigns the provided additional log messages to it.
  *
  * @param logCodeManager - LogCodeManager to create an extension from.
- * @param additionalLogs - Log messages to be added to the LogCodeManager.
+ * @param additionalLogs - Log messages to be added to the created LogCodeManager extensions.
  */
 export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
   logCodeManager: LogCodeManager<OldLogCodeMessages>,
@@ -293,11 +293,6 @@ if (process.env.NODE_ENV !== 'production') {
  */
 export { tempLogCodeManager as logCodeManager };
 
-export type LogCodesArrayType<T> = {
-  [K in keyof T]: T[K] extends string ? K : never;
-}[keyof T] &
-  string;
-
 interface LogConfigInterface {
   /**
    * Instances that replace these '${x}' placeholders based on the index
@@ -311,3 +306,8 @@ interface LogConfigInterface {
    */
   tags?: string[];
 }
+
+export type LogCodePaths<T> = {
+  [K in keyof T]: T[K] extends string ? K : never;
+}[keyof T] &
+  string;

@@ -1,6 +1,6 @@
 import { StateRuntimeJobConfigInterface, State } from '@agile-ts/core';
 import { isFunction, defineConfig } from '@agile-ts/utils';
-import { ItemKey, Multieditor } from './multieditor';
+import { Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
 import { logCodeManager } from './logCodeManager';
@@ -129,3 +129,5 @@ export interface ItemConfigInterface<ValueType = any> {
 }
 
 export type ComputeValueMethod<T = any> = (value: T) => T;
+
+export type ItemKey = string | number;

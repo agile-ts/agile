@@ -1,7 +1,9 @@
 import { Agile, shared } from '@agile-ts/core';
-import { EditorConfig, Multieditor } from './multieditor';
+import { Multieditor } from './multieditor';
+import { EditorConfig, FieldData } from './types';
 
 export * from './multieditor';
+export * from './types';
 
 /**
  * Returns a newly created Multieditor.
@@ -12,9 +14,9 @@ export * from './multieditor';
  * @param config - Configuration object
  * @param agileInstance - Instance of Agile the Multieditor belongs to.
  */
-export function createMultieditor<DataObjectType extends Object>(
-  config: EditorConfig<DataObjectType>,
+export function createMultieditor<TFieldData extends FieldData = FieldData>(
+  config: EditorConfig<TFieldData>,
   agileInstance: Agile = shared
-): Multieditor<DataObjectType> {
-  return new Multieditor<DataObjectType>(config, agileInstance);
+): Multieditor<TFieldData> {
+  return new Multieditor<TFieldData>(config, agileInstance);
 }

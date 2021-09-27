@@ -23,6 +23,7 @@ export function useEvent<E extends Event<any>>(
     return;
   }
 
+  // Handle Event Logic
   useIsomorphicLayoutEffect(() => {
     const eventKey = event.on(callback);
 
@@ -32,6 +33,7 @@ export function useEvent<E extends Event<any>>(
     };
   }, []);
 
+  // Subscribe Event to Component
   useBaseAgile(
     [event.observer],
     () => ({
