@@ -378,7 +378,7 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @param itemKey - Key/Name identifier of the Item.
    */
   public getItem(itemKey: FieldPaths<TFieldData>): Item | undefined {
-    return this.data[itemKey];
+    return this.data[itemKey as string];
   }
 
   /**

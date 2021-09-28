@@ -72,7 +72,7 @@ export type DeepPathValues<T, P extends DeepPaths<T> | string | number> = T exte
 
 export type DeepFieldPaths<TFieldData extends FieldData> = DeepPaths<TFieldData> | ItemKey;
 
-export type FieldPaths<TFieldData extends FieldData> = DeepPaths<TFieldData> | ItemKey;
+export type FieldPaths<TFieldData extends FieldData> = FlatPaths<TFieldData> | ItemKey;
 
 export type FieldData = Record<string, any>;
 
