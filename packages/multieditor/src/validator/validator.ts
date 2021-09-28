@@ -1,6 +1,6 @@
 import { generateId, isFunction, defineConfig, copy } from '@agile-ts/utils';
-import { ItemKey, Multieditor } from '../multieditor';
-import { Item } from '../item';
+import { Multieditor } from '../multieditor';
+import { Item, ItemKey } from '../item';
 import { logCodeManager } from '../logCodeManager';
 
 export class Validator<ValueType = any> {

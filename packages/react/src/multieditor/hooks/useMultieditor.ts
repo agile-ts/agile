@@ -16,7 +16,7 @@ import { FieldData } from '@agile-ts/multieditor';
 export function useMultieditor<TFieldData extends FieldData = FieldData>(
   configOrMultieditor: EditorConfig<TFieldData> | Multieditor<TFieldData>,
   agileInstance: Agile = shared
-): MultieditorHookResponseInterface<TFieldData> {
+): UseMultieditorReturnInterface<TFieldData> {
   // Return if '@agile-ts/multieditor' isn't installed
   if (multieditorPackage == null) {
     logCodeManager.log('34:03:00');
@@ -103,9 +103,11 @@ export interface InsertMethodConfigInterface {
   onChange?: (event: ChangeEvent) => void;
 }
 
-export interface MultieditorHookResponseInterface<
+// When using Interface the object destruction has no full intellij
+// https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces
+export type UseMultieditorReturnInterface<
   TFieldData extends FieldData = FieldData
-> {
+> = {
   /**
    * Multieditor that manages all the Form tasks.
    */
@@ -139,4 +141,4 @@ export interface MultieditorHookResponseInterface<
    * @param itemKey - Key/Name identifier of the Item.
    */
   item: (itemKey: FieldPaths<TFieldData>) => Item | null;
-}
+};
