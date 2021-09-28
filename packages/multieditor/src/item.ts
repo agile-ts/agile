@@ -18,6 +18,9 @@ export class Item<ValueType = any> extends State<ValueType> {
   // Handles and represents the validation Status of the Item
   public status: Status<ValueType>;
 
+  // Whether the Item has been touched
+  public touched = false;
+
   // Method for dynamically computing the Item value
   public computeValueMethod?: ComputeValueMethod<ValueType>;
 
@@ -80,6 +83,7 @@ export class Item<ValueType = any> extends State<ValueType> {
   public reset(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
     this.status.config.display = false;
+    this.touched = false;
     return this;
   }
 
@@ -105,6 +109,20 @@ export class Item<ValueType = any> extends State<ValueType> {
     // Initial compute
     // (not directly computing it here since it is computed once in the runtime!)
     this.set(this.nextStateValue);
+
+    return this;
+  }
+
+  public blur(): this {
+    this.touched = true;
+
+    // Assign Status to Item
+    if (this.editor().canAssignStatusToItemOnBlur(this)) {
+      this.status.config.display = true;
+      this.status.ingest({
+        force: true, // Force because the value hasn't changed
+      });
+    }
 
     return this;
   }

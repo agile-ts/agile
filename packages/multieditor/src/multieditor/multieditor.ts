@@ -227,7 +227,11 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
 
     // Update initial value
     if (path.length > 0) {
-      item.initialStateValue = updateNestedProperty(item.initialStateValue, path, value);
+      item.initialStateValue = updateNestedProperty(
+        item.initialStateValue,
+        path,
+        value
+      );
     } else {
       item.initialStateValue = value;
     }
@@ -500,6 +504,22 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
           !this.submitted) ||
         (this.config.reValidateMode === 'onChange' &&
           !item.status.config.display)) &&
+      (this.config.toValidate === 'all' ||
+        (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
+        false)
+    );
+  }
+
+  /**
+   * Returns a boolean indication whether the Status of the specified Item
+   * can be updated during the blur of the Item.
+   *
+   * @internal
+   * @param item - Item
+   */
+  public canAssignStatusToItemOnBlur(item: Item): boolean {
+    return (
+      this.config.reValidateMode === 'onBlur' &&
       (this.config.toValidate === 'all' ||
         (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)

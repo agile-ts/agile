@@ -130,7 +130,7 @@ export interface CreateEditorConfigInterface<
    * In which circumstances the Multieditor is revalidated.
    * @default 'onSubmit'
    */
-  reValidateMode?: RevalidationModeType;
+  reValidateMode?: ValidationMode;
   /**
    * What type of data should be revalidated.
    * @default 'editable'
@@ -147,7 +147,7 @@ export interface EditorConfigInterface {
    * In which circumstances the Multieditor is revalidated.
    * @default 'onSubmit'
    */
-  reValidateMode: RevalidationModeType;
+  reValidateMode: ValidationMode;
   /**
    * What type of data should be revalidated.
    * @default 'editable'
@@ -193,5 +193,5 @@ export interface RecomputeValidatedStateMethodConfigInterface {
   validate?: boolean;
 }
 
-export type RevalidationModeType = 'onChange' | 'onSubmit' | 'afterFirstSubmit';
+export type ValidationMode = 'onChange' | 'onSubmit' | 'onBlur' | 'afterFirstSubmit';
 export type ValidateType = 'all' | 'editable';

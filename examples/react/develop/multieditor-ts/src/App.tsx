@@ -20,7 +20,7 @@ const App = () => {
       }}>
       <h1>Sign Up</h1>
       <label>First Name:</label>
-      <input {...insertItem('firstName')} />
+      <input{...insertItem('firstName')} />
       <ErrorMessage error={status('firstName')?.message} />
 
       <label>Last Name:</label>

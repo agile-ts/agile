@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEventHandler, FocusEventHandler, useState } from 'react';
 import { Agile, shared } from '@agile-ts/core';
 import type {
   EditorConfig,
@@ -23,8 +23,7 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
     return null as any;
   }
 
-  // Retrieve Multieditor
-  const [multieditor] = useState(
+  const [multieditor] = useState<Multieditor<TFieldData>>(
     configOrMultieditor instanceof multieditorPackage.Multieditor
       ? configOrMultieditor
       : new multieditorPackage.Multieditor(configOrMultieditor, agileInstance)
@@ -41,7 +40,9 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
     if (item == null) return {};
 
     const isComputed = item.computeValueMethod != null;
-    const onChange = (e: any) => {
+
+    // Compute 'onChange' property
+    const onChange = async (e: any) => {
       const nextValue = e?.target?.value;
       if (nextValue != null) {
         multieditor.setValue(itemKey, nextValue, {
@@ -50,12 +51,17 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
       }
     };
 
-    // Compute value property
+    // Compute 'onBlur' property
+    const onBlur = async (e: any) => {
+      item.blur();
+    };
+
+    // Compute 'value' property
     let value = isComputed ? item.value : undefined;
     if (typeof value !== 'number' && typeof value !== 'string')
       value = undefined;
 
-    // Compute defaultValue property
+    // Compute 'defaultValue' property
     let defaultValue = item.initialStateValue as any;
     if (typeof defaultValue !== 'number' && typeof defaultValue !== 'string')
       defaultValue = undefined;
@@ -63,6 +69,7 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
     return {
       defaultValue,
       onChange,
+      onBlur,
       value,
     };
   };
@@ -79,9 +86,9 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
     return multieditor.getStatus(itemKey);
   };
 
-  // Retrieves a single Item with the specified key/name identifier from the Multieditor
+  // Retrieves the Item with the specified key/name identifier from the Multieditor
   const item = (itemKey: FieldPaths<TFieldData>): Item | null => {
-    return multieditor.getItem(itemKey);
+    return multieditor.getItem(itemKey) || null;
   };
 
   return { editor: multieditor, insertItem, submit, status, item };
@@ -100,7 +107,11 @@ export interface InsertMethodConfigInterface {
   /**
    * 'onChange()' method.
    */
-  onChange?: (event: ChangeEvent) => void;
+  onChange?: ChangeEventHandler;
+  /**
+   * 'onBlur()' method.
+   */
+  onBlur?: FocusEventHandler;
 }
 
 // When using Interface the object destruction has no full intellij
@@ -133,7 +144,7 @@ export type UseMultieditorReturnInterface<
    */
   status: (itemKey: FieldPaths<TFieldData>) => StatusInterface | null;
   /**
-   * Retrieves a single Item with the specified key/name identifier from the Multieditor.
+   * Retrieves the Item with the specified key/name identifier from the Multieditor.
    *
    * If the to retrieve Item doesn't exist, `undefined` is returned.
    *
