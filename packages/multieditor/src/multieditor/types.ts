@@ -195,5 +195,3 @@ export interface RecomputeValidatedStateMethodConfigInterface {
 
 export type RevalidationModeType = 'onChange' | 'onSubmit' | 'afterFirstSubmit';
 export type ValidateType = 'all' | 'editable';
-
-

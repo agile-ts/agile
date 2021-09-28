@@ -16,6 +16,7 @@ import {
   SubmitConfigInterface,
   UpdateInitialValueConfigInterface,
 } from './types';
+import { updateNestedProperty } from '../utils';
 
 export class Multieditor<TFieldData extends FieldData = FieldData> {
   // Agile Instance the Multieditor belongs to
@@ -183,12 +184,18 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
     config = defineConfig(config, {
       background: true, // Because by default the Form should only be re-rendered when the Status updates
     });
+    const path = itemKey.toString().split('.');
 
-    const item = this.getItem(itemKey);
+    // Fetch Item
+    const item = this.getItem(path.shift() as any);
     if (item == null) return this;
 
     // Update current value
-    item.set(value, config);
+    if (path.length > 0) {
+      item.set(updateNestedProperty(item.nextStateValue, path, value), config);
+    } else {
+      item.set(value, config);
+    }
 
     return this;
   }
@@ -212,12 +219,18 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
       background: true, // Because by default the Form should only be re-rendered when the Status updates
       reset: true,
     });
+    const path = itemKey.toString().split('.');
 
-    const item = this.getItem(itemKey);
+    // Fetch Item
+    const item = this.getItem(path.shift() as any);
     if (item == null) return this;
 
     // Update initial value
-    item.initialStateValue = copy(value);
+    if (path.length > 0) {
+      item.initialStateValue = updateNestedProperty(item.initialStateValue, path, value);
+    } else {
+      item.initialStateValue = value;
+    }
 
     // Reset Item (-> assign initial value to the current value)
     if (config.reset) {
