@@ -11,7 +11,7 @@ import {
 } from '../storages';
 
 export class CollectionPersistent<
-  DataType extends Object = DefaultItem
+  DataType extends DefaultItem = DefaultItem
 > extends Persistent {
   // Collection the Persistent belongs to
   public collection: () => Collection<DataType>;

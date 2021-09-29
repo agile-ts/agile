@@ -1,5 +1,5 @@
 import { Agile, Observer, StateIngestConfigInterface } from '@agile-ts/core';
-import { defineConfig, copy, removeProperties } from '@agile-ts/utils';
+import { defineConfig, removeProperties } from '@agile-ts/utils';
 import { Validator } from '../validator';
 import { Item, ItemKey } from '../item';
 import { StatusInterface, StatusType } from '../status';
@@ -175,10 +175,10 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @param config - Configuration object
    */
   public setValue<
-    TFieldName extends DeepFieldPaths<TFieldData> = DeepFieldPaths<TFieldData>
+    TItemName extends DeepFieldPaths<TFieldData> = DeepFieldPaths<TFieldData>
   >(
-    itemKey: TFieldName,
-    value: DeepFieldPathValues<TFieldData, TFieldName>,
+    itemKey: TItemName,
+    value: DeepFieldPathValues<TFieldData, TItemName>,
     config: StateIngestConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -192,7 +192,10 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
 
     // Update current value
     if (path.length > 0) {
-      item.set(updateNestedProperty(item.nextStateValue, path, value), config);
+      item.set(
+        updateNestedProperty(item.nextStateValue, path, value) as any,
+        config
+      );
     } else {
       item.set(value, config);
     }
@@ -209,10 +212,10 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @param config - Configuration object
    */
   public setInitialValue<
-    TFieldName extends DeepFieldPaths<TFieldData> = DeepFieldPaths<TFieldData>
+    TItemName extends DeepFieldPaths<TFieldData> = DeepFieldPaths<TFieldData>
   >(
-    itemKey: TFieldName,
-    value: DeepFieldPathValues<TFieldData, TFieldName>,
+    itemKey: TItemName,
+    value: DeepFieldPathValues<TFieldData, TItemName>,
     config: UpdateInitialValueConfigInterface = {}
   ): this {
     config = defineConfig(config, {
@@ -231,7 +234,7 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
         item.initialStateValue,
         path,
         value
-      );
+      ) as any;
     } else {
       item.initialStateValue = value;
     }
@@ -377,7 +380,11 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItem(itemKey: FieldPaths<TFieldData>): Item | undefined {
+  public getItem<
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): Item<DeepFieldPathValues<TFieldData, TItemName>> | undefined {
     return this.data[itemKey as string];
   }
 
@@ -390,7 +397,11 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemValue(itemKey: FieldPaths<TFieldData>): any | undefined {
+  public getItemValue<
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): DeepFieldPathValues<TFieldData, TItemName> | undefined {
     return this.getItem(itemKey)?.value;
   }
 
@@ -403,7 +414,11 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemInitialValue(itemKey: FieldPaths<TFieldData>): any | undefined {
+  public getItemInitialValue<
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): DeepFieldPathValues<TFieldData, TItemName> | undefined {
     return this.getItem(itemKey)?.initialStateValue;
   }
 

@@ -45,7 +45,7 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
     const onChange = async (e: any) => {
       const nextValue = e?.target?.value;
       if (nextValue != null) {
-        multieditor.setValue(itemKey, nextValue, {
+        multieditor.setValue(itemKey as any, nextValue, {
           background: !isComputed, // If the value is computed, we need a controlled input (-> re-render on every value change)
         });
       }

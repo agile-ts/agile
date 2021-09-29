@@ -25,7 +25,7 @@ import { StorageKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<
-  DataType extends Object = DefaultItem,
+  DataType extends DefaultItem = DefaultItem,
   GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
 > {
   // Agile Instance the Collection belongs to
@@ -424,7 +424,7 @@ export class Collection<
     else {
       // Ensure that the current Item identifier isn't different from the 'changes object' itemKey
       if (changes[this.config.primaryKey] !== itemKey) {
-        changes[this.config.primaryKey] = itemKey;
+        (changes as any)[this.config.primaryKey] = itemKey;
         logCodeManager.log('1B:02:02', {}, changes);
       }
 
@@ -1365,7 +1365,7 @@ export class Collection<
     // otherwise add random itemKey to Item
     if (!Object.prototype.hasOwnProperty.call(_data, primaryKey)) {
       logCodeManager.log('1B:02:05', { replacers: [this._key, primaryKey] });
-      _data[primaryKey] = generateId();
+      (_data as any)[primaryKey] = generateId();
     }
 
     const itemKey = _data[primaryKey];

@@ -28,7 +28,7 @@ export * from './selector';
  * @param config - Configuration object
  * @param agileInstance - Instance of Agile the Collection belongs to.
  */
-export function createCollection<DataType extends Object = DefaultItem>(
+export function createCollection<DataType extends DefaultItem = DefaultItem>(
   config?: CollectionConfig<DataType>,
   agileInstance: Agile = shared
 ): Collection<DataType> {

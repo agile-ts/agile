@@ -21,7 +21,7 @@ import { PersistentKey } from '../../storages';
 import { CollectionPersistent } from '../collection.persistent';
 
 export class Group<
-  DataType extends Object = DefaultItem,
+  DataType extends DefaultItem = DefaultItem,
   ValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
 > extends EnhancedState<Array<ItemKey>> {
   // Collection the Group belongs to

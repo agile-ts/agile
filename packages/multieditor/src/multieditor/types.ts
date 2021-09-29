@@ -45,7 +45,7 @@ export type ShallowPartial<T> = {
 // Extracts each path to a property from the specified object
 export type DeepPaths<T> = {
   [K in keyof T]: DeepPathsImpl<K & string, T[K]>;
-}[keyof T];
+}[keyof T] & string;
 
 type DeepPathsImpl<K extends string | number, V> = V extends Primitive
   ? `${K}`
@@ -54,7 +54,7 @@ type DeepPathsImpl<K extends string | number, V> = V extends Primitive
 // Extracts each path to a property at the top level of the specified object
 export type FlatPaths<T> = {
   [K in keyof T]: T[K] extends any ? K : never;
-}[keyof T]
+}[keyof T] & string;
 
 // Extracts the value type of the specified Path (P) in the provided object (T) at top level
 export type DeepPathValues<T, P extends DeepPaths<T> | string | number> = T extends any
