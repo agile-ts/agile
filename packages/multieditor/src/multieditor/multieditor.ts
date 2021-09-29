@@ -6,7 +6,7 @@ import { StatusInterface, StatusType } from '../status';
 import {
   DeepFieldPaths,
   DeepFieldPathValues,
-  EditorConfig,
+  CreateEditorConfig,
   EditorConfigInterface,
   EditorKey,
   EditorValidationSchemaType,
@@ -51,7 +51,7 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
    * @param agileInstance - Instance of Agile the Multieditor belongs to.
    * @param config - Configuration object
    */
-  constructor(config: EditorConfig<TFieldData>, agileInstance: Agile) {
+  constructor(config: CreateEditorConfig<TFieldData>, agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
@@ -375,7 +375,7 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
   /**
    * Retrieves a single Item with the specified key/name identifier from the Multieditor.
    *
-   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   * If the to retrieve Item doesn't exist, `null` is returned.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
@@ -422,7 +422,6 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
     return this.getItem(itemKey)?.initialStateValue;
   }
 
-  /**
   /**
    * Returns a boolean indicating whether at least one Item
    * of the Items with the specified key/name identifiers is modified.

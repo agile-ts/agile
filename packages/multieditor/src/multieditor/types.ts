@@ -25,7 +25,7 @@ export type NestedValue<TValue extends Object = Object> = {
   [$NestedValue]: never;
 } & TValue;
 
-// Creates an object type based on the specified object were each property is optional
+// Creates an object type, based on the specified object were each property is optional
 export type DeepPartial<T> = {
   [K in keyof T]?: DeepPartialImpl<T[K]>;
 };
@@ -36,13 +36,13 @@ type DeepPartialImpl<T> = T extends NestedValue
     ? DeepPartial<T>
     : T;
 
-// Creates an object type based on the specified object were each property at the top level is optional
+// Creates an object type, based on the specified object were each property at the top level is optional
 export type ShallowPartial<T> = {
   [K in keyof T]?: T;
 };
 
 
-// Extracts each path to a property from the specified object
+// Extracts each path to a property (e.g. user.location.city) from the specified object
 export type DeepPaths<T> = {
   [K in keyof T]: DeepPathsImpl<K & string, T[K]>;
 }[keyof T] & string;
@@ -51,12 +51,12 @@ type DeepPathsImpl<K extends string | number, V> = V extends Primitive
   ? `${K}`
   : `${K}` | `${K}.${DeepPaths<V>}`;
 
-// Extracts each path to a property at the top level of the specified object
+// Extracts each path to a property (e.g. user) at the top level of the specified object
 export type FlatPaths<T> = {
   [K in keyof T]: T[K] extends any ? K : never;
 }[keyof T] & string;
 
-// Extracts the value type of the specified Path (P) in the provided object (T) at top level
+// Extracts the value type of the specified Path (P) in the provided object (T) at the top level
 export type DeepPathValues<T, P extends DeepPaths<T> | string | number> = T extends any
   ? P extends `${infer K}.${infer R}` // if having nested Path like 'image.id'
     ? K extends keyof T
@@ -81,10 +81,9 @@ export type DeepFieldPathValues<
   TFieldPath extends DeepFieldPaths<TFieldData>,
   > = DeepPathValues<TFieldData, TFieldPath>;
 
-
 export type EditorKey = string | number;
 
-export interface CreateEditorConfigInterface<
+export interface CreateEditorConfigImpl<
   TFieldData extends FieldData = FieldData
   > {
   /**
@@ -98,13 +97,13 @@ export interface CreateEditorConfigInterface<
    */
   initialData: TFieldData;
   /**
-   * Key/name identifiers of Items whose values
+   * Key/name identifiers of the Items whose values
    * to be always passed to the specified 'onSubmit()' method.
    * @default []
    */
   fixedProperties?: string[];
   /**
-   * Key/Name identifiers of Items that can be edited.
+   * Key/Name identifiers of the Items that can be edited.
    * @default Object.keys(config.initialData)
    */
   editableProperties?: string[];
@@ -127,7 +126,7 @@ export interface CreateEditorConfigInterface<
     config?: any
   ) => Promise<any>;
   /**
-   * In which circumstances the Multieditor is revalidated.
+   * In which circumstances the Multieditor should be revalidated.
    * @default 'onSubmit'
    */
   reValidateMode?: ValidationMode;
@@ -138,13 +137,19 @@ export interface CreateEditorConfigInterface<
   toValidate?: ValidateType;
 }
 
+export type CreateEditorConfig<TFieldData extends FieldData = FieldData> =
+  | CreateEditorConfigImpl<TFieldData>
+  | ((
+  editor: Multieditor<TFieldData>
+) => CreateEditorConfigImpl<TFieldData>);
+
 export type EditorValidationSchemaType = {
   [key: string]: ValidationMethodInterface | Validator;
 };
 
 export interface EditorConfigInterface {
   /**
-   * In which circumstances the Multieditor is revalidated.
+   * In which circumstances the Multieditor should be revalidated.
    * @default 'onSubmit'
    */
   reValidateMode: ValidationMode;
@@ -154,12 +159,6 @@ export interface EditorConfigInterface {
    */
   toValidate: ValidateType;
 }
-
-export type EditorConfig<TFieldData extends FieldData = FieldData> =
-  | CreateEditorConfigInterface<TFieldData>
-  | ((
-  editor: Multieditor<TFieldData>
-) => CreateEditorConfigInterface<TFieldData>);
 
 export interface SubmitConfigInterface<OnSubmitConfigType = any> {
   /**

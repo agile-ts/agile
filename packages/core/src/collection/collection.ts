@@ -32,7 +32,7 @@ export class Collection<
   public agileInstance: () => Agile;
 
   public config: CollectionConfigInterface;
-  private initialConfig: CreateCollectionConfigInterface;
+  private initialConfig: CreateCollectionConfigImpl;
 
   // Key/Name identifier of the Collection
   public _key?: CollectionKey;
@@ -74,7 +74,10 @@ export class Collection<
    * @param agileInstance - Instance of Agile the Collection belongs to.
    * @param config - Configuration object
    */
-  constructor(agileInstance: Agile, config: CollectionConfig<DataType> = {}) {
+  constructor(
+    agileInstance: Agile,
+    config: CreateCollectionConfig<DataType> = {}
+  ) {
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
@@ -1521,7 +1524,9 @@ export type DefaultItem = Record<string, any>; // same as { [key: string]: any }
 export type CollectionKey = string | number;
 export type ItemKey = string | number;
 
-export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
+export interface CreateCollectionConfigImpl<
+  DataType extends DefaultItem = DefaultItem
+> {
   /**
    * Initial Groups of the Collection.
    * @default []
@@ -1557,11 +1562,13 @@ export interface CreateCollectionConfigInterface<DataType = DefaultItem> {
   initialData?: Array<DataType>;
 }
 
-export type CollectionConfig<DataType extends Object = DefaultItem> =
-  | CreateCollectionConfigInterface<DataType>
+export type CreateCollectionConfig<
+  DataType extends DefaultItem = DefaultItem
+> =
+  | CreateCollectionConfigImpl<DataType>
   | ((
       collection: Collection<DataType>
-    ) => CreateCollectionConfigInterface<DataType>);
+    ) => CreateCollectionConfigImpl<DataType>);
 
 export interface CollectionConfigInterface {
   /**
