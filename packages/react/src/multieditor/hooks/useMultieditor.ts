@@ -11,7 +11,7 @@ import type {
 import { useAgile } from '../../core';
 import { logCodeManager } from '../../logCodeManager';
 import { multieditorPackage } from '../multieditorPackage';
-import { FieldData } from '@agile-ts/multieditor';
+import { DeepFieldPathValues, FieldData } from '@agile-ts/multieditor';
 
 export function useMultieditor<TFieldData extends FieldData = FieldData>(
   configOrMultieditor: EditorConfig<TFieldData> | Multieditor<TFieldData>,
@@ -42,17 +42,17 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
     const isComputed = item.computeValueMethod != null;
 
     // Compute 'onChange' property
-    const onChange = async (e: any) => {
-      const nextValue = e?.target?.value;
+    const onChange = async (event: any) => {
+      const nextValue = event?.target?.value;
       if (nextValue != null) {
-        multieditor.setValue(itemKey as any, nextValue, {
+        multieditor.setValue(itemKey, nextValue, {
           background: !isComputed, // If the value is computed, we need a controlled input (-> re-render on every value change)
         });
       }
     };
 
     // Compute 'onBlur' property
-    const onBlur = async (e: any) => {
+    const onBlur = async (event: any) => {
       item.blur();
     };
 
@@ -87,8 +87,12 @@ export function useMultieditor<TFieldData extends FieldData = FieldData>(
   };
 
   // Retrieves the Item with the specified key/name identifier from the Multieditor
-  const item = (itemKey: FieldPaths<TFieldData>): Item | null => {
-    return multieditor.getItem(itemKey) || null;
+  const item = <
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): Item<DeepFieldPathValues<TFieldData, TItemName>> | null => {
+    return multieditor.getItem(itemKey);
   };
 
   return { editor: multieditor, insertItem, submit, status, item };
@@ -105,22 +109,22 @@ export interface InsertMethodConfigInterface {
    */
   value?: string | number;
   /**
-   * 'onChange()' method.
+   * 'onChange()' handler.
    */
   onChange?: ChangeEventHandler;
   /**
-   * 'onBlur()' method.
+   * 'onBlur()' handler.
    */
   onBlur?: FocusEventHandler;
 }
 
-// When using Interface the object destruction has no full intellij
+// When using 'interface' the object destructed methods have no intellij
 // https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces
 export type UseMultieditorReturnInterface<
   TFieldData extends FieldData = FieldData
 > = {
   /**
-   * Multieditor that manages all the Form tasks.
+   * Multieditor that manages the Form.
    */
   editor: Multieditor<TFieldData>;
   /**
@@ -131,6 +135,8 @@ export type UseMultieditorReturnInterface<
   submit: (config?: SubmitConfigInterface) => Promise<any | false>;
   /**
    * Inserts the most important 'props' into the React Component.
+   *
+   * Example: <ReactComponent {...insertItem('itemKey')}/>
    *
    * @param itemKey - Key/Name identifier of the Item.
    */
@@ -146,10 +152,12 @@ export type UseMultieditorReturnInterface<
   /**
    * Retrieves the Item with the specified key/name identifier from the Multieditor.
    *
-   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   * If the to retrieve Item doesn't exist, `null` is returned.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  item: (itemKey: FieldPaths<TFieldData>) => Item | null;
+  item: <TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>>(
+    itemKey: TItemName
+  ) => Item<DeepFieldPathValues<TFieldData, TItemName>> | null;
 };

@@ -384,7 +384,7 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
     TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
   >(
     itemKey: TItemName
-  ): Item<DeepFieldPathValues<TFieldData, TItemName>> | undefined {
+  ): Item<DeepFieldPathValues<TFieldData, TItemName>> | null {
     return this.data[itemKey as string];
   }
 
