@@ -3,7 +3,6 @@ import {
   isAsyncFunction,
   removeProperties,
 } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { extractRelevantObservers } from '../utils';
 import {

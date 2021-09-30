@@ -8,7 +8,7 @@ import {
   notEqual,
   removeProperties,
 } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { State, StateConfigInterface, StateKey } from './state';
 import { Agile } from '../agile';
 import { StateIngestConfigInterface } from './state.observer';
@@ -123,11 +123,13 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
 
     // Check if the given conditions are suitable for a patch action
     if (!isValidObject(this.nextStateValue, true)) {
-      LogCodeManager.log('14:03:02');
+      logCodeManager.log('14:03:02');
       return this;
     }
     if (!isValidObject(targetWithChanges, true)) {
-      LogCodeManager.log('00:03:01', ['TargetWithChanges', 'object']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['TargetWithChanges', 'object'],
+      });
       return this;
     }
 
@@ -192,7 +194,9 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
     }
 
     if (!isFunction(_callback)) {
-      LogCodeManager.log('00:03:01', ['Watcher Callback', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Watcher Callback', 'function'],
+      });
       return this;
     }
 
@@ -252,11 +256,13 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
     delay?: number
   ): this {
     if (!isFunction(handler)) {
-      LogCodeManager.log('00:03:01', ['Interval Callback', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Interval Callback', 'function'],
+      });
       return this;
     }
     if (this.currentInterval) {
-      LogCodeManager.log('14:03:03', [], this.currentInterval);
+      logCodeManager.log('14:03:03', { replacers: [] }, this.currentInterval);
       return this;
     }
     this.currentInterval = setInterval(() => {
@@ -307,7 +313,9 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
    */
   public computeExists(method: ComputeExistsMethod<ValueType>): this {
     if (!isFunction(method)) {
-      LogCodeManager.log('00:03:01', ['Compute Exists Method', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Compute Exists Method', 'function'],
+      });
       return this;
     }
     this.computeExistsMethod = method;
@@ -328,7 +336,9 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Compute Value Method', 'function'],
+      });
       return this;
     }
     this.computeValueMethod = method;
@@ -393,7 +403,9 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
         this.set((this.nextStateValue * -1) as any);
         break;
       default:
-        LogCodeManager.log('14:03:04', [typeof this.nextStateValue]);
+        logCodeManager.log('14:03:04', {
+          replacers: [typeof this.nextStateValue],
+        });
     }
     return this;
   }
@@ -476,7 +488,9 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
   public onLoad(callback: (success: boolean) => void): this {
     if (!this.persistent) return this;
     if (!isFunction(callback)) {
-      LogCodeManager.log('00:03:01', ['OnLoad Callback', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['OnLoad Callback', 'function'],
+      });
       return this;
     }
 

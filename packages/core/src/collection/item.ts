@@ -10,9 +10,9 @@ import { SelectorKey } from './selector';
 import { PersistentKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
-export class Item<DataType extends Object = DefaultItem> extends EnhancedState<
-  DataType
-> {
+export class Item<
+  DataType extends DefaultItem = DefaultItem
+> extends EnhancedState<DataType> {
   // Collection the Group belongs to
   public collection: () => Collection<DataType>;
 

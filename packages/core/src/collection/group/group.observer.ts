@@ -13,8 +13,11 @@ import {
   RuntimeJob,
 } from '../../runtime';
 import { Group } from './index';
+import { DefaultItem } from '../collection';
 
-export class GroupObserver<DataType = any> extends Observer {
+export class GroupObserver<
+  DataType extends DefaultItem = DefaultItem
+> extends Observer {
   // Group the Observer belongs to
   public group: () => Group<DataType>;
 

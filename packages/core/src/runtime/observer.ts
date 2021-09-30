@@ -1,5 +1,5 @@
 import { defineConfig, generateId } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { SubscriptionContainer } from './subscription';
 import { CreateRuntimeJobConfigInterface, RuntimeJob } from './runtime.job';
@@ -138,7 +138,7 @@ export class Observer<ValueType = any> {
    * @param job - Runtime-Job to be performed.
    */
   public perform(job: RuntimeJob): void {
-    LogCodeManager.log('17:03:00');
+    logCodeManager.log('17:03:00');
   }
 
   /**

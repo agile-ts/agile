@@ -1,6 +1,6 @@
 import { Agile } from '../agile';
 import { shared } from '../shared';
-import { Collection, CollectionConfig, DefaultItem } from './collection';
+import { Collection, CreateCollectionConfig, DefaultItem } from './collection';
 
 export * from './collection';
 export * from './collection.persistent';
@@ -28,8 +28,8 @@ export * from './selector';
  * @param config - Configuration object
  * @param agileInstance - Instance of Agile the Collection belongs to.
  */
-export function createCollection<DataType extends Object = DefaultItem>(
-  config?: CollectionConfig<DataType>,
+export function createCollection<DataType extends DefaultItem = DefaultItem>(
+  config?: CreateCollectionConfig<DataType>,
   agileInstance: Agile = shared
 ): Collection<DataType> {
   return new Collection<DataType>(agileInstance, config);

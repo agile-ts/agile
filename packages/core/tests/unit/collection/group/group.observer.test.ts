@@ -100,7 +100,7 @@ describe('GroupObserver Tests', () => {
   });
 
   describe('Group Observer Function Tests', () => {
-    let groupObserver: GroupObserver;
+    let groupObserver: GroupObserver<ItemInterface>;
 
     beforeEach(() => {
       groupObserver = new GroupObserver(dummyGroup, {

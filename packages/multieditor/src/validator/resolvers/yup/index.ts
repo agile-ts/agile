@@ -1,5 +1,5 @@
 import { generateId } from '@agile-ts/utils';
-import * as Yup from 'yup';
+import type { BaseSchema } from 'yup';
 import { Validator } from '../../validator';
 
 /**
@@ -7,7 +7,7 @@ import { Validator } from '../../validator';
  *
  * @param schema - Yup schema
  */
-export function yupResolver(schema: Yup.BaseSchema): Validator {
+export function yupResolver(schema: BaseSchema): Validator {
   const validator = new Validator();
 
   // Add validation method to the created Validator

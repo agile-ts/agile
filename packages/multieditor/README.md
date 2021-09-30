@@ -18,25 +18,33 @@
 ```ts
 // Create Multieditior 
 const multiEditor = createMultieditor(editor => ({
-  data: {
+  initialData: {
     id: "myId", // Initial Id
     email: undefined, // Inital Email
     name: undefined, // Inital Name
   },
   onSubmit: async (data) => {
-    console.log("Submitted ", data);  // <---------------------------------------------    
-  }, //                                                                               |
-  fixedProperties: ["id"], // Properties that are always passed to the 'onSubmit()' method
-  validateMethods: {
-    email: agileResolver(isString, isEmail, isRequired), // Validation with tree shakable validation methods
-    name: yupResolver(Yup.string().max(10).min(2).required()), // Validation with external validatiors like Yup
-  },
-  editableProperties: ["email", "name"], // Properties that can be edited
+    console.log("Submitted ", data);  // <---------
+  }, //                                           |
+  // Properties that are always passed to the 'onSubmit()' method
+  fixedProperties: ["id"],
+  validationSchema: {
+    // Validation with inbuilt tree shakable validation methods
+    email: agileResolver(isString, isEmail, isRequired),
+    // Validation with external validatiors like Yup
+    name: yupResolver(Yup.string().required().max(10).min(2)),
+  }
 }));
 
-// Update Multieditor values in the UI-Form
-multiEditor.setValue("email", "test@test.com");
-multiEditor.setValue("name", "Jeff");
+// Use the Multieditor in any UI-Form
+// ..
+<label>First Name:</label>
+<input
+onChange={(e) => signUpEditor.setValue("firstName", e.target.value)}
+defaultValue={signUpEditor.getItemInitialValue("firstName")}
+/>
+<ErrorMessage error={signUpEditor.getStatus("firstName")?.message} />
+// ..
 
 // Submit Multieditor and see what the 'onSubmit()' method will log
 multiEditor.submit();

@@ -2,7 +2,7 @@ import { Agile, assignSharedAgileInstance } from '@agile-ts/core';
 import { Event, createEvent } from '../../../src';
 import { LogMock } from '../../../../core/tests/helper/logMock';
 
-jest.mock('../../../src/event/event');
+jest.mock('../../../src/event');
 
 describe('Shared (Event) Tests', () => {
   let sharedAgileInstance: Agile;

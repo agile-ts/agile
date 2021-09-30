@@ -1,13 +1,13 @@
 import { StateRuntimeJobConfigInterface, State } from '@agile-ts/core';
 import { isFunction, defineConfig } from '@agile-ts/utils';
-import { ItemKey, Multieditor } from './multieditor';
+import { Multieditor } from './multieditor';
 import { Status } from './status';
 import { Validator } from './validator';
-import { LogCodeManager } from './logCodeManager';
+import { logCodeManager } from './logCodeManager';
 
 export class Item<ValueType = any> extends State<ValueType> {
   // Multieditor the Item belongs to
-  public editor: () => Multieditor<ValueType>;
+  public editor: () => Multieditor;
 
   public config: ItemConfigInterface;
 
@@ -16,7 +16,10 @@ export class Item<ValueType = any> extends State<ValueType> {
   // Handles the validation of the Item
   public validator: Validator<ValueType>;
   // Handles and represents the validation Status of the Item
-  public status: Status;
+  public status: Status<ValueType>;
+
+  // Whether the Item has been touched
+  public touched = false;
 
   // Method for dynamically computing the Item value
   public computeValueMethod?: ComputeValueMethod<ValueType>;
@@ -30,9 +33,9 @@ export class Item<ValueType = any> extends State<ValueType> {
    * @param config - Configuration object
    */
   constructor(
-    editor: Multieditor<ValueType>,
+    editor: Multieditor,
     initialValue: ValueType,
-    config: ItemConfigInterface
+    config: ItemConfigInterface<ValueType>
   ) {
     super(editor.agileInstance(), initialValue, {
       key: config.key,
@@ -48,10 +51,10 @@ export class Item<ValueType = any> extends State<ValueType> {
 
     // Add side effect to revalidate the Item on every Item value change
     this.addSideEffect('validateItem', async () => {
-      await this.validate();
-
       if (this.editor().canAssignStatusToItemOnChange(this))
-        this.status.display = true;
+        this.status.config.display = true;
+
+      await this.validate();
 
       // Recompute Multieditor states
       this.editor().recomputeValidatedState({ validate: false });
@@ -79,7 +82,8 @@ export class Item<ValueType = any> extends State<ValueType> {
    */
   public reset(config: StateRuntimeJobConfigInterface = {}): this {
     this.set(this.initialStateValue, config);
-    this.status.display = false;
+    this.status.config.display = false;
+    this.touched = false;
     return this;
   }
 
@@ -95,7 +99,9 @@ export class Item<ValueType = any> extends State<ValueType> {
    */
   public computeValue(method: ComputeValueMethod<ValueType>): this {
     if (!isFunction(method)) {
-      LogCodeManager.log('00:03:01', ['Compute Value Method', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Compute Value Method', 'function'],
+      });
       return this;
     }
     this.computeValueMethod = method;
@@ -106,9 +112,23 @@ export class Item<ValueType = any> extends State<ValueType> {
 
     return this;
   }
+
+  public blur(): this {
+    this.touched = true;
+
+    // Assign Status to Item
+    if (this.editor().canAssignStatusToItemOnBlur(this)) {
+      this.status.config.display = true;
+      this.status.ingest({
+        force: true, // Force because the value hasn't changed
+      });
+    }
+
+    return this;
+  }
 }
 
-export interface ItemConfigInterface {
+export interface ItemConfigInterface<ValueType = any> {
   /**
    * Key/Name identifier of the Item.
    */
@@ -123,7 +143,9 @@ export interface ItemConfigInterface {
    * Validator to handle validating the Item.
    * @default newly create Validator
    */
-  validator?: Validator;
+  validator?: Validator<ValueType>;
 }
 
 export type ComputeValueMethod<T = any> = (value: T) => T;
+
+export type ItemKey = string | number;

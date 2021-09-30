@@ -5,7 +5,7 @@ import {
   normalizeArray,
   removeProperties,
 } from '@agile-ts/utils';
-import { LogCodeManager } from '../../logCodeManager';
+import { logCodeManager } from '../../logCodeManager';
 import {
   EnhancedState,
   StateIngestConfigInterface,
@@ -21,7 +21,7 @@ import { PersistentKey } from '../../storages';
 import { CollectionPersistent } from '../collection.persistent';
 
 export class Group<
-  DataType extends Object = DefaultItem,
+  DataType extends DefaultItem = DefaultItem,
   ValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
 > extends EnhancedState<Array<ItemKey>> {
   // Collection the Group belongs to
@@ -102,7 +102,7 @@ export class Group<
   }
 
   public set output(value: DataType[]) {
-    LogCodeManager.log('1C:03:00', [this._key]);
+    logCodeManager.log('1C:03:00', { replacers: [this._key] });
   }
 
   /**
@@ -462,9 +462,9 @@ export class Group<
 
     // Logging
     if (notFoundItemKeys.length > 0 && this.loadedInitialValue) {
-      LogCodeManager.log(
+      logCodeManager.log(
         '1C:02:00',
-        [this.collection()._key, this._key],
+        { replacers: [this.collection()._key, this._key] },
         notFoundItemKeys
       );
     }

@@ -10,7 +10,7 @@ import Agile, {
   normalizeArray,
 } from '@agile-ts/core';
 import type { Collection } from '@agile-ts/core'; // Only import Collection and Group type for better Treeshaking
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../../logCodeManager';
 
 /**
  * A Higher order Component for binding the most relevant value of multiple Agile Instances
@@ -57,7 +57,7 @@ export function AgileHOC(
     }
   }
   if (!agileInstance || !agileInstance.subController) {
-    LogCodeManager.log('32:03:00', [deps]);
+    logCodeManager.log('32:03:00', { replacers: [deps] });
     return reactComponent;
   }
 
@@ -90,8 +90,9 @@ const createHOC = (
     public agileInstance: Agile;
     public waitForMount: boolean;
 
-    public componentSubscriptionContainers: Array<ComponentSubscriptionContainer> =
-      []; // Represents all Subscription Container subscribed to this Component (set by subController)
+    public componentSubscriptionContainers: Array<
+      ComponentSubscriptionContainer
+    > = []; // Represents all Subscription Container subscribed to this Component (set by subController)
     public agileProps = {}; // Props of subscribed Agile Instances (are merged into the normal props)
 
     constructor(props: any) {
@@ -231,8 +232,9 @@ const formatDepsWithIndicator = (
 export class AgileReactComponent extends React.Component {
   // @ts-ignore
   public agileInstance: Agile;
-  public componentSubscriptionContainers: Array<ComponentSubscriptionContainer> =
-    [];
+  public componentSubscriptionContainers: Array<
+    ComponentSubscriptionContainer
+  > = [];
   public agileProps = {};
 
   constructor(props: any) {

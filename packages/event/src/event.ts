@@ -2,7 +2,7 @@ import {
   Agile,
   generateId,
   isFunction,
-  LogCodeManager,
+  logCodeManager,
   Observer,
 } from '@agile-ts/core';
 import { defineConfig } from '@agile-ts/utils';
@@ -124,7 +124,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback is a Function
     if (!isFunction(_callback)) {
-      LogCodeManager.getLogger()?.error(
+      logCodeManager.logger?.error(
         'A Event Callback Function has to be typeof Function!'
       );
       return this;
@@ -132,7 +132,7 @@ export class Event<PayloadType = DefaultEventPayload> {
 
     // Check if Callback Function already exists
     if (this.callbacks[key]) {
-      LogCodeManager.getLogger()?.error(
+      logCodeManager.logger?.error(
         `Event Callback Function with the key/name '${key}' already exists!`
       );
       return this;

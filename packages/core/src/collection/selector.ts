@@ -4,7 +4,7 @@ import { Item } from './item';
 import { Collection, DefaultItem, ItemKey } from './collection';
 
 export class Selector<
-  DataType extends Object = DefaultItem
+  DataType extends DefaultItem = DefaultItem
 > extends EnhancedState<DataType | null> {
   // Collection the Selector belongs to
   public collection: () => Collection<DataType>;
