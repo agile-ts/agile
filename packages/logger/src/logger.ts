@@ -18,8 +18,10 @@ export class Logger {
   } = {};
 
   /**
+   * Handy Class for handling console.logs
+   *
    * @public
-   * Logger - Handy Class for handling console.logs
+   * @param config - Configuration object
    */
   constructor(config: LoggerConfig = {}) {
     let _config = typeof config === 'function' ? config(this) : config;
@@ -39,26 +41,17 @@ export class Logger {
       canUseCustomStyles: _config.canUseCustomStyles as any,
       level: _config.level as any,
     };
+
     this.addDefaultLoggerCategories();
   }
 
   /**
+   * Log level the Logger can work with.
+   *
    * @public
-   * Adds Conditions to Logs
-   */
-  public get if() {
-    return {
-      tag: (tags: string[]) => this.tag(tags),
-    };
-  }
-
-  /**
-   * @public
-   * Default Levels of Logger
    */
   static get level() {
     return {
-      TRACE: 1,
       DEBUG: 2,
       LOG: 5,
       TABLE: 5,
@@ -69,12 +62,21 @@ export class Logger {
     };
   }
 
-  //=========================================================================================================
-  // Add Default Logger Categories
-  //=========================================================================================================
   /**
+   * Adds Conditions to Logs
+   *
+   * @public
+   */
+  public get if() {
+    return {
+      tag: (tags: string[]) => this.tag(tags),
+    };
+  }
+
+  /**
+   * Assigns the default Logger categories to the Logger.
+   *
    * @internal
-   * Adds Default Logger Categories
    */
   private addDefaultLoggerCategories() {
     this.createLoggerCategory({
@@ -110,50 +112,34 @@ export class Logger {
       level: Logger.level.ERROR,
     });
     this.createLoggerCategory({
-      key: 'trace',
-      prefix: 'Trace',
-      level: Logger.level.TRACE,
-    });
-    this.createLoggerCategory({
       key: 'table',
       level: Logger.level.TABLE,
     });
   }
 
-  //=========================================================================================================
-  // Tag
-  //=========================================================================================================
   /**
-   * @internal
    * Only executes following 'command' if all given tags are included in allowedTags
+   *
+   * @internal
    * @param tags - Tags
    */
-  private tag(tags: string[]) {
-    if (includesArray(this.allowedTags, tags)) {
-      return {
-        log: (...data: any[]) => this.log(...data),
-        debug: (...data: any[]) => this.debug(...data),
-        info: (...data: any[]) => this.info(...data),
-        success: (...data: any[]) => this.success(...data),
-        warn: (...data: any[]) => this.warn(...data),
-        error: (...data: any[]) => this.error(...data),
-        trace: (...data: any[]) => this.trace(...data),
-        table: (...data: any[]) => this.table(...data),
-      };
+  private tag(tags: string[]): TagMethodReturnInterface {
+    const defaultLoggerCategories = Object.keys(
+      Logger.level
+    ).map((loggerCategory) => loggerCategory.toLowerCase());
+    const includesTag = includesArray(this.allowedTags, tags);
+
+    // Build object representing taggable log methods
+    const finalObject: TagMethodReturnInterface = {} as any;
+    for (const loggerCategory of defaultLoggerCategories) {
+      finalObject[loggerCategory] = includesTag
+        ? this[loggerCategory]
+        : () => {
+            /* do nothing */
+          };
     }
-    const doNothing = () => {
-      /* do nothing */
-    };
-    return {
-      log: doNothing,
-      debug: doNothing,
-      info: doNothing,
-      success: doNothing,
-      warn: doNothing,
-      error: doNothing,
-      trace: doNothing,
-      table: doNothing,
-    };
+
+    return finalObject;
   }
 
   public log(...data: any[]) {
@@ -193,14 +179,6 @@ export class Logger {
       data,
       'error',
       typeof console.error !== 'undefined' ? 'error' : 'log'
-    );
-  }
-
-  public trace(...data: any[]) {
-    this.invokeConsole(
-      data,
-      'trace',
-      typeof console.trace !== 'undefined' ? 'trace' : 'log'
     );
   }
 
@@ -460,7 +438,6 @@ export type ConsoleLogType =
   | 'log'
   | 'warn'
   | 'error'
-  | 'trace'
   | 'table'
   | 'info'
   | 'debug';
@@ -477,4 +454,14 @@ export type LoggerWatcherCallback = (
 export interface LoggerWatcherConfigInterface {
   callback: LoggerWatcherCallback;
   level?: number;
+}
+
+export interface TagMethodReturnInterface {
+  log: (...data: any) => void;
+  debug: (...data: any) => void;
+  info: (...data: any) => void;
+  success: (...data: any) => void;
+  warn: (...data: any) => void;
+  error: (...data: any) => void;
+  table: (...data: any) => void;
 }

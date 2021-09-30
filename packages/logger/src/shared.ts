@@ -13,9 +13,9 @@ let sharedLogger = new Logger(defaultSharedLoggerConfig);
 export { sharedLogger };
 
 /**
- * Assigns the specified configuration object to the shared Agile Logger.
+ * Assigns the specified Logger as the shared Logger.
  *
- * @param logger - Configuration object
+ * @param logger - Logger to become the new shared Logger.
  */
 export function assignSharedLogger(logger: Logger): void {
   sharedLogger = logger;

@@ -117,7 +117,7 @@ export const signUpEditor = createMultieditor<InitialDataInterface>({
     },
   },
   fixedProperties: ['id'],
-  reValidateMode: 'onChange',
+  reValidateMode: 'onBlur',
 });
 
 // For better debugging
