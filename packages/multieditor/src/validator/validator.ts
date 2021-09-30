@@ -74,7 +74,7 @@ export class Validator<ValueType = any> {
     // Handle tracked Statuses
     const trackedStatuses = item.status.statusTracker.getTrackedStatuses();
     if (trackedStatuses.length > 0) {
-      item.status.set(trackedStatuses[0]); // First tracked Status is the most recent validation Status and thus should be displayed
+      item.status.set(trackedStatuses[0]); // The first tracked Status is the most recent validation Status and thus should be displayed
       item.status.lastTrackedValues = copy(trackedStatuses);
     } else editor.resetStatus(item._key);
 
@@ -163,7 +163,7 @@ export interface ValidationMethodContainerInterface<DataType = any> {
    * Key/Name identifier of the validation method.
    * @default undefined
    */
-  key?: string;
+  key?: ValidationMethodKey;
   /**
    * Validation method
    */
@@ -177,3 +177,5 @@ export interface AddValidationMethodConfigInterface {
    */
   key?: string;
 }
+
+export type ValidationMethodKey = string | number;

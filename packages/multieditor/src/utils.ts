@@ -31,7 +31,7 @@ export function updateNestedProperty(
   }
 
   // Update the value in the schema (corresponding object part)
-  // and thus automatically update the 'newObject' by reference
+  // and thus automatically update the to change part in the 'newObject' by reference
   schema[pathParts[pathPartsLength - 1]] = value;
 
   return updatedObject;

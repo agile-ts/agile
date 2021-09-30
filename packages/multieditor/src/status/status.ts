@@ -23,10 +23,10 @@ export class Status<ValueType = any> extends State<StatusValueType> {
    * @param config - Configuration object
    */
   constructor(item: Item<ValueType>, config: CreateStatusConfigInterface = {}) {
+    super(item.agileInstance(), null, { key: `status_${item._key}` });
     config = defineConfig(config, {
       display: false,
     });
-    super(item.agileInstance(), null, { key: `status_${item._key}` });
     this.item = item;
     this.statusTracker = new StatusTracker();
     this.config = {
