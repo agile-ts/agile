@@ -6,11 +6,13 @@ export class Logger {
   // Key/Name identifier of the Logger
   public key?: LoggerKey;
 
-  // Whether the Logger is active and can log
+  // Whether the Logger is active and can log something
   public isActive: boolean;
+
   // Registered Logger Categories (type of log messages)
   public loggerCategories: { [key: string]: LoggerCategoryInterface } = {};
-  // Registered watcher callback
+
+  // Registered watcher callbacks
   public watchers: {
     [key: string]: LoggerWatcherConfigInterface;
   } = {};
@@ -22,9 +24,8 @@ export class Logger {
    * @public
    * @param config - Configuration object
    */
-  constructor(config: LoggerConfig = {}) {
-    let _config = typeof config === 'function' ? config(this) : config;
-    _config = defineConfig(_config, {
+  constructor(config: CreateLoggerConfigInterface = {}) {
+    config = defineConfig(config, {
       prefix: '',
       allowedTags: [],
       canUseCustomStyles: true,
@@ -32,13 +33,13 @@ export class Logger {
       level: 0,
       timestamp: false,
     });
-    this.isActive = _config.active as any;
+    this.isActive = config.active as any;
     this.config = {
-      timestamp: _config.timestamp as any,
-      prefix: _config.prefix as any,
-      canUseCustomStyles: _config.canUseCustomStyles as any,
-      level: _config.level as any,
-      allowedTags: _config.allowedTags as any,
+      timestamp: config.timestamp as any,
+      prefix: config.prefix as any,
+      canUseCustomStyles: config.canUseCustomStyles as any,
+      level: config.level as any,
+      allowedTags: config.allowedTags as any,
     };
 
     // Assign default Logger categories to the Logger
@@ -81,7 +82,7 @@ export class Logger {
   }
 
   /**
-   * Default log level of the Logger.
+   * Default log levels of the Logger.
    *
    * The log level determines which type of logs can be logged.
    *
@@ -102,36 +103,41 @@ export class Logger {
   /**
    * Lays the foundation for a conditional log.
    *
+   * logger.if.something.do_whatever (e.g. logger.if.tag('jeff').log('hello jeff'))
+   *
    * @public
    */
   public get if() {
     return {
       /**
-       * Only executes the following action
-       * if all given tags are allowed to be logged.
+       * Only performs the following action (tag().followingAction)
+       * if all specified tags are allowed to be logged.
        *
-       * @internal
-       * @param tags - Tags to be allowed.
+       * @public
+       * @param tags - Tags required to perform the following action.
        */
       tag: (tags: string[]) => this.tag(tags),
     };
   }
 
   /**
-   * Only executes the following action
-   * if all given tags are allowed to be logged.
+   * Only performs the following action (tag().followingAction)
+   * if all specified tags are allowed to be logged.
    *
    * @internal
-   * @param tags - Tags to be allowed.
+   * @param tags - Tags required to perform the following action.
    */
   private tag(tags: string[]): DefaultLogMethodsInterface {
     return this.logIfCondition(includesArray(this.config.allowedTags, tags));
   }
 
   /**
-   * Returns an array of the default log methods if the specified condition is true.
+   * Returns an object containing the default log methods
+   * (log, debug, table, info, success, warn error)
+   * if the specified condition is true.
    *
-   * @param condition
+   * @internal
+   * @param condition - Condition
    * @private
    */
   private logIfCondition(condition: boolean): DefaultLogMethodsInterface {
@@ -139,11 +145,11 @@ export class Logger {
       Logger.level
     ).map((loggerCategory) => loggerCategory.toLowerCase());
 
-    // Build object representing taggable log methods
+    // Build object based on the default log categories
     const finalObject: DefaultLogMethodsInterface = {} as any;
     for (const loggerCategory of defaultLoggerCategories) {
       finalObject[loggerCategory] = condition
-        ? (...data) => this[loggerCategory](...data)
+        ? (...data) => this[loggerCategory](...data) // Wrapping into method to preserve the this scope of the Logger
         : () => {
             /* do nothing */
           };
@@ -246,7 +252,7 @@ export class Logger {
    * Prints a log message based on the specified logger category.
    *
    * @public
-   * @param loggerCategory - Logger category to be logged.
+   * @param loggerCategory - Key/Name identifier of the Logger category.
    * @param data - Data to be logged.
    */
   public custom(loggerCategory: string, ...data: any[]) {
@@ -254,12 +260,12 @@ export class Logger {
   }
 
   /**
-   * Internal method for logging the data
-   * into the console based on the specified logger category.
+   * Internal method for logging the specified data
+   * into the 'console' based on the provided logger category.
    *
    * @internal
    * @param data - Data to be logged.
-   * @param loggerCategoryKey - Key/Name of the Logger Category.
+   * @param loggerCategoryKey - Key/Name identifier of the Logger category.
    * @param consoleLogType - What type of log to be logged (console[consoleLogType]).
    */
   private invokeConsole(
@@ -284,7 +290,7 @@ export class Logger {
       return prefix;
     };
 
-    // Add built log prefix to the to log data
+    // Add built log prefix to the data array
     if (typeof data[0] === 'string')
       data[0] = buildPrefix().concat(' ').concat(data[0]);
     else data.unshift(buildPrefix());
@@ -300,9 +306,12 @@ export class Logger {
     // Init custom styling provided by the Logger category
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
-      let didStyle = false; // Because only one string part of a log can be styled
+      let didStyle = false;
       for (const log of data) {
-        if (!didStyle && typeof log === 'string') {
+        if (
+          !didStyle && // Because only one string part of a log can be styled
+          typeof log === 'string'
+        ) {
           newLogs.push(`%c${log}`);
           newLogs.push(loggerCategory.customStyle);
           didStyle = true;
@@ -330,12 +339,13 @@ export class Logger {
    * @public
    * @param loggerCategory - Logger category to be added to the Logger.
    */
-  public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
+  public createLoggerCategory(loggerCategory: CreateLoggerCategoryInterface) {
     loggerCategory = {
       prefix: '',
+      level: 0,
       ...loggerCategory,
     };
-    this.loggerCategories[loggerCategory.key] = loggerCategory;
+    this.loggerCategories[loggerCategory.key] = loggerCategory as any;
   }
 
   /**
@@ -390,53 +400,66 @@ export class Logger {
 export type LoggerCategoryKey = string | number;
 export type LoggerKey = string | number;
 
-/**
- * @param key - Key/Name of Logger Category
- * @param customStyle - Css Styles that get applied to the Logs
- * @param prefix - Prefix that gets written before each Log of this Category
- * @param level - Until which Level this Logger Category gets logged
- */
-export interface LoggerCategoryInterface {
-  key: LoggerCategoryKey;
-  customStyle?: string;
-  prefix?: string;
-  level: number;
-}
-
-/**
- * @param prefix - Prefix that gets written before each log of this Logger
- * @param canUseCustomStyles - If custom Styles can be applied to the Logs
- * @param level - Handles which Logger Categories can be Logged
- * @param timestamp - Timestamp that ges written before each log of this Logger
- */
 export interface LoggerConfigInterface {
+  /**
+   * Prefix to be added before each log message.
+   * @default ''
+   */
   prefix: string;
+  /**
+   * Whether custom styles can be applied to the log messages.
+   * @default true
+   */
   canUseCustomStyles: boolean;
+  /**
+   * Handles which Logger categories (log message types) can be logged.
+   * @default 0
+   */
   level: number;
+  /**
+   * Whether to append the current timestamp before each log message.
+   * @default false
+   */
   timestamp: boolean;
+  /**
+   * Array of tags that must be included in a conditional log to be logged.
+   * @default []
+   */
   allowedTags: LoggerKey[];
 }
 
-/**
- * @param prefix - Prefix that gets written before each log of this Logger
- * @param allowedTags - Only Logs that, contains the allowed Tags or have no Tag get logged
- * @param canUseCustomStyles - If custom Styles can be applied to the Logs
- * @param active - If Logger is active
- * @param level - Handles which Logger Categories can be Logged
- * @param timestamp - Timestamp that ges written before each log of this Logger
- */
 export interface CreateLoggerConfigInterface {
-  prefix?: string;
-  allowedTags?: LoggerKey[];
-  canUseCustomStyles?: boolean;
+  /**
+   * Whether the Logger is allowed to log a message.
+   * @default true
+   */
   active?: boolean;
+  /**
+   * Prefix to be added before each log message.
+   * @default ''
+   */
+  prefix?: string;
+  /**
+   * Whether custom styles can be applied to the log messages.
+   * @default true
+   */
+  canUseCustomStyles?: boolean;
+  /**
+   * Handles which Logger categories (log message types) can be logged.
+   * @default 0
+   */
   level?: number;
+  /**
+   * Whether to append the current timestamp before each log message.
+   * @default false
+   */
   timestamp?: boolean;
+  /**
+   * Array of tags that must be included in a conditional log to be logged.
+   * @default []
+   */
+  allowedTags?: LoggerKey[];
 }
-
-export type LoggerConfig =
-  | CreateLoggerConfigInterface
-  | ((logger: Logger) => CreateLoggerConfigInterface);
 
 export type ConsoleLogType =
   | 'log'
@@ -446,22 +469,84 @@ export type ConsoleLogType =
   | 'info'
   | 'debug';
 
+/**
+ * @param key - Key/Name of Logger Category
+ * @param customStyle - Css Styles that get applied to the Logs
+ * @param prefix - Prefix that gets written before each Log of this Category
+ * @param level - Until which Level this Logger Category gets logged
+ */
+export interface LoggerCategoryInterface {
+  /**
+   * Key/Name identifier of the Logger category.
+   * @default undefined
+   */
+  key: LoggerCategoryKey;
+  /**
+   * CSS Styles to be applied to the log messages of this category.
+   * @default ''
+   */
+  customStyle?: string;
+  /**
+   * Prefix to be written before each Log message of this category.
+   * @default ''
+   */
+  prefix: string;
+  /**
+   * From which level the log messages of this category can be logged.
+   * @default 0
+   */
+  level: number;
+}
+
+export interface CreateLoggerCategoryInterface {
+  /**
+   * Key/Name identifier of the Logger category.
+   * @default undefined
+   */
+  key: LoggerCategoryKey;
+  /**
+   * CSS Styles to be applied to the log messages of this category.
+   * @default ''
+   */
+  customStyle?: string;
+  /**
+   * Prefix to be written before each Log message of this category.
+   * @default ''
+   */
+  prefix?: string;
+  /**
+   * From which level the log messages of this category can be logged.
+   * @default 0
+   */
+  level?: number;
+}
+
 export type LoggerWatcherCallback = (
   loggerCategory: LoggerCategoryInterface,
   data: any[]
 ) => void;
 
-/**
- * @param callback - Callback Function that gets called if something gets Logged
- * @param level - At which level the watcher is called
- */
 export interface LoggerWatcherConfigInterface {
+  /**
+   * Callback method to be executed on each log action.
+   */
   callback: LoggerWatcherCallback;
+  /**
+   * From which level the watcher callback should be fired.
+   */
   level: number;
 }
 
 export interface WatcherMethodConfigInterface {
+  /**
+   * Key/Name identifier of the watcher callback.
+   * @default generated id
+   */
   key?: string;
+  /**
+   * From which level the watcher callback should be fired.
+   * @default 0
+   */
   level?: number;
 }
 
