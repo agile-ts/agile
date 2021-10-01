@@ -1,24 +1,23 @@
-import {
-  defineConfig,
-  generateId,
-  includesArray,
-  isFunction,
-  isValidObject,
-} from '@agile-ts/utils';
+import { defineConfig, generateId, includesArray } from '@agile-ts/utils';
 
 export class Logger {
+  public config: LoggerConfigInterface;
+
+  // Key/Name identifier of the Logger
   public key?: LoggerKey;
 
+  // Whether the Logger is active and can log
   public isActive: boolean;
-  public config: LoggerConfigInterface;
-  public allowedTags: string[] = [];
-  public loggerCategories: { [key: string]: LoggerCategoryInterface } = {}; // Holds all registered Logger Categories
+  // Registered Logger Categories (type of log messages)
+  public loggerCategories: { [key: string]: LoggerCategoryInterface } = {};
+  // Registered watcher callback
   public watchers: {
     [key: string]: LoggerWatcherConfigInterface;
   } = {};
 
   /**
-   * Handy Class for handling console.logs
+   * Practical class for handling advanced logging
+   * with e.g. different types of logs or filtering.
    *
    * @public
    * @param config - Configuration object
@@ -34,51 +33,15 @@ export class Logger {
       timestamp: false,
     });
     this.isActive = _config.active as any;
-    this.allowedTags = _config.allowedTags as any;
     this.config = {
       timestamp: _config.timestamp as any,
       prefix: _config.prefix as any,
       canUseCustomStyles: _config.canUseCustomStyles as any,
       level: _config.level as any,
+      allowedTags: _config.allowedTags as any,
     };
 
-    this.addDefaultLoggerCategories();
-  }
-
-  /**
-   * Log level the Logger can work with.
-   *
-   * @public
-   */
-  static get level() {
-    return {
-      DEBUG: 2,
-      LOG: 5,
-      TABLE: 5,
-      INFO: 10,
-      SUCCESS: 15,
-      WARN: 20,
-      ERROR: 50,
-    };
-  }
-
-  /**
-   * Adds Conditions to Logs
-   *
-   * @public
-   */
-  public get if() {
-    return {
-      tag: (tags: string[]) => this.tag(tags),
-    };
-  }
-
-  /**
-   * Assigns the default Logger categories to the Logger.
-   *
-   * @internal
-   */
-  private addDefaultLoggerCategories() {
+    // Assign default Logger categories to the Logger
     this.createLoggerCategory({
       key: 'log',
       level: Logger.level.LOG,
@@ -118,22 +81,69 @@ export class Logger {
   }
 
   /**
-   * Only executes following 'command' if all given tags are included in allowedTags
+   * Default log level of the Logger.
+   *
+   * The log level determines which type of logs can be logged.
+   *
+   * @public
+   */
+  static get level() {
+    return {
+      DEBUG: 2,
+      LOG: 5,
+      TABLE: 5,
+      INFO: 10,
+      SUCCESS: 15,
+      WARN: 20,
+      ERROR: 50,
+    };
+  }
+
+  /**
+   * Lays the foundation for a conditional log.
+   *
+   * @public
+   */
+  public get if() {
+    return {
+      /**
+       * Only executes the following action
+       * if all given tags are allowed to be logged.
+       *
+       * @internal
+       * @param tags - Tags to be allowed.
+       */
+      tag: (tags: string[]) => this.tag(tags),
+    };
+  }
+
+  /**
+   * Only executes the following action
+   * if all given tags are allowed to be logged.
    *
    * @internal
-   * @param tags - Tags
+   * @param tags - Tags to be allowed.
    */
-  private tag(tags: string[]): TagMethodReturnInterface {
+  private tag(tags: string[]): DefaultLogMethodsInterface {
+    return this.logIfCondition(includesArray(this.config.allowedTags, tags));
+  }
+
+  /**
+   * Returns an array of the default log methods if the specified condition is true.
+   *
+   * @param condition
+   * @private
+   */
+  private logIfCondition(condition: boolean): DefaultLogMethodsInterface {
     const defaultLoggerCategories = Object.keys(
       Logger.level
     ).map((loggerCategory) => loggerCategory.toLowerCase());
-    const includesTag = includesArray(this.allowedTags, tags);
 
     // Build object representing taggable log methods
-    const finalObject: TagMethodReturnInterface = {} as any;
+    const finalObject: DefaultLogMethodsInterface = {} as any;
     for (const loggerCategory of defaultLoggerCategories) {
-      finalObject[loggerCategory] = includesTag
-        ? this[loggerCategory]
+      finalObject[loggerCategory] = condition
+        ? (...data) => this[loggerCategory](...data)
         : () => {
             /* do nothing */
           };
@@ -142,10 +152,22 @@ export class Logger {
     return finalObject;
   }
 
+  /**
+   * Prints to stdout with newline.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public log(...data: any[]) {
     this.invokeConsole(data, 'log', 'log');
   }
 
+  /**
+   * The 'logger.debug()' function is an alias for 'logger.log()'.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public debug(...data: any[]) {
     this.invokeConsole(
       data,
@@ -154,6 +176,12 @@ export class Logger {
     );
   }
 
+  /**
+   * The 'logger.info()' function is an alias for 'logger.log()'.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public info(...data: any[]) {
     this.invokeConsole(
       data,
@@ -162,10 +190,22 @@ export class Logger {
     );
   }
 
+  /**
+   * The 'logger.success()' function is an alias for 'logger.log()'.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public success(...data: any[]) {
     this.invokeConsole(data, 'success', 'log');
   }
 
+  /**
+   * The 'logger.warn()' function is an alias for 'logger.error()'.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public warn(...data: any[]) {
     this.invokeConsole(
       data,
@@ -174,6 +214,12 @@ export class Logger {
     );
   }
 
+  /**
+   * Prints to stderr with newline.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public error(...data: any[]) {
     this.invokeConsole(
       data,
@@ -182,6 +228,12 @@ export class Logger {
     );
   }
 
+  /**
+   * Prints the specified object in a visual table.
+   *
+   * @public
+   * @param data - Data to be logged.
+   */
   public table(...data: any[]) {
     this.invokeConsole(
       data,
@@ -190,19 +242,25 @@ export class Logger {
     );
   }
 
+  /**
+   * Prints a log message based on the specified logger category.
+   *
+   * @public
+   * @param loggerCategory - Logger category to be logged.
+   * @param data - Data to be logged.
+   */
   public custom(loggerCategory: string, ...data: any[]) {
     this.invokeConsole(data, loggerCategory, 'log');
   }
 
-  //=========================================================================================================
-  // Invoke Console
-  //=========================================================================================================
   /**
+   * Internal method for logging the data
+   * into the console based on the specified logger category.
+   *
    * @internal
-   * Logs data in Console
-   * @param data - Data
-   * @param loggerCategoryKey - Key/Name of Logger Category
-   * @param consoleLogType - console[consoleLogProperty]
+   * @param data - Data to be logged.
+   * @param loggerCategoryKey - Key/Name of the Logger Category.
+   * @param consoleLogType - What type of log to be logged (console[consoleLogType]).
    */
   private invokeConsole(
     data: any[],
@@ -211,10 +269,9 @@ export class Logger {
   ) {
     const loggerCategory = this.getLoggerCategory(loggerCategoryKey);
 
-    // Check if Logger Category is allowed
     if (!this.isActive || loggerCategory.level < this.config.level) return;
 
-    // Build Prefix of Log
+    // Build log prefix
     const buildPrefix = (): string => {
       let prefix = '';
       if (this.config.timestamp)
@@ -227,28 +284,28 @@ export class Logger {
       return prefix;
     };
 
-    // Add built Prefix
+    // Add built log prefix to the to log data
     if (typeof data[0] === 'string')
       data[0] = buildPrefix().concat(' ').concat(data[0]);
     else data.unshift(buildPrefix());
 
-    // Call Watcher Callbacks
+    // Call watcher callbacks
     for (const key in this.watchers) {
       const watcher = this.watchers[key];
-      if (loggerCategory.level >= (watcher.level || 0)) {
+      if (loggerCategory.level >= watcher.level) {
         watcher.callback(loggerCategory, data);
       }
     }
 
-    // Init Custom Style
+    // Init custom styling provided by the Logger category
     if (this.config.canUseCustomStyles && loggerCategory.customStyle) {
       const newLogs: any[] = [];
-      let hasStyledString = false; // NOTE: Only one style can be used for one String block!
+      let didStyle = false; // Because only one string part of a log can be styled
       for (const log of data) {
-        if (!hasStyledString && typeof log === 'string') {
+        if (!didStyle && typeof log === 'string') {
           newLogs.push(`%c${log}`);
           newLogs.push(loggerCategory.customStyle);
-          hasStyledString = true;
+          didStyle = true;
         } else {
           newLogs.push(log);
         }
@@ -256,126 +313,72 @@ export class Logger {
       data = newLogs;
     }
 
-    // Handle Console Table Log
+    // Handle table log
     if (consoleLogType === 'table') {
-      if (typeof data[0] === 'string') {
-        console.log(data[0]);
-        console.table(data.filter((d) => typeof d !== 'string' && 'number'));
-      }
-      return;
+      for (const log of data)
+        console[typeof log === 'object' ? 'table' : 'log'](log);
     }
-
-    // Normal Log
-    console[consoleLogType](...data);
+    // Handle 'normal' log
+    else {
+      console[consoleLogType](...data);
+    }
   }
 
-  //=========================================================================================================
-  // Create Logger Category
-  //=========================================================================================================
   /**
+   * Creates a new Logger category and assigns it to the Logger.
+   *
    * @public
-   * Creates new Logger Category
-   * @param loggerCategory - Logger Category
+   * @param loggerCategory - Logger category to be added to the Logger.
    */
   public createLoggerCategory(loggerCategory: LoggerCategoryInterface) {
     loggerCategory = {
       prefix: '',
-      // @ts-ignore
-      level: 0,
       ...loggerCategory,
     };
     this.loggerCategories[loggerCategory.key] = loggerCategory;
   }
 
-  //=========================================================================================================
-  // Get Logger Category
-  //=========================================================================================================
   /**
+   * Retrieves a single Logger category with the specified key/name identifier from the Logger.
+   *
+   * If the to retrieve Logger category doesn't exist, `undefined` is returned.
+   *
    * @public
-   * Get Logger Category
-   * @param key - Key/Name of Logger Category
+   * @param categoryKey - Key/Name identifier of the Item.
    */
-  public getLoggerCategory(key: LoggerCategoryKey) {
-    return this.loggerCategories[key];
+  public getLoggerCategory(categoryKey: LoggerCategoryKey) {
+    return this.loggerCategories[categoryKey];
   }
 
-  //=========================================================================================================
-  // Watch
-  //=========================================================================================================
   /**
+   * Fires on each logged message of the Logger.
+   *
    * @public
-   * Watches Logger and detects Logs
-   * @param config - Config
-   * @return Key of Watcher Function
+   * @param callback - A function to be executed on each logged message of the Logger..
+   * @param config - Configuration object
    */
-  public watch(config: LoggerWatcherConfigInterface): string;
-  /**
-   * @public
-   * Watches Logger and detects Logs
-   * @param key - Key of Watcher Function
-   * @param config - Config
-   */
-  public watch(key: string, config: LoggerWatcherConfigInterface): this;
   public watch(
-    keyOrConfig: string | LoggerWatcherConfigInterface,
-    config?: LoggerWatcherConfigInterface
-  ): this | string {
-    const generateKey = isValidObject(keyOrConfig);
-    let _config: LoggerWatcherConfigInterface;
-    let key: string;
-
-    if (generateKey) {
-      key = generateId();
-      _config = keyOrConfig as LoggerWatcherConfigInterface;
-    } else {
-      key = keyOrConfig as string;
-      _config = config as LoggerWatcherConfigInterface;
-    }
-
-    _config = defineConfig(_config, {
+    callback: LoggerWatcherCallback,
+    config: WatcherMethodConfigInterface = {}
+  ): this {
+    config = defineConfig(config, {
+      key: generateId(),
       level: 0,
     });
-
-    // Check if Callback is a Function
-    if (!isFunction(_config.callback)) {
-      console.error(
-        'Agile: A Watcher Callback Function has to be an function!'
-      );
-      return this;
-    }
-
-    // Check if Callback Function already exists
-    if (this.watchers[key] != null) {
-      console.error(
-        `Agile: Watcher Callback Function with the key/name ${key} already exists!`
-      );
-      return this;
-    }
-
-    this.watchers[key] = _config;
-    return generateKey ? key : this;
-  }
-
-  //=========================================================================================================
-  // Remove Watcher
-  //=========================================================================================================
-  /**
-   * @public
-   * Removes Watcher at given Key
-   * @param key - Key of Watcher that gets removed
-   */
-  public removeWatcher(key: string): this {
-    delete this.watchers[key];
+    this.watchers[config.key as any] = {
+      callback,
+      level: config.level as any,
+    };
     return this;
   }
 
-  //=========================================================================================================
-  // Set Level
-  //=========================================================================================================
   /**
+   * Assigns the specified level to the Logger.
+   *
+   * The Logger level determines which log types can be logged.
+   * By default, the logger supports a number of levels, which are represented in 'Logger.level'.
+   *
    * @public
-   * Assigns new Level to Logger
-   * NOTE: Default Levels can be found in 'Logger.level.x'
    * @param level - Level
    */
   public setLevel(level: number): this {
@@ -411,6 +414,7 @@ export interface LoggerConfigInterface {
   canUseCustomStyles: boolean;
   level: number;
   timestamp: boolean;
+  allowedTags: LoggerKey[];
 }
 
 /**
@@ -453,10 +457,15 @@ export type LoggerWatcherCallback = (
  */
 export interface LoggerWatcherConfigInterface {
   callback: LoggerWatcherCallback;
+  level: number;
+}
+
+export interface WatcherMethodConfigInterface {
+  key?: string;
   level?: number;
 }
 
-export interface TagMethodReturnInterface {
+export interface DefaultLogMethodsInterface {
   log: (...data: any) => void;
   debug: (...data: any) => void;
   info: (...data: any) => void;
