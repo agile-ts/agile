@@ -1,5 +1,5 @@
 import { defineConfig } from '@agile-ts/utils';
-import { Logger, LoggerConfig } from './logger';
+import { CreateLoggerConfigInterface, Logger } from './logger';
 
 export const defaultSharedLoggerConfig = {
   prefix: 'Agile',
@@ -24,9 +24,12 @@ export function assignSharedLogger(logger: Logger): void {
 /**
  * Returns a newly created Logger.
  *
+ * The Logger is a practical class for handling advanced logging
+ * with e.g. different types of logs or filtering.
+ *
  * @param config - Configuration object
  */
-export function createLogger(config: LoggerConfig = {}): Logger {
+export function createLogger(config: CreateLoggerConfigInterface = {}): Logger {
   config = defineConfig(config, defaultSharedLoggerConfig);
   return new Logger(config);
 }

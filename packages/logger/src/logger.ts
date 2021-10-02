@@ -114,7 +114,7 @@ export class Logger {
        * if all specified tags are allowed to be logged.
        *
        * @public
-       * @param tags - Tags required to perform the following action.
+       * @param tags - Tags required to be allowed to perform the following action.
        */
       tag: (tags: string[]) => this.tag(tags),
     };
@@ -125,7 +125,7 @@ export class Logger {
    * if all specified tags are allowed to be logged.
    *
    * @internal
-   * @param tags - Tags required to perform the following action.
+   * @param tags - Tags required to be allowed to perform the following action.
    */
   private tag(tags: string[]): DefaultLogMethodsInterface {
     return this.logIfCondition(includesArray(this.config.allowedTags, tags));
@@ -145,7 +145,7 @@ export class Logger {
       Logger.level
     ).map((loggerCategory) => loggerCategory.toLowerCase());
 
-    // Build object based on the default log categories
+    // Build object representing the default log categories
     const finalObject: DefaultLogMethodsInterface = {} as any;
     for (const loggerCategory of defaultLoggerCategories) {
       finalObject[loggerCategory] = condition
@@ -266,7 +266,7 @@ export class Logger {
    * @internal
    * @param data - Data to be logged.
    * @param loggerCategoryKey - Key/Name identifier of the Logger category.
-   * @param consoleLogType - What type of log to be logged (console[consoleLogType]).
+   * @param consoleLogType - What type of log to invoke the console with (console[consoleLogType]).
    */
   private invokeConsole(
     data: any[],
@@ -290,7 +290,7 @@ export class Logger {
       return prefix;
     };
 
-    // Add built log prefix to the data array
+    // Add created log prefix to the data array
     if (typeof data[0] === 'string')
       data[0] = buildPrefix().concat(' ').concat(data[0]);
     else data.unshift(buildPrefix());
@@ -354,7 +354,7 @@ export class Logger {
    * If the to retrieve Logger category doesn't exist, `undefined` is returned.
    *
    * @public
-   * @param categoryKey - Key/Name identifier of the Item.
+   * @param categoryKey - Key/Name identifier of the Logger category.
    */
   public getLoggerCategory(categoryKey: LoggerCategoryKey) {
     return this.loggerCategories[categoryKey];
@@ -364,7 +364,7 @@ export class Logger {
    * Fires on each logged message of the Logger.
    *
    * @public
-   * @param callback - A function to be executed on each logged message of the Logger..
+   * @param callback - A function to be executed on each logged message of the Logger.
    * @param config - Configuration object
    */
   public watch(
@@ -383,10 +383,11 @@ export class Logger {
   }
 
   /**
-   * Assigns the specified level to the Logger.
+   * Assigns the specified log level to the Logger.
    *
-   * The Logger level determines which log types can be logged.
-   * By default, the logger supports a number of levels, which are represented in 'Logger.level'.
+   * The Logger level determines which Logger categories (log message types) can be logged.
+   * By default, the logger supports a various number of levels,
+   * which are represented in 'Logger.level'.
    *
    * @public
    * @param level - Level
@@ -469,12 +470,6 @@ export type ConsoleLogType =
   | 'info'
   | 'debug';
 
-/**
- * @param key - Key/Name of Logger Category
- * @param customStyle - Css Styles that get applied to the Logs
- * @param prefix - Prefix that gets written before each Log of this Category
- * @param level - Until which Level this Logger Category gets logged
- */
 export interface LoggerCategoryInterface {
   /**
    * Key/Name identifier of the Logger category.
@@ -528,7 +523,7 @@ export type LoggerWatcherCallback = (
 
 export interface LoggerWatcherConfigInterface {
   /**
-   * Callback method to be executed on each log action.
+   * Callback method to be fired on each log action.
    */
   callback: LoggerWatcherCallback;
   /**
