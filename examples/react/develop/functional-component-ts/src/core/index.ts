@@ -126,12 +126,12 @@ MY_EVENT.on('Test', () => {
 
 // LOGGER tests
 
-const logger = new Logger((l) => ({
+const logger = new Logger({
   prefix: 'Tests',
   allowedTags: ['coreWarning', 'randomDebug'],
   level: Logger.level.DEBUG,
   timestamp: true,
-}));
+});
 logger.watch(
   (loggerCategory, data) => {
     console.log('--- CALLED WATCHER ', loggerCategory, data);

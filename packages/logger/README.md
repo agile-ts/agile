@@ -4,6 +4,9 @@
 
  <br />
 
+ <a href="https://agile-ts.org">
+   <img src="https://img.shields.io/badge/Status-Beta-green.svg" alt="Status"/>
+ </a>
 <a href="https://github.com/agile-ts/agile">
   <img src="https://img.shields.io/github/license/agile-ts/agile.svg?label=license&style=flat&colorA=293140&colorB=4a4872" alt="GitHub License"/></a>
 <a href="https://npm.im/@agile-ts/logger">

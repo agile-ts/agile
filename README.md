@@ -17,6 +17,9 @@
 </p>
 
 <p align="left">
+ <a href="https://agile-ts.org">
+   <img src="https://img.shields.io/badge/Status-Beta-green.svg" alt="Status"/>
+ </a>
  <a href="https://github.com/agile-ts/agile/actions?query=workflow%3ARelease">
    <img src="https://github.com/agile-ts/agile/workflows/Release/badge.svg" alt="Build Status"/>
  </a>
@@ -75,11 +78,11 @@ More examples can be found in the [Example section](https://agile-ts.org/docs/ex
 <br />
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/why_should_i_use_agile.png" alt="Why should I use AgileTs?"/>
 
-AgileTs is a global State and Logic Library implemented in Typescript.
+AgileTs is an atom based global State and Logic Library implemented in Typescript.
 It offers a reimagined API that focuses on **developer experience**
 and allows you to **easily** and **flexible** manage your application States.
 Besides [States](https://agile-ts.org/docs/core/state),
-AgileTs offers some other powerful and tree shakable APIs that make your life easier,
+AgileTs offers some other powerful APIs that make your life easier,
 such as [Collections](https://agile-ts.org/docs/core/collection)
 and [Computed States](https://agile-ts.org/docs/core/computed).
 The philosophy behind AgileTs is simple:
