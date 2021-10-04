@@ -116,17 +116,11 @@ export class SubController {
     });
 
     // Create Subscription Container based on specified 'integrationInstance'
-    const subscriptionContainer = isFunction(integrationInstance)
-      ? this.createCallbackSubscriptionContainer(
-          integrationInstance,
-          subs,
-          config
-        )
-      : this.createComponentSubscriptionContainer(
-          integrationInstance,
-          subs,
-          config
-        );
+    const subscriptionContainer = this[
+      isFunction(integrationInstance)
+        ? 'createCallbackSubscriptionContainer'
+        : 'createComponentSubscriptionContainer'
+    ](integrationInstance, subs, config);
 
     // Return object based Subscription Container and an Observer value keymap
     if (subscriptionContainer.isObjectBased && !Array.isArray(subs)) {
@@ -233,10 +227,7 @@ export class SubController {
 
     // Add Subscription Container to the UI-Component it represents.
     // (For example, useful to unsubscribe the Subscription Container via the Component Instance)
-    if (
-      componentInstance['componentSubscriptionContainers'] != null &&
-      Array.isArray(componentInstance.componentSubscriptionContainers)
-    )
+    if (Array.isArray(componentInstance.componentSubscriptionContainers))
       componentInstance.componentSubscriptionContainers.push(
         componentSubscriptionContainer
       );
