@@ -1,4 +1,4 @@
-import { defineConfig } from '@agile-ts/utils';
+import { defineConfig, generateId } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { SubscriptionContainer } from './subscription';
@@ -7,7 +7,7 @@ import { IngestConfigInterface } from './runtime';
 
 export type ObserverKey = string | number;
 
-export class Observer<ValueType = any> {
+export class Observer {
   // Agile Instance the Observer belongs to
   public agileInstance: () => Agile;
 
@@ -48,7 +48,7 @@ export class Observer<ValueType = any> {
    */
   constructor(
     agileInstance: Agile,
-    config: CreateObserverConfigInterface<ValueType> = {}
+    config: CreateObserverConfigInterface = {}
   ) {
     config = defineConfig(config, {
       dependents: [],
@@ -73,9 +73,20 @@ export class Observer<ValueType = any> {
    * @param config - Configuration object
    */
   public ingest(config: ObserverIngestConfigInterface = {}): void {
-    if (process.env.NODE_ENV !== 'production') {
-      logCodeManager.log('17:03:01');
-    }
+    config = defineConfig(config, {
+      perform: true,
+      key: logCodeManager.allowLogging
+        ? `${this.key != null ? this.key + '_' : ''}${generateId()}`
+        : undefined,
+    });
+
+    // Create Runtime-Job
+    const job = new RuntimeJob(this, config);
+
+    // Pass created Job into the Runtime
+    this.agileInstance().runtime.ingest(job, {
+      perform: config.perform,
+    });
   }
 
   /**
@@ -123,7 +134,7 @@ export class Observer<ValueType = any> {
   }
 }
 
-export interface CreateObserverConfigInterface<ValueType = any> {
+export interface CreateObserverConfigInterface {
   /**
    * Initial Observers to depend on the Observer.
    * @default []

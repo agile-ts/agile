@@ -66,7 +66,7 @@ export function useAgile<
   );
 
   const handleReturn = (dep: Observer | undefined) => {
-    return dep != null ? dep.value : undefined;
+    return dep != null ? dep['value'] : undefined;
   };
 
   useBaseAgile(
@@ -100,13 +100,13 @@ export interface AgileHookConfigInterface extends BaseAgileHookConfigInterface {
 export type AgileOutputHookArrayType<T> = {
   [K in keyof T]: T[K] extends Collection<infer U> | Group<infer U>
     ? U[]
-    : T[K] extends State<infer U> | Observer<infer U>
+    : T[K] extends State<infer U>
     ? U
     : T[K] extends undefined
     ? undefined
     : T[K] extends Collection<infer U> | Group<infer U> | undefined
     ? U[] | undefined
-    : T[K] extends State<infer U> | Observer<infer U> | undefined
+    : T[K] extends State<infer U> | undefined
     ? U | undefined
     : never;
 };
@@ -116,12 +116,12 @@ export type AgileOutputHookType<T> = T extends
   | Collection<infer U>
   | Group<infer U>
   ? U[]
-  : T extends State<infer U> | Observer<infer U>
+  : T extends State<infer U>
   ? U
   : T extends undefined
   ? undefined
   : T extends Collection<infer U> | Group<infer U> | undefined
   ? U[] | undefined
-  : T extends State<infer U> | Observer<infer U> | undefined
+  : T extends State<infer U> | undefined
   ? U | undefined
   : never;

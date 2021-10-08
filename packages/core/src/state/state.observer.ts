@@ -6,7 +6,6 @@ import {
   generateId,
   isFunction,
   notEqual,
-  removeProperties,
 } from '@agile-ts/utils';
 import {
   IngestConfigInterface,

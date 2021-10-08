@@ -1,12 +1,12 @@
 import { ChangeEventHandler, FocusEventHandler, useState } from 'react';
 import { Agile, shared } from '@agile-ts/core';
 import type {
-  EditorConfig,
   Multieditor,
   StatusInterface,
   SubmitConfigInterface,
   FieldPaths,
   Item,
+  CreateEditorConfig,
 } from '@agile-ts/multieditor';
 import { useAgile } from '../../core';
 import { logCodeManager } from '../../logCodeManager';
@@ -14,7 +14,7 @@ import { multieditorPackage } from '../multieditorPackage';
 import { DeepFieldPathValues, FieldData } from '@agile-ts/multieditor';
 
 export function useMultieditor<TFieldData extends FieldData = FieldData>(
-  configOrMultieditor: EditorConfig<TFieldData> | Multieditor<TFieldData>,
+  configOrMultieditor: CreateEditorConfig<TFieldData> | Multieditor<TFieldData>,
   agileInstance: Agile = shared
 ): UseMultieditorReturnInterface<TFieldData> {
   // Return if '@agile-ts/multieditor' isn't installed

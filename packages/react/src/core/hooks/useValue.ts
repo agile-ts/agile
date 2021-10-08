@@ -43,7 +43,7 @@ export type AgileValueHookArrayType<T> = {
     | Collection<infer U, infer Z>
     | Group<infer U, infer Z>
     ? Z
-    : T[K] extends State<infer U> | Observer<infer U>
+    : T[K] extends State<infer U>
     ? U
     : T[K] extends undefined
     ? undefined
@@ -52,7 +52,7 @@ export type AgileValueHookArrayType<T> = {
         | Group<infer U, infer Z>
         | undefined
     ? Z | undefined
-    : T[K] extends State<infer U> | Observer<infer U> | undefined
+    : T[K] extends State<infer U> | undefined
     ? U | undefined
     : never;
 };
@@ -62,12 +62,12 @@ export type AgileValueHookType<T> = T extends
   | Collection<infer U, infer Z>
   | Group<infer U, infer Z>
   ? Z
-  : T extends State<infer U> | Observer<infer U>
+  : T extends State<infer U>
   ? U
   : T extends undefined
   ? undefined
   : T extends Collection<infer U, infer Z> | Group<infer U, infer Z> | undefined
   ? Z | undefined
-  : T extends State<infer U> | Observer<infer U> | undefined
+  : T extends State<infer U> | undefined
   ? U | undefined
   : never;

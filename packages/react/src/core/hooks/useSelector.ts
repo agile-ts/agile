@@ -78,7 +78,7 @@ export function useSelector<
 
   const handleReturn = (dep: Observer | undefined): any => {
     if (dep == null) return undefined as any;
-    const value = dep.value;
+    const value = dep['value'];
 
     // If specified selector function and the value is of type object.
     // Return the selected value.
