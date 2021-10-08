@@ -44,14 +44,11 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
-    super(
-      state.agileInstance(),
-      defineConfig(config, {
-        value: state._value,
-      })
-    );
+    super(state.agileInstance(), config);
     this.state = () => state;
     this.nextStateValue = copy(state._value);
+    this.value = copy(state._value);
+    this.previousValue = copy(state._value);
   }
 
   /**

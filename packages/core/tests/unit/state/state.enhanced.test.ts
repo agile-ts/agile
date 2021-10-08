@@ -48,7 +48,7 @@ describe('Enhanced State Tests', () => {
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
-    expect(state.observers['value']._key).toBeUndefined();
+    expect(state.observers['value'].key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -83,7 +83,7 @@ describe('Enhanced State Tests', () => {
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([
       dummyObserver,
     ]);
-    expect(state.observers['value']._key).toBe('coolState');
+    expect(state.observers['value'].key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -113,7 +113,7 @@ describe('Enhanced State Tests', () => {
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
-    expect(state.observers['value']._key).toBeUndefined();
+    expect(state.observers['value'].key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
   });
 

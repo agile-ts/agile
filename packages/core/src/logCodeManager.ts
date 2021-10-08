@@ -275,7 +275,7 @@ export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
 
 // Instantiate LogCodeManager based on the current environment
 type LogCodeMessagesType = typeof logCodeMessages;
-let logCodeManager: LogCodeManager<LogCodeMessagesType>;
+export let tempLogCodeManager: LogCodeManager<LogCodeMessagesType>;
 if (process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {
@@ -283,9 +283,9 @@ if (process.env.NODE_ENV !== 'production') {
   } catch (e) {
     // empty catch block
   }
-  logCodeManager = new LogCodeManager(logCodeMessages, loggerPackage);
+  tempLogCodeManager = new LogCodeManager(logCodeMessages, loggerPackage);
 } else {
-  logCodeManager = new LogCodeManager({} as any, null);
+  tempLogCodeManager = new LogCodeManager({} as any, null);
 }
 
 /**
@@ -294,7 +294,7 @@ if (process.env.NODE_ENV !== 'production') {
  *
  * @internal
  */
-export { logCodeManager };
+export const logCodeManager = tempLogCodeManager;
 
 interface LogConfigInterface {
   /**

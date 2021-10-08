@@ -62,10 +62,10 @@ describe('Group Tests', () => {
     expect(group.nextStateValue).toStrictEqual([]);
     expect(group.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(group.observers['value'].dependents)).toStrictEqual([]);
-    expect(group.observers['value']._key).toBeUndefined();
+    expect(group.observers['value'].key).toBeUndefined();
     expect(group.observers['output']).toBeInstanceOf(GroupObserver);
     expect(Array.from(group.observers['output'].dependents)).toStrictEqual([]);
-    expect(group.observers['output']._key).toBeUndefined();
+    expect(group.observers['output'].key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
@@ -103,10 +103,10 @@ describe('Group Tests', () => {
     expect(group.nextStateValue).toStrictEqual([]);
     expect(group.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(group.observers['value'].dependents)).toStrictEqual([]);
-    expect(group.observers['value']._key).toBe('dummyKey');
+    expect(group.observers['value'].key).toBe('dummyKey');
     expect(group.observers['output']).toBeInstanceOf(GroupObserver);
     expect(Array.from(group.observers['output'].dependents)).toStrictEqual([]);
-    expect(group.observers['output']._key).toBe('dummyKey');
+    expect(group.observers['output'].key).toBe('dummyKey');
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
     expect(group.computeExistsMethod).toBeInstanceOf(Function);
@@ -140,9 +140,9 @@ describe('Group Tests', () => {
     expect(group.previousStateValue).toStrictEqual(['test1', 'test2', 'test3']);
     expect(group.nextStateValue).toStrictEqual(['test1', 'test2', 'test3']);
     expect(group.observers['value']).toBeInstanceOf(StateObserver);
-    expect(group.observers['value']._key).toBeUndefined();
+    expect(group.observers['value'].key).toBeUndefined();
     expect(group.observers['output']).toBeInstanceOf(GroupObserver);
-    expect(group.observers['output']._key).toBeUndefined();
+    expect(group.observers['output'].key).toBeUndefined();
     expect(group.sideEffects).toStrictEqual({});
     expect(group.computeValueMethod).toBeUndefined();
     expect(group.computeExistsMethod).toBeInstanceOf(Function);

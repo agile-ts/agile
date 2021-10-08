@@ -35,12 +35,12 @@ describe('SubController Tests', () => {
     beforeEach(() => {
       dummyObserver1 = new Observer(dummyAgile, {
         key: 'dummyObserver1',
-        value: 'dummyObserver1Value',
       });
+      dummyObserver1['value'] = 'dummyObserver1Value';
       dummyObserver2 = new Observer(dummyAgile, {
         key: 'dummyObserver2',
-        value: 'dummyObserver2Value',
       });
+      dummyObserver2['value'] = 'dummyObserver2Value';
       subController = new SubController(dummyAgile);
     });
 
@@ -73,8 +73,8 @@ describe('SubController Tests', () => {
             ComponentSubscriptionContainer
           );
           expect(returnValue.props).toStrictEqual({
-            observer1: dummyObserver1.value,
-            observer2: dummyObserver2.value,
+            observer1: dummyObserver1['value'],
+            observer2: dummyObserver2['value'],
           });
 
           expect(
@@ -150,8 +150,8 @@ describe('SubController Tests', () => {
             CallbackSubscriptionContainer
           );
           expect(returnValue.props).toStrictEqual({
-            observer1: dummyObserver1.value,
-            observer2: dummyObserver2.value,
+            observer1: dummyObserver1['value'],
+            observer2: dummyObserver2['value'],
           });
 
           expect(

@@ -186,10 +186,8 @@ describe('Utils Tests', () => {
       expect(normalizeArray(undefined)).toStrictEqual([]);
     });
 
-    it('should normalize undefined (config.createUndefinedArray = true)', () => {
-      expect(
-        normalizeArray(undefined, { createUndefinedArray: true })
-      ).toStrictEqual([undefined]);
+    it('should normalize undefined (createUndefinedArray = true)', () => {
+      expect(normalizeArray(undefined, true)).toStrictEqual([undefined]);
     });
   });
 

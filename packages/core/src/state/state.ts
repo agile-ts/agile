@@ -134,7 +134,7 @@ export class State<ValueType = any> {
 
     // Update key of Observers
     for (const observerKey in this.observers)
-      this.observers[observerKey]._key = value;
+      this.observers[observerKey].key = value;
 
     return this;
   }

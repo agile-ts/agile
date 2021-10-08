@@ -53,7 +53,7 @@ describe('Computed Tests', () => {
     expect(Array.from(computed.observers['value'].dependents)).toStrictEqual(
       []
     );
-    expect(computed.observers['value']._key).toBeUndefined();
+    expect(computed.observers['value'].key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
   });
 
@@ -117,7 +117,7 @@ describe('Computed Tests', () => {
     expect(Array.from(computed.observers['value'].dependents)).toStrictEqual([
       dummyObserver1,
     ]);
-    expect(computed.observers['value']._key).toBe('coolComputed');
+    expect(computed.observers['value'].key).toBe('coolComputed');
     expect(computed.sideEffects).toStrictEqual({});
   });
 
@@ -150,7 +150,7 @@ describe('Computed Tests', () => {
     expect(Array.from(computed.observers['value'].dependents)).toStrictEqual(
       []
     );
-    expect(computed.observers['value']._key).toBeUndefined();
+    expect(computed.observers['value'].key).toBeUndefined();
     expect(computed.sideEffects).toStrictEqual({});
   });
 

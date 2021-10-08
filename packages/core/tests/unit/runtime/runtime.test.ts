@@ -655,16 +655,16 @@ describe('Runtime Tests', () => {
           dummyFunction,
           [dummyObserver1, dummyObserver2, dummyObserver3]
         );
-        dummyObserver1.value = 'dummyObserverValue1';
-        dummyObserver3.value = 'dummyObserverValue3';
+        dummyObserver1['value'] = 'dummyObserverValue1';
+        dummyObserver3['value'] = 'dummyObserverValue3';
 
-        dummyObserver1._key = 'dummyObserver1KeyInObserver';
-        dummyObserver2._key = undefined;
+        dummyObserver1.key = 'dummyObserver1KeyInObserver';
+        dummyObserver2.key = undefined;
         subscriptionContainer.subscriberKeysWeakMap.set(
           dummyObserver2,
           'dummyObserver2KeyInWeakMap'
         );
-        dummyObserver3._key = 'dummyObserver3KeyInObserver';
+        dummyObserver3.key = 'dummyObserver3KeyInObserver';
         subscriptionContainer.subscriberKeysWeakMap.set(
           dummyObserver3,
           'dummyObserver3KeyInWeakMap'
@@ -708,10 +708,10 @@ describe('Runtime Tests', () => {
           dummyFunction,
           [dummyObserver1]
         );
-        dummyObserver1.value = {
+        dummyObserver1['value'] = {
           data: { name: 'jeff' },
         };
-        dummyObserver1.previousValue = {
+        dummyObserver1['previousValue'] = {
           data: { name: 'jeff' },
         };
         objectSubscriptionContainer.selectorsWeakMap.set(dummyObserver1, {
@@ -725,7 +725,7 @@ describe('Runtime Tests', () => {
           dummyFunction2,
           { dummyObserver2: dummyObserver2 }
         ).subscriptionContainer;
-        dummyObserver2.value = [
+        dummyObserver2['value'] = [
           {
             data: { name: 'jeff' },
           },
@@ -736,7 +736,7 @@ describe('Runtime Tests', () => {
             data: { name: 'frank' },
           },
         ];
-        dummyObserver2.previousValue = [
+        dummyObserver2['previousValue'] = [
           {
             data: { name: 'jeff' },
           },
@@ -775,7 +775,7 @@ describe('Runtime Tests', () => {
       });
 
       it('should return true if selected property has changed (object value)', () => {
-        dummyObserver1.value = {
+        dummyObserver1['value'] = {
           data: { name: 'changedName' },
         };
 
@@ -788,8 +788,8 @@ describe('Runtime Tests', () => {
 
         expect(Utils.notEqual).toHaveBeenCalledTimes(1);
         expect(Utils.notEqual).toHaveBeenCalledWith(
-          dummyObserver1.value.data.name,
-          dummyObserver1.previousValue.data.name
+          dummyObserver1['value'].data.name,
+          dummyObserver1['previousValue'].data.name
         );
       });
 
@@ -803,8 +803,8 @@ describe('Runtime Tests', () => {
 
         expect(Utils.notEqual).toHaveBeenCalledTimes(1);
         expect(Utils.notEqual).toHaveBeenCalledWith(
-          dummyObserver1.value.data.name,
-          dummyObserver1.previousValue.data.name
+          dummyObserver1['value'].data.name,
+          dummyObserver1['previousValue'].data.name
         );
       });
 
@@ -828,7 +828,7 @@ describe('Runtime Tests', () => {
       // });
 
       it('should return true if a selected property has changed (array value)', () => {
-        dummyObserver2.value = [
+        dummyObserver2['value'] = [
           {
             data: { name: 'jeff' },
           },
@@ -849,17 +849,17 @@ describe('Runtime Tests', () => {
 
         expect(Utils.notEqual).toHaveBeenCalledTimes(2);
         expect(Utils.notEqual).toHaveBeenCalledWith(
-          dummyObserver2.value['0'].data.name,
-          dummyObserver2.previousValue['0'].data.name
+          dummyObserver2['value']['0'].data.name,
+          dummyObserver2['previousValue']['0'].data.name
         );
         expect(Utils.notEqual).toHaveBeenCalledWith(
-          dummyObserver2.value['2'].data.name,
-          dummyObserver2.previousValue['2'].data.name
+          dummyObserver2['value']['2'].data.name,
+          dummyObserver2['previousValue']['2'].data.name
         );
       });
 
       it("should return false if used property hasn't changed (array value)", () => {
-        dummyObserver2.value = [
+        dummyObserver2['value'] = [
           {
             data: { name: 'jeff' },
           },
@@ -880,12 +880,12 @@ describe('Runtime Tests', () => {
 
         expect(Utils.notEqual).toHaveBeenCalledTimes(2);
         expect(Utils.notEqual).toHaveBeenCalledWith(
-          dummyObserver2.value['0'].data.name,
-          dummyObserver2.previousValue['0'].data.name
+          dummyObserver2['value']['0'].data.name,
+          dummyObserver2['previousValue']['0'].data.name
         );
         expect(Utils.notEqual).toHaveBeenCalledWith(
-          dummyObserver2.value['2'].data.name,
-          dummyObserver2.previousValue['2'].data.name
+          dummyObserver2['value']['2'].data.name,
+          dummyObserver2['previousValue']['2'].data.name
         );
       });
     });

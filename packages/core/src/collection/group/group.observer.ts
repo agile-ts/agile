@@ -43,12 +43,11 @@ export class GroupObserver<
     group: Group<DataType>,
     config: CreateObserverConfigInterface = {}
   ) {
-    super(
-      group.agileInstance(),
-      defineConfig(config, { value: group._output })
-    );
+    super(group.agileInstance(), config);
     this.group = () => group;
     this.nextGroupValue = copy(group._output);
+    this.value = copy(group._output);
+    this.previousValue = copy(group._output);
   }
 
   /**

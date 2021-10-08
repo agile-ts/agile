@@ -10,9 +10,8 @@ export function copy<T = any>(value: T): T {
   if (value == null || typeof value !== 'object') return value;
 
   // Ignore everything that is no object or array but has the type of an object (e.g. classes)
-  const valConstructorName = Object.getPrototypeOf(
-    value
-  ).constructor.name.toLowerCase();
+  const valConstructorName =
+    Object.getPrototypeOf(value).constructor.name.toLowerCase();
   if (valConstructorName !== 'object' && valConstructorName !== 'array')
     return value;
 
@@ -80,7 +79,7 @@ export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
   createUndefinedArray = false
 ): Array<DataType> {
-  if (items == null && createUndefinedArray) return [];
+  if (items == null && !createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 

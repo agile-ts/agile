@@ -84,7 +84,7 @@ export class Event<PayloadType = DefaultEventPayload> {
    */
   public setKey(value: EventKey | undefined): this {
     this._key = value;
-    this.observer._key = value;
+    this.observer.key = value;
     return this;
   }
 
