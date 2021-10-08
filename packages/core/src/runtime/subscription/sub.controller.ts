@@ -99,7 +99,7 @@ export class SubController {
     config?: RegisterSubscriptionConfigInterface
   ): {
     subscriptionContainer: SubscriptionContainer;
-    props: { [key: string]: Observer['value'] };
+    props: { [key: string]: any };
   };
   public subscribe(
     integrationInstance: any,
@@ -109,7 +109,7 @@ export class SubController {
     | SubscriptionContainer
     | {
         subscriptionContainer: SubscriptionContainer;
-        props: { [key: string]: Observer['value'] };
+        props: { [key: string]: any };
       } {
     config = defineConfig(config, {
       waitForMount: this.agileInstance().config.waitForMount,
@@ -124,8 +124,9 @@ export class SubController {
 
     // Return object based Subscription Container and an Observer value keymap
     if (subscriptionContainer.isObjectBased && !Array.isArray(subs)) {
-      const props: { [key: string]: Observer['value'] } = {};
-      for (const key in subs) if (subs[key].value) props[key] = subs[key].value;
+      const props: { [key: string]: any } = {};
+      for (const key in subs)
+        if (subs[key]['value']) props[key] = subs[key]['value'];
       return { subscriptionContainer, props };
     }
 
@@ -157,11 +158,13 @@ export class SubController {
     if (subscriptionInstance instanceof CallbackSubscriptionContainer) {
       unsub(subscriptionInstance);
       this.callbackSubs.delete(subscriptionInstance);
-      logCodeManager.log(
-        '15:01:00',
-        { tags: ['subscription'] },
-        subscriptionInstance
-      );
+      if (process.env.NODE_ENV !== 'production') {
+        logCodeManager.log(
+          '15:01:00',
+          { tags: ['subscription'] },
+          subscriptionInstance
+        );
+      }
       return;
     }
 
@@ -169,11 +172,13 @@ export class SubController {
     if (subscriptionInstance instanceof ComponentSubscriptionContainer) {
       unsub(subscriptionInstance);
       this.componentSubs.delete(subscriptionInstance);
-      logCodeManager.log(
-        '15:01:01',
-        { tags: ['subscription'] },
-        subscriptionInstance
-      );
+      if (process.env.NODE_ENV !== 'production') {
+        logCodeManager.log(
+          '15:01:01',
+          { tags: ['subscription'] },
+          subscriptionInstance
+        );
+      }
       return;
     }
 
@@ -187,11 +192,13 @@ export class SubController {
         (subContainer) => {
           unsub(subContainer as ComponentSubscriptionContainer);
           this.componentSubs.delete(subContainer);
-          logCodeManager.log(
-            '15:01:01',
-            { tags: ['subscription'] },
-            subscriptionInstance
-          );
+          if (process.env.NODE_ENV !== 'production') {
+            logCodeManager.log(
+              '15:01:01',
+              { tags: ['subscription'] },
+              subscriptionInstance
+            );
+          }
         }
       );
       return;
@@ -236,11 +243,13 @@ export class SubController {
         componentSubscriptionContainer,
       ];
 
-    logCodeManager.log(
-      '15:01:02',
-      { tags: ['subscription'] },
-      componentSubscriptionContainer
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log(
+        '15:01:02',
+        { tags: ['subscription'] },
+        componentSubscriptionContainer
+      );
+    }
 
     return componentSubscriptionContainer;
   }
@@ -267,11 +276,13 @@ export class SubController {
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;
 
-    logCodeManager.log(
-      '15:01:03',
-      { tags: ['subscription'] },
-      callbackSubscriptionContainer
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log(
+        '15:01:03',
+        { tags: ['subscription'] },
+        callbackSubscriptionContainer
+      );
+    }
 
     return callbackSubscriptionContainer;
   }

@@ -14,6 +14,7 @@ import {
 } from '../../runtime';
 import { Group } from './index';
 import { DefaultItem } from '../collection';
+import { logCodeManager } from '../../logCodeManager';
 
 export class GroupObserver<
   DataType extends DefaultItem = DefaultItem
@@ -22,7 +23,12 @@ export class GroupObserver<
   public group: () => Group<DataType>;
 
   // Next output applied to the Group
-  public nextGroupOutput: DataType[];
+  public nextGroupValue: DataType[];
+
+  // Current value of the Group (shared with the UI)
+  public value?: DataType[];
+  // Previous value of the Group (for handling selectors)
+  public previousValue?: DataType[];
 
   /**
    * A Group Observer manages the subscriptions to Subscription Containers (UI-Components)
@@ -42,7 +48,7 @@ export class GroupObserver<
       defineConfig(config, { value: group._output })
     );
     this.group = () => group;
-    this.nextGroupOutput = copy(group._output);
+    this.nextGroupValue = copy(group._output);
   }
 
   /**
@@ -79,6 +85,9 @@ export class GroupObserver<
     config = defineConfig(config, {
       perform: true,
       force: false,
+      key: logCodeManager.allowLogging
+        ? `${this.key != null ? this.key + '_' : ''}${generateId()}_output`
+        : undefined,
     });
 
     // Force overwriting the Group value if it is a placeholder.
@@ -88,20 +97,13 @@ export class GroupObserver<
     }
 
     // Assign next Group output to Observer
-    this.nextGroupOutput = copy(newGroupOutput);
+    this.nextGroupValue = copy(newGroupOutput);
 
     // Check if current Group output and to assign Group output are equal
-    if (equal(group._output, this.nextGroupOutput) && !config.force) return;
+    if (equal(group._output, this.nextGroupValue) && !config.force) return;
 
     // Create Runtime-Job
-    const job = new RuntimeJob(this, {
-      ...removeProperties(config, ['perform']),
-      ...{
-        key:
-          config.key ??
-          `${this._key != null ? this._key + '_' : ''}${generateId()}_output`,
-      },
-    });
+    const job = new RuntimeJob(this, config);
 
     // Pass created Job into the Runtime
     this.agileInstance().runtime.ingest(job, {
@@ -123,12 +125,12 @@ export class GroupObserver<
     const group = observer.group();
 
     // Assign new Group output
-    group._output = copy(observer.nextGroupOutput);
-    group.nextGroupOutput = copy(observer.nextGroupOutput);
+    group._output = copy(observer.nextGroupValue);
+    group.nextGroupOutput = copy(observer.nextGroupValue);
 
     // Assign new public output to the Observer (output used by the Integrations)
-    job.observer.previousValue = copy(job.observer.value);
-    job.observer.value = copy(group._output);
+    observer.previousValue = Object.freeze(copy(observer.value)) as any;
+    observer.value = Object.freeze(copy(group._output)) as any;
   }
 }
 

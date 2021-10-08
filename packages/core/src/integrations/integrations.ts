@@ -82,12 +82,14 @@ export class Integrations {
    */
   public async integrate(integration: Integration): Promise<boolean> {
     // Check if Integration is valid
-    if (integration._key == null) {
-      logCodeManager.log(
-        '18:03:00',
-        { replacers: [integration._key, this.agileInstance().key] },
-        integration
-      );
+    if (integration.key == null) {
+      if (process.env.NODE_ENV !== 'production') {
+        logCodeManager.log(
+          '18:03:00',
+          { replacers: [integration.key, this.agileInstance().key] },
+          integration
+        );
+      }
       return false;
     }
 
@@ -100,11 +102,13 @@ export class Integrations {
     this.integrations.add(integration);
     integration.integrated = true;
 
-    logCodeManager.log(
-      '18:00:00',
-      { replacers: [integration._key, this.agileInstance().key] },
-      integration
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log(
+        '18:00:00',
+        { replacers: [integration.key, this.agileInstance().key] },
+        integration
+      );
+    }
 
     return true;
   }
@@ -123,7 +127,7 @@ export class Integrations {
   public update(componentInstance: any, updatedData: Object): void {
     this.integrations.forEach((integration) => {
       if (!integration.ready) {
-        logCodeManager.log('18:02:00', { replacers: [integration._key] });
+        logCodeManager.log('18:02:00', { replacers: [integration.key] });
         return;
       }
       if (integration.methods.updateMethod)

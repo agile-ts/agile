@@ -10,8 +10,9 @@ export function copy<T = any>(value: T): T {
   if (value == null || typeof value !== 'object') return value;
 
   // Ignore everything that is no object or array but has the type of an object (e.g. classes)
-  const valConstructorName =
-    Object.getPrototypeOf(value).constructor.name.toLowerCase();
+  const valConstructorName = Object.getPrototypeOf(
+    value
+  ).constructor.name.toLowerCase();
   if (valConstructorName !== 'object' && valConstructorName !== 'array')
     return value;
 
@@ -73,16 +74,13 @@ export function includesArray<DataType = any>(
  *
  * @public
  * @param items - Item/s to be transformed into an array of Items.
- * @param config - Config
+ * @param createUndefinedArray - Whether to return `[undefined]` instead of `[]` if the specified Item is `undefined`.
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
-  config: { createUndefinedArray?: boolean } = {}
+  createUndefinedArray = false
 ): Array<DataType> {
-  config = defineConfig(config, {
-    createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
-  });
-  if (items == null && !config.createUndefinedArray) return [];
+  if (items == null && createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 
@@ -138,11 +136,8 @@ export function isJsonString(value: any): boolean {
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
   defaults: Object,
-  overwriteUndefinedProperties?: boolean
+  overwriteUndefinedProperties = true
 ): ConfigInterface {
-  if (overwriteUndefinedProperties === undefined)
-    overwriteUndefinedProperties = true;
-
   const shallowCopiedConfig = { ...config };
 
   for (const defaultKey in defaults) {

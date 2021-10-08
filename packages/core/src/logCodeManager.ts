@@ -94,6 +94,8 @@ const logCodeMessages = {
   // Observer
   '17:03:00':
     "The 'perform()' method isn't set in Observer but need to be set! Observer is no stand alone class.",
+  '17:03:01':
+    "The 'ingest()' method isn't set in Observer but need to be set! Observer is no stand alone class.",
 
   // Integrations
   '18:00:00': "Integrated '${0}' into AgileTs '${1}'",
@@ -162,7 +164,7 @@ const logCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-export class LogCodeManager<LogCodeMessagesType = {}> {
+export class LogCodeManager<LogCodeMessagesType extends Object = Object> {
   // Keymap of messages that the LogCodeManager can log
   public logCodeMessages: LogCodeMessagesType;
   // Optional '@agile-ts/logger' package for more advanced logging
@@ -272,7 +274,8 @@ export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
 }
 
 // Instantiate LogCodeManager based on the current environment
-let tempLogCodeManager: LogCodeManager<typeof logCodeMessages>;
+type LogCodeMessagesType = typeof logCodeMessages;
+let logCodeManager: LogCodeManager<LogCodeMessagesType>;
 if (process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {
@@ -280,9 +283,9 @@ if (process.env.NODE_ENV !== 'production') {
   } catch (e) {
     // empty catch block
   }
-  tempLogCodeManager = new LogCodeManager(logCodeMessages, loggerPackage);
+  logCodeManager = new LogCodeManager(logCodeMessages, loggerPackage);
 } else {
-  tempLogCodeManager = new LogCodeManager({} as any, null);
+  logCodeManager = new LogCodeManager({} as any, null);
 }
 
 /**
@@ -291,7 +294,7 @@ if (process.env.NODE_ENV !== 'production') {
  *
  * @internal
  */
-export { tempLogCodeManager as logCodeManager };
+export { logCodeManager };
 
 interface LogConfigInterface {
   /**

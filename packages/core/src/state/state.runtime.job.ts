@@ -6,9 +6,10 @@ import {
 } from '../runtime';
 import { StateObserver } from './state.observer';
 
-export class StateRuntimeJob extends RuntimeJob<StateObserver> {
-  public config: StateRuntimeJobConfigInterface;
-
+export class StateRuntimeJob extends RuntimeJob<
+  StateObserver,
+  StateRuntimeJobConfigInterface
+> {
   /**
    * A State Runtime Job is sent to the Runtime on behalf of the State Observer it represents.
    *
@@ -26,27 +27,12 @@ export class StateRuntimeJob extends RuntimeJob<StateObserver> {
   ) {
     super(observer, config);
     config = defineConfig(config, {
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
       storage: true,
       overwrite: false,
-      maxTriesToUpdate: 3,
-      any: {},
     });
 
-    this.config = {
-      background: config.background,
-      force: config.force,
-      sideEffects: config.sideEffects,
-      storage: config.storage,
-      overwrite: config.overwrite,
-      maxTriesToUpdate: config.maxTriesToUpdate,
-      any: config.any,
-    };
+    this.config['overwrite'] = config.overwrite;
+    this.config['storage'] = config.storage;
   }
 }
 

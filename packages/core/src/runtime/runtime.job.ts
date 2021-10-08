@@ -2,11 +2,14 @@ import { defineConfig } from '@agile-ts/utils';
 import { SubscriptionContainer } from './subscription';
 import { Observer } from './observer';
 
-export class RuntimeJob<ObserverType extends Observer = Observer> {
-  public config: RuntimeJobConfigInterface;
+export class RuntimeJob<
+  ObserverType extends Observer = Observer,
+  ConfigType extends RuntimeJobConfigInterface = RuntimeJobConfigInterface
+> {
+  public config: ConfigType;
 
   // Key/Name identifier of the Runtime Job
-  public _key?: RuntimeJobKey;
+  public key?: RuntimeJobKey;
   // Observer the Job represents
   public observer: ObserverType;
   // Whether the Subscription Containers (UI-Components) of the Observer should be updated (re-rendered)
@@ -51,32 +54,13 @@ export class RuntimeJob<ObserverType extends Observer = Observer> {
       sideEffects: config.sideEffects,
       maxTriesToUpdate: config.maxTriesToUpdate,
       any: config.any,
-    };
+    } as any;
     this.observer = observer;
     this.rerender =
       !config.background &&
       this.observer.agileInstance().integrations.hasIntegration();
-    this._key = config.key;
+    this.key = config.key;
     this.subscriptionContainersToUpdate = new Set(observer.subscribedTo);
-  }
-
-  /**
-   * Updates the key/name identifier of the Runtime Job.
-   *
-   * @public
-   * @param value - New key/name identifier.
-   */
-  public set key(value: RuntimeJobKey | undefined) {
-    this._key = value;
-  }
-
-  /**
-   * Returns the key/name identifier of the Runtime Job.
-   *
-   * @public
-   */
-  public get key(): RuntimeJobKey | undefined {
-    return this._key;
   }
 }
 
