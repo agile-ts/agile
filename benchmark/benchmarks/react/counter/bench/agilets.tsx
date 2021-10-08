@@ -5,7 +5,6 @@ import reactIntegration, { useAgile } from '@agile-ts/react';
 
 logCodeManager.allowLogging = false;
 shared.integrate(reactIntegration);
-shared.config.bucket = true;
 
 const COUNT = createState(0);
 

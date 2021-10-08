@@ -45,9 +45,7 @@ export function extractObservers(
   | Array<{ [key: string]: Observer | undefined }>
   | { [key: string]: Observer | undefined } {
   const observers: Array<{ [key: string]: Observer | undefined }> = [];
-  const tempInstancesArray = normalizeArray(instances, {
-    createUndefinedArray: true,
-  });
+  const tempInstancesArray = normalizeArray(instances, true);
 
   // Extract Observers from specified Instances
   for (const instance of tempInstancesArray) {
