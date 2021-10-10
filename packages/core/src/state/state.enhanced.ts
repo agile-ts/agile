@@ -6,7 +6,6 @@ import {
   isFunction,
   isValidObject,
   notEqual,
-  removeProperties,
 } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
 import { State, StateConfigInterface, StateKey } from './state';
@@ -151,7 +150,7 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
     }
 
     // Ingest updated 'nextStateValue' into runtime
-    this.ingest(removeProperties(config, ['addNewProperties']));
+    this.ingest(config);
 
     return this;
   }

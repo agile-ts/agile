@@ -112,7 +112,7 @@ export class Observer {
    * A dependent Observer is always ingested into the Runtime,
    * when the Observer it depends on has been ingested too.
    *
-   * (Note: not mutating directly 'dependents' for better testing)
+   * (Note: not mutating directly 'dependents' for better unit testing)
    *
    * @public
    * @param observer - Observer to depend on the Observer.
@@ -124,7 +124,7 @@ export class Observer {
   /**
    * Makes the specified Observer no longer depend on the Observer.
    *
-   * (Note: not mutating directly 'dependents' for better testing)
+   * (Note: not mutating directly 'dependents' for better unit testing)
    *
    * @public
    * @param observer - Observer to no longer depend on the Observer.

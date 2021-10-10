@@ -5,7 +5,6 @@ import {
   isFunction,
   isValidObject,
   normalizeArray,
-  removeProperties,
 } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
@@ -26,7 +25,7 @@ import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<
   DataType extends DefaultItem = DefaultItem,
-  GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
+  GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useValue()'
 > {
   // Agile Instance the Collection belongs to
   public agileInstance: () => Agile;
@@ -1089,10 +1088,7 @@ export class Collection<
     const _itemKeys = normalizeArray(itemKeys);
 
     // Remove itemKeys from old Group
-    this.getGroup(oldGroupKey)?.remove(
-      _itemKeys,
-      removeProperties(config, ['method', 'overwrite'])
-    );
+    this.getGroup(oldGroupKey)?.remove(_itemKeys, config);
 
     // Assign itemKeys to new Group
     this.getGroup(newGroupKey)?.add(_itemKeys, config);

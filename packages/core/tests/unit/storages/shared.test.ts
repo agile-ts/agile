@@ -34,6 +34,7 @@ describe('Shared (Storage) Tests', () => {
       expect(storageManager).toBeInstanceOf(Storages);
       expect(StoragesMock).toHaveBeenCalledWith(sharedAgileInstance, {
         localStorage: true,
+        agileInstance: sharedAgileInstance, // Not required but passed for simplicity
       });
     });
 
@@ -46,7 +47,10 @@ describe('Shared (Storage) Tests', () => {
       });
 
       expect(storageManager).toBeInstanceOf(Storages);
-      expect(StoragesMock).toHaveBeenCalledWith(agile, { localStorage: true });
+      expect(StoragesMock).toHaveBeenCalledWith(agile, {
+        localStorage: true,
+        agileInstance: agile, // Not required but passed for simplicity
+      });
     });
   });
 

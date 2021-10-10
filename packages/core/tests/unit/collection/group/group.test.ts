@@ -255,6 +255,7 @@ describe('Group Tests', () => {
                 },
               ],
             },
+            softRebuild: true, // Not required but passed for simplicity
           }
         );
       });
@@ -274,6 +275,7 @@ describe('Group Tests', () => {
             force: true,
             storage: false,
             any: { trackedChanges: [] },
+            softRebuild: false, // Not required but passed for simplicity
           }
         );
       });
@@ -307,6 +309,7 @@ describe('Group Tests', () => {
               },
             ],
           },
+          softRebuild: true, // Not required but passed for simplicity
         });
       });
 
@@ -318,6 +321,7 @@ describe('Group Tests', () => {
           {
             background: true,
             any: { trackedChanges: [] },
+            softRebuild: true, // Not required but passed for simplicity
           }
         );
       });
@@ -334,6 +338,7 @@ describe('Group Tests', () => {
             {
               background: true,
               any: { trackedChanges: [] },
+              softRebuild: true, // Not required but passed for simplicity
             }
           );
         }
@@ -364,6 +369,8 @@ describe('Group Tests', () => {
                 },
               ],
             },
+            method: 'push', // Not required but passed for simplicity
+            softRebuild: true, // Not required but passed for simplicity
           }
         );
       });
@@ -383,6 +390,8 @@ describe('Group Tests', () => {
             force: true,
             storage: false,
             any: { trackedChanges: [] },
+            method: 'push', // Not required but passed for simplicity
+            softRebuild: false, // Not required but passed for simplicity
           }
         );
       });
@@ -402,6 +411,8 @@ describe('Group Tests', () => {
                 },
               ],
             },
+            method: 'unshift', // Not required but passed for simplicity
+            softRebuild: true, // Not required but passed for simplicity
           }
         );
       });
@@ -438,6 +449,8 @@ describe('Group Tests', () => {
                 },
               ],
             },
+            method: 'push', // Not required but passed for simplicity
+            softRebuild: true, // Not required but passed for simplicity
           }
         );
       });
@@ -458,6 +471,8 @@ describe('Group Tests', () => {
                 },
               ],
             },
+            method: 'push', // Not required but passed for simplicity
+            softRebuild: true, // Not required but passed for simplicity
           }
         );
       });
@@ -487,6 +502,8 @@ describe('Group Tests', () => {
                   },
                 ],
               },
+              method: 'push', // Not required but passed for simplicity
+              softRebuild: true, // Not required but passed for simplicity
             }
           );
         }

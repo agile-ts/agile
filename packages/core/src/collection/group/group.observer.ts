@@ -1,10 +1,4 @@
-import {
-  copy,
-  defineConfig,
-  equal,
-  generateId,
-  removeProperties,
-} from '@agile-ts/utils';
+import { copy, defineConfig, equal, generateId } from '@agile-ts/utils';
 import {
   CreateObserverConfigInterface,
   CreateRuntimeJobConfigInterface,

@@ -50,6 +50,7 @@ describe('Shared (Event) Tests', () => {
       expect(EventMock).toHaveBeenCalledWith(agile, {
         key: 'myCoolEvent',
         delay: 10,
+        agileInstance: agile, // Not required but passed for simplicity
       });
     });
   });

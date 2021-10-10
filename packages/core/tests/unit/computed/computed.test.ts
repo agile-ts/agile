@@ -177,7 +177,9 @@ describe('Computed Tests', () => {
         await waitForExpect(() => {
           expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
             'jeff',
-            {}
+            {
+              autodetect: false, // Not required but passed for simplicity
+            }
           );
         });
       });
@@ -206,6 +208,7 @@ describe('Computed Tests', () => {
               },
               force: false,
               key: 'jeff',
+              autodetect: true, // Not required but passed for simplicity
             }
           );
         });

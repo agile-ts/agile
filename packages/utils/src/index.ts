@@ -10,8 +10,9 @@ export function copy<T = any>(value: T): T {
   if (value == null || typeof value !== 'object') return value;
 
   // Ignore everything that is no object or array but has the type of an object (e.g. classes)
-  const valConstructorName =
-    Object.getPrototypeOf(value).constructor.name.toLowerCase();
+  const valConstructorName = Object.getPrototypeOf(
+    value
+  ).constructor.name.toLowerCase();
   if (valConstructorName !== 'object' && valConstructorName !== 'array')
     return value;
 
@@ -279,20 +280,4 @@ export function clone<T = any>(instance: T): T {
   for (const key in objectClone) objectClone[key] = copy(objectClone[key]);
 
   return objectClone;
-}
-
-/**
- * Removes specified properties from the defined object.
- *
- * @public
- * @param object - Object to remove the specified properties from.
- * @param properties - Property keys to be removed from the specified object.
- */
-export function removeProperties<T = Object>(
-  object: T,
-  properties: Array<string>
-): T {
-  const copiedObject = copy(object);
-  properties.map((property) => delete copiedObject[property]);
-  return copiedObject;
 }

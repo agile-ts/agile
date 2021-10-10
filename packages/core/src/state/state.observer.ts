@@ -26,6 +26,7 @@ export class StateObserver<ValueType = any> extends Observer {
 
   // Next value applied to the State
   public nextStateValue: ValueType;
+
   // Current value of the State (shared with the UI)
   public value?: ValueType;
   // Previous value of the State (for handling selectors)

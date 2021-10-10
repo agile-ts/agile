@@ -1,4 +1,4 @@
-import { defineConfig, isFunction, removeProperties } from '@agile-ts/utils';
+import { defineConfig, isFunction } from '@agile-ts/utils';
 import { logCodeManager } from '../../logCodeManager';
 import { Agile } from '../../agile';
 import {
@@ -222,7 +222,7 @@ export class SubController {
     const componentSubscriptionContainer = new ComponentSubscriptionContainer(
       componentInstance,
       subs,
-      removeProperties(config, ['waitForMount'])
+      config
     );
     this.componentSubs.add(componentSubscriptionContainer);
 
@@ -271,7 +271,7 @@ export class SubController {
     const callbackSubscriptionContainer = new CallbackSubscriptionContainer(
       callbackFunction,
       subs,
-      removeProperties(config, ['waitForMount'])
+      config
     );
     this.callbackSubs.add(callbackSubscriptionContainer);
     callbackSubscriptionContainer.ready = true;

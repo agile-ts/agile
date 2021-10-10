@@ -3,7 +3,6 @@ import {
   defineConfig,
   isValidObject,
   normalizeArray,
-  removeProperties,
 } from '@agile-ts/utils';
 import { logCodeManager } from '../../logCodeManager';
 import {
@@ -197,7 +196,7 @@ export class Group<
     if (notExistingItemKeysInCollection.length >= _itemKeys.length)
       config.background = true;
 
-    this.set(newGroupValue, removeProperties(config, ['softRebuild']));
+    this.set(newGroupValue, config);
 
     return this;
   }
@@ -271,10 +270,7 @@ export class Group<
     )
       config.background = true;
 
-    this.set(
-      newGroupValue,
-      removeProperties(config, ['method', 'softRebuild'])
-    );
+    this.set(newGroupValue, config);
 
     return this;
   }

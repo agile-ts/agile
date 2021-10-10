@@ -2090,6 +2090,8 @@ describe('Collection Tests', () => {
         expect(dummyGroup2.add).not.toHaveBeenCalled();
         expect(dummyGroup2.remove).toHaveBeenCalledWith(['1'], {
           background: true,
+          method: 'push', // Not required but passed for simplicity
+          overwrite: true, // Not required but passed for simplicity
         });
       });
     });

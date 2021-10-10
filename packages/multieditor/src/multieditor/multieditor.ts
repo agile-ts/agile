@@ -1,5 +1,5 @@
 import { Agile, Observer, StateIngestConfigInterface } from '@agile-ts/core';
-import { defineConfig, removeProperties } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
 import { Validator } from '../validator';
 import { Item, ItemKey } from '../item';
 import { StatusInterface, StatusType } from '../status';
@@ -241,7 +241,7 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
 
     // Reset Item (-> assign initial value to the current value)
     if (config.reset) {
-      item.reset(removeProperties(config, ['reset']));
+      item.reset(config);
     }
 
     return this;

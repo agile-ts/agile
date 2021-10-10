@@ -1,8 +1,4 @@
-import {
-  defineConfig,
-  isAsyncFunction,
-  removeProperties,
-} from '@agile-ts/utils';
+import { defineConfig, isAsyncFunction } from '@agile-ts/utils';
 import { Agile } from '../agile';
 import { extractRelevantObservers } from '../utils';
 import {
@@ -103,10 +99,7 @@ export class Computed<ComputedValueType = any> extends State<
       autodetect: false,
     });
     this.compute({ autodetect: config.autodetect }).then((result) => {
-      this.observers['value'].ingestValue(
-        result,
-        removeProperties(config, ['autodetect'])
-      );
+      this.observers['value'].ingestValue(result, config);
     });
     return this;
   }
@@ -157,7 +150,7 @@ export class Computed<ComputedValueType = any> extends State<
 
     // Recompute to assign the new computed value to the Computed
     // and autodetect missing dependencies
-    this.recompute(removeProperties(config, ['overwriteDeps']));
+    this.recompute(config);
 
     return this;
   }
