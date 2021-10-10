@@ -45,10 +45,10 @@ describe('Computed Tests', () => {
     expect(computed._key).toBeUndefined();
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
-    expect(computed.initialStateValue).toBe(null);
-    expect(computed._value).toBe(null);
-    expect(computed.previousStateValue).toBe(null);
-    expect(computed.nextStateValue).toBe(null);
+    expect(computed.initialStateValue).toBe(computedFunction());
+    expect(computed._value).toBe(computedFunction());
+    expect(computed.previousStateValue).toBe(computedFunction());
+    expect(computed.nextStateValue).toBe(computedFunction());
     expect(computed.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(computed.observers['value'].dependents)).toStrictEqual(
       []
@@ -73,6 +73,7 @@ describe('Computed Tests', () => {
       dependents: [dummyObserver1],
       computedDeps: [dummyObserver2, undefined as any, dummyState],
       autodetect: false,
+      initialValue: 'initialValue',
     });
 
     expect(computed.computeFunction).toBe(computedFunction);
@@ -109,10 +110,10 @@ describe('Computed Tests', () => {
     expect(computed._key).toBe('coolComputed');
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
-    expect(computed.initialStateValue).toBe(null);
-    expect(computed._value).toBe(null);
-    expect(computed.previousStateValue).toBe(null);
-    expect(computed.nextStateValue).toBe(null);
+    expect(computed.initialStateValue).toBe('initialValue');
+    expect(computed._value).toBe('initialValue');
+    expect(computed.previousStateValue).toBe('initialValue');
+    expect(computed.nextStateValue).toBe('initialValue');
     expect(computed.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(computed.observers['value'].dependents)).toStrictEqual([
       dummyObserver1,
