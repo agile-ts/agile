@@ -53,7 +53,7 @@ export class Observer<ValueType = any> {
    */
   constructor(
     agileInstance: Agile,
-    config: CreateObserverConfigInterface = {}
+    config: CreateObserverConfigInterface<ValueType> = {}
   ) {
     config = defineConfig(config, {
       dependents: [],

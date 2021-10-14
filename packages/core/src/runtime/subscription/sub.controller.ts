@@ -99,7 +99,7 @@ export class SubController {
     config?: RegisterSubscriptionConfigInterface
   ): {
     subscriptionContainer: SubscriptionContainer;
-    props: { [key: string]: any };
+    props: { [key: string]: Observer['value'] };
   };
   public subscribe(
     integrationInstance: any,
@@ -109,7 +109,7 @@ export class SubController {
     | SubscriptionContainer
     | {
         subscriptionContainer: SubscriptionContainer;
-        props: { [key: string]: any };
+        props: { [key: string]: Observer['value'] };
       } {
     config = defineConfig(config, {
       waitForMount: this.agileInstance().config.waitForMount,
