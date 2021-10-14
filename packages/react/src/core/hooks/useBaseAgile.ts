@@ -93,7 +93,7 @@ export const getReturnValue = (
 
 export type SubscribableAgileInstancesType =
   | State
-  | Collection<any, any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
+  | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
 

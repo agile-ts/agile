@@ -23,10 +23,7 @@ import { GroupIngestConfigInterface } from './group/group.observer';
 import { StorageKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
-export class Collection<
-  DataType extends DefaultItem = DefaultItem,
-  GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useValue()'
-> {
+export class Collection<DataType extends DefaultItem = DefaultItem> {
   // Agile Instance the Collection belongs to
   public agileInstance: () => Agile;
 

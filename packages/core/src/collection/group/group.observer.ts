@@ -16,12 +16,12 @@ export class GroupObserver<
   // Group the Observer belongs to
   public group: () => Group<DataType>;
 
-  // Next output applied to the Group
+  // Next vale (output) applied to the Group
   public nextGroupValue: DataType[];
 
-  // Current value of the Group (shared with the UI)
+  // Current value (output) of the Group (shared with the UI)
   public value?: DataType[];
-  // Previous value of the Group (for handling selectors)
+  // Previous value (output) of the Group (for handling selectors)
   public previousValue?: DataType[];
 
   /**
@@ -123,7 +123,7 @@ export class GroupObserver<
 
     // Assign new public output to the Observer (output used by the Integrations)
     observer.previousValue = Object.freeze(copy(observer.value)) as any;
-    observer.value = Object.freeze(copy(group._output)) as any;
+    observer.value = copy(group._output); // Object.freeze(copy(group._output)); // Not freezing because of 'useProxy' hook
   }
 }
 

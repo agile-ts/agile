@@ -87,7 +87,7 @@ export function useProxy<
 
   const handleReturn = (dep: Observer | undefined) => {
     if (dep == null) return undefined as any;
-    const value = dep.value;
+    const value = dep['value'];
 
     // If proxyBased and the value is of the type object.
     // Wrap a Proxy around the object to track the accessed properties.
