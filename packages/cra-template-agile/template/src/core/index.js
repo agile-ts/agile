@@ -3,7 +3,7 @@ import { createState, globalBind } from '@agile-ts/core';
 // State to keep track of the current time of the Stopwatch
 const TIME = createState(
   { ms: 0, s: 0, m: 0, h: 0 },
-  { key: 'stopwatch-time' },
+  { key: 'stopwatch-time' }
 ).persist();
 
 // State to keep track of the current state of the Stopwatch

@@ -90,9 +90,8 @@ const createHOC = (
     public agileInstance: Agile;
     public waitForMount: boolean;
 
-    public componentSubscriptionContainers: Array<
-      ComponentSubscriptionContainer
-    > = []; // Represents all Subscription Container subscribed to this Component (set by subController)
+    public componentSubscriptionContainers: Array<ComponentSubscriptionContainer> =
+      []; // Represents all Subscription Container subscribed to this Component (set by subController)
     public agileProps = {}; // Props of subscribed Agile Instances (are merged into the normal props)
 
     constructor(props: any) {
@@ -232,9 +231,8 @@ const formatDepsWithIndicator = (
 export class AgileReactComponent extends React.Component {
   // @ts-ignore
   public agileInstance: Agile;
-  public componentSubscriptionContainers: Array<
-    ComponentSubscriptionContainer
-  > = [];
+  public componentSubscriptionContainers: Array<ComponentSubscriptionContainer> =
+    [];
   public agileProps = {};
 
   constructor(props: any) {

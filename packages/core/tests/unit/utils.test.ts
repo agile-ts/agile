@@ -59,13 +59,11 @@ describe('Utils Tests', () => {
       // State with multiple Observer
       dummyStateWithMultipleObserver = new State(dummyAgile, null);
       dummyStateValueObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers[
-        'value'
-      ] = dummyStateValueObserver;
+      dummyStateWithMultipleObserver.observers['value'] =
+        dummyStateValueObserver;
       dummyStateRandomObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers[
-        'random'
-      ] = dummyStateRandomObserver;
+      dummyStateWithMultipleObserver.observers['random'] =
+        dummyStateRandomObserver;
 
       // Collection
       dummyCollection = new Collection(dummyAgile);
@@ -157,13 +155,11 @@ describe('Utils Tests', () => {
       // State with multiple Observer
       dummyStateWithMultipleObserver = new State(dummyAgile, null);
       dummyStateValueObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers[
-        'value'
-      ] = dummyStateValueObserver;
+      dummyStateWithMultipleObserver.observers['value'] =
+        dummyStateValueObserver;
       dummyStateRandomObserver = new StateObserver(dummyState);
-      dummyStateWithMultipleObserver.observers[
-        'random'
-      ] = dummyStateRandomObserver;
+      dummyStateWithMultipleObserver.observers['random'] =
+        dummyStateRandomObserver;
 
       // Collection
       dummyCollection = new Collection(dummyAgile);

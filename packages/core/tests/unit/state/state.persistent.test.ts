@@ -349,9 +349,7 @@ describe('StatePersistent Tests', () => {
         () => {
           statePersistent.setupSideEffects();
 
-          expect(
-            dummyState.addSideEffect
-          ).toHaveBeenCalledWith(
+          expect(dummyState.addSideEffect).toHaveBeenCalledWith(
             StatePersistent.storeValueSideEffectKey,
             expect.any(Function),
             { weight: 0 }

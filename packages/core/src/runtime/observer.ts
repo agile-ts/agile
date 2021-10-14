@@ -7,7 +7,7 @@ import { IngestConfigInterface } from './runtime';
 
 export type ObserverKey = string | number;
 
-export class Observer {
+export class Observer<ValueType = any> {
   // Agile Instance the Observer belongs to
   public agileInstance: () => Agile;
 
@@ -17,6 +17,11 @@ export class Observer {
   public dependents: Set<Observer> = new Set();
   // Subscription Containers (UI-Components) the Observer is subscribed to
   public subscribedTo: Set<SubscriptionContainer> = new Set();
+
+  // Current value of the Observer (shared with the UI)
+  public value?: ValueType;
+  // Previous value of the Observer (for handling selectors)
+  public previousValue?: ValueType;
 
   /**
    * An Observer manages the subscriptions to Subscription Containers (UI-Components)
@@ -35,7 +40,7 @@ export class Observer {
    * When it is executed, the Observer's `perform()` method is called,
    * where the accordingly changes are applied to the Agile Class.
    *
-   * Now that the Job was performed, it is added to the rerender queue,
+   * Now that the Job was performed, it is added to the re-render queue,
    * where the subscribed Subscription Container (UI-Components)
    * of the Observer are updated (re-rendered).
    *
@@ -53,9 +58,12 @@ export class Observer {
     config = defineConfig(config, {
       dependents: [],
       subs: [],
+      value: null,
     });
     this.agileInstance = () => agileInstance;
     this.key = config.key;
+    this.value = config.value;
+    this.previousValue = config.value;
     config.dependents?.forEach((observer) => this.addDependent(observer));
     config.subs?.forEach((subscriptionContainer) =>
       subscriptionContainer.addSubscription(this)
@@ -134,7 +142,7 @@ export class Observer {
   }
 }
 
-export interface CreateObserverConfigInterface {
+export interface CreateObserverConfigInterface<ValueType = any> {
   /**
    * Initial Observers to depend on the Observer.
    * @default []
@@ -150,6 +158,20 @@ export interface CreateObserverConfigInterface {
    * @default undefined
    */
   key?: ObserverKey;
+  /**
+   * Initial value of the Observer.
+   *
+   * The value of an Observer is given to the Integration's `updateMethod()` method
+   * (Component Subscription Container) where it can be,
+   * for example, merged in a local State Management property of the UI-Component
+   * it is subscribed to.
+   *
+   * Also the selection of specific properties of an Agile Class value
+   * is based on the Observer `value` and `previousValue`.
+   *
+   * @default undefined
+   */
+  value?: ValueType;
 }
 
 export interface ObserverIngestConfigInterface

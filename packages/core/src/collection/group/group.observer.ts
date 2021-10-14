@@ -12,17 +12,12 @@ import { logCodeManager } from '../../logCodeManager';
 
 export class GroupObserver<
   DataType extends DefaultItem = DefaultItem
-> extends Observer {
+> extends Observer<DataType[]> {
   // Group the Observer belongs to
   public group: () => Group<DataType>;
 
   // Next vale (output) applied to the Group
   public nextGroupValue: DataType[];
-
-  // Current value (output) of the Group (shared with the UI)
-  public value?: DataType[];
-  // Previous value (output) of the Group (for handling selectors)
-  public previousValue?: DataType[];
 
   /**
    * A Group Observer manages the subscriptions to Subscription Containers (UI-Components)
@@ -37,11 +32,14 @@ export class GroupObserver<
     group: Group<DataType>,
     config: CreateObserverConfigInterface = {}
   ) {
-    super(group.agileInstance(), config);
+    super(
+      group.agileInstance(),
+      defineConfig(config, {
+        value: copy(group._output),
+      })
+    );
     this.group = () => group;
     this.nextGroupValue = copy(group._output);
-    this.value = copy(group._output);
-    this.previousValue = copy(group._output);
   }
 
   /**

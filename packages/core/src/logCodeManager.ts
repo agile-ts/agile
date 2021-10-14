@@ -94,8 +94,6 @@ const logCodeMessages = {
   // Observer
   '17:03:00':
     "The 'perform()' method isn't set in Observer but need to be set! Observer is no stand alone class.",
-  '17:03:01':
-    "The 'ingest()' method isn't set in Observer but need to be set! Observer is no stand alone class.",
 
   // Integrations
   '18:00:00': "Integrated '${0}' into AgileTs '${1}'",
@@ -275,7 +273,7 @@ export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
 
 // Instantiate LogCodeManager based on the current environment
 type LogCodeMessagesType = typeof logCodeMessages;
-export let tempLogCodeManager: LogCodeManager<LogCodeMessagesType>;
+let tempLogCodeManager: LogCodeManager<LogCodeMessagesType>;
 if (process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {

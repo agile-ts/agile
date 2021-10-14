@@ -10,9 +10,9 @@ import { Observer } from '../runtime';
 import { ComputedTracker } from './computed.tracker';
 import { Collection } from '../collection';
 
-export class Computed<ComputedValueType = any> extends State<
-  ComputedValueType
-> {
+export class Computed<
+  ComputedValueType = any
+> extends State<ComputedValueType> {
   public config: ComputedConfigInterface;
 
   // Function to compute the Computed Class value

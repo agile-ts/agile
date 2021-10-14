@@ -4,6 +4,7 @@ import {
   State,
   defineConfig,
   ItemKey,
+  Observer,
 } from '@agile-ts/core';
 import { useAgile } from './useAgile';
 import {
@@ -41,13 +42,13 @@ export function useValue<
 export type AgileValueHookArrayType<T> = {
   [K in keyof T]: T[K] extends Collection | Group
     ? Array<ItemKey>
-    : T[K] extends State<infer U>
+    : T[K] extends State<infer U> | Observer<infer U>
     ? U
     : T[K] extends undefined
     ? undefined
     : T[K] extends Collection | Group | undefined
     ? Array<ItemKey> | undefined
-    : T[K] extends State<infer U> | undefined
+    : T[K] extends State<infer U> | Observer<infer U> | undefined
     ? U | undefined
     : never;
 };
@@ -55,12 +56,12 @@ export type AgileValueHookArrayType<T> = {
 // No Array Type
 export type AgileValueHookType<T> = T extends Collection | Group
   ? Array<ItemKey>
-  : T extends State<infer U>
+  : T extends State<infer U> | Observer<infer U>
   ? U
   : T extends undefined
   ? undefined
   : T extends Collection | Group | undefined
   ? Array<ItemKey> | undefined
-  : T extends State<infer U> | undefined
+  : T extends State<infer U> | Observer<infer U> | undefined
   ? U | undefined
   : never;

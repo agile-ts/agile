@@ -69,7 +69,8 @@ describe('Shared (Storage) Tests', () => {
       SharedStorageManager.assignSharedStorageManager(createdStorageManager);
       jest.clearAllMocks();
 
-      const returnedStorageManager = SharedStorageManager.getSharedStorageManager();
+      const returnedStorageManager =
+        SharedStorageManager.getSharedStorageManager();
 
       expect(returnedStorageManager).toBeInstanceOf(Storages);
       expect(returnedStorageManager).toBe(createdStorageManager);

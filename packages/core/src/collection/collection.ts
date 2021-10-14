@@ -1218,9 +1218,7 @@ export class Collection<DataType extends DefaultItem = DefaultItem> {
    * @public
    * @param itemKeys - Item/s with identifier/s to be removed.
    */
-  public remove(
-    itemKeys: ItemKey | Array<ItemKey>
-  ): {
+  public remove(itemKeys: ItemKey | Array<ItemKey>): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
     everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
@@ -1555,13 +1553,12 @@ export interface CreateCollectionConfigImpl<
   initialData?: Array<DataType>;
 }
 
-export type CreateCollectionConfig<
-  DataType extends DefaultItem = DefaultItem
-> =
-  | CreateCollectionConfigImpl<DataType>
-  | ((
-      collection: Collection<DataType>
-    ) => CreateCollectionConfigImpl<DataType>);
+export type CreateCollectionConfig<DataType extends DefaultItem = DefaultItem> =
+
+    | CreateCollectionConfigImpl<DataType>
+    | ((
+        collection: Collection<DataType>
+      ) => CreateCollectionConfigImpl<DataType>);
 
 export interface CollectionConfigInterface {
   /**

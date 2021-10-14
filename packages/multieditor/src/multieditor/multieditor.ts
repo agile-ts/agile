@@ -78,9 +78,9 @@ export class Multieditor<TFieldData extends FieldData = FieldData> {
     } = {};
     Object.keys(_config.validationSchema as EditorValidationSchemaType).forEach(
       (key) => {
-        const validationMethod = (_config.validationSchema as EditorValidationSchemaType)[
-          key
-        ];
+        const validationMethod = (
+          _config.validationSchema as EditorValidationSchemaType
+        )[key];
 
         // If validation schema item is a Validator
         if (validationMethod instanceof Validator) {

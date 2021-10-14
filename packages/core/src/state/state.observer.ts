@@ -20,17 +20,12 @@ import {
 import { SideEffectInterface, State } from './state';
 import { logCodeManager } from '../logCodeManager';
 
-export class StateObserver<ValueType = any> extends Observer {
+export class StateObserver<ValueType = any> extends Observer<ValueType> {
   // State the Observer belongs to
   public state: () => State<ValueType>;
 
   // Next value applied to the State
   public nextStateValue: ValueType;
-
-  // Current value of the State (shared with the UI)
-  public value?: ValueType;
-  // Previous value of the State (for handling selectors)
-  public previousValue?: ValueType;
 
   /**
    * A State Observer manages the subscriptions to Subscription Containers (UI-Components)
@@ -45,11 +40,14 @@ export class StateObserver<ValueType = any> extends Observer {
     state: State<ValueType>,
     config: CreateStateObserverConfigInterface = {}
   ) {
-    super(state.agileInstance(), config);
+    super(
+      state.agileInstance(),
+      defineConfig(config, {
+        value: copy(state._value),
+      })
+    );
     this.state = () => state;
     this.nextStateValue = copy(state._value);
-    this.value = copy(state._value);
-    this.previousValue = copy(state._value);
   }
 
   /**

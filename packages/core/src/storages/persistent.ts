@@ -193,8 +193,8 @@ export class Persistent {
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      const defaultStorageKey = getSharedStorageManager()?.config
-        .defaultStorageKey;
+      const defaultStorageKey =
+        getSharedStorageManager()?.config.defaultStorageKey;
       if (defaultStorageKey != null) {
         this.config.defaultStorageKey = defaultStorageKey;
         _storageKeys.push(

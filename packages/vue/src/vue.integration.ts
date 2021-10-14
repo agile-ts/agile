@@ -41,9 +41,9 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
           },
           methods: {
             // TODO make 'bindAgileInstances' ('sharedState') more typesafe
-            bindAgileInstances: function (
-              deps: DepsType
-            ): { sharedState: { [key: string]: any } } {
+            bindAgileInstances: function (deps: DepsType): {
+              sharedState: { [key: string]: any };
+            } {
               return {
                 sharedState: {
                   ...(this?.$data?.sharedState || {}),
@@ -52,9 +52,9 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
               };
             },
             // TODO make 'bindAgileValues' ('sharedState') more typesafe
-            bindAgileValues: function (
-              deps: DepsType
-            ): { sharedState: { [key: string]: any } } {
+            bindAgileValues: function (deps: DepsType): {
+              sharedState: { [key: string]: any };
+            } {
               return {
                 sharedState: {
                   ...(this?.$data?.sharedState || {}),
@@ -63,9 +63,9 @@ const vueIntegration = new Integration<typeof Vue, Vue>({
               };
             },
             // TODO make 'bindAgileOutputs' ('sharedState') more typesafe
-            bindAgileOutputs: function (
-              deps: DepsType
-            ): { sharedState: { [key: string]: any } } {
+            bindAgileOutputs: function (deps: DepsType): {
+              sharedState: { [key: string]: any };
+            } {
               return {
                 sharedState: {
                   ...(this?.$data?.sharedState || {}),

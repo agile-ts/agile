@@ -36,6 +36,8 @@ describe('Observer Tests', () => {
     expect(observer.key).toBeUndefined();
     expect(Array.from(observer.dependents)).toStrictEqual([]);
     expect(Array.from(observer.subscribedTo)).toStrictEqual([]);
+    expect(observer.value).toBeNull();
+    expect(observer.previousValue).toBeNull();
   });
 
   it('should create Observer (specific config)', () => {
@@ -43,6 +45,7 @@ describe('Observer Tests', () => {
       key: 'testKey',
       subs: [dummySubscription1, dummySubscription2],
       dependents: [dummyObserver1, dummyObserver2],
+      value: 'coolValue',
     });
 
     expect(observer.agileInstance()).toBe(dummyAgile);
@@ -55,6 +58,8 @@ describe('Observer Tests', () => {
       dummySubscription1,
       dummySubscription2,
     ]);
+    expect(observer.value).toBe('coolValue');
+    expect(observer.previousValue).toBe('coolValue');
 
     expect(dummySubscription1.addSubscription).toHaveBeenCalledWith(observer);
     expect(dummySubscription2.addSubscription).toHaveBeenCalledWith(observer);
@@ -70,7 +75,6 @@ describe('Observer Tests', () => {
     describe('ingest function tests', () => {
       it('should create RuntimeJob containing the Observer and ingest it into the Runtime (default config)', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValueOnce('generatedKey');
-
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
           expect(job.key).toBe(`${observer.key}_generatedKey`);
           expect(job.observer).toBe(observer);

@@ -171,9 +171,8 @@ export class Runtime {
       return false;
 
     // Extract the Subscription Container to be re-rendered from the Jobs
-    const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
-      jobsToRerender
-    );
+    const subscriptionContainerToUpdate =
+      this.extractToUpdateSubscriptionContainer(jobsToRerender);
     if (subscriptionContainerToUpdate.length <= 0) return false;
 
     // Update Subscription Container (trigger re-render on the UI-Component they represent)
@@ -317,7 +316,7 @@ export class Runtime {
       const key =
         subscriptionContainer.subscriberKeysWeakMap.get(observer) ??
         observer.key;
-      if (key != null) props[key] = observer['value'];
+      if (key != null) props[key] = observer.value;
     }
     return props;
   }
@@ -351,9 +350,9 @@ export class Runtime {
     if (selectorMethods == null) return true;
 
     // Check if a selected part of the Observer value has changed
-    const previousValue = job.observer['previousValue'];
-    const newValue = job.observer['value'];
-    if (!previousValue && !newValue) return false;
+    const previousValue = job.observer.previousValue;
+    const newValue = job.observer.value;
+    if (!previousValue && !newValue) return false; // Because not all Observers contain a value/previousValue
     for (const selectorMethod of selectorMethods) {
       if (
         notEqual(selectorMethod(newValue), selectorMethod(previousValue))
