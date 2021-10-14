@@ -73,11 +73,13 @@ export class Runtime {
     // Add specified Job to the queue
     this.jobQueue.push(job);
 
-    logCodeManager.log(
-      '16:01:00',
-      { tags: ['runtime'], replacers: [job._key] },
-      job
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log(
+        '16:01:00',
+        { tags: ['runtime'], replacers: [job.key] },
+        job
+      );
+    }
 
     // Run first Job from the queue
     if (config.perform) {
@@ -114,11 +116,13 @@ export class Runtime {
     if (job.rerender) this.jobsToRerender.push(job);
     this.currentJob = null;
 
-    logCodeManager.log(
-      '16:01:01',
-      { tags: ['runtime'], replacers: [job._key] },
-      job
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log(
+        '16:01:01',
+        { tags: ['runtime'], replacers: [job.key] },
+        job
+      );
+    }
 
     // Perform Jobs as long as Jobs are left in the queue.
     // If no Job is left start updating (re-rendering) Subscription Container (UI-Components)
@@ -167,9 +171,8 @@ export class Runtime {
       return false;
 
     // Extract the Subscription Container to be re-rendered from the Jobs
-    const subscriptionContainerToUpdate = this.extractToUpdateSubscriptionContainer(
-      jobsToRerender
-    );
+    const subscriptionContainerToUpdate =
+      this.extractToUpdateSubscriptionContainer(jobsToRerender);
     if (subscriptionContainerToUpdate.length <= 0) return false;
 
     // Update Subscription Container (trigger re-render on the UI-Component they represent)
@@ -206,17 +209,21 @@ export class Runtime {
           ) {
             job.timesTriedToUpdateCount++;
             this.notReadyJobsToRerender.add(job);
-            logCodeManager.log(
-              '16:02:00',
-              { replacers: [subscriptionContainer.key] },
-              subscriptionContainer
-            );
+            if (process.env.NODE_ENV !== 'production') {
+              logCodeManager.log(
+                '16:02:00',
+                { replacers: [subscriptionContainer.key] },
+                subscriptionContainer
+              );
+            }
           } else {
-            logCodeManager.log(
-              '16:02:01',
-              { replacers: [job.config.maxTriesToUpdate] },
-              subscriptionContainer
-            );
+            if (process.env.NODE_ENV !== 'production') {
+              logCodeManager.log(
+                '16:02:01',
+                { replacers: [job.config.maxTriesToUpdate] },
+                subscriptionContainer
+              );
+            }
           }
           return;
         }
@@ -282,11 +289,13 @@ export class Runtime {
       subscriptionContainer.updatedSubscribers.clear();
     }
 
-    logCodeManager.log(
-      '16:01:02',
-      { tags: ['runtime'] },
-      subscriptionsToUpdate
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log(
+        '16:01:02',
+        { tags: ['runtime'] },
+        subscriptionsToUpdate
+      );
+    }
   }
 
   /**
@@ -343,6 +352,7 @@ export class Runtime {
     // Check if a selected part of the Observer value has changed
     const previousValue = job.observer.previousValue;
     const newValue = job.observer.value;
+    if (!previousValue && !newValue) return false; // Because not all Observers contain a value/previousValue
     for (const selectorMethod of selectorMethods) {
       if (
         notEqual(selectorMethod(newValue), selectorMethod(previousValue))

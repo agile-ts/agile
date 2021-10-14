@@ -36,7 +36,7 @@ describe('State Tests', () => {
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
-    expect(state.observers['value']._key).toBeUndefined();
+    expect(state.observers['value'].key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -63,7 +63,7 @@ describe('State Tests', () => {
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([
       dummyObserver,
     ]);
-    expect(state.observers['value']._key).toBe('coolState');
+    expect(state.observers['value'].key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -83,7 +83,7 @@ describe('State Tests', () => {
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
-    expect(state.observers['value']._key).toBeUndefined();
+    expect(state.observers['value'].key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -166,8 +166,8 @@ describe('State Tests', () => {
         numberState.setKey('newKey');
 
         expect(numberState._key).toBe('newKey');
-        expect(numberState.observers['value']._key).toBe('newKey');
-        expect(numberState.observers['output']._key).toBe('newKey');
+        expect(numberState.observers['value'].key).toBe('newKey');
+        expect(numberState.observers['output'].key).toBe('newKey');
       });
     });
 
@@ -231,9 +231,10 @@ describe('State Tests', () => {
 
         LogMock.hasNotLogged('warn');
         LogMock.hasNotLogged('error');
-        expect(
-          numberState.observers['value'].ingestValue
-        ).toHaveBeenCalledWith('coolValue', { force: false });
+        expect(numberState.observers['value'].ingestValue).toHaveBeenCalledWith(
+          'coolValue',
+          { force: false }
+        );
       });
     });
 

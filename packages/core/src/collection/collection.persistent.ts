@@ -135,9 +135,8 @@ export class CollectionPersistent<
         // that it was loaded completely.
         // After a successful loading assign the now valid Item to the Collection.
         else {
-          const placeholderItem = this.collection().getItemWithReference(
-            itemKey
-          );
+          const placeholderItem =
+            this.collection().getItemWithReference(itemKey);
           placeholderItem?.persist(itemStorageKey, {
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey as any,
@@ -145,7 +144,8 @@ export class CollectionPersistent<
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
           if (placeholderItem?.persistent?.ready) {
-            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue();
+            const loadedPersistedValueIntoItem =
+              await placeholderItem.persistent.loadPersistedValue();
 
             // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem) {

@@ -48,7 +48,7 @@ describe('Enhanced State Tests', () => {
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
-    expect(state.observers['value']._key).toBeUndefined();
+    expect(state.observers['value'].key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -83,7 +83,7 @@ describe('Enhanced State Tests', () => {
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([
       dummyObserver,
     ]);
-    expect(state.observers['value']._key).toBe('coolState');
+    expect(state.observers['value'].key).toBe('coolState');
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -113,7 +113,7 @@ describe('Enhanced State Tests', () => {
     expect(state.nextStateValue).toBe('coolValue');
     expect(state.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(state.observers['value'].dependents)).toStrictEqual([]);
-    expect(state.observers['value']._key).toBeUndefined();
+    expect(state.observers['value'].key).toBeUndefined();
     expect(state.sideEffects).toStrictEqual({});
   });
 
@@ -290,7 +290,9 @@ describe('Enhanced State Tests', () => {
           age: 10,
           name: 'frank',
         });
-        expect(objectState.ingest).toHaveBeenCalledWith({});
+        expect(objectState.ingest).toHaveBeenCalledWith({
+          addNewProperties: true, // Not required but passed for simplicity
+        });
       });
 
       it('should patch specified object value into a object based State (specific config)', () => {
@@ -323,6 +325,7 @@ describe('Enhanced State Tests', () => {
           sideEffects: {
             enabled: false,
           },
+          addNewProperties: false, // Not required but passed for simplicity
         });
       });
 
@@ -331,7 +334,9 @@ describe('Enhanced State Tests', () => {
 
         expect(Utils.flatMerge).not.toHaveBeenCalled();
         expect(arrayState.nextStateValue).toStrictEqual(['jeff', 'hi']);
-        expect(arrayState.ingest).toHaveBeenCalledWith({});
+        expect(arrayState.ingest).toHaveBeenCalledWith({
+          addNewProperties: true, // Not required but passed for simplicity
+        });
       });
 
       it('should patch specified array value into a object based State', () => {
@@ -347,7 +352,9 @@ describe('Enhanced State Tests', () => {
           age: 10,
           name: 'jeff',
         });
-        expect(objectState.ingest).toHaveBeenCalledWith({});
+        expect(objectState.ingest).toHaveBeenCalledWith({
+          addNewProperties: true, // Not required but passed for simplicity
+        });
       });
     });
 

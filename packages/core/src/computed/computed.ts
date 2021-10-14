@@ -1,8 +1,4 @@
-import {
-  defineConfig,
-  isAsyncFunction,
-  removeProperties,
-} from '@agile-ts/utils';
+import { defineConfig, isAsyncFunction } from '@agile-ts/utils';
 import { Agile } from '../agile';
 import { extractRelevantObservers } from '../utils';
 import {
@@ -14,9 +10,9 @@ import { Observer } from '../runtime';
 import { ComputedTracker } from './computed.tracker';
 import { Collection } from '../collection';
 
-export class Computed<ComputedValueType = any> extends State<
-  ComputedValueType
-> {
+export class Computed<
+  ComputedValueType = any
+> extends State<ComputedValueType> {
   public config: ComputedConfigInterface;
 
   // Function to compute the Computed Class value
@@ -50,12 +46,20 @@ export class Computed<ComputedValueType = any> extends State<
   constructor(
     agileInstance: Agile,
     computeFunction: ComputeFunctionType<ComputedValueType>,
-    config: CreateComputedConfigInterface = {}
+    config: CreateComputedConfigInterface<ComputedValueType> = {}
   ) {
-    super(agileInstance, null as any, {
-      key: config.key,
-      dependents: config.dependents,
-    });
+    super(
+      agileInstance,
+      Object.prototype.hasOwnProperty.call(config, 'initialValue')
+        ? config.initialValue
+        : !isAsyncFunction(computeFunction)
+        ? computeFunction()
+        : (null as any),
+      {
+        key: config.key,
+        dependents: config.dependents,
+      }
+    );
     config = defineConfig(config, {
       computedDeps: [],
       autodetect: !isAsyncFunction(computeFunction),
@@ -95,10 +99,7 @@ export class Computed<ComputedValueType = any> extends State<
       autodetect: false,
     });
     this.compute({ autodetect: config.autodetect }).then((result) => {
-      this.observers['value'].ingestValue(
-        result,
-        removeProperties(config, ['autodetect'])
-      );
+      this.observers['value'].ingestValue(result, config);
     });
     return this;
   }
@@ -149,7 +150,7 @@ export class Computed<ComputedValueType = any> extends State<
 
     // Recompute to assign the new computed value to the Computed
     // and autodetect missing dependencies
-    this.recompute(removeProperties(config, ['overwriteDeps']));
+    this.recompute(config);
 
     return this;
   }
@@ -205,7 +206,8 @@ export type ComputeFunctionType<ComputedValueType = any> = () =>
   | ComputedValueType
   | Promise<ComputedValueType>;
 
-export interface CreateComputedConfigInterface extends StateConfigInterface {
+export interface CreateComputedConfigInterface<ComputedValueType = any>
+  extends StateConfigInterface {
   /**
    * Hard-coded dependencies the Computed Class should depend on.
    * @default []
@@ -221,6 +223,15 @@ export interface CreateComputedConfigInterface extends StateConfigInterface {
    * @default true if the compute method isn't asynchronous, otherwise false
    */
   autodetect?: boolean;
+  /**
+   * Initial value of the Computed
+   * which is temporarily set until the first computation has been completed.
+   *
+   * Note: Only really relevant if an async compute method is used.
+   *
+   * @default undefined
+   */
+  initialValue?: ComputedValueType;
 }
 
 export interface ComputedConfigInterface {

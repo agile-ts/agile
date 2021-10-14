@@ -162,7 +162,7 @@ const logCodeMessages = {
   '00:03:01': "'${0}' has to be of the type ${1}!",
 };
 
-export class LogCodeManager<LogCodeMessagesType = {}> {
+export class LogCodeManager<LogCodeMessagesType extends Object = Object> {
   // Keymap of messages that the LogCodeManager can log
   public logCodeMessages: LogCodeMessagesType;
   // Optional '@agile-ts/logger' package for more advanced logging
@@ -272,7 +272,8 @@ export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
 }
 
 // Instantiate LogCodeManager based on the current environment
-let tempLogCodeManager: LogCodeManager<typeof logCodeMessages>;
+type LogCodeMessagesType = typeof logCodeMessages;
+let tempLogCodeManager: LogCodeManager<LogCodeMessagesType>;
 if (process.env.NODE_ENV !== 'production') {
   let loggerPackage: any = null;
   try {
@@ -291,7 +292,7 @@ if (process.env.NODE_ENV !== 'production') {
  *
  * @internal
  */
-export { tempLogCodeManager as logCodeManager };
+export const logCodeManager = tempLogCodeManager;
 
 interface LogConfigInterface {
   /**

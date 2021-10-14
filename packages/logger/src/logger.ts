@@ -141,9 +141,9 @@ export class Logger {
    * @private
    */
   private logIfCondition(condition: boolean): DefaultLogMethodsInterface {
-    const defaultLoggerCategories = Object.keys(
-      Logger.level
-    ).map((loggerCategory) => loggerCategory.toLowerCase());
+    const defaultLoggerCategories = Object.keys(Logger.level).map(
+      (loggerCategory) => loggerCategory.toLowerCase()
+    );
 
     // Build object representing the default log categories
     const finalObject: DefaultLogMethodsInterface = {} as any;

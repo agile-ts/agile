@@ -29,7 +29,7 @@ describe('Event Tests', () => {
     expect(event.enabled).toBeTruthy();
     expect(event.observer).toBeInstanceOf(EventObserver);
     expect(event.observer.dependents.size).toBe(0);
-    expect(event.observer._key).toBeUndefined();
+    expect(event.observer.key).toBeUndefined();
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
     expect(event.payload).toBeUndefined();
@@ -60,7 +60,7 @@ describe('Event Tests', () => {
     expect(event.observer).toBeInstanceOf(EventObserver);
     expect(event.observer.dependents.size).toBe(1);
     expect(event.observer.dependents.has(dummyObserver)).toBeTruthy();
-    expect(event.observer._key).toBe('coolEvent');
+    expect(event.observer.key).toBe('coolEvent');
     expect(event.currentTimeout).toBeUndefined();
     expect(event.queue).toStrictEqual([]);
     expect(event.payload).toBeUndefined();
@@ -96,7 +96,7 @@ describe('Event Tests', () => {
         event.setKey('newKey');
 
         expect(event.key).toBe('newKey');
-        expect(event.observer._key).toBe('newKey');
+        expect(event.observer.key).toBe('newKey');
       });
     });
 

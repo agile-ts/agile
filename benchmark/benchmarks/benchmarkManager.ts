@@ -49,9 +49,7 @@ export function endBenchmarkLog(
     const cycleResult = results[i];
 
     // Build Cycle Result Log
-    const cycleString = `{bold.bgGreen ${
-      i + 1
-    }.} {bold.blue ${cycleResult.name
+    const cycleString = `{bold.bgGreen ${i + 1}.} {bold.blue ${cycleResult.name
       .padEnd(20, '.')
       .replace(/(\.+)$/, '{red $1}')}}{yellow ${
       cycleResult.opsInSec

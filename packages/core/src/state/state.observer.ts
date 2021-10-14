@@ -6,7 +6,6 @@ import {
   generateId,
   isFunction,
   notEqual,
-  removeProperties,
 } from '@agile-ts/utils';
 import {
   IngestConfigInterface,
@@ -19,8 +18,9 @@ import {
   StateRuntimeJob,
 } from './state.runtime.job';
 import { SideEffectInterface, State } from './state';
+import { logCodeManager } from '../logCodeManager';
 
-export class StateObserver<ValueType = any> extends Observer {
+export class StateObserver<ValueType = any> extends Observer<ValueType> {
   // State the Observer belongs to
   public state: () => State<ValueType>;
 
@@ -43,7 +43,7 @@ export class StateObserver<ValueType = any> extends Observer {
     super(
       state.agileInstance(),
       defineConfig(config, {
-        value: state._value,
+        value: copy(state._value),
       })
     );
     this.state = () => state;
@@ -92,6 +92,9 @@ export class StateObserver<ValueType = any> extends Observer {
     config = defineConfig(config, {
       perform: true,
       force: false,
+      key: logCodeManager.allowLogging
+        ? `${this.key != null ? this.key + '_' : ''}${generateId()}_value`
+        : undefined,
     });
 
     // Force overwriting the State value if it is a placeholder.
@@ -110,14 +113,7 @@ export class StateObserver<ValueType = any> extends Observer {
     if (equal(state._value, this.nextStateValue) && !config.force) return;
 
     // Create Runtime-Job
-    const job = new StateRuntimeJob(this, {
-      ...removeProperties(config, ['perform']),
-      ...{
-        key:
-          config.key ??
-          `${this._key != null ? this._key + '_' : ''}${generateId()}_value`,
-      },
-    });
+    const job = new StateRuntimeJob(this, config);
 
     // Pass created Job into the Runtime
     this.agileInstance().runtime.ingest(job, {
@@ -144,10 +140,6 @@ export class StateObserver<ValueType = any> extends Observer {
     state._value = copy(observer.nextStateValue);
     state.nextStateValue = copy(observer.nextStateValue);
 
-    // TODO think about freezing the State value..
-    // https://www.geeksforgeeks.org/object-freeze-javascript/#:~:text=Object.freeze()%20Method&text=freeze()%20which%20is%20used,the%20prototype%20of%20the%20object.
-    // if (typeof state._value === 'object') Object.freeze(state._value);
-
     // Overwrite entire State with the newly assigned value
     if (job.config.overwrite) {
       state.initialStateValue = copy(state._value);
@@ -159,8 +151,8 @@ export class StateObserver<ValueType = any> extends Observer {
     this.sideEffects(job);
 
     // Assign new public value to the Observer (value used by the Integrations)
-    job.observer.previousValue = copy(observer.value);
-    job.observer.value = copy(state._value);
+    job.observer.previousValue = Object.freeze(copy(observer.value));
+    job.observer.value = copy(state._value); // Object.freeze(copy(state._value)); // Not freezing because of 'useProxy' hook
   }
 
   /**
@@ -175,6 +167,7 @@ export class StateObserver<ValueType = any> extends Observer {
    */
   public sideEffects(job: StateRuntimeJob) {
     const state = job.observer.state();
+    if (Object.keys(state.sideEffects).length === 0) return;
 
     // Call side effect functions
     if (job.config?.sideEffects?.enabled) {

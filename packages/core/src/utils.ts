@@ -36,18 +36,16 @@ export function extractObservers(
  * @internal
  * @param instances - Instance to extract the Observers from.
  */
-export function extractObservers(
-  instances: any
-): { [key: string]: Observer | undefined };
+export function extractObservers(instances: any): {
+  [key: string]: Observer | undefined;
+};
 export function extractObservers(
   instances: any | Array<any>
 ):
   | Array<{ [key: string]: Observer | undefined }>
   | { [key: string]: Observer | undefined } {
   const observers: Array<{ [key: string]: Observer | undefined }> = [];
-  const tempInstancesArray = normalizeArray(instances, {
-    createUndefinedArray: true,
-  });
+  const tempInstancesArray = normalizeArray(instances, true);
 
   // Extract Observers from specified Instances
   for (const instance of tempInstancesArray) {

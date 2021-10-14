@@ -37,7 +37,7 @@ describe('StateObserver Tests', () => {
     // Check if Observer was called with correct parameters
     expect(stateObserver.value).toBe('dummyValue');
     expect(stateObserver.previousValue).toBe('dummyValue');
-    expect(stateObserver._key).toBeUndefined();
+    expect(stateObserver.key).toBeUndefined();
     expect(Array.from(stateObserver.dependents)).toStrictEqual([]);
     expect(Array.from(stateObserver.subscribedTo)).toStrictEqual([]);
   });
@@ -61,7 +61,7 @@ describe('StateObserver Tests', () => {
     // Check if Observer was called with correct parameters
     expect(stateObserver.value).toBe('dummyValue');
     expect(stateObserver.previousValue).toBe('dummyValue');
-    expect(stateObserver._key).toBe('testKey');
+    expect(stateObserver.key).toBe('testKey');
     expect(Array.from(stateObserver.dependents)).toStrictEqual([
       dummyObserver1,
       dummyObserver2,
@@ -171,7 +171,7 @@ describe('StateObserver Tests', () => {
         () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
+            expect(job.key).toBe(`${stateObserver.key}_randomKey_value`);
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -204,7 +204,7 @@ describe('StateObserver Tests', () => {
           "if the new value isn't equal to the current value (specific config)",
         () => {
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe('dummyJob');
+            expect(job.key).toBe('dummyJob');
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -260,7 +260,7 @@ describe('StateObserver Tests', () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyState._value = 'updatedDummyValue';
           dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-            expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
+            expect(job.key).toBe(`${stateObserver.key}_randomKey_value`);
             expect(job.observer).toBe(stateObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -291,7 +291,7 @@ describe('StateObserver Tests', () => {
       it('should ingest placeholder State into the Runtime (default config)', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
         dummyAgile.runtime.ingest = jest.fn((job: StateRuntimeJob) => {
-          expect(job._key).toBe(`${stateObserver._key}_randomKey_value`);
+          expect(job.key).toBe(`${stateObserver.key}_randomKey_value`);
           expect(job.observer).toBe(stateObserver);
           expect(job.config).toStrictEqual({
             background: false,

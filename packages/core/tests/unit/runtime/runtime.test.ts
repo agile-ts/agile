@@ -658,13 +658,13 @@ describe('Runtime Tests', () => {
         dummyObserver1.value = 'dummyObserverValue1';
         dummyObserver3.value = 'dummyObserverValue3';
 
-        dummyObserver1._key = 'dummyObserver1KeyInObserver';
-        dummyObserver2._key = undefined;
+        dummyObserver1.key = 'dummyObserver1KeyInObserver';
+        dummyObserver2.key = undefined;
         subscriptionContainer.subscriberKeysWeakMap.set(
           dummyObserver2,
           'dummyObserver2KeyInWeakMap'
         );
-        dummyObserver3._key = 'dummyObserver3KeyInObserver';
+        dummyObserver3.key = 'dummyObserver3KeyInObserver';
         subscriptionContainer.subscriberKeysWeakMap.set(
           dummyObserver3,
           'dummyObserver3KeyInWeakMap'
@@ -680,7 +680,7 @@ describe('Runtime Tests', () => {
 
         expect(props).toStrictEqual({
           dummyObserver1KeyInObserver: 'dummyObserverValue1',
-          dummyObserver2KeyInWeakMap: undefined,
+          dummyObserver2KeyInWeakMap: null,
           dummyObserver3KeyInWeakMap: 'dummyObserverValue3',
         });
         expect(

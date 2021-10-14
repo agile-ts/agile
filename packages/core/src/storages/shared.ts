@@ -1,4 +1,4 @@
-import { defineConfig, removeProperties } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
 import { runsOnServer } from '../utils';
 import { CreateAgileSubInstanceInterface, shared } from '../shared';
 import { CreateStoragesConfigInterface, Storages } from './storages';
@@ -35,10 +35,7 @@ export function createStorageManager(
   config = defineConfig(config, {
     agileInstance: shared,
   });
-  return new Storages(
-    config.agileInstance as any,
-    removeProperties(config, ['agileInstance'])
-  );
+  return new Storages(config.agileInstance as any, config);
 }
 
 /**

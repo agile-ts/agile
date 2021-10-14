@@ -5,7 +5,6 @@ import {
   isFunction,
   isValidObject,
   normalizeArray,
-  removeProperties,
 } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
@@ -24,10 +23,7 @@ import { GroupIngestConfigInterface } from './group/group.observer';
 import { StorageKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
-export class Collection<
-  DataType extends DefaultItem = DefaultItem,
-  GroupValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
-> {
+export class Collection<DataType extends DefaultItem = DefaultItem> {
   // Agile Instance the Collection belongs to
   public agileInstance: () => Agile;
 
@@ -1089,10 +1085,7 @@ export class Collection<
     const _itemKeys = normalizeArray(itemKeys);
 
     // Remove itemKeys from old Group
-    this.getGroup(oldGroupKey)?.remove(
-      _itemKeys,
-      removeProperties(config, ['method', 'overwrite'])
-    );
+    this.getGroup(oldGroupKey)?.remove(_itemKeys, config);
 
     // Assign itemKeys to new Group
     this.getGroup(newGroupKey)?.add(_itemKeys, config);
@@ -1225,9 +1218,7 @@ export class Collection<
    * @public
    * @param itemKeys - Item/s with identifier/s to be removed.
    */
-  public remove(
-    itemKeys: ItemKey | Array<ItemKey>
-  ): {
+  public remove(itemKeys: ItemKey | Array<ItemKey>): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
     everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
@@ -1562,13 +1553,12 @@ export interface CreateCollectionConfigImpl<
   initialData?: Array<DataType>;
 }
 
-export type CreateCollectionConfig<
-  DataType extends DefaultItem = DefaultItem
-> =
-  | CreateCollectionConfigImpl<DataType>
-  | ((
-      collection: Collection<DataType>
-    ) => CreateCollectionConfigImpl<DataType>);
+export type CreateCollectionConfig<DataType extends DefaultItem = DefaultItem> =
+
+    | CreateCollectionConfigImpl<DataType>
+    | ((
+        collection: Collection<DataType>
+      ) => CreateCollectionConfigImpl<DataType>);
 
 export interface CollectionConfigInterface {
   /**

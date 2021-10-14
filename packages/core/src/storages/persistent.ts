@@ -193,8 +193,8 @@ export class Persistent {
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      const defaultStorageKey = getSharedStorageManager()?.config
-        .defaultStorageKey;
+      const defaultStorageKey =
+        getSharedStorageManager()?.config.defaultStorageKey;
       if (defaultStorageKey != null) {
         this.config.defaultStorageKey = defaultStorageKey;
         _storageKeys.push(
@@ -235,9 +235,11 @@ export class Persistent {
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
   ): Promise<boolean> {
-    logCodeManager.log('00:03:00', {
-      replacers: ['loadPersistedValue', 'Persistent'],
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('00:03:00', {
+        replacers: ['loadPersistedValue', 'Persistent'],
+      });
+    }
     return false;
   }
 
@@ -254,9 +256,11 @@ export class Persistent {
    * @return Whether the persisting of the value was successful.
    */
   public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
-    logCodeManager.log('00:03:00', {
-      replacers: ['persistValue', 'Persistent'],
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('00:03:00', {
+        replacers: ['persistValue', 'Persistent'],
+      });
+    }
     return false;
   }
 
@@ -276,9 +280,11 @@ export class Persistent {
   public async removePersistedValue(
     storageItemKey?: PersistentKey
   ): Promise<boolean> {
-    logCodeManager.log('00:03:00', {
-      replacers: ['removePersistedValue', 'Persistent'],
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('00:03:00', {
+        replacers: ['removePersistedValue', 'Persistent'],
+      });
+    }
     return false;
   }
 

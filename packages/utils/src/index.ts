@@ -73,16 +73,13 @@ export function includesArray<DataType = any>(
  *
  * @public
  * @param items - Item/s to be transformed into an array of Items.
- * @param config - Config
+ * @param createUndefinedArray - Whether to return `[undefined]` instead of `[]` if the specified Item is `undefined`.
  */
 export function normalizeArray<DataType = any>(
   items?: DataType | Array<DataType>,
-  config: { createUndefinedArray?: boolean } = {}
+  createUndefinedArray = false
 ): Array<DataType> {
-  config = defineConfig(config, {
-    createUndefinedArray: false, // If it should return [] or [undefined] if the passed Item is undefined
-  });
-  if (items == null && !config.createUndefinedArray) return [];
+  if (items == null && !createUndefinedArray) return [];
   return Array.isArray(items) ? items : [items as DataType];
 }
 
@@ -138,11 +135,8 @@ export function isJsonString(value: any): boolean {
 export function defineConfig<ConfigInterface = Object>(
   config: ConfigInterface,
   defaults: Object,
-  overwriteUndefinedProperties?: boolean
+  overwriteUndefinedProperties = true
 ): ConfigInterface {
-  if (overwriteUndefinedProperties === undefined)
-    overwriteUndefinedProperties = true;
-
   const shallowCopiedConfig = { ...config };
 
   for (const defaultKey in defaults) {
@@ -285,20 +279,4 @@ export function clone<T = any>(instance: T): T {
   for (const key in objectClone) objectClone[key] = copy(objectClone[key]);
 
   return objectClone;
-}
-
-/**
- * Removes specified properties from the defined object.
- *
- * @public
- * @param object - Object to remove the specified properties from.
- * @param properties - Property keys to be removed from the specified object.
- */
-export function removeProperties<T = Object>(
-  object: T,
-  properties: Array<string>
-): T {
-  const copiedObject = copy(object);
-  properties.map((property) => delete copiedObject[property]);
-  return copiedObject;
 }

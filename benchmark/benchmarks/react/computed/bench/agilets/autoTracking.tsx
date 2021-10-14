@@ -3,12 +3,12 @@ import ReactDom from 'react-dom';
 import {
   createComputed,
   createState,
-  LogCodeManager,
+  logCodeManager,
   shared,
 } from '@agile-ts/core';
 import reactIntegration, { useAgile } from '@agile-ts/react';
 
-LogCodeManager.setAllowLogging(false);
+logCodeManager.allowLogging = false;
 shared.integrate(reactIntegration);
 
 const COUNT = createState(0);

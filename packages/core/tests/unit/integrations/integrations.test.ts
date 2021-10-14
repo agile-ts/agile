@@ -158,7 +158,7 @@ describe('Integrations Tests', () => {
       });
 
       it("shouldn't integrate Integration that has no valid Key", async () => {
-        dummyIntegration1._key = undefined as any;
+        dummyIntegration1.key = undefined as any;
 
         const response = await integrations.integrate(dummyIntegration1);
 
@@ -169,7 +169,7 @@ describe('Integrations Tests', () => {
 
         LogMock.hasLoggedCode(
           '18:03:00',
-          [dummyIntegration1._key, dummyAgile.key],
+          [dummyIntegration1.key, dummyAgile.key],
           dummyIntegration1
         );
       });

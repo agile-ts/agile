@@ -9,13 +9,14 @@
     "eject": "react-scripts eject",
     "analyze": "yarn run build && source-map-explorer 'build/static/js/*.js'",
     "analyze:webpack": "node scripts/analyze.js",
-    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install",
-    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/logger & yarn install"
+    "install:dev:agile": "yalc add @agile-ts/core @agile-ts/react @agile-ts/logger @agile-ts/utils & yarn install",
+    "install:prod:agile": "yarn add @agile-ts/core @agile-ts/react @agile-ts/logger @agile-ts/utils & yarn install"
   },
   "dependencies": {
     "@agile-ts/core": "file:.yalc/@agile-ts/core",
     "@agile-ts/logger": "file:.yalc/@agile-ts/logger",
     "@agile-ts/react": "file:.yalc/@agile-ts/react",
+    "@agile-ts/utils": "file:.yalc/@agile-ts/utils",
     "@hookstate/core": "^3.0.8",
     "@reduxjs/toolkit": "^1.6.1",
     "dotenv": "^10.0.0",

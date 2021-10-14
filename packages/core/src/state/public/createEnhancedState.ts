@@ -1,4 +1,4 @@
-import { defineConfig, removeProperties } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
 import { shared } from '../../shared';
 import { EnhancedState } from '../state.enhanced';
 import { CreateStateConfigInterfaceWithAgile } from './index';
@@ -32,6 +32,6 @@ export function createEnhancedState<ValueType = any>(
   return new EnhancedState<ValueType>(
     config.agileInstance as any,
     initialValue,
-    removeProperties(config, ['agileInstance'])
+    config
   );
 }

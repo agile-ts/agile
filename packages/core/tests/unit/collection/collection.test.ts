@@ -265,10 +265,10 @@ describe('Collection Tests', () => {
           key: 'group1Key',
         });
 
-        expect(collection.createGroup).toHaveBeenCalledWith('group1Key', [
-          1,
-          2,
-        ]);
+        expect(collection.createGroup).toHaveBeenCalledWith(
+          'group1Key',
+          [1, 2]
+        );
         LogMock.hasLoggedCode('1B:02:00');
 
         expect(response).toBeInstanceOf(Group);
@@ -2090,6 +2090,8 @@ describe('Collection Tests', () => {
         expect(dummyGroup2.add).not.toHaveBeenCalled();
         expect(dummyGroup2.remove).toHaveBeenCalledWith(['1'], {
           background: true,
+          method: 'push', // Not required but passed for simplicity
+          overwrite: true, // Not required but passed for simplicity
         });
       });
     });

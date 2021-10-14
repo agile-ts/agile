@@ -34,6 +34,7 @@ describe('Shared (Storage) Tests', () => {
       expect(storageManager).toBeInstanceOf(Storages);
       expect(StoragesMock).toHaveBeenCalledWith(sharedAgileInstance, {
         localStorage: true,
+        agileInstance: sharedAgileInstance, // Not required but passed for simplicity
       });
     });
 
@@ -46,7 +47,10 @@ describe('Shared (Storage) Tests', () => {
       });
 
       expect(storageManager).toBeInstanceOf(Storages);
-      expect(StoragesMock).toHaveBeenCalledWith(agile, { localStorage: true });
+      expect(StoragesMock).toHaveBeenCalledWith(agile, {
+        localStorage: true,
+        agileInstance: agile, // Not required but passed for simplicity
+      });
     });
   });
 
@@ -65,7 +69,8 @@ describe('Shared (Storage) Tests', () => {
       SharedStorageManager.assignSharedStorageManager(createdStorageManager);
       jest.clearAllMocks();
 
-      const returnedStorageManager = SharedStorageManager.getSharedStorageManager();
+      const returnedStorageManager =
+        SharedStorageManager.getSharedStorageManager();
 
       expect(returnedStorageManager).toBeInstanceOf(Storages);
       expect(returnedStorageManager).toBe(createdStorageManager);

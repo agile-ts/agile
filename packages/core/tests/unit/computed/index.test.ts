@@ -39,6 +39,7 @@ describe('Computed Index Tests', () => {
         computedFunction,
         {
           computedDeps: ['dummyDep' as any],
+          agileInstance: sharedAgileInstance, // Not required but passed for simplicity
         }
       );
     });
@@ -57,7 +58,10 @@ describe('Computed Index Tests', () => {
       expect(ComputedMock).toHaveBeenCalledWith(
         sharedAgileInstance,
         computedFunction,
-        computedConfig
+        {
+          ...computedConfig,
+          agileInstance: sharedAgileInstance, // Not required but passed for simplicity
+        }
       );
     });
 
@@ -76,11 +80,10 @@ describe('Computed Index Tests', () => {
       });
 
       expect(response).toBeInstanceOf(Computed);
-      expect(ComputedMock).toHaveBeenCalledWith(
-        agile,
-        computedFunction,
-        computedConfig
-      );
+      expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
+        ...computedConfig,
+        agileInstance: agile, // Not required but passed for simplicity
+      });
     });
   });
 });

@@ -10,9 +10,8 @@ export class Validator<ValueType = any> {
   public _key?: ValidatorKey;
 
   // Methods that a value must pass in order to be 'valid'
-  public validationMethods: ValidationMethodContainerInterface<
-    ValueType
-  >[] = [];
+  public validationMethods: ValidationMethodContainerInterface<ValueType>[] =
+    [];
 
   /**
    * Handles the validation of Items.

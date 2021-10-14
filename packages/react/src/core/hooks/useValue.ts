@@ -1,9 +1,10 @@
 import {
   Collection,
   Group,
-  Observer,
   State,
   defineConfig,
+  ItemKey,
+  Observer,
 } from '@agile-ts/core';
 import { useAgile } from './useAgile';
 import {
@@ -39,35 +40,28 @@ export function useValue<
 // Array Type
 // https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-1.html
 export type AgileValueHookArrayType<T> = {
-  [K in keyof T]: T[K] extends
-    | Collection<infer U, infer Z>
-    | Group<infer U, infer Z>
-    ? Z
+  [K in keyof T]: T[K] extends Collection | Group
+    ? Array<ItemKey>
     : T[K] extends State<infer U> | Observer<infer U>
     ? U
     : T[K] extends undefined
     ? undefined
-    : T[K] extends
-        | Collection<infer U, infer Z>
-        | Group<infer U, infer Z>
-        | undefined
-    ? Z | undefined
+    : T[K] extends Collection | Group | undefined
+    ? Array<ItemKey> | undefined
     : T[K] extends State<infer U> | Observer<infer U> | undefined
     ? U | undefined
     : never;
 };
 
 // No Array Type
-export type AgileValueHookType<T> = T extends
-  | Collection<infer U, infer Z>
-  | Group<infer U, infer Z>
-  ? Z
+export type AgileValueHookType<T> = T extends Collection | Group
+  ? Array<ItemKey>
   : T extends State<infer U> | Observer<infer U>
   ? U
   : T extends undefined
   ? undefined
-  : T extends Collection<infer U, infer Z> | Group<infer U, infer Z> | undefined
-  ? Z | undefined
+  : T extends Collection | Group | undefined
+  ? Array<ItemKey> | undefined
   : T extends State<infer U> | Observer<infer U> | undefined
   ? U | undefined
   : never;

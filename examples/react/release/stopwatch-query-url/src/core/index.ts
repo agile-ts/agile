@@ -40,7 +40,7 @@ getSharedStorageManager().register(queryUrlStorage, { default: true });
 // State to keep track of the current time of the Stopwatch
 const TIME = createState(
   { s: 0, m: 0, h: 0 },
-  { key: 'stopwatch-time' },
+  { key: 'stopwatch-time' }
 ).persist();
 
 // State to keep track of the current state of the Stopwatch

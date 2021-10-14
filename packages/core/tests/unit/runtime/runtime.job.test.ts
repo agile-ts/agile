@@ -26,7 +26,7 @@ describe('RuntimeJob Tests', () => {
 
       const job = new RuntimeJob(dummyObserver);
 
-      expect(job._key).toBeUndefined();
+      expect(job.key).toBeUndefined();
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: false,
@@ -64,7 +64,7 @@ describe('RuntimeJob Tests', () => {
         any: { jeff: 'frank' },
       });
 
-      expect(job._key).toBe('dummyJob');
+      expect(job.key).toBe('dummyJob');
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: false,
@@ -90,7 +90,7 @@ describe('RuntimeJob Tests', () => {
     () => {
       const job = new RuntimeJob(dummyObserver);
 
-      expect(job._key).toBeUndefined();
+      expect(job.key).toBeUndefined();
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: false,
@@ -118,7 +118,7 @@ describe('RuntimeJob Tests', () => {
 
       const job = new RuntimeJob(dummyObserver, { background: true });
 
-      expect(job._key).toBeUndefined();
+      expect(job.key).toBeUndefined();
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: true,
@@ -137,28 +137,4 @@ describe('RuntimeJob Tests', () => {
       expect(job.performed).toBeFalsy();
     }
   );
-
-  describe('RuntimeJob Function Tests', () => {
-    let job: RuntimeJob;
-
-    beforeEach(() => {
-      job = new RuntimeJob(dummyObserver);
-    });
-
-    describe('key get function tests', () => {
-      it('should return key of RuntimeJob', () => {
-        job._key = 'myCoolKey';
-
-        expect(job.key).toBe('myCoolKey');
-      });
-    });
-
-    describe('key set function tests', () => {
-      it('should update key in RuntimeJob', () => {
-        job.key = 'myCoolKey';
-
-        expect(job._key).toBe('myCoolKey');
-      });
-    });
-  });
 });
