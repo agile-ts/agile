@@ -14,7 +14,8 @@
     "agile"
   ],
   "scripts": {
-    "pack": "npm pack"
+    "pack": "npm pack",
+    "install:clean": "shx rm -rf dist && shx rm -rf node_modules && yarn install"
   },
   "devDependencies": {
     "@agile-ts/core": "^0.2.6",

@@ -35,7 +35,8 @@
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "lint": "eslint src/**/*"
+    "lint": "eslint src/**/*",
+    "install:clean": "shx rm -rf dist && shx rm -rf node_modules && yarn install"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core",
