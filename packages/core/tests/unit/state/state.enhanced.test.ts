@@ -464,20 +464,18 @@ describe('Enhanced State Tests', () => {
     });
 
     describe('persist function tests', () => {
-      it('should create Persistent with StateKey (default config)', () => {
+      it('should create Persistent (default config)', () => {
         numberState.persist();
 
         expect(numberState.persistent).toBeInstanceOf(StatePersistent);
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          loadValue: true,
-          storageKeys: [],
           key: numberState._key,
-          defaultStorageKey: null,
         });
       });
 
-      it('should create Persistent with StateKey (specific config)', () => {
+      it('should create Persistent (specific config)', () => {
         numberState.persist({
+          key: 'specificKey',
           storageKeys: ['test1', 'test2'],
           loadValue: false,
           defaultStorageKey: 'test1',
@@ -487,35 +485,7 @@ describe('Enhanced State Tests', () => {
         expect(StatePersistent).toHaveBeenCalledWith(numberState, {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
-          key: numberState._key,
-          defaultStorageKey: 'test1',
-        });
-      });
-
-      it('should create Persistent with passed Key (default config)', () => {
-        numberState.persist('passedKey');
-
-        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
-        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          loadValue: true,
-          storageKeys: [],
-          key: 'passedKey',
-          defaultStorageKey: null,
-        });
-      });
-
-      it('should create Persistent with passed Key (specific config)', () => {
-        numberState.persist('passedKey', {
-          storageKeys: ['test1', 'test2'],
-          loadValue: false,
-          defaultStorageKey: 'test1',
-        });
-
-        expect(numberState.persistent).toBeInstanceOf(StatePersistent);
-        expect(StatePersistent).toHaveBeenCalledWith(numberState, {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          key: 'passedKey',
+          key: 'specificKey',
           defaultStorageKey: 'test1',
         });
       });
@@ -526,7 +496,7 @@ describe('Enhanced State Tests', () => {
         numberState.isPersisted = true;
         jest.clearAllMocks();
 
-        numberState.persist('newPersistentKey');
+        numberState.persist({ key: 'newPersistentKey' });
 
         expect(numberState.persistent).toBe(dummyPersistent);
         // expect(numberState.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent

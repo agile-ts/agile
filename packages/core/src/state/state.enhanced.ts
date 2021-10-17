@@ -11,7 +11,10 @@ import { logCodeManager } from '../logCodeManager';
 import { State, StateConfigInterface, StateKey } from './state';
 import { Agile } from '../agile';
 import { StateIngestConfigInterface } from './state.observer';
-import { StatePersistent } from './state.persistent';
+import {
+  CreateStatePersistentConfigInterface,
+  StatePersistent,
+} from './state.persistent';
 import { PersistentKey, StorageKey } from '../storages';
 
 export class EnhancedState<ValueType = any> extends State<ValueType> {
@@ -421,53 +424,16 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
    * @public
    * @param config - Configuration object
    */
-  public persist(config?: StatePersistentConfigInterface): this;
-  /**
-   * Preserves the State `value` in the corresponding external Storage.
-   *
-   * The specified key is used as the unique identifier for the Persistent.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
-   *
-   * @public
-   * @param key - Key/Name identifier of Persistent.
-   * @param config - Configuration object
-   */
-  public persist(
-    key?: PersistentKey,
-    config?: StatePersistentConfigInterface
-  ): this;
-  public persist(
-    keyOrConfig: PersistentKey | StatePersistentConfigInterface = {},
-    config: StatePersistentConfigInterface = {}
-  ): this {
-    let _config: StatePersistentConfigInterface;
-    let key: PersistentKey | undefined;
-
-    if (isValidObject(keyOrConfig)) {
-      _config = keyOrConfig as StatePersistentConfigInterface;
-      key = this._key;
-    } else {
-      _config = config || {};
-      key = keyOrConfig as PersistentKey;
-    }
-
-    _config = defineConfig(_config, {
-      loadValue: true,
-      storageKeys: [],
-      defaultStorageKey: null as any,
+  public persist(config: CreateStatePersistentConfigInterface = {}): this {
+    config = defineConfig(config, {
+      key: this._key,
     });
 
     // Check if State is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
     // Create Persistent (-> persist value)
-    this.persistent = new StatePersistent<ValueType>(this, {
-      loadValue: _config.loadValue,
-      storageKeys: _config.storageKeys,
-      key: key,
-      defaultStorageKey: _config.defaultStorageKey,
-    });
+    this.persistent = new StatePersistent<ValueType>(this, config);
 
     return this;
   }
@@ -522,31 +488,6 @@ export interface PatchOptionConfigInterface {
    * @default true
    */
   addNewProperties?: boolean;
-}
-
-export interface StatePersistentConfigInterface {
-  /**
-   * Whether the Persistent should automatically load
-   * the persisted value into the State after its instantiation.
-   * @default true
-   */
-  loadValue?: boolean;
-  /**
-   * Key/Name identifier of Storages
-   * in which the State value should be or is persisted.
-   * @default [`defaultStorageKey`]
-   */
-  storageKeys?: StorageKey[];
-  /**
-   * Key/Name identifier of the default Storage of the specified Storage keys.
-   *
-   * The State value is loaded from the default Storage by default
-   * and is only loaded from the remaining Storages (`storageKeys`)
-   * if the loading from the default Storage failed.
-   *
-   * @default first index of the specified Storage keys or the AgileTs default Storage key
-   */
-  defaultStorageKey?: StorageKey;
 }
 
 export type StateWatcherCallback<T = any> = (value: T, key: string) => void;

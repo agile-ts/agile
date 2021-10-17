@@ -101,7 +101,8 @@ export class CollectionPersistent<
       // Persist default Group and load its value manually to be 100% sure
       // that it was loaded completely
       defaultGroup.loadedInitialValue = false;
-      defaultGroup.persist(defaultGroupStorageKey, {
+      defaultGroup.persist({
+        key: defaultGroupStorageKey,
         loadValue: false,
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
@@ -121,7 +122,8 @@ export class CollectionPersistent<
         // Persist an already present Item and load its value manually to be 100% sure
         // that it was loaded completely
         if (item != null) {
-          item.persist(itemStorageKey, {
+          item.persist({
+            key: itemStorageKey,
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey || undefined,
             storageKeys: this.storageKeys,
@@ -135,17 +137,18 @@ export class CollectionPersistent<
         // that it was loaded completely.
         // After a successful loading assign the now valid Item to the Collection.
         else {
-          const placeholderItem =
-            this.collection().getItemWithReference(itemKey);
-          placeholderItem?.persist(itemStorageKey, {
+          const placeholderItem = this.collection().getItemWithReference(
+            itemKey
+          );
+          placeholderItem?.persist({
+            key: itemStorageKey,
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey as any,
             storageKeys: this.storageKeys,
             followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
           });
           if (placeholderItem?.persistent?.ready) {
-            const loadedPersistedValueIntoItem =
-              await placeholderItem.persistent.loadPersistedValue();
+            const loadedPersistedValueIntoItem = await placeholderItem.persistent.loadPersistedValue();
 
             // If successfully loaded Item value, assign Item to Collection
             if (loadedPersistedValueIntoItem) {
@@ -202,7 +205,8 @@ export class CollectionPersistent<
     getSharedStorageManager()?.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
-    defaultGroup.persist(defaultGroupStorageKey, {
+    defaultGroup.persist({
+      key: defaultGroupStorageKey,
       defaultStorageKey: this.config.defaultStorageKey || undefined,
       storageKeys: this.storageKeys,
       followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
@@ -215,7 +219,8 @@ export class CollectionPersistent<
         itemKey,
         _storageItemKey
       );
-      item?.persist(itemStorageKey, {
+      item?.persist({
+        key: itemStorageKey,
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
         followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
@@ -348,7 +353,8 @@ export class CollectionPersistent<
         _storageItemKey
       );
       if (item != null && !item.isPersisted)
-        item.persist(itemStorageKey, {
+        item.persist({
+          key: itemStorageKey,
           defaultStorageKey: this.config.defaultStorageKey || undefined,
           storageKeys: this.storageKeys,
           followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
