@@ -1,5 +1,35 @@
 # Change Log
 
+## 0.2.3
+
+### Patch Changes
+
+- 36b235a: #### ❗️ Breaking Change
+
+  ```ts
+  MY_STATE.persist('persistKey'); -> MY_STATE.persist({key: 'persistKey'});
+  ```
+
+  #### :rocket: New Feature
+
+  - `core`
+    - [#214](https://github.com/agile-ts/agile/pull/214) add migration callback ([@bennodev19](https://github.com/bennodev19))
+
+  #### :nail_care: Polish
+
+  - `logger`
+    - [#210](https://github.com/agile-ts/agile/pull/210) Refactor logger ([@bennodev19](https://github.com/bennodev19))
+  - `api`, `core`, `event`, `logger`, `multieditor`, `proxytree`, `react`, `utils`, `vue`
+    - [#209](https://github.com/agile-ts/agile/pull/209) Outsource react hooks ([@bennodev19](https://github.com/bennodev19))
+
+  #### Committers: 1
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+
+- Updated dependencies [36b235a]
+  - @agile-ts/core@0.2.7
+  - @agile-ts/proxytree@0.0.9
+
 ## 0.2.2
 
 ### Patch Changes
