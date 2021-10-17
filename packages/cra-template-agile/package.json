@@ -1,6 +1,6 @@
 {
   "name": "cra-template-agile",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -18,8 +18,8 @@
     "install:clean": "shx rm -rf dist && shx rm -rf node_modules && yarn install"
   },
   "devDependencies": {
-    "@agile-ts/core": "^0.2.6",
-    "@agile-ts/react": "^0.2.2",
+    "@agile-ts/core": "^0.2.7",
+    "@agile-ts/react": "^0.2.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3"
