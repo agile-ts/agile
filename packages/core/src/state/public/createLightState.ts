@@ -1,4 +1,4 @@
-import { defineConfig, removeProperties } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
 import { shared } from '../../shared';
 import { State } from '../state';
 import { CreateStateConfigInterfaceWithAgile } from './index';
@@ -28,6 +28,6 @@ export function createLightState<ValueType = any>(
   return new State<ValueType>(
     config.agileInstance as any,
     initialValue,
-    removeProperties(config, ['agileInstance'])
+    config
   );
 }

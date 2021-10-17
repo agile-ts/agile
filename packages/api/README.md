@@ -2,6 +2,9 @@
 
 > Promise based HTTP request API for Node.js
 
+ <a href="https://agile-ts.org">
+   <img src="https://img.shields.io/badge/Status-Alpha-green.svg" alt="Status"/>
+ </a>
 <a href="https://npm.im/@agile-ts/api">
   <img src="https://img.shields.io/npm/v/@agile-ts/api.svg" alt="npm version"/></a>
  <a href="https://github.com/agile-ts/agile">

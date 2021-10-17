@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { useAgile, useWatcher, useProxy, useSelector } from '@agile-ts/react';
+import {
+  useAgile,
+  useWatcher,
+  useSelector,
+  useProxy,
+  useEvent,
+} from '@agile-ts/react';
 import {
   COUNTUP,
   externalCreatedItem,
@@ -14,7 +20,6 @@ import {
 } from './core';
 import { generateId } from '@agile-ts/utils';
 import { globalBind } from '@agile-ts/core';
-import { useEvent } from '@agile-ts/event';
 
 let rerenderCount = 0;
 let rerenderCountInCountupView = 0;

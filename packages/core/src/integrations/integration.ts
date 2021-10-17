@@ -2,7 +2,7 @@ import { Agile } from '../agile';
 
 export class Integration<F = any, C = any> {
   // Key/Name identifier of the Integration
-  public _key: IntegrationKey;
+  public key: IntegrationKey;
   // Instance of the Framework the Integration represents
   public frameworkInstance?: F;
   // Whether the Integration is ready and the binding to AgileTs was successful
@@ -23,31 +23,12 @@ export class Integration<F = any, C = any> {
    * @param config - Configuration object
    */
   constructor(config: CreateIntegrationConfig<F, C>) {
-    this._key = config.key;
+    this.key = config.key;
     this.frameworkInstance = config.frameworkInstance;
     this.methods = {
       bind: config.bind,
       updateMethod: config.updateMethod,
     };
-  }
-
-  /**
-   * Updates the key/name identifier of the Integration.
-   *
-   * @public
-   * @param value - New key/name identifier.
-   */
-  public set key(value: IntegrationKey) {
-    this._key = value;
-  }
-
-  /**
-   * Returns the key/name identifier of the Integration.
-   *
-   * @public
-   */
-  public get key(): IntegrationKey {
-    return this._key;
   }
 }
 

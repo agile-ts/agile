@@ -1,5 +1,5 @@
 import { normalizeArray } from '@agile-ts/utils';
-import { LogCodeManager } from './logCodeManager';
+import { logCodeManager } from './logCodeManager';
 import { Observer } from './runtime';
 
 /**
@@ -36,18 +36,16 @@ export function extractObservers(
  * @internal
  * @param instances - Instance to extract the Observers from.
  */
-export function extractObservers(
-  instances: any
-): { [key: string]: Observer | undefined };
+export function extractObservers(instances: any): {
+  [key: string]: Observer | undefined;
+};
 export function extractObservers(
   instances: any | Array<any>
 ):
   | Array<{ [key: string]: Observer | undefined }>
   | { [key: string]: Observer | undefined } {
   const observers: Array<{ [key: string]: Observer | undefined }> = [];
-  const tempInstancesArray = normalizeArray(instances, {
-    createUndefinedArray: true,
-  });
+  const tempInstancesArray = normalizeArray(instances, true);
 
   // Extract Observers from specified Instances
   for (const instance of tempInstancesArray) {
@@ -184,7 +182,7 @@ export function optionalRequire<PackageType = any>(
     requiredPackage = require(moduleName);
   } catch (e) {
     if (error) {
-      LogCodeManager.log('20:03:02', [moduleName]);
+      logCodeManager.log('20:03:02', { replacers: [moduleName] });
       console.log(e);
     }
   }
@@ -218,7 +216,7 @@ export function globalBind(
       return true;
     }
   } catch (e) {
-    LogCodeManager.log('20:03:01', [key]);
+    logCodeManager.log('20:03:01', { replacers: [key] });
   }
   return false;
 }

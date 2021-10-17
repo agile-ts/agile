@@ -225,6 +225,34 @@ describe('StatePersistent Tests', () => {
       );
 
       it(
+        "should load State value with Persistent key from the corresponding Storage, migrate it with the 'onMigrate()' method " +
+          'and apply it to the State if the loading was successful',
+        async () => {
+          statePersistent.ready = true;
+          storageManager.get = jest.fn(() =>
+            Promise.resolve('dummyValue' as any)
+          );
+          statePersistent.onMigrate = jest.fn((value) => `migrated_${value}`);
+
+          const response = await statePersistent.loadPersistedValue();
+
+          expect(response).toBeTruthy();
+          expect(storageManager.get).toHaveBeenCalledWith(
+            statePersistent._key,
+            statePersistent.config.defaultStorageKey
+          );
+          expect(dummyState.set).toHaveBeenCalledWith('migrated_dummyValue', {
+            storage: false,
+            overwrite: true,
+          });
+          expect(statePersistent.onMigrate).toHaveBeenCalledWith('dummyValue');
+          expect(statePersistent.setupSideEffects).toHaveBeenCalledWith(
+            statePersistent._key
+          );
+        }
+      );
+
+      it(
         "shouldn't load State value with Persistent key from the corresponding Storage " +
           "and apply it to the State if the loading wasn't successful",
         async () => {
@@ -503,6 +531,25 @@ describe('StatePersistent Tests', () => {
           statePersistent.storageKeys
         );
       });
+
+      it(
+        'should store current State value in the corresponding Storage ' +
+          "and format it with the 'onSave()' method (default config)",
+        () => {
+          statePersistent.onSave = jest.fn((value) => `save_${value}`);
+
+          statePersistent.rebuildStorageSideEffect(dummyState, 'coolKey');
+
+          expect(storageManager.set).toHaveBeenCalledWith(
+            'coolKey',
+            `save_${dummyState.getPersistableValue()}`,
+            statePersistent.storageKeys
+          );
+          expect(statePersistent.onSave).toHaveBeenCalledWith(
+            dummyState.getPersistableValue()
+          );
+        }
+      );
 
       it("shouldn't store State value in the corresponding Storage (config.storage = false)", () => {
         statePersistent.rebuildStorageSideEffect(dummyState, 'coolKey', {

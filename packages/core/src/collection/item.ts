@@ -1,8 +1,8 @@
-import { defineConfig, isValidObject } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
 import {
+  CreateStatePersistentConfigInterface,
   EnhancedState,
   StateKey,
-  StatePersistentConfigInterface,
   StateRuntimeJobConfigInterface,
 } from '../state';
 import { Collection, DefaultItem } from './collection';
@@ -10,9 +10,9 @@ import { SelectorKey } from './selector';
 import { PersistentKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
-export class Item<DataType extends Object = DefaultItem> extends EnhancedState<
-  DataType
-> {
+export class Item<
+  DataType extends DefaultItem = DefaultItem
+> extends EnhancedState<DataType> {
   // Collection the Group belongs to
   public collection: () => Collection<DataType>;
 
@@ -96,59 +96,21 @@ export class Item<DataType extends Object = DefaultItem> extends EnhancedState<
    * @public
    * @param config - Configuration object
    */
-  public persist(config?: ItemPersistConfigInterface): this;
-  /**
-   * Preserves the Item `value` in the corresponding external Storage.
-   *
-   * The specified key is used as the unique identifier for the Persistent.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
-   *
-   * @public
-   * @param key - Key/Name identifier of Persistent.
-   * @param config - Configuration object
-   */
-  public persist(
-    key?: PersistentKey,
-    config?: ItemPersistConfigInterface
-  ): this;
-  public persist(
-    keyOrConfig: PersistentKey | ItemPersistConfigInterface = {},
-    config: ItemPersistConfigInterface = {}
-  ): this {
-    let _config: ItemPersistConfigInterface;
-    let key: PersistentKey | undefined;
-
-    if (isValidObject(keyOrConfig)) {
-      _config = keyOrConfig as ItemPersistConfigInterface;
-      key = this._key;
-    } else {
-      _config = config || {};
-      key = keyOrConfig as PersistentKey;
-    }
-
-    _config = defineConfig(_config, {
-      loadValue: true,
+  public persist(config: ItemPersistConfigInterface = {}): this {
+    config = defineConfig(config, {
+      key: this._key,
       followCollectionPersistKeyPattern: true,
-      storageKeys: [],
-      defaultStorageKey: null as any,
     });
 
     // Create storageItemKey based on Collection key/name identifier
-    if (_config.followCollectionPersistKeyPattern) {
-      key = CollectionPersistent.getItemStorageKey(
-        key || this._key,
+    if (config.followCollectionPersistKeyPattern) {
+      config.key = CollectionPersistent.getItemStorageKey(
+        config.key || this._key,
         this.collection()._key
       );
     }
 
-    // Persist Item
-    super.persist(key, {
-      loadValue: _config.loadValue,
-      storageKeys: _config.storageKeys,
-      defaultStorageKey: _config.defaultStorageKey,
-    });
-
+    super.persist(config);
     return this;
   }
 
@@ -181,7 +143,7 @@ export interface ItemConfigInterface {
 }
 
 export interface ItemPersistConfigInterface
-  extends StatePersistentConfigInterface {
+  extends CreateStatePersistentConfigInterface {
   /**
    * Whether to format the specified Storage key following the Collection Item Storage key pattern.
    * `_${collectionKey}_item_${itemKey}`

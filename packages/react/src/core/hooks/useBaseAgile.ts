@@ -8,8 +8,8 @@ import Agile, {
   SubscriptionContainerKeyType,
   RegisterSubscriptionConfigInterface,
 } from '@agile-ts/core';
-import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
-import { LogCodeManager } from '../logCodeManager';
+import { useIsomorphicLayoutEffect } from '../../general';
+import { logCodeManager } from '../../logCodeManager';
 
 /**
  * An internal used React Hook
@@ -46,7 +46,7 @@ export const useBaseAgile = (
     // Try to extract Agile Instance from the specified Instance/s
     if (agileInstance == null) agileInstance = getAgileInstance(observers[0]);
     if (agileInstance == null || agileInstance.subController == null) {
-      LogCodeManager.log('30:03:00', deps);
+      logCodeManager.log('30:03:00', { replacers: deps });
       return;
     }
 
@@ -93,7 +93,7 @@ export const getReturnValue = (
 
 export type SubscribableAgileInstancesType =
   | State
-  | Collection<any, any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
+  | Collection<any> //https://stackoverflow.com/questions/66987727/type-classa-id-number-name-string-is-not-assignable-to-type-classar
   | Observer
   | undefined;
 

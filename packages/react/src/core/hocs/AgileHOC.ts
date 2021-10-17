@@ -10,7 +10,7 @@ import Agile, {
   normalizeArray,
 } from '@agile-ts/core';
 import type { Collection } from '@agile-ts/core'; // Only import Collection and Group type for better Treeshaking
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../../logCodeManager';
 
 /**
  * A Higher order Component for binding the most relevant value of multiple Agile Instances
@@ -57,7 +57,7 @@ export function AgileHOC(
     }
   }
   if (!agileInstance || !agileInstance.subController) {
-    LogCodeManager.log('32:03:00', [deps]);
+    logCodeManager.log('32:03:00', { replacers: [deps] });
     return reactComponent;
   }
 

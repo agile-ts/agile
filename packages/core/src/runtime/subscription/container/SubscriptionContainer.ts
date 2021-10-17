@@ -159,9 +159,8 @@ export class SubscriptionContainer {
     // only count for the scope of the Subscription Container)
     const existingSelectorMethods =
       this.selectorsWeakMap.get(sub)?.methods ?? [];
-    const newSelectorMethods = existingSelectorMethods.concat(
-      toAddSelectorMethods
-    );
+    const newSelectorMethods =
+      existingSelectorMethods.concat(toAddSelectorMethods);
     if (newSelectorMethods.length > 0)
       this.selectorsWeakMap.set(sub, { methods: newSelectorMethods });
 

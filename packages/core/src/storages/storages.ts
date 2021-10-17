@@ -1,5 +1,5 @@
 import { defineConfig, notEqual } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { Persistent } from './persistent';
 import { Storage, StorageItemKey, StorageKey } from './storage';
@@ -47,7 +47,7 @@ export class Storages {
    */
   public instantiateLocalStorage(): boolean {
     if (!Storages.localStorageAvailable()) {
-      LogCodeManager.log('11:02:00');
+      logCodeManager.log('11:02:00');
       return false;
     }
     const _localStorage = new Storage({
@@ -79,13 +79,13 @@ export class Storages {
 
     // Check if Storage already exists
     if (Object.prototype.hasOwnProperty.call(this.storages, storage.key)) {
-      LogCodeManager.log('11:03:00', [storage.key]);
+      logCodeManager.log('11:03:00', { replacers: [storage.key] });
       return false;
     }
 
     // Assign Storage as default Storage if it is the first one added
     if (!hasRegisteredAnyStorage && config.default === false)
-      LogCodeManager.log('11:02:01');
+      logCodeManager.log('11:02:01');
     if (!hasRegisteredAnyStorage) config.default = true;
 
     // Register Storage
@@ -113,7 +113,7 @@ export class Storages {
       }
     }
 
-    LogCodeManager.log('13:00:00', [storage.key], storage);
+    logCodeManager.log('13:00:00', { replacers: [storage.key] }, storage);
 
     return true;
   }
@@ -133,11 +133,11 @@ export class Storages {
     if (!storageKey) return undefined;
     const storage = this.storages[storageKey];
     if (!storage) {
-      LogCodeManager.log('11:03:01', [storageKey]);
+      logCodeManager.log('11:03:01', { replacers: [storageKey] });
       return undefined;
     }
     if (!storage.ready) {
-      LogCodeManager.log('11:03:02', [storageKey]);
+      logCodeManager.log('11:03:02', { replacers: [storageKey] });
       return undefined;
     }
     return storage;
@@ -160,7 +160,7 @@ export class Storages {
     storageKey?: StorageKey
   ): Promise<GetType | undefined> {
     if (!this.hasStorage()) {
-      LogCodeManager.log('11:03:03');
+      logCodeManager.log('11:03:03');
       return Promise.resolve(undefined);
     }
 
@@ -196,7 +196,7 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      LogCodeManager.log('11:03:04');
+      logCodeManager.log('11:03:04');
       return;
     }
 
@@ -229,7 +229,7 @@ export class Storages {
     storageKeys?: StorageKey[]
   ): void {
     if (!this.hasStorage()) {
-      LogCodeManager.log('11:03:05');
+      logCodeManager.log('11:03:05');
       return;
     }
 

@@ -22,7 +22,7 @@ describe('Integration Tests', () => {
 
     const integration = new Integration(integrationConfig);
 
-    expect(integration._key).toBe('test');
+    expect(integration.key).toBe('test');
     expect(integration.frameworkInstance).toStrictEqual({ react: 'native' });
     expect(integration.ready).toBeFalsy();
     expect(integration.integrated).toBeFalsy();
@@ -40,13 +40,13 @@ describe('Integration Tests', () => {
       it('should update key in Integration', () => {
         integration.key = 'myCoolKey';
 
-        expect(integration._key).toBe('myCoolKey');
+        expect(integration.key).toBe('myCoolKey');
       });
     });
 
     describe('key get function tests', () => {
       it('should return current key of Integration', () => {
-        integration._key = 'myCoolKey';
+        integration.key = 'myCoolKey';
 
         expect(integration.key).toBe('myCoolKey');
       });

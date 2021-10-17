@@ -32,6 +32,24 @@
       "module": "./dist/esm/index.js",
       "import": "./dist/esm/index.js",
       "default": "./dist/index.js"
+    },
+    "./proxy": {
+      "types": "./dist/proxy/index.d.ts",
+      "module": "./dist/esm/proxy/index.js",
+      "import": "./dist/esm/proxy/index.js",
+      "default": "./dist/proxy/index.js"
+    },
+    "./event": {
+      "types": "./dist/event/index.d.ts",
+      "module": "./dist/esm/event/index.js",
+      "import": "./dist/esm/event/index.js",
+      "default": "./dist/event/index.js"
+    },
+    "./multieditor": {
+      "types": "./dist/multieditor/index.d.ts",
+      "module": "./dist/esm/multieditor/index.js",
+      "import": "./dist/esm/multieditor/index.js",
+      "default": "./dist/multieditor/index.js"
     }
   },
   "scripts": {
@@ -42,12 +60,12 @@
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
     "release": "yarn run prepare",
-    "release:manual": "yarn run prepare && yarn run release && npm publish",
+    "release:manual": "yarn run release && npm publish",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*",
-    "size": "yarn run build && size-limit"
+    "install:clean": "shx rm -rf dist && shx rm -rf node_modules && yarn install"
   },
   "devDependencies": {
     "@agile-ts/core": "file:../core",

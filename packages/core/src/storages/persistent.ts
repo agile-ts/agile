@@ -1,5 +1,5 @@
 import { copy, defineConfig } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { getSharedStorageManager } from './shared';
 import { StorageKey } from './storage';
@@ -146,20 +146,20 @@ export class Persistent {
 
     // Validate Persistent key/name identifier
     if (this._key === Persistent.placeHolderKey) {
-      LogCodeManager.log('12:03:00');
+      logCodeManager.log('12:03:00');
       isValid = false;
     }
 
     // Validate Storage keys
     if (this.config.defaultStorageKey == null || this.storageKeys.length <= 0) {
-      LogCodeManager.log('12:03:01');
+      logCodeManager.log('12:03:01');
       isValid = false;
     }
 
     // Check if the Storages exist at the specified Storage keys
     this.storageKeys.map((key) => {
       if (!getSharedStorageManager()?.storages[key]) {
-        LogCodeManager.log('12:03:02', [this._key, key]);
+        logCodeManager.log('12:03:02', { replacers: [this._key, key] });
         isValid = false;
       }
     });
@@ -193,8 +193,8 @@ export class Persistent {
     // and specify it as the Persistent's default Storage key
     // if no valid Storage key was provided
     if (_storageKeys.length <= 0) {
-      const defaultStorageKey = getSharedStorageManager()?.config
-        .defaultStorageKey;
+      const defaultStorageKey =
+        getSharedStorageManager()?.config.defaultStorageKey;
       if (defaultStorageKey != null) {
         this.config.defaultStorageKey = defaultStorageKey;
         _storageKeys.push(
@@ -235,7 +235,11 @@ export class Persistent {
   public async loadPersistedValue(
     storageItemKey?: PersistentKey
   ): Promise<boolean> {
-    LogCodeManager.log('00:03:00', ['loadPersistedValue', 'Persistent']);
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('00:03:00', {
+        replacers: ['loadPersistedValue', 'Persistent'],
+      });
+    }
     return false;
   }
 
@@ -252,7 +256,11 @@ export class Persistent {
    * @return Whether the persisting of the value was successful.
    */
   public async persistValue(storageItemKey?: PersistentKey): Promise<boolean> {
-    LogCodeManager.log('00:03:00', ['persistValue', 'Persistent']);
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('00:03:00', {
+        replacers: ['persistValue', 'Persistent'],
+      });
+    }
     return false;
   }
 
@@ -272,7 +280,11 @@ export class Persistent {
   public async removePersistedValue(
     storageItemKey?: PersistentKey
   ): Promise<boolean> {
-    LogCodeManager.log('00:03:00', ['removePersistedValue', 'Persistent']);
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('00:03:00', {
+        replacers: ['removePersistedValue', 'Persistent'],
+      });
+    }
     return false;
   }
 

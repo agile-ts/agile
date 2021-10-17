@@ -54,6 +54,7 @@ describe('State Index Tests', () => {
         'testValue',
         {
           key: 'myCoolState',
+          agileInstance: sharedAgileInstance, // Not required but passed for simplicity
         }
       );
     });
@@ -69,6 +70,7 @@ describe('State Index Tests', () => {
       // expect(state).toBeInstanceOf(EnhancedState); // Because 'State' is completely overwritten with a mock (mockImplementation)
       expect(EnhancedStateMock).toHaveBeenCalledWith(agile, 'testValue', {
         key: 'myCoolState',
+        agileInstance: agile, // Not required but passed for simplicity
       });
     });
   });
@@ -88,6 +90,7 @@ describe('State Index Tests', () => {
       // expect(state).toBeInstanceOf(State); // Because 'State' is completely overwritten with a mock (mockImplementation)
       expect(StateMock).toHaveBeenCalledWith(sharedAgileInstance, 'testValue', {
         key: 'myCoolState',
+        agileInstance: sharedAgileInstance, // Not required but passed for simplicity
       });
     });
 
@@ -102,6 +105,7 @@ describe('State Index Tests', () => {
       // expect(state).toBeInstanceOf(State); // Because 'State' is completely overwritten with a mock (mockImplementation)
       expect(StateMock).toHaveBeenCalledWith(agile, 'testValue', {
         key: 'myCoolState',
+        agileInstance: agile, // Not required but passed for simplicity
       });
     });
   });

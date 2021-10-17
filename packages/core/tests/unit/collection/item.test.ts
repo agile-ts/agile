@@ -51,7 +51,7 @@ describe('Item Tests', () => {
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(item.observers['value'].dependents)).toStrictEqual([]);
-    expect(item.observers['value']._key).toBe(
+    expect(item.observers['value'].key).toBe(
       dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
@@ -88,7 +88,7 @@ describe('Item Tests', () => {
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(item.observers['value'].dependents)).toStrictEqual([]);
-    expect(item.observers['value']._key).toBe(
+    expect(item.observers['value'].key).toBe(
       dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
@@ -123,7 +123,7 @@ describe('Item Tests', () => {
     expect(item.nextStateValue).toStrictEqual(dummyData);
     expect(item.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(item.observers['value'].dependents)).toStrictEqual([]);
-    expect(item.observers['value']._key).toBe(
+    expect(item.observers['value'].key).toBe(
       dummyData[dummyCollection.config.primaryKey]
     );
     expect(item.sideEffects).toStrictEqual({});
@@ -216,99 +216,54 @@ describe('Item Tests', () => {
       it('should persist Item with formatted itemKey (default config)', () => {
         item.persist();
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
             item._key,
             dummyCollection._key
           ),
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
+          followCollectionPersistKeyPattern: true, // Not required but passed for simplicity
+        });
       });
 
-      it('should persist Item with formatted itemKey (specific config)', () => {
+      it('should persist Item with formatted key (specific config)', () => {
         item.persist({
+          key: 'specificKey',
           loadValue: false,
           storageKeys: ['test1', 'test2'],
           defaultStorageKey: 'test1',
         });
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            item._key,
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
+            'specificKey',
             dummyCollection._key
           ),
-          {
-            loadValue: false,
-            storageKeys: ['test1', 'test2'],
-            defaultStorageKey: 'test1',
-          }
-        );
-      });
-
-      it('should persist Item with formatted specified key (default config)', () => {
-        item.persist('dummyKey');
-
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            'dummyKey',
-            dummyCollection._key
-          ),
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
-      });
-
-      it('should persist Item with formatted specified key (specific config)', () => {
-        item.persist('dummyKey', {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
           defaultStorageKey: 'test1',
+          followCollectionPersistKeyPattern: true, // Not required but passed for simplicity
         });
-
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
-            'dummyKey',
-            dummyCollection._key
-          ),
-          {
-            loadValue: false,
-            storageKeys: ['test1', 'test2'],
-            defaultStorageKey: 'test1',
-          }
-        );
       });
 
       it('should persist Item with itemKey (config.followCollectionPersistKeyPattern = false)', () => {
         item.persist({ followCollectionPersistKeyPattern: false });
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          item._key,
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: item._key,
+          followCollectionPersistKeyPattern: false, // Not required but passed for simplicity
+        });
       });
 
       it('should persist Item with specified key (config.followCollectionPersistKeyPattern = false)', () => {
-        item.persist('dummyKey', { followCollectionPersistKeyPattern: false });
+        item.persist({
+          key: 'specificKey',
+          followCollectionPersistKeyPattern: false,
+        });
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          'dummyKey',
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: 'specificKey',
+          followCollectionPersistKeyPattern: false, // Not required but passed for simplicity
+        });
       });
     });
 
@@ -321,7 +276,9 @@ describe('Item Tests', () => {
       it('should add rebuildGroupThatIncludeItemKey sideEffect to Item', () => {
         item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
-        expect(item.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          item.addSideEffect
+        ).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
           expect.any(Function),
           { weight: 100 }

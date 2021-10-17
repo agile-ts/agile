@@ -49,7 +49,7 @@ describe('GroupObserver Tests', () => {
     const groupObserver = new GroupObserver(dummyGroup);
 
     expect(groupObserver).toBeInstanceOf(GroupObserver);
-    expect(groupObserver.nextGroupOutput).toStrictEqual([
+    expect(groupObserver.nextGroupValue).toStrictEqual([
       dummyItem1._value,
       dummyItem2._value,
     ]);
@@ -64,7 +64,7 @@ describe('GroupObserver Tests', () => {
       dummyItem1._value,
       dummyItem2._value,
     ]);
-    expect(groupObserver._key).toBeUndefined();
+    expect(groupObserver.key).toBeUndefined();
     expect(Array.from(groupObserver.dependents)).toStrictEqual([]);
     expect(Array.from(groupObserver.subscribedTo)).toStrictEqual([]);
   });
@@ -82,13 +82,13 @@ describe('GroupObserver Tests', () => {
     });
 
     expect(groupObserver).toBeInstanceOf(GroupObserver);
-    expect(groupObserver.nextGroupOutput).toStrictEqual([]);
+    expect(groupObserver.nextGroupValue).toStrictEqual([]);
     expect(groupObserver.group()).toBe(dummyGroup);
 
     // Check if Observer was called with correct parameters
     expect(groupObserver.value).toStrictEqual([]);
     expect(groupObserver.previousValue).toStrictEqual([]);
-    expect(groupObserver._key).toBe('testKey');
+    expect(groupObserver.key).toBe('testKey');
     expect(Array.from(groupObserver.dependents)).toStrictEqual([
       dummyObserver1,
       dummyObserver2,
@@ -100,7 +100,7 @@ describe('GroupObserver Tests', () => {
   });
 
   describe('Group Observer Function Tests', () => {
-    let groupObserver: GroupObserver;
+    let groupObserver: GroupObserver<ItemInterface>;
 
     beforeEach(() => {
       groupObserver = new GroupObserver(dummyGroup, {
@@ -155,7 +155,7 @@ describe('GroupObserver Tests', () => {
         () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-            expect(job._key).toBe(`${groupObserver._key}_randomKey_output`);
+            expect(job.key).toBe(`${groupObserver.key}_randomKey_output`);
             expect(job.observer).toBe(groupObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -171,7 +171,7 @@ describe('GroupObserver Tests', () => {
 
           groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value]);
 
-          expect(groupObserver.nextGroupOutput).toStrictEqual([
+          expect(groupObserver.nextGroupValue).toStrictEqual([
             dummyItem1._value,
             dummyItem2._value,
           ]);
@@ -189,7 +189,7 @@ describe('GroupObserver Tests', () => {
           "if the new value isn't equal to the current value (specific config)",
         () => {
           dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-            expect(job._key).toBe('dummyJob');
+            expect(job.key).toBe('dummyJob');
             expect(job.observer).toBe(groupObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -212,7 +212,7 @@ describe('GroupObserver Tests', () => {
             maxTriesToUpdate: 5,
           });
 
-          expect(groupObserver.nextGroupOutput).toStrictEqual([
+          expect(groupObserver.nextGroupValue).toStrictEqual([
             dummyItem1._value,
             dummyItem2._value,
           ]);
@@ -233,7 +233,7 @@ describe('GroupObserver Tests', () => {
 
           groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value]);
 
-          expect(groupObserver.nextGroupOutput).toStrictEqual([
+          expect(groupObserver.nextGroupValue).toStrictEqual([
             dummyItem1._value,
             dummyItem2._value,
           ]);
@@ -248,7 +248,7 @@ describe('GroupObserver Tests', () => {
           jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
           dummyGroup._output = [dummyItem1._value, dummyItem2._value];
           dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-            expect(job._key).toBe(`${groupObserver._key}_randomKey_output`);
+            expect(job.key).toBe(`${groupObserver.key}_randomKey_output`);
             expect(job.observer).toBe(groupObserver);
             expect(job.config).toStrictEqual({
               background: false,
@@ -266,7 +266,7 @@ describe('GroupObserver Tests', () => {
             force: true,
           });
 
-          expect(groupObserver.nextGroupOutput).toStrictEqual([
+          expect(groupObserver.nextGroupValue).toStrictEqual([
             dummyItem1._value,
             dummyItem2._value,
           ]);
@@ -282,7 +282,7 @@ describe('GroupObserver Tests', () => {
       it('should ingest placeholder Group into the Runtime (default config)', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValue('randomKey');
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-          expect(job._key).toBe(`${groupObserver._key}_randomKey_output`);
+          expect(job.key).toBe(`${groupObserver.key}_randomKey_output`);
           expect(job.observer).toBe(groupObserver);
           expect(job.config).toStrictEqual({
             background: false,
@@ -299,7 +299,7 @@ describe('GroupObserver Tests', () => {
 
         groupObserver.ingestOutput([dummyItem1._value, dummyItem2._value]);
 
-        expect(groupObserver.nextGroupOutput).toStrictEqual([
+        expect(groupObserver.nextGroupValue).toStrictEqual([
           dummyItem1._value,
           dummyItem2._value,
         ]);
@@ -322,11 +322,11 @@ describe('GroupObserver Tests', () => {
       });
 
       it('should perform the specified Job', () => {
-        (dummyJob.observer as GroupObserver).nextGroupOutput = [
+        (dummyJob.observer as GroupObserver).nextGroupValue = [
           dummyItem1._value,
           dummyItem2._value,
         ];
-        dummyJob.observer.value = [dummyItem1._value];
+        (dummyJob.observer as GroupObserver).value = [dummyItem1._value];
         dummyGroup._output = [dummyItem1._value];
         dummyGroup.nextGroupOutput = [dummyItem1._value];
 

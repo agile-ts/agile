@@ -11,6 +11,11 @@ export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to
   public state: () => EnhancedState;
 
+  // Method used to format the loaded value before migrating it into the State.
+  public onMigrate?: (value: any) => ValueType;
+  // Method used to format the to persist value before persisting it into the external storage.
+  public onSave?: (value: ValueType) => any;
+
   static storeValueSideEffectKey = 'rebuildStateStorageValue';
 
   /**
@@ -22,7 +27,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   constructor(
     state: EnhancedState<ValueType>,
-    config: CreatePersistentConfigInterface = {}
+    config: CreateStatePersistentConfigInterface = {}
   ) {
     super(state.agileInstance(), {
       loadValue: false,
@@ -33,6 +38,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
       defaultStorageKey: null as any,
     });
     this.state = () => state;
+    this.onMigrate = config.onMigrate;
+    this.onSave = config.onSave;
     this.instantiatePersistent({
       key: config.key,
       storageKeys: config.storageKeys,
@@ -80,10 +87,13 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (loadedValue == null) return false;
 
     // Assign loaded value to the State
-    this.state().set(loadedValue, {
-      storage: false,
-      overwrite: true,
-    });
+    this.state().set(
+      this.onMigrate != null ? this.onMigrate(loadedValue) : loadedValue,
+      {
+        storage: false,
+        overwrite: true,
+      }
+    );
 
     // Setup side effects to keep the Storage value in sync
     // with the current State value
@@ -192,9 +202,25 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (config['storage'] == null || config.storage) {
       getSharedStorageManager()?.set(
         storageItemKey,
-        this.state().getPersistableValue(),
+        this.onSave != null
+          ? this.onSave(this.state().getPersistableValue())
+          : this.state().getPersistableValue(),
         this.storageKeys
       );
     }
   }
+}
+
+export interface CreateStatePersistentConfigInterface<ValueType = any>
+  extends CreatePersistentConfigInterface {
+  /**
+   * Method used to format the loaded value before migrating it into the State.
+   * @default undefined
+   */
+  onMigrate?: (value: any) => ValueType;
+  /**
+   * Method used to format the to persist value before persisting it into the external storage.
+   * @default undefined
+   */
+  onSave?: (value: ValueType) => any;
 }

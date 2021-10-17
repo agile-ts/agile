@@ -1,5 +1,5 @@
 import { defineConfig } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Collection, CollectionKey, DefaultItem, ItemKey } from './collection';
 import { Group, GroupKey } from './group';
 import {
@@ -11,7 +11,7 @@ import {
 } from '../storages';
 
 export class CollectionPersistent<
-  DataType extends Object = DefaultItem
+  DataType extends DefaultItem = DefaultItem
 > extends Persistent {
   // Collection the Persistent belongs to
   public collection: () => Collection<DataType>;
@@ -101,7 +101,8 @@ export class CollectionPersistent<
       // Persist default Group and load its value manually to be 100% sure
       // that it was loaded completely
       defaultGroup.loadedInitialValue = false;
-      defaultGroup.persist(defaultGroupStorageKey, {
+      defaultGroup.persist({
+        key: defaultGroupStorageKey,
         loadValue: false,
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
@@ -121,7 +122,8 @@ export class CollectionPersistent<
         // Persist an already present Item and load its value manually to be 100% sure
         // that it was loaded completely
         if (item != null) {
-          item.persist(itemStorageKey, {
+          item.persist({
+            key: itemStorageKey,
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey || undefined,
             storageKeys: this.storageKeys,
@@ -138,7 +140,8 @@ export class CollectionPersistent<
           const placeholderItem = this.collection().getItemWithReference(
             itemKey
           );
-          placeholderItem?.persist(itemStorageKey, {
+          placeholderItem?.persist({
+            key: itemStorageKey,
             loadValue: false,
             defaultStorageKey: this.config.defaultStorageKey as any,
             storageKeys: this.storageKeys,
@@ -202,7 +205,8 @@ export class CollectionPersistent<
     getSharedStorageManager()?.set(_storageItemKey, true, this.storageKeys);
 
     // Persist default Group
-    defaultGroup.persist(defaultGroupStorageKey, {
+    defaultGroup.persist({
+      key: defaultGroupStorageKey,
       defaultStorageKey: this.config.defaultStorageKey || undefined,
       storageKeys: this.storageKeys,
       followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
@@ -215,7 +219,8 @@ export class CollectionPersistent<
         itemKey,
         _storageItemKey
       );
-      item?.persist(itemStorageKey, {
+      item?.persist({
+        key: itemStorageKey,
         defaultStorageKey: this.config.defaultStorageKey || undefined,
         storageKeys: this.storageKeys,
         followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
@@ -348,7 +353,8 @@ export class CollectionPersistent<
         _storageItemKey
       );
       if (item != null && !item.isPersisted)
-        item.persist(itemStorageKey, {
+        item.persist({
+          key: itemStorageKey,
           defaultStorageKey: this.config.defaultStorageKey || undefined,
           storageKeys: this.storageKeys,
           followCollectionPersistKeyPattern: false, // Because of the dynamic 'storageItemKey', the key is already formatted above
@@ -379,7 +385,7 @@ export class CollectionPersistent<
     collectionKey: CollectionKey | undefined | null
   ): string {
     if (itemKey == null || collectionKey == null)
-      LogCodeManager.log('1A:02:00');
+      logCodeManager.log('1A:02:00');
     if (itemKey == null) itemKey = 'unknown';
     if (collectionKey == null) collectionKey = 'unknown';
     return this.storageItemKeyPattern
@@ -399,7 +405,7 @@ export class CollectionPersistent<
     collectionKey: CollectionKey | undefined | null
   ): string {
     if (groupKey == null || collectionKey == null)
-      LogCodeManager.log('1A:02:01');
+      logCodeManager.log('1A:02:01');
     if (groupKey == null) groupKey = 'unknown';
     if (collectionKey == null) collectionKey = 'unknown';
     return this.storageGroupKeyPattern

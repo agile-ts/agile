@@ -1821,20 +1821,18 @@ describe('Collection Tests', () => {
     });
 
     describe('persist function tests', () => {
-      it('should create Persistent with CollectionKey (default config)', () => {
+      it('should create Persistent (default config)', () => {
         collection.persist();
 
         expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          loadValue: true,
-          storageKeys: [],
           key: collection._key,
-          defaultStorageKey: null,
         });
       });
 
-      it('should create Persistent with CollectionKey (specific config)', () => {
+      it('should create Persistent (specific config)', () => {
         collection.persist({
+          key: 'specificKey',
           storageKeys: ['test1', 'test2'],
           loadValue: false,
           defaultStorageKey: 'test1',
@@ -1844,35 +1842,7 @@ describe('Collection Tests', () => {
         expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
-          key: collection._key,
-          defaultStorageKey: 'test1',
-        });
-      });
-
-      it('should create Persistent with passed Key (default config)', () => {
-        collection.persist('passedKey');
-
-        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
-        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          loadValue: true,
-          storageKeys: [],
-          key: 'passedKey',
-          defaultStorageKey: null,
-        });
-      });
-
-      it('should create Persistent with passed Key (specific config)', () => {
-        collection.persist('passedKey', {
-          storageKeys: ['test1', 'test2'],
-          loadValue: false,
-          defaultStorageKey: 'test1',
-        });
-
-        expect(collection.persistent).toBeInstanceOf(CollectionPersistent);
-        expect(CollectionPersistent).toHaveBeenCalledWith(collection, {
-          loadValue: false,
-          storageKeys: ['test1', 'test2'],
-          key: 'passedKey',
+          key: 'specificKey',
           defaultStorageKey: 'test1',
         });
       });
@@ -1883,7 +1853,7 @@ describe('Collection Tests', () => {
         collection.isPersisted = true;
         jest.clearAllMocks();
 
-        collection.persist('newPersistentKey');
+        collection.persist({ key: 'newPersistentKey' });
 
         expect(collection.persistent).toBe(dummyPersistent);
         // expect(collection.persistent._key).toBe("newPersistentKey"); // Can not test because of Mocking Persistent
@@ -2090,6 +2060,8 @@ describe('Collection Tests', () => {
         expect(dummyGroup2.add).not.toHaveBeenCalled();
         expect(dummyGroup2.remove).toHaveBeenCalledWith(['1'], {
           background: true,
+          method: 'push', // Not required but passed for simplicity
+          overwrite: true, // Not required but passed for simplicity
         });
       });
     });

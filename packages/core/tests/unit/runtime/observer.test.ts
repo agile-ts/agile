@@ -33,11 +33,11 @@ describe('Observer Tests', () => {
     const observer = new Observer(dummyAgile);
 
     expect(observer.agileInstance()).toBe(dummyAgile);
-    expect(observer._key).toBeUndefined();
+    expect(observer.key).toBeUndefined();
     expect(Array.from(observer.dependents)).toStrictEqual([]);
     expect(Array.from(observer.subscribedTo)).toStrictEqual([]);
-    expect(observer.value).toBeUndefined();
-    expect(observer.previousValue).toBeUndefined();
+    expect(observer.value).toBeNull();
+    expect(observer.previousValue).toBeNull();
   });
 
   it('should create Observer (specific config)', () => {
@@ -49,7 +49,7 @@ describe('Observer Tests', () => {
     });
 
     expect(observer.agileInstance()).toBe(dummyAgile);
-    expect(observer._key).toBe('testKey');
+    expect(observer.key).toBe('testKey');
     expect(Array.from(observer.dependents)).toStrictEqual([
       dummyObserver1,
       dummyObserver2,
@@ -72,28 +72,11 @@ describe('Observer Tests', () => {
       observer = new Observer(dummyAgile, { key: 'observer' });
     });
 
-    describe('key set function tests', () => {
-      it('should update key in Observer', () => {
-        observer.key = 'myNewDummyKey';
-
-        expect(observer._key).toBe('myNewDummyKey');
-      });
-    });
-
-    describe('key get function tests', () => {
-      it('should return current key of Observer', () => {
-        observer._key = 'myDummyKey';
-
-        expect(observer.key).toBe('myDummyKey');
-      });
-    });
-
     describe('ingest function tests', () => {
       it('should create RuntimeJob containing the Observer and ingest it into the Runtime (default config)', () => {
         jest.spyOn(Utils, 'generateId').mockReturnValueOnce('generatedKey');
-
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-          expect(job._key).toBe(`${observer._key}_generatedKey`);
+          expect(job.key).toBe(`${observer.key}_generatedKey`);
           expect(job.observer).toBe(observer);
           expect(job.config).toStrictEqual({
             background: false,
@@ -119,7 +102,7 @@ describe('Observer Tests', () => {
 
       it('should create RuntimeJob containing the Observer and ingest it into the Runtime (specific config)', () => {
         dummyAgile.runtime.ingest = jest.fn((job: RuntimeJob) => {
-          expect(job._key).toBe('coolKey');
+          expect(job.key).toBe('coolKey');
           expect(job.observer).toBe(observer);
           expect(job.config).toStrictEqual({
             background: true,

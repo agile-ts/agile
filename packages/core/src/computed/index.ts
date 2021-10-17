@@ -1,4 +1,4 @@
-import { removeProperties, defineConfig } from '@agile-ts/utils';
+import { defineConfig } from '@agile-ts/utils';
 import { CreateAgileSubInstanceInterface, shared } from '../shared';
 import {
   Computed,
@@ -75,7 +75,7 @@ export function createComputed<ComputedValueType = any>(
   return new Computed<ComputedValueType>(
     _config.agileInstance as any,
     computeFunction,
-    removeProperties(_config, ['agileInstance'])
+    _config
   );
 }
 

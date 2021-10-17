@@ -20,8 +20,7 @@ describe('EventObserver Tests', () => {
 
     expect(eventObserver).toBeInstanceOf(EventObserver);
     expect(eventObserver.event()).toBe(dummyEvent);
-    expect(eventObserver.value).toBeUndefined();
-    expect(eventObserver._key).toBeUndefined();
+    expect(eventObserver.key).toBeUndefined();
     expect(eventObserver.dependents.size).toBe(0);
     expect(eventObserver.subscribedTo.size).toBe(0);
   });
@@ -40,8 +39,7 @@ describe('EventObserver Tests', () => {
 
     expect(eventObserver).toBeInstanceOf(EventObserver);
     expect(eventObserver.event()).toBe(dummyEvent);
-    expect(eventObserver.value).toBeUndefined();
-    expect(eventObserver._key).toBe('testKey');
+    expect(eventObserver.key).toBe('testKey');
     expect(eventObserver.dependents.size).toBe(2);
     expect(eventObserver.dependents.has(dummyObserver2)).toBeTruthy();
     expect(eventObserver.dependents.has(dummyObserver1)).toBeTruthy();

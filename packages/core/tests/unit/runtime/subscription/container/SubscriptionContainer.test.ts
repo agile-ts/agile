@@ -258,15 +258,13 @@ describe('SubscriptionContainer Tests', () => {
           expect(observer2Selector.methods[0](null)).toBe('doesNotMatter');
 
           // should assign specified key to the 'subscriberKeysWeakMap'
-          const observer1Key = subscriptionContainer.subscriberKeysWeakMap.get(
-            dummyObserver1
-          );
+          const observer1Key =
+            subscriptionContainer.subscriberKeysWeakMap.get(dummyObserver1);
           expect(observer1Key).toBe('dummyObserver1');
 
           // shouldn't overwrite already set values in 'subscriberKeysWeakMap' (Observer2)
-          const observer2Key = subscriptionContainer.subscriberKeysWeakMap.get(
-            dummyObserver2
-          );
+          const observer2Key =
+            subscriptionContainer.subscriberKeysWeakMap.get(dummyObserver2);
           expect(observer2Key).toBe('dummyObserver2');
         }
       );

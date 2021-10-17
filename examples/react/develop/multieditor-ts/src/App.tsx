@@ -1,38 +1,31 @@
 import React from 'react';
 import './App.css';
 import ErrorMessage from './components/ErrorMessage';
-import { useAgile } from '@agile-ts/react';
+import { useMultieditor } from '@agile-ts/react';
 import { signUpEditor } from './core/signUpEditor';
 import { generateColor, generateId } from './core/utils';
 
 let renderCount = 0;
 
 const App = () => {
-  useAgile(signUpEditor.deps);
+  const { submit, status, insertItem } = useMultieditor(signUpEditor);
 
   renderCount++;
 
   return (
-    <form>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        submit();
+      }}>
       <h1>Sign Up</h1>
       <label>First Name:</label>
-      <input
-        onChange={(e) => signUpEditor.setValue('firstName', e.target.value)}
-        defaultValue={signUpEditor.getItemInitialValue('firstName')}
-      />
-      <ErrorMessage error={signUpEditor.getStatus('firstName')?.message} />
+      <input {...insertItem('firstName')} />
+      <ErrorMessage error={status('firstName')?.message} />
 
       <label>Last Name:</label>
-      <input
-        onChange={(e) =>
-          signUpEditor.setValue('lastName', e.target.value, {
-            background: false,
-          })
-        }
-        defaultValue={signUpEditor.getItemInitialValue('lastName')}
-        value={signUpEditor.getItemValue('lastName')}
-      />
-      <ErrorMessage error={signUpEditor.getStatus('lastName')?.message} />
+      <input {...insertItem('lastName')} />
+      <ErrorMessage error={status('lastName')?.message} />
 
       <label>Image</label>
       <div
@@ -48,6 +41,7 @@ const App = () => {
         <button
           style={{ marginLeft: 50 }}
           onClick={(event) => {
+            event.preventDefault();
             signUpEditor.setValue(
               'image',
               {
@@ -56,63 +50,38 @@ const App = () => {
               },
               { background: false }
             );
-            event.preventDefault();
           }}>
           Reset Image
         </button>
       </div>
-      <ErrorMessage error={signUpEditor.getStatus('image')?.message} />
+      <ErrorMessage error={status('image')?.message} />
 
       <label>Gender</label>
-      <select
-        defaultValue={''}
-        onChange={(e) => signUpEditor.setValue('gender', e.target.value)}>
+      <select {...insertItem('gender')}>
         <option value={''}>Select...</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
-      <ErrorMessage error={signUpEditor.getStatus('gender')?.message} />
+      <ErrorMessage error={status('gender')?.message} />
 
       <label>Username</label>
-      <input
-        onChange={(e) => signUpEditor.setValue('userName', e.target.value)}
-        defaultValue={signUpEditor.getItemInitialValue('userName')}
-      />
-      <ErrorMessage error={signUpEditor.getStatus('userName')?.message} />
+      <input {...insertItem('userName')} />
+      <ErrorMessage error={status('userName')?.message} />
 
       <label>Email</label>
-      <input
-        onChange={(e) => signUpEditor.setValue('email', e.target.value)}
-        defaultValue={signUpEditor.getItemInitialValue('email')}
-      />
-      <ErrorMessage error={signUpEditor.getStatus('email')?.message} />
+      <input {...insertItem('email')} />
+      <ErrorMessage error={status('email')?.message} />
 
       <label>Age</label>
-      <input
-        onChange={(e) =>
-          signUpEditor.setValue('age', e.target.value, { background: false })
-        }
-        defaultValue={signUpEditor.getItemInitialValue('age')}
-        value={signUpEditor.getItemValue('age')}
-      />
-      <ErrorMessage error={signUpEditor.getStatus('age')?.message} />
+      <input {...insertItem('age')} />
+      <ErrorMessage error={status('age')?.message} />
 
       <label>About you</label>
-      <textarea
-        onChange={(e) => signUpEditor.setValue('aboutYou', e.target.value)}
-        defaultValue={signUpEditor.getItemInitialValue('aboutYou')}
-      />
-      <ErrorMessage error={signUpEditor.getStatus('aboutYou')?.message} />
+      <textarea {...insertItem('aboutYou')} />
+      <ErrorMessage error={status('aboutYou')?.message} />
 
-      <button
-        style={{ marginLeft: 50 }}
-        onClick={async (event) => {
-          event.preventDefault();
-          console.log(signUpEditor);
-          await signUpEditor.submit();
-        }}>
-        Submit
-      </button>
+      <input type="submit" />
+
       <p>Is Modified: {signUpEditor.isModified.toString()}</p>
       <p>Is Valid: {signUpEditor.isValid.toString()}</p>
       <p>Render Count: {renderCount}</p>

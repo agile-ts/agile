@@ -1,10 +1,9 @@
 import { defineConfig, generateId } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { SubscriptionContainer } from './subscription';
 import { CreateRuntimeJobConfigInterface, RuntimeJob } from './runtime.job';
 import { IngestConfigInterface } from './runtime';
-import { StateKey } from '../state';
 
 export type ObserverKey = string | number;
 
@@ -13,15 +12,15 @@ export class Observer<ValueType = any> {
   public agileInstance: () => Agile;
 
   // Key/Name identifier of the Observer
-  public _key?: ObserverKey;
+  public key?: ObserverKey;
   // Observers that depend on this Observer
   public dependents: Set<Observer> = new Set();
   // Subscription Containers (UI-Components) the Observer is subscribed to
   public subscribedTo: Set<SubscriptionContainer> = new Set();
 
-  // Current value of the Observer
+  // Current value of the Observer (shared with the UI)
   public value?: ValueType;
-  // Previous value of the Observer
+  // Previous value of the Observer (for handling selectors)
   public previousValue?: ValueType;
 
   /**
@@ -41,7 +40,7 @@ export class Observer<ValueType = any> {
    * When it is executed, the Observer's `perform()` method is called,
    * where the accordingly changes are applied to the Agile Class.
    *
-   * Now that the Job was performed, it is added to the rerender queue,
+   * Now that the Job was performed, it is added to the re-render queue,
    * where the subscribed Subscription Container (UI-Components)
    * of the Observer are updated (re-rendered).
    *
@@ -59,34 +58,16 @@ export class Observer<ValueType = any> {
     config = defineConfig(config, {
       dependents: [],
       subs: [],
+      value: null,
     });
     this.agileInstance = () => agileInstance;
-    this._key = config.key;
+    this.key = config.key;
     this.value = config.value;
     this.previousValue = config.value;
     config.dependents?.forEach((observer) => this.addDependent(observer));
     config.subs?.forEach((subscriptionContainer) =>
       subscriptionContainer.addSubscription(this)
     );
-  }
-
-  /**
-   * Updates the key/name identifier of the Observer.
-   *
-   * @public
-   * @param value - New key/name identifier.
-   */
-  public set key(value: StateKey | undefined) {
-    this._key = value;
-  }
-
-  /**
-   * Returns the key/name identifier of the Observer.
-   *
-   * @public
-   */
-  public get key(): StateKey | undefined {
-    return this._key;
   }
 
   /**
@@ -102,23 +83,13 @@ export class Observer<ValueType = any> {
   public ingest(config: ObserverIngestConfigInterface = {}): void {
     config = defineConfig(config, {
       perform: true,
-      background: false,
-      sideEffects: {
-        enabled: true,
-        exclude: [],
-      },
-      force: false,
+      key: logCodeManager.allowLogging
+        ? `${this.key != null ? this.key + '_' : ''}${generateId()}`
+        : undefined,
     });
 
     // Create Runtime-Job
-    const job = new RuntimeJob(this, {
-      force: config.force,
-      sideEffects: config.sideEffects,
-      background: config.background,
-      key:
-        config.key ??
-        `${this._key != null ? this._key + '_' : ''}${generateId()}`,
-    });
+    const job = new RuntimeJob(this, config);
 
     // Pass created Job into the Runtime
     this.agileInstance().runtime.ingest(job, {
@@ -138,7 +109,9 @@ export class Observer<ValueType = any> {
    * @param job - Runtime-Job to be performed.
    */
   public perform(job: RuntimeJob): void {
-    LogCodeManager.log('17:03:00');
+    if (process.env.NODE_ENV !== 'production') {
+      logCodeManager.log('17:03:00');
+    }
   }
 
   /**
@@ -146,6 +119,8 @@ export class Observer<ValueType = any> {
    *
    * A dependent Observer is always ingested into the Runtime,
    * when the Observer it depends on has been ingested too.
+   *
+   * (Note: not mutating directly 'dependents' for better unit testing)
    *
    * @public
    * @param observer - Observer to depend on the Observer.
@@ -156,6 +131,8 @@ export class Observer<ValueType = any> {
 
   /**
    * Makes the specified Observer no longer depend on the Observer.
+   *
+   * (Note: not mutating directly 'dependents' for better unit testing)
    *
    * @public
    * @param observer - Observer to no longer depend on the Observer.

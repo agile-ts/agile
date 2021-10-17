@@ -43,12 +43,12 @@
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
     "release": "node ./scripts/prepublish.js && yarn run prepare",
-    "release:manual": "yarn run prepare && yarn run release && npm publish && git checkout README.md",
+    "release:manual": "yarn run release && npm publish && git checkout README.md",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*",
-    "size": "yarn run build && size-limit"
+    "install:clean": "shx rm -rf dist && shx rm -rf node_modules && yarn install"
   },
   "devDependencies": {
     "@agile-ts/logger": "file:../logger",

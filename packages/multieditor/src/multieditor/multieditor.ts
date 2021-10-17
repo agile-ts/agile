@@ -1,20 +1,24 @@
-import {
-  Agile,
-  ComputeValueMethod,
-  Observer,
-  StateIngestConfigInterface,
-  StateRuntimeJobConfigInterface,
-} from '@agile-ts/core';
-import { defineConfig, copy, removeProperties } from '@agile-ts/utils';
-import { ValidationMethodInterface, Validator } from '../validator';
-import { Item } from '../item';
+import { Agile, Observer, StateIngestConfigInterface } from '@agile-ts/core';
+import { defineConfig } from '@agile-ts/utils';
+import { Validator } from '../validator';
+import { Item, ItemKey } from '../item';
 import { StatusInterface, StatusType } from '../status';
+import {
+  DeepFieldPaths,
+  DeepFieldPathValues,
+  CreateEditorConfig,
+  EditorConfigInterface,
+  EditorKey,
+  EditorValidationSchemaType,
+  FieldData,
+  FieldPaths,
+  RecomputeValidatedStateMethodConfigInterface,
+  SubmitConfigInterface,
+  UpdateInitialValueConfigInterface,
+} from './types';
+import { updateNestedProperty } from '../utils';
 
-export class Multieditor<
-  DataType = any,
-  SubmitReturnType = void,
-  OnSubmitConfigType = Object
-> {
+export class Multieditor<TFieldData extends FieldData = FieldData> {
   // Agile Instance the Multieditor belongs to
   public agileInstance: () => Agile;
 
@@ -33,12 +37,12 @@ export class Multieditor<
   public editableProperties: ItemKey[] = [];
 
   public onSubmit: (
-    preparedData: DataObject<DataType>,
-    config?: OnSubmitConfigType
-  ) => Promise<SubmitReturnType>;
+    preparedData: { [key: string]: any },
+    config?: Object
+  ) => Promise<any>;
 
   // Items the Multieditor works with
-  public data: DataObject<Item<DataType>> = {};
+  public data: { [key: string]: Item } = {};
 
   /**
    * Simple Form Handler.
@@ -47,10 +51,7 @@ export class Multieditor<
    * @param agileInstance - Instance of Agile the Multieditor belongs to.
    * @param config - Configuration object
    */
-  constructor(
-    config: EditorConfig<DataType, SubmitReturnType, OnSubmitConfigType>,
-    agileInstance: Agile
-  ) {
+  constructor(config: CreateEditorConfig<TFieldData>, agileInstance: Agile) {
     this.agileInstance = () => agileInstance;
     let _config = typeof config === 'function' ? config(this) : config;
     _config = defineConfig(_config, {
@@ -72,31 +73,34 @@ export class Multieditor<
     };
 
     // Format specified validation instances to valid Validators
-    const formattedValidators: { [key: string]: Validator<DataType> } = {};
-    Object.keys(
-      _config.validationSchema as ValidationSchemaType<DataType>
-    ).forEach((key) => {
-      const validationMethod = (_config.validationSchema as ValidationSchemaType<
-        DataType
-      >)[key];
+    const formattedValidators: {
+      [key: string]: Validator;
+    } = {};
+    Object.keys(_config.validationSchema as EditorValidationSchemaType).forEach(
+      (key) => {
+        const validationMethod = (
+          _config.validationSchema as EditorValidationSchemaType
+        )[key];
 
-      // If validation schema item is a Validator
-      if (validationMethod instanceof Validator) {
-        if (validationMethod.key == null) validationMethod.key = key;
-        formattedValidators[key] = validationMethod;
-      }
+        // If validation schema item is a Validator
+        if (validationMethod instanceof Validator) {
+          if (validationMethod.key == null) validationMethod.key = key;
+          formattedValidators[key] = validationMethod;
+        }
 
-      // If validation schema item is a method
-      else {
-        formattedValidators[key] = new Validator<DataType>({
-          key,
-        }).addValidationMethod(validationMethod);
+        // If validation schema item is a method
+        else {
+          formattedValidators[key] = new Validator({
+            key,
+          }).addValidationMethod(validationMethod);
+        }
       }
-    });
+    );
 
     // Instantiate Multieditor Items based on the 'initialData'
     for (const key in _config.initialData) {
-      const item = new Item<DataType>(this as any, _config.initialData[key], {
+      const data = _config.initialData[key];
+      const item = new Item<typeof data>(this as any, data, {
         key,
         canBeEdited: this.editableProperties.includes(key),
         validator: formattedValidators[key],
@@ -150,11 +154,11 @@ export class Multieditor<
    * with the specified key/name identifier depends on.
    *
    * @public
-   * @param key - Key/Name identifier of the Item.
+   * @param itemKey - Key/Name identifier of the Item.
    */
-  public itemDeps(key: ItemKey): Array<Observer> {
+  public itemDeps(itemKey: FieldPaths<TFieldData>): Array<Observer> {
     const deps: Array<Observer> = [];
-    const item = this.getItem(key);
+    const item = this.getItem(itemKey);
     if (item) {
       deps.push(item.observers['value']);
       deps.push(item.status.observers['value']);
@@ -170,20 +174,31 @@ export class Multieditor<
    * @param value - New Item value
    * @param config - Configuration object
    */
-  public setValue(
-    itemKey: ItemKey,
-    value: DataType,
+  public setValue<
+    TItemName extends DeepFieldPaths<TFieldData> = DeepFieldPaths<TFieldData>
+  >(
+    itemKey: TItemName,
+    value: DeepFieldPathValues<TFieldData, TItemName>,
     config: StateIngestConfigInterface = {}
   ): this {
     config = defineConfig(config, {
       background: true, // Because by default the Form should only be re-rendered when the Status updates
     });
+    const path = itemKey.toString().split('.');
 
-    const item = this.getItem(itemKey);
+    // Fetch Item
+    const item = this.getItem(path.shift() as any);
     if (item == null) return this;
 
     // Update current value
-    item.set(value, config);
+    if (path.length > 0) {
+      item.set(
+        updateNestedProperty(item.nextStateValue, path, value) as any,
+        config
+      );
+    } else {
+      item.set(value, config);
+    }
 
     return this;
   }
@@ -196,25 +211,37 @@ export class Multieditor<
    * @param value - New Item initial value
    * @param config - Configuration object
    */
-  public setInitialValue(
-    itemKey: ItemKey,
-    value: DataType,
+  public setInitialValue<
+    TItemName extends DeepFieldPaths<TFieldData> = DeepFieldPaths<TFieldData>
+  >(
+    itemKey: TItemName,
+    value: DeepFieldPathValues<TFieldData, TItemName>,
     config: UpdateInitialValueConfigInterface = {}
   ): this {
     config = defineConfig(config, {
       background: true, // Because by default the Form should only be re-rendered when the Status updates
       reset: true,
     });
+    const path = itemKey.toString().split('.');
 
-    const item = this.getItem(itemKey);
+    // Fetch Item
+    const item = this.getItem(path.shift() as any);
     if (item == null) return this;
 
     // Update initial value
-    item.initialStateValue = copy(value);
+    if (path.length > 0) {
+      item.initialStateValue = updateNestedProperty(
+        item.initialStateValue,
+        path,
+        value
+      ) as any;
+    } else {
+      item.initialStateValue = value;
+    }
 
     // Reset Item (-> assign initial value to the current value)
     if (config.reset) {
-      item.reset(removeProperties(config, ['reset']));
+      item.reset(config);
     }
 
     return this;
@@ -227,8 +254,8 @@ export class Multieditor<
    * @param config - Configuration object
    */
   public async submit(
-    config: SubmitConfigInterface<OnSubmitConfigType> = {}
-  ): Promise<SubmitReturnType | false> {
+    config: SubmitConfigInterface = {}
+  ): Promise<any | false> {
     config = defineConfig(config, {
       assignToInitial: true,
       onSubmitConfig: undefined,
@@ -238,7 +265,7 @@ export class Multieditor<
     for (const key in this.data) {
       const item = this.data[key];
       if (this.canAssignStatusToItemOnSubmit(item)) {
-        item.status.display = true;
+        item.status.config.display = true;
         item.status.ingest({
           force: true, // Force because the value hasn't changed
         });
@@ -251,7 +278,7 @@ export class Multieditor<
     if (!this.isValid) return false;
 
     // Data to be passed to the 'onSubmit()' method
-    const preparedData: DataObject<DataType> = {};
+    const preparedData = {};
 
     // Add Items whose value has been updated to the prepared data
     for (const key in this.data) {
@@ -303,7 +330,11 @@ export class Multieditor<
    * @param type - Status type
    * @param message - Status message
    */
-  public setStatus(itemKey: ItemKey, type: StatusType, message: string): this {
+  public setStatus(
+    itemKey: FieldPaths<TFieldData>,
+    type: StatusType,
+    message: string
+  ): this {
     const item = this.getItem(itemKey);
     if (item == null) return this;
     item.status.set(
@@ -322,7 +353,7 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public resetStatus(itemKey: ItemKey): this {
+  public resetStatus(itemKey: FieldPaths<TFieldData>): this {
     const item = this.getItem(itemKey);
     if (item == null || item.status == null) return this;
     item.status.set(null);
@@ -332,25 +363,29 @@ export class Multieditor<
   /**
    * Retrieves the Status of the Item with the specified key/name identifier.
    *
-   * If the to retrieve Item doesn't exist, `null` is returned.
+   * If the to retrieve Status doesn't exist, `null` is returned.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getStatus(itemKey: ItemKey): StatusInterface | null {
+  public getStatus(itemKey: FieldPaths<TFieldData>): StatusInterface | null {
     return this.getItem(itemKey)?.status.value || null;
   }
 
   /**
    * Retrieves a single Item with the specified key/name identifier from the Multieditor.
    *
-   * If the to retrieve Item doesn't exist, `undefined` is returned.
+   * If the to retrieve Item doesn't exist, `null` is returned.
    *
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItem(itemKey: ItemKey): Item<DataType> | undefined {
-    return this.data[itemKey];
+  public getItem<
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): Item<DeepFieldPathValues<TFieldData, TItemName>> | null {
+    return this.data[itemKey as string];
   }
 
   /**
@@ -362,7 +397,11 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemValue(itemKey: string): DataType | undefined {
+  public getItemValue<
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): DeepFieldPathValues<TFieldData, TItemName> | undefined {
     return this.getItem(itemKey)?.value;
   }
 
@@ -375,7 +414,11 @@ export class Multieditor<
    * @public
    * @param itemKey - Key/Name identifier of the Item.
    */
-  public getItemInitialValue(itemKey: string): DataType | undefined {
+  public getItemInitialValue<
+    TItemName extends FieldPaths<TFieldData> = FieldPaths<TFieldData>
+  >(
+    itemKey: TItemName
+  ): DeepFieldPathValues<TFieldData, TItemName> | undefined {
     return this.getItem(itemKey)?.initialStateValue;
   }
 
@@ -435,7 +478,7 @@ export class Multieditor<
   }
 
   /**
-   * evalidates the Multieditor.
+   * Revalidates the Multieditor.
    *
    * @public
    */
@@ -473,136 +516,27 @@ export class Multieditor<
       (this.config.reValidateMode === 'onSubmit' ||
         (this.config.reValidateMode === 'afterFirstSubmit' &&
           !this.submitted) ||
-        (this.config.reValidateMode === 'onChange' && !item.status.display)) &&
+        (this.config.reValidateMode === 'onChange' &&
+          !item.status.config.display)) &&
+      (this.config.toValidate === 'all' ||
+        (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
+        false)
+    );
+  }
+
+  /**
+   * Returns a boolean indication whether the Status of the specified Item
+   * can be updated during the blur of the Item.
+   *
+   * @internal
+   * @param item - Item
+   */
+  public canAssignStatusToItemOnBlur(item: Item): boolean {
+    return (
+      this.config.reValidateMode === 'onBlur' &&
       (this.config.toValidate === 'all' ||
         (this.config.toValidate === 'editable' && item.config.canBeEdited) ||
         false)
     );
   }
 }
-
-export type DataObject<T = any> = { [key: string]: T };
-export type EditorKey = string | number;
-export type ItemKey = string | number;
-
-export interface CreateEditorConfigInterface<
-  DataType = any,
-  SubmitReturnType = void,
-  onSubmitConfig = any
-> {
-  /**
-   * Key/Name identifier of the Multieditor.
-   * @default undefined
-   */
-  key?: string;
-  /**
-   * Initial data of the Multieditor.
-   * @default {}
-   */
-  initialData: DataObject<DataType>;
-  /**
-   * Key/name identifiers of Items whose values
-   * to be always passed to the specified 'onSubmit()' method.
-   * @default []
-   */
-  fixedProperties?: string[];
-  /**
-   * Key/Name identifiers of Items that can be edited.
-   * @default Object.keys(config.initialData)
-   */
-  editableProperties?: string[];
-  /**
-   * Keymap to assign validation schemas to the individual Items of the Multieditor.
-   * @default {}
-   */
-  validationSchema?: ValidationSchemaType<DataType>;
-  /**
-   * Keymap to assign compute methods to the individual Items of the Multieditor.
-   * @default {}
-   */
-  computeMethods?: { [key: string]: ComputeValueMethod<DataType> };
-  /**
-   * Callback to be called when the Multieditor is submitted.
-   * @default () => {}
-   */
-  onSubmit: (
-    preparedData: DataObject<DataType>,
-    config?: onSubmitConfig
-  ) => Promise<SubmitReturnType>;
-  /**
-   * In which circumstances the Multieditor is revalidated.
-   * @default 'onSubmit'
-   */
-  reValidateMode?: RevalidationModeType;
-  /**
-   * What type of data should be revalidated.
-   * @default 'editable'
-   */
-  toValidate?: ValidateType;
-}
-
-export type ValidationSchemaType<DataType = any> = {
-  [key: string]: ValidationMethodInterface<DataType> | Validator<DataType>;
-};
-
-export interface EditorConfigInterface {
-  /**
-   * In which circumstances the Multieditor is revalidated.
-   * @default 'onSubmit'
-   */
-  reValidateMode: RevalidationModeType;
-  /**
-   * What type of data should be revalidated.
-   * @default 'editable'
-   */
-  toValidate: ValidateType;
-}
-
-export type EditorConfig<
-  DataType = any,
-  SubmitReturnType = void,
-  OnSubmitConfigType = any
-> =
-  | CreateEditorConfigInterface<DataType, SubmitReturnType, OnSubmitConfigType>
-  | ((
-      editor: Multieditor<DataType, SubmitReturnType, OnSubmitConfigType>
-    ) => CreateEditorConfigInterface<
-      DataType,
-      SubmitReturnType,
-      OnSubmitConfigType
-    >);
-
-export interface SubmitConfigInterface<OnSubmitConfigType = any> {
-  /**
-   * Whether the submitted values should be assigned
-   * as the initial values of the corresponding Items.
-   * @default true
-   */
-  assignToInitial?: boolean;
-  /**
-   * Configuration object that is passed into the 'onSubmit()' method.
-   * @default {}
-   */
-  onSubmitConfig?: OnSubmitConfigType;
-}
-
-export interface UpdateInitialValueConfigInterface
-  extends StateRuntimeJobConfigInterface {
-  /**
-   * Whether the new initial Item value should be applied to the current Item value.
-   * @default true
-   */
-  reset?: boolean;
-}
-
-export interface RecomputeValidatedStateMethodConfigInterface {
-  /**
-   * Whether all Items should be revalidated
-   * before the validation state of the Multieditor is computed.
-   * @default true
-   */
-  validate?: boolean;
-}
-
-export type RevalidationModeType = 'onChange' | 'onSubmit' | 'afterFirstSubmit';
-export type ValidateType = 'all' | 'editable';

@@ -1,5 +1,5 @@
 import { copy, defineConfig, isFunction } from '@agile-ts/utils';
-import { LogCodeManager } from '../logCodeManager';
+import { logCodeManager } from '../logCodeManager';
 import { Agile } from '../agile';
 import { StateIngestConfigInterface, StateObserver } from './state.observer';
 import { Observer } from '../runtime';
@@ -134,7 +134,7 @@ export class State<ValueType = any> {
 
     // Update key of Observers
     for (const observerKey in this.observers)
-      this.observers[observerKey]._key = value;
+      this.observers[observerKey].key = value;
 
     return this;
   }
@@ -207,7 +207,9 @@ export class State<ValueType = any> {
       weight: 10,
     });
     if (!isFunction(callback)) {
-      LogCodeManager.log('00:03:01', ['Side Effect Callback', 'function']);
+      logCodeManager.log('00:03:01', {
+        replacers: ['Side Effect Callback', 'function'],
+      });
       return this;
     }
     this.sideEffects[key] = {

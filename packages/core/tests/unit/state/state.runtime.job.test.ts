@@ -36,7 +36,7 @@ describe('RuntimeJob Tests', () => {
 
       const job = new StateRuntimeJob(dummyObserver);
 
-      expect(job._key).toBeUndefined();
+      expect(job.key).toBeUndefined();
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: false,
@@ -74,7 +74,7 @@ describe('RuntimeJob Tests', () => {
         any: { jeff: 'frank' },
       });
 
-      expect(job._key).toBe('dummyJob');
+      expect(job.key).toBe('dummyJob');
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: false,
@@ -101,7 +101,7 @@ describe('RuntimeJob Tests', () => {
     () => {
       const job = new StateRuntimeJob(dummyObserver);
 
-      expect(job._key).toBeUndefined();
+      expect(job.key).toBeUndefined();
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: false,
@@ -131,7 +131,7 @@ describe('RuntimeJob Tests', () => {
 
       const job = new StateRuntimeJob(dummyObserver, { background: true });
 
-      expect(job._key).toBeUndefined();
+      expect(job.key).toBeUndefined();
       expect(job.observer).toBe(dummyObserver);
       expect(job.config).toStrictEqual({
         background: true,

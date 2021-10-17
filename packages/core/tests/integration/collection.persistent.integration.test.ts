@@ -63,7 +63,7 @@ describe('Collection Persist Function Tests', () => {
       expect(storageMethods.remove).not.toHaveBeenCalled();
 
       // Test Persisting
-      MY_COLLECTION.persist('myCollection');
+      MY_COLLECTION.persist({ key: 'myCollection' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
@@ -160,7 +160,7 @@ describe('Collection Persist Function Tests', () => {
       const MY_COLLECTION = createCollection<User>({}, App);
 
       // Load persisted Value
-      MY_COLLECTION.persist('myCollection');
+      MY_COLLECTION.persist({ key: 'myCollection' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
@@ -214,7 +214,7 @@ describe('Collection Persist Function Tests', () => {
       const MY_COLLECTION = createCollection<User>({}, App);
 
       // Load persisted Value
-      MY_COLLECTION.persist('myCollection');
+      MY_COLLECTION.persist({ key: 'myCollection' });
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(myStorage).toStrictEqual({
