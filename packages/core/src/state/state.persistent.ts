@@ -202,8 +202,8 @@ export class StatePersistent<ValueType = any> extends Persistent {
     if (config['storage'] == null || config.storage) {
       getSharedStorageManager()?.set(
         storageItemKey,
-        this.onLoad != null
-          ? this.onLoad(this.state().getPersistableValue())
+        this.onSave != null
+          ? this.onSave(this.state().getPersistableValue())
           : this.state().getPersistableValue(),
         this.storageKeys
       );
