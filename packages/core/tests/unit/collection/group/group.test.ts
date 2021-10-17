@@ -560,99 +560,54 @@ describe('Group Tests', () => {
       it('should persist Group with formatted groupKey (default config)', () => {
         group.persist();
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getGroupStorageKey(
             group._key,
             dummyCollection._key
           ),
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
+          followCollectionPersistKeyPattern: true, // Not required but passed for simplicity
+        });
       });
 
-      it('should persist Group with formatted groupKey (specific config)', () => {
+      it('should persist Group with formatted key (specific config)', () => {
         group.persist({
+          key: 'specificKey',
           loadValue: false,
           storageKeys: ['test1', 'test2'],
           defaultStorageKey: 'test1',
         });
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
-            group._key,
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getGroupStorageKey(
+            'specificKey',
             dummyCollection._key
           ),
-          {
-            loadValue: false,
-            storageKeys: ['test1', 'test2'],
-            defaultStorageKey: 'test1',
-          }
-        );
-      });
-
-      it('should persist Group with formatted specified key (default config)', () => {
-        group.persist('dummyKey');
-
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
-            'dummyKey',
-            dummyCollection._key
-          ),
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
-      });
-
-      it('should persist Group with formatted specified key (specific config)', () => {
-        group.persist('dummyKey', {
           loadValue: false,
           storageKeys: ['test1', 'test2'],
           defaultStorageKey: 'test1',
+          followCollectionPersistKeyPattern: true, // Not required but passed for simplicity
         });
-
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
-            'dummyKey',
-            dummyCollection._key
-          ),
-          {
-            loadValue: false,
-            storageKeys: ['test1', 'test2'],
-            defaultStorageKey: 'test1',
-          }
-        );
       });
 
       it('should persist Group with groupKey (config.followCollectionPersistKeyPattern = false)', () => {
         group.persist({ followCollectionPersistKeyPattern: false });
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          group._key,
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: group._key,
+          followCollectionPersistKeyPattern: false, // Not required but passed for simplicity
+        });
       });
 
       it('should persist Group with specified key (config.followCollectionPersistKeyPattern = false)', () => {
-        group.persist('dummyKey', { followCollectionPersistKeyPattern: false });
+        group.persist({
+          key: 'specificKey',
+          followCollectionPersistKeyPattern: false,
+        });
 
-        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith(
-          'dummyKey',
-          {
-            loadValue: true,
-            storageKeys: [],
-            defaultStorageKey: null,
-          }
-        );
+        expect(EnhancedState.prototype.persist).toHaveBeenCalledWith({
+          key: 'specificKey',
+          followCollectionPersistKeyPattern: false, // Not required but passed for simplicity
+        });
       });
     });
 

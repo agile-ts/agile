@@ -307,35 +307,31 @@ describe('CollectionPersistent Tests', () => {
 
           // Default Group
           expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
-          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getGroupStorageKey(
+          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getGroupStorageKey(
               dummyDefaultGroup._key,
               collectionPersistent._key
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             dummyDefaultGroup.persistent?.initialLoading
           ).toHaveBeenCalledTimes(1);
 
           // Dummy Item 3
-          expect(dummyItem3.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getItemStorageKey(
+          expect(dummyItem3.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getItemStorageKey(
               '3',
               collectionPersistent._key
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalledTimes(
             1
           );
@@ -397,18 +393,16 @@ describe('CollectionPersistent Tests', () => {
 
           // Default Group
           expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
-          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getGroupStorageKey(
+          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getGroupStorageKey(
               dummyDefaultGroup._key,
               collectionPersistent._key
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             dummyDefaultGroup.persistent?.initialLoading
           ).toHaveBeenCalledTimes(1);
@@ -417,18 +411,16 @@ describe('CollectionPersistent Tests', () => {
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
             '1'
           );
-          expect(placeholderItem1.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getItemStorageKey(
+          expect(placeholderItem1.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getItemStorageKey(
               '1',
               collectionPersistent._key
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             placeholderItem1?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
@@ -445,18 +437,16 @@ describe('CollectionPersistent Tests', () => {
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
             '2'
           );
-          expect(placeholderItem2.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getItemStorageKey(
+          expect(placeholderItem2.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getItemStorageKey(
               '2',
               collectionPersistent._key
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             placeholderItem2?.persistent?.loadPersistedValue
           ).not.toHaveBeenCalled();
@@ -473,18 +463,16 @@ describe('CollectionPersistent Tests', () => {
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
             '3'
           );
-          expect(placeholderItem3.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getItemStorageKey(
+          expect(placeholderItem3.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getItemStorageKey(
               '3',
               collectionPersistent._key
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             placeholderItem3?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
@@ -543,32 +531,28 @@ describe('CollectionPersistent Tests', () => {
 
           // Default Group
           expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
-          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getGroupStorageKey(
+          expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getGroupStorageKey(
               dummyDefaultGroup._key,
               'dummyKey'
             ),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             dummyDefaultGroup.persistent?.initialLoading
           ).toHaveBeenCalledTimes(1);
 
           // Dummy Item 3
-          expect(dummyItem3.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getItemStorageKey('3', 'dummyKey'),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+          expect(dummyItem3.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getItemStorageKey('3', 'dummyKey'),
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(dummyItem3.persistent?.initialLoading).toHaveBeenCalledTimes(
             1
           );
@@ -587,15 +571,13 @@ describe('CollectionPersistent Tests', () => {
           expect(dummyCollection.getItemWithReference).toHaveBeenCalledWith(
             '1'
           );
-          expect(placeholderItem1.persist).toHaveBeenCalledWith(
-            CollectionPersistent.getItemStorageKey('1', 'dummyKey'),
-            {
-              loadValue: false,
-              defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-              storageKeys: collectionPersistent.storageKeys,
-              followCollectionPersistKeyPattern: false,
-            }
-          );
+          expect(placeholderItem1.persist).toHaveBeenCalledWith({
+            key: CollectionPersistent.getItemStorageKey('1', 'dummyKey'),
+            loadValue: false,
+            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+            storageKeys: collectionPersistent.storageKeys,
+            followCollectionPersistKeyPattern: false,
+          });
           expect(
             placeholderItem1?.persistent?.loadPersistedValue
           ).toHaveBeenCalledTimes(1);
@@ -733,40 +715,34 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
-        expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
+        expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getGroupStorageKey(
             dummyDefaultGroup._key,
             collectionPersistent._key
           ),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
 
-        expect(dummyItem1.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
+        expect(dummyItem1.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
             dummyItem1._key,
             collectionPersistent._key
           ),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
-        expect(dummyItem3.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
+        expect(dummyItem3.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
             dummyItem3._key,
             collectionPersistent._key
           ),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
 
         expect(collectionPersistent.setupSideEffects).toHaveBeenCalled();
         expect(collectionPersistent.isPersisted).toBeTruthy();
@@ -785,34 +761,34 @@ describe('CollectionPersistent Tests', () => {
         );
 
         expect(dummyCollection.getDefaultGroup).toHaveBeenCalled();
-        expect(dummyDefaultGroup.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getGroupStorageKey(
+        expect(dummyDefaultGroup.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getGroupStorageKey(
             dummyDefaultGroup._key,
             'dummyKey'
           ),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
 
-        expect(dummyItem1.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(dummyItem1._key, 'dummyKey'),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
-        expect(dummyItem3.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(dummyItem3._key, 'dummyKey'),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
+        expect(dummyItem1.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
+            dummyItem1._key,
+            'dummyKey'
+          ),
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
+        expect(dummyItem3.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
+            dummyItem3._key,
+            'dummyKey'
+          ),
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
 
         expect(collectionPersistent.setupSideEffects).toHaveBeenCalled();
         expect(collectionPersistent.isPersisted).toBeTruthy();
@@ -875,7 +851,9 @@ describe('CollectionPersistent Tests', () => {
       it("shouldn't add rebuild Storage side effect to the default Group", () => {
         collectionPersistent.setupSideEffects();
 
-        expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
+        expect(
+          dummyDefaultGroup.addSideEffect
+        ).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
           expect.any(Function),
           { weight: 0 }
@@ -1207,17 +1185,15 @@ describe('CollectionPersistent Tests', () => {
         expect(dummyItem1.persist).not.toHaveBeenCalled();
         expect(dummyItem2.persist).not.toHaveBeenCalled();
         expect(dummyItem3.persist).not.toHaveBeenCalled();
-        expect(dummyItem4WithoutPersistent.persist).toHaveBeenCalledWith(
-          CollectionPersistent.getItemStorageKey(
+        expect(dummyItem4WithoutPersistent.persist).toHaveBeenCalledWith({
+          key: CollectionPersistent.getItemStorageKey(
             '4',
             collectionPersistent._key
           ),
-          {
-            defaultStorageKey: collectionPersistent.config.defaultStorageKey,
-            storageKeys: collectionPersistent.storageKeys,
-            followCollectionPersistKeyPattern: false,
-          }
-        );
+          defaultStorageKey: collectionPersistent.config.defaultStorageKey,
+          storageKeys: collectionPersistent.storageKeys,
+          followCollectionPersistKeyPattern: false,
+        });
 
         expect(
           dummyItem1.persistent?.removePersistedValue

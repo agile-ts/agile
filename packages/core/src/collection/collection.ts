@@ -20,7 +20,7 @@ import {
   TrackedChangeMethod,
 } from './group';
 import { GroupIngestConfigInterface } from './group/group.observer';
-import { StorageKey } from '../storages';
+import { CreatePersistentConfigInterface, StorageKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<DataType extends DefaultItem = DefaultItem> {
@@ -936,53 +936,16 @@ export class Collection<DataType extends DefaultItem = DefaultItem> {
    * @public
    * @param config - Configuration object
    */
-  public persist(config?: CollectionPersistentConfigInterface): this;
-  /**
-   * Preserves the Collection `value` in the corresponding external Storage.
-   *
-   * The specified key is used as the unique identifier for the Persistent.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/collection/methods/#persist)
-   *
-   * @public
-   * @param key - Key/Name identifier of Persistent.
-   * @param config - Configuration object
-   */
-  public persist(
-    key?: StorageKey,
-    config?: CollectionPersistentConfigInterface
-  ): this;
-  public persist(
-    keyOrConfig: StorageKey | CollectionPersistentConfigInterface = {},
-    config: CollectionPersistentConfigInterface = {}
-  ): this {
-    let _config: CollectionPersistentConfigInterface;
-    let key: StorageKey | undefined;
-
-    if (isValidObject(keyOrConfig)) {
-      _config = keyOrConfig as CollectionPersistentConfigInterface;
-      key = this._key;
-    } else {
-      _config = config || {};
-      key = keyOrConfig as StorageKey;
-    }
-
-    _config = defineConfig(_config, {
-      loadValue: true,
-      storageKeys: [],
-      defaultStorageKey: null as any,
+  public persist(config: CreatePersistentConfigInterface = {}): this {
+    config = defineConfig(config, {
+      key: this.key,
     });
 
     // Check if Collection is already persisted
     if (this.persistent != null && this.isPersisted) return this;
 
     // Create Persistent (-> persist value)
-    this.persistent = new CollectionPersistent<DataType>(this, {
-      loadValue: _config.loadValue,
-      storageKeys: _config.storageKeys,
-      key: key,
-      defaultStorageKey: _config.defaultStorageKey,
-    });
+    this.persistent = new CollectionPersistent<DataType>(this, config);
 
     return this;
   }
@@ -1218,7 +1181,9 @@ export class Collection<DataType extends DefaultItem = DefaultItem> {
    * @public
    * @param itemKeys - Item/s with identifier/s to be removed.
    */
-  public remove(itemKeys: ItemKey | Array<ItemKey>): {
+  public remove(
+    itemKeys: ItemKey | Array<ItemKey>
+  ): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
     everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
@@ -1553,12 +1518,13 @@ export interface CreateCollectionConfigImpl<
   initialData?: Array<DataType>;
 }
 
-export type CreateCollectionConfig<DataType extends DefaultItem = DefaultItem> =
-
-    | CreateCollectionConfigImpl<DataType>
-    | ((
-        collection: Collection<DataType>
-      ) => CreateCollectionConfigImpl<DataType>);
+export type CreateCollectionConfig<
+  DataType extends DefaultItem = DefaultItem
+> =
+  | CreateCollectionConfigImpl<DataType>
+  | ((
+      collection: Collection<DataType>
+    ) => CreateCollectionConfigImpl<DataType>);
 
 export interface CollectionConfigInterface {
   /**
@@ -1634,31 +1600,6 @@ export interface HasConfigInterface {
    * @default true
    */
   notExisting?: boolean;
-}
-
-export interface CollectionPersistentConfigInterface {
-  /**
-   * Whether the Persistent should automatically load
-   * the persisted value into the Collection after its instantiation.
-   * @default true
-   */
-  loadValue?: boolean;
-  /**
-   * Key/Name identifier of Storages
-   * in which the Collection value should be or is persisted.
-   * @default [`defaultStorageKey`]
-   */
-  storageKeys?: StorageKey[];
-  /**
-   * Key/Name identifier of the default Storage of the specified Storage keys.
-   *
-   * The Collection value is loaded from the default Storage by default
-   * and is only loaded from the remaining Storages (`storageKeys`)
-   * if the loading from the default Storage failed.
-   *
-   * @default first index of the specified Storage keys or the AgileTs default Storage key
-   */
-  defaultStorageKey?: StorageKey;
 }
 
 export interface RemoveItemsConfigInterface {

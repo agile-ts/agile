@@ -1,27 +1,20 @@
-import {
-  copy,
-  defineConfig,
-  isValidObject,
-  normalizeArray,
-} from '@agile-ts/utils';
+import { copy, defineConfig, normalizeArray } from '@agile-ts/utils';
 import { logCodeManager } from '../../logCodeManager';
 import {
+  CreateStatePersistentConfigInterface,
   EnhancedState,
   StateIngestConfigInterface,
   StateObserver,
   StateObserversInterface,
-  StatePersistentConfigInterface,
 } from '../../state';
 import { Collection, DefaultItem, ItemKey } from '../collection';
 import { GroupIngestConfigInterface, GroupObserver } from './group.observer';
 import { ComputedTracker } from '../../computed';
 import { Item } from '../item';
-import { PersistentKey } from '../../storages';
 import { CollectionPersistent } from '../collection.persistent';
 
 export class Group<
-  DataType extends DefaultItem = DefaultItem,
-  ValueType = Array<ItemKey> // To extract the Group Type Value in Integration methods like 'useAgile()'
+  DataType extends DefaultItem = DefaultItem
 > extends EnhancedState<Array<ItemKey>> {
   // Collection the Group belongs to
   collection: () => Collection<DataType>;
@@ -322,58 +315,22 @@ export class Group<
    * @public
    * @param config - Configuration object
    */
-  public persist(config?: GroupPersistConfigInterface): this;
-  /**
-   * Preserves the Group `value` in the corresponding external Storage.
-   *
-   * The specified key is used as the unique identifier for the Persistent.
-   *
-   * [Learn more..](https://agile-ts.org/docs/core/state/methods/#persist)
-   *
-   * @public
-   * @param key - Key/Name identifier of Persistent.
-   * @param config - Configuration object
-   */
-  public persist(
-    key?: PersistentKey,
-    config?: GroupPersistConfigInterface
-  ): this;
-  public persist(
-    keyOrConfig: PersistentKey | GroupPersistConfigInterface = {},
-    config: GroupPersistConfigInterface = {}
-  ): this {
-    let _config: GroupPersistConfigInterface;
-    let key: PersistentKey | undefined;
-
-    if (isValidObject(keyOrConfig)) {
-      _config = keyOrConfig as GroupPersistConfigInterface;
-      key = this._key;
-    } else {
-      _config = config || {};
-      key = keyOrConfig as PersistentKey;
-    }
-
-    _config = defineConfig(_config, {
-      loadValue: true,
+  public persist(config: GroupPersistConfigInterface = {}): this {
+    config = defineConfig(config, {
+      key: this._key,
       followCollectionPersistKeyPattern: true,
-      storageKeys: [],
-      defaultStorageKey: null as any,
     });
 
     // Create storageItemKey based on Collection key/name identifier
-    if (_config.followCollectionPersistKeyPattern) {
-      key = CollectionPersistent.getGroupStorageKey(
-        key || this._key,
+    if (config.followCollectionPersistKeyPattern) {
+      config.key = CollectionPersistent.getGroupStorageKey(
+        config.key || this._key,
         this.collection()._key
       );
     }
 
     // Persist Group
-    super.persist(key, {
-      loadValue: _config.loadValue,
-      storageKeys: _config.storageKeys,
-      defaultStorageKey: _config.defaultStorageKey,
-    });
+    super.persist(config);
 
     return this;
   }
@@ -524,7 +481,7 @@ export interface GroupConfigInterface {
 }
 
 export interface GroupPersistConfigInterface
-  extends StatePersistentConfigInterface {
+  extends CreateStatePersistentConfigInterface {
   /**
    * Whether to format the specified Storage key following the Collection Group Storage key pattern.
    * `_${collectionKey}_group_${groupKey}`
