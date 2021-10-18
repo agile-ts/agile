@@ -7,7 +7,6 @@ import {
 } from '../state';
 import { Collection, DefaultItem } from './collection';
 import { SelectorKey } from './selector';
-import { PersistentKey } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
 export class Item<
@@ -96,7 +95,7 @@ export class Item<
    * @public
    * @param config - Configuration object
    */
-  public persist(config: ItemPersistConfigInterface = {}): this {
+  public persist(config: ItemPersistConfigInterface<DataType> = {}): this {
     config = defineConfig(config, {
       key: this._key,
       followCollectionPersistKeyPattern: true,
@@ -142,8 +141,8 @@ export interface ItemConfigInterface {
   isPlaceholder?: boolean;
 }
 
-export interface ItemPersistConfigInterface
-  extends CreateStatePersistentConfigInterface {
+export interface ItemPersistConfigInterface<DataType = any>
+  extends CreateStatePersistentConfigInterface<DataType> {
   /**
    * Whether to format the specified Storage key following the Collection Item Storage key pattern.
    * `_${collectionKey}_item_${itemKey}`

@@ -424,7 +424,9 @@ export class EnhancedState<ValueType = any> extends State<ValueType> {
    * @public
    * @param config - Configuration object
    */
-  public persist(config: CreateStatePersistentConfigInterface = {}): this {
+  public persist(
+    config: CreateStatePersistentConfigInterface<ValueType> = {}
+  ): this {
     config = defineConfig(config, {
       key: this._key,
     });

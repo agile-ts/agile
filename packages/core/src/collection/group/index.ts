@@ -315,7 +315,9 @@ export class Group<
    * @public
    * @param config - Configuration object
    */
-  public persist(config: GroupPersistConfigInterface = {}): this {
+  public persist(
+    config: GroupPersistConfigInterface<Array<ItemKey>> = {}
+  ): this {
     config = defineConfig(config, {
       key: this._key,
       followCollectionPersistKeyPattern: true,
@@ -480,8 +482,8 @@ export interface GroupConfigInterface {
   isPlaceholder?: boolean;
 }
 
-export interface GroupPersistConfigInterface
-  extends CreateStatePersistentConfigInterface {
+export interface GroupPersistConfigInterface<ValueType = any>
+  extends CreateStatePersistentConfigInterface<ValueType> {
   /**
    * Whether to format the specified Storage key following the Collection Group Storage key pattern.
    * `_${collectionKey}_group_${groupKey}`
