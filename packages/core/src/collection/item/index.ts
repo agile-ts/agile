@@ -4,10 +4,10 @@ import {
   EnhancedState,
   StateKey,
   StateRuntimeJobConfigInterface,
-} from '../state';
-import { Collection, DefaultItem } from './collection';
-import { SelectorKey } from './selector';
-import { CollectionPersistent } from './collection.persistent';
+} from '../../state';
+import { Collection, DefaultItem } from '../collection';
+import { SelectorKey } from '../selector';
+import { CollectionPersistent } from '../collection.persistent';
 
 export class Item<
   DataType extends DefaultItem = DefaultItem

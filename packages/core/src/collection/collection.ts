@@ -20,7 +20,7 @@ import {
   TrackedChangeMethod,
 } from './group';
 import { GroupIngestConfigInterface } from './group/group.observer';
-import { CreatePersistentConfigInterface, StorageKey } from '../storages';
+import { CreatePersistentConfigInterface } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<DataType extends DefaultItem = DefaultItem> {
