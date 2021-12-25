@@ -1,5 +1,4 @@
-import { ProxyTree } from './proxytree';
+import { ProxyTree } from './tree';
 
-export * from './proxytree';
-export * from './branch';
+export * from './tree';
 export default ProxyTree;

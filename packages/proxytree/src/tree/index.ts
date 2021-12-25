@@ -1,5 +1,7 @@
 import { Branch, BranchKey, DefaultProxyTreeObject } from './branch';
-import { isObject } from './utils';
+import { isObject } from '../utils';
+
+export * from './branch';
 
 export class ProxyTree<T extends Object = DefaultProxyTreeObject> {
   public rootBranch: Branch<T>; // Root Branch of the proxy tree
