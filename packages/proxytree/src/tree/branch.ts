@@ -1,5 +1,5 @@
-import { ProxyTree } from './index';
-import { isObject } from './utils';
+import { ProxyTree } from '..';
+import { isObject } from '../utils';
 
 export class Branch<T extends Object = DefaultProxyTreeObject> {
   public proxy: T; // Target object wrapped in proxy

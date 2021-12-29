@@ -8,7 +8,7 @@ import Agile, {
   SubscriptionContainerKeyType,
   RegisterSubscriptionConfigInterface,
 } from '@agile-ts/core';
-import { useIsomorphicLayoutEffect } from '../../general';
+import { useIsomorphicLayoutEffect } from '../../util';
 import { logCodeManager } from '../../logCodeManager';
 
 /**
