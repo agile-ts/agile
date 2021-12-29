@@ -151,7 +151,7 @@ export class StateObserver<ValueType = any> extends Observer<ValueType> {
     this.sideEffects(job);
 
     // Assign new public value to the Observer (value used by the Integrations)
-    job.observer.previousValue = Object.freeze(copy(observer.value));
+    job.observer.previousValue = copy(observer.value); // Object.freeze(copy(observer.value)); // Not freezing because it leads to issues when working with classes
     job.observer.value = copy(state._value); // Object.freeze(copy(state._value)); // Not freezing because of 'useProxy' hook
   }
 
