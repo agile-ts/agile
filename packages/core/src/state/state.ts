@@ -74,7 +74,7 @@ export class State<ValueType = any> {
 
   /**
    * Assigns a new value to the State
-   * and rerenders all subscribed Components.
+   * and re-renders all subscribed Components.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/properties#value)
    *

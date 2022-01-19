@@ -1,4 +1,4 @@
-import React, { ComponentClass } from 'react';
+import React from 'react';
 import Agile, {
   State,
   ComponentSubscriptionContainer,
@@ -25,11 +25,15 @@ import { logCodeManager } from '../../logCodeManager';
  * @param deps - Agile Sub Instances to be bound to the Class Component.
  * @param agileInstance - Instance of Agile the React Component belongs to.
  */
-export function AgileHOC(
-  reactComponent: ComponentClass<any, any>,
-  deps: DepsType,
+export function AgileHOC<
+  ComponentProps,
+  Deps extends DepsType,
+  ComponentPropsWithDeps = ComponentProps & DepProps<Deps>
+>(
+  reactComponent: React.ComponentClass<ComponentProps, any>,
+  deps: Deps,
   agileInstance?: Agile
-): ComponentClass<any, any> {
+): React.ComponentClass<ComponentProps, any> {
   let depsWithoutIndicator: Array<Observer> = [];
   let depsWithIndicator: DepsWithIndicatorType;
 
@@ -81,11 +85,11 @@ export function AgileHOC(
  * @param depsWithIndicator - Dependencies that have a unique key/name indicator.
  */
 const createHOC = (
-  ReactComponent: ComponentClass<any, any>,
+  ReactComponent: React.ComponentClass<any, any>,
   agileInstance: Agile,
   depsWithoutIndicator: Array<Observer>,
   depsWithIndicator: DepsWithIndicatorType
-): ComponentClass<any, any> => {
+): React.ComponentClass<any, any> => {
   return class extends ReactComponent {
     public agileInstance: Agile;
     public waitForMount: boolean;
@@ -252,3 +256,11 @@ export type DepsType =
 //  | SubscribableAgileInstancesType; // Not allowed because each passed Agile Instance is detect as object and will run through 'formatDepsWithIndicator'
 
 type DepsWithIndicatorType = { [key: string]: Observer };
+
+export type DepProps<T extends DepsType> = {
+  [K in keyof T]: T[K] extends State<infer U> | Observer<infer U>
+    ? U
+    : T[K] extends Collection<infer U>
+    ? U[]
+    : never;
+};
