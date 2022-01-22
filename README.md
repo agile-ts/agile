@@ -244,3 +244,6 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 
 AgileTs is inspired by [MVVM Libraries](https://de.wikipedia.org/wiki/Model_View_ViewModel) 
 like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
+
+### 🕐 Time spent building this project
+[![wakatime](https://wakatime.com/badge/user/aa5a8ce7-1c57-4f26-a159-ea57ec5ea7c1/project/6d1a7308-89b1-4e95-9623-64c0c6116d0a.svg)](https://wakatime.com/badge/user/aa5a8ce7-1c57-4f26-a159-ea57ec5ea7c1/project/6d1a7308-89b1-4e95-9623-64c0c6116d0a)
