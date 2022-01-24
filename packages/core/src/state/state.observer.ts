@@ -19,6 +19,7 @@ import {
 } from './state.runtime.job';
 import { SideEffectInterface, State } from './state';
 import { logCodeManager } from '../logCodeManager';
+import { Computed } from '../computed';
 
 export class StateObserver<ValueType = any> extends Observer<ValueType> {
   // State the Observer belongs to
@@ -65,9 +66,8 @@ export class StateObserver<ValueType = any> extends Observer<ValueType> {
     const state = this.state() as any;
 
     if (state.isComputed) {
-      state.compute().then((result) => {
-        this.ingestValue(result, config);
-      });
+      const computedState = state as Computed;
+      computedState.computeAndIngest(this, config);
     } else {
       this.ingestValue(state.nextStateValue, config);
     }
