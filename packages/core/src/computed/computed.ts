@@ -5,7 +5,6 @@ import {
   State,
   StateConfigInterface,
   StateIngestConfigInterface,
-  StateObserver,
 } from '../state';
 import { Observer } from '../runtime';
 import { ComputedTracker } from './computed.tracker';
@@ -16,19 +15,12 @@ export class Computed<
 > extends State<ComputedValueType> {
   public config: ComputedConfigInterface;
 
-  // Caches if the compute function is async
+  // Caches whether the compute function is async
   private computeFunctionIsAsync!: boolean;
 
   // Function to compute the Computed Class value
   private _computeFunction!: ComputeFunctionType<ComputedValueType>;
-  public get computeFunction() : ComputeFunctionType<ComputedValueType> {
-    return this._computeFunction;
-  }
-  public set computeFunction(v : ComputeFunctionType<ComputedValueType>) {
-    this._computeFunction = v;
-    this.computeFunctionIsAsync = isAsyncFunction(v);
-  }
-  
+
   // All dependencies the Computed Class depends on (including hardCoded and automatically detected dependencies)
   public deps: Set<Observer> = new Set();
   // Only hardCoded dependencies the Computed Class depends on
@@ -100,10 +92,32 @@ export class Computed<
   }
 
   /**
-   * synchronously computes the value 
-   * 
-   * @param config ComputeConfigInterface
-   * @returns 
+   * Returns the compute function of the Computed State
+   *
+   * @public
+   */
+  public get computeFunction(): ComputeFunctionType<ComputedValueType> {
+    return this._computeFunction;
+  }
+
+  /**
+   * Assigns a new compute function to the Computed State
+   * and checks whether it's async.
+   *
+   * @public
+   * @param value - New compute function.
+   */
+  public set computeFunction(value: ComputeFunctionType<ComputedValueType>) {
+    this._computeFunction = value;
+    this.computeFunctionIsAsync = isAsyncFunction(value);
+  }
+
+  /**
+   * Synchronously computes and returns the new value of the Computed Class
+   * and autodetects used dependencies in the compute function.
+   *
+   * @public
+   * @param config - Configuration object
    */
   private computeSync(config: ComputeConfigInterface = {}): ComputedValueType {
     config = defineConfig(config, {
@@ -113,7 +127,8 @@ export class Computed<
     // Start auto tracking of Observers on which the computeFunction might depend
     if (config.autodetect) ComputedTracker.track();
 
-    const computeFunction = this.computeFunction as SyncComputeFunctionType<ComputedValueType>;
+    const computeFunction = this
+      .computeFunction as SyncComputeFunctionType<ComputedValueType>;
     const computedValue = computeFunction();
 
     // Handle auto tracked Observers
@@ -144,17 +159,24 @@ export class Computed<
   }
 
   /**
-   * asynchronously computes the value 
-   * 
-   * @param config ComputeConfigInterface
-   * @returns 
+   * Asynchronously computes and returns the new value of the Computed Class.
    */
-  private async computeAsync(config: ComputeConfigInterface = {}): Promise<ComputedValueType> {
-    config = defineConfig(config, {
-      autodetect: this.config.autodetect,
-    });
-
+  private async computeAsync(): Promise<ComputedValueType> {
     return this.computeFunction();
+  }
+
+  /**
+   * Computes and returns the new value of the Computed Class
+   * and autodetects used dependencies in a synchronous compute function.
+   *
+   * @internal
+   * @param config - Configuration object
+   */
+  public async compute(
+    config: ComputeConfigInterface = {}
+  ): Promise<ComputedValueType> {
+    if (this.computeFunctionIsAsync) return this.computeAsync();
+    else return this.computeSync(config);
   }
 
   /**
@@ -170,27 +192,28 @@ export class Computed<
       autodetect: false,
     });
 
-    this.computeAndIngest(this.observers['value'], config, { autodetect: config.autodetect });
-  
+    this.computeAndIngest(config);
+
     return this;
   }
 
   /**
-   * Recomputes value and ingests it into the observer
+   * Recomputes the value and ingests it into the runtime.
    *
    * @public
-   * @param observer - StateObserver<ComputedValueType> to ingest value into
-   * @param ingestConfig - Configuration object
+   * @param config - Configuration object
    */
-  public computeAndIngest(observer: StateObserver<ComputedValueType>, ingestConfig: StateIngestConfigInterface, computeConfig: ComputeConfigInterface = {}) {
+  public computeAndIngest(
+    // https://www.reddit.com/r/learnjavascript/comments/q5rvux/pass_parent_config_object_directly_into_child/
+    config: StateIngestConfigInterface & ComputeConfigInterface = {}
+  ) {
     if (this.computeFunctionIsAsync) {
-      this.computeAsync(computeConfig).then((result) => {
-        observer.ingestValue(result, ingestConfig);
+      this.computeAsync().then((result) => {
+        this.observers['value'].ingestValue(result, config);
       });
-    }
-    else {
-      const result = this.computeSync(computeConfig);
-      observer.ingestValue(result, ingestConfig);
+    } else {
+      const result = this.computeSync(config);
+      this.observers['value'].ingestValue(result, config);
     }
   }
 
@@ -244,30 +267,16 @@ export class Computed<
 
     return this;
   }
-
-  /**
-   * Computes and returns the new value of the Computed Class
-   * and autodetects used dependencies in the compute function.
-   *
-   * @internal
-   * @param config - Configuration object
-   */
-  public async compute(
-    config: ComputeConfigInterface = {}
-  ): Promise<ComputedValueType> {
-    if (this.computeFunctionIsAsync) {
-      return this.computeAsync(config);
-    }
-    else {
-      return this.computeSync(config);
-    }
-  }
 }
 
-export type SyncComputeFunctionType<ComputedValueType = any> = () => ComputedValueType; 
-export type AsyncComputeFunctionType<ComputedValueType = any> = () => Promise<ComputedValueType>; 
+export type SyncComputeFunctionType<ComputedValueType = any> =
+  () => ComputedValueType;
+export type AsyncComputeFunctionType<ComputedValueType = any> =
+  () => Promise<ComputedValueType>;
 
-export type ComputeFunctionType<ComputedValueType = any> = SyncComputeFunctionType<ComputedValueType> | AsyncComputeFunctionType<ComputedValueType>;
+export type ComputeFunctionType<ComputedValueType = any> =
+  | SyncComputeFunctionType<ComputedValueType>
+  | AsyncComputeFunctionType<ComputedValueType>;
 
 export interface CreateComputedConfigInterface<ComputedValueType = any>
   extends StateConfigInterface {

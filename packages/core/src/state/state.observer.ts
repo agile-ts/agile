@@ -63,11 +63,10 @@ export class StateObserver<ValueType = any> extends Observer<ValueType> {
    * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): void {
-    const state = this.state() as any;
+    const state = this.state();
 
-    if (state.isComputed) {
-      const computedState = state as Computed;
-      computedState.computeAndIngest(this, config);
+    if (state instanceof Computed && state.isComputed) {
+      state.computeAndIngest(config);
     } else {
       this.ingestValue(state.nextStateValue, config);
     }

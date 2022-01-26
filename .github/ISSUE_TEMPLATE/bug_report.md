@@ -1,6 +1,6 @@
 ---
 name: 🐛 Bug report
-about: Create a report to help us improve AgileTs
+about: Create a bug report to help us improve AgileTs
 title: ''
 labels: 'Type: Bug'
 assignees: ''
@@ -11,7 +11,7 @@ assignees: ''
 
 ### 🤖 Current Behavior
 
-<!-- Explain your problem (with screenshots, videos, text) in detail -->
+<!-- Explain your problem (e.g. with screenshots, text, code snippets) in detail -->
 
 ### 🎯 Expected behavior
 
@@ -19,27 +19,28 @@ assignees: ''
 
 ### 📄 Reproducible example
 
-<!-- Create a simple example in Codebox -->
+<!-- Create a simple example that reproduces your problem in a code sandbox 
+     (like this one: https://codesandbox.io/s/issue-219-ufcck?file=/src/main.js) -->
 
 ### 💡 Suggested solution(s)
 
-<!-- How could we solve this bug? What changes would need to made to AgileTs? -->
+<!-- How could we solve this bug? What changes would need to made to AgileTs? Any idea? -->
 
 ### ➕ Additional notes
 
-<!-- Add any other context about the problem here.  -->
+<!-- Add additional context about the problem here. (optional) -->
 
 ### 💻 Your environment
 
-<!-- PLEASE FILL THIS OUT -->
+<!-- What version/s of AgileTs are you using? -->
 
 | Software              | Version(s) |
 | ----------------------| ---------- |
-| TypeScript            |
-| npm/Yarn              |
-| NodeJs                |
-| @agile-ts/core        |
-| @agile-ts/react       |
-| @agile-ts/api         |
-| @agile-ts/multieditor |
-<!-- Any additional important Version Notes? -->
+| @agile-ts/core        | N/A
+| @agile-ts/react       | N/A
+| @agile-ts/api         | N/A
+| @agile-ts/multieditor | N/A
+| TypeScript            | N/A
+| npm/Yarn              | N/A
+| NodeJs                | N/A
+<!-- Any additional important version notes? -->

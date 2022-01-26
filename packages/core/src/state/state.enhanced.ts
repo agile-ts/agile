@@ -15,7 +15,6 @@ import {
   CreateStatePersistentConfigInterface,
   StatePersistent,
 } from './state.persistent';
-import { PersistentKey, StorageKey } from '../storages';
 
 export class EnhancedState<ValueType = any> extends State<ValueType> {
   // Whether the State is persisted in an external Storage
