@@ -5,6 +5,7 @@ import {
   State,
   StateConfigInterface,
   StateIngestConfigInterface,
+  StateObserver,
 } from '../state';
 import { Observer } from '../runtime';
 import { ComputedTracker } from './computed.tracker';
@@ -15,8 +16,19 @@ export class Computed<
 > extends State<ComputedValueType> {
   public config: ComputedConfigInterface;
 
+  // Caches if the compute function is async
+  private computeFunctionIsAsync!: boolean;
+
   // Function to compute the Computed Class value
-  public computeFunction: ComputeFunctionType<ComputedValueType>;
+  private _computeFunction!: ComputeFunctionType<ComputedValueType>;
+  public get computeFunction() : ComputeFunctionType<ComputedValueType> {
+    return this._computeFunction;
+  }
+  public set computeFunction(v : ComputeFunctionType<ComputedValueType>) {
+    this._computeFunction = v;
+    this.computeFunctionIsAsync = isAsyncFunction(v);
+  }
+  
   // All dependencies the Computed Class depends on (including hardCoded and automatically detected dependencies)
   public deps: Set<Observer> = new Set();
   // Only hardCoded dependencies the Computed Class depends on
@@ -60,12 +72,13 @@ export class Computed<
         dependents: config.dependents,
       }
     );
+    this.computeFunction = computeFunction;
+
     config = defineConfig(config, {
       computedDeps: [],
-      autodetect: !isAsyncFunction(computeFunction),
+      autodetect: !this.computeFunctionIsAsync,
     });
     this.agileInstance = () => agileInstance;
-    this.computeFunction = computeFunction;
     this.config = {
       autodetect: config.autodetect as any,
     };
@@ -87,6 +100,64 @@ export class Computed<
   }
 
   /**
+   * synchronously computes the value 
+   * 
+   * @param config ComputeConfigInterface
+   * @returns 
+   */
+  private computeSync(config: ComputeConfigInterface = {}): ComputedValueType {
+    config = defineConfig(config, {
+      autodetect: this.config.autodetect,
+    });
+
+    // Start auto tracking of Observers on which the computeFunction might depend
+    if (config.autodetect) ComputedTracker.track();
+
+    const computeFunction = this.computeFunction as SyncComputeFunctionType<ComputedValueType>;
+    const computedValue = computeFunction();
+
+    // Handle auto tracked Observers
+    if (config.autodetect) {
+      const foundDeps = ComputedTracker.getTrackedObservers();
+
+      // Clean up old dependencies
+      this.deps.forEach((observer) => {
+        if (
+          !foundDeps.includes(observer) &&
+          !this.hardCodedDeps.includes(observer)
+        ) {
+          this.deps.delete(observer);
+          observer.removeDependent(this.observers['value']);
+        }
+      });
+
+      // Make this Observer depend on the newly found dep Observers
+      foundDeps.forEach((observer) => {
+        if (!this.deps.has(observer)) {
+          this.deps.add(observer);
+          observer.addDependent(this.observers['value']);
+        }
+      });
+    }
+
+    return computedValue;
+  }
+
+  /**
+   * asynchronously computes the value 
+   * 
+   * @param config ComputeConfigInterface
+   * @returns 
+   */
+  private async computeAsync(config: ComputeConfigInterface = {}): Promise<ComputedValueType> {
+    config = defineConfig(config, {
+      autodetect: this.config.autodetect,
+    });
+
+    return this.computeFunction();
+  }
+
+  /**
    * Forces a recomputation of the cached value with the compute function.
    *
    * [Learn more..](https://agile-ts.org/docs/core/computed/methods/#recompute)
@@ -98,10 +169,29 @@ export class Computed<
     config = defineConfig(config, {
       autodetect: false,
     });
-    this.compute({ autodetect: config.autodetect }).then((result) => {
-      this.observers['value'].ingestValue(result, config);
-    });
+
+    this.computeAndIngest(this.observers['value'], config, { autodetect: config.autodetect });
+  
     return this;
+  }
+
+  /**
+   * Recomputes value and ingests it into the observer
+   *
+   * @public
+   * @param observer - StateObserver<ComputedValueType> to ingest value into
+   * @param ingestConfig - Configuration object
+   */
+  public computeAndIngest(observer: StateObserver<ComputedValueType>, ingestConfig: StateIngestConfigInterface, computeConfig: ComputeConfigInterface = {}) {
+    if (this.computeFunctionIsAsync) {
+      this.computeAsync(computeConfig).then((result) => {
+        observer.ingestValue(result, ingestConfig);
+      });
+    }
+    else {
+      const result = this.computeSync(computeConfig);
+      observer.ingestValue(result, ingestConfig);
+    }
   }
 
   /**
@@ -165,46 +255,19 @@ export class Computed<
   public async compute(
     config: ComputeConfigInterface = {}
   ): Promise<ComputedValueType> {
-    config = defineConfig(config, {
-      autodetect: this.config.autodetect,
-    });
-
-    // Start auto tracking of Observers on which the computeFunction might depend
-    if (config.autodetect) ComputedTracker.track();
-
-    const computedValue = this.computeFunction();
-
-    // Handle auto tracked Observers
-    if (config.autodetect) {
-      const foundDeps = ComputedTracker.getTrackedObservers();
-
-      // Clean up old dependencies
-      this.deps.forEach((observer) => {
-        if (
-          !foundDeps.includes(observer) &&
-          !this.hardCodedDeps.includes(observer)
-        ) {
-          this.deps.delete(observer);
-          observer.removeDependent(this.observers['value']);
-        }
-      });
-
-      // Make this Observer depend on the newly found dep Observers
-      foundDeps.forEach((observer) => {
-        if (!this.deps.has(observer)) {
-          this.deps.add(observer);
-          observer.addDependent(this.observers['value']);
-        }
-      });
+    if (this.computeFunctionIsAsync) {
+      return this.computeAsync(config);
     }
-
-    return computedValue;
+    else {
+      return this.computeSync(config);
+    }
   }
 }
 
-export type ComputeFunctionType<ComputedValueType = any> = () =>
-  | ComputedValueType
-  | Promise<ComputedValueType>;
+export type SyncComputeFunctionType<ComputedValueType = any> = () => ComputedValueType; 
+export type AsyncComputeFunctionType<ComputedValueType = any> = () => Promise<ComputedValueType>; 
+
+export type ComputeFunctionType<ComputedValueType = any> = SyncComputeFunctionType<ComputedValueType> | AsyncComputeFunctionType<ComputedValueType>;
 
 export interface CreateComputedConfigInterface<ComputedValueType = any>
   extends StateConfigInterface {

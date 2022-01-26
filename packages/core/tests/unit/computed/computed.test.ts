@@ -5,6 +5,8 @@ import {
   Observer,
   State,
   ComputedTracker,
+  createComputed,
+  createState,
 } from '../../../src';
 import * as Utils from '../../../src/utils';
 import { LogMock } from '../../helper/logMock';
@@ -110,10 +112,10 @@ describe('Computed Tests', () => {
     expect(computed._key).toBe('coolComputed');
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
-    expect(computed.initialStateValue).toBe('initialValue');
-    expect(computed._value).toBe('initialValue');
-    expect(computed.previousStateValue).toBe('initialValue');
-    expect(computed.nextStateValue).toBe('initialValue');
+    expect(computed.initialStateValue).toBe('computedValue'); // must be "computedValue" since the value was computed in the constructor with overwrite=true 
+    expect(computed._value).toBe('computedValue');
+    expect(computed.previousStateValue).toBe('computedValue');
+    expect(computed.nextStateValue).toBe('computedValue');
     expect(computed.observers['value']).toBeInstanceOf(StateObserver);
     expect(Array.from(computed.observers['value'].dependents)).toStrictEqual([
       dummyObserver1,
@@ -155,6 +157,25 @@ describe('Computed Tests', () => {
     expect(computed.sideEffects).toStrictEqual({});
   });
 
+  it('should synchronously update the computed value', () => {
+    const counter = createState(1, {
+      agileInstance: dummyAgile
+    });
+    const timesTwo = createComputed(() => {
+        return counter.value * 2;
+    }, {
+      agileInstance: dummyAgile
+    });
+
+    expect(counter.value).toBe(1);
+    expect(timesTwo.value).toBe(2);
+    
+    counter.set(3);
+
+    expect(counter.value).toBe(3);
+    expect(timesTwo.value).toBe(6);
+  });
+
   describe('Computed Function Tests', () => {
     let computed: Computed;
     const dummyComputeFunction = jest.fn(() => 'computedValue');
@@ -169,11 +190,11 @@ describe('Computed Tests', () => {
       });
 
       it('should ingest Computed Class into the Runtime (default config)', async () => {
-        computed.compute = jest.fn(() => Promise.resolve('jeff'));
+        (computed as any).computeSync = jest.fn(() => 'jeff');
 
         computed.recompute();
 
-        expect(computed.compute).toHaveBeenCalledWith({ autodetect: false });
+        expect((computed as any).computeSync).toHaveBeenCalledWith({ autodetect: false });
         await waitForExpect(() => {
           expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
             'jeff',
@@ -185,7 +206,7 @@ describe('Computed Tests', () => {
       });
 
       it('should ingest Computed Class into the Runtime (specific config)', async () => {
-        computed.compute = jest.fn(() => Promise.resolve('jeff'));
+        (computed as any).computeSync = jest.fn(() => 'jeff');
 
         computed.recompute({
           autodetect: true,
@@ -197,7 +218,7 @@ describe('Computed Tests', () => {
           key: 'jeff',
         });
 
-        expect(computed.compute).toHaveBeenCalledWith({ autodetect: true });
+        expect((computed as any).computeSync).toHaveBeenCalledWith({ autodetect: true });
         await waitForExpect(() => {
           expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
             'jeff',
