@@ -1,6 +1,10 @@
+ > ⚠️ **No longer actively maintained**. If there is more interest and people want to use this package, I will be happy to continue working on it. cheers
+ > 
+ > ❓ If you've any questions feel free to open a [discussions](https://github.com/agile-ts/agile/discussions).
+ 
  <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
 
-> Global State and Logic Library
+> 🎇 **Global State and Logic Library**
 
  <br />
 
