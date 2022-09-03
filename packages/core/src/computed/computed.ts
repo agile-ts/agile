@@ -17,7 +17,7 @@ export class Computed<
   public config: ComputedConfigInterface;
 
   // Caches whether the compute function is async
-  private isComuteFunctionAsync!: boolean;
+  public isComputeFunctionAsync!: boolean;
 
   // Function to compute the Computed Class value
   private _computeFunction!: ComputeFunctionType<ComputedValueType>;
@@ -29,7 +29,7 @@ export class Computed<
 
   // Helper property to check whether an unknown instance is a Computed,
   // without importing the Computed itself for using 'instanceof' (Treeshaking support)
-  public isComputed = true;
+  public readonly isComputed = true;
 
   /**
    * A Computed is an extension of the State Class
@@ -70,7 +70,7 @@ export class Computed<
 
     config = defineConfig(config, {
       computedDeps: [],
-      autodetect: !this.isComuteFunctionAsync,
+      autodetect: !this.isComputeFunctionAsync, // 'isComputeFunctionAsync' will be set by assigning 'computeFunction'
     });
     this.agileInstance = () => agileInstance;
     this.config = {
@@ -106,12 +106,14 @@ export class Computed<
    * Assigns a new compute function to the Computed State
    * and checks whether it's async.
    *
-   * @public
+   * To update the compute function properly use 'updateComputeFunction()'!
+   *
+   * @internal
    * @param value - New compute function.
    */
   public set computeFunction(value: ComputeFunctionType<ComputedValueType>) {
     this._computeFunction = value;
-    this.isComuteFunctionAsync = isAsyncFunction(value);
+    this.isComputeFunctionAsync = isAsyncFunction(value);
   }
 
   /**
@@ -180,10 +182,10 @@ export class Computed<
   public async compute(
     config: ComputeConfigInterface = {}
   ): Promise<ComputedValueType> {
-    if (config.autodetect && this.isComuteFunctionAsync) {
-      logCodeManager.log('19:00:01');
+    if (config.autodetect && this.isComputeFunctionAsync) {
+      logCodeManager.log('19:02:00');
     }
-    return this.isComuteFunctionAsync
+    return this.isComputeFunctionAsync
       ? this.computeAsync()
       : this.computeSync(config);
   }
@@ -191,14 +193,14 @@ export class Computed<
   /**
    * Recomputes the value and ingests it into the runtime.
    *
-   * @public
+   * @internal
    * @param config - Configuration object
    */
   public computeAndIngest(
     // https://www.reddit.com/r/learnjavascript/comments/q5rvux/pass_parent_config_object_directly_into_child/
     config: StateIngestConfigInterface & ComputeConfigInterface = {}
   ) {
-    if (this.isComuteFunctionAsync) {
+    if (this.isComputeFunctionAsync) {
       this.computeAsync().then((result) => {
         this.observers['value'].ingestValue(result, config);
       });
@@ -312,7 +314,7 @@ export interface CreateComputedConfigInterface<ComputedValueType = any>
    *
    * @default undefined
    */
-  initialValue?: ComputedValueType;
+  initialValue?: Awaited<ComputedValueType>; // https://stackoverflow.com/questions/48944552/typescript-how-to-unwrap-remove-promise-from-a-type
 }
 
 export interface ComputedConfigInterface {

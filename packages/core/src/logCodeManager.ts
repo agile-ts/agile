@@ -102,7 +102,7 @@ const logCodeMessages = {
   '18:03:00': "Failed to integrate Framework '${0}' into AgileTs '${1}'!",
 
   // Computed
-  '19:00:01': `Can't autodetect dependencies of async compute function!`,
+  '19:02:00': `Can't autodetect dependencies of async compute function!`,
 
   // Collection Persistent
   '1A:02:00': 'Failed to build unique Item StorageKey!',
