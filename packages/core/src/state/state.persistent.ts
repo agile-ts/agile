@@ -5,7 +5,7 @@ import {
   Persistent,
   PersistentKey,
 } from '../storages';
-import { EnhancedState } from './state.enhanced';
+import type { EnhancedState } from './state.enhanced';
 
 export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to

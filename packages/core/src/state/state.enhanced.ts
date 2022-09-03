@@ -9,7 +9,7 @@ import {
 } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
 import { State, StateConfigInterface, StateKey } from './state';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import { StateIngestConfigInterface } from './state.observer';
 import {
   CreateStatePersistentConfigInterface,

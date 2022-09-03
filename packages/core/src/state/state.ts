@@ -1,6 +1,6 @@
 import { copy, defineConfig, isFunction } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import { StateIngestConfigInterface, StateObserver } from './state.observer';
 import { Observer } from '../runtime';
 import { ComputedTracker } from '../computed/computed.tracker'; // Not imported directly from '../computed' due circular dependencies

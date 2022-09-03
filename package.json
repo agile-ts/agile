@@ -41,7 +41,8 @@
     "pack:react": "cd packages/react && yarn run prepare && yarn run pack",
     "pack:multieditor": "cd packages/multieditor && yarn run prepare && yarn run pack",
     "pack:api": "cd packages/api && yarn run prepare && yarn run pack",
-    "pack:event": "cd packages/event && yarn run prepare && yarn run pack"
+    "pack:event": "cd packages/event && yarn run prepare && yarn run pack",
+    "install:clean": "shx rm -rf yarn.lock && shx rm -rf node_modules && yarn install && lerna run install:clean"
   },
   "repository": {
     "type": "git",

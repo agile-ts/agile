@@ -1,14 +1,15 @@
 import { defineConfig, isAsyncFunction } from '@agile-ts/utils';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import { extractRelevantObservers } from '../utils';
 import {
   State,
   StateConfigInterface,
   StateIngestConfigInterface,
 } from '../state';
-import { Observer } from '../runtime';
+import type { Observer } from '../runtime';
 import { ComputedTracker } from './computed.tracker';
-import { Collection } from '../collection';
+import type { Collection } from '../collection';
+import { logCodeManager } from '../logCodeManager';
 
 export class Computed<
   ComputedValueType = any
@@ -16,7 +17,7 @@ export class Computed<
   public config: ComputedConfigInterface;
 
   // Caches whether the compute function is async
-  private computeFunctionIsAsync!: boolean;
+  private isComuteFunctionAsync!: boolean;
 
   // Function to compute the Computed Class value
   private _computeFunction!: ComputeFunctionType<ComputedValueType>;
@@ -54,6 +55,7 @@ export class Computed<
   ) {
     super(
       agileInstance,
+      // Assign inital value (if property set or not async)
       Object.prototype.hasOwnProperty.call(config, 'initialValue')
         ? config.initialValue
         : !isAsyncFunction(computeFunction)
@@ -68,7 +70,7 @@ export class Computed<
 
     config = defineConfig(config, {
       computedDeps: [],
-      autodetect: !this.computeFunctionIsAsync,
+      autodetect: !this.isComuteFunctionAsync,
     });
     this.agileInstance = () => agileInstance;
     this.config = {
@@ -109,14 +111,14 @@ export class Computed<
    */
   public set computeFunction(value: ComputeFunctionType<ComputedValueType>) {
     this._computeFunction = value;
-    this.computeFunctionIsAsync = isAsyncFunction(value);
+    this.isComuteFunctionAsync = isAsyncFunction(value);
   }
 
   /**
    * Synchronously computes and returns the new value of the Computed Class
    * and autodetects used dependencies in the compute function.
    *
-   * @public
+   * @internal
    * @param config - Configuration object
    */
   private computeSync(config: ComputeConfigInterface = {}): ComputedValueType {
@@ -160,6 +162,9 @@ export class Computed<
 
   /**
    * Asynchronously computes and returns the new value of the Computed Class.
+   * !! Since its async it can't autodetect used dependencies in the compute function.
+   *
+   * @internal
    */
   private async computeAsync(): Promise<ComputedValueType> {
     return this.computeFunction();
@@ -175,8 +180,32 @@ export class Computed<
   public async compute(
     config: ComputeConfigInterface = {}
   ): Promise<ComputedValueType> {
-    if (this.computeFunctionIsAsync) return this.computeAsync();
-    else return this.computeSync(config);
+    if (config.autodetect && this.isComuteFunctionAsync) {
+      logCodeManager.log('19:00:01');
+    }
+    return this.isComuteFunctionAsync
+      ? this.computeAsync()
+      : this.computeSync(config);
+  }
+
+  /**
+   * Recomputes the value and ingests it into the runtime.
+   *
+   * @public
+   * @param config - Configuration object
+   */
+  public computeAndIngest(
+    // https://www.reddit.com/r/learnjavascript/comments/q5rvux/pass_parent_config_object_directly_into_child/
+    config: StateIngestConfigInterface & ComputeConfigInterface = {}
+  ) {
+    if (this.isComuteFunctionAsync) {
+      this.computeAsync().then((result) => {
+        this.observers['value'].ingestValue(result, config);
+      });
+    } else {
+      const result = this.computeSync(config);
+      this.observers['value'].ingestValue(result, config);
+    }
   }
 
   /**
@@ -195,26 +224,6 @@ export class Computed<
     this.computeAndIngest(config);
 
     return this;
-  }
-
-  /**
-   * Recomputes the value and ingests it into the runtime.
-   *
-   * @public
-   * @param config - Configuration object
-   */
-  public computeAndIngest(
-    // https://www.reddit.com/r/learnjavascript/comments/q5rvux/pass_parent_config_object_directly_into_child/
-    config: StateIngestConfigInterface & ComputeConfigInterface = {}
-  ) {
-    if (this.computeFunctionIsAsync) {
-      this.computeAsync().then((result) => {
-        this.observers['value'].ingestValue(result, config);
-      });
-    } else {
-      const result = this.computeSync(config);
-      this.observers['value'].ingestValue(result, config);
-    }
   }
 
   /**

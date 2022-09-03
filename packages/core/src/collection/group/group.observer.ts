@@ -6,7 +6,7 @@ import {
   Observer,
   RuntimeJob,
 } from '../../runtime';
-import { Group } from './index';
+import type { Group } from './index';
 import { DefaultItem } from '../collection';
 import { logCodeManager } from '../../logCodeManager';
 

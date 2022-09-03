@@ -143,9 +143,7 @@ describe('StateObserver Tests', () => {
         "should call 'ingestValue' with computed value " +
           'if Observer belongs to a Computed State (default config)',
         async () => {
-          (dummyComputed as any).computeSync = jest.fn(() =>
-            'computedValue'
-          );
+          (dummyComputed as any).computeSync = jest.fn(() => 'computedValue');
 
           computedObserver.ingest();
 

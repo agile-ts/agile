@@ -109,10 +109,11 @@ describe('Computed Tests', () => {
     );
 
     // Check if State was called with correct parameters
+    // TODO make jest working again
     expect(computed._key).toBe('coolComputed');
     expect(computed.isSet).toBeFalsy();
     expect(computed.isPlaceholder).toBeFalsy();
-    expect(computed.initialStateValue).toBe('computedValue'); // must be "computedValue" since the value was computed in the constructor with overwrite=true 
+    expect(computed.initialStateValue).toBe('computedValue'); // "computedValue" since the compute method was synchronous
     expect(computed._value).toBe('computedValue');
     expect(computed.previousStateValue).toBe('computedValue');
     expect(computed.nextStateValue).toBe('computedValue');
@@ -159,17 +160,20 @@ describe('Computed Tests', () => {
 
   it('should synchronously update the computed value', () => {
     const counter = createState(1, {
-      agileInstance: dummyAgile
+      agileInstance: dummyAgile,
     });
-    const timesTwo = createComputed(() => {
+    const timesTwo = createComputed(
+      () => {
         return counter.value * 2;
-    }, {
-      agileInstance: dummyAgile
-    });
+      },
+      {
+        agileInstance: dummyAgile,
+      }
+    );
 
     expect(counter.value).toBe(1);
     expect(timesTwo.value).toBe(2);
-    
+
     counter.set(3);
 
     expect(counter.value).toBe(3);
@@ -194,7 +198,9 @@ describe('Computed Tests', () => {
 
         computed.recompute();
 
-        expect((computed as any).computeSync).toHaveBeenCalledWith({ autodetect: false });
+        expect((computed as any).computeSync).toHaveBeenCalledWith({
+          autodetect: false,
+        });
         await waitForExpect(() => {
           expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
             'jeff',
@@ -218,7 +224,9 @@ describe('Computed Tests', () => {
           key: 'jeff',
         });
 
-        expect((computed as any).computeSync).toHaveBeenCalledWith({ autodetect: true });
+        expect((computed as any).computeSync).toHaveBeenCalledWith({
+          autodetect: true,
+        });
         await waitForExpect(() => {
           expect(computed.observers['value'].ingestValue).toHaveBeenCalledWith(
             'jeff',

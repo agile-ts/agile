@@ -1,12 +1,12 @@
 import { defineConfig, notEqual } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import {
   SubscriptionContainer,
   CallbackSubscriptionContainer,
   ComponentSubscriptionContainer,
 } from './subscription';
-import { RuntimeJob } from './runtime.job';
+import type { RuntimeJob } from './runtime.job';
 
 export class Runtime {
   // Agile Instance the Runtime belongs to

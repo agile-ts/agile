@@ -1,5 +1,5 @@
 import { Collection, CreateCollectionConfig, DefaultItem } from '../collection';
-import { Agile } from '../../agile';
+import type { Agile } from '../../agile';
 import { shared } from '../../shared';
 
 /**

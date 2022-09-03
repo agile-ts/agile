@@ -52,7 +52,8 @@ export default function App() {
             id: FIELDS.size,
             name: `Field #${FIELDS.size + 1}`,
           });
-        }}>
+        }}
+      >
         Add Field
       </button>
     </div>
