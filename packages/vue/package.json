@@ -31,7 +31,7 @@
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
-    "release": "yarn run prepare",
+    "release:prepare": "yarn run build",
     "release:manual": "yarn run release && npm publish",
     "pack": "npm pack",
     "test": "jest",
