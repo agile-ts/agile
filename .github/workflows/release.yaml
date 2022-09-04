@@ -22,6 +22,10 @@ jobs:
       - name: ⏳ Install
         run: yarn install
 
+        # Build packages
+      - name: 🔨 Build Packages
+        run: yarn run build
+
         # Create Release Pull Request
       - name: 📤 Create Release Pull Request or Publish to NPM
         uses: changesets/action@master
