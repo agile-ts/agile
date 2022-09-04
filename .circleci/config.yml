@@ -1,19 +1,15 @@
 # Following this caching concept https://circleci.com/docs/2.0/persist-data/
+# https://circleci.com/docs/language-javascript
 
 version: 2.1
 
 orbs:
   node: circleci/node@5.0.2
 
-executors:
-  node-executor:
-    docker:
-      - image: circleci/node:16
-
 jobs:
 
   build:
-    executor: node-executor
+    executor: node/default
     steps:
       # Checkout Project from Github
       - checkout
@@ -31,9 +27,9 @@ jobs:
      #       # fallback to using the latest cache if no exact match is found
      #       - v1-dependencies-
 
-      - run:
-         name: ⏳ Install
-         command: yarn install
+#      - run:
+#         name: ⏳ Install
+#         command: yarn install
 
      # Not necessary because of auto caching of circleci/node@4.1.0
      # - save_cache:
