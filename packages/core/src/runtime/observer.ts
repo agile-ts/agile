@@ -1,9 +1,9 @@
 import { defineConfig, generateId } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
-import { Agile } from '../agile';
-import { SubscriptionContainer } from './subscription';
+import type { Agile } from '../agile';
+import type { SubscriptionContainer } from './subscription';
 import { CreateRuntimeJobConfigInterface, RuntimeJob } from './runtime.job';
-import { IngestConfigInterface } from './runtime';
+import type { IngestConfigInterface } from './runtime';
 
 export type ObserverKey = string | number;
 

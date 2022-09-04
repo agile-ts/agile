@@ -64,26 +64,5 @@ describe('Computed Index Tests', () => {
         }
       );
     });
-
-    it('should create Computed with a specified Agile Instance (specific config)', () => {
-      const agile = new Agile();
-      const computedConfig = {
-        key: 'jeff',
-        isPlaceholder: false,
-        computedDeps: ['dummyDep' as any],
-        autodetect: true,
-      };
-
-      const response = createComputed(computedFunction, {
-        ...computedConfig,
-        ...{ agileInstance: agile },
-      });
-
-      expect(response).toBeInstanceOf(Computed);
-      expect(ComputedMock).toHaveBeenCalledWith(agile, computedFunction, {
-        ...computedConfig,
-        agileInstance: agile, // Not required but passed for simplicity
-      });
-    });
   });
 });

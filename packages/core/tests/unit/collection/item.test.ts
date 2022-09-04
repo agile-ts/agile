@@ -276,9 +276,7 @@ describe('Item Tests', () => {
       it('should add rebuildGroupThatIncludeItemKey sideEffect to Item', () => {
         item.addRebuildGroupThatIncludeItemKeySideEffect('itemKey');
 
-        expect(
-          item.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(item.addSideEffect).toHaveBeenCalledWith(
           Item.updateGroupSideEffectKey,
           expect.any(Function),
           { weight: 100 }

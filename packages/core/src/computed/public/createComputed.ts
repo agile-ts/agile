@@ -5,7 +5,7 @@ import {
 } from '../computed';
 import { defineConfig } from '@agile-ts/utils';
 import { shared } from '../../shared';
-import { CreateComputedConfigInterfaceWithAgile } from './index';
+import { CreateComputedConfigInterfaceWithAgile } from './types';
 
 /**
  * Returns a newly created Computed.
