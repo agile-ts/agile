@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/proxytree",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -29,8 +29,8 @@
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
-    "release": "yarn run prepare",
-    "release:manual": "yarn run release && npm publish",
+    "release:prepare": "yarn run build",
+    "release:manual": "yarn run release:prepare && npm publish",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",

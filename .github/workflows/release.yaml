@@ -26,7 +26,7 @@ jobs:
       - name: 📤 Create Release Pull Request or Publish to NPM
         uses: changesets/action@master
         with:
-          publish: yarn release
+          publish: yarn release:prepare
           commit: Version Release
           title: Next Release
         env:

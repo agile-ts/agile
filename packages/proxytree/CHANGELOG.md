@@ -1,5 +1,19 @@
 # @agile-ts/proxytree
 
+## 0.0.10
+
+### Patch Changes
+
+- 71563a4: #### :bug: Bug Fix
+
+  - `core`
+    - [#220](https://github.com/agile-ts/agile/pull/220) synchronously recompute value after state change ([@leopf](https://github.com/leopf))
+
+  #### Committers: 2
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+  - [@leopf](https://github.com/leopf)
+
 ## 0.0.9
 
 ### Patch Changes

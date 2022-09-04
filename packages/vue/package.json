@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/vue",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -31,8 +31,8 @@
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
-    "release": "yarn run prepare",
-    "release:manual": "yarn run release && npm publish",
+    "release:prepare": "yarn run build",
+    "release:manual": "yarn run release:prepare && npm publish",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -45,7 +45,7 @@
     "vue": "^2.6.12"
   },
   "peerDependencies": {
-    "@agile-ts/core": "^0.2.7",
+    "@agile-ts/core": "^0.2.8",
     "vue": "^2.6.12"
   },
   "peerDependenciesMeta": {

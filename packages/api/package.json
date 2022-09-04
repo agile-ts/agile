@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/api",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -30,8 +30,8 @@
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
-    "release": "yarn run prepare",
-    "release:manual": "yarn run release && npm publish",
+    "release:prepare": "yarn run build",
+    "release:manual": "yarn run release:prepare && npm publish",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
@@ -42,7 +42,7 @@
     "@agile-ts/utils": "file:../utils"
   },
   "dependencies": {
-    "@agile-ts/utils": "^0.0.11"
+    "@agile-ts/utils": "^0.0.12"
   },
   "publishConfig": {
     "access": "public"
