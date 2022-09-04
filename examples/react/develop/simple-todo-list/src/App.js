@@ -30,7 +30,8 @@ const App = () => {
             method: 'unshift', // to add todo at the beginning of the Collection
           });
           setCurrentInput('');
-        }}>
+        }}
+      >
         Add
       </button>
       {todos.map((value) => (
@@ -41,7 +42,8 @@ const App = () => {
             onClick={() => {
               // Remove Todo at specific primary Key
               TODOS.remove(value.id).everywhere();
-            }}>
+            }}
+          >
             Remove
           </button>
         </div>

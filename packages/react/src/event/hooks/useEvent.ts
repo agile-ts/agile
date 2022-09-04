@@ -1,5 +1,5 @@
 import type { Event, EventCallbackFunction } from '@agile-ts/event'; // When only importing the types the "Can't resolve '@agile-ts/event'" error doesn't occur
-import { useIsomorphicLayoutEffect } from '../../general';
+import { useIsomorphicLayoutEffect } from '../../utils';
 import { eventPackage } from '../eventPackage';
 import { logCodeManager } from '../../logCodeManager';
 import { BaseAgileHookConfigInterface, useBaseAgile } from '../../core';

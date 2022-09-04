@@ -3,36 +3,36 @@
 
 
 "@agile-ts/api@file:.yalc/@agile-ts/api":
-  version "0.0.24"
+  version "0.0.25"
   dependencies:
-    "@agile-ts/utils" "^0.0.10"
+    "@agile-ts/utils" "^0.0.11"
 
 "@agile-ts/core@file:.yalc/@agile-ts/core":
-  version "0.2.6"
+  version "0.2.7"
   dependencies:
-    "@agile-ts/utils" "^0.0.10"
+    "@agile-ts/utils" "^0.0.11"
 
 "@agile-ts/event@file:.yalc/@agile-ts/event":
-  version "0.0.13"
+  version "0.0.14"
 
 "@agile-ts/logger@file:.yalc/@agile-ts/logger":
-  version "0.0.10"
+  version "0.0.11"
   dependencies:
-    "@agile-ts/utils" "^0.0.10"
+    "@agile-ts/utils" "^0.0.11"
 
 "@agile-ts/multieditor@file:.yalc/@agile-ts/multieditor":
-  version "0.0.23"
+  version "0.0.24"
 
 "@agile-ts/proxytree@file:.yalc/@agile-ts/proxytree":
-  version "0.0.8"
+  version "0.0.9"
 
 "@agile-ts/react@file:.yalc/@agile-ts/react":
-  version "0.2.2"
+  version "0.2.3"
 
-"@agile-ts/utils@^0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.10.tgz#5eb2d7b7faefc00c416165ad93c79237e8448bbd"
-  integrity sha512-eVJZS60H8HaD8atTfswObihdDxjcxNlaoHk8Crmz85KOrdIMBMdrGx41p+Zf15s+dSfal1gbgM2In3bw4zjSww==
+"@agile-ts/utils@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@agile-ts/utils/-/utils-0.0.11.tgz#3680407e92528f0e372af28983872c20b80b395c"
+  integrity sha512-tbrlXbo3ukoODodl4Og99BG/glhk9NUO09LJ7qdQ25/coL13lNzQQix9Z5IFohEIeJ71Y4ZIGzJmmui29FxTKA==
 
 "@babel/code-frame@7.8.3":
   version "7.8.3"

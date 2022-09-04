@@ -102,6 +102,7 @@ const logCodeMessages = {
   '18:03:00': "Failed to integrate Framework '${0}' into AgileTs '${1}'!",
 
   // Computed
+  '19:02:00': `Can't autodetect dependencies of async compute function!`,
 
   // Collection Persistent
   '1A:02:00': 'Failed to build unique Item StorageKey!',
@@ -257,9 +258,12 @@ export class LogCodeManager<LogCodeMessagesType extends Object = Object> {
  * @param logCodeManager - LogCodeManager to create an extension from.
  * @param additionalLogs - Log messages to be added to the created LogCodeManager extensions.
  */
-export function assignAdditionalLogs<NewLogCodeMessages, OldLogCodeMessages>(
+export function assignAdditionalLogs<
+  NewLogCodeMessages extends Object,
+  OldLogCodeMessages extends Object
+>(
   logCodeManager: LogCodeManager<OldLogCodeMessages>,
-  additionalLogs: { [key: string]: string }
+  additionalLogs: Record<string, string>
 ): LogCodeManager<NewLogCodeMessages> {
   const copiedLogCodeManager = new LogCodeManager(
     {

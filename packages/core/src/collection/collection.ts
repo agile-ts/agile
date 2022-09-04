@@ -7,9 +7,9 @@ import {
   normalizeArray,
 } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import { PatchOptionConfigInterface } from '../state';
-import { ComputedTracker } from '../computed';
+import { ComputedTracker } from '../computed/computed.tracker'; // Not imported directly from '../computed' due circular dependencies
 import { Item } from './item';
 import { SelectorConfigInterface, Selector, SelectorKey } from './selector';
 import {
@@ -20,7 +20,7 @@ import {
   TrackedChangeMethod,
 } from './group';
 import { GroupIngestConfigInterface } from './group/group.observer';
-import { CreatePersistentConfigInterface, StorageKey } from '../storages';
+import { CreatePersistentConfigInterface } from '../storages';
 import { CollectionPersistent } from './collection.persistent';
 
 export class Collection<DataType extends DefaultItem = DefaultItem> {
@@ -1181,9 +1181,7 @@ export class Collection<DataType extends DefaultItem = DefaultItem> {
    * @public
    * @param itemKeys - Item/s with identifier/s to be removed.
    */
-  public remove(
-    itemKeys: ItemKey | Array<ItemKey>
-  ): {
+  public remove(itemKeys: ItemKey | Array<ItemKey>): {
     fromGroups: (groups: Array<ItemKey> | ItemKey) => Collection<DataType>;
     everywhere: (config?: RemoveItemsConfigInterface) => Collection<DataType>;
   } {
@@ -1518,13 +1516,12 @@ export interface CreateCollectionConfigImpl<
   initialData?: Array<DataType>;
 }
 
-export type CreateCollectionConfig<
-  DataType extends DefaultItem = DefaultItem
-> =
-  | CreateCollectionConfigImpl<DataType>
-  | ((
-      collection: Collection<DataType>
-    ) => CreateCollectionConfigImpl<DataType>);
+export type CreateCollectionConfig<DataType extends DefaultItem = DefaultItem> =
+
+    | CreateCollectionConfigImpl<DataType>
+    | ((
+        collection: Collection<DataType>
+      ) => CreateCollectionConfigImpl<DataType>);
 
 export interface CollectionConfigInterface {
   /**
@@ -1542,8 +1539,9 @@ export interface CollectionConfigInterface {
   defaultGroupKey: ItemKey;
 }
 
-export interface CollectConfigInterface<DataType = any>
-  extends AssignDataConfigInterface {
+export interface CollectConfigInterface<
+  DataType extends DefaultItem = DefaultItem
+> extends AssignDataConfigInterface {
   /**
    * In which way the collected data should be added to the Collection.
    * - 'push' =  at the end

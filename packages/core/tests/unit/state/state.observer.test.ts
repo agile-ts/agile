@@ -101,6 +101,7 @@ describe('StateObserver Tests', () => {
 
         stateObserver.ingestValue = jest.fn();
         computedObserver.ingestValue = jest.fn();
+        dummyComputed.computeAndIngest = jest.fn();
       });
 
       it('should call ingestValue with nextStateValue (default config)', () => {
@@ -140,21 +141,41 @@ describe('StateObserver Tests', () => {
       });
 
       it(
-        "should call 'ingestValue' with computed value " +
+        "should call 'computeAndIngest' " +
           'if Observer belongs to a Computed State (default config)',
         async () => {
-          dummyComputed.compute = jest.fn(() =>
-            Promise.resolve('computedValue')
-          );
-
           computedObserver.ingest();
 
-          expect(dummyComputed.compute).toHaveBeenCalled();
-          await waitForExpect(() => {
-            expect(computedObserver.ingestValue).toHaveBeenCalledWith(
-              'computedValue',
-              {}
-            );
+          expect(dummyComputed.computeAndIngest).toHaveBeenCalledWith({});
+        }
+      );
+
+      it(
+        "should call 'computeAndIngest' " +
+          'if Observer belongs to a Computed State (specific config)',
+        async () => {
+          computedObserver.ingest({
+            force: true,
+            key: 'coolKey',
+            storage: false,
+            sideEffects: {
+              enabled: false,
+            },
+            background: true,
+            perform: false,
+            maxTriesToUpdate: 5,
+          });
+
+          expect(dummyComputed.computeAndIngest).toHaveBeenCalledWith({
+            force: true,
+            key: 'coolKey',
+            storage: false,
+            sideEffects: {
+              enabled: false,
+            },
+            background: true,
+            perform: false,
+            maxTriesToUpdate: 5,
           });
         }
       );

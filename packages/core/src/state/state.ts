@@ -1,6 +1,6 @@
 import { copy, defineConfig, isFunction } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import { StateIngestConfigInterface, StateObserver } from './state.observer';
 import { Observer } from '../runtime';
 import { ComputedTracker } from '../computed/computed.tracker'; // Not imported directly from '../computed' due circular dependencies
@@ -74,7 +74,7 @@ export class State<ValueType = any> {
 
   /**
    * Assigns a new value to the State
-   * and rerenders all subscribed Components.
+   * and re-renders all subscribed Components.
    *
    * [Learn more..](https://agile-ts.org/docs/core/state/properties#value)
    *

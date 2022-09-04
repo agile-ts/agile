@@ -851,9 +851,7 @@ describe('CollectionPersistent Tests', () => {
       it("shouldn't add rebuild Storage side effect to the default Group", () => {
         collectionPersistent.setupSideEffects();
 
-        expect(
-          dummyDefaultGroup.addSideEffect
-        ).toHaveBeenCalledWith(
+        expect(dummyDefaultGroup.addSideEffect).toHaveBeenCalledWith(
           CollectionPersistent.defaultGroupSideEffectKey,
           expect.any(Function),
           { weight: 0 }
