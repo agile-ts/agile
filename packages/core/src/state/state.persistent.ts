@@ -1,11 +1,11 @@
-import { defineConfig } from '@agile-ts/utils';
+import { copy, defineConfig } from '@agile-ts/utils';
 import {
   CreatePersistentConfigInterface,
   getSharedStorageManager,
   Persistent,
   PersistentKey,
 } from '../storages';
-import { EnhancedState } from './state.enhanced';
+import type { EnhancedState } from './state.enhanced';
 
 export class StatePersistent<ValueType = any> extends Persistent {
   // State the Persistent belongs to
@@ -27,7 +27,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
    */
   constructor(
     state: EnhancedState<ValueType>,
-    config: CreateStatePersistentConfigInterface = {}
+    config: CreateStatePersistentConfigInterface<ValueType> = {}
   ) {
     super(state.agileInstance(), {
       loadValue: false,
@@ -203,7 +203,7 @@ export class StatePersistent<ValueType = any> extends Persistent {
       getSharedStorageManager()?.set(
         storageItemKey,
         this.onSave != null
-          ? this.onSave(this.state().getPersistableValue())
+          ? this.onSave(copy(this.state().getPersistableValue()))
           : this.state().getPersistableValue(),
         this.storageKeys
       );

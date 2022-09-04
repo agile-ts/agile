@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/utils",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -24,7 +24,6 @@
   },
   "scripts": {
     "build": "shx rm -rf dist && rollup --c rollup.config.js",
-    "prepare": "yarn run build",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",

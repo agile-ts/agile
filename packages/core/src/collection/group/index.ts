@@ -7,10 +7,10 @@ import {
   StateObserver,
   StateObserversInterface,
 } from '../../state';
-import { Collection, DefaultItem, ItemKey } from '../collection';
+import type { Collection, DefaultItem, ItemKey } from '../collection';
 import { GroupIngestConfigInterface, GroupObserver } from './group.observer';
-import { ComputedTracker } from '../../computed';
-import { Item } from '../item';
+import { ComputedTracker } from '../../computed/computed.tracker'; // Not imported directly from '../computed' due circular dependencies
+import type { Item } from '../item';
 import { CollectionPersistent } from '../collection.persistent';
 
 export class Group<
@@ -315,7 +315,9 @@ export class Group<
    * @public
    * @param config - Configuration object
    */
-  public persist(config: GroupPersistConfigInterface = {}): this {
+  public persist(
+    config: GroupPersistConfigInterface<Array<ItemKey>> = {}
+  ): this {
     config = defineConfig(config, {
       key: this._key,
       followCollectionPersistKeyPattern: true,
@@ -430,8 +432,10 @@ export class Group<
 
 export type GroupKey = string | number;
 
-export interface GroupObservers<ValueType = any, DataType = any>
-  extends StateObserversInterface<ValueType> {
+export interface GroupObservers<
+  ValueType = any,
+  DataType extends DefaultItem = any
+> extends StateObserversInterface<ValueType> {
   /**
    * Observer responsible for the output of the Group.
    */
@@ -480,8 +484,8 @@ export interface GroupConfigInterface {
   isPlaceholder?: boolean;
 }
 
-export interface GroupPersistConfigInterface
-  extends CreateStatePersistentConfigInterface {
+export interface GroupPersistConfigInterface<ValueType = any>
+  extends CreateStatePersistentConfigInterface<ValueType> {
   /**
    * Whether to format the specified Storage key following the Collection Group Storage key pattern.
    * `_${collectionKey}_group_${groupKey}`

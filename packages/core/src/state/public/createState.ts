@@ -1,6 +1,6 @@
 import { EnhancedState } from '../state.enhanced';
 import { createEnhancedState } from './createEnhancedState';
-import { CreateStateConfigInterfaceWithAgile } from './index';
+import { CreateStateConfigInterfaceWithAgile } from './types';
 
 /**
  * Returns a newly created enhanced State.

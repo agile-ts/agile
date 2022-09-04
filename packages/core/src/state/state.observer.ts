@@ -19,6 +19,7 @@ import {
 } from './state.runtime.job';
 import { SideEffectInterface, State } from './state';
 import { logCodeManager } from '../logCodeManager';
+import type { Computed } from '../computed';
 
 export class StateObserver<ValueType = any> extends Observer<ValueType> {
   // State the Observer belongs to
@@ -62,12 +63,11 @@ export class StateObserver<ValueType = any> extends Observer<ValueType> {
    * @param config - Configuration object
    */
   public ingest(config: StateIngestConfigInterface = {}): void {
-    const state = this.state() as any;
+    const state = this.state();
 
-    if (state.isComputed) {
-      state.compute().then((result) => {
-        this.ingestValue(result, config);
-      });
+    // Note: "state instanceof Computed" results in circular dependency issue (https://stackoverflow.com/questions/46703364/why-does-instanceof-in-typescript-give-me-the-error-foo-only-refers-to-a-ty)
+    if (state['isComputed']) {
+      (state as Computed).computeAndIngest(config);
     } else {
       this.ingestValue(state.nextStateValue, config);
     }
@@ -151,7 +151,7 @@ export class StateObserver<ValueType = any> extends Observer<ValueType> {
     this.sideEffects(job);
 
     // Assign new public value to the Observer (value used by the Integrations)
-    job.observer.previousValue = Object.freeze(copy(observer.value));
+    job.observer.previousValue = copy(observer.value); // Object.freeze(copy(observer.value)); // Not freezing because it leads to issues when working with classes
     job.observer.value = copy(state._value); // Object.freeze(copy(state._value)); // Not freezing because of 'useProxy' hook
   }
 

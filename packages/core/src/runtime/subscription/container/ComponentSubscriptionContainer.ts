@@ -2,7 +2,7 @@ import {
   SubscriptionContainer,
   SubscriptionContainerConfigInterface,
 } from './SubscriptionContainer';
-import { Observer } from '../../observer';
+import type { Observer } from '../../observer';
 
 export class ComponentSubscriptionContainer<
   C = any

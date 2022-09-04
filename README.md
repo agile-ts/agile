@@ -1,8 +1,12 @@
- > ⚠️ **No longer actively maintained**. If there is more interest and people want to use this package, I will be happy to continue working on it. cheers
- > 
- > ❓ If you've any questions feel free to open a [discussions](https://github.com/agile-ts/agile/discussions).
- 
- <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
+> ⚠️ **No longer actively maintained**. 
+> In case there will be a higher demand and more known bugs in the future, 
+> I will be happy to continue improving this project. 
+> But as for now its stable and can be used in any sort of project.
+> In case you face any problem feel free open an [issue](https://github.com/agile-ts/agile/issues).
+>
+> ❓ If you've any questions, don't hesitate to start a [discussion](https://github.com/agile-ts/agile/discussions).
+
+<img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
 
 > 🎇 **Global State and Logic Library**
 
@@ -248,3 +252,6 @@ To find out more about contributing, check out the [CONTRIBUTING.md](https://git
 
 AgileTs is inspired by [MVVM Libraries](https://de.wikipedia.org/wiki/Model_View_ViewModel) 
 like [MobX](https://mobx.js.org/README.html) and [PulseJs](https://github.com/pulse-framework/pulse).
+
+### 🕐 Time spent building this project
+[![wakatime](https://wakatime.com/badge/user/aa5a8ce7-1c57-4f26-a159-ea57ec5ea7c1/project/6d1a7308-89b1-4e95-9623-64c0c6116d0a.svg)](https://wakatime.com/badge/user/aa5a8ce7-1c57-4f26-a159-ea57ec5ea7c1/project/6d1a7308-89b1-4e95-9623-64c0c6116d0a)

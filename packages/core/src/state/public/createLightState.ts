@@ -1,7 +1,7 @@
 import { defineConfig } from '@agile-ts/utils';
 import { shared } from '../../shared';
 import { State } from '../state';
-import { CreateStateConfigInterfaceWithAgile } from './index';
+import { CreateStateConfigInterfaceWithAgile } from './types';
 
 /**
  * Returns a newly created State.

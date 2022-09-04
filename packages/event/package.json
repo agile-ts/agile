@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/event",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -25,7 +25,6 @@
   },
   "scripts": {
     "build": "shx rm -rf dist && rollup --c rollup.config.js",
-    "prepare": "yarn run build",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
@@ -45,7 +44,7 @@
   },
   "peerDependencies": {
     "react": "^16.13.1",
-    "@agile-ts/core": "^0.2.7"
+    "@agile-ts/core": "^0.2.8"
   },
   "publishConfig": {
     "access": "public"

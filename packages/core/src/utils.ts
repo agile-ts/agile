@@ -1,6 +1,6 @@
 import { normalizeArray } from '@agile-ts/utils';
 import { logCodeManager } from './logCodeManager';
-import { Observer } from './runtime';
+import { Observer } from './runtime/observer'; // Not imported directly from '../runtime' due circular dependencies
 
 /**
  * Extracts all Observers from the specified Instances
