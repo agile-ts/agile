@@ -17,7 +17,6 @@
   "syncDir": "dist",
   "scripts": {
     "build": "lerna run build",
-    "prepare": "lerna run prepare",
     "changelog": "lerna-changelog",
     "bootstrap": "lerna bootstrap",
     "watch:core": "cd packages/core && yarn run watch",

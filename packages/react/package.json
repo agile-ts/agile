@@ -54,7 +54,6 @@
   },
   "scripts": {
     "build": "shx rm -rf dist && rollup --c rollup.config.js",
-    "prepare": "yarn run build",
     "dev:publish": "yalc publish",
     "dev:push": "yalc push",
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
