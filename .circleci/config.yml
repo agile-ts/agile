@@ -9,7 +9,7 @@ orbs:
 jobs:
 
   build:
-    executor: node/default
+    executor: node/default # Docker environment in what to execute the steps
     steps:
       # Checkout Project from Github
       - checkout
@@ -51,7 +51,7 @@ jobs:
           paths: [ ./* ]
 
   test:
-    executor: node-executor
+    executor: node/default
     steps:
       # https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
       - attach_workspace:
@@ -66,7 +66,7 @@ jobs:
           command: yarn run test --runInBand # Tests somehow only get executed with the '--runInBand' Flag
 
   test-coverage:
-    executor: node-executor
+    executor: node/default
     steps:
       # https://circleci.com/docs/2.0/configuration-reference/#attach_workspace
       - attach_workspace:
