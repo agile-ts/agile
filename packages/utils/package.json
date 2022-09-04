@@ -29,7 +29,7 @@
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
     "release:prepare": "yarn run build",
-    "release:manual": "yarn run release && npm publish",
+    "release:manual": "yarn run release:prepare && npm publish",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",

@@ -1,6 +1,6 @@
 {
   "name": "@agile-ts/core",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "author": "BennoDev",
   "license": "MIT",
   "homepage": "https://agile-ts.org/",
@@ -42,7 +42,7 @@
     "watch:push": "tsc-watch --onSuccess \"yarn run dev:push\"",
     "watch": "shx rm -rf dist && tsc -w",
     "release:prepare": "node ./scripts/prepublish.js && yarn run build",
-    "release:manual": "yarn run release && npm publish && git checkout README.md",
+    "release:manual": "yarn run release:prepare && npm publish && git checkout README.md",
     "pack": "npm pack",
     "test": "jest",
     "test:coverage": "jest --coverage",
