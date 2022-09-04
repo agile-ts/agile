@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.0.15
+
+### Patch Changes
+
+- 71563a4: #### :bug: Bug Fix
+
+  - `core`
+    - [#220](https://github.com/agile-ts/agile/pull/220) synchronously recompute value after state change ([@leopf](https://github.com/leopf))
+
+  #### Committers: 2
+
+  - BennoDev ([@bennodev19](https://github.com/bennodev19))
+  - [@leopf](https://github.com/leopf)
+
+- Updated dependencies [71563a4]
+  - @agile-ts/core@0.2.8
+
 ## 0.0.14
 
 ### Patch Changes
