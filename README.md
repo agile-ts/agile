@@ -4,11 +4,11 @@
 > But as for now its stable and can be used in any sort of project.
 > In case you face any problem feel free open an [issue](https://github.com/agile-ts/agile/issues).
 >
-> ❓ If you've any questions feel free to start a [discussions](https://github.com/agile-ts/agile/discussions). 
+> ❓ If you've any questions, don't hesitate to start a [discussion](https://github.com/agile-ts/agile/discussions).
 
 <img src="https://raw.githubusercontent.com/agile-ts/agile/master/static/header_background.png" alt="AgileTs">
 
-> Global State and Logic Library
+> 🎇 **Global State and Logic Library**
 
  <br />
 
