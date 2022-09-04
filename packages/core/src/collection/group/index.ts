@@ -7,10 +7,10 @@ import {
   StateObserver,
   StateObserversInterface,
 } from '../../state';
-import { Collection, DefaultItem, ItemKey } from '../collection';
+import type { Collection, DefaultItem, ItemKey } from '../collection';
 import { GroupIngestConfigInterface, GroupObserver } from './group.observer';
-import { ComputedTracker } from '../../computed';
-import { Item } from '../item';
+import { ComputedTracker } from '../../computed/computed.tracker'; // Not imported directly from '../computed' due circular dependencies
+import type { Item } from '../item';
 import { CollectionPersistent } from '../collection.persistent';
 
 export class Group<
@@ -432,8 +432,10 @@ export class Group<
 
 export type GroupKey = string | number;
 
-export interface GroupObservers<ValueType = any, DataType = any>
-  extends StateObserversInterface<ValueType> {
+export interface GroupObservers<
+  ValueType = any,
+  DataType extends DefaultItem = any
+> extends StateObserversInterface<ValueType> {
   /**
    * Observer responsible for the output of the Group.
    */

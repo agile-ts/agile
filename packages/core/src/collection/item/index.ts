@@ -5,8 +5,8 @@ import {
   StateKey,
   StateRuntimeJobConfigInterface,
 } from '../../state';
-import { Collection, DefaultItem } from '../collection';
-import { SelectorKey } from '../selector';
+import type { Collection, DefaultItem } from '../collection';
+import type { SelectorKey } from '../selector';
 import { CollectionPersistent } from '../collection.persistent';
 
 export class Item<

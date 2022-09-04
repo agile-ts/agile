@@ -273,7 +273,7 @@ export function createArrayFromObject<P = any>(object: {
 export function clone<T = any>(instance: T): T {
   // Clone Class
   const objectCopy: T = Object.create(Object.getPrototypeOf(instance));
-  const objectClone = Object.assign(objectCopy, instance);
+  const objectClone = Object.assign(objectCopy as any, instance);
 
   // Copy Properties of Class to remove flat references
   for (const key in objectClone) objectClone[key] = copy(objectClone[key]);

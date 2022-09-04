@@ -4,7 +4,7 @@ import {
   RuntimeJobConfigInterface,
   RuntimeJobKey,
 } from '../runtime';
-import { StateObserver } from './state.observer';
+import type { StateObserver } from './state.observer';
 
 export class StateRuntimeJob extends RuntimeJob<
   StateObserver,

@@ -1,6 +1,6 @@
 import { defineConfig, notEqual } from '@agile-ts/utils';
 import { logCodeManager } from '../logCodeManager';
-import { Agile } from '../agile';
+import type { Agile } from '../agile';
 import { Persistent } from './persistent';
 import { Storage, StorageItemKey, StorageKey } from './storage';
 
