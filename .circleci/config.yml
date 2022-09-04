@@ -3,12 +3,12 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4.1.0
+  node: circleci/node@5.0.2
 
 executors:
   node-executor:
     docker:
-      - image: circleci/node:14
+      - image: circleci/node:16.16
 
 jobs:
 
