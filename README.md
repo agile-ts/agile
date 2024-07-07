@@ -1,8 +1,8 @@
-> ⚠️ **No longer actively maintained**. 
-> In case there will be a higher demand and more known bugs in the future, 
-> I will be happy to continue improving this project. 
-> But as for now its stable and can be used in any sort of project.
-> In case you face any problem feel free open an [issue](https://github.com/agile-ts/agile/issues).
+> ⚠️ **No longer actively maintained**.
+>
+> Check out [`feature-state`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-state)! It offers similar functionality to AgileTs but is significantly more lightweight. I've incorporated my learnings over the years, including insights from AgileTs, to create this new state management library, embracing the principle that the best code is no code :)
+>
+> 👉 If you face any problem feel free open an [issue](https://github.com/agile-ts/agile/issues).
 >
 > ❓ If you've any questions, don't hesitate to start a [discussion](https://github.com/agile-ts/agile/discussions).
 
